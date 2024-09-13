@@ -22,6 +22,11 @@ public class GraphConfig {
     public int placeKey = Keyboard.KEY_F;
 
     @Expose
+    @ConfigOption(name = "Toggle Ghost Position", desc = "Creates or removes the Ghost Position. This helps editing nodes tht are in the air.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_F)
+    public int toggleGhostPosition = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = -98) // Middle Mouse
     public int selectKey = -98;
@@ -37,7 +42,7 @@ public class GraphConfig {
     public int exitKey = Keyboard.KEY_HOME;
 
     @Expose
-    @ConfigOption(name = "Edit Key", desc = "While holding the Key, edit the position of the active node with the minecraft movement controls.")
+    @ConfigOption(name = "Edit Key", desc = "While holding the Key, edit the position of the active node or the selection block with the minecraft movement controls.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_TAB)
     public int editKey = Keyboard.KEY_TAB;
 
@@ -75,6 +80,16 @@ public class GraphConfig {
     @ConfigOption(name = "Tutorial Key", desc = "Toggle the tutorial mode. In this mode, you will get feedback for everything you do.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_K)
     public int tutorialKey = Keyboard.KEY_K;
+
+    @Expose
+    @ConfigOption(name = "Split Key", desc = "Key for splitting an edge that is between the active and the closed node.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int splitKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int dissolveKey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")

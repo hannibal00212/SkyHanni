@@ -23,10 +23,14 @@ public class TitleAndFooterConfig {
     public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
 
     @Expose
-    @ConfigOption(name = "Hypixel's Title Animation", desc = "Will overwrite the custom title with Hypixel's title animation." +
-        "\nWill also include \"COOP\" if you are in a coop.")
+    @ConfigOption(name = "Use Custom Title", desc = "Use a custom title instead of the default Hypixel title.")
     @ConfigEditorBoolean
-    public boolean useHypixelTitleAnimation = false;
+    public boolean useCustomTitle = true;
+
+    @Expose
+    @ConfigOption(name = "Use Custom Title Outside SkyBlock", desc = "Use a custom title outside of SkyBlock.")
+    @ConfigEditorBoolean
+    public boolean useCustomTitleOutsideSkyBlock = false;
 
     @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard." +

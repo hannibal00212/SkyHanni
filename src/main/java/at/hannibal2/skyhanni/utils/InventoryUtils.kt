@@ -54,7 +54,10 @@ object InventoryUtils {
     fun getItemsInHotbar() =
         getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
-    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
+    fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
+        countItemsInLowerInventory(predicate) > 0
+
+    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean): Int =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
     fun inStorage() = openInventoryName().let {

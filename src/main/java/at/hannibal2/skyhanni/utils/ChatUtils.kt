@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.url
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -82,7 +83,7 @@ object ChatUtils {
     }
 
     fun chat(message: IChatComponent): Boolean {
-        val formattedMessage = message.formattedText
+        val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()
@@ -255,5 +256,21 @@ object ChatUtils {
             it.color = color.toChatFormatting()
         }
         return this
+    }
+
+
+    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+        ChatUtils.clickableChat(
+            "$message\n§e[CLICK to $actionName or disable this feature]",
+            onClick = {
+                if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
+                    option.jumpToEditor()
+                } else {
+                    action()
+                }
+            },
+            hover = "§eClick to $actionName!\n" +
+                "§eShift-Click or Control-Click to disable this feature!",
+        )
     }
 }

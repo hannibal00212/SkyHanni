@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -80,7 +81,7 @@ object NonGodPotEffectDisplay {
 
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
-        "§7You have §e(?<name>\\d+) §7non-god effects\\."
+        "§7You have §e(?<name>\\d+) §7non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
@@ -181,7 +182,19 @@ object NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        update()
+        if (config.nonGodPotEffectDisplay) update()
+
+        val effectWarning = config.expireWarning
+        val effectSound = config.expireSound
+
+        if (!effectWarning && !effectSound) return
+
+        effectDuration.sorted().forEach { (effect, time) ->
+            if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
+
+            if (effectWarning) LorenzUtils.sendTitle(effect.tabListName, 3.seconds)
+            if (effectSound) repeat(5) { playPlingSound() }
+        }
     }
 
     @SubscribeEvent
@@ -199,22 +212,18 @@ object NonGodPotEffectDisplay {
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
-                    if (line.contains("Remaining") &&
-                        line != "§7Time Remaining: §aCompleted!" &&
-                        !line.contains("Remaining Uses")
-                    ) {
-                        val duration = try {
-                            TimeUtils.getDuration(line.split("§f")[1])
-                        } catch (e: IndexOutOfBoundsException) {
-                            ErrorManager.logErrorWithData(
-                                e, "Error while reading Non God-Potion effects from tab list",
-                                "line" to line
-                            )
-                            continue
-                        }
-                        effectDuration[effect] = Timer(duration)
-                        update()
+                    if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
+                    val duration = try {
+                        TimeUtils.getDuration(line.split("§f")[1])
+                    } catch (e: IndexOutOfBoundsException) {
+                        ErrorManager.logErrorWithData(
+                            e, "Error while reading Non God-Potion effects from tab list",
+                            "line" to line,
+                        )
+                        continue
                     }
+                    effectDuration[effect] = Timer(duration)
+                    update()
                 }
             }
         }
@@ -258,13 +267,13 @@ object NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftAPI.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,
             extraSpace = 3,
-            posLabel = "Non God Pot Effects"
+            posLabel = "Non God Pot Effects",
         )
     }
 
@@ -275,6 +284,5 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 }

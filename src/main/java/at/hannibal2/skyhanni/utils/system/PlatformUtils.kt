@@ -11,9 +11,7 @@ import net.minecraftforge.fml.common.ModContainer
 object PlatformUtils {
 
     private val modPackages: Map<String, ModContainer> by lazy {
-        Loader.instance().modList
-            .flatMap { mod -> mod.ownedPackages.map { it to mod } }
-            .toMap()
+        Loader.instance().modList.flatMap { mod -> mod.ownedPackages.map { it to mod } }.toMap()
     }
 
     val isDevEnvironment: Boolean by lazy {

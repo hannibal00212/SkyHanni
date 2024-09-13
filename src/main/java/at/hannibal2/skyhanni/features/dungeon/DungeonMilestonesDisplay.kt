@@ -27,7 +27,7 @@ object DungeonMilestonesDisplay {
     private var display = ""
     private var currentMilestone = 0
     private var timeReached = SimpleTimeMark.farPast()
-    var colour = ""
+    var color = ""
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -54,7 +54,7 @@ object DungeonMilestonesDisplay {
             timeReached = SimpleTimeMark.now()
         }
 
-        colour = when (currentMilestone) {
+        color = when (currentMilestone) {
             0, 1 -> "§c"
             2 -> "§e"
             else -> "§a"
@@ -79,7 +79,7 @@ object DungeonMilestonesDisplay {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
-            colour + display,
+            color + display,
             posLabel = "Dungeon Milestone"
         )
     }

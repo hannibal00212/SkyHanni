@@ -74,10 +74,12 @@ object ErrorManager {
             errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
-        ChatUtils.chat(errorMessage?.let {
-            OSUtils.copyToClipboard(it)
-            "$name copied into the clipboard, please report it on the SkyHanni discord!"
-        } ?: "Error id not found!")
+        ChatUtils.chat(
+            errorMessage?.let {
+                OSUtils.copyToClipboard(it)
+                "$name copied into the clipboard, please report it on the SkyHanni discord!"
+            } ?: "Error id not found!",
+        )
     }
 
     fun logErrorStateWithData(
@@ -87,6 +89,7 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
+        condition: () -> Boolean = { true },
     ) {
         logError(
             IllegalStateException(internalMessage),
@@ -95,6 +98,7 @@ object ErrorManager {
             noStackTrace,
             *extraData,
             betaOnly = betaOnly,
+            condition = condition,
         )
     }
 
@@ -116,6 +120,7 @@ object ErrorManager {
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
+        condition: () -> Boolean = { true },
     ) {
         if (betaOnly && !LorenzUtils.isBetaVersion()) return
         if (!ignoreErrorCache) {
@@ -125,6 +130,7 @@ object ErrorManager {
             if (pair in cache) return
             cache.add(pair)
         }
+        if (!condition()) return
 
         Error(message, throwable).printStackTrace()
         Minecraft.getMinecraft().thePlayer ?: return
@@ -152,7 +158,7 @@ object ErrorManager {
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
-            prefix = false
+            prefix = false,
         )
     }
 

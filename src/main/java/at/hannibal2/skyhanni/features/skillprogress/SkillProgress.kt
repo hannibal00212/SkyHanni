@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -112,7 +112,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get()
             )
@@ -122,8 +122,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                endColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get()

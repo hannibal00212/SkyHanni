@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -110,13 +113,13 @@ object TunnelsMaps {
     }
 
     private val oldGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*"
+        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*",
     )
     private val newGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*"
+        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*",
     )
     private val commissionInvPattern by RepoPattern.pattern(
-        "mining.commission.inventory", "Commissions"
+        "mining.commission.inventory", "Commissions",
     )
 
     /**
@@ -125,19 +128,19 @@ object TunnelsMaps {
      */
     private val glacitePattern by RepoPattern.pattern(
         "mining.commisson.reward.glacite",
-        "§7- §b[\\d,]+ Glacite Powder"
+        "§7- §b[\\d,]+ Glacite Powder",
     )
     private val collectorCommissionPattern by RepoPattern.pattern(
         "mining.commisson.collector",
-        "§9(?<what>\\w+(?: \\w+)?) Collector"
+        "§9(?<what>\\w+(?: \\w+)?) Collector",
     )
     private val invalidGoalPattern by RepoPattern.pattern(
         "mining.commisson.collector.invalid",
-        "Glacite|Scrap"
+        "Glacite|Scrap",
     )
     private val completedPattern by RepoPattern.pattern(
         "mining.commisson.completed",
-        "§a§lCOMPLETED"
+        "§a§lCOMPLETED",
     )
 
     private val translateTable = mutableMapOf<String, String>()
@@ -150,6 +153,8 @@ object TunnelsMaps {
     private var clickTranslate = mapOf<Int, String>()
 
     private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
+
+    private var isCommission = false
 
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -170,7 +175,7 @@ object TunnelsMaps {
                     "Unknown Collection Commission: $type", "$type can't be found in the graph.",
                     "type" to type,
                     "graphNames" to possibleLocations.keys,
-                    "lore" to lore
+                    "lore" to lore,
                 )
                 null
             } else {
@@ -179,9 +184,21 @@ object TunnelsMaps {
         }.toMap()
         if (config.autoCommission) {
             clickTranslate.values.firstOrNull()?.let {
+                isCommission = true
                 setActiveAndGoal(it)
+            } ?: run {
+                if (isCommission) {
+                    active = ""
+                    clearPath()
+                    isCommission = false
+                }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        clickTranslate = mapOf()
     }
 
     @SubscribeEvent
@@ -197,6 +214,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
+            isCommission = true
             setActiveAndGoal(it)
         }
     }
@@ -234,7 +252,7 @@ object TunnelsMaps {
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.compactGemstone,
-            config.excludeFairy
+            config.excludeFairy,
         ) {
             locationDisplay = generateLocationsDisplay()
         }
@@ -247,77 +265,104 @@ object TunnelsMaps {
             if (active.isNotEmpty()) {
                 if (goal == campfire && active != campfire.name) {
                     add(Renderable.string("§6Override for ${campfire.name}"))
-                    add(Renderable.clickable(Renderable.string("§eMake §f$active §eactive"), onClick = {
-                        goal = getNext()
-                    }))
+                    add(
+                        Renderable.clickable(
+                            Renderable.string("§eMake §f$active §eactive"),
+                            onClick = {
+                                goal = getNext()
+                            },
+                        ),
+                    )
                 } else {
                     add(
                         Renderable.clickAndHover(
                             Renderable.string("§6Active: §f$active"),
                             listOf("§eClick to disable current Waypoint"),
-                            onClick = ::clearPath
-                        )
+                            onClick = ::clearPath,
+                        ),
                     )
                     if (hasNext()) {
-                        add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
-                            goal = getNext()
-                        }))
+                        add(
+                            Renderable.clickable(
+                                Renderable.string("§eNext Spot"),
+                                onClick = {
+                                    goal = getNext()
+                                },
+                            ),
+                        )
                     } else {
-                        add(Renderable.string(""))
+                        addString("")
                     }
                 }
             } else {
-                add(Renderable.string(""))
-                add(Renderable.string(""))
+                addString("")
+                addString("")
             }
             addAll(locationDisplay)
         }
-        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+        config.position.renderRenderables(display, posLabel = "Tunnels Maps")
+
     }
 
     private fun generateLocationsDisplay() = buildList {
         add(Renderable.string("§6Locations:"))
         add(
             Renderable.multiClickAndHover(
-                campfire.name!!, listOf(
-                    "§eLeft Click to set active", "§eRight Click for override"
-                ), click = mapOf(
-                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride
-                )
-            )
+                campfire.name!!,
+                listOf(
+                    "§eLeft Click to set active", "§eRight Click for override",
+                ),
+                click = mapOf(
+                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride,
+                ),
+            ),
         )
         if (!config.excludeFairy.get()) {
-            add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
-                val name = it.key.removePrefix("§dFairy Soul ")
-                Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
-            }), Renderable.string("§dFairy Souls")))
+            add(
+                Renderable.hoverable(
+                    Renderable.horizontalContainer(
+                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                            val name = it.key.removePrefix("§dFairy Soul ")
+                            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+                        },
+                    ),
+                    Renderable.string("§dFairy Souls"),
+                ),
+            )
         }
         if (config.compactGemstone.get()) {
             add(
                 Renderable.table(
                     listOf(
-                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName)
-                    )
-                )
+                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName),
+                    ),
+                ),
             )
         } else {
-            addAll(newGemstones.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-            })
-            addAll(oldGemstones.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-            })
+            addAll(
+                newGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                },
+            )
+            addAll(
+                oldGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                },
+            )
         }
-        addAll(normalLocations.map {
-            Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-        })
+        addAll(
+            normalLocations.map {
+                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+            },
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
-        Renderable.string((it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
-            it.key.removeColor().removeSuffix("stone")
-        ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        Renderable.string(
+            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
+                it.key.removeColor().removeSuffix("stone"),
+            ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
         onClick = guiSetActive(it.key),
@@ -334,6 +379,7 @@ object TunnelsMaps {
     }
 
     private fun guiSetActive(it: String): () -> Unit = {
+        isCommission = false
         setActiveAndGoal(it)
     }
 
@@ -400,7 +446,7 @@ object TunnelsMaps {
             config.pathWidth.toInt(),
             true,
             bezierPoint = 2.0,
-            textSize = config.textSize.toDouble()
+            textSize = config.textSize.toDouble(),
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -410,7 +456,7 @@ object TunnelsMaps {
             }.position,
             "§e${path.second.roundToInt()}m",
             config.textSize.toDouble(),
-            yOff = 10f
+            yOff = 10f,
         )
     }
 
@@ -453,6 +499,15 @@ object TunnelsMaps {
                 goal = getNext()
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (closedNote == null) return // Value that must be none null if it was active
+        closedNote = null
+        clearPath()
+        cooldowns.clear()
+        goalReached = false
     }
 
     private var nextSpotDelay = SimpleTimeMark.farPast()

@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
@@ -169,7 +169,7 @@ class RepoManager(private val configLocation: File) {
         val comp = CompletableFuture<Void?>()
         if (!atomicShouldManuallyReload.get()) return comp
         ErrorManager.resetCache()
-        Minecraft.getMinecraft().addScheduledTask {
+        DelayedRun.onThread.execute {
             error = false
             successfulConstants.clear()
             unsuccessfulConstants.clear()

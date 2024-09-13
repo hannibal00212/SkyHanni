@@ -8,17 +8,18 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of sea creatures while fishing on the barn via hub."
+        desc = "Show the time and amount of own sea creatures nearby while barn fishing."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public Property<Boolean> enabled = Property.of(true);
 
     @Expose
     @ConfigOption(
@@ -26,7 +27,7 @@ public class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer in the Crystal Hollows."
     )
     @ConfigEditorBoolean
-    public boolean crystalHollows = true;
+    public Property<Boolean> crystalHollows = Property.of(true);
 
     @Expose
     @ConfigOption(
@@ -34,7 +35,7 @@ public class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer in the Crimson Isle."
     )
     @ConfigEditorBoolean
-    public boolean crimsonIsle = true;
+    public Property<Boolean> crimsonIsle = Property.of(true);
 
     @Expose
     @ConfigOption(
@@ -42,7 +43,7 @@ public class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer on the Jerry's Workshop island."
     )
     @ConfigEditorBoolean
-    public boolean winterIsland = true;
+    public Property<Boolean> winterIsland = Property.of(true);
 
     @Expose
     @ConfigOption(
@@ -50,12 +51,12 @@ public class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer on all the different islands that Stranded players can visit."
     )
     @ConfigEditorBoolean
-    public boolean forStranded = true;
+    public Property<Boolean> forStranded = Property.of(true);
 
     @Expose
     @ConfigOption(
         name = "Worm Cap Alert",
-        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 60."
+        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 20."
     )
     @ConfigEditorBoolean
     public boolean wormLimitAlert = true;
@@ -73,6 +74,16 @@ public class BarnTimerConfig {
         minStep = 10
     )
     public int alertTime = 330;
+
+    @Expose
+    @ConfigOption(name = "Fishing Cap Alert", desc = "Gives a warning when you reach a certain amount of mobs.")
+    @ConfigEditorBoolean
+    public boolean fishingCapAlert = true;
+
+    @Expose
+    @ConfigOption(name = "Fishing Cap Amount", desc = "Amount of mobs at which to trigger the Fishing Cap Alert.")
+    @ConfigEditorSlider(minValue = 10, maxValue = 60, minStep = 1)
+    public int fishingCapAmount = 30;
 
     @Expose
     @ConfigLink(owner = BarnTimerConfig.class, field = "enabled")

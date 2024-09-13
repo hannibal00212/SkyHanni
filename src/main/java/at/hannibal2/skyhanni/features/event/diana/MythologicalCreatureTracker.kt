@@ -1,18 +1,21 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -29,32 +32,37 @@ object MythologicalCreatureTracker {
     private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
     private val minotaurPattern by patternGroup.pattern(
         "minotaur",
-        ".* §r§eYou dug out a §r§2Minotaur§r§e!"
+        ".* §r§eYou dug out a §r§2Minotaur§r§e!",
     )
     private val gaiaConstructPattern by patternGroup.pattern(
         "gaiaconstruct",
-        ".* §r§eYou dug out a §r§2Gaia Construct§r§e!"
+        ".* §r§eYou dug out a §r§2Gaia Construct§r§e!",
     )
     private val minosChampionPattern by patternGroup.pattern(
         "minoschampion",
-        ".* §r§eYou dug out a §r§2Minos Champion§r§e!"
+        ".* §r§eYou dug out a §r§2Minos Champion§r§e!",
     )
     private val siameseLynxesPattern by patternGroup.pattern(
         "siameselynxes",
-        ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!"
+        ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!",
     )
     private val minosHunterPattern by patternGroup.pattern(
         "minoshunter",
-        ".* §r§eYou dug out a §r§2Minos Hunter§r§e!"
+        ".* §r§eYou dug out a §r§2Minos Hunter§r§e!",
     )
     private val minosInquisitorPattern by patternGroup.pattern(
         "minosinquisitor",
-        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
+        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
-    private val tracker =
-        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-        { drawDisplay(it) }
+    private val tracker = SkyHanniTracker(
+        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
+    ) { drawDisplay(it) }
 
     class Data : TrackerData() {
 
@@ -89,8 +97,7 @@ object MythologicalCreatureTracker {
 
                     // TODO migrate to abstract feature in the future
                     if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
-                        event.chatComponent =
-                            ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                        event.chatComponent = ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
                         it.creaturesSinceLastInquisitor = 0
                     } else it.creaturesSinceLastInquisitor++
                 }
@@ -99,8 +106,8 @@ object MythologicalCreatureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Mythological Creature Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
         for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
@@ -108,10 +115,13 @@ object MythologicalCreatureTracker {
                 " §7$percentage"
             } else ""
 
-            addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
+            addSearchString(
+                " §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix",
+                searchText = creatureType.displayName,
+            )
         }
-        addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
-        addAsSingletonList(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
+        addSearchString(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
+        addSearchString(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
     }
 
     @SubscribeEvent

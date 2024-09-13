@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -52,6 +53,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -62,6 +64,8 @@ internal var unconfirmedUnknownLines = listOf<String>()
 internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
+    if (!unconfirmedUnknownLines.contains(line)) return
     if (line !in unconfirmedUnknownLines) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
     confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
@@ -74,7 +78,7 @@ private fun onRemoval(line: String) {
         "Unknown Lines" to confirmedUnknownLines,
         "Island" to LorenzUtils.skyBlockIsland,
         "Area" to HypixelData.skyBlockArea,
-        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        "Full Scoreboard" to CustomScoreboard.activeLines,
         noStackTrace = true,
         betaOnly = true,
     )
@@ -147,9 +151,15 @@ enum class ScoreboardElement(
         ::shouldShowChunkedStats,
         "§652,763,737 §7| §d64,647 §7| §6249M\n§b59,264 §7| §c23,495 §7| §a57,873\n§c♨ 0 §7| §b0❄ §7| §d756",
     ),
+    SOULFLOW(
+        ::getSoulflowDisplayPair,
+        ::getSoulflowDisplayWhen,
+        "Soulflow: §3761",
+    ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
-        { true }, "",
+        { true },
+        "",
     ),
     ISLAND(
         ::getIslandDisplayPair,
@@ -203,7 +213,8 @@ enum class ScoreboardElement(
     ),
     EMPTY_LINE2(
         ::getEmptyLineDisplayPair,
-        { true }, "",
+        { true },
+        "",
     ),
     OBJECTIVE(
         ::getObjectiveDisplayPair,
@@ -351,28 +362,35 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair(): List<ScoreboardElementType> =
-    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-    } else {
-        listOf(
-            displayConfig.titleAndFooter.customTitle.get().toString()
-                .replace("&", "§")
-                .split("\\n")
-                .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
-        ).flatten()
+private fun getTitleDisplayPair(): List<ScoreboardElementType> {
+    val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
+
+    if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
+        return listOf(ScoreboardData.objectiveTitle to alignment)
     }
 
-private fun getProfileDisplayPair() =
-    listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase() to HorizontalAlignment.LEFT)
+    return if (displayConfig.titleAndFooter.useCustomTitle) {
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to alignment }
+        ).flatten()
+    } else {
+        listOf(ScoreboardData.objectiveTitle to alignment)
+    }
+}
+
+private fun getProfileDisplayPair() = listOf(
+    CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase()
+        to HorizontalAlignment.LEFT,
+)
 
 private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     var purse = PurseAPI.currentPurse.formatNum()
 
-    val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
-
-    if (earned != "0") {
-        purse += " §7(§e+$earned§7)§6"
+    if (!displayConfig.hideCoinsDifference) {
+        val earned = getGroupFromPattern(CustomScoreboard.activeLines, PurseAPI.coinsPattern, "earned")
+        if (earned != null) purse += " §7(§e+$earned§7)§6"
     }
 
     return listOf(
@@ -387,7 +405,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
 private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<ScoreboardElementType> {
-    val motes = getMotes().formatNum()
+    val motes = getMotes()?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -401,7 +419,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
 private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBankDisplayPair(): List<ScoreboardElementType> {
-    val bank = getBank()
+    val bank = getBank() ?: "0"
 
     return listOf(
         when {
@@ -434,7 +452,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
 private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
 private fun getCopperDisplayPair(): List<ScoreboardElementType> {
-    val copper = getCopper().formatNum()
+    val copper = getCopper()?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -467,14 +485,14 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     return listOf(
         when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> "<hidden>"
-            displayConfig.displayNumbersFirst/* && heat != "§6IMMUNE" */ -> if (heat == "0") "§c♨ 0 Heat" else "$heat Heat"
-            else -> if (heat == "0") "Heat: §c♨ 0" else "Heat: $heat"
+            displayConfig.displayNumbersFirst -> heat?.let { "$heat Heat" } ?: "§c♨ 0 Heat"
+            else -> heat?.let { "Heat: $heat" } ?: "§c♨ 0 Heat"
         } to HorizontalAlignment.LEFT,
     )
 }
 
 private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
-    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
+    && CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -488,11 +506,11 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
-    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
+private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT) &&
+    CustomScoreboard.activeLines.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
-    val northStars = getNorthStars().formatNum()
+    val northStars = getNorthStars()?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -510,6 +528,20 @@ private fun getChunkedStatsDisplayPair(): List<ScoreboardElementType> =
         .chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(" §f| ") to HorizontalAlignment.LEFT }
 
+private fun getSoulflowDisplayPair(): List<ScoreboardElementType> {
+    val soulflow = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.soulflowPattern, "soulflow")
+        ?.formatNum() ?: "0"
+    return listOf(
+        when {
+            informationFilteringConfig.hideEmptyLines && soulflow == "0" -> "<hidden>"
+            displayConfig.displayNumbersFirst -> "§3$soulflow Soulflow"
+            else -> "Soulflow: §3$soulflow"
+        } to HorizontalAlignment.LEFT,
+    )
+}
+
+private fun getSoulflowDisplayWhen() = !inAnyIsland(IslandType.THE_RIFT)
+
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
 
 private fun getIslandDisplayPair() =
@@ -518,7 +550,7 @@ private fun getIslandDisplayPair() =
 private fun getLocationDisplayPair() = buildList {
     HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
 
-    ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
+    CustomScoreboard.activeLines.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
 }
 
@@ -536,11 +568,12 @@ fun getPlayerAmountDisplayPair() = buildList {
 
 private fun getVisitDisplayPair() =
     listOf(
-        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to HorizontalAlignment.LEFT,
+        CustomScoreboard.activeLines.first { ScoreboardPattern.visitingPattern.matches(it) } to
+            HorizontalAlignment.LEFT,
     )
 
 private fun getVisitShowWhen() =
-    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.visitingPattern.matches(it) }
+    CustomScoreboard.activeLines.any { ScoreboardPattern.visitingPattern.matches(it) }
 
 private fun getDateDisplayPair() =
     listOf(
@@ -548,11 +581,17 @@ private fun getDateDisplayPair() =
     )
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
-    var symbol = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol")
-    if (symbol == "0") symbol = ""
+    val symbol =
+        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false) + " $symbol" to HorizontalAlignment.LEFT,
+            .formatted(
+                dayAndMonthElement = false,
+                yearElement = false,
+                timeFormat24h = config.display.skyblockTime24hFormat,
+                exactMinutes = config.display.skyblockTimeExactMinutes,
+            ) +
+            " $symbol" to HorizontalAlignment.LEFT,
     )
 }
 
@@ -632,7 +671,7 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val formattedLines = ScoreboardData.sidebarLinesFormatted
+    val formattedLines = CustomScoreboard.activeLines
     val objective = formattedLines.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
     if (objective != null) {
         add(objective to HorizontalAlignment.LEFT)
@@ -651,7 +690,7 @@ private fun getObjectiveDisplayPair() = buildList {
 }
 
 private fun getObjectiveShowWhen(): Boolean =
-    ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+    ScoreboardPattern.objectivePattern.anyMatches(CustomScoreboard.activeLines)
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
     add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)
@@ -668,14 +707,14 @@ private fun getQuiverDisplayPair(): List<ScoreboardElementType> {
     if (QuiverAPI.currentArrow == NONE_ARROW_TYPE)
         return listOf("No Arrows selected" to HorizontalAlignment.LEFT)
 
-    val amountString = (if (arrowConfig.colorArrowAmount) {
-        percentageColor(
-            QuiverAPI.currentAmount.toLong(),
-            QuiverAPI.MAX_ARROW_AMOUNT.toLong(),
-        ).getChatColor()
-    } else {
-        ""
-    }) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
+    val amountString = (
+        if (arrowConfig.colorArrowAmount) {
+            percentageColor(
+                QuiverAPI.currentAmount.toLong(),
+                QuiverAPI.MAX_ARROW_AMOUNT.toLong(),
+            ).getChatColor()
+        } else ""
+        ) + if (QuiverAPI.wearingSkeletonMasterChestplate) {
         "∞"
     } else {
         when (arrowConfig.arrowAmountDisplay) {
@@ -700,7 +739,7 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = HotmAPI.Powder.values()
+    val powderTypes = HotmAPI.PowderType.values()
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
@@ -747,7 +786,7 @@ private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEven
 private fun getEventsShowWhen() = ScoreboardEvent.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair() = buildList {
-    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
     val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
         "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
     } else {
@@ -763,6 +802,15 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     if (!mayorConfig.showExtraMayor) return@buildList
+    val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
+    add(ministerName to HorizontalAlignment.LEFT)
+
+    if (mayorConfig.showMayorPerks) {
+        MayorAPI.currentMinister?.activePerks?.forEach { perk ->
+            add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
+        }
+    }
+
     val jerryExtraMayor = MayorAPI.jerryExtraMayor
     val extraMayor = jerryExtraMayor.first ?: return@buildList
 
@@ -774,7 +822,6 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     add((extraMayorName + extraTimeTillNextMayor) to HorizontalAlignment.LEFT)
-
 }
 
 private fun getMayorShowWhen() =
@@ -801,11 +848,7 @@ private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     if (partyConfig.showPartyEverywhere) {
         true
     } else {
-        inAnyIsland(
-            IslandType.DUNGEON_HUB,
-            IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE,
-        )
+        inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || inGlaciteArea()
     }
 }
 

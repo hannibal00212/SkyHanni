@@ -13,7 +13,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
 
-@Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
+@Deprecated("Use SkyHanniEvent instead")
 abstract class LorenzEvent : Event() {
 
     private val eventName by lazy {

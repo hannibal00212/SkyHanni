@@ -120,7 +120,7 @@ object JacobContestFFNeededDisplay {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
-        if (lastToolTipTime.passedSince() < 200.milliseconds) return
+        if (lastToolTipTime.passedSince() > 200.milliseconds) return
         config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
     }
 

@@ -148,7 +148,7 @@ object GetFromSackAPI {
 
         when (result) {
             CommandResult.VALID -> getFromSack(stack ?: return)
-            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
+            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> [amount]")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
@@ -168,20 +168,27 @@ object GetFromSackAPI {
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size <= 1) {
-            return CommandResult.WRONG_ARGUMENT to null
-        }
+        if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        var amountString = args.last()
+        // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
+        val argsNull = !args.last().last().isDigit()
+        val arguments = if (argsNull) {
+            if (!config.defaultGFS) return CommandResult.WRONG_ARGUMENT to null
+
+            args + config.defaultAmountGFS.toString()
+        } else args
+
+        var amountString = arguments.last()
         amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
 
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
-        val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+        val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+        val replacedString = itemString.replace("_"," ")
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            SackAPI.sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+            SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",

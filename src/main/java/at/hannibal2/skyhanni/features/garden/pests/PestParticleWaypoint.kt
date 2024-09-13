@@ -121,7 +121,7 @@ object PestParticleWaypoint {
         ++particles
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
         if (!config.hideParticles) return

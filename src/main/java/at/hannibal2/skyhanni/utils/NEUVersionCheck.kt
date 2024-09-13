@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Desktop
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.io.File
 import java.net.URI
 import javax.swing.JButton
 import javax.swing.JFrame
@@ -42,6 +44,7 @@ object NEUVersionCheck {
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
             Pair("Download NEU from GitHub", "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/latest"),
             Pair("Download NEU from Modrinth", "https://modrinth.com/mod/notenoughupdates/version/latest"),
+            Pair("Open Mods Folder", File(Minecraft.getMinecraft().mcDataDir, "mods").toURI().toString()),
         )
         closeMinecraft()
     }

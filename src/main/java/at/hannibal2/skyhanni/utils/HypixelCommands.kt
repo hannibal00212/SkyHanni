@@ -12,6 +12,10 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
+    }
+
     fun playtime() {
         send("playtime")
     }
@@ -62,6 +66,10 @@ object HypixelCommands {
 
     fun chocolateFactory() {
         send("cf")
+    }
+
+    fun pet() {
+        send("pet")
     }
 
     fun openBaker() {
@@ -128,6 +136,11 @@ object HypixelCommands {
         send("pq $quality")
     }
 
+    // Changes the speed of rancher boots in garden
+    fun setMaxSpeed() {
+        send("setmaxspeed")
+    }
+
     fun showRng(major: String? = null, minor: String? = null) = when {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
@@ -135,6 +148,10 @@ object HypixelCommands {
 
     fun chatPrompt(prompt: String) {
         send("chatprompt $prompt")
+    }
+
+    fun callback(uuid: String) {
+        send("cb $uuid")
     }
 
     private fun send(command: String) {

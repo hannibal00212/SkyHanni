@@ -101,6 +101,7 @@ enum class BossType(
     DUMMY("Dummy", Type.DUMMY),
     ARACHNE_SMALL("§cSmall Arachne", Type.ARACHNE),
     ARACHNE_BIG("§4Big Arachne", Type.ARACHNE),
+    BROODMOTHER("§cBroodmother", Type.BROODMOTHER),
 
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", Type.THE_RIFT_BOSSES),
@@ -118,8 +119,6 @@ enum class BossType(
     GARDEN_PEST_RAT("§cRat", Type.GARDEN_PESTS),
     GARDEN_PEST_SLUG("§cSlug", Type.GARDEN_PESTS),
     GARDEN_PEST_EARTHWORM("§cEarthworm", Type.GARDEN_PESTS),
-
-    // TODO arachne
 
     // TODO Corleone
     // TODO bal

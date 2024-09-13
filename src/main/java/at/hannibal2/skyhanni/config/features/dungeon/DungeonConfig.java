@@ -12,9 +12,13 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightClickedBlocks = false;
+    @Accordion
+    public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
+
+    @Expose
+    @ConfigOption(name = "Secret Chime", desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.")
+    @Accordion
+    public SecretChimeConfig secretChime = new SecretChimeConfig();
 
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
@@ -66,6 +70,11 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean architectNotifier = true;
+
+    @Expose
+    @ConfigOption(name = "Object Highlighter", desc = "Highlights various things in Dungeons.")
+    @Accordion
+    public ObjectHighlighterConfig objectHighlighter = new ObjectHighlighterConfig();
 
     @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")

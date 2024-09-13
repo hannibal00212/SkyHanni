@@ -23,7 +23,7 @@ object PetAPI {
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
-        "(?:§f§f)?§7\\[Lvl 1➡(?:100|200)] (?<name>.*)",
+        "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
     )
 
     private val ignoredPetStrings = listOf(

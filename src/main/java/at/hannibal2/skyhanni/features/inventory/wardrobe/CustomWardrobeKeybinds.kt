@@ -32,7 +32,7 @@ object CustomWardrobeKeybinds {
     @SubscribeEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
-        val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }
+        val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }.filterNot { config.onlyFavorites && !it.favorite }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue

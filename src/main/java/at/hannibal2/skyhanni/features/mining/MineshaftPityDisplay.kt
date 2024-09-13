@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
+import at.hannibal2.skyhanni.features.mining.OreType.Companion.isGemstone
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -73,6 +74,8 @@ object MineshaftPityDisplay {
             profileStorage?.mineshaftTotalCount = value
         }
 
+    private var sessionMineshafts = 0
+
     var lastMineshaftSpawn = SimpleTimeMark.farPast()
 
     private var display = listOf<Renderable>()
@@ -81,13 +84,13 @@ object MineshaftPityDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
-        if (!isEnabled()) return
+        if (!MiningAPI.inGlacialTunnels()) return
 
-        event.originalOre.getOreType()?.getPityBlock()?.let { it.blocksBroken++ }
+        event.originalOre.getPityBlock()?.let { it.blocksBroken++ }
         event.extraBlocks.toMutableMap()
             .apply { addOrPut(event.originalOre, -1) }
             .map { (block, amount) ->
-                block.getOreType()?.getPityBlock()?.let { it.efficientMiner += amount }
+                block.getPityBlock()?.let { it.efficientMiner += amount }
             }
 
         update()
@@ -95,7 +98,7 @@ object MineshaftPityDisplay {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!MiningAPI.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
@@ -104,39 +107,41 @@ object MineshaftPityDisplay {
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
+            sessionMineshafts++
 
             val message = event.message + " §e($counterUntilPity)"
 
-            val hover = mutableListOf<String>()
-            hover.add("§7Blocks mined: §e$totalBlocks")
-            hover.add("§7Pity Counter: §e$pityCounter")
-            hover.add(
-                "§7Chance: " +
-                    "§e1§6/§e${chance.round(1)} " +
-                    "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
-            )
-            minedBlocks.forEach {
-                hover.add(
-                    "    §7${it.pityBlock.displayName} mined: " +
-                        "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner]" +
-                        " §6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})",
+            val hoverText = buildList {
+                add("§7Blocks mined: §e$totalBlocks")
+                add("§7Pity Counter: §e$pityCounter")
+                add(
+                    "§7Chance: " +
+                        "§e1§6/§e${chance.round(1)} " +
+                        "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
                 )
-            }
-            hover.add("")
-            hover.add(
-                "§7Average Blocks/Mineshaft: " +
-                    "§e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
-            )
+                minedBlocks.forEach {
+                    add(
+                        "    §7${it.pityBlock.displayName} mined: " +
+                            "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner]" +
+                            " §6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})",
+                    )
+                }
+                add("")
+                add(
+                    "§7Average Blocks/Mineshaft: " +
+                        "§e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
+                )
 
-            if (!lastMineshaftSpawn.isFarPast()) {
-                hover.add("")
-                hover.add("§7Time since Last Mineshaft: §b${lastMineshaftSpawn.passedSince().format()}")
+                if (!lastMineshaftSpawn.isFarPast()) {
+                    add("")
+                    add("§7Time since Last Mineshaft: §b${lastMineshaftSpawn.passedSince().format()}")
+                }
             }
 
             resetCounter()
 
             val newComponent = Text.text(message) {
-                this.hover = Text.multiline(hover)
+                hover = Text.multiline(hoverText)
             }
 
             if (config.modifyChatMessage) event.chatComponent = newComponent
@@ -164,6 +169,7 @@ object MineshaftPityDisplay {
         return chance
     }
 
+    // TODO extract into multiple smaller functions
     private fun update() {
         val pityCounter = calculateCounter()
         val chance = calculateChance(pityCounter)
@@ -201,27 +207,24 @@ object MineshaftPityDisplay {
             ),
         )
 
-        val map = buildMap {
-            put(MineshaftPityLine.TITLE, Renderable.string("§9§lMineshaft Pity Counter"))
-            put(MineshaftPityLine.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
-            put(
-                MineshaftPityLine.CHANCE,
-                Renderable.string(
-                    "§3Chance: §e1§6/§e${chance.round(1).addSeparators()} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
-                ),
-            )
-            put(MineshaftPityLine.NEEDED_TO_PITY, neededToPityRenderable)
-            put(
-                MineshaftPityLine.TIME_SINCE_MINESHAFT,
+        val map = mapOf(
+            MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
+            MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
+            MineshaftPityLine.CHANCE to Renderable.string(
+                "§3Chance: §e1§6/§e${
+                    chance.round(1).addSeparators()
+                } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
+            ),
+            MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
+            MineshaftPityLine.TIME_SINCE_MINESHAFT to
                 Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
-            )
-            put(
-                MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT,
+            MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT to
                 Renderable.string(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            )
-        }
+            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
+        )
 
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
     }
@@ -247,6 +250,7 @@ object MineshaftPityDisplay {
         resetCounter()
         mineshaftTotalBlocks = 0
         mineshaftTotalCount = 0
+        sessionMineshafts = 0
         lastMineshaftSpawn = SimpleTimeMark.farPast()
         update()
     }
@@ -258,8 +262,6 @@ object MineshaftPityDisplay {
         }
     }
 
-    fun isEnabled() = MiningAPI.inGlacialTunnels() && config.enabled
-
     private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
 
     enum class MineshaftPityLine(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
@@ -268,7 +270,9 @@ object MineshaftPityDisplay {
         CHANCE("§3Chance: §e1§6/§e1439 §7(§b0.069%§7)"),
         NEEDED_TO_PITY("§3Needed to pity:\n§7   <blocks>"),
         TIME_SINCE_MINESHAFT("§3Last Mineshaft: §e21m 5s", { !lastMineshaftSpawn.isFarPast() }),
-        AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 })
+        AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 }),
+        MINESHAFTS_TOTAL("§3Mineshafts total: §e23", { mineshaftTotalCount != 0 }),
+        MINESHAFTS_SESSION("§3Mineshafts this session: §e3", { sessionMineshafts != 0 }),
         ;
 
         override fun toString() = display
@@ -295,11 +299,12 @@ object MineshaftPityDisplay {
 
         GEMSTONE(
             "Gemstone",
-            listOf(
+            /*listOf(
                 OreType.RUBY, OreType.AMBER, OreType.AMETHYST, OreType.JADE,
                 OreType.SAPPHIRE, OreType.TOPAZ, OreType.JASPER, OreType.OPAL,
                 OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT,
-            ),
+            ),*/
+            OreType.entries.filter { it.isGemstone() },
             4,
             ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
         ),
@@ -332,7 +337,10 @@ object MineshaftPityDisplay {
 
         companion object {
 
-            fun OreType.getPityBlock() = entries.firstOrNull { this in it.oreTypes }
+            fun OreBlock.getPityBlock(): PityBlock? {
+                val oreType = getOreType() ?: return null
+                return entries.firstOrNull { oreType in it.oreTypes }
+            }
 
             fun PityBlock.getPity() = (blocksBroken + efficientMiner / 2.0) * multiplier
         }

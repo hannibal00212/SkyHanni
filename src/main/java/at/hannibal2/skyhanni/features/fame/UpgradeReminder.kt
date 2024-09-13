@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -27,31 +28,33 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object UpgradeReminder {
+    private val config get() = SkyHanniMod.feature.misc
+
     private val patternGroup = RepoPattern.group("fame.upgrades")
 
     private val accountUpgradePattern by patternGroup.pattern(
         "account",
-        "§8Account Upgrade"
+        "§8Account Upgrade",
     )
     private val profileUpgradePattern by patternGroup.pattern(
         "profile",
-        "§8Profile Upgrade"
+        "§8Profile Upgrade",
     )
     private val upgradeDurationPattern by patternGroup.pattern(
         "duration",
-        "§8Duration: (?<duration>.+)"
+        "§8Duration: (?<duration>.+)",
     )
     private val upgradeStartedPattern by patternGroup.pattern(
         "started",
-        "§eYou started the §r§a(?<upgrade>.+) §r§eupgrade!"
+        "§eYou started the §r§a(?<upgrade>.+) §r§eupgrade!",
     )
     private val upgradeClaimedPattern by patternGroup.pattern(
         "claimed",
-        "§eYou claimed the §r§a(?<upgrade>.+) §r§eupgrade!"
+        "§eYou claimed the §r§a(?<upgrade>.+) §r§eupgrade!",
     )
     private val upgradePattern by patternGroup.pattern(
         "upgrade",
-        "§eClick to start upgrade!"
+        "§eClick to start upgrade!",
     )
 
     private var currentProfileUpgrade: CommunityShopUpgrade?
@@ -74,7 +77,6 @@ object UpgradeReminder {
     // TODO: (for 0.27) merge this logic with reminder manager
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (inInventory || LorenzUtils.skyBlockArea == "Community Center") return
@@ -127,28 +129,26 @@ object UpgradeReminder {
         }
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.misc.accountUpgradeReminder
-
-    fun disable() {
-        SkyHanniMod.feature.misc.accountUpgradeReminder = false
-    }
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.accountUpgradeReminder
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(49,
+        event.move(
+            49,
             "#player.currentAccountUpgrade",
-            "#player.communityShopAccountUpgrade.name"
+            "#player.communityShopAccountUpgrade.name",
         )
 
-        event.move(49,
+        event.move(
+            49,
             "#player.nextAccountUpgradeCompletionTime",
-            "#player.communityShopAccountUpgrade.completionTime"
+            "#player.communityShopAccountUpgrade.completionTime",
         )
     }
 
     class CommunityShopUpgrade(
         @Expose val name: String?,
-        @Expose var completionTime: SimpleTimeMark = SimpleTimeMark.farFuture()
+        @Expose var completionTime: SimpleTimeMark = SimpleTimeMark.farFuture(),
     ) {
         private var duration: Duration = Duration.ZERO
 
@@ -158,10 +158,11 @@ object UpgradeReminder {
 
         fun sendReminderIfClaimable() {
             if (this.name == null || this.completionTime.isInFuture()) return
-            ChatUtils.clickableChat(
-                "The §a$name §eupgrade has completed! §c(Click to disable these reminders)", onClick = {
-                    disable()
-                }, oneTimeClick = true
+            ChatUtils.clickToActionOrDisable(
+                "The §a$name §eupgrade has completed!",
+                config::accountUpgradeReminder,
+                actionName = "warp to Hub",
+                action = { HypixelCommands.warp("hub") },
             )
         }
 

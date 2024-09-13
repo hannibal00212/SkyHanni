@@ -80,7 +80,7 @@ object ArachneSpawnTimer {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN, priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIslands = [IslandType.SPIDER_DEN], priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return

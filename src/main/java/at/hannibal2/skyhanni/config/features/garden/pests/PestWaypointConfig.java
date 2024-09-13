@@ -35,6 +35,14 @@ public class PestWaypointConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show Middle",
+        desc = "Also show a waypoint to the middle of a plot. This can help determine if the tracker is pointing to the middle instead of a pest."
+    )
+    @ConfigEditorBoolean
+    public boolean showMiddle = false;
+
+    @Expose
+    @ConfigOption(
         name = "Show For Seconds",
         desc = "The waypoint will disappear after this number of seconds."
     )

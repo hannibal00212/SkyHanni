@@ -21,7 +21,7 @@ public class HalloweenBasketConfig {
     public boolean allEntranceWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint")
+    @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint.")
     @ConfigEditorBoolean
     public boolean onlyClosest = true;
 }

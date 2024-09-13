@@ -14,19 +14,19 @@
 
 ## What it does
 
-SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock. With SkyHanni, you'll get:
+SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to [Hypixel SkyBlock](https://wiki.hypixel.net/Main_Page). With SkyHanni you have access to:
 
-* **Helpful GUIs:** Access important information at a glance.
-* **Extra Chat Messages:** Receive reminders and helpful tips.
-* **Message Hiders:** Control which messages you see in chat.
-* **Entity/Item Highlighters:** Focus on important mobs or items in the world/your inventory.
-* **[And much more!](docs/FEATURES.md)**
+* **Helpful GUIs:** View important information at a glance.
+* **Extra Chat Messages:** Receive reminders and tips at the right moment.
+* **Object Highlighters:** Focus on important items in inventories or highlight mobs in the world.
+* **Highly Customizeable Displays:** Personalise your Scoreboard, Tab List or chat format.
+* [And **much** more!](docs/FEATURES.md)
 
-SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, fishing, or Rift.
+SkyHanni is especially useful when doing farming, slayers, Bingo, Diana, fishing, Rift or mining.
 
 ## Getting Started
 
-1. **Install:**  Check out the [installation guide](docs/INSTALLING.md).
+1. **Install:**  Follow the [installation guide](docs/INSTALLING.md).
 2. **Set Up:** Type `/sh` or `/skyhanni` in-game to configure your settings.
 3. **Explore:** See all the features [here](docs/FEATURES.md).
 
@@ -34,17 +34,17 @@ SkyHanni is especially helpful when doing activities like farming, slayers, Bing
 
 Give feedback or just chat with others on our community Discord!
 
-* **Bug Reports:** Use the `#bug-reports` channel.
-* **Feature Suggestions:** Use the `#suggestions` channel.
-* **General Chat:** Chat with other SkyHanni users in `#skyblock-general` channel.
+* **Bug Reports:** Use the `#bug-reports` channel when you find broken features (please check out `#faq` and `#known-bugs`).
+* **Quick Help** Ask in `#support` for questions and problems with the the mod or Minecraft in general.
+* **Feature Suggestions:** Feel fre to tell your ideas in `#suggestions` channel for new features and improvements to the mod. (Don't copy from existing mods or break Hypixel rules).
+* **General Chat:** Chat with other SkyHanni users in `#skyblock-general` channel about the game.
 
-[Join the Discord](https://discord.gg/skyhanni-997079228510117908)
+**[Join the Discord!](https://discord.gg/skyhanni-997079228510117908)**
 
 ## Contributing
 
-Interested in writing your own SkyHanni feature or fixing that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information.
+Are you interested in writing your own SkyHanni feature? Do you want to fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information!
 
 ---
 
-**SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to
-complete your SkyBlock setup!**
+**SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) for even more SkyBlock features!**

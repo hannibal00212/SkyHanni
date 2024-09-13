@@ -36,7 +36,8 @@ public class DianaConfig {
     public boolean burrowsNearbyDetection = false;
 
     @Expose
-    @ConfigOption(name = "Line To Next", desc = "Show a line to the closest burrow or guess location.")
+    @ConfigOption(name = "Line To Next", desc = "Show a line to the closest burrow or guess location.\n" +
+        "§eRequires Burrow particle detection.")
     @ConfigEditorBoolean
     public boolean lineToNext = true;
 

@@ -429,6 +429,11 @@ class MobFinder {
                 entity.hasMaxHealth(2_400_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
             }
         }
+        if (entity.hasNameTagWith(1, "[§7Lv12§8] §4Broodmother")) {
+            if (entity.hasMaxHealth(6000)) {
+                return EntityResult(bossType = BossType.BROODMOTHER)
+            }
+        }
         checkArachne(entity as EntitySpider)?.let { return it }
         return null
     }

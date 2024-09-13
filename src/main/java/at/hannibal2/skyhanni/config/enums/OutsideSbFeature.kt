@@ -18,10 +18,11 @@ enum class OutsideSbFeature(private val displayName: String) {
     FOLLOWING_LINE("Following Line"),
     ARROW_TRAIL("Arrow Trail"),
     HIGHLIGHT_PARTY_MEMBERS("Highlight Party Members"),
-    MOVEMENT_SPEED("Movement Speed");
+    MOVEMENT_SPEED("Movement Speed"),
+    CUSTOM_SCOREBOARD("Custom Scoreboard (only on Hypixel)"),
+    ;
 
     override fun toString() = displayName
 
-    fun isSelected() =
-        Minecraft.getMinecraft().thePlayer != null && SkyHanniMod.feature.misc.showOutsideSB.contains(this)
+    fun isSelected() = Minecraft.getMinecraft().thePlayer != null && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
 }

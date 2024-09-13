@@ -41,12 +41,10 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-
         equipmentTotalFF = FarmingItems.equip.getFFData()
 
         armorTotalFF = FarmingItems.armor.getFFData()
-
-        usingSpeedBoots = FarmingItems.BOOTS.getItem()?.getInternalName()?.asString() in farmingBoots
+        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         baseFF = getGenericFF()
 
@@ -79,7 +77,7 @@ object FFStats {
             in dicerCrops -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
-                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 20.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
             CropType.MUSHROOM -> {
@@ -116,7 +114,7 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(item, 0.0)
         this[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         this[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
-        this[FFTypes.GREEN_THUMB] = FarmingFortuneDisplay.greenThumbFortune
+        this[FFTypes.ENCHANT] = FarmingFortuneDisplay.greenThumbFortune
         this[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         this[FFTypes.TOTAL] = this.values.sum()
     }
@@ -126,7 +124,7 @@ object FFStats {
         this[FFTypes.BASE] = FarmingFortuneDisplay.itemBaseFortune
         this[FFTypes.REFORGE] = FarmingFortuneDisplay.reforgeFortune
         this[FFTypes.GEMSTONE] = FarmingFortuneDisplay.gemstoneFortune
-        this[FFTypes.PESTERMINATOR] = FarmingFortuneDisplay.pesterminatorFortune
+        this[FFTypes.ENCHANT] = FarmingFortuneDisplay.pesterminatorFortune
         this[FFTypes.ABILITY] = FarmingFortuneDisplay.getAbilityFortune(item)
         this[FFTypes.TOTAL] = this.values.sum()
     }
@@ -159,12 +157,12 @@ object FFStats {
     }
 
     fun getTotalFF() {
-
-        currentPetItem = FarmingItems.currentPet.getItem()?.getPetItem().toString()
+        currentPetItem = FarmingItems.currentPet.getItem().getPetItem().toString()
 
         totalBaseFF = combineFFData(
-            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData()
+            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData(),
         )
+
         FFGuideGUI.updateDisplay()
     }
 
@@ -190,6 +188,7 @@ object FFStats {
                 rawInternalName.contains("MOOSHROOM") -> (10 + petLevel).toDouble()
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
+                rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
                 else -> 0.0
             }
         }

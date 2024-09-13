@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -37,7 +39,7 @@ object OwnInventoryData {
     private var dirty = false
     private val sackToInventoryChatPattern by RepoPattern.pattern(
         "data.owninventory.chat.movedsacktoinventory",
-        "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory."
+        "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory.",
     )
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnSkyblock = true)
@@ -117,6 +119,46 @@ object OwnInventoryData {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
+
+        val itemName = event.item?.name ?: return
+        checkAHMovements(itemName)
+    }
+
+    private fun checkAHMovements(itemName: String) {
+        val inventoryName = InventoryUtils.openInventoryName()
+
+        // cancel own auction
+        if (inventoryName.let { it == "BIN Auction View" || it == "Auction View" }) {
+            if (itemName == "§cCancel Auction") {
+                val item = InventoryUtils.getItemAtSlotIndex(13)
+                val internalName = item?.getInternalNameOrNull() ?: return
+                OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+            }
+        }
+
+        // bought item from bin ah
+        if (inventoryName == "Confirm Purchase" && itemName == "§aConfirm") {
+            val item = InventoryUtils.getItemAtSlotIndex(13)
+            val internalName = item?.getInternalNameOrNull() ?: return
+            OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+        }
+
+        // bought item from normal ah
+        if (inventoryName == "Auction View" && itemName == "§6Collect Auction") {
+            val item = InventoryUtils.getItemAtSlotIndex(13)
+            val internalName = item?.getInternalNameOrNull() ?: return
+            OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+        }
+
+        // collected all items in "own bins"
+        if (inventoryName == "Your Bids" && itemName == "§aClaim All") {
+            for (stack in InventoryUtils.getItemsInOpenChest().map { it.stack }) {
+                if (stack.getLore().any { it == "§7Status: §aSold!" || it == "7Status: §aEnded!" }) {
+                    val internalName = stack.getInternalNameOrNull() ?: return
+                    OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -127,7 +169,7 @@ object OwnInventoryData {
         }
     }
 
-    private fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
+    fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
 

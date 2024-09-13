@@ -78,14 +78,14 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun add(position: Position, posLabel: String, x: Int, y: Int) {
+    fun add(position: Position, posLabel: String, width: Int, height: Int) {
         var name = position.internalName
         if (name == null) {
             name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
             position.internalName = name
         }
         currentPositions[name] = position
-        currentBorderSize[posLabel] = Pair(x, y)
+        currentBorderSize[posLabel] = Pair(width, height)
     }
 
     private var lastHotkeyReminded = SimpleTimeMark.farPast()

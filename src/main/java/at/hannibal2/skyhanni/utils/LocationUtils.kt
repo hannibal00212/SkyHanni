@@ -106,4 +106,24 @@ object LocationUtils {
         val maxZ = min(this.maxZ, other.maxZ)
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
+
+    fun calculatePlayerYaw(): Float {
+        val player = Minecraft.getMinecraft().thePlayer
+        var yaw = player.rotationYaw % 360
+        if (yaw < 0) yaw += 360
+        if (yaw > 180) yaw -= 360
+
+        return yaw
+    }
+
+    fun calculatePlayerFacingDirection(): LorenzVec {
+        var yaw = LocationUtils.calculatePlayerYaw() + 180
+        return when {
+            yaw < 45 -> LorenzVec(0, 0, -1)
+            yaw < 135 -> LorenzVec(1, 0, 0)
+            yaw < 225 -> LorenzVec(0, 0, 1)
+            yaw < 315 -> LorenzVec(-1, 0, 0)
+            else -> LorenzVec(0, 0, -1)
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.tweaker;
 
+import at.hannibal2.skyhanni.SkyHanniMod;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -94,10 +96,11 @@ public class DownloadSourceChecker {
             }
         ));
 
+        String version = SkyHanniMod.Companion.getVersion();
         JOptionPane.showOptionDialog(
             frame,
             String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
-            "SkyHanni Security Error",
+            "SkyHanni " + version + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
             null,
@@ -135,7 +138,7 @@ public class DownloadSourceChecker {
     private static URI getHost(File file) throws Exception {
         final File adsFile = new File(file.getAbsolutePath() + ":Zone.Identifier:$DATA");
         String host = null;
-        try(BufferedReader reader = new BufferedReader(new FileReader(adsFile))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(adsFile))) {
             String line = reader.readLine();
             while (line != null) {
                 if (line.startsWith("HostUrl=")) {

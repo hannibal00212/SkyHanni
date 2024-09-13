@@ -30,10 +30,12 @@ object PatcherSendCoordinates {
 
     /**
      * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4broken
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4 extra text
      */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",
-        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>.*)"
+        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>[0-9.-]+(?: .*)?)"
     )
 
     @SubscribeEvent

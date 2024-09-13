@@ -218,7 +218,7 @@ object TrophyFishDisplay {
 
     private fun getItemName(rawName: String): String {
         val name = getInternalName(rawName).itemName
-        return name.split(" ").dropLast(1).joinToString(" ").replace("§k", "")
+        return name.split(" ").dropLast(1).joinToString(" ")
     }
 
     private fun getInternalName(name: String): NEUInternalName {

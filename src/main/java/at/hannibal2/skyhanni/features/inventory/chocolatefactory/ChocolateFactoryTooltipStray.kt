@@ -13,14 +13,14 @@ object ChocolateFactoryTooltipStray {
     private val config get() = ChocolateFactoryAPI.config
 
     /**
-     * REGEX-TEST: §7You gained §6+2,465,018 Chocolate§7!
-     * REGEX-TEST: §7gained §6+30,292 Chocolate§7!
-     * REGEX-TEST: §7§6+36,330 Chocolate§7!
-     * REGEX-TEST: §9Rabbit§7, so you received §655,935,257
+     * REGEX-TEST: §5§o§7You gained §6+2,465,018 Chocolate§7!
+     * REGEX-TEST: §5§o§7gained §6+30,292 Chocolate§7!
+     * REGEX-TEST: §5§o§7§6+36,330 Chocolate§7!
+     * REGEX-TEST: §5§o§9Rabbit§7, so you received §655,935,257
      */
     private val chocolateGainedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.stray",
-        "(?:§.)?+(?:Rabbit§7, so )?(?:[Yy]ou )?(?:gained |received )?§6\\+?(?<amount>[\\d,]+)(?:$| Chocolate§7!)"
+        "(?:§.)*(?:Rabbit§7, so )?(?:[Yy]ou )?(?:gained |received )?§6\\+?(?<amount>[\\d,]+)(?: Chocolate§7!)?"
     )
 
     @SubscribeEvent(priority = EventPriority.HIGH)

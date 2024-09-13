@@ -1,0 +1,20 @@
+
+net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
+net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
+net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Rotations net.minecraft.util.Rotations
+net.minecraft.network.play.server.SPacketParticles net.minecraft.network.play.server.S2APacketParticles
+
+net.minecraft.util.text.TextComponentString net.minecraft.util.ChatComponentText
+net.minecraft.util.text.TextComponentTranslation net.minecraft.util.ChatComponentTranslation
+net.minecraft.util.text.Style net.minecraft.util.ChatStyle
+net.minecraft.util.text.Style getHoverEvent() getChatHoverEvent()
+net.minecraft.util.text.Style getClickEvent() getChatClickEvent()
+net.minecraft.util.text.TextFormatting net.minecraft.util.EnumChatFormatting
+net.minecraft.util.text.ITextComponent net.minecraft.util.IChatComponent
+net.minecraft.util.text.event.HoverEvent net.minecraft.event.HoverEvent
+net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
+
+

@@ -137,6 +137,7 @@ object BurrowWarpHelper {
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
         WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
+        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks

@@ -28,8 +28,9 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -40,8 +41,8 @@ import java.io.IOException
 class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
-    private val oldScreen: GuiContainer? = null
-) : GuiScreen() {
+    private val oldScreen: GuiContainer? = null,
+) : SkyhanniBaseScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
@@ -86,18 +87,14 @@ class GuiPositionEditor(
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
             GuiRenderUtils.drawStringCentered(
-
                 "§eTo edit hidden GUI elements set a key in /sh edit",
                 getScaledWidth() / 2,
-                20
-
+                20,
             )
             GuiRenderUtils.drawStringCentered(
-
                 "§ethen click that key while the GUI element is visible",
                 getScaledWidth() / 2,
-                32
-
+                32,
             )
             return
         }
@@ -110,7 +107,7 @@ class GuiPositionEditor(
             GuiRenderUtils.drawStringCentered(
                 "§aRight-Click to open associated config options",
                 getScaledWidth() / 2,
-                38
+                38,
             )
     }
 
@@ -136,16 +133,13 @@ class GuiPositionEditor(
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
             if (GuiRenderUtils.isPointInRect(
-
                     mouseX,
                     mouseY,
                     x - border,
                     y - border,
                     elementWidth + border * 2,
-                    elementHeight + border * 2
-
+                    elementHeight + border * 2,
                 )
-
             ) {
                 hoveredPos = index
             }
@@ -154,8 +148,8 @@ class GuiPositionEditor(
         return hoveredPos
     }
 
-    private fun getScaledHeight() = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-    private fun getScaledWidth() = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+    private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
+    private fun getScaledWidth() = GuiScreenUtils.scaledWindowWidth
 
     @Throws(IOException::class)
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
@@ -175,7 +169,7 @@ class GuiPositionEditor(
                 x - border,
                 y - border,
                 elementWidth + border * 2,
-                elementHeight + border * 2
+                elementHeight + border * 2,
             )
             if (!isHovered) continue
             if (mouseButton == 1) {
@@ -251,7 +245,7 @@ class GuiPositionEditor(
                 GuiRenderUtils.isPointInRect(
                     mx, my,
                     it.getAbsX() - border, it.getAbsY() - border,
-                    size.x + border * 2, size.y + border * 2
+                    size.x + border * 2, size.y + border * 2,
                 )
             } ?: return
         if (mw < 0)

@@ -57,14 +57,7 @@ object GardenComposterInventoryFeatures {
                     )
                     continue
                 }
-                val internalName = NEUInternalName.fromItemNameOrNull(itemName) ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Error reading internal name for item: $itemName",
-                        "could not find internal name for",
-                        "itemName" to itemName
-                    )
-                    continue
-                }
+                val internalName = NEUInternalName.fromItemName(itemName)
                 val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price

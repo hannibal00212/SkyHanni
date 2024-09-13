@@ -24,12 +24,17 @@ abstract class ItemTrackerData : TrackerData() {
         resetItems()
     }
 
-    fun addItem(internalName: NEUInternalName, stackSize: Int) {
+    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         val item = items.getOrPut(internalName) { TrackedItem() }
 
-        item.timesGained++
-        item.totalAmount += stackSize
+        if (!command) {
+            item.timesGained++
+        }
+        item.totalAmount += amount
         item.lastTimeUpdated = SimpleTimeMark.now()
+        if (command && item.totalAmount <= 0) {
+            items.remove(internalName)
+        }
     }
 
     @Expose
@@ -47,5 +52,19 @@ abstract class ItemTrackerData : TrackerData() {
         var hidden = false
 
         var lastTimeUpdated = SimpleTimeMark.farPast()
+
+        fun copy(
+            timesGained: Long = this.timesGained,
+            totalAmount: Long = this.totalAmount,
+            hidden: Boolean = this.hidden,
+            lastTimeUpdated: SimpleTimeMark = this.lastTimeUpdated,
+        ): TrackedItem {
+            val copy = TrackedItem()
+            copy.timesGained = timesGained
+            copy.totalAmount = totalAmount
+            copy.hidden = hidden
+            copy.lastTimeUpdated = lastTimeUpdated
+            return copy
+        }
     }
 }

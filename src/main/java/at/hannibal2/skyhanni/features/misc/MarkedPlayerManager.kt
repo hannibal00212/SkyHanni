@@ -63,7 +63,7 @@ object MarkedPlayerManager {
         }
     }
 
-    private fun refreshColours() =
+    private fun refreshColors() =
         markedPlayers.forEach {
             it.value.setColor()
         }
@@ -104,7 +104,7 @@ object MarkedPlayerManager {
                 playerNamesToMark.remove(name)
             }
         }
-        config.entityColor.onToggle(::refreshColours)
+        config.entityColor.onToggle(::refreshColors)
     }
 
     @SubscribeEvent

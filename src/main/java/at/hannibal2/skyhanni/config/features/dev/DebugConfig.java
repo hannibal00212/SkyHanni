@@ -157,6 +157,11 @@ public class DebugConfig {
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
 
+    @Expose
+    @ConfigOption(name = "Always Hoppity's", desc = "Always act as if Hoppity's Hunt is active.")
+    @ConfigEditorBoolean
+    public boolean alwaysHoppitys = false;
+
     // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);

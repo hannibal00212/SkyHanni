@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig
 import at.hannibal2.skyhanni.config.features.inventory.EnchantParsingConfig.CommaFormat
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,8 +19,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.lang.ArithmeticException
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
@@ -38,10 +41,11 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants", "(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+)(?<stacking>, |\$| \\d{1,3}(,\\d{3})*)"
+        "enchants.new",
+        "(§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
+        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -91,10 +95,10 @@ object EnchantParser {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltipEvent(event: LorenzToolTipEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTooltipEvent(event: ItemHoverEvent) {
         // If enchants doesn't have any enchant data then we have no data to parse enchants correctly
-        if (!isEnabled() || !this.enchants.hasEnchantData()) return
+        if (!this.enchants.hasEnchantData()) return
 
         currentItem = event.itemStack
 
@@ -114,6 +118,8 @@ object EnchantParser {
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
+
+        currentItem = null
 
         val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
 
@@ -198,7 +204,26 @@ object EnchantParser {
         val insertEnchants: MutableList<String> = mutableListOf()
 
         // Format enchants based on format config option
-        formatEnchants(insertEnchants)
+        try {
+            formatEnchants(insertEnchants)
+        } catch (e: ArithmeticException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Item has enchants in nbt but none were found?",
+                "item" to currentItem,
+                "loreList" to loreList,
+                "nbt" to currentItem?.getExtraAttributes()
+            )
+            return
+        } catch (e: ConcurrentModificationException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "ConcurrentModificationException whilst formatting enchants",
+                "loreList" to loreList,
+                "format" to config.format.get(),
+                "orderedEnchants" to orderedEnchants
+            )
+        }
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
@@ -220,7 +245,7 @@ object EnchantParser {
             val strippedLine = loreList[i].removeColor()
 
             if (startEnchant == -1) {
-                if (this.enchants.containsEnchantment(enchants, strippedLine)) startEnchant = i
+                if (this.enchants.containsEnchantment(enchants, loreList[i])) startEnchant = i
             } else if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1
         }
 
@@ -232,22 +257,27 @@ object EnchantParser {
         var lastEnchant: FormattedEnchant? = null
 
         for (i in startEnchant..endEnchant) {
-            val unformattedLine = loreList[i].removeColor()
-            val matcher = enchantmentPattern.matcher(unformattedLine)
+            val matcher = enchantmentPattern.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
+            var isRoman = true
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = matcher.group("levelNumeral").romanToDecimal()
-                val stacking = if (matcher.group("stacking").trimStart().matches("[\\d,]+\$".toRegex())) {
+                val level = try {
+                    // If one enchant is not a roman numeral we assume all are not roman numerals (idk a situation where this wouldn't be the case)
+                    matcher.group("levelNumeral").toInt().also { isRoman = false }
+                } catch (e: NumberFormatException) {
+                    matcher.group("levelNumeral").romanToDecimal()
+                }
+                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,]+\$".toRegex())) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
 
                 // Last found enchant
-                lastEnchant = FormattedEnchant(enchant, level, stacking)
+                lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
 
                 if (!orderedEnchants.add(lastEnchant)) {
                     for (e: FormattedEnchant in orderedEnchants) {
@@ -291,7 +321,7 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
+            builder.append(orderedEnchant.getFormattedString(currentItem))
             if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
                 builder.append(comma)
             } else {
@@ -314,12 +344,19 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
-            if (i % 3 != 2) {
-                builder.append(comma)
-            } else {
+            builder.append(orderedEnchant.getFormattedString(currentItem))
+
+            if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(builder.toString())
+                insertEnchants.addAll(orderedEnchant.getLore())
                 builder = StringBuilder()
+            } else {
+                if (i % 3 != 2) {
+                    builder.append(comma)
+                } else {
+                    insertEnchants.add(builder.toString())
+                    builder = StringBuilder()
+                }
             }
         }
 
@@ -329,12 +366,12 @@ object EnchantParser {
     private fun stackedFormatting(insertEnchants: MutableList<String>) {
         if (!config.hideEnchantDescriptions.get() || itemIsBook()) {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
                 insertEnchants.addAll(enchant.getLore())
             }
         } else {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
             }
         }
     }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
@@ -65,7 +65,7 @@ object VoltHighlighter {
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 RenderUtils.drawCylinderInWorld(
-                    Color(SpecialColour.specialToChromaRGB(config.voltColour), true),
+                    Color(SpecialColor.specialToChromaRGB(config.voltColour), true),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,

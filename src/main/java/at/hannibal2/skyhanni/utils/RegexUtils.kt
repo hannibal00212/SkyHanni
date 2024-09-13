@@ -21,10 +21,20 @@ object RegexUtils {
         return null
     }
 
+    inline fun <T> Pattern.firstMatcherWithIndex(sequence: Sequence<String>, consumer: Matcher.(Int) -> T): T? {
+        for ((index, line) in sequence.withIndex()) {
+            matcher(line).let { if (it.matches()) return consumer(it, index) }
+        }
+        return null
+    }
+
     @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.firstMatcher(this, consumer)
 
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
+
+    inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
+        firstMatcherWithIndex(list.asSequence(), consumer)
 
     @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.matchAll(this, consumer)
@@ -83,4 +93,16 @@ object RegexUtils {
         return this.any { it.matches(string) }
     }
 
+    /**
+     * Returns a list of all occurrences of a pattern within the [input] string.
+     */
+    fun Pattern.findAll(input: String): List<String> {
+        val matcher = matcher(input)
+
+        return buildList {
+            while (matcher.find()) {
+                add(matcher.group())
+            }
+        }
+    }
 }

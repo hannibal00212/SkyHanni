@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
+import java.util.TreeSet
 
 data class HoppityEggLocationsJson(
     @Expose val eggLocations: Map<IslandType, List<LorenzVec>>,
@@ -21,6 +22,7 @@ data class HoppityEggLocationsJson(
     @Expose val coachRabbitIndex: Int,
     @Expose val maxRabbits: Int,
     @Expose val maxPrestige: Int,
+    @Expose val chocolateMilestones: TreeSet<Long>,
     @Expose val apiEggLocations: Map<IslandType, Map<String, LorenzVec>>,
     @Expose val specialRabbits: List<String>,
 )

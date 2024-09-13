@@ -2,9 +2,16 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.observer.Property
 import java.util.TreeSet
+import net.minecraft.item.ItemStack
 
 open class Enchant : Comparable<Enchant> {
     @Expose
@@ -23,22 +30,56 @@ open class Enchant : Comparable<Enchant> {
     private fun isUltimate() = this is Ultimate
     private fun isStacking() = this is Stacking
 
-    open fun getFormattedName(level: Int) = getFormat(level) + loreName
+    open fun getFormattedName(level: Int, itemStack: ItemStack?) = getFormat(level, itemStack) + loreName
 
-    open fun getFormat(level: Int): String {
+    open fun getFormat(level: Int, itemStack: ItemStack? = null): String {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
         // TODO change color to string (support for bold)
-        val colour = when {
+        var color = when {
             level >= maxLevel -> config.perfectEnchantColor
             level > goodLevel -> config.greatEnchantColor
             level == goodLevel -> config.goodEnchantColor
             else -> config.poorEnchantColor
         }
 
+        // Exceptions
+        color = checkExceptions(color, level, itemStack)
+
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
-        if (colour.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
-        return colour.get().getChatColor()
+        if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+        return color.get().getChatColor()
+    }
+
+    /**
+     * Method to check for certain or unique exceptions that need to be handled explicitly.
+     *
+     * *(There isn't much of a convention to adding exceptions, except try to include relevant exceptions under
+     * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
+     * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
+     *
+     * @param color The original coloring based on default behaviour, for when no exception is met
+     * @param level The level of the enchant currently being parsed
+     * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
+     */
+    private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?): Property<LorenzColor> {
+        val config = SkyHanniMod.feature.inventory.enchantParsing
+
+        val itemCategory = itemStack?.getItemCategoryOrNull()
+        val internalName = itemStack?.getInternalNameOrNull()
+        val itemName = internalName?.itemName?.removeColor()
+
+        if (this.nbtName == "efficiency") {
+            // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
+            // color the enchant as max
+            if (itemName == "Stonk" ||
+                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
+            ) {
+                return config.perfectEnchantColor
+            }
+        }
+
+        return color
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
@@ -57,7 +98,7 @@ open class Enchant : Comparable<Enchant> {
     }
 
     class Ultimate : Enchant() {
-        override fun getFormat(level: Int) = "§d§l"
+        override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
     }
 
     class Stacking : Enchant() {
@@ -81,6 +122,6 @@ open class Enchant : Comparable<Enchant> {
 
         // Ensures enchants not yet in repo stay as vanilla formatting
         // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-        override fun getFormattedName(level: Int) = "§9$loreName"
+        override fun getFormattedName(level: Int, itemStack: ItemStack?): String = "§9$loreName"
     }
 }

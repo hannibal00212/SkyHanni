@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -32,6 +33,7 @@ object ProfileStorageData {
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
+    var hypixelDataLoaded = false
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -84,24 +86,28 @@ object ProfileStorageData {
         if (!LorenzUtils.inSkyBlock) return
         if (noTabListTime == SimpleTimeMark.farPast()) return
 
-        if (noTabListTime.passedSince() > 3.seconds) {
-            noTabListTime = SimpleTimeMark.now()
-            val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
-            if (foundSkyBlockTabList) {
-                ChatUtils.clickableChat(
-                    "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
-                        "This is needed for the mod to function! And therefore this warning cannot be disabled",
-                    onClick = {
-                        HypixelCommands.widget()
-                    },
-                    "§eClick to run /widget!",
-                )
-            } else {
-                ChatUtils.chat(
-                    "§cExtra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
-                )
-            }
+        playerSpecific?.let {
+            // do not try to load the data when hypixel has not yet send the profile loaded message
+            if (it.multipleProfiles && !hypixelDataLoaded) return
+        }
+
+        if (noTabListTime.passedSince() < 5.seconds) return
+        noTabListTime = SimpleTimeMark.now()
+        val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
+        if (foundSkyBlockTabList) {
+            ChatUtils.clickableChat(
+                "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
+                    "This is needed for the mod to function! And therefore this warning cannot be disabled",
+                onClick = {
+                    HypixelCommands.widget()
+                },
+                "§eClick to run /widget!",
+            )
+        } else {
+            ChatUtils.chat(
+                "§cExtra Information from Tab list not found! " +
+                    "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
+            )
         }
     }
 
@@ -123,5 +129,15 @@ object ProfileStorageData {
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent().postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        hypixelDataLoaded = false
+    }
+
+    fun profileJoinMessage() {
+        hypixelDataLoaded = true
+        playerSpecific?.multipleProfiles = true
     }
 }

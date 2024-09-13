@@ -4,11 +4,20 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
+import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -67,14 +76,29 @@ object PartyCommands {
         HypixelCommands.partyPromote(args[0])
     }
 
+    fun reverseTransfer() {
+        if (!config.reversePT.command) return
+        if (PartyAPI.partyMembers.isEmpty()) return
+        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+
+        autoPartyTransfer(prevPartyLeader)
+    }
+
+    private fun autoPartyTransfer(prevPartyLeader: String) {
+        HypixelCommands.partyTransfer(prevPartyLeader)
+        config.reversePT.message?.let {
+            if (it.isNotBlank()) {
+                HypixelCommands.partyChat(it)
+            }
+        }
+    }
+
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
             return
         }
-        if (!event.message.startsWith("/party kick ", ignoreCase = true)
-            && !event.message.startsWith("/p kick ", ignoreCase = true)
-        ) {
+        if (!event.message.startsWith("/party kick ", ignoreCase = true) && !event.message.startsWith("/p kick ", ignoreCase = true)) {
             return
         }
         val args = event.message.substringAfter("kick").trim().split(" ")
@@ -116,6 +140,22 @@ object PartyCommands {
 
         event.move(31, "commands", "misc.commands")
     }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onChat(event: LorenzChatEvent) {
+        if (!config.reversePT.clickable) return
+        if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
+        if (partyLeader != LorenzUtils.getPlayerName()) return
+
+        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+        event.blockedReason = "replacing"
+
+        ChatUtils.clickableChat(
+            event.message,
+            onClick = { autoPartyTransfer(prevPartyLeader) },
+            prefix = false,
+        )
+    }
 }
 
 private val otherPartyCommands = listOf(
@@ -126,5 +166,5 @@ private val otherPartyCommands = listOf(
     "Mute",
     "Private",
     "Warp",
-    "Settings"
+    "Settings",
 )

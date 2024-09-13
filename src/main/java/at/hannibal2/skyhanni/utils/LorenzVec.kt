@@ -215,6 +215,10 @@ data class LorenzVec(
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
 
+    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+
+    private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
+
     companion object {
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {

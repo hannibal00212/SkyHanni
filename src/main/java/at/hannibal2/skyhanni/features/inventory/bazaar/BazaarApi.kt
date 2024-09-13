@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -13,8 +14,10 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -32,6 +35,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object BazaarApi {
@@ -43,13 +47,14 @@ object BazaarApi {
     private var currentSearchedItem = ""
 
     var currentlyOpenedProduct: NEUInternalName? = null
+    var orderOptionProduct: NEUInternalName? = null
 
     fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
     fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
             "Can not find bazaar data for $itemName",
-            "internal name" to this
+            "internal name" to this,
         )
     }
 
@@ -78,6 +83,25 @@ object BazaarApi {
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+        }
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        val item = event.item ?: return
+        val itemName = item.name
+        if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
+            val internalName = item.getInternalNameOrNull() ?: return
+            if (itemName.contains("SELL")) {
+                orderOptionProduct = internalName
+            } else if (itemName.contains("BUY")) {
+                // pickup items from bazaar order
+                OwnInventoryData.ignoreItem(1.seconds, { it == internalName })
+            }
+        }
+        if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
+            // pickup items from own bazaar order
+            OwnInventoryData.ignoreItem(1.seconds, { it == orderOptionProduct })
         }
     }
 
@@ -160,5 +184,11 @@ object BazaarApi {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
         currentlyOpenedProduct = null
+    }
+
+    fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
+        "Your Bazaar Orders" -> true
+        "Co-op Bazaar Orders" -> true
+        else -> false
     }
 }

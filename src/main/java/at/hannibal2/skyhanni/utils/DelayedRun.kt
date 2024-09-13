@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
+import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executor
 import kotlin.time.Duration
 
 object DelayedRun {
@@ -34,5 +36,15 @@ object DelayedRun {
             inPast
         }
         futureTasks.drainTo(tasks)
+    }
+
+    @JvmField
+    val onThread = Executor {
+        val mc = Minecraft.getMinecraft()
+        if (mc.isCallingFromMinecraftThread) {
+            it.run()
+        } else {
+            Minecraft.getMinecraft().addScheduledTask(it)
+        }
     }
 }

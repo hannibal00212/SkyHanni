@@ -1,139 +1,118 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
-import org.lwjgl.opengl.GL11
 
-class RenderBackground {
+object RenderBackground {
 
-    fun renderBackground() {
-        val alignmentConfig = CustomScoreboard.alignmentConfig
-        val backgroundConfig = CustomScoreboard.backgroundConfig
-        val outlineConfig = backgroundConfig.outline
-        val position = CustomScoreboard.config.position
-        val border = backgroundConfig.borderSize
+    private val textureLocation by lazy { ResourceLocation("skyhanni", "scoreboard.png") }
 
-        val x = position.getAbsX()
-        val y = position.getAbsY()
+    internal fun addBackground(renderable: Renderable): Renderable {
+        with(backgroundConfig) {
+            if (!backgroundConfig.enabled) return renderable
 
-        val elementWidth = position.getDummySize().x
-        val elementHeight = position.getDummySize().y
+            val backgroundRenderable = createBackground(renderable)
 
-        // Update the position to the alignment options
-        if (
-            alignmentConfig.horizontalAlignment != RenderUtils.HorizontalAlignment.DONT_ALIGN
-            || alignmentConfig.verticalAlignment != RenderUtils.VerticalAlignment.DONT_ALIGN
-        ) {
-            position.set(updatePosition(position))
+            if (!outline.enabled) return backgroundRenderable
+
+            return Renderable.drawInsideRoundedRectOutline(
+                backgroundRenderable,
+                0,
+                backgroundConfig.roundedCornerSmoothness,
+                1,
+                outline.colorTop.toChromaColor().rgb,
+                outline.colorBottom.toChromaColor().rgb,
+                outline.thickness,
+                outline.blur,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
         }
-
-        if (GuiEditManager.isInGui()) return
-
-        GlStateManager.pushMatrix()
-
-        GlStateManager.color(1f, 1f, 1f, 1f)
-        GL11.glDepthMask(false)
-
-        if (backgroundConfig.enabled) {
-            if (backgroundConfig.useCustomBackgroundImage) {
-                val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
-                Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
-
-                Utils.drawTexturedRect(
-                    (x - border).toFloat(),
-                    (y - border).toFloat(),
-                    (elementWidth + border * 3).toFloat(),
-                    (elementHeight + border * 2).toFloat(),
-                    GL11.GL_NEAREST
-                )
-            } else {
-                RenderUtils.drawRoundRect(
-                    x - border,
-                    y - border,
-                    elementWidth + border * 3,
-                    elementHeight + border * 2,
-                    backgroundConfig.color.toChromaColor().rgb,
-                    backgroundConfig.roundedCornerSmoothness
-                )
-            }
-            if (outlineConfig.enabled) {
-                RenderUtils.drawRoundRectOutline(
-                    x - border,
-                    y - border,
-                    elementWidth + border * 3,
-                    elementHeight + border * 2,
-                    outlineConfig.colorTop.toChromaColor().rgb,
-                    outlineConfig.colorBottom.toChromaColor().rgb,
-                    outlineConfig.thickness,
-                    backgroundConfig.roundedCornerSmoothness,
-                    outlineConfig.blur
-                )
-            }
-        }
-        GL11.glDepthMask(true)
-        GlStateManager.popMatrix()
     }
 
-    private fun updatePosition(position: Position): Position {
+    private fun BackgroundConfig.createBackground(renderable: Renderable): Renderable =
+        if (backgroundConfig.useCustomBackgroundImage) {
+            Renderable.drawInsideImage(
+                renderable,
+                textureLocation,
+                (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
+                borderSize,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                radius = backgroundConfig.roundedCornerSmoothness,
+            )
+        } else {
+            Renderable.drawInsideRoundedRect(
+                renderable,
+                backgroundConfig.color.toChromaColor(),
+                borderSize,
+                backgroundConfig.roundedCornerSmoothness,
+                1,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
+        }
+
+
+    internal fun updatePosition(renderable: Renderable) {
+        if (GuiEditManager.isInGui()) return
         val alignmentConfig = CustomScoreboard.alignmentConfig
-        val backgroundConfig = CustomScoreboard.backgroundConfig
-        val outlineConfig = backgroundConfig.outline
-        val border = backgroundConfig.borderSize
 
-        val x = position.getAbsX()
-        val y = position.getAbsY()
+        with(alignmentConfig) {
+            if (horizontalAlignment == RenderUtils.HorizontalAlignment.DONT_ALIGN &&
+                verticalAlignment == RenderUtils.VerticalAlignment.DONT_ALIGN
+            ) return
+        }
 
-        val elementWidth = position.getDummySize().x
-        val elementHeight = position.getDummySize().y
+        val position = CustomScoreboard.config.position
 
         val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
         val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val elementWidth = (renderable.width * position.effectiveScale).toInt()
+        val elementHeight = (renderable.height * position.effectiveScale).toInt()
 
-
-        var newX = when (alignmentConfig.horizontalAlignment) {
-            RenderUtils.HorizontalAlignment.LEFT -> border
-            RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - (elementWidth + border * 3) / 2
-            RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - (elementWidth + border * 2)
-            else -> x
-        }
-
-        var newY = when (alignmentConfig.verticalAlignment) {
-            RenderUtils.VerticalAlignment.TOP -> border
-            RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - (elementHeight + border * 2) / 2
-            RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - border
-            else -> y
-        }
-
-        if (outlineConfig.enabled) {
-            val thickness = outlineConfig.thickness
-            if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
-                newX -= thickness / 2
-            } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
-                newX += thickness / 2
+        with(alignmentConfig) {
+            var x = when (horizontalAlignment) {
+                RenderUtils.HorizontalAlignment.DONT_ALIGN -> position.getAbsX()
+                RenderUtils.HorizontalAlignment.LEFT -> 0 + margin
+                RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - elementWidth / 2
+                RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - elementWidth - margin
+                else -> 0
+            }
+            var y = when (verticalAlignment) {
+                RenderUtils.VerticalAlignment.DONT_ALIGN -> position.getAbsY()
+                RenderUtils.VerticalAlignment.TOP -> 0 + margin
+                RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - elementHeight / 2
+                RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - margin
+                else -> 0
             }
 
-            if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
-                newY += thickness / 2
-            } else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
-                newY -= thickness / 2
-            }
-        }
+            val outlineConfig = backgroundConfig.outline
+            if (outlineConfig.enabled) {
+                val thickness = outlineConfig.thickness
 
-        return Position(
-            newX,
-            newY,
-            position.getScale(),
-            position.isCenter
-        )
+                when (horizontalAlignment) {
+                    RenderUtils.HorizontalAlignment.RIGHT -> x -= thickness / 2
+                    RenderUtils.HorizontalAlignment.LEFT -> x += thickness / 2
+                    else -> x
+                }
+
+                when (verticalAlignment) {
+                    RenderUtils.VerticalAlignment.TOP -> y += thickness / 2
+                    RenderUtils.VerticalAlignment.BOTTOM -> y -= thickness / 2
+                    else -> y
+                }
+            }
+            CustomScoreboard.config.position.moveTo(x, y)
+        }
     }
 }

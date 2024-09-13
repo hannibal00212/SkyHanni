@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -53,17 +54,12 @@ object CityProjectFeatures {
     private val patternGroup = RepoPattern.group("fame.projects")
     private val contributeAgainPattern by patternGroup.pattern(
         "contribute",
-        "§7Contribute again: §e(?<time>.*)"
+        "§7Contribute again: §e(?<time>.*)",
     )
     private val completedPattern by patternGroup.pattern(
         "completed",
-        "§aProject is (?:being built|released)!"
+        "§aProject is (?:being built|released)!",
     )
-
-    fun disable() {
-        config.dailyReminder = false
-        ChatUtils.chat("Disabled city project reminder messages!")
-    }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -79,11 +75,11 @@ object CityProjectFeatures {
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
-        ChatUtils.clickableChat(
-            "Daily City Project Reminder! (Click here to disable this reminder)",
-            onClick = { disable() },
-            "§eClick to disable!",
-            oneTimeClick = true
+        ChatUtils.clickToActionOrDisable(
+            "Daily City Project Reminder!",
+            config::dailyReminder,
+            actionName = "warp to Hub",
+            action = { HypixelCommands.warp("hub") },
         )
     }
 
@@ -166,8 +162,8 @@ object CityProjectFeatures {
                         } else {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }
-                    }
-                ) { inInventory && !NEUItems.neuHasFocus() }
+                    },
+                ) { inInventory && !NEUItems.neuHasFocus() },
             )
 
             val price = internalName.getPrice() * amount

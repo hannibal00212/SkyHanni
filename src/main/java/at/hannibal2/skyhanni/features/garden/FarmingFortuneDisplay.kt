@@ -44,33 +44,33 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal",
-        " Farming Fortune: §r§6☘(?<fortune>\\d+)"
+        " Farming Fortune: §r§6☘(?<fortune>\\d+)",
     )
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*"
+        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
     )
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
-        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$"
+        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",
-        "Tiered Bonus: .* [(](?<pieces>.*)/4[)]"
+        "Tiered Bonus: .* [(](?<pieces>.*)/4[)]",
     )
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)☘"
+        "§7Piece Bonus: §6+(?<bonus>.*)☘",
     )
 
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)☘.*"
+        "§7.*§7Grants §6(?<bonus>.*)☘.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -168,8 +168,8 @@ object FarmingFortuneDisplay {
             Renderable.string(
                 "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
                     farmingFortune.round(0).addSeparators()
-                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
-            )
+                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
+            ),
         )
         add(Renderable.horizontalContainer(list))
 
@@ -189,27 +189,31 @@ object FarmingFortuneDisplay {
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
         if (cropFortune) {
-            add(Renderable.clickAndHover(
-                "§cNo Crop Fortune Found! Enable The Stats Widget",
-                listOf(
-                    "§cEnable the Stats widget and enable",
-                    "§cshowing latest Crop Fortune."
+            add(
+                Renderable.clickAndHover(
+                    "§cNo Crop Fortune Found! Enable The Stats Widget",
+                    listOf(
+                        "§cEnable the Stats widget and enable",
+                        "§cshowing latest Crop Fortune.",
+                    ),
+                    onClick = {
+                        HypixelCommands.widget()
+                    },
                 ),
-                onClick = {
-                    HypixelCommands.widget()
-                }
-            ))
+            )
         } else {
-            add(Renderable.clickAndHover(
-                "§cNo Farming Fortune Found! Enable The Stats Widget",
-                listOf(
-                    "§cEnable the Stats widget and enable",
-                    "§cshowing the Farming Fortune stat."
+            add(
+                Renderable.clickAndHover(
+                    "§cNo Farming Fortune Found! Enable The Stats Widget",
+                    listOf(
+                        "§cEnable the Stats widget and enable",
+                        "§cshowing the Farming Fortune stat.",
+                    ),
+                    onClick = {
+                        HypixelCommands.widget()
+                    },
                 ),
-                onClick = {
-                    HypixelCommands.widget()
-                }
-            ))
+            )
         }
     }
 
@@ -300,7 +304,7 @@ object FarmingFortuneDisplay {
         val dedicationLevel = tool?.getEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
         val cropMilestone = GardenCropMilestones.getTierForCropCount(
-            cropType.getCounter(), cropType
+            cropType.getCounter(), cropType,
         )
         return dedicationMultiplier * cropMilestone
     }
@@ -355,11 +359,14 @@ object FarmingFortuneDisplay {
 
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
+            } else if (tool.getInternalName().equals("ZORROS_CAPE")) {
+                10.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
                 displayedFortune - reforgeFortune - gemstoneFortune - pesterminatorFortune - enchantmentFortune - dummiesFF
             }
-            greenThumbFortune = if (tool.getInternalName().contains("LOTUS")) {
+
+            greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it.equals("ZORROS_CAPE") }) {
                 displayedFortune - reforgeFortune - itemBaseFortune
             } else 0.0
         }

@@ -18,6 +18,11 @@ public class CommandsConfig {
     @Expose
     public BetterWikiCommandConfig betterWiki = new BetterWikiCommandConfig();
 
+    @ConfigOption(name = "Reverse Party Transfer", desc = "")
+    @Accordion
+    @Expose
+    public ReversePartyTransferConfig reversePT = new ReversePartyTransferConfig();
+
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
         "\n§eCommands: /pt, /pp, /pko, /pk, /pd §7(SkyBlock command §e/pt §7to check your play time will still work)")
     @Expose
@@ -42,4 +47,16 @@ public class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean viewRecipeLowerCase = true;
+
+    @Expose
+    @ConfigOption(name = "Fix Transfer Cooldown", desc = "Waits for the transfer cooldown to complete if you try to warp.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean transferCooldown = false;
+
+    @Expose
+    @ConfigOption(name = "Transfer Cooldown Ended Message", desc = "Sends a message in chat when the transfer cooldown ends.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean transferCooldownMessage = false;
 }

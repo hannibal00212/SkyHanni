@@ -71,6 +71,6 @@ public abstract class MixinGuiContainer extends GuiScreen {
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);
-        ToolTipData.INSTANCE.setLastSlot(theSlot);
+        ToolTipData.INSTANCE.setLastSlot(this.theSlot);
     }
 }

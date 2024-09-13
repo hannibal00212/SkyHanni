@@ -25,6 +25,7 @@ object ItemAddManager {
     enum class Source {
         ITEM_ADD,
         SACKS,
+        COMMAND,
     }
 
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".asInternalName()

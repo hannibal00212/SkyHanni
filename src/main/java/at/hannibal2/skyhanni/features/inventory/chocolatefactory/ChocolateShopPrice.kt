@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
@@ -39,18 +39,19 @@ object ChocolateShopPrice {
 
     private val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.title",
-        "Chocolate Shop"
+        "Chocolate Shop",
     )
     private val itemBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.bought",
-        "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!"
+        "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
     )
+
     /**
      * REGEX-TEST: §7Chocolate Spent: §60
      */
     private val chocolateSpentPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.spent",
-        "§7Chocolate Spent: §6(?<amount>[\\d,]+)"
+        "§7Chocolate Spent: §6(?<amount>[\\d,]+)",
     )
 
     var inInventory = false
@@ -143,8 +144,8 @@ object ChocolateShopPrice {
                     factor,
                     product.item,
                     hover,
-                    highlightsOnHoverSlots = product.slot?.let { listOf(it) } ?: emptyList()
-                )
+                    highlightsOnHoverSlots = product.slot?.let { listOf(it) } ?: emptyList(),
+                ),
             )
         }
 
@@ -171,7 +172,7 @@ object ChocolateShopPrice {
             config.position.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "Chocolate Shop Price"
+                posLabel = "Chocolate Shop Price",
             )
         }
     }

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
@@ -17,17 +17,14 @@ object UnknownLinesHandler {
     internal lateinit var remoteOnlyPatterns: Array<Pattern>
 
     fun handleUnknownLines() {
-        val sidebarLines = ScoreboardData.sidebarLinesFormatted
+        val sidebarLines = CustomScoreboard.activeLines
 
-        var unknownLines = sidebarLines
-            .map { it.removeResets() }
-            .filter { it.isNotBlank() }
-            .filter { it.trim().length > 3 }
+        var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
         /**
          * Remove known lines with patterns
          **/
-        val patternsToExclude = listOf(
+        val patternsToExclude = mutableListOf(
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
@@ -120,12 +117,15 @@ object UnknownLinesHandler {
             SbPattern.riftHotdogEatenPattern,
             SbPattern.mineshaftNotStartedPattern,
             SbPattern.queuePattern,
+            SbPattern.queueTierPattern,
             SbPattern.queuePositionPattern,
             SbPattern.fortunateFreezingBonusPattern,
             SbPattern.riftAveikxPattern,
             SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
             SbPattern.cluesPattern,
+            SbPattern.barryProtestorsQuestlinePattern,
+            SbPattern.barryProtestorsHandledPattern,
             SbPattern.carnivalPattern,
             SbPattern.carnivalTasksPattern,
             SbPattern.carnivalTokensPattern,
@@ -134,8 +134,11 @@ object UnknownLinesHandler {
             SbPattern.carnivalCatchStreakPattern,
             SbPattern.carnivalAccuracyPattern,
             SbPattern.carnivalKillsPattern,
-            *remoteOnlyPatterns,
         )
+
+        if (::remoteOnlyPatterns.isInitialized) {
+            patternsToExclude.addAll(remoteOnlyPatterns)
+        }
 
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
@@ -209,7 +212,9 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter { it !in unknownLinesSet }
 
         unknownLines.forEach {
-            ChatUtils.debug("Unknown Scoreboard line: '$it'")
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.debug("Unknown Scoreboard line: '$it'")
+            }
             unknownLinesSet.add(it)
         }
     }

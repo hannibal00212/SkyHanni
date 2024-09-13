@@ -28,12 +28,12 @@ import kotlin.math.min
 // TODO cleanup of redundant functions
 object GuiRenderUtils {
 
-    fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, colour: Int) {
+    fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
         GL11.glTranslatef(x2, y2, 0f)
-        fr.drawString(str, 0f, 0f, colour, shadow)
+        fr.drawString(str, 0f, 0f, color, shadow)
         GL11.glTranslatef(-x2, -y2, 0f)
     }
 
@@ -222,19 +222,19 @@ object GuiRenderUtils {
         return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
     }
 
-    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, colour: Int, inverseScale: Float) {
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         GuiScreen.drawRect(
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
             (bottom * inverseScale).toInt(),
-            colour
+            color,
         )
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, colour: Int) {
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
-        GuiScreen.drawRect(x, y, x + 16, y + 16, colour)
+        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
     }
 
     // Taken and edited from NEU <- it's broken

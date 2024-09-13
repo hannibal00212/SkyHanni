@@ -21,6 +21,8 @@ open class MobEvent(val mob: Mob) : LorenzEvent() {
         class Projectile(mob: Mob) : DeSpawn(mob)
     }
 
+    // TODO replace with "isFirstTime" parameter in the Spawn event. Also create an actual "player sees the mob for the first time" event
+    @Deprecated("Old. Will get replaced soon.")
     open class FirstSeen(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : FirstSeen(mob)
         class Summon(mob: Mob) : FirstSeen(mob)

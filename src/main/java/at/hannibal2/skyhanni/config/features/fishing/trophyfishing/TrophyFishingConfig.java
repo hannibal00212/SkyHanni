@@ -30,6 +30,11 @@ public class TrophyFishingConfig {
     public SulphurSkitterBoxConfig sulphurSkitterBox = new SulphurSkitterBoxConfig();
 
     @Expose
+    @ConfigOption(name = "Golden Fish Timer", desc = "")
+    @Accordion
+    public GoldenFishTimerConfig goldenFishTimer = new GoldenFishTimerConfig();
+
+    @Expose
     @ConfigOption(name = "Fillet Tooltip", desc = "Show fillet value of Trophy Fish in tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle

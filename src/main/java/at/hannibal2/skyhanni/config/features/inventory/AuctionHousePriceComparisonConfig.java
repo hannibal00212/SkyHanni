@@ -20,22 +20,22 @@ public class AuctionHousePriceComparisonConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Good Colour", desc = "What colour to highlight good value items with.")
+    @ConfigOption(name = "Good Color", desc = "What color to highlight good value items with.")
     @ConfigEditorColour
-    public String good = LorenzColor.GREEN.toConfigColour();
+    public String good = LorenzColor.GREEN.toConfigColor();
 
     @Expose
-    @ConfigOption(name = "Very Good Colour", desc = "What colour to highlight very good value items with.")
+    @ConfigOption(name = "Very Good Color", desc = "What color to highlight very good value items with.")
     @ConfigEditorColour
     public String veryGood = "0:255:0:139:0";
 
     @Expose
-    @ConfigOption(name = "Bad Colour", desc = "What colour to highlight bad items with.")
+    @ConfigOption(name = "Bad Color", desc = "What color to highlight bad items with.")
     @ConfigEditorColour
-    public String bad = LorenzColor.YELLOW.toConfigColour();
+    public String bad = LorenzColor.YELLOW.toConfigColor();
 
     @Expose
-    @ConfigOption(name = "Very Bad Colour", desc = "What colour to highlight very bad items with.")
+    @ConfigOption(name = "Very Bad Color", desc = "What color to highlight very bad items with.")
     @ConfigEditorColour
     public String veryBad = "0:255:225:43:30";
 }

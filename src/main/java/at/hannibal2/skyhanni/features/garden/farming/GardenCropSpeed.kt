@@ -177,8 +177,6 @@ object GardenCropSpeed {
         secondsStopped = 0
     }
 
-    fun finneganPerkActive() = Perk.FARMING_SIMULATOR.isActive
-
     fun isEnabled() = GardenAPI.inGarden()
 
     fun CropType.getSpeed() = cropsPerSecond?.get(this)

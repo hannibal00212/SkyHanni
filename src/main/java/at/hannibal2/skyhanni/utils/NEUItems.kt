@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -16,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -47,6 +46,11 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull as getPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRawCraftCostOrNullNew
 
 @SkyHanniModule
 object NEUItems {
@@ -134,10 +138,16 @@ object NEUItems {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
+
+            // we ignore all builder blocks from the item name -> internal name cache
+            // because builder blocks can have the same display name as normal items.
+            if (rawInternalName.startsWith("BUILDER_")) continue
+
             val internalName = rawInternalName.asInternalName()
 
-            // TODO remove one of them once neu is consistent
+            // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§f§f§7[lvl {lvl}] ")
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
@@ -160,62 +170,40 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+        val internalName = hypixelId.replace(':', '-')
+        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+    }
+
+    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+        getInternalNameFromHypixelIdOrNull(hypixelId)
+            ?: error("hypixel item id does not match internal name: $hypixelId")
+
+
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<NeuRecipe> = emptyList(),
-    ) = getPriceOrNull(priceSource, pastRecipes) ?: -1.0
+    ): Double = getPriceNew(priceSource, pastRecipes)
 
-    fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
 
-    fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
-        }
-        return BazaarDataHolder.getNpcPrice(this)
-    }
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<NeuRecipe> = emptyList(),
-    ): Double? {
-        when (this) {
-            NEUInternalName.JASPER_CRYSTAL -> return 0.0
-            NEUInternalName.RUBY_CRYSTAL -> return 0.0
-            NEUInternalName.SKYBLOCK_COIN -> return 1.0
-            NEUInternalName.WISP_POTION -> return 20_000.0
-        }
+    ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
-        if (priceSource != ItemPriceSource.NPC_SELL) {
-            getBazaarData()?.let {
-                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
-            }
-
-            val result = manager.auctionManager.getLowestBin(asString())
-            if (result != -1L) return result.toDouble()
-
-            if (equals("JACK_O_LANTERN")) {
-                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
-            }
-        }
-        if (equals("GOLDEN_CARROT")) {
-            // 6.8 for some players
-            return 7.0 // NPC price
-        }
-
-        return getNpcPriceOrNull() ?: getRawCraftCostOrNull(pastRecipes)
-    }
-
-    // If NEU fails to calculate the craft costs, we calculate it ourself.
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
-        manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
-            getRecipes(this).filter { it !in pastRecipes }
-                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
-                .filter { it >= 0 }
-                .minOrNull()
-        }
+        getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
@@ -225,16 +213,11 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            getPriceOrNull() ?: return@run fallbackItem
+            getPriceOrNullNew() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Something went wrong!"),
-                "Encountered an error getting the item for §7$this§c. " +
-                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case.",
-                "Item name" to this.asString(),
-                "repo commit" to manager.latestRepoCommit,
-            )
+
+            val name = this.toString()
+            ItemUtils.addMissingRepoItem(name, "Could not create item stack for $name")
             fallbackItem
         }
 
@@ -360,7 +343,7 @@ object NEUItems {
             val id = current.first
             return if (current.second > 1) {
                 val child = getPrimitiveMultiplier(id, tryCount + 1)
-                val result = child.multiply(current.second)
+                val result = child * current.second
                 multiplierCache[internalName] = result
                 result
             } else {
@@ -384,6 +367,8 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
+        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 

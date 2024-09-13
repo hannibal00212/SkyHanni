@@ -125,11 +125,17 @@ object SlayerQuestWarning {
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
         val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
 
-        val activeSlayer = SlayerAPI.activeSlayer
+        // workaround for rift mob that is unrelated to slayer
+        if (entity.name == "Oubliette Guard") return false
+        // workaround for Bladesoul in  Crimson Isle
+        if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
 
-        if (activeSlayer != null) {
-            if (slayerType != activeSlayer) {
-                val activeSlayerName = activeSlayer.displayName
+        val isSlayer = slayerType.clazz.isInstance(entity)
+        if (!isSlayer) return false
+
+        SlayerAPI.activeSlayer?.let {
+            if (slayerType != it) {
+                val activeSlayerName = it.displayName
                 val slayerName = slayerType.displayName
                 SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
@@ -138,9 +144,8 @@ object SlayerQuestWarning {
                 )
             }
         }
-        // workaround for rift mob that is unrelated to slayer
-        val isSlayer = slayerType.clazz.isInstance(entity) && entity.name != "Oubliette Guard"
-        return (getSlayerData().lastSlayerType == slayerType) && isSlayer
+
+        return getSlayerData().lastSlayerType == slayerType
     }
 
     @SubscribeEvent

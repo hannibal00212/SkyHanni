@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
+import at.hannibal2.skyhanni.config.features.event.carnival.CarnivalConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
 import com.google.gson.annotations.Expose;
@@ -41,6 +43,11 @@ public class EventConfig {
     @Accordion
     @Expose
     public GreatSpookConfig spook = new GreatSpookConfig();
+
+    @ConfigOption(name = "Carnival", desc = "")
+    @Accordion
+    @Expose
+    public CarnivalConfig carnival = new CarnivalConfig();
 
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")

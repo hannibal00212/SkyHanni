@@ -37,15 +37,15 @@ object PresentWaypoints {
     private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
     private val presentAlreadyFoundPattern by patternGroup.pattern(
         "foundalready",
-        "§cYou have already found this present!"
+        "§cYou have already found this present!",
     )
     private val presentFoundPattern by patternGroup.pattern(
         "found",
-        "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)"
+        "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)",
     )
     private val allFoundPattern by patternGroup.pattern(
         "foundall",
-        "§aCongratulations! You found all the presents in every lobby!"
+        "§aCongratulations! You found all the presents in every lobby!",
     )
 
     @SubscribeEvent
@@ -125,5 +125,5 @@ object PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints && WinterAPI.isDecember())
+        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterAPI.isDecember()
 }

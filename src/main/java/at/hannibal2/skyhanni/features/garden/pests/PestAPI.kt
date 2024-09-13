@@ -158,7 +158,7 @@ object PestAPI {
         PestUpdateEvent().post()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
     fun onPestSpawn(event: PestSpawnEvent) {
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames

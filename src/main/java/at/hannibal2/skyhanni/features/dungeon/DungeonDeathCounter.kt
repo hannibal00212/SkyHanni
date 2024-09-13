@@ -94,7 +94,7 @@ object DungeonDeathCounter {
         if (!isEnabled()) return
 
         config.deathCounterPos.renderString(
-            DungeonMilestonesDisplay.colour + display,
+            DungeonMilestonesDisplay.color + display,
             posLabel = "Dungeon Death Counter"
         )
     }

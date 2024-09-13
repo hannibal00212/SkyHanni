@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -25,8 +26,9 @@ object StringUtils {
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
+    private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -194,7 +196,7 @@ object StringUtils {
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val matcher = stringColourPattern.matcher(string)
+        val matcher = stringColorPattern.matcher(string)
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
@@ -244,7 +246,6 @@ object StringUtils {
             codes + text.removeRange(matcher.range)
         } ?: text
     }
-
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -556,7 +557,16 @@ object StringUtils {
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
-    fun String.width(): Int {
-        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+
+    fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.isValidUuid(): Boolean {
+        return try {
+            UUID.fromString(this)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
     }
 }

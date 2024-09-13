@@ -49,6 +49,16 @@ object UtilsPatterns {
         "^(?<format>(?:§.)*)(?<name>[^§]+) (?<level>[IVXL]+)(?: Book)?$"
     )
 
+    /**
+     * REGEX-TEST: duplex i
+     * REGEX-TEST: ultimate wise v
+     * REGEX-TEST: chimera 2
+     */
+    val cleanEnchantedNamePattern by patternGroup.pattern(
+        "item.enchantment.clean.name",
+        "(?i)(?<name>.*) (?<level>[IVXL]+|[0-9]+)"
+    )
+
     val potionPattern by patternGroup.pattern(
         "item.name.potion",
         ".*Potion"

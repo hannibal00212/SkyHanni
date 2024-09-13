@@ -34,15 +34,15 @@ object BazaarCancelledBuyOrderClipboard {
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",
-        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\."
+        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\.",
     )
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage",
-        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!"
+        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!",
     )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
-        "Order options"
+        "Order options",
     )
 
     /**
@@ -50,7 +50,7 @@ object BazaarCancelledBuyOrderClipboard {
      */
     private val lastItemClickedPattern by patternGroup.pattern(
         "lastitemclicked",
-        "§a§lBUY (?<name>.*)"
+        "§a§lBUY (?<name>.*)",
     )
 
     private var latestAmount: Int? = null
@@ -83,7 +83,7 @@ object BazaarCancelledBuyOrderClipboard {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!BazaarOrderHelper.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
+        if (!BazaarApi.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
         val item = event.slot?.stack ?: return
 
         val name = lastItemClickedPattern.matchMatcher(item.name) {
@@ -105,9 +105,12 @@ object BazaarCancelledBuyOrderClipboard {
 
         val message = "Bazaar buy order cancelled. Click to reorder. " +
             "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
-        ChatUtils.clickableChat(message, onClick = {
-            BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
-        })
+        ChatUtils.clickableChat(
+            message,
+            onClick = {
+                BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
+            },
+        )
         OSUtils.copyToClipboard(latestAmount.toString())
         this.latestAmount = null
     }

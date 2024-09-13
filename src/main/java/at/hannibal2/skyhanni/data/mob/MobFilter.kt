@@ -103,6 +103,10 @@ object MobFilter {
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
+    val heavyPearlPattern by repoGroup.pattern(
+        "pattern.heavypearl.collect",
+        "§.§lCOLLECT!",
+    )
 
     /**
      * REGEX-TEST: §8[§7Lv1§8] §5Horse

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -19,8 +20,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -28,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,6 +43,10 @@ object PestFinder {
     private val config get() = PestAPI.config.pestFinder
 
     private var display = emptyList<Renderable>()
+    val noPestsChatPattern by RepoPattern.pattern(
+        "chat.garden.no.pest",
+        "§cThere are not any Pests on your Garden right now! Keep farming!",
+    )
 
     @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
@@ -68,26 +76,28 @@ object PestFinder {
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
-                    "§eClick here to warp!"
+                    "§eClick here to warp!",
                 ),
                 onClick = {
                     plot.sendTeleportTo()
-                }
+                },
             )
             add(renderable)
         }
 
         if (PestAPI.getInfestedPlots().isEmpty() && PestAPI.scoreboardPests != 0) {
             add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
-            add(Renderable.clickAndHover(
-                "§cTry opening your plots menu.",
-                listOf(
-                    "Runs /desk."
+            add(
+                Renderable.clickAndHover(
+                    "§cTry opening your plots menu.",
+                    listOf(
+                        "Runs /desk.",
+                    ),
+                    onClick = {
+                        HypixelCommands.gardenDesk()
+                    },
                 ),
-                onClick = {
-                    HypixelCommands.gardenDesk()
-                }
-            ))
+            )
         }
     }
 
@@ -151,11 +161,19 @@ object PestFinder {
             pests
             ) + " §c$pestsName §7in §b$plotName"
         event.drawDynamicText(
-            location, text, 1.5
+            location, text, 1.5,
         )
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (!config.noPestTitle) return
+
+        if (noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+    }
 
     @SubscribeEvent
     fun onKeyClick(event: LorenzKeyPressEvent) {

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
@@ -45,7 +45,7 @@ object ThunderSparksHighlight {
         if (!isEnabled()) return
 
         val special = config.color
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        val color = Color(SpecialColor.specialToChromaRGB(special), true)
 
         val playerLocation = LocationUtils.playerLocation()
         for (spark in sparks) {

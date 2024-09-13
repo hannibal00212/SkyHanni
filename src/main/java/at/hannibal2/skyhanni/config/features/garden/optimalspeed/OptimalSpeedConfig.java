@@ -17,7 +17,7 @@ public class OptimalSpeedConfig {
     public boolean showOnHUD = false;
 
     @Expose
-    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigOption(name = "Wrong Speed Warning", desc = "Warn via title and chat message when you don't have the optimal speed.")
     @ConfigEditorBoolean
     public boolean warning = false;
 

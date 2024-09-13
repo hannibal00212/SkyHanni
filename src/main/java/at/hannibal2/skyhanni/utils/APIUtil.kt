@@ -185,6 +185,7 @@ object APIUtil {
         return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))
     }
 
+    // TODO remove command, use clickable chat message instead
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
         ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")

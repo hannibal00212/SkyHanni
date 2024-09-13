@@ -56,7 +56,7 @@ var beenAfkFor = SimpleTimeMark.now()
 
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2)
+    val petName = it.substring(2).removeColor()
     val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
@@ -86,7 +86,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     NONE({ null }),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
+        var location = LorenzUtils.skyBlockArea ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"
@@ -167,9 +167,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         } ?: "No item in hand"
     }),
 
-    TIME({
-        SkyBlockTime.now().formatted()
-    }),
+    TIME(
+        {
+            SkyBlockTime.now().formatted().removeColor()
+        },
+    ),
 
     PROFILE({
         val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
@@ -226,25 +228,30 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         DiscordRPCManager.config.customText.get() // custom field in the config
     }),
 
-    AUTO({
-        var autoReturn = ""
-        for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
-            // TODO, change functionality to use enum rather than ordinals
-            val autoStatus = AutoStatus.entries[statusID.ordinal]
-            val result =
-                autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
-            if (result != autoStatus.placeholderText) { // if that value is useful, display it
-                autoReturn = result
-                break
+    AUTO(
+        {
+            var autoReturn = ""
+            for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
+                // TODO, change functionality to use enum rather than ordinals
+                val autoStatus = AutoStatus.entries[statusID.ordinal]
+                val result =
+                    autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
+                if (result != autoStatus.placeholderText) { // if that value is useful, display it
+                    autoReturn = result
+                    break
+                }
             }
-        }
-        if (autoReturn == "") { // if we didn't find any useful information, display the fallback
-            val statusNoAuto = DiscordStatus.entries.toMutableList()
-            statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
-        }
-        autoReturn
-    }),
+            if (autoReturn == "") { // if we didn't find any useful information, display the fallback
+                val fallbackID = DiscordRPCManager.config.auto.get().ordinal
+                autoReturn = if (fallbackID == 10) {
+                    NONE.getDisplayString() // 10 is this (DiscordStatus.AUTO); prevents an infinite loop
+                } else {
+                    DiscordStatus.entries[fallbackID].getDisplayString()
+                }
+            }
+            autoReturn
+        },
+    ),
 
     CROP_MILESTONES({ getCropMilestoneDisplay() }),
 

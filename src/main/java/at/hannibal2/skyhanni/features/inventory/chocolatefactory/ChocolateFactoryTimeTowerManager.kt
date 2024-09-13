@@ -92,11 +92,11 @@ object ChocolateFactoryTimeTowerManager {
         val warningSeparation = if (inInventory) 30.seconds else 5.minutes
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
 
-        ChatUtils.clickableChat(
-            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
-                "Use one to avoid wasting time tower usages!",
-            onClick = { HypixelCommands.chocolateFactory() },
-            HOVER_TEXT,
+        ChatUtils.clickToActionOrDisable(
+            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages!",
+            config::timeTowerWarning,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()

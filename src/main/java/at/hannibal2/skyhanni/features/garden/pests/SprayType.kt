@@ -6,6 +6,7 @@ enum class SprayType(val displayName: String) {
     DUNG("Dung"),
     HONEY_JAR("Honey Jar"),
     TASTY_CHEESE("Tasty Cheese"),
+    FINE_FLOUR("Fine Flour"),
     ;
 
     companion object {

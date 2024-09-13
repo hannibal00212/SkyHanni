@@ -8,9 +8,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -33,6 +37,7 @@ object GardenOptimalSpeed {
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
+    private val rancherBoots = "RANCHERS_BOOTS".asInternalName()
 
     /**
      * This speed value represents the walking speed, not the speed stat.
@@ -175,21 +180,26 @@ object GardenOptimalSpeed {
         if (speed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn(speed)
     }
 
-    private fun warn(speed: Int) {
+    private fun warn(optimalSpeed: Int) {
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (GardenAPI.onBarnPlot) return
         if (!config.warning) return
+        if (!GardenAPI.isCurrentlyFarming()) return
+        if (InventoryUtils.getBoots()?.getInternalNameOrNull() != rancherBoots) return
         if (lastWarnTime.passedSince() < 20.seconds) return
 
         lastWarnTime = SimpleTimeMark.now()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
-        cropInHand?.let {
-            var text = "Wrong speed for ${it.cropName}: §f$currentSpeed"
-            if (sneaking) text += " §7[Sneaking]"
-            text += " §e(§f$speed §eis optimal)"
+        val cropInHand = cropInHand ?: return
 
-            ChatUtils.chat(text)
-        }
+        var text = "§cWrong speed while farming ${cropInHand.cropName} detected!"
+        text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
+        ChatUtils.clickToActionOrDisable(
+            text,
+            config::warning,
+            actionName = "change the speed",
+            action = { HypixelCommands.setMaxSpeed() },
+        )
     }
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled

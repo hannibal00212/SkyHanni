@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
@@ -78,7 +78,7 @@ object SulphurSkitterBox {
     }
 
     private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
-        val color = Color(SpecialColour.specialToChromaRGB(config.boxColor), true)
+        val color = Color(SpecialColor.specialToChromaRGB(config.boxColor), true)
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 RenderUtils.drawFilledBoundingBox_nea(

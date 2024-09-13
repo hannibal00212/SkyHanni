@@ -44,7 +44,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         String string = classUrl.toString();
         if (classUrl.getProtocol().equals("jar")) {
             try {
-                return new URL(string.substring(4).split("!")[0]);
+                return new URL(string.substring(4, string.lastIndexOf('!')));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }

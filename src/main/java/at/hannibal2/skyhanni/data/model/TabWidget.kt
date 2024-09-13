@@ -55,7 +55,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*",
+        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -195,7 +195,7 @@ enum class TabWidget(
     ),
     BROODMOTHER(
         // language=RegExp
-        "Broodmother: (?:§.)*(?<time>.*)",
+        "Broodmother: (?:§.)*(?<stage>.*)",
     ),
     EYES_PLACED(
         // language=RegExp
@@ -307,6 +307,10 @@ enum class TabWidget(
         // language=RegExp
         "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
     ),
+    EVENT_TRACKERS(
+        // language=RegExp
+        "§e§lEvent Trackers:",
+    )
 
     ;
 

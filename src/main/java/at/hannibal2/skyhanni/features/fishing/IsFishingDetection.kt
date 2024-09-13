@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
-import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
+import at.hannibal2.skyhanni.events.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -26,7 +26,7 @@ object IsFishingDetection {
     private var lastSeaCreatureKillAreaTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onBobberInWater(event: FishingBobberInWaterEvent) {
+    fun onBobber(event: FishingBobberInLiquidEvent) {
         lastRodCastLocation = LocationUtils.playerLocation()
         lastRodCastTime = SimpleTimeMark.now()
     }

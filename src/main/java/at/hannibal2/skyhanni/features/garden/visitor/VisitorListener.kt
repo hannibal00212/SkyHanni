@@ -56,7 +56,7 @@ object VisitorListener {
     }
 
     // TODO make event
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
@@ -136,7 +136,7 @@ object VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
     fun onTooltip(event: ItemHoverEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return

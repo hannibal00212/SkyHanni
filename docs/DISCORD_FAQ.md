@@ -26,8 +26,8 @@ _Frequently Asked Questions_
 
 > **8: How can I get bigger crop hit boxes?**
 > Use Patcher or PolyPatcher to have 1.12 hit boxes in 1.8.9.
-> - [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>)
-> - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes)
+> - [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>) (Versions 1.8.8 and after will have broken cactus hitboxes)
+> - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes. Fixes cactus hitboxes.)
 
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
@@ -57,10 +57,17 @@ _Frequently Asked Questions_
 > **12: Why can I still see the normal Scoreboard when using Custom Scoreboard?**
 > Most of the time, this is a mod conflict.
 > If you are using [Sidebar Mod](https://github.com/Alexdoru/SidebarMod), please remove this mod.
-> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.8 or newer to resolve this issue.
+> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.9 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
+> If you are using [Odin](https://github.com/odtheking/Odin), disable their "Sidebar".
+> If you are using [Patcher](https://sk1er.club/mods/patcher) or [PolyPatcher](https://modrinth.com/mod/patcher) and the vanilla scoreboard is flickering, disable the "HUD Caching" option.
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
+> **13: Why doesn't the burrow warp key and line prioritize my guess waypoint when there are known burrows nearby?**
+> This is intended behavior. SkyHanni prioritizes the closest known burrow or guess waypoint, not necessarily the guess waypoint itself. Focusing on the closest point, even if it's a known burrow and not your guess, is faster and leads to a higher "burrows dug over time" rate, meaning more mobs, more inquisitors, more money and faster milestones. 
+> While interrupting your current chain to focus on a nearby burrow might feel counterintuitive, it ultimately benefits you in the long run. 
+> The existing chain isn't reset, and you gain the advantage of a higher burrow digging rate.
 
-*This FAQ was last updated on July 1st, 2024.
+
+*This FAQ was last updated on August 26th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

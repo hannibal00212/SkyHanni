@@ -31,87 +31,97 @@ object DungeonFinderFeatures {
     private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*"
+        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*"
+        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(?i).*(PERM|VC|DISCORD).*"
+        "(?i).*(PERM|VC|DISCORD).*",
     )
     private val memberPattern by patternGroup.pattern(
         "member",
-        ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)"
+        ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
-        "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)"
+        "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
     )
     private val classLevelPattern by patternGroup.pattern(
         "class.level",
-        " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)"
+        " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
     private val notePattern by patternGroup.pattern(
         "note",
-        "§7§7Note: §f(?<note>.*)"
+        "§7§7Note: §f(?<note>.*)",
     )
+
+    /**
+     * REGEX-TEST: The Catacombs
+     * REGEX-TEST: MM The Catacombs
+     */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM Catacombs).*"
+        "(The Catacombs).*|.*(MM The Catacombs).*",
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
-        ".*('s Party)"
+        ".*('s Party)",
     )
     private val partyFinderTitlePattern by patternGroup.pattern(
         "party.finder.title",
-        "(Party Finder)"
+        "(Party Finder)",
     )
     private val catacombsGatePattern by patternGroup.pattern(
         "catacombs.gate",
-        "(Catacombs Gate)"
+        "(Catacombs Gate)",
     )
     private val selectFloorPattern by patternGroup.pattern(
         "select.floor",
-        "(Select Floor)"
+        "(Select Floor)",
     )
     private val entranceFloorPattern by patternGroup.pattern(
         "entrance",
-        "(.*Entrance)"
+        "(.*Entrance)",
     )
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "(Floor .*)"
+        "(Floor .*)",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
-        "(Any)"
+        "(Any)",
     )
+
+    /**
+     * REGEX-TEST: Master Mode The Catacombs
+     * REGEX-TEST: MM The Catacombs
+     */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM )|(.*Master Mode Catacombs)"
+        "(MM|.*Master Mode) The Catacombs.*",
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
-        "(Dungeon: .*)"
+        "(Dungeon: .*)",
     )
     private val floorFloorPattern by patternGroup.pattern(
         "floor.pattern",
-        "(Floor: .*)"
+        "(Floor: .*)",
     )
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",
-        ".* (?<floorNum>[IV\\d]+)"
+        ".* (?<floorNum>[IV\\d]+)",
     )
     private val getDungeonClassPattern by patternGroup.pattern(
         "get.dungeon.class",
-        ".* (?<class>.*)"
+        ".* (?<class>.*)",
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "§7View and select a dungeon class."
+        "§7View and select a dungeon class.",
     )
 
     private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
@@ -195,14 +205,13 @@ object DungeonFinderFeatures {
         }
     }
 
-    private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String =
-        if (entranceFloorPattern.matches(floor)) {
-            "E"
-        } else if (masterModeFloorPattern.matches(dungeon)) {
-            "M$floorNum"
-        } else {
-            "F$floorNum"
-        }
+    private fun getFloorName(floor: String, dungeon: String, floorNum: Int?): String = if (entranceFloorPattern.matches(floor)) {
+        "E"
+    } else if (masterModeFloorPattern.matches(dungeon)) {
+        "M$floorNum"
+    } else {
+        "F$floorNum"
+    }
 
     private fun highlightingHandler(event: InventoryOpenEvent): Map<Int, LorenzColor> {
         val map = mutableMapOf<Int, LorenzColor>()
@@ -297,7 +306,11 @@ object DungeonFinderFeatures {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        val toolTip = toolTipMap[event.slot.slotIndex]
+
+        val featureActive = config.let { it.coloredClassLevel || it.showMissingClasses }
+        if (!featureActive) return
+
+        val toolTip = toolTipMap[event.slot.slotNumber]
         if (toolTip.isNullOrEmpty()) return
         // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip
@@ -316,8 +329,7 @@ object DungeonFinderFeatures {
         if (!config.floorAsStackSize) return
         val slot = event.slot
         if (slot.slotNumber != slot.slotIndex) return
-        event.stackTip = (floorStackSize[slot.slotIndex]
-            ?.takeIf { it.isNotEmpty() } ?: return)
+        event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
     @SubscribeEvent
@@ -325,11 +337,9 @@ object DungeonFinderFeatures {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.gui.inventorySlots.inventorySlots
-            .associateWith { highlightParty[it.slotNumber] }
-            .forEach { (slot, color) ->
-                color?.let { slot.highlight(it) }
-            }
+        event.gui.inventorySlots.inventorySlots.associateWith { highlightParty[it.slotNumber] }.forEach { (slot, color) ->
+            color?.let { slot.highlight(it) }
+        }
     }
 
     @SubscribeEvent

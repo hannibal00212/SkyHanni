@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,6 +28,9 @@ object ItemNameResolver {
 
         resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
+        }
+        resolveEnchantmentByCleanName(itemName)?.let {
+            return itemNameCache.getOrPut(lowercase) { it }
         }
         if (itemName.endsWith("gemstone", ignoreCase = true)) {
             val split = lowercase.split(" ")
@@ -68,6 +73,28 @@ object ItemNameResolver {
         return internalName
     }
 
+    private fun resolveEnchantmentByCleanName(itemName: String): NEUInternalName? {
+        UtilsPatterns.cleanEnchantedNamePattern.matchMatcher(itemName) {
+            val name = group("name")
+            val level = group("level").romanToDecimalIfNecessary()
+            val rawInternalName = "$name;$level".uppercase()
+
+            var internalName = fixEnchantmentName(rawInternalName)
+            internalName.getItemStackOrNull()?.let {
+                return internalName
+            }
+
+            internalName = fixEnchantmentName("ULTIMATE_$rawInternalName")
+            internalName.getItemStackOrNull()?.let {
+                return internalName
+            }
+
+            return null
+        }
+        return null
+    }
+
+    // does not work without color codes, or with roman numbers
     // Taken and edited from NEU
     private fun resolveEnchantmentByName(enchantmentName: String) =
         UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
@@ -87,7 +114,7 @@ object ItemNameResolver {
     // Workaround for duplex
     private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
 
-    private fun fixEnchantmentName(originalName: String): NEUInternalName {
+    fun fixEnchantmentName(originalName: String): NEUInternalName {
         duplexPattern.matchMatcher(originalName) {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".asInternalName()

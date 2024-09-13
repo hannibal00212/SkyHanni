@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,7 +42,7 @@ object AshfangGravityOrbs {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val color = Color(SpecialColour.specialToChromaRGB(config.color), true)
+        val color = Color(SpecialColor.specialToChromaRGB(config.color), true)
         val playerLocation = LocationUtils.playerLocation()
         for (orb in orbs) {
             if (orb.isDead) continue

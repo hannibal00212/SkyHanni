@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -39,9 +40,11 @@ object ChocolateFactoryBlockOpen {
 
         commandSentTimer = SimpleTimeMark.now()
         event.cancel()
-        ChatUtils.chatAndOpenConfig(
-            "Blocked opening the Chocolate Factory without a §dMythic Rabbit Pet §eequipped. Click here to disable!",
+        ChatUtils.clickToActionOrDisable(
+            "§cBlocked opening the Chocolate Factory without a §dMythic Rabbit Pet §cequipped!",
             config::mythicRabbitRequirement,
+            actionName = "open pets menu",
+            action = { HypixelCommands.pet() },
         )
     }
 

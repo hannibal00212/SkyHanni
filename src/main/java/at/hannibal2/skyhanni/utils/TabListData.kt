@@ -36,6 +36,7 @@ object TabListData {
     var fullyLoaded = false
 
     // TODO replace with TabListUpdateEvent
+    @Deprecated("replace with TabListUpdateEvent")
     fun getTabList() = debugCache ?: tablistCache
     fun getHeader() = header
     fun getFooter() = footer

@@ -25,7 +25,7 @@ enum class OreBlock(
     // MITHRIL
     LOW_TIER_MITHRIL(
         checkBlock = ::isLowTierMithril,
-        checkArea = { inGlacite },
+        checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
     ),
     MID_TIER_MITHRIL(
         checkBlock = { it.block == Blocks.prismarine },
@@ -133,21 +133,33 @@ enum class OreBlock(
     ),
 
     // DWARVEN BLOCKS
-    DWARVEN_REDSTONE(
-        checkBlock = { it.block == Blocks.redstone_block },
-        checkArea = { inCrystalHollows },
+    PURE_COAL(
+        checkBlock = { it.block == Blocks.coal_block },
+        checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    DWARVEN_GOLD(
+    PURE_IRON(
+        checkBlock = { it.block == Blocks.iron_block },
+        checkArea = { inDwarvenMines || inCrystalHollows },
+    ),
+    PURE_GOLD(
         checkBlock = { it.block == Blocks.gold_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    DWARVEN_EMERALD(
-        checkBlock = { it.block == Blocks.emerald_block },
-        checkArea = { inCrystalHollows },
+    PURE_LAPIS(
+        checkBlock = { it.block == Blocks.lapis_block },
+        checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    DWARVEN_DIAMOND(
+    PURE_REDSTONE(
+        checkBlock = { it.block == Blocks.redstone_block },
+        checkArea = { inDwarvenMines || inCrystalHollows },
+    ),
+    PURE_EMERALD(
+        checkBlock = { it.block == Blocks.emerald_block },
+        checkArea = { inDwarvenMines || inCrystalHollows },
+    ),
+    PURE_DIAMOND(
         checkBlock = { it.block == Blocks.diamond_block },
-        checkArea = { inCrystalHollows },
+        checkArea = { inDwarvenMines || inCrystalHollows },
     ),
 
     // GEMSTONES
@@ -176,7 +188,7 @@ enum class OreBlock(
         checkArea = { inCrystalHollows || inGlacite },
     ),
     JASPER(
-        checkBlock = { it.isGemstoneWithColor(EnumDyeColor.PINK) },
+        checkBlock = { it.isGemstoneWithColor(EnumDyeColor.MAGENTA) },
         checkArea = { inCrystalHollows || inGlacite },
     ),
     OPAL(

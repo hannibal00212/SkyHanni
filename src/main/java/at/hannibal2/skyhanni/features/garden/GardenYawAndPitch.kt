@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -29,10 +30,7 @@ object GardenYawAndPitch {
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         val player = Minecraft.getMinecraft().thePlayer
-
-        var yaw = player.rotationYaw % 360
-        if (yaw < 0) yaw += 360
-        if (yaw > 180) yaw -= 360
+        var yaw = LocationUtils.calculatePlayerYaw()
         val pitch = player.rotationPitch
 
         if (yaw != lastYaw || pitch != lastPitch) {

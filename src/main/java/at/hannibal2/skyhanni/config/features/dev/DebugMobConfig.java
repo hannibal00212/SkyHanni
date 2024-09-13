@@ -74,7 +74,7 @@ public class DebugMobConfig {
         public HowToShow special = HowToShow.OFF;
 
         @Expose
-        @ConfigOption(name = "Show Invisible", desc = "Shows the mob even though they are invisible (do to invisibility effect) if looked at directly.")
+        @ConfigOption(name = "Show Invisible", desc = "Shows invisible mobs (due to invisibility effect) if looked at directly.")
         @ConfigEditorBoolean
         public boolean showInvisible = false;
     }

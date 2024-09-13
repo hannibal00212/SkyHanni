@@ -47,9 +47,13 @@ object SlayerAPI {
             val totalPrice = maxPrice * amount
 
             val format = totalPrice.shortFormat()
-            val priceFormat = " §7(§6$format coins§7)"
 
-            "$amountFormat$displayName$priceFormat" to totalPrice
+            if (internalName == NEUInternalName.SKYBLOCK_COIN) {
+                "§6$format coins" to totalPrice
+            } else {
+                val priceFormat = " §7(§6$format coins§7)"
+                "$amountFormat$displayName$priceFormat" to totalPrice
+            }
         }
 
     @SubscribeEvent

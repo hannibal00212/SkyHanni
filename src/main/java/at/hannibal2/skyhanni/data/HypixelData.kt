@@ -290,6 +290,7 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            ProfileStorageData.profileJoinMessage()
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
@@ -317,7 +318,7 @@ object HypixelData {
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
+                    val originalLocation = group("area").removeColor()
                     skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
                     break@loop

@@ -17,6 +17,7 @@ public class KloonHackingConfig {
     @ConfigOption(name = "Color Guide", desc = "Show which color to pick.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to color
     public boolean colour = true;
 
     @Expose

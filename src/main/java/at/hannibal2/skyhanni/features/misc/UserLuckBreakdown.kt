@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -33,6 +34,7 @@ object UserLuckBreakdown {
     private var skillCalcCoolDown = SimpleTimeMark.farPast()
 
     private val storage get() = ProfileStorageData.playerSpecific
+    private val config get() = SkyHanniMod.feature.misc
 
     private lateinit var mainLuckItem: ItemStack
     private val mainLuckID = "ENDER_PEARL".asInternalName()
@@ -71,6 +73,7 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!config.userluckEnabled) return
         if (event.inventory !is ContainerLocalMenu) return
         if (!inMiscStats) return
 
@@ -151,6 +154,7 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun onHoverItem(event: LorenzToolTipEvent) {
+        if (!config.userluckEnabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
@@ -212,6 +216,7 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.userluckEnabled) return
         if (!inMiscStats) return
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
         if (limboUserLuck == 0.0f && !showAllStats) return

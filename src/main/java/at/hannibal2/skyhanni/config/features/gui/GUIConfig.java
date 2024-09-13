@@ -67,6 +67,11 @@ public class GUIConfig {
     public HotbarConfig hotbar = new HotbarConfig();
 
     @Expose
+    @ConfigOption(name = "Xp Bar", desc = "Settings for adjusting the xp bar")
+    @Accordion
+    public XPBarConfig xpBar = new XPBarConfig();
+
+    @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     @Accordion
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
@@ -80,6 +85,11 @@ public class GUIConfig {
     @ConfigOption(name = "Custom Text Box", desc = "")
     @Accordion
     public TextBoxConfig customTextBox = new TextBoxConfig();
+
+    @Expose
+    @ConfigOption(name = "Tab Widget", desc = "")
+    @Accordion
+    public TabWidgetConfig tabWidget = new TabWidgetConfig();
 
     @Expose
     @ConfigOption(name = "In-Game Date", desc = "")

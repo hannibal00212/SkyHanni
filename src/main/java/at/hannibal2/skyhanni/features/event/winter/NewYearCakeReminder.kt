@@ -24,7 +24,7 @@ object NewYearCakeReminder {
     private val config get() = SkyHanniMod.feature.event.winter
     private val sidebarDetectionPattern by RepoPattern.pattern(
         "event.winter.newyearcake.reminder.sidebar",
-        "§dNew Year Event!§f (?<time>.*)"
+        "§dNew Year Event!§f (?<time>.*)",
     )
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -63,11 +63,11 @@ object NewYearCakeReminder {
 
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
-
-        ChatUtils.clickableChat(
+        ChatUtils.clickToActionOrDisable(
             "Reminding you to grab the free New Year Cake. Click here to open the baker menu!",
-            onClick = { HypixelCommands.openBaker() },
-            "§eClick to run /openbaker!",
+            config::newYearCakeReminder,
+            actionName = "open the baker menu",
+            action = { HypixelCommands.openBaker() },
         )
     }
 

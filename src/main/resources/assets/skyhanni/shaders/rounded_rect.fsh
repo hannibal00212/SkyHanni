@@ -22,7 +22,7 @@ void main() {
     vec2 newHalfSize = vec2(halfSize.x * xScale, halfSize.y * yScale);
 
     float newCenterPosY = centerPos.y;
-    if (yScale > 1.0) {
+    if (yScale != 1.0) {
         newCenterPosY = centerPos.y - (halfSize.y * (yScale - 1));
     }
 

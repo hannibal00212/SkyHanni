@@ -30,4 +30,10 @@ public class RiftTimerConfig {
     @ConfigLink(owner = RiftTimerConfig.class, field = "enabled")
     public Position timerPosition = new Position(10, 10, false, true);
 
+    @Expose
+    @ConfigOption(name = "Nametag Format", desc = "Format the remaining rift time for other players in their nametag.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean nametag = true;
+
 }

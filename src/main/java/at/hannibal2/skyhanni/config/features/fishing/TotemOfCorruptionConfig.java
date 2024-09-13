@@ -29,7 +29,8 @@ public class TotemOfCorruptionConfig {
     public int distanceThreshold = 16;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.\n" +
+        "§eRequires the Overlay to be active.")
     @ConfigEditorBoolean
     public boolean hideParticles = true;
 

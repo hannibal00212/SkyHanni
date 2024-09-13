@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
+import at.hannibal2.skyhanni.utils.FakePlayer;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,8 +34,9 @@ public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
         return true;
     }
 
-    @Inject(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/EnumChatFormatting;getTextWithoutFormattingCodes(Ljava/lang/String;)Ljava/lang/String;", shift = At.Shift.AFTER))
+    @Inject(method = "rotateCorpse", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/EnumChatFormatting;getTextWithoutFormattingCodes(Ljava/lang/String;)Ljava/lang/String;", shift = At.Shift.AFTER), cancellable = true)
     private void rotateThePlayer(T bat, float p_77043_2_, float p_77043_3_, float partialTicks, CallbackInfo ci) {
+        if (bat instanceof FakePlayer) ci.cancel();
         if (bat instanceof EntityPlayer) {
             RendererLivingEntityHook.rotatePlayer((EntityPlayer) bat);
         }

@@ -1,0 +1,75 @@
+net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
+net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
+net.minecraft.world.entity.decoration.ArmorStand getArmorSlots() getArmorInventoryList()
+net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
+net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiContainer
+
+net.minecraft.world.entity.player.Inventory armor armorInventory
+
+net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
+net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
+net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity
+net.minecraft.world.entity.Entity xo posX
+net.minecraft.world.entity.Entity yo posY
+net.minecraft.world.entity.Entity zo posZ
+net.minecraft.world.entity.Entity xOld prevPosX
+net.minecraft.world.entity.Entity yOld prevPosY
+net.minecraft.world.entity.Entity zOld prevPosZ
+net.minecraft.world.entity.Entity level getEntityWorld()
+net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
+net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+com.mojang.blaze3d.platform.GlStateManager net.minecraft.client.renderer.GlStateManager
+com.mojang.blaze3d.platform.GlStateManager _disableRescaleNormal() disableRescaleNormal()
+com.mojang.blaze3d.platform.GlStateManager _viewport() viewport()
+com.mojang.blaze3d.platform.GlStateManager _enableCull() enableCull()
+com.mojang.blaze3d.platform.GlStateManager _disableCull() disableCull()
+com.mojang.blaze3d.platform.GlStateManager _enableBlend() enableBlend()
+com.mojang.blaze3d.platform.GlStateManager _disableBlend() disableBlend()
+com.mojang.blaze3d.platform.GlStateManager _blendFunc() blendFunc()
+com.mojang.blaze3d.platform.GlStateManager _depthFunc() depthFunc()
+com.mojang.blaze3d.platform.GlStateManager _depthMask() depthMask()
+com.mojang.blaze3d.platform.GlStateManager _enableLighting() enableLighting()
+com.mojang.blaze3d.platform.GlStateManager _enableDepthTest() enableDepth()
+com.mojang.blaze3d.platform.GlStateManager _disableDepthTest() disableDepth()
+com.mojang.blaze3d.platform.GlStateManager _disableLighting() disableLighting()
+com.mojang.blaze3d.platform.GlStateManager _pushMatrix() pushMatrix()
+com.mojang.blaze3d.platform.GlStateManager _popMatrix() popMatrix()
+com.mojang.blaze3d.platform.GlStateManager _bindTexture() bindTexture()
+com.mojang.blaze3d.platform.GlStateManager _deleteTexture() deleteTexture()
+com.mojang.blaze3d.platform.GlStateManager _clearColor() clearColor()
+com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
+com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
+net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
+
+net.minecraft.world.level.Level getEntity() getEntityByID()
+net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+
+net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
+
+net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
+net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
+net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
+net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
+net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
+net.minecraft.client.Options net.minecraft.client.settings.GameSettings
+net.minecraft.client.renderer.texture.TextureManager register() loadTexture()
+net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
+net.minecraft.client.renderer.texture.AbstractTexture getId() getGlTextureId()
+net.minecraft.client.renderer.texture.AbstractTexture releaseId() deleteGlTexture()
+net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
+net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
+net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
+net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
+net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
+net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
+net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
+net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
+net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+

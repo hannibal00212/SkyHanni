@@ -35,6 +35,7 @@ enum class FarmingItems(
     MOOSHROOM_COW(ItemCategory.PET, FFStats::getPetFFData),
     RABBIT(ItemCategory.PET, FFStats::getPetFFData),
     BEE(ItemCategory.PET, FFStats::getPetFFData),
+    SLUG(ItemCategory.PET, FFStats::getPetFFData),
     ;
 
     var selectedState = false
@@ -95,10 +96,11 @@ enum class FarmingItems(
 
         val content = Renderable.clickable(
             Renderable.itemStackWithTip(
-                getItem(), 1.0, 0, 0, false
+                getItem(), 1.0, 0, 0, false,
             ),
             onClick = onClick(),
-            condition = { clickEnabled })
+            condition = { clickEnabled },
+        )
 
         override val width = content.width
         override val height = content.height
@@ -111,7 +113,7 @@ enum class FarmingItems(
                 0,
                 width,
                 height,
-                if (this@FarmingItems.selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt(),
             )
             content.render(posX, posY)
         }
@@ -136,14 +138,14 @@ enum class FarmingItems(
 
         val armor = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
         val equip = listOf(NECKLACE, CLOAK, BELT, BRACELET)
-        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE)
+        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE, SLUG)
 
         fun getArmorDisplay(clickEnabled: Boolean = false): List<Renderable> = armor.map { it.getDisplay(clickEnabled) }
 
-        fun getEquipmentDisplay(clickEnabled: Boolean = false): List<Renderable> =
-            equip.map { it.getDisplay(clickEnabled) }
+        fun getEquipmentDisplay(clickEnabled: Boolean = false): List<Renderable> = equip.map { it.getDisplay(clickEnabled) }
 
         fun getPetsDisplay(clickEnabled: Boolean = false): List<Renderable> = pets.map { it.getDisplay(clickEnabled) }
+
         fun resetClickState() {
             entries.filterNot { pets.contains(it) }.forEach { it.selectedState = false }
         }

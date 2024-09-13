@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig;
 import com.google.gson.annotations.Expose;
@@ -72,6 +73,7 @@ public class DevConfig {
             "§eThose are the folks that coded the mod for you for free :)"
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean fancyContributors = true;
 
     @Expose
@@ -80,6 +82,7 @@ public class DevConfig {
         desc = "Makes SkyHanni contributors' nametags fancy too. "
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean contributorNametags = true;
 
     @Expose
@@ -87,6 +90,7 @@ public class DevConfig {
         name = "Flip Contributors",
         desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean flipContributors = true;
 
     @Expose

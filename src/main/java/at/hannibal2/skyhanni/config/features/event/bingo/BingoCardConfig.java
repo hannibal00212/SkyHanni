@@ -16,7 +16,7 @@ public class BingoCardConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Quick Toggle", desc = "Quickly toggle the Bingo Card or the step helper by sneaking with SkyBlock Menu in hand.")
+    @ConfigOption(name = "Quick Toggle", desc = "Quickly show/hide the Bingo Card (when enabled above) or the step helper by sneaking with SkyBlock Menu in hand.")
     @ConfigEditorBoolean
     public boolean quickToggle = true;
 

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.ARACHNE;
+import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.BROODMOTHER;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.DIANA_MOBS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.GARDEN_PESTS;
 import static at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory.INFERNO_DEMONLORD;
@@ -96,6 +97,7 @@ public class DamageIndicatorConfig {
         DIANA_MOBS,
         SEA_CREATURES,
         ARACHNE,
+        BROODMOTHER,
         THE_RIFT_BOSSES,
         RIFTSTALKER_BLOODFIEND,
         REINDRAKE,
@@ -129,6 +131,7 @@ public class DamageIndicatorConfig {
         RIFTSTALKER_BLOODFIEND("§bRiftstalker Bloodfiend", 23),
         REINDRAKE("§6Reindrake", 24),
         GARDEN_PESTS("§aGarden Pests", 25),
+        BROODMOTHER("§bBroodmother")
         ;
 
         private final String str;
@@ -171,7 +174,8 @@ public class DamageIndicatorConfig {
     public boolean hideVanillaNametag = false;
 
     @Expose
-    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.")
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
+        "§eRequires Damage Indicator to be active.")
     @ConfigEditorBoolean
     public boolean timeToKillSlayer = true;
 

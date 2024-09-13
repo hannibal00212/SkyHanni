@@ -36,7 +36,7 @@ object AdvancedPlayerList {
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)"
+        ".*\\[(?<level>.*)] §r(?<name>.*)",
     )
 
     private var playerData = mutableMapOf<String, PlayerData>()
@@ -193,7 +193,9 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let {
+                BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
+            } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -220,7 +222,7 @@ object AdvancedPlayerList {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
         MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
         PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.getAllFriends().any { it.name.contains(name) } -> SocialIcon.FRIEND
+        FriendAPI.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
         GuildAPI.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }

@@ -94,6 +94,7 @@ object PestParticleLine {
     }
 
     private fun showMiddle(event: LorenzRenderWorldEvent) {
+        if (!config.showMiddle) return
         if (locations.size <= 0) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
         val middle = plot.middle.copy(y = LocationUtils.playerLocation().y)

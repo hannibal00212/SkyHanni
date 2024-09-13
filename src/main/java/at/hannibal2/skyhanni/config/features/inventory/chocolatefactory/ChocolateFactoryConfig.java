@@ -62,7 +62,7 @@ public class ChocolateFactoryConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.\n" +
-        "The upgrade with a star is the most optimal and the lightest colour of green is the most optimal you can afford.")
+        "The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford.")
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 
@@ -221,4 +221,14 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean mythicRabbitRequirement = false;
+
+    @Expose
+    @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean strayRabbitTracker = true;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "strayRabbitTracker")
+    public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
 }

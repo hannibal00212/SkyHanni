@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -50,16 +51,14 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (!HoppityAPI.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 2.minutes) return
 
-        ChatUtils.clickableChat(
-            "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable this reminder)",
-            onClick = {
-                disableReminder()
-                ChatUtils.chat("§eHoppity's Shop reminder disabled.")
-            },
-            oneTimeClick = true
+        ChatUtils.clickToActionOrDisable(
+            "New rabbits are available at §aHoppity's Shop§e!",
+            config::hoppityShopReminder,
+            actionName = "warp to hub",
+            action = { HypixelCommands.warp("hub") },
         )
 
         lastReminderSent = SimpleTimeMark.now()
@@ -103,9 +102,5 @@ object HoppityNpc {
     private fun clear() {
         inShop = false
         slotsToHighlight.clear()
-    }
-
-    private fun disableReminder() {
-        config.hoppityShopReminder = false
     }
 }

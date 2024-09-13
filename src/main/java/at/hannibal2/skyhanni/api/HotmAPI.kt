@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -30,7 +32,7 @@ object HotmAPI {
             }
         } == true
 
-    enum class Powder(val displayName: String, val color: String) {
+    enum class PowderType(val displayName: String, val color: String) {
         MITHRIL("Mithril", "§2"),
         GEMSTONE("Gemstone", "§d"),
         GLACITE("Glacite", "§b"),
@@ -71,9 +73,11 @@ object HotmAPI {
         }
 
         /** Use when new powder gets collected*/
-        fun gain(value: Long) {
-            addTotal(value)
-            addCurrent(value)
+        fun gain(difference: Long) {
+            ChatUtils.debug("Gained §a${difference.addSeparators()} §e${displayName} Powder")
+            addTotal(difference)
+            addCurrent(difference)
+            PowderGainEvent(this, difference).post()
         }
 
         fun reset() {

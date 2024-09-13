@@ -32,12 +32,12 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
     ),
     ;
 
-    /** Pattern without colour codes */
+    /** Pattern without color codes */
     val completeMessagePattern by RepoPattern.pattern(
         "garden.ff.carrolyn.complete.${crop.patternKeyName}", completeMessage,
     )
 
-    /** Pattern without colour codes */
+    /** Pattern without color codes */
     val thxMessagePattern by RepoPattern.pattern(
         "garden.ff.carrolyn.thx.${crop.patternKeyName}", thxMessage,
     )

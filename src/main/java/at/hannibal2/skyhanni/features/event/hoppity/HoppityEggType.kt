@@ -6,7 +6,7 @@ import kotlin.time.Duration
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColour: String,
+    private val mealColor: String,
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
@@ -14,9 +14,14 @@ enum class HoppityEggType(
     BREAKFAST("Breakfast", "§6", 7),
     LUNCH("Lunch", "§9", 14),
     DINNER("Dinner", "§a", 21),
+    SIDE_DISH("Side Dish", "§6§l", -1),
+    BOUGHT("Bought", "§a", -1),
+    CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6", -1),
+    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1)
     ;
 
     fun timeUntil(): Duration {
+        if (resetsAt == -1) return Duration.INFINITE
         val now = SkyBlockTime.now()
         if (now.hour >= resetsAt) {
             return now.copy(day = now.day + 1, hour = resetsAt, minute = 0, second = 0)
@@ -34,11 +39,13 @@ enum class HoppityEggType(
     }
 
     fun isClaimed() = claimed
-    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColour}$mealName:$mealColour"
-    val coloredName get() = "$mealColour$mealName"
+    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
+    val coloredName get() = "$mealColor$mealName"
 
     companion object {
-        fun allFound() = entries.forEach { it.markClaimed() }
+        val resettingEntries = entries.filter { it.resetsAt != -1 }
+
+        fun allFound() = resettingEntries.forEach { it.markClaimed() }
 
         fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
 
@@ -47,7 +54,7 @@ enum class HoppityEggType(
             val currentSbDay = currentSbTime.day
             val currentSbHour = currentSbTime.hour
 
-            for (eggType in entries) {
+            for (eggType in resettingEntries) {
                 if (currentSbHour < eggType.resetsAt || eggType.lastResetDay == currentSbDay) continue
                 eggType.markSpawned()
                 eggType.lastResetDay = currentSbDay
@@ -60,11 +67,11 @@ enum class HoppityEggType(
         }
 
         fun eggsRemaining(): Boolean {
-            return entries.any { !it.claimed }
+            return resettingEntries.any { !it.claimed }
         }
 
         fun allEggsRemaining(): Boolean {
-            return entries.all { !it.claimed }
+            return resettingEntries.all { !it.claimed }
         }
     }
 }

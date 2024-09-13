@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
+import at.hannibal2.skyhanni.data.model.TextInput;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -26,5 +27,10 @@ public class MixinGuiScreen {
         if (list.isEmpty()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "handleKeyboardInput", at = @At("HEAD"), cancellable = true)
+    public void handleKeyboardInput(CallbackInfo ci) {
+        TextInput.Companion.onGuiInput(ci);
     }
 }

@@ -29,5 +29,6 @@ public class DicerRngDropTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DicerRngDropTrackerConfig.class, field = "display")
+    // TODO rename to "positon"
     public Position pos = new Position(16, -232, false, true);
 }

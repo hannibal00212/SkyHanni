@@ -65,11 +65,9 @@ public class CustomSpeedConfig {
 
     @Expose
     @ConfigOption(name = "Cactus", desc = "Suggested farm speed:\n" +
-        "§eNormal§7: §f✦ 400 speed\n" +
-        "§eRacing Helmet§7: §f✦ 464 speed\n" +
-        "§eBlack Cat§7: §f✦ 464 speed")
+        "§eYaw 90§7: §f✦ 464 speed")
     @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
-    public Property<Float> cactus = Property.of(400f);
+    public Property<Float> cactus = Property.of(464f);
 
     // TODO does other speed settings exist?
     @Expose

@@ -76,7 +76,7 @@ object HoppityEggDisplayManager {
         if (ReminderUtils.isBusy() && !config.showWhileBusy) return emptyList()
 
         val displayList =
-            HoppityEggType.entries.map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }.toMutableList()
+            HoppityEggType.resettingEntries.map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }.toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {

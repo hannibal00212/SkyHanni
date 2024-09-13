@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.ENCHANTING_EXP
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -23,7 +25,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -96,7 +97,16 @@ object ItemDisplayOverlayFeatures {
     )
     private val bestiaryStackPattern by patternGroup.pattern(
         "bestiarystack",
-        "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%"
+        "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%",
+    )
+
+    /**
+     * REGEX-TEST: 5k Enchanting Exp
+     * REGEX-TEST: 5.5k Enchanting Exp
+     */
+    private val enchantingExpPattern by patternGroup.pattern(
+        "enchantingexp",
+        "(?<exp>.*)k Enchanting Exp",
     )
 
     @SubscribeEvent
@@ -241,7 +251,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
             lore.matchFirst(gardenVacuumPatterm) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
@@ -299,11 +309,23 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
+        if (ENCHANTING_EXP.isSelected() && chestName.startsWith("Superpairs")) {
+            enchantingExpPattern.matchMatcher(item.cleanName()) {
+                val exp = group("exp").formatLong()
+                return "§b${exp.shortFormat()}"
+            }
+        }
+
         return null
     }
 
-    private fun isOwnVacuum(lore: List<String>) =
-        lore.none { it.contains("Click to trade!") || it.contains("Starting bid:") || it.contains("Buy it now:") }
+    fun isOwnItem(lore: List<String>) =
+        lore.none {
+            it.contains("Click to trade!") ||
+                it.contains("Starting bid:") ||
+                it.contains("Buy it now:") ||
+                it.contains("Click to inspect")
+        }
 
     var done = false
 

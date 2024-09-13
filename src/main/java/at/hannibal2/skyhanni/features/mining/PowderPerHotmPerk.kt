@@ -40,19 +40,19 @@ object PowderPerHotmPerk {
         if (indexOfCost == -1) return
 
         val powderFor10Levels =
-            perk.calculateTotalCost(perk.activeLevel + 10) - perk.calculateTotalCost(perk.activeLevel)
+            perk.calculateTotalCost((perk.rawLevel + 10).coerceAtMost(perk.maxLevel)) - perk.calculateTotalCost(perk.rawLevel)
 
         event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
     }
 
     private fun handlePowderSpend(perk: HotmData): String {
-        val currentPowderSpend = perk.calculateTotalCost(perk.activeLevel)
+        val currentPowderSpend = perk.calculateTotalCost(perk.rawLevel)
         val maxPowderNeeded = perk.totalCostMaxLevel
         val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).round(2)
 
         return when (config.powderSpentDesign) {
             PowderSpentDesign.NUMBER -> {
-                if (perk.activeLevel == perk.maxLevel) {
+                if (perk.rawLevel == perk.maxLevel) {
                     "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
                 } else {
                     "§7Powder spent: §e${currentPowderSpend.addSeparators()}§7 / §e${maxPowderNeeded.addSeparators()}"
@@ -60,7 +60,7 @@ object PowderPerHotmPerk {
             }
 
             PowderSpentDesign.PERCENTAGE -> {
-                if (perk.activeLevel == perk.maxLevel) {
+                if (perk.rawLevel == perk.maxLevel) {
                     "§7Powder spent: §e$percentage% §7(§aMax level§7)"
                 } else {
                     "§7Powder spent: §e$percentage%§7 of max"
@@ -68,7 +68,7 @@ object PowderPerHotmPerk {
             }
 
             PowderSpentDesign.NUMBER_AND_PERCENTAGE -> {
-                if (perk.activeLevel == perk.maxLevel) {
+                if (perk.rawLevel == perk.maxLevel) {
                     "§7Powder spent: §e${maxPowderNeeded.addSeparators()} §7(§aMax level§7)"
                 } else {
                     "§7Powder spent: §e${currentPowderSpend.addSeparators()}§7/§e${maxPowderNeeded.addSeparators()}§7 (§e$percentage%§7)"
@@ -85,6 +85,5 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory &&
-        (config.powderSpent || config.powderFor10Levels)
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory && (config.powderSpent || config.powderFor10Levels)
 }

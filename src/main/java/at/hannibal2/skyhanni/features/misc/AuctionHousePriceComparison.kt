@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -109,6 +110,7 @@ object AuctionHousePriceComparison {
         if (!isEnabled()) return
 
         val diff = slotPriceMap[event.slot.slotIndex] ?: return
+        if (event.slot.inventory !is ContainerLocalMenu) return
 
         event.toolTip.add("")
         if (diff >= 0) {

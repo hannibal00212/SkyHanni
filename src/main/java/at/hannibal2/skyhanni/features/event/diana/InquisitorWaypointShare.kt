@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -202,7 +201,8 @@ object InquisitorWaypointShare {
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ErrorManager.skyHanniError("No Inquisitor Found!")
+            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
+            return
         }
 
         val inquisitor = EntityUtils.getEntityByID(inquisitor)
@@ -222,7 +222,7 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIslands = [IslandType.HUB], priority = HandleEvent.LOW, receiveCancelled = true)
     fun onFirstChatEvent(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet

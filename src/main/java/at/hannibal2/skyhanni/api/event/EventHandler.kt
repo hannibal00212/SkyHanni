@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.chat.Text
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
@@ -113,7 +113,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(val name: String, priv
     private fun shouldInvoke(event: SkyHanniEvent, listener: Listener): Boolean {
         if (SkyHanniEvents.isDisabledInvoker(listener.name)) return false
         if (listener.options.onlyOnSkyblock && !LorenzUtils.inSkyBlock) return false
-        if (listener.options.onlyOnIsland != IslandType.ANY && !listener.options.onlyOnIsland.isInIsland()) return false
+        if (IslandType.ANY !in listener.onlyOnIslandTypes && !inAnyIsland(listener.onlyOnIslandTypes)) return false
         if (event.isCancelled && !listener.options.receiveCancelled) return false
         if (
             event is GenericSkyHanniEvent<*> &&
@@ -129,6 +129,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(val name: String, priv
         val name: String,
         val invoker: Consumer<Any>,
         val options: HandleEvent,
-        val generic: Class<*>?
+        val generic: Class<*>?,
+        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIslands.toSet(),
     )
 }

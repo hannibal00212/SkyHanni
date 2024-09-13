@@ -179,6 +179,13 @@ object ItemAbilityCooldown {
             event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
             }
+            // Tactical Insertion
+            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
+            }
+            event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
+            }
         }
     }
 

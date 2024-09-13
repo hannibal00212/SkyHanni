@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.block.state.IBlockState
@@ -30,37 +29,37 @@ enum class OreType(
     COAL(
         "Coal",
         "COAL",
-        listOf(OreBlock.COAL_ORE),
+        listOf(OreBlock.COAL_ORE, OreBlock.PURE_COAL),
     ),
     IRON(
         "Iron",
         "IRON_INGOT",
-        listOf(OreBlock.IRON_ORE),
+        listOf(OreBlock.IRON_ORE, OreBlock.PURE_IRON),
     ),
     GOLD(
         "Gold",
         "GOLD_INGOT",
-        listOf(OreBlock.GOLD_ORE, OreBlock.DWARVEN_GOLD),
+        listOf(OreBlock.GOLD_ORE, OreBlock.PURE_GOLD),
     ),
     LAPIS(
         "Lapis Lazuli",
         "INK_SACK-4",
-        listOf(OreBlock.LAPIS_ORE),
+        listOf(OreBlock.LAPIS_ORE, OreBlock.PURE_LAPIS),
     ),
     REDSTONE(
         "Redstone",
         "REDSTONE",
-        listOf(OreBlock.REDSTONE_ORE, OreBlock.DWARVEN_REDSTONE),
+        listOf(OreBlock.REDSTONE_ORE, OreBlock.PURE_REDSTONE),
     ),
     EMERALD(
         "Emerald",
         "EMERALD",
-        listOf(OreBlock.EMERALD_ORE, OreBlock.DWARVEN_EMERALD),
+        listOf(OreBlock.EMERALD_ORE, OreBlock.PURE_EMERALD),
     ),
     DIAMOND(
         "Diamond",
         "DIAMOND",
-        listOf(OreBlock.DIAMOND_ORE, OreBlock.DWARVEN_DIAMOND),
+        listOf(OreBlock.DIAMOND_ORE, OreBlock.PURE_DIAMOND),
     ),
     NETHERRACK(
         "Netherrack",
@@ -191,23 +190,21 @@ enum class OreType(
 
     companion object {
 
+        private val gemstones = setOf(
+            RUBY, AMBER, AMETHYST, JADE,
+            SAPPHIRE, TOPAZ, JASPER, OPAL,
+            AQUAMARINE, CITRINE, ONYX, PERIDOT,
+        )
+
         fun IBlockState.isOreType(oreType: OreType): Boolean {
             return oreType.oreBlocks.intersect(MiningAPI.currentAreaOreBlocks)
                 .any { it.checkBlock.invoke(this) }
         }
 
-        fun OreType.isGemstone(): Boolean {
-            return this.equalsOneOf(
-                RUBY, AMBER, AMETHYST, JADE,
-                SAPPHIRE, TOPAZ, JASPER, OPAL,
-                AQUAMARINE, CITRINE, ONYX, PERIDOT,
-            )
-        }
+        fun OreType.isGemstone(): Boolean = this in gemstones
 
         fun OreBlock.getOreType(): OreType? {
-            return OreType.entries.firstOrNull {
-                it.oreBlocks.contains(this)
-            }
+            return OreType.entries.firstOrNull { this in it.oreBlocks }
         }
     }
 }

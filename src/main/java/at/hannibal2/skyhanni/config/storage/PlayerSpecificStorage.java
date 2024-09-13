@@ -23,6 +23,9 @@ public class PlayerSpecificStorage {
     public Boolean useRomanNumerals = true;
 
     @Expose
+    public Boolean multipleProfiles = false;
+
+    @Expose
     public Integer gardenCommunityUpgrade = -1;
 
     @Expose
