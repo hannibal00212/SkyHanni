@@ -39,6 +39,7 @@ object FruitDigging {
     var shovelMode = ""
     var lastTimeDigging = SimpleTimeMark.farPast()
     var lastMined = mutableListOf<LorenzVec>()
+    var lastDrop = mutableListOf<DropType>()
     var hasStarted = false
 
     private var itemsOnGround = mutableMapOf<LorenzVec, EntityInfo>()
@@ -62,7 +63,7 @@ object FruitDigging {
      * REGEX-TEST: MINES! There are 0 bombs hidden nearby.
      * REGEX-TEST: MINES! There are 4 bombs hidden nearby.
      */
-    private val minesPattern by patternGroup.pattern(
+    val minesPattern by patternGroup.pattern(
         "info.chat.mines",
         "^MINES! There are (?<amount>\\d) bombs hidden nearby\\.\$",
     )
@@ -71,9 +72,14 @@ object FruitDigging {
      * REGEX-TEST: TREASURE! There is a Mango nearby.
      * REGEX-TEST: TREASURE! There is an Apple nearby.
      */
-    private val treasurePattern by patternGroup.pattern(
+    val treasurePattern by patternGroup.pattern(
         "info.chat.treasure",
         "^TREASURE! There is an? (?<fruit>\\S+) nearby\\.$",
+    )
+
+    val noFruitPattern by patternGroup.pattern(
+        "info.chat.nofruit",
+        ".*There are no fruits nearby!",
     )
 
     /**
@@ -92,6 +98,8 @@ object FruitDigging {
         "^ {31}Fruit Digging$",
     )
 
+    private fun LorenzVec.coveredCords(): Pair<Int, Int> = add(112, 0, 11).let { it.x.toInt() to it.z.toInt() }
+
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !hasStarted) return
@@ -101,6 +109,12 @@ object FruitDigging {
         if (event.location.distanceToPlayer() <= 7) {
             val itemHeld = InventoryUtils.getItemInHand() ?: return
             shovelMode = modePattern.matchMatcher(itemHeld.getLore()[3].removeColor()) { group("mode") }.toString()
+            MyFruitDigging.ShovelType.active = when (shovelMode) {
+                "Mines" -> MyFruitDigging.ShovelType.MINES
+                "Treasure" -> MyFruitDigging.ShovelType.TREASURE
+                "Anchor" -> MyFruitDigging.ShovelType.ANCHOR
+                else -> MyFruitDigging.ShovelType.MINES
+            }
 
             if (event.new == "sandstone") {
                 lastTimeDigging = SimpleTimeMark.now()
@@ -110,6 +124,7 @@ object FruitDigging {
                 val entry = mineBlocks.entries.find { it.key == lastMined.last() } ?: return
                 entry.value.uncovered = true;
                 entry.value.dropTypes = mutableListOf(DropType.BOMB)
+                MyFruitDigging.setBombed(event.location.coveredCords())
             }
 
             if (mineBlocks.size != 49) {
@@ -134,6 +149,8 @@ object FruitDigging {
             val dropType = convertToType(null, itemStack) ?: continue
             println("test")
             val mineBlocksEntry = mineBlocks.entries.find { it.key == position } ?: continue
+
+            dig(dropType)
             println("tesstss")
 
             val types = mineBlocksEntry.value.dropTypes ?: mutableListOf()
@@ -145,6 +162,20 @@ object FruitDigging {
 
             println(itemsOnGround)
             println(mineBlocks)
+        }
+    }
+
+    private var lastChat: String = ""
+
+    fun dig(drop: DropType) {
+        val result = MyFruitDigging.ShovelType.active.getResult(lastChat)
+        if (result != null) {
+            MyFruitDigging.onDig(
+                lastMined.last().coveredCords(),
+                drop,
+                MyFruitDigging.ShovelType.active,
+                result,
+            )
         }
     }
 
@@ -164,6 +195,8 @@ object FruitDigging {
         if (lastTimeDigging.passedSince() > 1.seconds) return
 
         val entry = mineBlocks.entries.find { it.key == lastMined.last() } ?: return
+
+        lastChat = message
 
         when (shovelMode) {
             "Mines" -> minesPattern.matchMatcher(message) {
@@ -214,7 +247,7 @@ object FruitDigging {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        mineBlocks.entries.forEach { (loc, info ) ->
+        mineBlocks.entries.forEach { (loc, info) ->
             val amt = info.minesNear
 
             val adjacent = getAdjacent(loc)
@@ -371,10 +404,11 @@ object FruitDigging {
     private fun getTypes(types: MutableList<DropType>?): MutableList<DropType> =
         if (!types.isNullOrEmpty()) types else mutableListOf()
 
-    private fun convertToType(name: String?, itemStack: ItemStack?): DropType? {
+    fun convertToType(name: String?, itemStack: ItemStack?): DropType? {
         val skullTextureURL = if (itemStack != null) Gson().fromJson(
             itemStack.getSkullTexture()?.let { decodeBase64(it) },
-            MinecraftTextures::class.java)
+            MinecraftTextures::class.java,
+        )
             .textures.SKIN.url else ""
         val nameClean = name?.removeColor() ?: ""
 

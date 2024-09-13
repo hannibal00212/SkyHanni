@@ -10,4 +10,9 @@ public class CarnivalConfig {
     @ConfigOption(name = "Zombie Shootout", desc = "")
     @Accordion
     public ZombieShootoutConfig zombieShootout = new ZombieShootoutConfig();
+
+    @Expose
+    @ConfigOption(name = "Fruit Digging", desc = "")
+    @Accordion
+    public FruitDiggingConfig fruitDigging = new FruitDiggingConfig();
 }

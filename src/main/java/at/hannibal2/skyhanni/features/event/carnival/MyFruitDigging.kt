@@ -1,0 +1,214 @@
+package at.hannibal2.skyhanni.features.event.carnival
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+
+@SkyHanniModule
+object MyFruitDigging {
+
+    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
+
+    class BlockInfo(val pos: Pair<Int, Int>) {
+
+        val possibilities = mutableListOf<DropType>()
+
+        var diggable = true
+
+        init {
+            clear()
+        }
+
+        fun clear() {
+            possibilities.clear()
+            possibilities.addAll(
+                listOf(
+                    DropType.MANGO,
+                    DropType.APPLE,
+                    DropType.WATERMELON,
+                    DropType.POMEGRANATE,
+                    DropType.COCONUT,
+                    DropType.CHERRY,
+                    DropType.DURIAN,
+                    DropType.DRAGONFRUIT,
+                    DropType.RUM,
+                    DropType.BOMB,
+                ),
+            )
+            diggable = true
+        }
+
+        fun setResult(drop: DropType) {
+            possibilities.clear()
+            possibilities.add(drop)
+            diggable = false
+        }
+
+        fun setResolve(drop: DropType) {
+            possibilities.clear()
+            possibilities.add(drop)
+        }
+
+        fun setBombed() {
+            diggable = false
+        }
+
+    }
+
+    enum class ShovelType {
+        MINES {
+            override fun getResult(message: String): Int? = FruitDigging.minesPattern.matchGroup(message, "amount")?.toInt()
+
+        },
+        ANCHOR {
+            override fun getResult(message: String): Triple<DropType, Int, Int>? =
+                if (FruitDigging.noFruitPattern.matches(message)) Triple(DropType.NONE, -1, -1) else null
+
+        },
+        TREASURE {
+            override fun getResult(message: String): DropType? = if (FruitDigging.noFruitPattern.matches(message)) DropType.NONE else
+                FruitDigging.treasurePattern.matchGroup(message, "fruit")?.let { FruitDigging.convertToType(it, null) }
+        },
+
+        ;
+
+        abstract fun getResult(message: String): Any?
+
+        companion object {
+            var active = MINES
+        }
+    }
+
+    /** @param result is a [Int] for [ShovelType.MINES], is a [DropType] for [ShovelType.TREASURE] and a Triple<DropType,Int,Int> for [ShovelType.ANCHOR]*/
+    fun onDig(pos: Pair<Int, Int>, drop: DropType, ability: ShovelType, result: Any) {
+        ChatUtils.chat("Digged $drop @${pos.first} ${pos.second} with $ability $result")
+        board.setResult(pos, drop)
+        when (ability) {
+            ShovelType.MINES -> {
+                if (result !is Int) throw IllegalStateException("Expected Int as result type for MINES")
+                val neighbours = board.getNeighbors(pos)
+                if (result == 0) {
+                    neighbours.forEach { it.possibilities.remove(DropType.BOMB) }
+                } else {
+                    val bombNeighbors = neighbours.filter { it.possibilities.contains(DropType.BOMB) && it.diggable }
+                    if (bombNeighbors.size == result) {
+                        bombNeighbors.forEach { board.setResolve(it.pos, DropType.BOMB) }
+                    }
+                }
+            }
+
+            ShovelType.ANCHOR -> {
+                if (result !is Triple<*, *, *>) throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
+                val item =
+                    result.first as? DropType ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
+                val nPos = (result.second as? Int)?.let { f -> (result.third as? Int)?.let { f to it } }
+                    ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
+                if (item == DropType.NONE) {
+                    board.getNeighbors(pos).forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
+                }
+            }
+
+            ShovelType.TREASURE -> {
+                if (result !is DropType) throw IllegalStateException("Expected DropType as result type for TREASURE")
+                val neighbours = board.getNeighbors(pos)
+                if (result == DropType.NONE) {
+                    neighbours.forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
+                } else {
+                    val amount = neighbours.count { it.possibilities.contains(drop) }
+                    if (amount == 1) {
+                        neighbours.first { it.possibilities.contains(drop) }.let {
+                            it.possibilities.clear()
+                            it.possibilities.add(drop)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun setBombed(pos: Pair<Int, Int>) {
+        ChatUtils.chat("Bombed @${pos.first} ${pos.second}")
+        board.setBombed(pos)
+    }
+
+    fun setWatermeloned(pos: Pair<Int, Int>, drop: DropType) {
+        ChatUtils.chat("Watermeloned $drop @${pos.first} ${pos.second}")
+        board.setResult(pos, drop)
+    }
+
+    private val board = object {
+
+        private val GRID_SIZE = 7
+
+        private val cells = Array<Array<BlockInfo>>(GRID_SIZE) {
+            val x = it
+            Array(GRID_SIZE) {
+                val z = it
+                BlockInfo(x to z)
+            }
+        }
+
+        private val found = mutableMapOf<DropType, Int>()
+
+        var multiplier = 1.0
+
+        fun getPointsForDrop(drop: DropType): Int = when (drop) {
+            DropType.APPLE -> 100 * (found[DropType.APPLE] ?: 0)
+            DropType.CHERRY -> found[DropType.CHERRY]?.let { 500 } ?: 200
+            else -> drop.basePoints
+        }
+
+        fun clear() {
+            cells.forEach { it.forEach { it.clear() } }
+            found.clear()
+        }
+
+        fun setResult(pos: Pair<Int, Int>, drop: DropType) {
+            cells[pos.first][pos.second].setResult(drop)
+            foundLogic(drop)
+        }
+
+        fun setResolve(pos: Pair<Int, Int>, drop: DropType) {
+            cells[pos.first][pos.second].setResolve(drop)
+            foundLogic(drop)
+        }
+
+        private fun foundLogic(drop: DropType) {
+            found.addOrPut(drop, 1)
+            if (found[drop] == amountOnTheBoard[drop]) {
+                cells.forEach {
+                    it.forEach {
+                        if (it.possibilities.size != 1) {
+                            it.possibilities.remove(drop)
+                        }
+                    }
+                }
+            }
+        }
+
+        fun setBombed(pos: Pair<Int, Int>) {
+            cells[pos.first][pos.second].setBombed()
+        }
+
+        fun getNeighbors(pos: Pair<Int, Int>): List<BlockInfo> =
+            directions.mapNotNull { cells.getOrNull(it.first + pos.first)?.getOrNull(it.second + pos.second) }
+    }
+
+    private val directions = listOf(
+        1 to 0,
+        -1 to 0,
+        0 to 1,
+        0 to -1,
+        1 to 1,
+        1 to -1,
+        -1 to 1,
+        -1 to -1,
+    )
+
+    interface Strategy {
+        fun getNextBlock(): Pair<Int, Int>
+    }
+}
