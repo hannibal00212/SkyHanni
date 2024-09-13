@@ -48,6 +48,11 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
+    @ConfigOption(name = "Carnival", desc = "")
+    @Accordion
+    @Expose
+    public CarnivalConfig carnival = new CarnivalConfig();
+
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
