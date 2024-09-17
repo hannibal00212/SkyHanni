@@ -84,6 +84,7 @@ object MyFruitDigging {
 
     /** @param result is a [Int] for [ShovelType.MINES], is a [DropType] for [ShovelType.TREASURE] and a Triple<DropType,Int,Int> for [ShovelType.ANCHOR]*/
     fun onDig(pos: Pair<Int, Int>, drop: DropType, ability: ShovelType, result: Any) {
+
         ChatUtils.chat("Digged $drop @${pos.first} ${pos.second} with $ability $result")
         board.setResult(pos, drop)
         when (ability) {
