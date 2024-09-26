@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -187,7 +187,7 @@ object GardenCropMilestoneDisplay {
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).round(1).toInt()
+        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).roundTo(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
@@ -219,7 +219,7 @@ object GardenCropMilestoneDisplay {
             val hourFormat = (farmingFortuneSpeed * 60 * 60).addSeparators()
             lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.string("§7Crops/Hour§8: §e$hourFormat")
 
-            val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
+            val formatBps = speed.roundTo(config.blocksBrokenPrecision).addSeparators()
             lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.string("§7Blocks/Second§8: §e$formatBps")
         }
 

@@ -111,7 +111,7 @@ class TextInput {
             }
             if (KeyboardManager.isPastingKeysDown()) {
                 runBlocking {
-                    textBox = OSUtils.readFromClipboard() ?: return@runBlocking
+                    textBox = OSUtils.readFromClipboard()?.take(2024) ?: return@runBlocking
                     updated()
                 }
                 return

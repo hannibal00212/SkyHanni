@@ -29,7 +29,7 @@ object SulphurSkitterBox {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
     private var spongeBlocks = listOf<BlockPos>()
     private var closestBlock: BlockPos? = null
-    private const val RADIUS = 8
+    private const val RADIUS = 4
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

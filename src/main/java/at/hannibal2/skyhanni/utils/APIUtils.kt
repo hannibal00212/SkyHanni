@@ -16,16 +16,40 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
+import java.security.KeyStore
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
 
-object APIUtil {
+object APIUtils {
 
     private val parser = JsonParser()
     private var showApiErrors = false
+
+    private val ctx: SSLContext? = run {
+        try {
+            val myKeyStore = KeyStore.getInstance("JKS")
+            myKeyStore.load(APIUtils.javaClass.getResourceAsStream("/keystore.jks"), "changeit".toCharArray())
+            val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+            val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+            kmf.init(myKeyStore, null)
+            tmf.init(myKeyStore)
+            SSLContext.getInstance("TLS").apply {
+                init(kmf.keyManagers, tmf.trustManagers, null)
+            }
+        } catch (e: Exception) {
+            println("Failed to load keystore. A lot of API requests won't work")
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun patchHttpsRequest(connection: HttpsURLConnection) {
+        ctx?.let {
+            connection.sslSocketFactory = it.socketFactory
+        }
+    }
 
     data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
 
@@ -34,19 +58,19 @@ object APIUtil {
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),
-                    BasicHeader("Cache-Control", "no-cache")
-                )
+                    BasicHeader("Cache-Control", "no-cache"),
+                ),
             )
             .setDefaultRequestConfig(
                 RequestConfig.custom()
-                    .build()
+                    .build(),
             )
             .useSystemProperties()
 
     /**
      * TODO
      * make suspend
-     * use withContext(Dispatchers.IO) { APIUtil.getJSONResponse(url) }.asJsonObject
+     * use withContext(Dispatchers.IO) { APIUtils.getJSONResponse(url) }.asJsonObject
      */
     fun getJSONResponse(urlString: String, silentError: Boolean = false) =
         getJSONResponseAsElement(urlString, silentError) as JsonObject
@@ -76,7 +100,7 @@ object APIUtil {
                                 ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
                                     onClick = { toggleApiErrorMessages() },
-                                    "§eClick to run /shtogglehypixelapierrors!"
+                                    "§eClick to run /shtogglehypixelapierrors!",
                                 )
                             }
                             ErrorManager.skyHanniError(
@@ -84,7 +108,7 @@ object APIUtil {
                                 "error message" to "$message(502 Bad Gateway)",
                                 "apiName" to apiName,
                                 "urlString" to urlString,
-                                "returnedData" to retSrc
+                                "returnedData" to retSrc,
                             )
                         } else {
                             ErrorManager.skyHanniError(
@@ -92,7 +116,7 @@ object APIUtil {
                                 "error message" to message,
                                 "apiName" to apiName,
                                 "urlString" to urlString,
-                                "returnedData" to retSrc
+                                "returnedData" to retSrc,
                             )
                         }
                     }
@@ -179,10 +203,6 @@ object APIUtil {
         )
 
         return false
-    }
-
-    fun readFile(file: File): BufferedReader {
-        return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))
     }
 
     // TODO remove command, use clickable chat message instead

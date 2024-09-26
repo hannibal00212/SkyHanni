@@ -146,6 +146,7 @@ enum class Mayor(
 
         fun Mayor.addPerks(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
+            activePerks.forEach { it.isActive = false }
             activePerks.clear()
             for (perk in perks.filter { perks.contains(it) }) {
                 perk.isActive = true

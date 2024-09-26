@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -116,7 +116,7 @@ object TrackParticlesCommand {
                 event.drawDynamicText(key, "§7§l${particle.type}", 0.8)
                 event.drawDynamicText(
                     key.up(-0.2),
-                    "§7C: §e${particle.count} §7S: §a${particle.speed.round(2)}",
+                    "§7C: §e${particle.count} §7S: §a${particle.speed.roundTo(2)}",
                     scaleMultiplier = 0.8
                 )
             }

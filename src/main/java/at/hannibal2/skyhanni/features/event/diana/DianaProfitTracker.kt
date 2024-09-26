@@ -8,9 +8,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -107,7 +109,7 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled()) return
+        if (!(DianaAPI.isDoingDiana() && config.enabled)) return
 
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
@@ -137,9 +139,7 @@ object DianaProfitTracker {
             tryHide(event)
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
-            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
-        ) {
+        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" || message == "§eFollow the arrows to find the §r§6treasure§r§e!") {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }
@@ -153,7 +153,13 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
+        if (spadeInHand) {
+            tracker.firstUpdate()
+        }
 
         tracker.renderDisplay(config.position)
     }
@@ -168,6 +174,4 @@ object DianaProfitTracker {
     fun resetCommand() {
         tracker.resetCommand()
     }
-
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 }

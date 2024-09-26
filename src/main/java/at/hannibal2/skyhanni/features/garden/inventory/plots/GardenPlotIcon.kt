@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -51,7 +51,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = internalName.getItemStack()
-            cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
+            cachedStack[index] = new.editItemInfo(old.displayName, true, old.getLore())
         }
     }
 

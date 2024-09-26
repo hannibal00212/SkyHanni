@@ -15,11 +15,10 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.features.mining.OreType.Companion.isGemstone
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -86,9 +85,12 @@ object MineshaftPityDisplay {
     fun onOreMined(event: OreMinedEvent) {
         if (!MiningAPI.inGlacialTunnels()) return
 
-        event.originalOre.getPityBlock()?.let { it.blocksBroken++ }
+        val originalOre = event.originalOre
+        originalOre?.getPityBlock()?.let { it.blocksBroken++ }
         event.extraBlocks.toMutableMap()
-            .apply { addOrPut(event.originalOre, -1) }
+            .apply {
+                if (originalOre != null) addOrPut(originalOre, -1)
+            }
             .map { (block, amount) ->
                 block.getPityBlock()?.let { it.efficientMiner += amount }
             }
@@ -116,7 +118,7 @@ object MineshaftPityDisplay {
                 add("§7Pity Counter: §e$pityCounter")
                 add(
                     "§7Chance: " +
-                        "§e1§6/§e${chance.round(1)} " +
+                        "§e1§6/§e${chance.roundTo(1)} " +
                         "§7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
                 )
                 minedBlocks.forEach {
@@ -164,7 +166,7 @@ object MineshaftPityDisplay {
     // if the chance is 1/1500, it will return 1500
     private fun calculateChance(counter: Int): Double {
         val surveyorPercent = HotmData.SURVEYOR.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
-        val peakMountainPercent = HotmData.PEAK_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
+        val peakMountainPercent = HotmData.CORE_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
         return chance
     }
@@ -212,7 +214,7 @@ object MineshaftPityDisplay {
             MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
             MineshaftPityLine.CHANCE to Renderable.string(
                 "§3Chance: §e1§6/§e${
-                    chance.round(1).addSeparators()
+                    chance.roundTo(1).addSeparators()
                 } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
             ),
             MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,

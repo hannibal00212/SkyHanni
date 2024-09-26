@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
-import io.github.moulberry.notenoughupdates.util.Shimmy
 import kotlinx.coroutines.launch
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier

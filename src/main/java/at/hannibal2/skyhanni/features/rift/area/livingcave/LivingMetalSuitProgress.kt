@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
 import net.minecraft.item.ItemStack
@@ -39,7 +39,7 @@ object LivingMetalSuitProgress {
 
         if (progressMap.isEmpty()) return@buildList
 
-        val totalProgress = progressMap.values.map { it ?: 1.0 }.average().roundToPrecision(1)
+        val totalProgress = progressMap.values.map { it ?: 1.0 }.average().roundTo(1)
         val formatPercentage = LorenzUtils.formatPercentage(totalProgress)
         addAsSingletonList("§7Living Metal Suit Progress: ${if (isMaxed) "§a§lMAXED!" else "§a$formatPercentage"}")
 

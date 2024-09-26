@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
+import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
 abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
@@ -64,7 +65,9 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             )
     }
 
+    @Expose
     private var selectedBucket: E? = null
+    @Expose
     private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
     private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()

@@ -222,7 +222,7 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.HUB], priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onFirstChatEvent(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet

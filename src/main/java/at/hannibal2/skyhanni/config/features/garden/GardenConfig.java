@@ -159,12 +159,6 @@ public class GardenConfig {
     public boolean burrowingSporesNotification = true;
 
     @Expose
-    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops while farming.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean wildStrawberryDyeNotification = true;
-
-    @Expose
     @ConfigOption(
         name = "FF for Contest",
         desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."

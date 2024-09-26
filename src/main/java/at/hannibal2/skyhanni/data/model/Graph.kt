@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
@@ -10,31 +10,32 @@ import com.google.gson.annotations.Expose
 import com.google.gson.stream.JsonToken
 import java.util.PriorityQueue
 
+// TODO: This class should be disambiguated into a NodePath and a Graph class
 @JvmInline
 value class Graph(
-    @Expose val graph: List<GraphNode>,
+    @Expose val nodes: List<GraphNode>,
 ) : List<GraphNode> {
     override val size
-        get() = graph.size
+        get() = nodes.size
 
-    override fun contains(element: GraphNode) = graph.contains(element)
+    override fun contains(element: GraphNode) = nodes.contains(element)
 
-    override fun containsAll(elements: Collection<GraphNode>) = graph.containsAll(elements)
+    override fun containsAll(elements: Collection<GraphNode>) = nodes.containsAll(elements)
 
-    override fun get(index: Int) = graph.get(index)
+    override fun get(index: Int) = nodes.get(index)
 
-    override fun isEmpty() = graph.isEmpty()
+    override fun isEmpty() = nodes.isEmpty()
 
-    override fun indexOf(element: GraphNode) = graph.indexOf(element)
+    override fun indexOf(element: GraphNode) = nodes.indexOf(element)
 
-    override fun iterator(): Iterator<GraphNode> = graph.iterator()
-    override fun listIterator() = graph.listIterator()
+    override fun iterator(): Iterator<GraphNode> = nodes.iterator()
+    override fun listIterator() = nodes.listIterator()
 
-    override fun listIterator(index: Int) = graph.listIterator(index)
+    override fun listIterator(index: Int) = nodes.listIterator(index)
 
-    override fun subList(fromIndex: Int, toIndex: Int) = graph.subList(fromIndex, toIndex)
+    override fun subList(fromIndex: Int, toIndex: Int) = nodes.subList(fromIndex, toIndex)
 
-    override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
+    override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
@@ -49,7 +50,7 @@ value class Graph(
                         out.name("Name").value(it)
                     }
 
-                    it.tagNames?.takeIf { it.isNotEmpty() }?.let {
+                    it.tagNames.takeIf { list -> list.isNotEmpty() }?.let {
                         out.name("Tags")
                         out.beginArray()
                         for (tagName in it) {
@@ -62,7 +63,7 @@ value class Graph(
                     out.beginObject()
                     for ((node, weight) in it.neighbours) {
                         val id = node.id.toString()
-                        out.name(id).value(weight.round(2))
+                        out.name(id).value(weight.roundTo(2))
                     }
                     out.endObject()
 
@@ -79,8 +80,8 @@ value class Graph(
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
-                    var tags: List<String>? = null
-                    var neighbors = mutableListOf<Pair<Int, Double>>()
+                    var tags = emptyList<String>()
+                    val neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
                         if (reader.peek() != JsonToken.NAME) {
                             reader.skipValue()
@@ -140,7 +141,11 @@ value class Graph(
 }
 
 // The node object that gets parsed from/to json
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String>? = null) {
+class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) {
+
+    val tags: List<GraphNodeTag> by lazy {
+        tagNames.mapNotNull { GraphNodeTag.byId(it) }
+    }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>
@@ -163,18 +168,50 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
 
 fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph = this.findShortestPathAsGraphWithDistance(start, end).first
 
-fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
+data class DijkstraTree(
+    val origin: GraphNode,
+    /**
+     * A map of distances between the [origin] and each node in a graph. This distance map is only accurate for nodes closer to the
+     * origin than the [lastVisitedNode]. In case there is no early bailout, this map will be accurate for all nodes in the graph.
+     */
+    val distances: Map<GraphNode, Double>,
+    /**
+     * A map of nodes to the neighbouring node that is the quickest path towards the origin (the neighbouring node that has the lowest value
+     * in [distances])
+     */
+    val towardsOrigin: Map<GraphNode, GraphNode>,
+    /**
+     * This is either the furthest away node in the graph, or the node that was bailed out on early because it fulfilled the search
+     * condition. In case the search condition matches nothing, this will *still* be the furthest away node, so an additional check might be
+     * necessary.
+     */
+    val lastVisitedNode: GraphNode,
+)
+
+/**
+ * Find a tree of distances to the [start] node using dijkstra's algorithm.
+ */
+fun Graph.findDijkstraDistances(
+    start: GraphNode,
+    /**
+     * Bail out early before collecting all the distances to all nodes in the graph. This will not collect valid distance data for *all*
+     * nodes for which bailout matches, but only the closest one.
+     */
+    bailout: (GraphNode) -> Boolean,
+): DijkstraTree {
     val distances = mutableMapOf<GraphNode, Double>()
     val previous = mutableMapOf<GraphNode, GraphNode>()
     val visited = mutableSetOf<GraphNode>()
     val queue = PriorityQueue<GraphNode>(compareBy { distances.getOrDefault(it, Double.MAX_VALUE) })
+    var lastVisitedNode: GraphNode = start
 
     distances[start] = 0.0
     queue.add(start)
 
     while (queue.isNotEmpty()) {
         val current = queue.poll()
-        if (current == end) break
+        lastVisitedNode = current
+        if (bailout(current)) break
 
         visited.add(current)
 
@@ -190,16 +227,34 @@ fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode):
         }
     }
 
-    return Graph(
-        buildList {
-            var current = end
-            while (current != start) {
-                add(current)
-                current = previous[current] ?: return Graph(emptyList()) to 0.0
-            }
-            add(start)
-        }.reversed(),
-    ) to distances[end]!!
+    return DijkstraTree(
+        start,
+        distances,
+        previous,
+        lastVisitedNode,
+    )
+}
+
+fun Graph.findAllShortestDistances(start: GraphNode): DijkstraTree {
+    return findDijkstraDistances(start) { false }
+}
+
+fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
+    val distances = this
+    val reversePath = buildList {
+        var current = end
+        while (true) {
+            add(current)
+            if (current == distances.origin) break
+            current = distances.towardsOrigin[current] ?: return Graph(emptyList()) to 0.0
+        }
+    }
+    return Graph(reversePath.reversed()) to distances.distances[end]!!
+}
+
+fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
+    val distances = findDijkstraDistances(start) { it == end }
+    return distances.findPathToDestination(end)
 }
 
 fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = this.findShortestPathAsGraph(start, end).toPositionsList()

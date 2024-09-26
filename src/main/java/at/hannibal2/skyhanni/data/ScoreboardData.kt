@@ -51,16 +51,13 @@ object ScoreboardData {
             val lastColor = start.lastColorCode() ?: ""
 
             // Generate the list of color suffixes
-            val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
-                .takeWhile { it.isNotEmpty() }
-                .toMutableList()
+            val colorSuffixes = lastColor.chunked(2).toMutableList()
 
             // Iterate through the colorSuffixes to remove matching prefixes from 'end'
             for (suffix in colorSuffixes.toList()) {
                 if (end.startsWith(suffix)) {
                     end = end.removePrefix(suffix)
                     colorSuffixes.remove(suffix)
-                    break
                 }
             }
 

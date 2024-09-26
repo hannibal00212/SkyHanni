@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
@@ -36,7 +36,7 @@ object PetExpTooltip {
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack
-        val petExperience = itemStack.getPetExp()?.round(1) ?: return
+        val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
         val name = itemStack.name
         try {
 
@@ -105,7 +105,7 @@ object PetExpTooltip {
         val maxLevel = if (useGoldenDragonLevels) 200 else 100
 
         val maxXp = when {
-            useGoldenDragonLevels -> LEVEL_200_LEGENDARY // lvl 200 legendary
+            useGoldenDragonLevels -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY

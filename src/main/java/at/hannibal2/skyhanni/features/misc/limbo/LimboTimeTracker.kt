@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -116,7 +116,7 @@ object LimboTimeTracker {
         if (passedSince > currentPB) {
             oldPB = currentPB
             storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
-            userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).round(2)
+            userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).roundTo(2)
             if (onFire) userLuck *= FIRE_MULTIPLIER
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
             if (oldPB != 0.seconds) {
@@ -126,9 +126,9 @@ object LimboTimeTracker {
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > oldLuck) {
             if (onFire) {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}§c✴ §aSkyHanni User Luck§f! ")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}§c✴ §aSkyHanni User Luck§f! ")
             } else {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.round(2)}✴ SkyHanni User Luck§f!")
+                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}✴ SkyHanni User Luck§f!")
             }
             storage?.userLuck = userLuck
         }
@@ -152,7 +152,7 @@ object LimboTimeTracker {
             val currentPB = storage?.personalBest ?: 0
             val userLuck = storage?.userLuck ?: 0f
             val limboPB: Int = if (currentPB < timeInLimbo) timeInLimbo else currentPB
-            var luckString = tryTruncateFloat(userLuck.round(2))
+            var luckString = tryTruncateFloat(userLuck.roundTo(2))
             if (userLuck > 0) luckString = "+$luckString"
             var firstMessage =
                 "§fYour current PB is §e${limboPB.seconds}§f, granting you §a$luckString✴ SkyHanni User Luck§f!"

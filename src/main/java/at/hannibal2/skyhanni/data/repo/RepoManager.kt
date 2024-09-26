@@ -34,7 +34,7 @@ class RepoManager(private val configLocation: File) {
 
     private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
-    private val repoLocation: File = File(configLocation, "repo")
+    val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.farPast()
 

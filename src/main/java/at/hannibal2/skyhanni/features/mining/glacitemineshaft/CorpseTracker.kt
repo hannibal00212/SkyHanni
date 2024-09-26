@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -64,9 +66,10 @@ object CorpseTracker {
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
 
     @SubscribeEvent
-    fun onCorpseLoot(event: CorpseLootedEvent) {
+    fun onCorpseLooted(event: CorpseLootedEvent) {
         addLootedCorpse(event.corpseType)
         for ((itemName, amount) in event.loot) {
+            if (itemName.removeColor().trim() == "Glacite Powder") continue
             NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
                 tracker.modify {
                     it.addItem(event.corpseType, item, amount)
@@ -82,8 +85,8 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) }
-            ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
+        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
+            .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
         val keyCostStrings = buildList {
@@ -138,5 +141,5 @@ object CorpseTracker {
     }
 
     fun isEnabled() =
-        config.enabled && IslandType.DWARVEN_MINES.isInIsland() && (!config.onlyInMineshaft || IslandType.MINESHAFT.isInIsland())
+        LorenzUtils.inSkyBlock && config.enabled && (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
 }

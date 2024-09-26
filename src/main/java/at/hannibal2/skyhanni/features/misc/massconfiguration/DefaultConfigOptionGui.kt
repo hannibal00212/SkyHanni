@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
@@ -66,7 +67,7 @@ class DefaultConfigOptionGui(
             mc.fontRendererObj.FONT_HEIGHT.toFloat(),
             false,
             xSize / 2 - padding,
-            -1
+            -1,
         )
         GlStateManager.popMatrix()
 
@@ -74,7 +75,7 @@ class DefaultConfigOptionGui(
         GlStateManager.translate(
             (width - xSize) / 2F + padding,
             (height + ySize) / 2F - mc.fontRendererObj.FONT_HEIGHT * 2,
-            0F
+            0F,
         )
         var i = 0
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
@@ -95,7 +96,7 @@ class DefaultConfigOptionGui(
                 2 + i.toFloat(),
                 0F,
                 if (overMouse) 0xFF00FF00.toInt() else -1,
-                overMouse
+                overMouse,
             )
             i += width + 12
         }
@@ -132,12 +133,12 @@ class DefaultConfigOptionGui(
             (height - ySize) / 2 + barSize,
             (width + xSize) / 2,
             (height + ySize) / 2 - barSize,
-            scaledResolution
+            scaledResolution,
         )
         GlStateManager.translate(
             (width - xSize) / 2F + padding,
             (height - ySize) / 2F + barSize - currentScrollOffset,
-            0F
+            0F,
         )
 
         for ((cat) in orderedOptions.entries) {
@@ -157,13 +158,13 @@ class DefaultConfigOptionGui(
                     "§7${cat.description}",
                     "§7Current plan: ${suggestionState.label}",
                     "§aClick to toggle!",
-                    "§7Hold shift to show all options"
+                    "§7Hold shift to show all options",
                 )
 
                 if (isShiftKeyDown()) {
                     hoveringTextToDraw = listOf(
                         "§e${cat.name}",
-                        "§7${cat.description}"
+                        "§7${cat.description}",
                     ) + orderedOptions[cat]!!.map { "§7 - §a" + it.name }
                 }
 
@@ -179,8 +180,8 @@ class DefaultConfigOptionGui(
 
         GlStateManager.popMatrix()
         GlScissorStack.pop(scaledResolution)
-        if (hoveringTextToDraw != null) {
-            Utils.drawHoveringText(hoveringTextToDraw, mouseX, mouseY, width, height, 100, mc.fontRendererObj)
+        hoveringTextToDraw?.let { tooltip ->
+            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
     }
 

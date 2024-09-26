@@ -104,6 +104,7 @@ class ConfigManager {
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
         "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
 
         // debug features

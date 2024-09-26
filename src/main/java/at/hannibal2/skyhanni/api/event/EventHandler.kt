@@ -130,6 +130,13 @@ class EventHandler<T : SkyHanniEvent> private constructor(val name: String, priv
         val invoker: Consumer<Any>,
         val options: HandleEvent,
         val generic: Class<*>?,
-        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIslands.toSet(),
-    )
+    ) {
+        val onlyOnIslandTypes: Set<IslandType> = getIslands(options)
+
+        companion object {
+            private fun getIslands(options: HandleEvent): Set<IslandType> =
+                if (options.onlyOnIslands.isEmpty()) setOf(options.onlyOnIsland)
+                else options.onlyOnIslands.toSet()
+        }
+    }
 }

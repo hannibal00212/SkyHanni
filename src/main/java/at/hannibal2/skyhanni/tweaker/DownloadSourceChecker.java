@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.tweaker;
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -16,7 +14,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DownloadSourceChecker {
 
-    private static final String GITHUB_REPO_TEXT = "repo_id=511310721";
+    private static final String MOD_VERSION = "@MOD_VERSION@";
+    private static final String GITHUB_REPO = "511310721";
+    private static final String GITHUB_REPO_TEXT = "repo_id=" + GITHUB_REPO;
     private static final String MODRINTH_URL = "/data/byNkmv5G/";
     private static final String THE_PASSWORD = "danger";
 
@@ -96,11 +96,10 @@ public class DownloadSourceChecker {
             }
         ));
 
-        String version = SkyHanniMod.Companion.getVersion();
         JOptionPane.showOptionDialog(
             frame,
             String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
-            "SkyHanni " + version + " Security Error",
+            "SkyHanni " + MOD_VERSION + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
             null,
@@ -124,8 +123,12 @@ public class DownloadSourceChecker {
             URI host = getHost(file);
             if (host == null) return null;
 
-            if (host.getHost().equals("objects.githubusercontent.com") && host.getQuery().contains(GITHUB_REPO_TEXT)) {
-                return null;
+            if (host.getHost().equals("objects.githubusercontent.com")) {
+                if (host.getQuery().contains(GITHUB_REPO_TEXT)) {
+                    return null;
+                } else if (host.getPath().contains("/" + GITHUB_REPO + "/")) {
+                    return null;
+                }
             } else if (host.getHost().equals("cdn.modrinth.com") && host.getPath().startsWith(MODRINTH_URL)) {
                 return null;
             }

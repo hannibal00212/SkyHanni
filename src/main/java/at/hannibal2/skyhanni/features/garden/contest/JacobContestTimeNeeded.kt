@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -102,7 +102,7 @@ object JacobContestTimeNeeded {
             return
         }
 
-        val speed = (ff * crop.baseDrops * bps / 100).round(1).toInt()
+        val speed = (ff * crop.baseDrops * bps / 100).roundTo(1).toInt()
 
         renderCrop(speed, crop, averages, sorted, map)
     }
@@ -174,7 +174,7 @@ object JacobContestTimeNeeded {
             add("")
             val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
             add("§7Latest FF: §e${(latestFF).addSeparators()}")
-            val bps = crop.getBps()?.round(1) ?: 0
+            val bps = crop.getBps()?.roundTo(1) ?: 0
             add("§7${addBpsTitle()}§e${bps.addSeparators()}")
             addAll(lowBPSWarning)
         })

@@ -81,6 +81,7 @@ object TunnelsMaps {
     private var active: String = ""
 
     private lateinit var fairySouls: Map<String, GraphNode>
+    // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
@@ -221,7 +222,7 @@ object TunnelsMaps {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -235,7 +236,12 @@ object TunnelsMaps {
                 key.contains("Fairy") -> fairy[key] = value.first()
                 newGemstonePattern.matches(key) -> newGemstone[key] = value
                 oldGemstonePattern.matches(key) -> oldGemstone[key] = value
-                else -> other[key] = value
+                else -> {
+                    // ignore node names without color codes
+                    if (key.removeColor() != key) {
+                        other[key] = value
+                    }
+                }
             }
         }
         fairySouls = fairy
@@ -447,6 +453,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
+            showNoteNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -523,7 +530,7 @@ object TunnelsMaps {
         goal = getNext()
     }
 
-    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center")
+    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }

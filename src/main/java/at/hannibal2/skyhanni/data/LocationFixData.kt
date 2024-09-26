@@ -11,9 +11,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object LocationFixData {
 
-    private var locationFixes = mutableListOf<LocationFix>()
+    private var locationFixes = mutableMapOf<IslandType, List<LocationFix>>()
 
-    class LocationFix(val island: IslandType, val area: AxisAlignedBB, val realLocation: String)
+    private data class LocationFix(val area: AxisAlignedBB, val realLocation: String)
 
     // priority set to low so that IslandType can load their island names from repo earlier
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -26,11 +26,18 @@ object LocationFixData {
             val area = fix.a.axisAlignedTo(fix.b)
             val realLocation = fix.realLocation
 
-            locationFixes.add(LocationFix(island, area, realLocation))
+            val list = locationFixes[island]
+
+            val locationFix = LocationFix(area, realLocation)
+
+            if (list == null) locationFixes[island] = listOf(locationFix)
+            else locationFixes[island] = list + locationFix
         }
     }
 
-    fun fixLocation(skyBlockIsland: IslandType) = locationFixes
-        .firstOrNull { skyBlockIsland == it.island && it.area.isPlayerInside() }
-        ?.realLocation
+    fun fixLocation(skyBlockIsland: IslandType): String? =
+        locationFixes[skyBlockIsland]
+            ?.find { it.area.isPlayerInside() }
+            ?.realLocation
+
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -39,6 +40,10 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
+    @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
+    public ExperimentationTableConfig experimentationTable = new ExperimentationTableConfig();
+
+    @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
@@ -61,6 +66,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
+    // TODO remove the suffix "config"
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
@@ -286,4 +292,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hexAsColorInLore = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightActiveBeaconEffect = true;
 }

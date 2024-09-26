@@ -51,6 +51,12 @@ public class HoppityEggsConfig {
     public boolean showLine = false;
 
     @Expose
+    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the next hoppity egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showPathFinder = false;
+
+    @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
         "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
@@ -190,6 +196,11 @@ public class HoppityEggsConfig {
             return name;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
 
     @Expose
     @ConfigOption(

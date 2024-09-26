@@ -12,6 +12,11 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+/**
+ * Use @[SubscribeEvent]
+ */
 
 @Deprecated("Use SkyHanniEvent instead")
 abstract class LorenzEvent : Event() {

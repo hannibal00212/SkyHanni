@@ -12,7 +12,7 @@ enum class SlayerType(val displayName: String, val rngName: String, val clazz: C
     SVEN("Sven Packmaster", "sven", EntityWolf::class.java),
     VOID("Voidgloom Seraph", "voidgloom", EntityEnderman::class.java),
     INFERNO("Inferno Demonlord", "inferno", EntityBlaze::class.java),
-    VAMPIRE("Riftstalker Bloodfiend", "vampire", EntityZombie::class.java)
+    VAMPIRE("Bloodfiend", "vampire", EntityZombie::class.java) // previously called "Riftstalker Bloodfiend"
     ;
 
     companion object {

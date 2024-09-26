@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -18,13 +19,13 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -139,7 +140,7 @@ object MinionCraftHelper {
 
             for (recipe in recipes) {
                 for (ingredient in recipe.getCachedIngredients()) {
-                    val ingredientInternalName = ingredient.internalItemId.asInternalName()
+                    val ingredientInternalName = ingredient.internalName
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
@@ -169,10 +170,10 @@ object MinionCraftHelper {
 
             if (internalName.contains("_GENERATOR_")) {
                 for (recipe in NEUItems.getRecipes(internalName)) {
-                    if (recipe !is CraftingRecipe) continue
+                    if (!recipe.isCraftingRecipe()) continue
 
                     for (ingredient in recipe.getCachedIngredients()) {
-                        val id = ingredient.internalItemId.asInternalName()
+                        val id = ingredient.internalName
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
                         }
@@ -194,17 +195,13 @@ object MinionCraftHelper {
         newDisplay.add(minionName)
         val nextMinionId = minionId.addOneToId()
         for (recipe in NEUItems.getRecipes(nextMinionId)) {
-            if (recipe !is CraftingRecipe) continue
-            val output = recipe.output
-            val internalItemId = output.internalItemId.asInternalName()
-            if (!internalItemId.contains("_GENERATOR_")) continue
+            if (!recipe.isCraftingRecipe()) continue
+            val output = recipe.output ?: continue
+            if (!output.internalName.contains("_GENERATOR_")) continue
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (input in recipe.inputs) {
-                val itemId = input.internalItemId.asInternalName()
+            for ((itemId, count) in recipe.ingredients.toPrimitiveItemStacks()) {
                 if (minionId != itemId) {
-                    val count = input.count.toInt()
-                    val old = map.getOrDefault(itemId, 0)
-                    map[itemId] = old + count
+                    map.addOrPut(itemId, count)
                 }
             }
             var allDone = true

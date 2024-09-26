@@ -58,7 +58,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.HUB], priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return

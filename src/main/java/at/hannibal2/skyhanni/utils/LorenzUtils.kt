@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -100,23 +101,11 @@ object LorenzUtils {
         return originalMessage.stripHypixelMessage()
     }
 
-    fun Double.round(decimals: Int): Double {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString()
-        val b = toString()
-        return if (a.length > b.length) this else result
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Double.round(decimals: Int) = this.roundTo(decimals)
 
-    fun Float.round(decimals: Int): Float {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString().length
-        val b = toString().length
-        return if (a > b) this else result.toFloat()
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Float.round(decimals: Int) = this.roundTo(decimals)
 
     // TODO replace all calls with regex
     @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))

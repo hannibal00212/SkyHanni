@@ -108,16 +108,15 @@ object KeyboardManager {
         return this.isKeyDown || this.isPressed
     }
 
-    fun Int.isKeyHeld(): Boolean {
-        if (this == 0) return false
-        return if (this < 0) {
-            Mouse.isButtonDown(this + 100)
-        } else if (this >= Keyboard.KEYBOARD_SIZE) {
+    fun Int.isKeyHeld(): Boolean = when {
+        this == 0 -> false
+        this < 0 -> Mouse.isButtonDown(this + 100)
+        this >= Keyboard.KEYBOARD_SIZE -> {
             val pressedKey = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
             Keyboard.getEventKeyState() && this == pressedKey
-        } else {
-            Keyboard.isKeyDown(this)
         }
+
+        else -> Keyboard.isKeyDown(this)
     }
 
     private val pressedKeys = mutableMapOf<Int, Boolean>()

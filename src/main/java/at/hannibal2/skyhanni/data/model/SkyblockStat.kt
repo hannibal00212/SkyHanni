@@ -43,8 +43,18 @@ enum class SkyblockStat(val icon: String) {
     PRISTINE("§5✧"),
     FORAGING_FORTUNE("§☘"),
     FARMING_FORTUNE("§6☘"),
+
+    MINING_SPREAD("§e▚"),
     MINING_FORTUNE("§6☘"),
-    FEAR("§a☠")
+    ORE_FORTUNE("§6☘"),
+    DWARVEN_METAL_FORTUNE("§6☘"),
+    BLOCK_FORTUNE("§6☘"),
+    GEMSTONE_FORTUNE("§6☘"),
+
+    FEAR("§a☠"),
+    HEAT_RESISTANCE("§c♨"),
+
+    UNKNOWN("§c?")
     ;
 
     val capitalizedName = name.lowercase().allLettersFirstUppercase()
@@ -57,6 +67,10 @@ enum class SkyblockStat(val icon: String) {
         val fontSizeOfLargestIcon by lazy {
             entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
         }
+
+        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string }
+
+        fun getValue(string: String): SkyblockStat = getValueOrNull(string) ?: UNKNOWN
     }
 }
 

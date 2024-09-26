@@ -18,9 +18,11 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
+import java.time.LocalDate
 import java.util.UUID
 
 object SkyHanniTypeAdapters {
+
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NEUItems::saveNBTData, NEUItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
@@ -65,14 +67,26 @@ object SkyHanniTypeAdapters {
 
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
-        { SkyblockStat.valueOf(this.uppercase()) },
+        { SkyblockStat.getValue(this.uppercase()) },
     )
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 
-    inline fun <reified T> GsonBuilder.registerTypeAdapter(
+    val LOCALE_DATE = object : TypeAdapter<LocalDate>() {
+        override fun write(out: JsonWriter, value: LocalDate) {
+            out.value(value.toString())
+        }
+
+        override fun read(reader: JsonReader): LocalDate {
+            return LocalDate.parse(reader.nextString())
+        }
+    }
+
+    inline
+
+    fun <reified T> GsonBuilder.registerTypeAdapter(
         crossinline write: (JsonWriter, T) -> Unit,
         crossinline read: (JsonReader) -> T,
     ): GsonBuilder {

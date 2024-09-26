@@ -20,13 +20,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
@@ -58,7 +58,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -499,11 +498,6 @@ object EstimatedItemValueCalculator {
                 if (remainingStars <= 0) continue
 
                 val price = getPriceFor(prices, remainingStars) ?: return null
-                println(" ")
-                println("price for $id ($remainingStars)")
-                println("price.itemPrice: ${price.itemPrice}")
-                println("essencePrice: ${price.essencePrice}")
-                println("itemPrice: ${price.itemPrice}")
                 finalPrice = finalPrice?.let { it + price } ?: price
                 remainingStars -= prices.size
             }
@@ -528,7 +522,7 @@ object EstimatedItemValueCalculator {
                 return kuudraUpgradeTiers.indexOf(tier)
             }
         }
-        return 0
+        return -1
     }
 //     private fun getKuudraTier(internalName: NEUInternalName): Int? =
 //         kuudraUpgradeTiers.firstOrNull { it in internalName.toString() }?.let { kuudraUpgradeTiers.indexOf(it) }
@@ -889,12 +883,12 @@ object EstimatedItemValueCalculator {
 
             val previousTotal = totalPrice
             for (ingredients in slot.value) {
-                val ingredient = Ingredient(NEUItems.manager, ingredients)
+                val ingredient = PrimitiveIngredient(ingredients)
 
-                totalPrice += if (ingredient.isCoins) {
+                totalPrice += if (ingredient.isCoin()) {
                     ingredient.count
                 } else {
-                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
+                    ingredient.internalName.getPrice() * ingredient.count
                 }
             }
 

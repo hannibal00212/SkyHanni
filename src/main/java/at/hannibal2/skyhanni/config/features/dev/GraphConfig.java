@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -30,6 +31,11 @@ public class GraphConfig {
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = -98) // Middle Mouse
     public int selectKey = -98;
+
+    @Expose
+    @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int selectRaycastKey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Connect Key", desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection.")
@@ -100,7 +106,23 @@ public class GraphConfig {
     public Position namedNodesList = new Position(20, 20);
 
     @Expose
+    @ConfigOption(
+        name = "Max Node Distance",
+        desc = "Only render nodes below this distance to the player.")
+    @ConfigEditorSlider(
+        minValue = 10,
+        maxValue = 500,
+        minStep = 10
+    )
+    public int maxNodeDistance = 50;
+
+    @Expose
     @ConfigOption(name = "Shows Stats", desc = "Show funny extra statistics on save. May lag the game a bit.")
     @ConfigEditorBoolean
     public boolean showsStats = true;
+
+    @Expose
+    @ConfigOption(name = "Use as Island Area", desc = "When saving, use the current edited graph as temporary island area for the current island.")
+    @ConfigEditorBoolean
+    public boolean useAsIslandArea = false;
 }

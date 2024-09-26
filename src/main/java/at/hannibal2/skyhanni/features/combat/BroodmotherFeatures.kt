@@ -60,9 +60,7 @@ object BroodmotherFeatures {
     private fun onStageUpdate() {
         ChatUtils.debug("New Broodmother stage: $currentStage")
 
-        if (lastStage == null) {
-            if (onServerJoin()) return
-        }
+        if (lastStage == null && onServerJoin()) return
 
         // ignore Hypixel bug where the stage may temporarily revert to Imminent after the Broodmother's death
         if (currentStage == StageEntry.IMMINENT && lastStage == StageEntry.ALIVE) return
@@ -72,23 +70,23 @@ object BroodmotherFeatures {
             return
         }
 
-        val timeUntilSpawn = currentStage?.minutes?.minutes
-        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn!!
-
         if (currentStage == StageEntry.IMMINENT && config.imminentWarning) {
             playImminentWarning()
             return
         }
 
-        if (config.stages.contains(currentStage) && lastStage != null) {
-            if (currentStage == StageEntry.SLAIN) {
-                onBroodmotherSlain()
-            } else {
-                val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
-                ChatUtils.chat(
-                    "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
-                )
-            }
+        val lastStage = lastStage ?: return
+        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
+        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
+
+        if (currentStage !in config.stages) return
+        if (currentStage == StageEntry.SLAIN) {
+            onBroodmotherSlain()
+        } else {
+            val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
+            ChatUtils.chat(
+                "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
+            )
         }
     }
 
@@ -99,7 +97,7 @@ object BroodmotherFeatures {
             val pluralize = StringUtils.pluralize(currentStage?.minutes ?: 0, "minute")
             var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
             if (currentStage?.minutes != 0) {
-                message += " It will spawn within §b${currentStage?.minutes} $pluralize§e."
+                message += " It will spawn §bwithin ${currentStage?.minutes} $pluralize§e."
             }
             ChatUtils.chat(message)
             return true
@@ -161,7 +159,7 @@ object BroodmotherFeatures {
         if (!isCountdownEnabled()) return
 
         if (broodmotherSpawnTime.isFarPast()) {
-            if (lastStage != null) {
+            if (lastStage != null && currentStage == StageEntry.ALIVE) {
                 display = "§4Broodmother spawned!"
             }
         } else {

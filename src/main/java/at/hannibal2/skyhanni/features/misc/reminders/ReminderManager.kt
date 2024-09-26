@@ -11,15 +11,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.center
 import at.hannibal2.skyhanni.utils.chat.Text.command
-import at.hannibal2.skyhanni.utils.chat.Text.fitToChat
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.send
-import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.chat.Text.wrap
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -44,11 +40,6 @@ object ReminderManager {
 
     private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
 
-    private fun createDivider() = Text.HYPHEN.fitToChat().style {
-        strikethrough = true
-        color = EnumChatFormatting.BLUE
-    }
-
     private fun parseDuration(text: String): Duration? = try {
         val duration = TimeUtils.getDuration(text)
         if (duration <= 1.seconds) null else duration
@@ -57,65 +48,34 @@ object ReminderManager {
     }
 
     private fun listReminders(page: Int) {
-        val reminders = getSortedReminders()
-        val maxPage = (reminders.size + REMINDERS_PER_PAGE - 1) / REMINDERS_PER_PAGE
-
-        listPage = page.coerceIn(0, maxPage)
-
-        val text: MutableList<IChatComponent> = mutableListOf()
-
-        text.add(createDivider())
-
-        text.add(
+        Text.displayPaginatedList(
+            "SkyHanni Reminders",
+            getSortedReminders(),
+            chatLineId = REMINDERS_LIST_ID,
+            emptyMessage = "No reminders found.",
+            currentPage = page,
+            maxPerPage = REMINDERS_PER_PAGE,
+        ) { reminderEntry ->
+            val id = reminderEntry.key
+            val reminder = reminderEntry.value
             Text.join(
-                if (listPage > 1) "§6§l<<".asComponent {
-                    hover = "§eClick to view page ${listPage - 1}".asComponent()
-                    command = "/shremind list ${listPage - 1}"
-                } else null,
+                "§c✕".asComponent {
+                    hover = "§7Click to remove".asComponent()
+                    command = "/shremind remove -l $id"
+                }.wrap("§8[", "§8]"),
                 " ",
-                "§6Reminders (Page $listPage of $maxPage)",
+                "§e✎".asComponent {
+                    hover = "§7Click to start editing".asComponent()
+                    suggest = "/shremind edit -l $id ${reminder.reason} "
+                }.wrap("§8[", "§8]"),
                 " ",
-                if (listPage < maxPage) "§6§l>>".asComponent {
-                    hover = "§eClick to view page ${listPage + 1}".asComponent()
-                    command = "/shremind list ${listPage + 1}"
-                } else null,
-            ).center(),
-        )
-
-        if (reminders.isNotEmpty()) {
-            for (i in (listPage - 1) * REMINDERS_PER_PAGE until listPage * REMINDERS_PER_PAGE) {
-                if (i >= reminders.size) break
-                val (id, reminder) = reminders[i]
-
-                text.add(
-                    Text.join(
-                        "§c✕".asComponent {
-                            hover = "§7Click to remove".asComponent()
-                            command = "/shremind remove -l $id"
-                        }.wrap("§8[", "§8]"),
-                        " ",
-                        "§e✎".asComponent {
-                            hover = "§7Click to start editing".asComponent()
-                            suggest = "/shremind edit -l $id ${reminder.reason} "
-                        }.wrap("§8[", "§8]"),
-                        " ",
-                        "§6${reminder.formatShort()}".asComponent {
-                            hover = "§7${reminder.formatFull()}".asComponent()
-                        }.wrap("§8[", "§8]"),
-                        " ",
-                        "§7${reminder.reason}",
-                    ),
-                )
-            }
-        } else {
-            text.add(Text.EMPTY)
-            text.add("§cNo reminders found.".asComponent().center())
-            text.add(Text.EMPTY)
+                "§6${reminder.formatShort()}".asComponent {
+                    hover = "§7${reminder.formatFull()}".asComponent()
+                }.wrap("§8[", "§8]"),
+                " ",
+                "§7${reminder.reason}",
+            )
         }
-
-        text.add(createDivider())
-
-        Text.join(*text.toTypedArray(), separator = Text.NEWLINE).send(REMINDERS_LIST_ID)
     }
 
     private fun createReminder(args: Array<String>) {
@@ -183,7 +143,7 @@ object ReminderManager {
     }
 
     private fun help() {
-        createDivider().send()
+        Text.createDivider().send()
         "§6SkyHanni Reminder Commands:".asComponent().send()
         "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
         "§e/shremind list <page> - §bLists all reminders".asComponent().send()
@@ -191,7 +151,7 @@ object ReminderManager {
         "§e/shremind edit <id> <reminder> - §bEdits a reminder".asComponent().send()
         "§e/shremind move <id> <time> - §bMoves a reminder".asComponent().send()
         "§e/shremind help - §bShows this help message".asComponent().send()
-        createDivider().send()
+        Text.createDivider().send()
     }
 
     @SubscribeEvent

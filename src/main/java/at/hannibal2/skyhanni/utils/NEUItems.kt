@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -30,11 +32,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -57,8 +55,8 @@ object NEUItems {
 
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
-    private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
-    private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+    private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
+    private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
     private val hypixelApiGson by lazy {
@@ -100,7 +98,7 @@ object NEUItems {
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
-        Utils.createItemStack(
+        ItemUtils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
@@ -183,7 +181,7 @@ object NEUItems {
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double = getPriceNew(priceSource, pastRecipes)
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
@@ -198,11 +196,11 @@ object NEUItems {
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<PrimitiveRecipe> = emptyList()): Double? =
         getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
@@ -309,12 +307,12 @@ object NEUItems {
             return internalName.makePrimitiveStack()
         }
         for (recipe in getRecipes(internalName)) {
-            if (recipe !is CraftingRecipe) continue
+            if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients()) {
-                val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalItemId.asInternalName()
+            for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
+                val amount = ingredient.amount
+                var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
                     internalItemId = "CACTUS".asInternalName()
@@ -335,8 +333,7 @@ object NEUItems {
                     continue
                 }
 
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
+                map.addOrPut(internalItemId, amount)
             }
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()
@@ -356,13 +353,13 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
+    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> {
         return recipesCache.getOrPut(internalName) {
-            manager.getRecipesFor(internalName.asString())
+            PrimitiveRecipe.convertMultiple(manager.getRecipesFor(internalName.asString())).toSet()
         }
     }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { allIngredients() }
+    fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -391,6 +388,4 @@ object NEUItems {
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
         return manager.jsonToStack(jsonObject, false)
     }
-
-    fun NeuRecipe.allIngredients(): Set<Ingredient> = ingredients
 }

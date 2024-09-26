@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -112,7 +112,7 @@ object Translator {
      */
 
     private fun getJSONResponse(urlString: String) =
-        APIUtil.getJSONResponseAsElement(urlString, false, "Google Translate API")
+        APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
     private fun getTranslationToEnglish(message: String): String {
         val url =

@@ -44,9 +44,8 @@ public class EventConfig {
     @Expose
     public GreatSpookConfig spook = new GreatSpookConfig();
 
-    @ConfigOption(name = "Carnival", desc = "")
-    @Accordion
     @Expose
+    @Category(name = "The Carnival", desc = "Features for games at §eThe Carnival §7when §bFoxy §7is Mayor.")
     public CarnivalConfig carnival = new CarnivalConfig();
 
     // comment in if the event is needed again
@@ -58,5 +57,4 @@ public class EventConfig {
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
-
 }

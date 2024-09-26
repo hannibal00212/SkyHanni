@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.Quad
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -441,7 +441,7 @@ object SkillProgress {
             val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
 
             if (config.usePercentage.get())
-                append("§7(§6${percent.roundToPrecision(2)}%§7)")
+                append("§7(§6${percent.roundTo(2)}%§7)")
             else {
                 if (currentXpMax == 0L)
                     append("§7(§6${currentXp.addSeparators()}§7)")

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -80,7 +80,7 @@ object CruxTalismanDisplay {
                 }
             }
         }
-        percentValue = ((percent.toDouble() / 600) * 100).roundToPrecision(1)
+        percentValue = ((percent.toDouble() / 600) * 100).roundTo(1)
         if (bonusesLine.isNotEmpty() && config.showBonuses.get()) {
             addAsSingletonList("§7Bonuses:")
             bonusesLine.forEach { addAsSingletonList("  $it") }

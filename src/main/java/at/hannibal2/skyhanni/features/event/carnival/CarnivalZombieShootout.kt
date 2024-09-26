@@ -61,10 +61,10 @@ object CarnivalZombieShootout {
     )
 
     enum class ZombieType(val points: Int, val helmet: String, val color: Color) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42)),  //Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192)),  //Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0)),  //Gold
-        DIAMOND(120, "Diamond Helmet", Color(185, 242, 255)) //Diamond
+        LEATHER(30, "Leather Cap", Color(165, 42, 42)), //Brown
+        IRON(50, "Iron Helmet", Color(192, 192, 192)), //Silver
+        GOLD(80, "Golden Helmet", Color(255, 215, 0)), //Gold
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) //Diamond
     }
 
     @SubscribeEvent
@@ -86,15 +86,22 @@ object CarnivalZombieShootout {
                 zombie to type
             }.toMap()
 
-            drawZombies = nearbyZombies.filterValues { it == nearbyZombies.values.maxByOrNull { it.points } }
+            drawZombies =
+                if (config.highestOnly) nearbyZombies.filterValues { zombieType -> zombieType == nearbyZombies.values.maxByOrNull { it.points } }
+                else nearbyZombies
+
             lastUpdate.zombie = SimpleTimeMark.now()
         }
 
         for ((zombie, type) in drawZombies) {
             val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
+            val isSmall = (entity as? EntityZombie)?.isChild ?: false
+
+            val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+            else entity.entityBoundingBox
 
             event.drawHitbox(
-                entity.entityBoundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
+                boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
                 lineWidth = 3,
                 type.color,
                 depth = false,

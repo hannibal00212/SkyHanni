@@ -6,17 +6,22 @@ import at.hannibal2.skyhanni.data.MiningAPI.inCrystalHollows
 import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningAPI.inEnd
 import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
+import at.hannibal2.skyhanni.data.MiningAPI.inMineshaft
 import at.hannibal2.skyhanni.data.MiningAPI.inSpidersDen
+import at.hannibal2.skyhanni.data.MiningAPI.inTunnels
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import net.minecraft.block.BlockColored
 import net.minecraft.block.BlockSand
+import net.minecraft.block.BlockSilverfish
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.BlockStainedGlassPane
 import net.minecraft.block.BlockStone
+import net.minecraft.block.BlockStoneSlab
 import net.minecraft.block.BlockStoneSlabNew
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
+
 
 enum class OreBlock(
     val checkBlock: (IBlockState) -> Boolean,
@@ -25,7 +30,7 @@ enum class OreBlock(
     // MITHRIL
     LOW_TIER_MITHRIL(
         checkBlock = ::isLowTierMithril,
-        checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
+        checkArea = { inDwarvenMines || inGlacite },
     ),
     MID_TIER_MITHRIL(
         checkBlock = { it.block == Blocks.prismarine },
@@ -127,9 +132,13 @@ enum class OreBlock(
         checkBlock = ::isHardStoneHollows,
         checkArea = { inCrystalHollows },
     ),
-    HARD_STONE_GLACIAL(
-        checkBlock = ::isHardstoneGlacite,
-        checkArea = { inGlacite },
+    HARD_STONE_TUNNELS(
+        checkBlock = ::isHardstoneTunnels,
+        checkArea = { inTunnels },
+    ),
+    HARD_STONE_MINESHAFT(
+        checkBlock = ::isHardstoneMineshaft,
+        checkArea = { inMineshaft },
     ),
 
     // DWARVEN BLOCKS
@@ -138,10 +147,12 @@ enum class OreBlock(
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_IRON(
+        // currently not detected
         checkBlock = { it.block == Blocks.iron_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_GOLD(
+        // currently not detected
         checkBlock = { it.block == Blocks.gold_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -150,14 +161,17 @@ enum class OreBlock(
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_REDSTONE(
+        // currently not detected
         checkBlock = { it.block == Blocks.redstone_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_EMERALD(
+        // currently not detected
         checkBlock = { it.block == Blocks.emerald_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_DIAMOND(
+        // currently not detected
         checkBlock = { it.block == Blocks.diamond_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -221,14 +235,20 @@ enum class OreBlock(
         checkBlock = ::isHighTierUmber,
         checkArea = { inGlacite },
     ),
-    LOW_TIER_TUNGSTEN(
-        checkBlock = { it.block == Blocks.cobblestone },
-        checkArea = { inGlacite },
+
+    LOW_TIER_TUNGSTEN_TUNNELS(
+        checkBlock = ::isLowTierTungstenTunnels,
+        checkArea = { inTunnels },
+    ),
+    LOW_TIER_TUNGSTEN_MINESHAFT(
+        checkBlock = ::isLowTierTungstenMineshaft,
+        checkArea = { inMineshaft },
     ),
     HIGH_TIER_TUNGSTEN(
         checkBlock = { it.block == Blocks.clay },
         checkArea = { inGlacite },
     ),
+
     GLACITE(
         checkBlock = { it.block == Blocks.packed_ice },
         checkArea = { inGlacite },
@@ -240,19 +260,17 @@ enum class OreBlock(
     }
 }
 
-private fun isLowTierMithril(state: IBlockState): Boolean {
-    return when (state.block) {
-        Blocks.wool -> state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY
-        Blocks.stained_hardened_clay -> state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN
-        else -> false
-    }
+private fun isLowTierMithril(state: IBlockState): Boolean = when (state.block) {
+    Blocks.wool -> state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY
+    Blocks.stained_hardened_clay -> state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN
+    else -> false
 }
 
 private fun isHighTierMithril(state: IBlockState): Boolean {
     return (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.LIGHT_BLUE)
 }
 
-private fun isTitanium(state: IBlockState): Boolean {
+fun isTitanium(state: IBlockState): Boolean {
     return (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.DIORITE_SMOOTH)
 }
 
@@ -262,30 +280,50 @@ private fun isStone(state: IBlockState): Boolean {
 
 private fun isHardStoneHollows(state: IBlockState): Boolean {
     return when (state.block) {
-        Blocks.wool -> (state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
-        Blocks.stained_hardened_clay -> (state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN)
-        Blocks.stone -> (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE)
+        Blocks.wool -> {
+            val color = state.getValue(BlockColored.COLOR)
+            color == EnumDyeColor.GRAY || color == EnumDyeColor.GREEN
+        }
+        Blocks.stained_hardened_clay -> when (state.getValue(BlockColored.COLOR)) {
+            EnumDyeColor.CYAN, EnumDyeColor.BROWN, EnumDyeColor.GRAY, EnumDyeColor.BLACK,
+            EnumDyeColor.LIME, EnumDyeColor.GREEN, EnumDyeColor.BLUE, EnumDyeColor.RED,
+            EnumDyeColor.SILVER -> true
+            else -> false
+        }
+        Blocks.clay, Blocks.stonebrick, Blocks.stone -> true
         else -> false
     }
 }
 
-private fun isHardstoneGlacite(state: IBlockState): Boolean =
+private fun isHardstoneTunnels(state: IBlockState): Boolean =
+    (state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE) ||
+        (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
+
+private fun isHardstoneMineshaft(state: IBlockState): Boolean =
     (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
-        (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
+        (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
 
 private fun isRedSand(state: IBlockState): Boolean =
     (state.block == Blocks.sand && state.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND)
 
-private fun isLowTierUmber(state: IBlockState): Boolean = state.block == Blocks.hardened_clay ||
-    (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
+private fun isLowTierUmber(state: IBlockState): Boolean =
+    state.block == Blocks.hardened_clay ||
+        (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
 
 private fun isHighTierUmber(state: IBlockState): Boolean =
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
 
-private fun IBlockState.isGemstoneWithColor(color: EnumDyeColor): Boolean {
-    return when (this.block) {
-        Blocks.stained_glass -> color == this.getValue(BlockStainedGlass.COLOR)
-        Blocks.stained_glass_pane -> color == this.getValue(BlockStainedGlassPane.COLOR)
-        else -> false
-    }
+private fun isLowTierTungstenTunnels(state: IBlockState): Boolean =
+    state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.COBBLESTONE
+
+private fun isLowTierTungstenMineshaft(state: IBlockState): Boolean = when (state.block) {
+    Blocks.stone_slab -> state.getValue(BlockStoneSlab.VARIANT) == BlockStoneSlab.EnumType.COBBLESTONE
+    Blocks.cobblestone, Blocks.stone_stairs -> true
+    else -> false
+}
+
+private fun IBlockState.isGemstoneWithColor(color: EnumDyeColor): Boolean = when (block) {
+    Blocks.stained_glass -> color == getValue(BlockStainedGlass.COLOR)
+    Blocks.stained_glass_pane -> color == getValue(BlockStainedGlassPane.COLOR)
+    else -> false
 }

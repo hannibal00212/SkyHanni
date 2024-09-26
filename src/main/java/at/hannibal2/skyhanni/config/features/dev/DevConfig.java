@@ -109,6 +109,13 @@ public class DevConfig {
     public boolean fancySbaContributors = false;
 
     @Expose
+    @ConfigOption(
+        name = "Number Format Override",
+        desc = "Forces the number format to use the en_US locale.")
+    @ConfigEditorBoolean
+    public boolean numberFormatOverride = false;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.max
@@ -74,13 +75,13 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
     fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
 
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
@@ -126,6 +127,8 @@ data class LorenzVec(
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(this.lengthSquared())
 
+    fun isNormalized(tolerance: Double = 0.01) = (lengthSquared() - 1.0).absoluteValue < tolerance
+
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
     fun clone(): LorenzVec = LorenzVec(x, y, z)
@@ -150,17 +153,21 @@ data class LorenzVec(
         return result
     }
 
-    fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun round(precision: Int) = roundTo(precision)
+
+    fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
     fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).round(0)
-        val y = (y - .499999).round(0)
-        val z = (z - .499999).round(0)
+        val x = (x - .499999).roundTo(0)
+        val y = (y - .499999).roundTo(0)
+        val z = (z - .499999).roundTo(0)
         return LorenzVec(x, y, z)
     }
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
+    // TODO better name. dont confuse with roundTo()
     fun roundLocation(): LorenzVec {
         val x = if (this.x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1

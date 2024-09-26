@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
@@ -63,6 +65,29 @@ public class ProfileSpecificStorage {
 
     @Expose
     public String currentPet = "";
+
+    @Expose
+    public ExperimentationStorage experimentation = new ExperimentationStorage();
+
+    public static class ExperimentationStorage {
+
+        @Expose
+        public LorenzVec tablePos = new LorenzVec();
+
+        @Expose
+        public ExperimentsDryStreakStorage dryStreak = new ExperimentsDryStreakStorage();
+
+        public static class ExperimentsDryStreakStorage {
+            @Expose
+            public int attemptsSince = 0;
+
+            @Expose
+            public int xpSince = 0;
+        }
+
+        @Expose
+        public ExperimentsProfitTracker.Data experimentsProfitTracker = new ExperimentsProfitTracker.Data();
+    }
 
     @Expose
     public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
@@ -157,6 +182,22 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+    }
+
+    @Expose
+    public CarnivalStorage carnival = new CarnivalStorage();
+
+    public static class CarnivalStorage {
+
+        @Expose
+        @Nullable
+        public java.time.LocalDate lastClaimedDay = null;
+
+        @Expose
+        public int carnivalYear = 0;
+
+        @Expose
+        public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
     }
 
     @Expose

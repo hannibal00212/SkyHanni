@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -176,7 +177,18 @@ object ReforgeAPI {
                     while (reader.hasNext()) {
                         val name = reader.nextName()
                         val value = reader.nextDouble()
-                        list[SkyblockStat.valueOf(name.uppercase())] = value
+
+                        val stat = SkyblockStat.getValueOrNull(name.uppercase()) ?: run {
+                            ErrorManager.logErrorStateWithData(
+                                "Unknown stat: '${name.uppercase()}'",
+                                "Stat list could not parse stat",
+                                "failed" to name.uppercase(),
+                                betaOnly = true,
+                            )
+                            continue
+                        }
+
+                        list[stat] = value
                     }
                     reader.endObject()
                     return list

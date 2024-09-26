@@ -19,11 +19,11 @@ object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
     val coinsPattern by patternGroup.pattern(
         "coins",
-        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$"
+        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
     val piggyPattern by patternGroup.pattern(
         "piggy",
-        "Piggy: (?<coins>.*)"
+        "Piggy: (?<coins>.*)",
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
@@ -54,6 +54,7 @@ object PurseAPI {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
+            // TODO relic of coins support
             if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
@@ -55,7 +55,7 @@ object TpsCounter {
                 "§eTPS: §f(${current}s)"
             } else {
                 val sum = tpsList.sum().toDouble()
-                var tps = (sum / tpsList.size).round(1)
+                var tps = (sum / tpsList.size).roundTo(1)
                 if (tps > 20) tps = 20.0
                 val color = getColor(tps)
                 "§eTPS: $color$tps"

@@ -30,7 +30,7 @@ object HoppityEggLocations {
             ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value
         }
 
-    private var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
+    var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
     val islandLocations
         get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()

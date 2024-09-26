@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,14 +15,7 @@ object EssenceItemUtils {
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts", NeuEssenceCostJson.TYPE)
-
-        ConfigManager.gson.toJson(unformattedData).let {
-            ChatUtils.debug("saved to clipboard!")
-            OSUtils.copyToClipboard(it)
-        }
         this.itemPrices = reformatData(unformattedData)
-
-        println("result: ${itemPrices.size}")
     }
 
     fun NEUInternalName.getEssencePrices(): Map<Int, EssenceUpgradePrice>? = itemPrices[this]

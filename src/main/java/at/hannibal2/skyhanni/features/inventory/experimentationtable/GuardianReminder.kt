@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.experiments
+package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -28,31 +28,16 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GuardianReminder {
 
-    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private var lastInventoryOpen = SimpleTimeMark.farPast()
     private var lastWarn = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    private val patternGroup = RepoPattern.group("data.enchanting.inventory.experimentstable")
-    private val inventoryNamePattern by patternGroup.pattern(
-        "mainmenu",
-        "Experimentation Table",
-    )
-
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     */
-    private val petNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "§[956d]Guardian.*",
-    )
-
     @SubscribeEvent
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (!inventoryNamePattern.matches(event.inventoryName)) return
-        if (petNamePattern.matches(PetAPI.currentPet)) return
+        if (event.inventoryName != "Experimentation Table") return
+        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
 
         lastInventoryOpen = SimpleTimeMark.now()
 
@@ -69,7 +54,7 @@ object GuardianReminder {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!inventoryNamePattern.matches(InventoryUtils.openInventoryName())) return
+        if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
@@ -93,6 +78,11 @@ object GuardianReminder {
 
         GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(59, "inventory.helper.enchanting.guardianReminder", "inventory.experimentationTable.guardianReminder")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.guardianReminder

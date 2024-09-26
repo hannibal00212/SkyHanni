@@ -9,18 +9,17 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 
 object ItemPriceUtils {
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ) = getPriceOrNull(priceSource, pastRecipes) ?: 0.0
 
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
         when (this) {
             NEUInternalName.JASPER_CRYSTAL -> return 0.0
@@ -60,7 +59,7 @@ object ItemPriceUtils {
     // NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost
     fun NEUInternalName.getRawCraftCostOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? = getRecipes(this).filter { it !in pastRecipes }
         .map { it.getRecipePrice(priceSource, pastRecipes + it) }
         .filter { it >= 0 }

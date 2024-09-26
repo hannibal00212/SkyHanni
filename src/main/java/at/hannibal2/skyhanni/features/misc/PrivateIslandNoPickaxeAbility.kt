@@ -21,12 +21,10 @@ object PrivateIslandNoPickaxeAbility {
         if (!config.privateIslandNoPickaxeAbility) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        when (event.itemInHand?.getItemCategoryOrNull()) {
-            ItemCategory.GAUNTLET, ItemCategory.PICKAXE, ItemCategory.DRILL -> {
-                event.cancel()
-            }
-
-            else -> {}
+        if (event.itemInHand?.getItemCategoryOrNull()?.let {
+                ItemCategory.miningTools.contains(it)
+            } == true) {
+            event.cancel()
         }
     }
 }

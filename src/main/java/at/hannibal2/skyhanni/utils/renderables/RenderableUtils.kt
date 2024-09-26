@@ -39,6 +39,12 @@ internal object RenderableUtils {
         } ?: listOf(yPadding))
     }
 
+    fun calculateAlignmentXOffset(width: Int, xSpace: Int, alignment: HorizontalAlignment) = when (alignment) {
+        HorizontalAlignment.CENTER -> (xSpace - width) / 2
+        HorizontalAlignment.RIGHT -> xSpace - width
+        else -> 0
+    }
+
     private fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2

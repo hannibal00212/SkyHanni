@@ -3,6 +3,8 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -18,30 +20,11 @@ plugins {
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
+    id("io.gitlab.arturbosch.detekt")
+    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven("https://maven.minecraftforge.net") {
-        metadataSources {
-            artifact() // We love missing POMs
-        }
-    }
-    maven("https://repo.spongepowered.org/maven/") // mixin
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
-        content {
-            includeGroupByRegex("(com|io)\\.github\\..*")
-        }
-    }
-    maven("https://repo.nea.moe/releases") // libautoupdate
-    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-}
 
 // Toolchains:
 java {
@@ -159,9 +142,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // June 3, 2024, 9:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
+    // August 27, 2024, 4:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.3
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.3:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -177,10 +160,14 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
+
+    detektPlugins("org.notenoughupdates:detektrules:1.0.0")
+    detektPlugins(project(":detekt"))
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
 }
 
 afterEvaluate {
@@ -312,12 +299,18 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
         onlyIf { false }
     }
 }
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
+
+blossom {
+    replaceToken("@MOD_VERSION@", version)
+}
+
 val sourcesJar by tasks.creating(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
@@ -343,3 +336,29 @@ publishing.publications {
         }
     }
 }
+
+// Detekt: TODO: Uncomment this when we're ready to enforce
+/*detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        md.required.set(true) // simple Markdown format
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}*/

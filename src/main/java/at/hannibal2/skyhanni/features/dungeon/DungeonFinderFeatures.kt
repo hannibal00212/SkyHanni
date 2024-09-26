@@ -275,6 +275,7 @@ object DungeonFinderFeatures {
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
+            // TODO use enum
             val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
             val toolTip = stack.getLore().toMutableList()
             for ((index, line) in stack.getLore().withIndex()) {

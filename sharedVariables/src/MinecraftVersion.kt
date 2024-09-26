@@ -16,6 +16,9 @@ enum class MinecraftVersion(
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)
 
+    val formattedJavaLanguageVersion: String
+        get() = if (javaVersion <= 8) "1.$javaVersion" else javaVersion.toString()
+
     val versionNumber = run {
         val parts = versionName.split('.').mapTo(mutableListOf()) { it.toInt() }
         if (parts.size == 2) parts.add(0)

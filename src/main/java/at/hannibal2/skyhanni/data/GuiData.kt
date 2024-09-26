@@ -36,6 +36,9 @@ object GuiData {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
+
+        if (CustomWardrobeKeybinds.allowMouseClick()) return
+
         if (preDrawEventCancelled) event.isCanceled = true
     }
 

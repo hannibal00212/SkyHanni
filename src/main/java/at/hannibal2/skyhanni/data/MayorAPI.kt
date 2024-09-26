@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -216,7 +216,7 @@ object MayorAPI {
 
         SkyHanniMod.coroutineScope.launch {
             val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            val jsonObject = withContext(dispatcher) { APIUtils.getJSONResponse(url) }
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launch
             val map = mutableMapOf<Int, MayorCandidate>()

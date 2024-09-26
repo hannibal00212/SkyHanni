@@ -159,7 +159,7 @@ object DiscordLocationKey {
 
         "Dwarven Base Camp" to "glacite-tunnels",
         "Fossil Research Center" to "glacite-tunnels",
-        "Glacite Lake" to "glacite-tunnels",
+        "Great Glacite Lake" to "glacite-tunnels",
         "Glacite Mineshafts" to "glacite-tunnels",
     ) // maps sublocations to their broader image
 

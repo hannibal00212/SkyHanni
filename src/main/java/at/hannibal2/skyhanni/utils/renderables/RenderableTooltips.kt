@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -44,8 +43,8 @@ object RenderableTooltips {
         val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val x = Utils.getMouseX() + 12
-        val y = Utils.getMouseY() - if (tips.size > 1) 1 else -7
+        val x = RenderUtils.getMouseX() + 12
+        val y = RenderUtils.getMouseY() - if (tips.size > 1) 1 else -7
         val borderColorStart = tooltip.getBorderColor()
         val scaled = ScaledResolution(Minecraft.getMinecraft())
         val isSpacedTitle = tooltip.isSpacedTitle()

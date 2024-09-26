@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -91,7 +91,7 @@ object CropSpeedMeter {
             currentCrop?.let {
                 val crops = it.getCounter() - startCrops[it]!!
                 val blocks = currentBlocks
-                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).round(3)
+                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 
                 val list = mutableListOf<String>()
                 list.add("")
@@ -101,7 +101,7 @@ object CropSpeedMeter {
                 list.add(" §7Crops per Block: " + cropsPerBlocks.addSeparators())
 
                 val baseDrops = it.baseDrops
-                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).round(3)
+                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).roundTo(3)
 
                 list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
                 list.add("§cOpen /cropmilestones again to recalculate!")

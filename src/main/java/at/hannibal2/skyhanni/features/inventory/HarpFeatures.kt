@@ -44,15 +44,15 @@ object HarpFeatures {
     private val patternGroup = RepoPattern.group("harp")
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*"
+        "Harp.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*"
+        "Melody.*",
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
-        "§aSong is selected!"
+        "§aSong is selected!",
     )
 
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
@@ -77,7 +77,7 @@ object HarpFeatures {
                 37 + index,
                 2,
                 3,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             ) // middle clicks > left clicks
             lastClick = SimpleTimeMark.now()
             break
@@ -181,7 +181,7 @@ object HarpFeatures {
                 it,
                 event.clickedButton,
                 event.clickType,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             )
         }
     }
@@ -213,6 +213,6 @@ object HarpFeatures {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot.inventory !is ContainerLocalMenu) return
-            event.cancel()
+        event.cancel()
     }
 }

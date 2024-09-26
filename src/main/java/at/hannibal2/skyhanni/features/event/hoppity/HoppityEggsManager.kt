@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,11 +24,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,34 +39,10 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
      */
-    private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!",
-    )
-
-    /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
-     */
-    private val sideDishEggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "sidedish.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§l(?<meal>.*) §r§6Egg §r§din the Chocolate Factory§r§d!",
-    )
-
-    /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!
-     */
-    private val milestoneRabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "milestone.claimed",
-        "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§l(?<meal>[\\w ]+) Rabbit §r§din the Chocolate Factory§r§d!",
-    )
-
-    val eggFoundPatterns: List<Pattern> = listOf(
-        eggFoundPattern,
-        sideDishEggFoundPattern,
-        milestoneRabbitFoundPattern,
     )
 
     /**
@@ -126,10 +103,26 @@ object HoppityEggsManager {
     private var warningActive = false
     private var lastWarnTime = SimpleTimeMark.farPast()
 
+    private var latestWaypointOnclick: () -> Unit = {}
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastMeal = null
         lastNote = null
+    }
+
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (!HoppityAPI.isHoppityEvent() || !event.type.isResetting) return
+        HoppityEggLocations.saveNearestEgg()
+        event.type.markClaimed()
+        lastMeal = event.type
+        lastNote = event.note
+    }
+
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
     }
 
     @SubscribeEvent
@@ -147,21 +140,7 @@ object HoppityEggsManager {
             return
         }
 
-        HoppityEggsCompactChat.handleChat(event)
-        HoppityAPI.handleChat(event)
-
         if (!HoppityAPI.isHoppityEvent()) return
-
-        eggFoundPattern.matchMatcher(event.message) {
-            HoppityEggLocations.saveNearestEgg()
-            HoppityEggLocator.eggFound()
-            val meal = getEggType(event)
-            val note = group("note").removeColor()
-            meal.markClaimed()
-            lastMeal = meal
-            lastNote = note
-            return
-        }
 
         noEggsLeftPattern.matchMatcher(event.message) {
             HoppityEggType.allFound()
@@ -188,10 +167,6 @@ object HoppityEggsManager {
             getEggType(event).markSpawned()
             return
         }
-
-        rabbitFoundPattern.matchMatcher(event.message) {
-            HoppityCollectionStats.incrementRabbit(group("name"))
-        }
     }
 
     internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
@@ -202,6 +177,12 @@ object HoppityEggsManager {
             )
         }
 
+    fun getAndDisposeWaypointOnclick(): () -> Unit {
+        val onClick = latestWaypointOnclick
+        latestWaypointOnclick = {}
+        return onClick
+    }
+
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
         val meal = lastMeal ?: return
@@ -211,16 +192,16 @@ object HoppityEggsManager {
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
-            val onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
-            if (!HoppityEggsCompactChat.clickableCompact(onClick)) {
-                ChatUtils.clickableChat(
-                    "Click here to share the location of this chocolate egg with the server!",
-                    onClick = onClick,
-                    "§eClick to share!",
-                    expireAt = 30.seconds.fromNow(),
-                    oneTimeClick = true,
-                )
-            }
+            latestWaypointOnclick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
+            if (config.compactChat) return@runNextTick
+            ChatUtils.clickableChat(
+                "Click here to share the location of this chocolate egg with the server!",
+                onClick = latestWaypointOnclick,
+                "§eClick to share!",
+                expireAt = 30.seconds.fromNow(),
+                oneTimeClick = true,
+            )
+            latestWaypointOnclick = {}
         }
     }
 
@@ -252,7 +233,7 @@ object HoppityEggsManager {
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
             val (action, actionName) = if (LorenzUtils.inSkyBlock) {
-                { HypixelCommands.warp(config.warpDestination) } to "${"warp to ${config.warpDestination}".trim()}"
+                { HypixelCommands.warp(config.warpDestination) } to "warp to ${config.warpDestination}".trim()
             } else {
                 { HypixelCommands.skyblock() } to "join /skyblock!"
             }

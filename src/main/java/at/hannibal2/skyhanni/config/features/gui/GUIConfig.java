@@ -36,7 +36,7 @@ public class GUIConfig {
     @Accordion
     public ChromaConfig chroma = new ChromaConfig();
 
-    @ConfigOption(name = "Edit GUI Locations", desc = "Change the position of SkyHanni's overlays.")
+    @ConfigOption(name = "Edit GUI Locations", desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays.")
     @ConfigEditorButton(buttonText = "Edit")
     public Runnable positions = () -> GuiEditManager.openGuiPositionEditor(true);
 

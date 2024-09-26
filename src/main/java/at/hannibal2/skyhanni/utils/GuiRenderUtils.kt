@@ -3,20 +3,21 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.ceil
@@ -75,7 +76,7 @@ object GuiRenderUtils {
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
         drawStringCentered(
-            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff
+            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff,
         )
     }
 
@@ -125,25 +126,25 @@ object GuiRenderUtils {
             if (tooltipY + tooltipHeight + 6 > screenHeight) tooltipY = screenHeight - tooltipHeight - 6
             // main background
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0
+                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, -0xfeffff0,
             )
 
             // borders
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor
+                tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor,
 
-            )
+                )
 
             GuiScreen.drawRect(
                 tooltipX + tooltipTextWidth + 2,
                 tooltipY - 3 + 1,
                 tooltipX + tooltipTextWidth + 3,
                 tooltipY + tooltipHeight + 3 - 1,
-                borderColor
+                borderColor,
             )
 
             GuiScreen.drawRect(
-                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor
+                tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColor,
             )
 
             GuiScreen.drawRect(
@@ -151,7 +152,7 @@ object GuiRenderUtils {
                 tooltipY + tooltipHeight + 2,
                 tooltipX + tooltipTextWidth + 3,
                 tooltipY + tooltipHeight + 3,
-                borderColor
+                borderColor,
             )
             GlStateManager.translate(0f, 0f, -100f)
             GlStateManager.disableDepth()
@@ -188,27 +189,33 @@ object GuiRenderUtils {
         val current = currentValue.toDouble().coerceAtLeast(0.0)
         val percent = current.fractionOf(maxValue)
         val scale = textScale.toDouble()
-        return Renderable.hoverTips(Renderable.verticalContainer(
-            listOf(
-                Renderable.string(label, scale = scale),
-                Renderable.fixedSizeLine(
-                    listOf(
-                        Renderable.string(
-                            "§2${DecimalFormat("0.##").format(current)} / ${
-                                DecimalFormat(
-                                    "0.##"
-                                ).format(maxValue)
-                            }☘", scale = scale, horizontalAlign = HorizontalAlignment.LEFT
+        return Renderable.hoverTips(
+            Renderable.verticalContainer(
+                listOf(
+                    Renderable.string(label, scale = scale),
+                    Renderable.fixedSizeLine(
+                        listOf(
+                            Renderable.string(
+                                "§2${DecimalFormat("0.##").format(current)} / ${
+                                    DecimalFormat(
+                                        "0.##",
+                                    ).format(maxValue)
+                                }☘",
+                                scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
+                            ),
+                            Renderable.string(
+                                "§2${(percent * 100).roundTo(1)}%",
+                                scale = scale,
+                                horizontalAlign = HorizontalAlignment.RIGHT,
+                            ),
                         ),
-                        Renderable.string(
-                            "§2${(percent * 100).round(1)}%",
-                            scale = scale,
-                            horizontalAlign = HorizontalAlignment.RIGHT
-                        ),
-                    ), width
-                ), Renderable.progressBar(percent, width = width)
-            )
-        ), tooltip.split('\n').map { Renderable.string(it) })
+                        width,
+                    ),
+                    Renderable.progressBar(percent, width = width),
+                ),
+            ),
+            tooltip.split('\n').map { Renderable.string(it) },
+        )
     }
 
     private fun barColorGradient(double: Double): Int {
@@ -265,16 +272,14 @@ object GuiRenderUtils {
                 Color.LIGHT_GRAY.darker().red / 255f,
                 Color.LIGHT_GRAY.darker().green / 255f,
                 Color.LIGHT_GRAY.darker().blue / 255f,
-                1f
+                1f,
             )
         } else {
             GlStateManager.color(color.darker().red / 255f, color.darker().green / 255f, color.darker().blue / 255f, 1f)
         }
 
-        Utils.drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
-        Utils.drawTexturedRect(
-            x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST
-        )
+        drawTexturedRect(x, y, w_2.toFloat(), height, 0f, w_2 / xSize, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
+        drawTexturedRect(x + w_2, y, w_2.toFloat(), height, 1 - w_2 / xSize, 1f, vMinEmpty, vMaxEmpty, GL11.GL_NEAREST)
 
         if (useChroma) {
             GlStateManager.color(Color.WHITE.red / 255f, Color.WHITE.green / 255f, Color.WHITE.blue / 255f, 1f)
@@ -285,9 +290,9 @@ object GuiRenderUtils {
         if (k > 0) {
             val uMax = w_2.toDouble().coerceAtMost(k.toDouble() / xSize).toFloat()
             val width = w_2.coerceAtMost(k).toFloat()
-            Utils.drawTexturedRect(x, y, width, height, 0f, uMax, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
+            drawTexturedRect(x, y, width, height, 0f, uMax, vMinFilled, vMaxFilled, GL11.GL_NEAREST)
             if (completed > 0.5f) {
-                Utils.drawTexturedRect(
+                drawTexturedRect(
                     x + w_2,
                     y,
                     (k - w_2).toFloat(),
@@ -296,7 +301,7 @@ object GuiRenderUtils {
                     1 + (k - w) / xSize,
                     vMinFilled,
                     vMaxFilled,
-                    GL11.GL_NEAREST
+                    GL11.GL_NEAREST,
                 )
             }
         }
@@ -341,5 +346,60 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
+    }
+
+    fun drawTexturedRect(x: Float, y: Float) {
+        with(ScaledResolution(Minecraft.getMinecraft())) {
+            drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), filter = GL11.GL_NEAREST)
+        }
+    }
+
+    fun drawTexturedRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        uMin: Float = 0f,
+        uMax: Float = 1f,
+        vMin: Float = 0f,
+        vMax: Float = 1f,
+        filter: Int = GL11.GL_NEAREST,
+    ) {
+        drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), uMin, uMax, vMin, vMax, filter)
+    }
+
+    // Taken from NEU
+    fun drawTexturedRect(
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        uMin: Float = 0f,
+        uMax: Float = 1f,
+        vMin: Float = 0f,
+        vMax: Float = 1f,
+        filter: Int = GL11.GL_NEAREST,
+    ) {
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
+
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, filter)
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, filter)
+
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
+        worldRenderer.pos(x.toDouble(), (y + height).toDouble(), 0.0).tex(uMin.toDouble(), vMax.toDouble()).endVertex()
+        worldRenderer.pos((x + width).toDouble(), (y + height).toDouble(), 0.0).tex(uMax.toDouble(), vMax.toDouble()).endVertex()
+        worldRenderer.pos((x + width).toDouble(), y.toDouble(), 0.0).tex(uMax.toDouble(), vMin.toDouble()).endVertex()
+        worldRenderer.pos(x.toDouble(), y.toDouble(), 0.0).tex(uMin.toDouble(), vMin.toDouble()).endVertex()
+        tessellator.draw()
+
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST)
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
+
+        GlStateManager.disableBlend()
     }
 }

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -37,7 +38,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -115,45 +116,29 @@ object SkyHanniDebugsAndTests {
         if (args.isEmpty()) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
+            IslandGraphs.stop()
+            return
         }
 
         val x = args[0].toDouble()
         val y = args[1].toDouble()
         val z = args[2].toDouble()
-        testLocation = LorenzVec(x, y, z)
+        val location = LorenzVec(x, y, z)
+        testLocation = location
+        if (args.getOrNull(3) == "pathfind") {
+            IslandGraphs.pathFind(location)
+        }
         ChatUtils.chat("set test waypoint")
     }
 
     fun testCommand(args: Array<String>) {
-        SoundUtils.playBeepSound()
-//            val a = Thread { OSUtils.copyToClipboard("123") }
-//            val b = Thread { OSUtils.copyToClipboard("456") }
-//            a.start()
-//            b.start()
+        SkyHanniMod.coroutineScope.launch {
+            asyncTest(args)
+        }
+    }
 
-//            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
-//                println("$i: '$s'")
-//            }
+    private fun asyncTest(args: Array<String>) {
 
-//            val name = args[0]
-//            val pitch = args[1].toFloat()
-//            val sound = SoundUtils.createSound("note.harp", 1.35f)
-//            val sound = SoundUtils.createSound("random.orb", 11.2f)
-//            SoundUtils.createSound(name, pitch).playSound()
-
-//            a = args[0].toDouble()
-//            b = args[1].toDouble()
-//            c = args[2].toDouble()
-
-//            for (line in getPlayerTabOverlay().footer.unformattedText
-//                .split("\n")) {
-//                println("footer: '$line'")
-//            }
-//
-//
-//            for (line in TabListUtils.getTabList()) {
-//                println("tablist: '$line'")
-//            }
     }
 
     fun findNullConfig(args: Array<String>) {
@@ -340,9 +325,9 @@ object SkyHanniDebugsAndTests {
 
     fun copyLocation(args: Array<String>) {
         val location = LocationUtils.playerLocation()
-        val x = (location.x + 0.001).round(1)
-        val y = (location.y + 0.001).round(1)
-        val z = (location.z + 0.001).round(1)
+        val x = (location.x + 0.001).roundTo(1)
+        val y = (location.y + 0.001).roundTo(1)
+        val z = (location.z + 0.001).roundTo(1)
         if (args.size == 1 && args[0].equals("json", false)) {
             OSUtils.copyToClipboard("\"$x:$y:$z\"")
             return
@@ -465,7 +450,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onSHowCraftPrice(event: LorenzToolTipEvent) {
+    fun onShowCraftPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
@@ -509,8 +494,7 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             itemRenderDebug()
         }
 
@@ -545,8 +529,7 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             dragAbleTest()
         }
     }
@@ -594,7 +577,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }
                     .toList(),
             )
         }
@@ -616,15 +599,15 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
-        val originalOre = event.originalOre
+        val originalOre = event.originalOre?.let { "$it " } ?: ""
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
-        ChatUtils.debug("Mined: $originalOre (${extraBlocks.joinToString()})")
+        ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
-//        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
+//        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
 //
 //        println("")
 //        println("particleType: $particleType")
