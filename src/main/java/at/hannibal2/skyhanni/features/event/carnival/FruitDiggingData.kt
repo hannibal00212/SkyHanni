@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack
 
 data class PosInfo(
     var uncovered: Boolean,
-    var dropTypes: MutableList<DropType>?,
+    var dropTypes: MutableSet<DropType>?,
     var lowestFruit: DropType?,
     var highestFruit: DropType?,
     var minesNear: Int?,

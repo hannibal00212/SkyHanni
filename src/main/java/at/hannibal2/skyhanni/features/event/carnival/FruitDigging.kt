@@ -98,7 +98,7 @@ object FruitDigging {
         "^ {31}Fruit Digging$",
     )
 
-    private fun LorenzVec.coveredCords(): Pair<Int, Int> = add(112, 0, 11).let { it.x.toInt() to it.z.toInt() }
+    private fun LorenzVec.convertCords(): Pair<Int, Int> = add(112, 0, 11).let { it.x.toInt() to it.z.toInt() }
 
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
@@ -119,12 +119,13 @@ object FruitDigging {
             if (event.new == "sandstone") {
                 lastTimeDigging = SimpleTimeMark.now()
                 lastMined.add(event.location)
+                println("Block converted")
             } else if (event.new == "sandstone_stairs") {
                 mineBlocks[event.location] = PosInfo(true, null, null, null, null)
                 val entry = mineBlocks.entries.find { it.key == lastMined.last() } ?: return
                 entry.value.uncovered = true;
-                entry.value.dropTypes = mutableListOf(DropType.BOMB)
-                MyFruitDigging.setBombed(event.location.coveredCords())
+                entry.value.dropTypes = mutableSetOf(DropType.BOMB)
+                MyFruitDigging.setBombed(event.location.convertCords())
             }
 
             if (mineBlocks.size != 49) {
@@ -137,6 +138,10 @@ object FruitDigging {
         }
     }
 
+    private val fruitStack = mutableSetOf<LorenzVec>()
+    private var lastPos = LorenzVec()
+    private var ticksSinceLastFound = 0
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
@@ -144,17 +149,26 @@ object FruitDigging {
             val position = entityItem.position.let { pos -> LorenzVec(pos.x, 72, pos.z) }
             val itemStack = entityItem.entityItem
 
-            if (itemStack.item != Items.skull || itemsOnGround.containsKey(position)) continue
+            if (itemStack.item != Items.skull) continue
 
-            val dropType = convertToType(null, itemStack) ?: continue
-            println("test")
+            val dropType =
+                itemsOnGround[position]?.type ?: run { convertToType(null, itemStack)?.takeIf { it != DropType.NONE } } ?: continue
+
+            /*             if (lastPos == position) { // TODO
+                            fruitStack.clear()
+                            break
+                        } */
+
+            if (fruitStack.contains(position)) continue
+
+            fruitStack.add(position)
+            ticksSinceLastFound = 0
+
+            println("Detected $dropType")
+
             val mineBlocksEntry = mineBlocks.entries.find { it.key == position } ?: continue
 
-            dig(dropType)
-            println("tesstss")
-
-            val types = mineBlocksEntry.value.dropTypes ?: mutableListOf()
-            println("teststs")
+            val types = mineBlocksEntry.value.dropTypes ?: mutableSetOf()
             types.add(dropType)
             mineBlocksEntry.value.dropTypes = types
             if (lastMined.lastOrNull() == position) mineBlocksEntry.value.uncovered = true
@@ -163,19 +177,60 @@ object FruitDigging {
             println(itemsOnGround)
             println(mineBlocks)
         }
+        if (ticksSinceLastFound > (fruitStack.count { itemsOnGround[it]!!.type == DropType.WATERMELON } * 5 + 2) * 3) {
+            if (lastPos == fruitStack.firstOrNull()) {
+                fruitStack.clear()
+            }
+            if (fruitStack.isNotEmpty()) {
+                val pos = fruitStack.first()
+                val dropType = itemsOnGround[pos]!!.type
+                dig(dropType)
+                if (dropType == DropType.RUM) {
+                    rummed = true
+                }
+            }
+        } else {
+            ticksSinceLastFound++
+        }
     }
 
+    private fun isDug(pos: LorenzVec) = mineBlocks[pos]?.uncovered ?: false
+
     private var lastChat: String = ""
+    private var rummed = false
 
     fun dig(drop: DropType) {
-        val result = MyFruitDigging.ShovelType.active.getResult(lastChat)
-        if (result != null) {
-            MyFruitDigging.onDig(
-                lastMined.last().coveredCords(),
-                drop,
-                MyFruitDigging.ShovelType.active,
-                result,
-            )
+        try {
+            println("Fruit Stack: $fruitStack")
+            val watermeloned = fruitStack.filter { isDug(it) }.drop(1).toSet()
+            val anchor = (fruitStack - watermeloned).drop(1).firstOrNull()
+            val result = if (rummed) 0 else when (MyFruitDigging.ShovelType.active) {
+                MyFruitDigging.ShovelType.ANCHOR -> MyFruitDigging.ShovelType.active.getResult(lastChat)?.also { lastChat = "" }
+                    ?: (anchor ?: watermeloned.firstOrNull())?.let {
+                        val (x, z) = it.convertCords()
+                        Triple(itemsOnGround[it]!!.type, x, z)
+                    }
+
+                else -> MyFruitDigging.ShovelType.active.getResult(lastChat)
+            }
+            if (result != null) {
+                MyFruitDigging.onDig(
+                    lastMined.last().convertCords(),
+                    drop,
+                    if (rummed) null else MyFruitDigging.ShovelType.active,
+                    result,
+                )
+                for (it in watermeloned) {
+                    MyFruitDigging.setWatermeloned(
+                        it.convertCords(),
+                        itemsOnGround[it]!!.type,
+                    ) // TODO Fix ANCHOR + WATERMELON on same Block
+                }
+                rummed = false
+                lastPos = fruitStack.first()
+            }
+        } finally {
+            fruitStack.clear()
         }
     }
 
@@ -197,6 +252,8 @@ object FruitDigging {
         val entry = mineBlocks.entries.find { it.key == lastMined.last() } ?: return
 
         lastChat = message
+
+        println("Chat ability")
 
         when (shovelMode) {
             "Mines" -> minesPattern.matchMatcher(message) {
@@ -222,7 +279,7 @@ object FruitDigging {
 
                 if (message == "TREASURE! There are no fruits nearby!") {
                     getAdjacent(lastMined.last()).forEach {
-                        val types = mutableListOf(DropType.BOMB, DropType.RUM)
+                        val types = mutableSetOf(DropType.BOMB, DropType.RUM)
                         if (it.value.dropTypes == null) it.value.dropTypes = types
                     }
                 }
@@ -236,7 +293,7 @@ object FruitDigging {
 //                     null, null,
 //                 )
                 getAdjacent(lastMined.last()).forEach {
-                    val types = mutableListOf(DropType.BOMB, DropType.RUM)
+                    val types = mutableSetOf(DropType.BOMB, DropType.RUM)
                     if (it.value.dropTypes == null) it.value.dropTypes = types
                 }
             }
@@ -327,7 +384,7 @@ object FruitDigging {
 
     private fun updateMineBlocks(
         position: LorenzVec,
-        dropTypes: MutableList<DropType>,
+        dropTypes: MutableSet<DropType>,
         lowest: DropType?,
         highest: DropType?,
         amount: Int?,
@@ -351,14 +408,14 @@ object FruitDigging {
             event.drawWaypointFilled(normal.key, config.safe.toColor(), minimumAlpha = 1F)
             event.drawDynamicText(normal.key.add(0.0, 1.5, 0.0), "§${safeColor}Safe", 1.0)
             val entry = mineBlocks[normal.key] ?: continue
-            entry.dropTypes = mutableListOf(DropType.NOT_BOMB)
+            entry.dropTypes = mutableSetOf(DropType.NOT_BOMB)
         }
 
         for (bomb in surroundingBombs) {
             event.drawWaypointFilled(bomb.key, config.mine.toColor(), minimumAlpha = 1F)
             event.drawDynamicText(bomb.key.add(0.0, 1.5, 0.0), "§${mineColor}Mine", 1.0)
             val entry = mineBlocks[bomb.key] ?: continue
-            entry.dropTypes = mutableListOf(DropType.BOMB)
+            entry.dropTypes = mutableSetOf(DropType.BOMB)
         }
     }
 
@@ -401,8 +458,8 @@ object FruitDigging {
         return validBlocks.ifEmpty { return mutableMapOf() }
     }
 
-    private fun getTypes(types: MutableList<DropType>?): MutableList<DropType> =
-        if (!types.isNullOrEmpty()) types else mutableListOf()
+    private fun getTypes(types: MutableSet<DropType>?): MutableSet<DropType> =
+        if (!types.isNullOrEmpty()) types else mutableSetOf()
 
     fun convertToType(name: String?, itemStack: ItemStack?): DropType? {
         val skullTextureURL = if (itemStack != null) Gson().fromJson(
