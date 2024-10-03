@@ -7,6 +7,17 @@ import java.net.URI
 
 object OSUtils {
 
+    val isWindows: Boolean
+    val isMac: Boolean
+    val isLinux: Boolean
+
+    init {
+        val os = System.getProperty("os.name")
+        isWindows = os.contains("win", ignoreCase = true)
+        isMac = os.contains("mac", ignoreCase = true)
+        isLinux = os.contains("linux", ignoreCase = true)
+    }
+
     @JvmStatic
     fun openBrowser(url: String) {
         val desktopSupported = Desktop.isDesktopSupported()
@@ -17,7 +28,7 @@ object OSUtils {
             } catch (e: IOException) {
                 ErrorManager.logErrorWithData(
                     e, "Error while opening website.",
-                    "url" to url
+                    "url" to url,
                 )
             }
         } else {

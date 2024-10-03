@@ -52,6 +52,7 @@ object NEUVersionCheck {
     /**
      * Taken and modified from Skytils
      */
+    @Suppress("PrintStackTrace")
     private fun openPopupWindow(errorMessage: String, vararg options: Pair<String, String>) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())

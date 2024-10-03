@@ -40,7 +40,7 @@ object CrownOfAvariceCounter {
         if (!config.enable) return null
         val item = InventoryUtils.getHelmet()
         if (item?.getInternalNameOrNull() != internalName) return null
-        val count = item.extraAttributes.getLong("collected_coins");
+        val count = item.extraAttributes.getLong("collected_coins")
         return Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(internalName.getItemStack()),

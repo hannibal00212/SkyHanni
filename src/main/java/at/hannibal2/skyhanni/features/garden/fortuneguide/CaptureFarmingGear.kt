@@ -112,8 +112,8 @@ object CaptureFarmingGear {
         val currentCrop = itemStack.getCropType()
 
         if (currentCrop == null) {
-            //todo better fall back items
-            //todo Daedalus axe
+            // todo better fall back items
+            // todo Daedalus axe
         } else {
             currentCrop.farmingItem.setItem(itemStack)
         }

@@ -98,8 +98,8 @@ object FishingProfitTracker {
 
     private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
 
-    private val nameAll: CategoryName = "All"
-    private var currentCategory: CategoryName = nameAll
+    private const val NAME_ALL: CategoryName = "All"
+    private var currentCategory: CategoryName = NAME_ALL
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
@@ -110,7 +110,7 @@ object FishingProfitTracker {
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[nameAll] = data.items.size
+        map[NAME_ALL] = data.items.size
         for ((name, items) in itemCategories) {
             val amount = items.count { it in data.items }
             if (amount > 0) {
@@ -145,7 +145,7 @@ object FishingProfitTracker {
         checkMissingItems(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = nameAll
+            currentCategory = NAME_ALL
         }
 
         if (tracker.isInventoryOpen()) {
@@ -160,7 +160,7 @@ object FishingProfitTracker {
             )
         }
 
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
+        val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
             val items = itemCategories[currentCategory]!!

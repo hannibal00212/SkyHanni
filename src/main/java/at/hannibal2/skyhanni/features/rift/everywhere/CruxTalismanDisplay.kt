@@ -28,7 +28,7 @@ object CruxTalismanDisplay {
         ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
     )
 
-    private val partialName = "CRUX_TALISMAN"
+    private const val PARTIAL_NAME = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
@@ -91,7 +91,7 @@ object CruxTalismanDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
-        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }) return
+        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(PARTIAL_NAME) }) return
 
         displayLine.clear()
         bonusesLine.clear()

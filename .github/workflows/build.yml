@@ -44,14 +44,15 @@ jobs:
     #        -   name: Checkout code
     #            uses: actions/checkout@v4
     #        -   uses: ./.github/actions/setup-normal-workspace
-    #        -   name: Run detekt
+    #        # detektMain is a LOT slower than detekt, but it does type analysis
+    #        -   name: Run detekt main (w/typing analysis)
     #            run: |
-    #                ./gradlew detekt --stacktrace
+    #                ./gradlew detektMain --stacktrace
     #        -   name: Annotate detekt failures
     #            if: ${{ !cancelled() }}
     #            run: |
     #                chmod +x .github/scripts/process_detekt_sarif.sh
-    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/detekt.sarif
+    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
     
 
     preprocess:

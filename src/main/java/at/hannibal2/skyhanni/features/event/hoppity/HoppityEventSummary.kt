@@ -231,12 +231,18 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.forEach {
             summaryOperationList[it]?.invoke(statsBuilder, stats, eventYear)
         }
+
+        // If no stats are found, display a message
         if (statsBuilder.toString().replace("\n", "").isEmpty()) {
-            statsBuilder.appendHeadedLine("§c§lNothing to show!\n§c§oGo find some eggs!")
+            statsBuilder.appendHeadedLine("§c§lNothing to show!")
+            statsBuilder.appendHeadedLine("§c§oGo find some eggs!")
         }
 
+        // Remove any consecutive empty lines in the stats
+        val statsBuilderString = statsBuilder.toString().replace(Regex("\n{4,}"), "\n".repeat(3))
+
         // Append stats
-        summaryBuilder.append(statsBuilder)
+        summaryBuilder.append(statsBuilderString)
 
         // Footer
         summaryBuilder.append("§d§l${"▬".repeat(64)}")

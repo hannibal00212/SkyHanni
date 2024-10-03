@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -20,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -79,7 +83,16 @@ object CityProjectFeatures {
             "Daily City Project Reminder!",
             config::dailyReminder,
             actionName = "warp to Hub",
-            action = { HypixelCommands.warp("hub") },
+            action = {
+                HypixelCommands.warp("hub")
+                EntityMovementData.onNextTeleport(IslandType.HUB) {
+                    IslandGraphs.pathFind(
+                        LorenzVec(9.3, 72.0, -103.4),
+                        "§aCity Project",
+                        condition = { config.dailyReminder },
+                    )
+                }
+            },
         )
     }
 

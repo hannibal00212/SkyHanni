@@ -91,7 +91,7 @@ object EasterEggWaypoints {
     /*
         Title:
         §e§lHYPIXEL
-        
+
         '§703/14/24  §8L30A'
         '  '
         'Rank: §bMVP§d+§b'
@@ -106,7 +106,7 @@ object EasterEggWaypoints {
         'Easter Eggs: §a0/§a30'
         '             '
         '§ewww.hypixel.net'
-    */
+     */
     private fun checkScoreboardEasterSpecific(): Boolean {
         val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
         val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter") }

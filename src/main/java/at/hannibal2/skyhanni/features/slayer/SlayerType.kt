@@ -16,6 +16,6 @@ enum class SlayerType(val displayName: String, val rngName: String, val clazz: C
     ;
 
     companion object {
-        fun getByName(name: String): SlayerType? = entries.firstOrNull {name.contains(it.displayName)}
+        fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
     }
 }

@@ -81,8 +81,8 @@ class DefaultConfigOptionGui(
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
             val width = mc.fontRendererObj.getStringWidth(title)
             var overMouse = false
-            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width)
-                && mouseY - (height + ySize) / 2 in -barSize..0
+            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
+                mouseY - (height + ySize) / 2 in -barSize..0
             ) {
                 overMouse = true
                 hoveringTextToDraw = tooltip

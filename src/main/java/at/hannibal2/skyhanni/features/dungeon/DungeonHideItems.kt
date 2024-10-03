@@ -194,10 +194,10 @@ object DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(60))
-            {
-                shouldColorMovingSkull(entity)
-            }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                LorenzColor.GOLD.toColor().withAlpha(60)
+            ) { shouldColorMovingSkull(entity) }
         }
     }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,7 +18,7 @@ import java.awt.Color
 // Trying to find errors in Area Graph for the current graph editor instance
 @SkyHanniModule
 object GraphEditorBugFinder {
-    private var errorsInWorld = emptyMap<LorenzVec, String>()
+    private var errorsInWorld = emptyMap<GraphNode, String>()
 
     fun runTests() {
         SkyHanniMod.coroutineScope.launch {
@@ -28,21 +28,22 @@ object GraphEditorBugFinder {
 
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val errorsInWorld: MutableMap<LorenzVec, String> = mutableMapOf()
+        val errorsInWorld: MutableMap<GraphNode, String> = mutableMapOf()
         val nodes = graph.nodes
 
         for (node in nodes) {
             if (node.tags.any { it in NavigationHelper.allowedTags }) {
                 val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
                 if (remainingTags.size != 1) {
-                    errorsInWorld[node.position] = "§cConflicting tags: $remainingTags"
+                    errorsInWorld[node] = "§cConflicting tags: $remainingTags"
                 }
             }
         }
 
+
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
-            val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
+            val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag(ignoreConfig = true) != null }?.first
             if (pathToNearestArea == null) {
                 continue
             }
@@ -57,7 +58,7 @@ object GraphEditorBugFinder {
                 if (neighbouringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag(ignoreConfig = true))) {
                     bugs++
-                    errorsInWorld[node.position] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
+                    errorsInWorld[node] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
                 }
             }
         }
@@ -65,11 +66,11 @@ object GraphEditorBugFinder {
             val nameNull = node.name.isNullOrBlank()
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
-                errorsInWorld[node.position] = "§cMissing name despite having tags"
+                errorsInWorld[node] = "§cMissing name despite having tags"
                 bugs++
             }
             if (tagsEmpty > nameNull) {
-                errorsInWorld[node.position] = "§cMissing tags despite having name"
+                errorsInWorld[node] = "§cMissing tags despite having name"
                 bugs++
             }
         }
@@ -80,18 +81,20 @@ object GraphEditorBugFinder {
             val foreignClusters = clusters.filter { it !== closestCluster }
             val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.position.distanceSqToPlayer() } }
             closestForeignNodes.forEach {
-                errorsInWorld[it.position] = "§cDisjoint node network"
+                errorsInWorld[it] = "§cDisjoint node network"
                 bugs++
             }
             val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
             val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-            IslandGraphs.pathFind(closestNodeToForeignNode.position, Color.RED)
+            closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
 
         println("found $bugs bugs!")
         this.errorsInWorld = errorsInWorld
         if (clusters.size <= 1) {
-            IslandGraphs.pathFind(errorsInWorld.keys.minByOrNull { it.distanceSqToPlayer() } ?: return, Color.RED)
+            errorsInWorld.keys.minByOrNull {
+                it.position.distanceSqToPlayer()
+            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
     }
 
@@ -99,8 +102,8 @@ object GraphEditorBugFinder {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        for ((location, text) in errorsInWorld) {
-            event.drawDynamicText(location, text, 1.5)
+        for ((node, text) in errorsInWorld) {
+            event.drawDynamicText(node.position, text, 1.5)
         }
     }
 

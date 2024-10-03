@@ -132,7 +132,7 @@ object ChocolateShopPrice {
                 add("§7Profit per purchase: §6${profit.shortFormat()} ")
                 add("")
                 add("§7Chocolate amount: §c${product.chocolate.shortFormat()} ")
-                add("§7Profit per million chocolate: §6${perFormat} ")
+                add("§7Profit per million chocolate: §6$perFormat ")
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(product.chocolate)
                 add("§7Time until affordable: §6$formattedTimeUntilGoal ")

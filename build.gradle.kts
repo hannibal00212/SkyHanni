@@ -3,11 +3,11 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 
 plugins {
     idea
@@ -39,11 +39,15 @@ val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 // Minecraft configuration:
 loom {
-    if (this.isForgeLike)
+    if (this.isForgeLike) {
         forge {
-            pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+            pack200Provider.set(
+                dev.architectury.pack200.java
+                    .Pack200Adapter(),
+            )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -67,11 +71,12 @@ loom {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     sourceSets.main {
         resources.destinationDirectory.set(kotlin.destinationDirectory)
         output.setResourcesDir(kotlin.destinationDirectory)
     }
+}
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -91,9 +96,11 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 tasks.runClient {
-    this.javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    })
+    this.javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+        },
+    )
 }
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
@@ -104,8 +111,9 @@ dependencies {
     } else {
         mappings(target.mappingDependency)
     }
-    if (target.forgeDep != null)
+    if (target.forgeDep != null) {
         "forge"(target.forgeDep!!)
+    }
 
     // Discord RPC client
     shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
@@ -165,6 +173,9 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 
+    // getting clock offset
+    shadowImpl("commons-net:commons-net:3.8.0")
+
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
@@ -218,10 +229,11 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
 
 if (target.parent == ProjectTarget.MAIN) {
     val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
@@ -272,6 +284,7 @@ tasks.shadowJar {
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
+    relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -337,8 +350,7 @@ publishing.publications {
     }
 }
 
-// Detekt: TODO: Uncomment this when we're ready to enforce
-/*detekt {
+detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
@@ -346,6 +358,10 @@ publishing.publications {
 }
 
 tasks.withType<Detekt>().configureEach {
+    onlyIf {
+        false // TODO: Remove onlyIf when we're ready to enforce
+    }
+
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
@@ -361,4 +377,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}*/
+}

@@ -24,7 +24,7 @@ object RiftUpsideDownParkour {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(
-            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
+            data.locations.map { it.add(-1.0, -1.0, -1.0) }, // TODO remove offset. change repo instead
             data.shortCuts,
             platformSize = 2.0,
             detectionRange = 2.0

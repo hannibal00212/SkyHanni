@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "at.hannibal2.skyhanni"
-    version = "0.27.Beta.12"
+    version = "0.27.Beta.14"
     repositories {
         mavenCentral()
         mavenLocal()
@@ -25,7 +25,8 @@ allprojects {
         }
         maven("https://repo.spongepowered.org/maven/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-        maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
+        maven("https://jitpack.io") {
+            // NotEnoughUpdates (compiled against)
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
@@ -42,8 +43,9 @@ preprocess {
     ProjectTarget.activeVersions().forEach { target ->
         nodes[target] = createNode(target.projectName, target.minecraftVersion.versionNumber, target.mappingStyle.identifier)
         val p = project(target.projectPath)
-        if (target.isForge)
+        if (target.isForge) {
             p.extra.set("loom.platform", "forge")
+        }
     }
     ProjectTarget.activeVersions().forEach { child ->
         val parent = child.linkTo ?: return@forEach

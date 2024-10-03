@@ -38,19 +38,19 @@ object UserLuckBreakdown {
 
     private lateinit var mainLuckItem: ItemStack
     private val mainLuckID = "ENDER_PEARL".asInternalName()
-    private val mainLuckName = "§a✴ SkyHanni User Luck"
+    private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
     private var fillerID = "STAINED_GLASS_PANE".asInternalName()
-    private val fillerName = " "
+    private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
     private var limboID = "ENDER_PEARL".asInternalName()
-    private val limboName = "§a✴ Limbo Personal Best"
+    private const val LIMBO_NAME = "§a✴ Limbo Personal Best"
 
     private lateinit var skillsItem: ItemStack
     private var skillsID = "DIAMOND_SWORD".asInternalName()
-    private val skillsName = "§a✴ Category: Skills"
+    private const val SKILLS_NAME = "§a✴ Category: Skills"
 
     private var showAllStats = true
 
@@ -63,7 +63,7 @@ object UserLuckBreakdown {
         "§7Show all stats: §.(?<toggle>.*)",
     )
 
-    private val luckTooltipString = "§5§o §a✴ SkyHanni User Luck §f"
+    private const val LUCK_TOOLTIP = "§5§o §a✴ SkyHanni User Luck §f"
     private var inCustomBreakdown = false
 
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
@@ -178,7 +178,7 @@ object UserLuckBreakdown {
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
+        event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
     private fun statsBreakdownLoreTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
@@ -205,7 +205,7 @@ object UserLuckBreakdown {
         if (totalLuck == 0f) return
 
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
+        event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
     private fun tryTruncateFloat(input: Float): String {
@@ -239,7 +239,7 @@ object UserLuckBreakdown {
     private fun createItems() {
         fillerItem = ItemUtils.createItemStack(
             fillerID.getItemStack().item,
-            fillerName,
+            FILLER_NAME,
             listOf(),
             1,
             15,
@@ -251,17 +251,17 @@ object UserLuckBreakdown {
 
         mainLuckItem = ItemUtils.createItemStack(
             mainLuckID.getItemStack().item,
-            "$mainLuckName §f${tryTruncateFloat(totalLuck)}",
+            "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
             *createItemLore("mainMenu", totalLuck),
         )
         limboItem = ItemUtils.createItemStack(
             limboID.getItemStack().item,
-            limboName,
+            LIMBO_NAME,
             *createItemLore("limbo", limboLuck),
         )
         skillsItem = ItemUtils.createItemStack(
             skillsID.getItemStack().item,
-            skillsName,
+            SKILLS_NAME,
             *createItemLore("skills"),
         )
     }

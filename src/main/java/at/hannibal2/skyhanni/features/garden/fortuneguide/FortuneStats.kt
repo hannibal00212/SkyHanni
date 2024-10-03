@@ -23,7 +23,7 @@ enum class FortuneStats(
     GEMSTONE("§2Tool gemstone", "§7§2Fortune from gemstones on your tool"),
     FFD("§2Farming for Dummies", "§7§2Fortune for each applied book\n§2You get 1☘ per applied book"),
     COUNTER("§2Logarithmic Counter", "§7§2Fortune from increasing crop counter\n§2You get 16☘ per digit - 4"),
-    COLLECTION("§2Collection Analyst", "§7§2Fortune from increasing crop collection\n§2You get 8☘ per digit - 4"),
+    COLLECTION("§2Collection Analysis", "§7§2Fortune from increasing crop collection\n§2You get 8☘ per digit - 4"),
     HARVESTING("§2Harvesting Enchantment", "§7§2Fortune for each enchantment level\n§2You get 12.5☘ per level"),
     SUNDER("§2Sunder Enchantment", "§7§2Fortune for each enchantment level\n§2You get 12.5☘ per level"),
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),

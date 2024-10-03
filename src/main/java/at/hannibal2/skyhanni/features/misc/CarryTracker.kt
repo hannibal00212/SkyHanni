@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -228,7 +228,7 @@ object CarryTracker {
                             add("§7Missing: §e$missing")
                             add("")
                             if (cost != "") {
-                                add("§7Total cost: §e${cost}")
+                                add("§7Total cost: §e$cost")
                                 add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
                             } else {
                                 add("§cNo price set for this carry!")
@@ -264,7 +264,7 @@ object CarryTracker {
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
-                    Renderable.string("§b$customerName $paidFormat§8/${totalCostFormat}"),
+                    Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
                     tips = listOf(
                         "§7Carries for §b$customerName",
                         "",

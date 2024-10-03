@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -56,8 +55,9 @@ object VerminTracker {
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 
-    private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
 
@@ -162,9 +162,7 @@ object VerminTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (!config.showOutsideWestVillage &&
-            !LorenzUtils.skyBlockArea.let { it == "Infested House" || it == "West Village" }
-        ) return
+        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return
         if (!config.showWithoutVacuum && !hasVacuum) return
 
         tracker.renderDisplay(config.position)

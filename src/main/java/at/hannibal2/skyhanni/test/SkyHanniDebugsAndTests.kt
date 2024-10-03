@@ -126,7 +126,7 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.pathFind(location)
+            IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
         }
         ChatUtils.chat("set test waypoint")
     }
@@ -137,8 +137,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
+    @Suppress("EmptyFunctionBlock")
     private fun asyncTest(args: Array<String>) {
-
     }
 
     fun findNullConfig(args: Array<String>) {
@@ -328,9 +328,15 @@ object SkyHanniDebugsAndTests {
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
         val z = (location.z + 0.001).roundTo(1)
-        if (args.size == 1 && args[0].equals("json", false)) {
-            OSUtils.copyToClipboard("\"$x:$y:$z\"")
-            return
+        if (args.size == 1) {
+            if (args[0].equals("json", false)) {
+                OSUtils.copyToClipboard("\"$x:$y:$z\"")
+                return
+            }
+            if (args[0].equals("pathfind", false)) {
+                OSUtils.copyToClipboard("`/shtestwaaypoint $x $y $z pathfind`")
+                return
+            }
         }
 
         OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
@@ -379,7 +385,7 @@ object SkyHanniDebugsAndTests {
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -389,7 +395,7 @@ object SkyHanniDebugsAndTests {
                 add("§einternal name: §7${internalName.asString()}")
                 add("§einternal name -> item name: '$itemName§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -487,6 +493,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    @Suppress("EmptyFunctionBlock")
     fun onChat(event: LorenzChatEvent) {
     }
 
@@ -494,7 +501,8 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             itemRenderDebug()
         }
 
@@ -529,7 +537,8 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             dragAbleTest()
         }
     }
@@ -577,8 +586,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }
-                    .toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(

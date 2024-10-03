@@ -334,4 +334,13 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean userluckEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Computer Time Offset Warning",
+        desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
+        "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnAboutPcTimeOffset = true;
 }

@@ -196,7 +196,7 @@ object GardenVisitorDropStatistics {
 
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
-            if (config.displayIcons) {// Icons
+            if (config.displayIcons) { // Icons
                 val stack = reward.itemStack
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
@@ -228,7 +228,7 @@ object GardenVisitorDropStatistics {
         return "$amount"
     }
 
-    //todo this should just save when changed not once a second
+    // todo this should just save when changed not once a second
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()

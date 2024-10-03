@@ -120,9 +120,11 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRabbitFound(event: RabbitFoundEvent) {
-        HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
+        DelayedRun.runDelayed(1.seconds) {
+            HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
+        }
     }
 
     @SubscribeEvent

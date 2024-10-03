@@ -143,7 +143,7 @@ object SackDisplay {
                     add(
                         Renderable.hoverTips(
                             Renderable.string(
-                                "§d${magmaFish}",
+                                "§d$magmaFish",
                                 horizontalAlign = config.alignment
                             ),
                             listOf(
@@ -153,7 +153,7 @@ object SackDisplay {
                             ),
                         )
                     )
-                    //TOOD add cache
+                    // TODO add cache
                     addItemStack("MAGMA_FISH".asInternalName())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
@@ -299,20 +299,17 @@ object SackDisplay {
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
     }
 
     enum class PriceFormat(val displayName: String) {
-        FORMATED("Formatted"),
-        UNFORMATED("Unformatted"),
-        ;
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
     }
 
     enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted"),
-        ;
     }
 
     @SubscribeEvent

@@ -291,7 +291,7 @@ object DungeonFinderFeatures {
             val name = stack.getLore().firstOrNull()?.removeColor()
             if (config.showMissingClasses && dungeonFloorPattern.matches(name)) {
                 if (classNames.contains(selectedClass)) {
-                    classNames[classNames.indexOf(selectedClass)] = "§a${selectedClass}§7"
+                    classNames[classNames.indexOf(selectedClass)] = "§a$selectedClass§7"
                 }
                 toolTip.add("")
                 toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())

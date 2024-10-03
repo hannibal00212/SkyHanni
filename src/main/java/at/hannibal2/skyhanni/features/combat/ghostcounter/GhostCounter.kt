@@ -71,7 +71,8 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.combat.ghostCounter
     val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    var ghostCounterV3File = File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
+    var ghostCounterV3File =
+        File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
 
     private val patternGroup = RepoPattern.group("combat.ghostcounter")
     private val skillXPPattern by patternGroup.pattern(

@@ -34,6 +34,11 @@ object TimeUtils {
 
         val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
 
+        if (absoluteValue < 1.seconds) {
+            val formattedMillis = (millis / 100).toInt()
+            return "0.${formattedMillis}s"
+        }
+
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {

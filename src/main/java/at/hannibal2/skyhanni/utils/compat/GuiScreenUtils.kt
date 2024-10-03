@@ -47,7 +47,7 @@ object GuiScreenUtils {
     val mouseY: Int
         get() {
             val height = this.scaledWindowHeight
-            //TODO: in later versions the height - factor is removed, i think
+            // TODO: in later versions the height - factor is removed, i think
             val y = globalMouseY * height / displayHeight
 //#if MC < 1.16
             return height - y - 1

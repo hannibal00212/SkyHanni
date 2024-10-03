@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DataWatcherAPI {
 
-    private val DATA_VALUE_CUSTOM_NAME = 2
+    private const val DATA_VALUE_CUSTOM_NAME = 2
 
     @SubscribeEvent
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent) {

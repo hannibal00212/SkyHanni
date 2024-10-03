@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.data.repo.RepoUtils
+import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -14,25 +14,30 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.Text.onClick
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -97,11 +102,17 @@ object IslandGraphs {
 
     val existsForThisIsland get() = currentIslandGraph != null
 
-    var closedNote: GraphNode? = null
+    private var pathfindClosestNode: GraphNode? = null
+    var closestNode: GraphNode? = null
+    private var secondClosestNode: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
+    private var currentTargetNode: GraphNode? = null
+    private var label = ""
+    private var lastDistance = 0.0
+    private var totalDistance = 0.0
     private var color = Color.WHITE
-    private var showGoalExact = false
+    private var shouldAllowRerouting = false
     private var onFound: () -> Unit = {}
     private var goal: GraphNode? = null
         set(value) {
@@ -143,6 +154,9 @@ object IslandGraphs {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         currentIslandGraph = null
+        if (currentTarget != null) {
+            "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(PATHFIND_ID)
+        }
         reset()
     }
 
@@ -188,43 +202,44 @@ object IslandGraphs {
         }
 
         val graph = RepoUtils.getConstant(SkyHanniMod.repo.repoLocation, constant, Graph.gson, Graph::class.java)
+        IslandAreas.display = null
         setNewGraph(graph)
     }
 
     fun setNewGraph(graph: Graph) {
-        IslandAreas.display = null
         reset()
         currentIslandGraph = graph
 
         // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
         handleTick()
-        IslandAreas.noteMoved()
+        IslandAreas.nodeMoved()
         DelayedRun.runDelayed(150.milliseconds) {
             IslandAreas.updatePosition()
         }
     }
 
     private fun reset() {
-        closedNote = null
-        currentTarget = null
-        goal = null
-        fastestPath = null
+        stop()
+        pathfindClosestNode = null
+        closestNode = null
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        handleTick()
+        if (event.isMod(2)) {
+            handleTick()
+            checkMoved()
+        }
     }
 
     private fun handleTick() {
-        val prevClosed = closedNote
-
-        val graph = currentIslandGraph ?: return
+        val prevClosest = pathfindClosestNode
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
                 onFound()
+                "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(PATHFIND_ID)
                 reset()
             }
             if (!condition()) {
@@ -232,17 +247,52 @@ object IslandGraphs {
             }
         }
 
-        val newClosest = if (SkyHanniDebugsAndTests.c == 0.0) {
-            graph.minBy { it.position.distanceSqToPlayer() }
-        } else null
-        if (closedNote == newClosest) return
-        closedNote = newClosest
-        onNewNote()
-        val closest = closedNote ?: return
-        val goal = goal ?: return
-        if (closest == prevClosed) return
+        val graph = currentIslandGraph ?: return
+        val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
+        val newClosest = sortedNodes.first()
+        if (pathfindClosestNode == newClosest) return
+        val newPath = !onCurrentPath()
 
-        val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
+        closestNode = newClosest
+        secondClosestNode = sortedNodes.getOrNull(1)
+        onNewNode()
+        if (newClosest == prevClosest) return
+        if (newPath) {
+            pathfindClosestNode = closestNode
+            findNewPath()
+        }
+    }
+
+    private fun onCurrentPath(): Boolean {
+        val path = fastestPath ?: return false
+        if (path.isEmpty()) return false
+        val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
+        val distance = closest.position.distanceToPlayer()
+        if (distance > 7) return false
+
+        val index = path.nodes.indexOf(closest)
+        val newNodes = path.drop(index)
+        val newGraph = Graph(newNodes)
+        fastestPath = skipIfCloser(newGraph)
+        newNodes.getOrNull(1)?.let {
+            secondClosestNode = it
+        }
+        setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
+        return true
+    }
+
+    private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
+        val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
+        Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
+    } else {
+        graph
+    }
+
+    private fun findNewPath() {
+        val goal = IslandGraphs.goal ?: return
+        val closest = pathfindClosestNode ?: return
+
+        val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
@@ -260,40 +310,167 @@ object IslandGraphs {
         setFastestPath(path to (distance + nodeDistance))
     }
 
-    private fun setFastestPath(path: Pair<Graph, Double>) {
-        fastestPath = path.takeIf { it.first.isNotEmpty() }?.first
+    private fun Graph.totalLenght(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
-        fastestPath?.let {
-            fastestPath = Graph(cutByMaxDistance(it.nodes, 3.0))
+    private fun handlePositionChange() {
+        updateChat()
+    }
+
+    private var hasMoved = false
+
+    private fun checkMoved() {
+        if (hasMoved) {
+            hasMoved = false
+            if (goal != null) {
+                handlePositionChange()
+            }
         }
     }
 
-    private fun onNewNote() {
+    @SubscribeEvent
+    fun onPlayerMove(event: EntityMoveEvent) {
+        if (LorenzUtils.inSkyBlock && event.entity == Minecraft.getMinecraft().thePlayer) {
+            hasMoved = true
+        }
+    }
+
+    private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
+        // TODO cleanup
+        val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
+        val nodes = fastestPath.nodes.toMutableList()
+        if (Minecraft.getMinecraft().thePlayer.onGround) {
+            nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
+        }
+        if (setPath) {
+            this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
+        }
+        updateChat()
+    }
+
+    private fun onNewNode() {
         // TODO create an event
-        IslandAreas.noteMoved()
+        IslandAreas.nodeMoved()
+        if (shouldAllowRerouting) {
+            tryRerouting()
+        }
+    }
+
+    private fun tryRerouting() {
+        val target = currentTargetNode ?: return
+        val closest = pathfindClosestNode ?: return
+        val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
+        val newTarget = map.sorted().keys.firstOrNull() ?: return
+        if (newTarget != target) {
+            ChatUtils.debug("Rerouting navigation..")
+            newTarget.pathFind(label, color, onFound, allowRerouting = true, condition = condition)
+        }
     }
 
     fun stop() {
         currentTarget = null
         goal = null
         fastestPath = null
+        currentTargetNode = null
+        label = ""
+        totalDistance = 0.0
+        lastDistance = 0.0
     }
 
-    fun pathFind(
-        location: LorenzVec,
+    /**
+     * Activates pathfinding, with this graph node as goal.
+     *
+     * @param label The name of the naviation goal in chat.
+     * @param color The color of the lines in world.
+     * @param onFound The callback that gets fired when the goal is reached.
+     * @param allowRerouting When a different node with same name and tags as the origianl goal is closer to the player, starts routing to this instead.
+     * @param condition The pathfinding stops when the condition is no longer valid.
+     */
+    fun GraphNode.pathFind(
+        label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
-        showGoalExact: Boolean = false,
-        condition: () -> Boolean = { true },
+        allowRerouting: Boolean = false,
+        condition: () -> Boolean,
     ) {
         reset()
+        currentTargetNode = this
+        shouldAllowRerouting = allowRerouting
+        pathFind0(location = position, label, color, onFound, condition)
+    }
+
+    /**
+     * Activates pathfinding to a location in the island.
+     *
+     * @param location The goal of the pathfinder.
+     * @param label The name of the naviation goal in chat.
+     * @param color The color of the lines in world.
+     * @param onFound The callback that gets fired when the goal is reached.
+     * @param condition The pathfinding stops when the condition is no longer valid.
+     */
+    fun pathFind(
+        location: LorenzVec,
+        label: String,
+        color: Color = LorenzColor.WHITE.toColor(),
+        onFound: () -> Unit = {},
+        condition: () -> Boolean,
+    ) {
+        reset()
+        shouldAllowRerouting = false
+        pathFind0(location, label, color, onFound, condition)
+    }
+
+    private fun pathFind0(
+        location: LorenzVec,
+        label: String,
+        color: Color = LorenzColor.WHITE.toColor(),
+        onFound: () -> Unit = {},
+        condition: () -> Boolean,
+    ) {
         currentTarget = location
+        this.label = label
         this.color = color
         this.onFound = onFound
-        this.showGoalExact = showGoalExact
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
+        updateChat()
+    }
+
+    private const val PATHFIND_ID = -6457563
+
+    private fun updateChat() {
+        if (label == "") return
+        val path = fastestPath ?: return
+        var distance = 0.0
+        if (path.isNotEmpty()) {
+            for ((a, b) in path.zipWithNext()) {
+                distance += a.position.distance(b.position)
+            }
+            val distanceToPlayer = path.first().position.distanceToPlayer()
+            distance += distanceToPlayer
+            distance = distance.roundTo(1)
+        }
+
+        if (distance == lastDistance) return
+        lastDistance = distance
+        if (distance == 0.0) return
+        if (totalDistance == 0.0 || distance > totalDistance) {
+            totalDistance = distance
+        }
+        sendChatDistance(distance)
+    }
+
+    private fun sendChatDistance(distance: Double) {
+        val percentage = (1 - (distance / totalDistance)) * 100
+        val componentText = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
+        componentText.onClick(
+            onClick = {
+                stop()
+                "§e[SkyHanni] Navigation manually stopped!".asComponent().send(PATHFIND_ID)
+            },
+        )
+        componentText.hover = "§eClick to stop navigating!".asComponent()
+        componentText.send(PATHFIND_ID)
     }
 
     @SubscribeEvent
@@ -301,24 +478,23 @@ object IslandGraphs {
         if (!LorenzUtils.inSkyBlock) return
         val path = fastestPath ?: return
 
-        var graph = path
-        graph = skipNodes(graph) ?: graph
-
+        // maybe reuse for debuggin
+//         for ((a, b) in path.nodes.zipWithNext()) {
+//             val diff = a.position.distance(b.position)
+//             event.drawString(a.position, "diff: ${diff.roundTo(1)}")
+//         }
         event.draw3DPathWithWaypoint(
-            graph,
+            path,
             color,
             6,
             true,
-            bezierPoint = 2.0,
+            bezierPoint = 0.6,
             textSize = 1.0,
         )
-        val lastNode = graph.nodes.last().position
-        val targetLocation = currentTarget ?: return
-        event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
 
-        if (showGoalExact) {
-            event.drawWaypointFilled(targetLocation, color)
-        }
+        val targetLocation = currentTarget ?: return
+        val lastNode = path.nodes.lastOrNull()?.position ?: return
+        event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
     }
 
     // TODO move into new utils class
@@ -349,48 +525,5 @@ object IslandGraphs {
         }
 
         return locations.map { GraphNode(index++, it) }
-    }
-
-    // trying to find a faster node-path, if the future nodes are in line of sight and gratly beneift the current path
-    private fun skipNodes(graph: Graph): Graph? {
-        val closedNode = closedNote ?: return null
-
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
-        val playerY = playerEyeLocation.y - 1
-
-        val distanceToPlayer = closedNode.position.distanceToPlayer()
-        val skipNodeDistance = distanceToPlayer > 8
-        val maxSkipDistance = if (skipNodeDistance) 50.0 else 20.0
-
-        val nodes = graph.nodes
-        val potentialSkip =
-            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 } ?: return null
-
-        val angleSkip = if (potentialSkip == nodes.first()) {
-            false
-        } else {
-            val v1 = potentialSkip.position - playerEyeLocation
-            val v2 = nodes.first().position - playerEyeLocation
-            val v = v1.angleInRad(v2)
-            v > 1
-        }
-
-        if (!skipNodeDistance && !angleSkip) return null
-
-        val list = mutableListOf<GraphNode>()
-        list.add(potentialSkip)
-
-        var passed = false
-        for (node in nodes) {
-            if (passed) {
-                list.add(node)
-            } else {
-                if (node == potentialSkip) {
-                    passed = true
-                }
-            }
-        }
-
-        return Graph(list)
     }
 }

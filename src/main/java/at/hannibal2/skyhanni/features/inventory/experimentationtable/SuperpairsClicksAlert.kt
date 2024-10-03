@@ -47,13 +47,12 @@ object SuperpairsClicksAlert {
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
 
         if ( // checks if we have succeeded in either minigame
-            (event.inventoryName.contains("Chronomatron")
-                && ((event.inventoryItems[4]?.displayName?.removeColor()
+            (event.inventoryName.contains("Chronomatron") &&
+                ((event.inventoryItems[4]?.displayName?.removeColor()
                 ?.let { currentRoundRegex.find(it) }
-                ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded))
-
-            || (event.inventoryName.contains("Ultrasequencer")
-                && event.inventoryItems.entries
+                ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded)) ||
+            (event.inventoryName.contains("Ultrasequencer") &&
+                event.inventoryItems.entries
                 .filter { it.key < 45 }
                 .any { it.value.stackSize > roundsNeeded })
         ) {

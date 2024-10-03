@@ -30,7 +30,7 @@ object APIUtils {
     private val ctx: SSLContext? = run {
         try {
             val myKeyStore = KeyStore.getInstance("JKS")
-            myKeyStore.load(APIUtils.javaClass.getResourceAsStream("/keystore.jks"), "changeit".toCharArray())
+            myKeyStore.load(APIUtils.javaClass.getResourceAsStream("/skyhanni-keystore.jks"), "changeit".toCharArray())
             val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
             val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
             kmf.init(myKeyStore, null)

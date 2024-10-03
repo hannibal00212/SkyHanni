@@ -57,7 +57,7 @@ class GuiPositionEditor(
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //Items aren't drawn due to a bug in neu rendering
+        // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground()
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer

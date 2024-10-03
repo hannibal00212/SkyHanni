@@ -34,7 +34,7 @@ object DungeonRankTabListColor {
             val sbLevel = group("sbLevel")
             val rank = groupOrNull("rank") ?: ""
             val playerName = group("playerName")
-            //val symbols = group("symbols")
+            // val symbols = group("symbols")
             val className = group("className")
             val classLevel = group("classLevel")
 

@@ -193,7 +193,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         add("§eControl + Click to remove this item!")
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
-            add("§7${internalName}")
+            add("§7$internalName")
         }
     }
 

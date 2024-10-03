@@ -218,7 +218,7 @@ object HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    //todo convert to proper json object
+    // todo convert to proper json object
     fun checkForLocraw(message: String) {
         jsonBracketPattern.matchMatcher(message.removeColor()) {
             try {

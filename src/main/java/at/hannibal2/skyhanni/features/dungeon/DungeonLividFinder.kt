@@ -59,7 +59,7 @@ object DungeonLividFinder {
         val chatColor = color.getChatColor()
 
         lividArmorStand = EntityUtils.getEntities<EntityArmorStand>()
-            .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") }
+            .firstOrNull { it.name.startsWith("$chatColor﴾ $chatColor§lLivid") }
 
         if (event.isMod(20)) {
             if (lividArmorStand == null) {

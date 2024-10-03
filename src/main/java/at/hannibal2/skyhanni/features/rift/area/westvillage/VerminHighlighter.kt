@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -63,10 +62,8 @@ object VerminHighlighter {
         else -> false
     }
 
-    private fun inArea() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
-
     private fun hasItemInHand() = InventoryUtils.itemInHandId == "TURBOMAX_VACUUM".asInternalName()
 
-    fun isEnabled() = RiftAPI.inRift() && inArea() && config.enabled && hasItemInHand()
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inWestVillage() && config.enabled && hasItemInHand()
 
 }

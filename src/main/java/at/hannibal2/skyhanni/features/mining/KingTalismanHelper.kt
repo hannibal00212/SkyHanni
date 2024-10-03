@@ -103,8 +103,8 @@ object KingTalismanHelper {
         skyblockYear = SkyBlockTime.now().year
     }
 
-    fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
-        && (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
+    fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock &&
+        (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {

@@ -4,7 +4,7 @@ config:
 
 GrammarRules:
     active: true
-    AvoidColour: # custom rule to prefer color to colour
+    AvoidBritishSpelling: # custom rule to prefer american spellings over british ones
         active: true
 
 FormattingRules:

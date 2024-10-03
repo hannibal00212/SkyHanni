@@ -214,7 +214,7 @@ object PlayerNameFormatter {
         val color = rawColor ?: return null
         val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
-        val result = if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
+        val result = if (config.hideLevelBrackets) levelData else "§8[$levelData§8]"
         return result.applyFormattingFrom(rawLevel)
     }
 

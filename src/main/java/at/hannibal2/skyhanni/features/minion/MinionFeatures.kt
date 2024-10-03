@@ -298,7 +298,7 @@ object MinionFeatures {
             System.currentTimeMillis() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
-        //§7Held Coins: §b151,389
+        // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 

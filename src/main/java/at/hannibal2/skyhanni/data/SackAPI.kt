@@ -412,5 +412,5 @@ enum class SackStatus {
     MISSING,
     CORRECT,
     ALRIGHT,
-    OUTDATED;
+    OUTDATED,
 }

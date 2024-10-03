@@ -6,5 +6,4 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#if MC > 1.12
     //$$ net.minecraft.network.chat.TextComponent.EMPTY
     //#endif
-) {
-}
+)

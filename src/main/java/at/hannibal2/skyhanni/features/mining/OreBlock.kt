@@ -117,7 +117,7 @@ enum class OreBlock(
         checkArea = { inSpidersDen },
     ),
 
-    //END
+    // END
     END_STONE(
         checkBlock = { it.block == Blocks.end_stone },
         checkArea = { inEnd },

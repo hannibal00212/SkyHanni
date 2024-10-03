@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
-import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -15,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -53,13 +52,13 @@ object GraphEditor {
     var activeNode: GraphingNode? = null
         set(value) {
             field = value
-            selectedEdge = findEdgeBetweenActiveAndClosed()
+            selectedEdge = findEdgeBetweenActiveAndClosest()
             checkDissolve()
         }
-    private var closedNode: GraphingNode? = null
+    private var closestNode: GraphingNode? = null
         set(value) {
             field = value
-            selectedEdge = findEdgeBetweenActiveAndClosed()
+            selectedEdge = findEdgeBetweenActiveAndClosest()
         }
 
     private var selectedEdge: GraphingEdge? = null
@@ -89,7 +88,7 @@ object GraphEditor {
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
     private val activeColor = LorenzColor.GREEN.addOpacity(200)
-    private val closedColor = LorenzColor.YELLOW.addOpacity(200)
+    private val closestColor = LorenzColor.YELLOW.addOpacity(200)
     private val dijkstraColor = LorenzColor.LIGHT_PURPLE.addOpacity(200)
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
@@ -169,7 +168,7 @@ object GraphEditor {
 
     private var dissolvePossible = false
 
-    private fun findEdgeBetweenActiveAndClosed(): GraphingEdge? = getEdgeIndex(activeNode, closedNode)?.let { edges[it] }
+    private fun findEdgeBetweenActiveAndClosest(): GraphingEdge? = getEdgeIndex(activeNode, closestNode)?.let { edges[it] }
 
     private fun checkDissolve() {
         if (activeNode == null) {
@@ -190,7 +189,7 @@ object GraphEditor {
         if (!isEnabled()) return
         input()
         if (nodes.isEmpty()) return
-        closedNode = nodes.minBy { it.position.distanceSqToPlayer() }
+        closestNode = nodes.minBy { it.position.distanceSqToPlayer() }
     }
 
     private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
@@ -246,8 +245,8 @@ object GraphEditor {
     }
 
     private fun GraphingNode.getNodeColor() = when (this) {
-        activeNode -> if (this == closedNode) ColorUtils.blendRGB(activeColor, closedColor, 0.5) else activeColor
-        closedNode -> closedColor
+        activeNode -> if (this == closestNode) ColorUtils.blendRGB(activeColor, closestColor, 0.5) else activeColor
+        closestNode -> closestColor
         in highlightedNodes -> dijkstraColor
         else -> nodeColor
     }
@@ -342,12 +341,12 @@ object GraphEditor {
             toggleGhostPosition()
         }
         if (config.selectKey.isKeyClicked()) {
-            activeNode = if (activeNode == closedNode) {
+            activeNode = if (activeNode == closestNode) {
                 feedBackInTutorial("De-selected active node.")
                 null
             } else {
                 feedBackInTutorial("Selected new active node.")
-                closedNode
+                closestNode
             }
         }
         if (config.selectRaycastKey.isKeyClicked()) {
@@ -372,15 +371,15 @@ object GraphEditor {
             }
             activeNode = minimumNode
         }
-        if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
-            val edge = getEdgeIndex(activeNode, closedNode)
+        if (activeNode != closestNode && config.connectKey.isKeyClicked()) {
+            val edge = getEdgeIndex(activeNode, closestNode)
             if (edge == null) {
-                addEdge(activeNode, closedNode)
+                addEdge(activeNode, closestNode)
                 feedBackInTutorial("Added new edge.")
             } else {
                 edges.removeAt(edge)
                 checkDissolve()
-                selectedEdge = findEdgeBetweenActiveAndClosed()
+                selectedEdge = findEdgeBetweenActiveAndClosest()
                 feedBackInTutorial("Removed edge.")
             }
         }
@@ -477,14 +476,14 @@ object GraphEditor {
     }
 
     private fun addNode() {
-        val closedNode = closedNode
-        if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
-            if (closedNode == activeNode) {
+        val closestNode = closestNode
+        if (closestNode != null && closestNode.position.distanceSqToPlayer() < 9.0) {
+            if (closestNode == activeNode) {
                 feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
-                nodes.remove(closedNode)
-                edges.removeIf { it.isInEdge(closedNode) }
-                if (closedNode == activeNode) activeNode = null
-                GraphEditor.closedNode = null
+                nodes.remove(closestNode)
+                edges.removeIf { it.isInEdge(closestNode) }
+                if (closestNode == activeNode) activeNode = null
+                GraphEditor.closestNode = null
                 return
             }
         }
@@ -522,7 +521,7 @@ object GraphEditor {
         val edge = GraphingEdge(node1, node2)
         if (edge.isInEdge(activeNode)) {
             checkDissolve()
-            selectedEdge = findEdgeBetweenActiveAndClosed()
+            selectedEdge = findEdgeBetweenActiveAndClosest()
         }
         edges.add(edge)
     } else false
@@ -562,7 +561,7 @@ object GraphEditor {
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
         checkDissolve()
-        selectedEdge = findEdgeBetweenActiveAndClosed()
+        selectedEdge = findEdgeBetweenActiveAndClosest()
     }
 
     private val highlightedNodes = mutableSetOf<GraphingNode>()
@@ -570,7 +569,7 @@ object GraphEditor {
 
     private fun testDijkstra() {
 
-        val savedCurrent = closedNode ?: return
+        val savedCurrent = closestNode ?: return
         val savedActive = activeNode ?: return
 
         val compiled = compileGraph()
@@ -581,7 +580,7 @@ object GraphEditor {
         val current = compiled.firstOrNull { it.position == savedCurrent.position } ?: return
         val goal = compiled.firstOrNull { it.position == savedActive.position } ?: return
 
-        val path = compiled.findShortestPathAsGraph(current, goal)
+        val path = GraphUtils.findShortestPathAsGraph(current, goal)
 
         val inGraph = path.map { nodes[it.id] }
         highlightedNodes.addAll(inGraph)
@@ -595,12 +594,12 @@ object GraphEditor {
         nodes.clear()
         edges.clear()
         activeNode = null
-        closedNode = null
+        closestNode = null
         dissolvePossible = false
         ghostPosition = null
     }
 
-    private fun prune() { //TODO fix
+    private fun prune() { // TODO fix
         val hasNeighbours = nodes.associateWith { false }.toMutableMap()
         edges.forEach {
             hasNeighbours[it.node1] = true

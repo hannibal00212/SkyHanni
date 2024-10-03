@@ -23,6 +23,7 @@ class ParkourHelper(
     val detectionRange: Double = 1.0,
     val depth: Boolean = true,
     val onEndReach: () -> Unit = {},
+    val goInOrder: Boolean = false,
 ) {
 
     private var current = -1
@@ -58,9 +59,9 @@ class ParkourHelper(
                     for ((index, location) in locations.withIndex()) {
                         val onGround = Minecraft.getMinecraft().thePlayer.onGround
                         val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
-                        if (closeEnough && onGround) {
-                            current = index
-                        }
+                        if (!(closeEnough && onGround)) continue
+                        if (goInOrder && (index < current - 1 || index > current + 1)) continue
+                        current = index
                     }
                 }
 

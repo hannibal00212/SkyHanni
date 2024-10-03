@@ -33,8 +33,10 @@ object PabloHelper {
 //     )
 
     private val patterns = listOf(
-        "\\[NPC] Pablo: (?:✆ )?Could you bring me an (?<flower>[\\w ]+).*".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.".toPattern(),
         "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?".toPattern(),
     )
 
     private var lastSentMessage = SimpleTimeMark.farPast()

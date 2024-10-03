@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,10 +58,9 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
-        return list.filter { it.currentParticles.distanceSq(location) < 8 }
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
+        list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
-    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -70,13 +71,13 @@ object RiftWiltedBerberisHelper {
         val berberis = nearestBerberis(location)
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
-            if (config.hideparticles && berberis != null) {
+            if (config.hideParticles && berberis != null) {
                 event.cancel()
             }
             return
         }
 
-        if (config.hideparticles) {
+        if (config.hideParticles) {
             event.cancel()
         }
 
@@ -107,6 +108,16 @@ object RiftWiltedBerberisHelper {
     }
 
     @SubscribeEvent
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!isMuteOthersSoundsEnabled()) return
+        val soundName = event.soundName
+
+        if (soundName == "mob.horse.donkey.death" || soundName == "mob.horse.donkey.hit") {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
@@ -133,6 +144,11 @@ object RiftWiltedBerberisHelper {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
+    }
+
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
     private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
@@ -143,4 +159,9 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
+
+    private fun isMuteOthersSoundsEnabled() = RiftAPI.inRift() &&
+        config.muteOthersSounds &&
+        (RiftAPI.inDreadfarm() || RiftAPI.inWestVillage()) &&
+        !(hasFarmingToolInHand && isOnFarmland)
 }

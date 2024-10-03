@@ -27,7 +27,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -39,6 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 //#endif
 
 @SkyHanniModule
+@Suppress("ImportOrdering")
 object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")

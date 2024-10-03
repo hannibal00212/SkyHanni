@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -13,14 +14,12 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -54,7 +53,7 @@ object IslandAreas {
         hasMoved = true
     }
 
-    fun noteMoved() {
+    fun nodeMoved() {
         SkyHanniMod.coroutineScope.launch {
             updateNodes()
         }
@@ -63,9 +62,9 @@ object IslandAreas {
     private fun updateNodes() {
         if (!isEnabled()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val closedNote = IslandGraphs.closedNote ?: return
+        val closestNode = IslandGraphs.closestNode ?: return
 
-        val (paths, map) = GraphUtils.findFastestPaths(graph, closedNote) { it.getAreaTag() != null }
+        val (paths, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
         this.paths = paths
 
         val finalNodes = mutableMapOf<GraphNode, Double>()
@@ -81,7 +80,7 @@ object IslandAreas {
         nodes = finalNodes
     }
 
-    var hasMoved = false
+    private var hasMoved = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -129,14 +128,11 @@ object IslandAreas {
     }
 
     private fun buildDisplay() = buildList<Searchable> {
-        val closedNote = IslandGraphs.closedNote ?: return@buildList
-        val playerDiff = closedNote.position.distanceToPlayer()
-
         var foundCurrentArea = false
         var foundAreas = 0
 
         for ((node, diff) in nodes) {
-            val difference = diff + playerDiff
+            val difference = diff
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
@@ -144,12 +140,7 @@ object IslandAreas {
             val isTarget = node.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
-            // trying to find a faster path to the existing target
-            if (isTarget && node != targetNode) {
-                ChatUtils.debug("Found a faster node, rerouting...")
-                setTarget(node)
-            }
-            val coloredName = "${color.getChatColor()}${name}"
+            val coloredName = "${color.getChatColor()}$name"
 
             var suffix = ""
             paths[node]?.let { path ->
@@ -159,13 +150,14 @@ object IslandAreas {
                 passedAreas.remove("null")
                 passedAreas.remove(currentAreaName)
                 // so show areas needed to pass thorough
+                // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
 //                     suffix = " §7${passedAreas.joinToString(", ")}"
                 }
             }
 
-            val distance = difference.roundTo(1)
-            val text = "${coloredName}§7: §e$distance$suffix"
+            val distance = difference.roundTo(0).toInt()
+            val text = "$coloredName§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
                 foundCurrentArea = true
@@ -268,13 +260,17 @@ object IslandAreas {
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
+        val tag = node.getAreaTag() ?: return
+        val displayName = tag.color.getChatColor() + node.name
         val color = config.pathfinder.color.get().toChromaColor()
-        IslandGraphs.pathFind(
-            node.position, color,
+        node.pathFind(
+            displayName,
+            color,
             onFound = {
                 targetNode = null
                 updatePosition()
             },
+            allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
         hasMoved = true

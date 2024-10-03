@@ -38,8 +38,8 @@ object VoltHighlighter {
     fun onArmorChange(event: EntityEquipmentChangeEvent) {
         if (!RiftAPI.inRift() || !config.voltWarning) return
         val player = Minecraft.getMinecraft().thePlayer ?: return
-        if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING
-            && event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
+        if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
+            event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
             chargingSince = chargingSince.editCopy {
                 this[event.entity] = SimpleTimeMark.now()
@@ -91,11 +91,11 @@ object VoltHighlighter {
         FRIENDLY,
         HOSTILE,
         DOING_LIGHTNING,
-        ;
     }
 
     private fun getVoltState(itemStack: ItemStack): VoltState {
         return when (itemStack.getSkullTexture()) {
+            // TODO: Move these textures to the repo
             "ewogICJ0aW1lc3RhbXAiIDogMTY3Mzg4MzU3MjAzNSwKICAicHJvZmlsZUlkIiA6ICI0MDU4NDhjMmJjNTE0ZDhkOThkOTJkMGIwYzhiZDQ0YiIsCiAgInByb2ZpbGVOYW1lIiA6ICJMb3ZlT3dPIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2UxYjFiZmI1MzZiNjQxNmIyNmEyODNkMmQ4YWQ0YjE3NzFiYmU1Yjc2ODk2ZTI3MjdkNWU4MzNiYzg5NDk4MmQiLAogICAgICAibWV0YWRhdGEiIDogewogICAgICAgICJtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ==" -> {
                 VoltState.DOING_LIGHTNING
             }

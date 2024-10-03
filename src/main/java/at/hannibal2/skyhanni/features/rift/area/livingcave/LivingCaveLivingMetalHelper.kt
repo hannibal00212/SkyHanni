@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -72,8 +72,8 @@ object LivingCaveLivingMetalHelper {
         } else b
         event.drawWaypointFilled(
             location,
-            LorenzColor.AQUA.toColor(),
-            seeThroughBlocks = location.distanceToPlayer() < 10
+            color,
+            seeThroughBlocks = location.distanceToPlayer() < 10,
         )
     }
 
@@ -96,6 +96,8 @@ object LivingCaveLivingMetalHelper {
             pair = null
         }
     }
+
+    val color get() = config.color.get().toChromaColor()
 
     fun isEnabled() = RiftAPI.inRift() && (RiftAPI.inLivingCave() || RiftAPI.inLivingStillness()) && config.enabled
 }

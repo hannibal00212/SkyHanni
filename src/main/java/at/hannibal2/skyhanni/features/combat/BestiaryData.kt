@@ -441,8 +441,8 @@ object BestiaryData {
             return true
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a")
-                && loreList[1].startsWith("§7Results: §a")
+            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a") &&
+                loreList[1].startsWith("§7Results: §a")
             ) {
                 return true
             }

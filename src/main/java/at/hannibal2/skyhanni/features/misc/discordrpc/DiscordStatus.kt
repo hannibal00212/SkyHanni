@@ -344,5 +344,4 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
     AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
-    ;
 }

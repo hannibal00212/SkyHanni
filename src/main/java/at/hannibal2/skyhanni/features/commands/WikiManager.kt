@@ -84,7 +84,7 @@ object WikiManager {
         }
 
         var search = ""
-        for (arg in args) search = "$search${arg}"
+        for (arg in args) search = "$search$arg"
 
         if (wikithis) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {

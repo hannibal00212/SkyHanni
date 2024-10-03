@@ -21,8 +21,9 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         update(content, footer)
     }
 
-    //TODO split up this 240 lines function
-    fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
+    // TODO split up this 240 lines function - remove suppression when done
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
+    private fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
         val timeUntilCakes = FFStats.cakeExpireTime.timeUntil().format(TimeUnit.HOUR, maxUnits = 1)

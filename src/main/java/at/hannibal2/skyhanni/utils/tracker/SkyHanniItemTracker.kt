@@ -119,9 +119,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
-            val name = cleanName.removeColor(keepFormatting = true).replace("§r", "")
+            val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             var displayName = if (hidden) {
-                "§8§m$name"
+                "§8§m$formattedName"
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
@@ -152,7 +152,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.add(renderable.toSearchable(name))
+            lists.add(renderable.toSearchable(formattedName))
         }
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
@@ -189,7 +189,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
-            add("§7${internalName}")
+            add("§7$internalName")
         }
     }
 

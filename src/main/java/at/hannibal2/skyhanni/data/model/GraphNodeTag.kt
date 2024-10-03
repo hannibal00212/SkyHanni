@@ -42,6 +42,7 @@ enum class GraphNodeTag(
 
     // Rift
     RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the Rift.", onlyIsland = IslandType.THE_RIFT),
+    RIFT_BUTTONS_QUEST("rift_buttons_quest", LorenzColor.LIGHT_PURPLE, "Wooden Buttons", "A spot to hit wooden buttons for the Dreadfarm Enigma Soul.", onlyIsland = IslandType.THE_RIFT),
     RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the Rift to teleport to.", onlyIsland = IslandType.THE_RIFT),
     RIFT_MONTEZUMA(
         "rift_montezuma",

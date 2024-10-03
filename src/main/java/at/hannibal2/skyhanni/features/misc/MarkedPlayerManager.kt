@@ -78,8 +78,8 @@ object MarkedPlayerManager {
 
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
-        && config.highlightInWorld
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected()) &&
+        config.highlightInWorld
 
     fun replaceInChat(string: String): String {
         if (!config.highlightInChat) return string

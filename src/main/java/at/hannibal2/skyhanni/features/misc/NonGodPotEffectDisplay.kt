@@ -76,7 +76,6 @@ object NonGodPotEffectDisplay {
         CURSE_OF_GREED("§4Curse of Greed I"),
 
         COLD_RESISTANCE_4("§bCold Resistance IV"),
-        ;
     }
 
     private val effectsCountPattern by RepoPattern.pattern(

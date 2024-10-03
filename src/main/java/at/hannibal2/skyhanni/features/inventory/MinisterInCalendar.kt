@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
@@ -74,7 +75,7 @@ object MinisterInCalendar {
             addAll(prefix)
             for (perk in minister.activePerks) {
                 add("$ministerColor${perk.perkName}")
-                addAll(perk.description.splitLines(170).removePrefix("§r").split("\n").map { "§7$it" })
+                addAll(perk.description.splitLines(170).removeResets().split("\n").map { "§7$it" })
             }
             addAll(suffix)
         }

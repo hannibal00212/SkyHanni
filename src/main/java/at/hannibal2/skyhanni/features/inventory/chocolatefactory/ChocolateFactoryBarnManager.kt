@@ -62,7 +62,7 @@ object ChocolateFactoryBarnManager {
             HoppityAPI.attemptFireRabbitFound(lastDuplicateAmount = amount)
 
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
-                (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit()) - 1).takeIf { it > 1 }?.let {
+                (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit())).takeIf { it > 0 }?.let {
                     event.chatComponent = ChatComponentText(
                         event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"),
                     )

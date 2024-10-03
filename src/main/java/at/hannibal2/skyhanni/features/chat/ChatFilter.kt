@@ -27,7 +27,7 @@ object ChatFilter {
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
 
-    /// <editor-fold desc="Regex Patterns & Messages">
+    // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
     private val lobbyPatterns = listOf(
         // player join
@@ -89,15 +89,19 @@ object ChatFilter {
     )
 
     // Guild EXP
+    /**
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     */
     private val guildExpPatterns = listOf(
-        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
-        // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
         "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
+    /**
+     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
+     */
     private val killComboPatterns = listOf(
-        //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
@@ -500,7 +504,7 @@ object ChatFilter {
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -515,6 +519,7 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
+    @Suppress("CyclomaticComplexMethod")
     private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"

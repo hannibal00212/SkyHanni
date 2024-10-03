@@ -379,8 +379,6 @@ object ReforgeHelper {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
-
-                //?.get(reforgeItem)?. = hoverColor
             }
             hoveredReforge = null
         }

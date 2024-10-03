@@ -26,10 +26,10 @@ object CopyItemCommand {
             val tag = compound.getTag(s)
 
             if (tag !is NBTTagCompound) {
-                list.add("${text}${s}: $tag")
+                list.add("$text$s: $tag")
             } else {
                 val element = compound.getCompoundTag(s)
-                list.add("${text}${s}:")
+                list.add("$text$s:")
                 recurseTag(element, "$text  ", list)
             }
         }

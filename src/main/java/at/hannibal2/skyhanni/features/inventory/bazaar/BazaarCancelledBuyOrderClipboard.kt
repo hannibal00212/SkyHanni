@@ -103,7 +103,7 @@ object BazaarCancelledBuyOrderClipboard {
         event.blockedReason = "bazaar cancelled buy order clipboard"
         val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
 
-        val message = "Bazaar buy order cancelled. Click to reorder. " +
+        val message = "Bazaar buy order cancelled. Click to re-order. " +
             "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
         ChatUtils.clickableChat(
             message,

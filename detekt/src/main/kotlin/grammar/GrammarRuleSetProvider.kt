@@ -10,8 +10,11 @@ class GrammarRuleSetProvider : RuleSetProvider {
     override val ruleSetId: String = "GrammarRules"
 
     override fun instance(config: Config): RuleSet {
-        return RuleSet(ruleSetId, listOf(
-            AvoidColour(config)
-        ))
+        return RuleSet(
+            ruleSetId,
+            listOf(
+                AvoidBritishSpelling(config),
+            ),
+        )
     }
 }

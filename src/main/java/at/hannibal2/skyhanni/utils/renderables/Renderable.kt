@@ -1139,6 +1139,7 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
+                @Suppress("SpacingAroundCurly")
                 val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
                     ?: yOffsets.size) - 1
 

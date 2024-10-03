@@ -62,8 +62,8 @@ object HighlightVisitorsOutsideOfGarden {
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1)
-                && it.skinOrType == skinOrType
+            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1) &&
+                it.skinOrType == skinOrType
         }
     }
 

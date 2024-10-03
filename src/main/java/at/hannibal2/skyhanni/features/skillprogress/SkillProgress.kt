@@ -291,7 +291,7 @@ object SkillProgress {
                 )
             } else {
                 val tips = buildList {
-                    add("§6Level: §b${level}")
+                    add("§6Level: §b$level")
                     add("§6Current XP: §b${currentXp.addSeparators()}")
                     add("§6Needed XP: §b${currentXpMax.addSeparators()}")
                     add("§6Total XP: §b${totalXp.addSeparators()}")

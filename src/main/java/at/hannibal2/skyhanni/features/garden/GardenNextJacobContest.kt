@@ -441,7 +441,7 @@ object GardenNextJacobContest {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
                     "<html>Farming Contest soon!<br />" +
-                        "Crops: ${cropTextNoColor}</html>"
+                        "Crops: $cropTextNoColor</html>"
                 )
             }
         }

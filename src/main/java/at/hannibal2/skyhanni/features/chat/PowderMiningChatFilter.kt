@@ -33,6 +33,7 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
+    // TODO rename to "openedRewards" ?
     private var unclosedRewards = false
 
     /**
@@ -246,12 +247,16 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§a❈ Flawed Amethyst Gemstone §r§8x4
      * REGEX-TEST: §r§9⸕ Fine Amber Gemstone
      * REGEX-TEST: §r§5⸕ Flawless Amber Gemstone
+     * REGEX-TEST: §r§f❁ Rough Jasper Gemstone §r§8x24
+     * REGEX-TEST: §r§a❁ Flawed Jasper Gemstone
      */
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa9][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
+    @Suppress("CyclomaticComplexMethod")
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
@@ -275,7 +280,7 @@ object PowderMiningChatFilter {
         // To simplify regex statements, this check is done outside
         val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
 
-        //Powder
+        // Powder
         powderRewardPattern.matchMatcher(ssMessage) {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
@@ -286,7 +291,7 @@ object PowderMiningChatFilter {
             }
         }
 
-        //Essence
+        // Essence
         essenceRewardPattern.matchMatcher(ssMessage) {
             if (config.essenceFilterThreshold == 20) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: "1"
@@ -301,11 +306,12 @@ object PowderMiningChatFilter {
         blockGoblinEggs(ssMessage)?.let { return it }
         blockGemstones(ssMessage)?.let { return it }
 
-        //Fallback default
+        // Fallback default
         return null
     }
 
-    var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
+        emptyMap()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -339,7 +345,7 @@ object PowderMiningChatFilter {
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
             return when (val colorStr = groupOrNull("color")?.lowercase()) {
-                //'Colorless', base goblin eggs will never be shown in this code path
+                // 'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
                     "powder_mining_goblin_eggs"
@@ -358,7 +364,7 @@ object PowderMiningChatFilter {
                 else -> {
                     ErrorManager.logErrorWithData(
                         NoSuchElementException(),
-                        "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
+                        "Unknown Goblin Egg color detected in Powder Mining Filter: '$colorStr' - please report this in the Discord!",
                         noStackTrace = true,
                     )
                     "no_filter"
@@ -380,7 +386,8 @@ object PowderMiningChatFilter {
                 "amethyst" -> gemstoneConfig.amethystGemstones
                 "jade" -> gemstoneConfig.jadeGemstones
                 "topaz" -> gemstoneConfig.topazGemstones
-                //Failure case that should never be reached
+                "jasper" -> gemstoneConfig.jasperGemstones
+                // Failure case that should never be reached
                 else -> return "no_filter"
             }
 

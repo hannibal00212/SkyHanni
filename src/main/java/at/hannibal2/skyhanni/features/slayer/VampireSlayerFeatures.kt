@@ -60,9 +60,11 @@ object VampireSlayerFeatures {
     // Nicked support
     private val username
         get() = EntityUtils.getEntities<EntityPlayerSP>().firstOrNull()?.name ?: error("own player is null")
-    private val bloodIchorTexture =
+
+    // TODO: Add to repo
+    private const val BLOOD_ICHOR_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
-    private val killerSpringTexture =
+    private const val KILLER_SPRING_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzdmN2E3YmM4YWM4NmYyM2NhN2JmOThhZmViNzY5NjAyMjdlMTgzMmZlMjA5YTMwMjZmNmNlYjhiZGU3NGY1NCJ9fX0="
     private var nextClawSend = 0L
 
@@ -82,8 +84,8 @@ object VampireSlayerFeatures {
             for (stand in EntityUtils.getEntities<EntityArmorStand>()) {
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
-                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-                if (isIchor || stand.hasSkullTexture(killerSpringTexture)) {
+                val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
+                if (isIchor || stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
                     val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
                         .toChromaColor().withAlpha(config.withAlpha)
                     if (distance <= 15) {
@@ -275,8 +277,8 @@ object VampireSlayerFeatures {
         for (stand in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = start.distance(vec)
-            val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-            val isSpring = stand.hasSkullTexture(killerSpringTexture)
+            val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
+            val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
             val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
                 .toChromaColor().withAlpha(config.withAlpha)
@@ -336,7 +338,7 @@ object VampireSlayerFeatures {
         for (player in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
             if (!player.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
             for (stand in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
-                if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
+                if (stand.hasSkullTexture(KILLER_SPRING_TEXTURE) || stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)) {
                     standList = standList.editCopy { this[stand] = player }
                 }
             }

@@ -16,7 +16,7 @@ object DungeonChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    /// <editor-fold desc="Patterns, Messages, and Maps">
+    // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO
     private val endPatterns = listOf(
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
@@ -140,9 +140,12 @@ object DungeonChatFilter {
     private val pickupMessages = listOf(
         "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
     )
+
+    /**
+     * REGEX-TEST: §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
+     * REGEX-TEST: §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
+     */
     private val startPatterns = listOf(
-        //§a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
-        //§a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
         "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern()
     )
     private val startMessages = listOf(
@@ -188,7 +191,7 @@ object DungeonChatFilter {
     private val messagesEndsWithMap: Map<MessageTypes, List<String>> = mapOf(
         MessageTypes.END to endMessagesEndWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

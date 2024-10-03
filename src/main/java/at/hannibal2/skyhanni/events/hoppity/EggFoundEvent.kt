@@ -5,6 +5,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 
 class EggFoundEvent(
     val type: HoppityEggType,
-    val slotIndex: Int?,
-    val note: String?,
+    val slotIndex: Int? = null,
+    val note: String? = null,
 ) : SkyHanniEvent()

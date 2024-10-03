@@ -29,6 +29,8 @@ enum class ItemAbility(
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA", ignoreMageCooldownReduction = true),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
+    SOS_FLARE(10),
+    ALERT_FLARE(20, "WARNING_FLARE"),
 
     GOLEM_SWORD(3),
     END_STONE_SWORD(5),
@@ -75,7 +77,7 @@ enum class ItemAbility(
         cooldownInSeconds,
         actionBarDetection = false,
         alternativePosition = alternativePosition,
-        ignoreMageCooldownReduction = ignoreMageCooldownReduction
+        ignoreMageCooldownReduction = ignoreMageCooldownReduction,
     ) {
         newVariant = true
         alternateInternalNames.forEach {

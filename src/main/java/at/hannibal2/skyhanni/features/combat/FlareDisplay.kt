@@ -48,7 +48,7 @@ object FlareDisplay {
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMyNjQzMiwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQyYmY5ODY0NzIwZDg3ZmQwNmI4NGVmYTgwYjc5NWM0OGVkNTM5YjE2NTIzYzNiMWYxOTkwYjQwYzAwM2Y2YiIKICAgIH0KICB9Cn0="
             to FlareType.ALERT,
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzM0NzQ4OSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAwNjJjYzk4ZWJkYTcyYTZhNGI4OTc4M2FkY2VmMjgxNWI0ODNhMDFkNzNlYTg3YjNkZjc2MDcyYTg5ZDEzYiIKICAgIH0KICB9Cn0="
-            to FlareType.SOS
+            to FlareType.SOS,
     )
 
     @SubscribeEvent
@@ -92,7 +92,8 @@ object FlareDisplay {
             val name = type.displayName
             if (newDisplay == null) {
                 newDisplay = buildList {
-                    add(Renderable.string("$name: §b${remainingTime.format()}"))
+                    val displayTime = if (remainingTime.isNegative()) "§eSoon" else "§b${remainingTime.format()}"
+                    add(Renderable.string("$name: $displayTime"))
                     if (config.showManaBuff) {
                         type.manaBuff?.let {
                             add(Renderable.string(" §b$it §7mana regen"))
@@ -100,7 +101,7 @@ object FlareDisplay {
                     }
                 }
             }
-            if (remainingTime > 5.seconds) continue
+            if (remainingTime !in 0.seconds..5.seconds) continue
             val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
             when (config.alertType) {
                 FlareConfig.AlertType.CHAT -> {
@@ -194,7 +195,6 @@ object FlareDisplay {
         SOS("§5SOS Flare", "+125%"),
         ALERT("§9Alert Flare", "+50%"),
         WARNING("§aWarning Flare", null),
-        ;
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

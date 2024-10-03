@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -35,7 +36,13 @@ object TrackParticlesCommand {
     private var display: List<Renderable> = emptyList()
     private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
 
+    // TODO write abstract code for this and TrackSoundsCommand
     fun command(args: Array<String>) {
+        if (!LorenzUtils.inSkyBlock) {
+            ChatUtils.userError("This command only works in SkyBlock!")
+            return
+        }
+
         if (args.firstOrNull() == "end") {
             if (!isRecording) {
                 ChatUtils.userError("Nothing to end")

@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -162,7 +166,16 @@ object UpgradeReminder {
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
                 actionName = "warp to Hub",
-                action = { HypixelCommands.warp("hub") },
+                action = {
+                    HypixelCommands.warp("hub")
+                    EntityMovementData.onNextTeleport(IslandType.HUB) {
+                        IslandGraphs.pathFind(
+                            LorenzVec(-2.6, 73.0, -101.6),
+                            "§eCommunity Shop",
+                            condition = { config.accountUpgradeReminder },
+                        )
+                    }
+                },
             )
         }
 

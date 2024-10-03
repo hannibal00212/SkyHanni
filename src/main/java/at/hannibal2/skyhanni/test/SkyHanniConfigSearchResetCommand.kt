@@ -274,6 +274,7 @@ object SkyHanniConfigSearchResetCommand {
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
+            @Suppress("ComplexCondition")
             if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }

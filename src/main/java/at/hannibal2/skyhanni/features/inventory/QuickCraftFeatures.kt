@@ -29,7 +29,6 @@ object QuickCraftFeatures {
     enum class InventoryType(val inventoryName: String) {
         CRAFT_ITEM("Craft Item"),
         MORE_QUICK_CRAFT_OPTIONS("Quick Crafting"),
-        ;
     }
 
     private fun InventoryType.ignoreSlot(slotNumber: Int?): Boolean = when (this) {
