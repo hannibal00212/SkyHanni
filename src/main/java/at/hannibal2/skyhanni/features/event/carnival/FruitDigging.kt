@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -174,8 +175,8 @@ object FruitDigging {
             if (lastMined.lastOrNull() == position) mineBlocksEntry.value.uncovered = true
             itemsOnGround[position] = EntityInfo(itemStack, dropType)
 
-            println(itemsOnGround)
-            println(mineBlocks)
+            //println(itemsOnGround)
+            //println(mineBlocks)
         }
         if (ticksSinceLastFound > (fruitStack.count { itemsOnGround[it]!!.type == DropType.WATERMELON } * 5 + 2) * 3) {
             if (lastPos == fruitStack.firstOrNull()) {
@@ -234,6 +235,16 @@ object FruitDigging {
         }
     }
 
+    private fun reset() {
+        itemsOnGround.clear()
+        mineBlocks.clear()
+        rummed = false
+        lastChat = ""
+        fruitStack.clear()
+        lastPos = LorenzVec()
+        MyFruitDigging.reset()
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -242,8 +253,8 @@ object FruitDigging {
 
         if (startedPattern.matches(message)) {
             hasStarted = true
-            itemsOnGround.clear()
-            return mineBlocks.clear()
+            reset()
+            return
         }
         if (endedPattern.matches(message)) hasStarted = false
 
@@ -298,6 +309,12 @@ object FruitDigging {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onLorenzToolTip(event: LorenzToolTipEvent) {
+        if (event.itemStack != InventoryUtils.getItemInHand()) return
+        event.toolTip = MyFruitDigging.printBoard().replace("(\\[(?!\\[)[^\\]]*\\])".toRegex(), "$1\n").split("\n").toMutableList()
     }
 
     @SubscribeEvent

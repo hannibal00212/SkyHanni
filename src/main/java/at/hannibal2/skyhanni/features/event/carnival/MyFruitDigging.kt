@@ -56,6 +56,10 @@ object MyFruitDigging {
             diggable = false
         }
 
+        override fun toString(): String {
+            return (if (diggable) "" else "!") + possibilities.toString()
+        }
+
     }
 
     enum class ShovelType {
@@ -69,8 +73,11 @@ object MyFruitDigging {
 
         },
         TREASURE {
-            override fun getResult(message: String): DropType? = if (FruitDigging.noFruitPattern.matches(message)) DropType.NONE else
-                FruitDigging.treasurePattern.matchGroup(message, "fruit")?.let { FruitDigging.convertToType(it, null) }
+            override fun getResult(message: String): DropType? =
+                if (FruitDigging.noFruitPattern.matches(message)) DropType.NONE else FruitDigging.treasurePattern.matchGroup(
+                    message,
+                    "fruit",
+                )?.let { FruitDigging.convertToType(it, null) }
         },
 
         ;
@@ -107,8 +114,16 @@ object MyFruitDigging {
                     result.first as? DropType ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
                 val nPos = (result.second as? Int)?.let { f -> (result.third as? Int)?.let { f to it } }
                     ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
+                val neighbours = board.getNeighbors(nPos)
                 if (item == DropType.NONE) {
-                    board.getNeighbors(pos).forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
+                    neighbours.forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
+                } else {
+                    val notPossible = item.below
+                    neighbours.forEach {
+                        if (it.possibilities.size != 1) {
+                            it.possibilities.removeIf { notPossible.contains(it) }
+                        }
+                    }
                 }
             }
 
@@ -125,11 +140,18 @@ object MyFruitDigging {
                             it.possibilities.add(drop)
                         }
                     }
+                    val notPossible = result.above
+                    neighbours.forEach {
+                        if (it.possibilities.size != 1) {
+                            it.possibilities.removeIf { notPossible.contains(it) }
+                        }
+                    }
                 }
             }
 
             else -> {} // RUM
         }
+        println(board)
     }
 
     fun setBombed(pos: Pair<Int, Int>) {
@@ -198,6 +220,10 @@ object MyFruitDigging {
 
         fun getNeighbors(pos: Pair<Int, Int>): List<BlockInfo> =
             directions.mapNotNull { cells.getOrNull(it.first + pos.first)?.getOrNull(it.second + pos.second) }
+
+        override fun toString(): String {
+            return "$found ${cells.contentDeepToString()}"
+        }
     }
 
     private val directions = listOf(
@@ -214,4 +240,11 @@ object MyFruitDigging {
     interface Strategy {
         fun getNextBlock(): Pair<Int, Int>
     }
+
+    fun reset() {
+        board.clear()
+    }
+
+    fun printBoard() = board.toString()
+
 }

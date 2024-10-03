@@ -55,6 +55,7 @@ enum class DropType(
     val basePoints: Int,
     val skullTexture: String,
     val display: String,
+    belowConstruction: () -> Set<DropType> = { emptySet() },
 ) {
     MANGO(
         300,
@@ -66,29 +67,39 @@ enum class DropType(
     ),
     WATERMELON(
         100,
-        "http://textures.minecraft.net/texture/efe4ef83baf105e8dee6cf03dfe7407f1911b3b9952c891ae34139560f2931d6", "§9Watermelon",
+        "http://textures.minecraft.net/texture/efe4ef83baf105e8dee6cf03dfe7407f1911b3b9952c891ae34139560f2931d6",
+        "§9Watermelon",
+        { setOf(MANGO, APPLE) },
     ),
     POMEGRANATE(
         200,
         "" +
             "http://textures.minecraft.net/texture/40824d18079042d5769f264f44394b95b9b99ce689688cc10c9eec3f882ccc08",
-        "§9Pomegranate",
+        "§9Pomegranate", { setOf(MANGO, APPLE) },
     ),
     COCONUT(
         200,
-        "http://textures.minecraft.net/texture/10ceb1455b471d016a9f06d25f6e468df9fcf223e2c1e4795b16e84fcca264ee", "§5Coconut",
+        "http://textures.minecraft.net/texture/10ceb1455b471d016a9f06d25f6e468df9fcf223e2c1e4795b16e84fcca264ee",
+        "§5Coconut",
+        { setOf(MANGO, APPLE, POMEGRANATE, WATERMELON) },
     ),
     CHERRY(
         200,
-        "http://textures.minecraft.net/texture/c92b099a62cd2fbf8ada09dec145c75d7fda4dc57b968bea3a8fa11e37aa48b2", "§5Cherry",
+        "http://textures.minecraft.net/texture/c92b099a62cd2fbf8ada09dec145c75d7fda4dc57b968bea3a8fa11e37aa48b2",
+        "§5Cherry",
+        { setOf(MANGO, APPLE, POMEGRANATE, WATERMELON) },
     ),
     DURIAN(
         800,
-        "http://textures.minecraft.net/texture/ac268d36c2c6047ffeec00124096376b56dbb4d756a55329363a1b27fcd659cd", "§5Durian",
+        "http://textures.minecraft.net/texture/ac268d36c2c6047ffeec00124096376b56dbb4d756a55329363a1b27fcd659cd",
+        "§5Durian",
+        { setOf(MANGO, APPLE, POMEGRANATE, WATERMELON) },
     ),
     DRAGONFRUIT(
         1200,
-        "http://textures.minecraft.net/texture/3cc761bcb0579763d9b8ab6b7b96fa77eb6d9605a804d838fec39e7b25f95591", "§dDragonfruit",
+        "http://textures.minecraft.net/texture/3cc761bcb0579763d9b8ab6b7b96fa77eb6d9605a804d838fec39e7b25f95591",
+        "§dDragonfruit",
+        { setOf(MANGO, APPLE, POMEGRANATE, WATERMELON, DURIAN, CHERRY, COCONUT) },
     ),
     RUM(
         0,
@@ -101,4 +112,9 @@ enum class DropType(
     ),
     NOT_BOMB(0, "", "§${config.safeText.chatColorCode}Safe"),
     NONE(0, "", "")
+    ;
+
+    val below by lazy(belowConstruction)
+
+    val above by lazy { entries.filter { it.below.contains(this) }.toSet() }
 }
