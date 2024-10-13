@@ -31,8 +31,8 @@ val amountOnTheBoard = mapOf(
     DropType.DRAGONFRUIT to 1,
     DropType.RUM to 5,
     DropType.BOMB to 15,
-    DropType.NOT_BOMB to 34,
-    DropType.NONE to 0,
+    //DropType.NOT_BOMB to 34,
+    //DropType.NONE to 0,
 )
 
 class DropTypeManager {
@@ -114,7 +114,11 @@ enum class DropType(
     NONE(0, "", "")
     ;
 
+    fun isFruit(): Boolean = setOf(MANGO, APPLE, WATERMELON, POMEGRANATE, COCONUT, CHERRY, DURIAN, DRAGONFRUIT).contains(this)
+
     val below by lazy(belowConstruction)
 
     val above by lazy { entries.filter { it.below.contains(this) }.toSet() }
+
+    val absoluteRanking: Int = below.maxOfOrNull { it.absoluteRanking }?.plus(1) ?: 0
 }

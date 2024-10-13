@@ -226,7 +226,7 @@ object MyFruitDigging {
         }
     }
 
-    private val directions = listOf(
+    val directions = listOf(
         1 to 0,
         -1 to 0,
         0 to 1,
