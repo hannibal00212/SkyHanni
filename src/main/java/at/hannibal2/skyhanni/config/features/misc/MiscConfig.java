@@ -143,7 +143,7 @@ public class MiscConfig {
     @ConfigOption(name = "Auto join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean autoJoinSkyblock = true;
+    public boolean autoJoinSkyblock = false;
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
