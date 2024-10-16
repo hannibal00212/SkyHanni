@@ -140,7 +140,7 @@ public class MiscConfig {
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
-    @ConfigOption(name = "Auto join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
+    @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean autoJoinSkyblock = false;
