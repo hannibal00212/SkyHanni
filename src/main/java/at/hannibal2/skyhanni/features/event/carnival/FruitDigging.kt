@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -13,7 +12,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -100,6 +99,7 @@ object FruitDigging {
     )
 
     private fun LorenzVec.convertCords(): Pair<Int, Int> = add(112, 0, 11).let { it.x.toInt() to it.z.toInt() }
+    private fun Pair<Int, Int>.convertCords(): LorenzVec = LorenzVec(first - 112, 72, second - 11)
 
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
@@ -178,7 +178,7 @@ object FruitDigging {
             //println(itemsOnGround)
             //println(mineBlocks)
         }
-        if (ticksSinceLastFound > (fruitStack.count { itemsOnGround[it]!!.type == DropType.WATERMELON } * 5 + 2) * 3) {
+        if (ticksSinceLastFound > (fruitStack.count { itemsOnGround[it]!!.type == DropType.WATERMELON } * 5 + 3) * 3) {
             if (lastPos == fruitStack.firstOrNull()) {
                 fruitStack.clear()
             }
@@ -216,7 +216,7 @@ object FruitDigging {
             }
             if (result != null) {
                 MyFruitDigging.onDig(
-                    lastMined.last().convertCords(),
+                    lastMined.get(lastMined.size - 1 - watermeloned.size).convertCords(),
                     drop,
                     if (rummed) null else MyFruitDigging.ShovelType.active,
                     result,
@@ -311,13 +311,7 @@ object FruitDigging {
         }
     }
 
-    @SubscribeEvent
-    fun onLorenzToolTip(event: LorenzToolTipEvent) {
-        if (event.itemStack != InventoryUtils.getItemInHand()) return
-        event.toolTip = MyFruitDigging.printBoard().replace("(\\[(?!\\[)[^\\]]*\\])".toRegex(), "$1\n").split("\n").toMutableList()
-    }
-
-    @SubscribeEvent
+    /* @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -393,6 +387,48 @@ object FruitDigging {
             }
 
             if (text == null || color == null) return@forEach
+
+            event.drawWaypointFilled(loc, color, minimumAlpha = 0.5F)
+            event.drawDynamicText(loc.add(0.0, 1.5, 0.0), text, 1.0)
+        }
+    } */
+
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!isEnabled()) return
+
+        for (info in MyFruitDigging.getBoardState()) {
+            val text: String
+            val color: Color
+            when {
+                info.isBombed() -> {
+                    text = if (info.possibilities.size <= 2) info.fancyPrint() else ""
+                    color = LorenzColor.GRAY.toColor()
+                }
+
+                !info.diggable -> {
+                    text = info.fancyPrint()
+                    color = config.uncovered.toColor()
+                }
+
+                info.isOnlyBombOrRum() -> {
+                    text = info.fancyPrint()
+                    color = config.mine.toColor()
+                }
+
+                info.isOnlyFruit() -> {
+                    text = info.fancyPrint()
+                    color = config.safe.toColor()
+                }
+
+                info.possibilities.size <= 3 -> {
+                    text = info.fancyPrint()
+                    color = LorenzColor.BLUE.toColor()
+                }
+
+                else -> continue
+            }
+            val loc = info.pos.convertCords()
 
             event.drawWaypointFilled(loc, color, minimumAlpha = 0.5F)
             event.drawDynamicText(loc.add(0.0, 1.5, 0.0), text, 1.0)

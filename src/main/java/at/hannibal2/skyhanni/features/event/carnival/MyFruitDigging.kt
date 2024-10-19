@@ -18,6 +18,8 @@ object MyFruitDigging {
 
         var diggable = true
 
+        var bombed = false
+
         init {
             clear()
         }
@@ -39,6 +41,7 @@ object MyFruitDigging {
                 ),
             )
             diggable = true
+            bombed = false
         }
 
         fun setResult(drop: DropType) {
@@ -54,12 +57,117 @@ object MyFruitDigging {
 
         fun setBombed() {
             diggable = false
+            bombed = true
         }
 
         override fun toString(): String {
             return (if (diggable) "" else "!") + possibilities.toString()
         }
 
+        var area: AreaInfo? = null
+
+        fun isResolvedTo(drop: DropType): Boolean = diggable && possibilities.contains(drop)
+
+        fun fancyPrint() = possibilities.joinToString(" or ") { it.display }
+
+        fun isOnlyFruit() = possibilities.all { it.isFruit() }
+
+        fun isOnlyBombOrRum() = possibilities.all { it == DropType.BOMB || it == DropType.RUM }
+
+        fun isBombed() = bombed
+    }
+
+    interface AreaInfo {
+        fun interact(other: AreaInfo)
+        val pos: Pair<Int, Int>
+        val fields: Set<Pair<Int, Int>>
+            get() = directions.map { (it.first + pos.first) to (it.second + pos.second) }.toSet()
+
+        fun overlap(other: AreaInfo): Pair<Set<Pair<Int, Int>>, OverlapInfo> {
+            val myFields = fields
+            val otherFields = other.fields
+            val intersect = myFields.intersect(otherFields)
+            //val relativeIntersect = intersect.map { (it.first - pos.first) to (it.second - pos.second) }.toSet()
+            val relativePos = (other.pos.first - pos.first) to (other.pos.second - pos.second)
+            val info: OverlapInfo = OverlapInfo.entries.firstOrNull { it.relation.contains(relativePos) } ?: OverlapInfo.NONE
+            return intersect to info
+        }
+
+        enum class OverlapInfo(val relation: Set<Pair<Int, Int>>) {
+            CORNER(
+                setOf(
+                    2 to 2,
+                    -2 to -2,
+                    2 to -2,
+                    -2 to 2,
+                ),
+            ),
+            PARALLEL(
+                setOf(
+                    2 to 0,
+                    0 to 2,
+                    -2 to 0,
+                    0 to -2,
+                ),
+            ),
+            DIAGONAL(
+                setOf(
+                    1 to 1,
+                    -1 to -1,
+                    1 to -1,
+                    -1 to 1,
+                ),
+            ),
+            TWO(
+                setOf(
+                    1 to 2,
+                    -1 to -2,
+                    1 to -2,
+                    -1 to 2,
+                    2 to 1,
+                    -2 to -1,
+                    2 to -1,
+                    -2 to 1,
+                ),
+            ),
+            NEIGHBOUR(
+                setOf(
+                    1 to 0,
+                    0 to 1,
+                    -1 to 0,
+                    0 to -1,
+                ),
+            ),
+            NONE(setOf()),
+        }
+    }
+
+    private class NoFruitInfo(override val pos: Pair<Int, Int>) : AreaInfo {
+        override fun interact(other: AreaInfo) {
+            return
+        }
+    }
+
+    private class FruitInfo(override val pos: Pair<Int, Int>, val fruit: DropType) : AreaInfo {
+
+        val foundNearby get() = fields.any { board.getInfo(it).isResolvedTo(fruit) }
+
+        val possibleSpace get() = fields.filter { board.getInfo(it).possibilities.contains(fruit) }
+
+        override fun interact(other: AreaInfo) {
+            if (other !is FruitInfo) return
+            if (other.fruit != fruit) return
+            val (overlap, info) = overlap(other)
+            if (!foundNearby && overlap.size == 1 && board.getRemaining(fruit) == 1) {
+                board.setResolve(overlap.first(), fruit)
+            }
+        }
+    }
+
+    private class BombInfo(override val pos: Pair<Int, Int>, var bombGuess: Int) : AreaInfo {
+        override fun interact(other: AreaInfo) {
+            if (other is NoFruitInfo) return
+        }
     }
 
     enum class ShovelType {
@@ -94,10 +202,12 @@ object MyFruitDigging {
 
         ChatUtils.chat("Digged $drop @${pos.first} ${pos.second} with $ability $result")
         board.setResult(pos, drop)
+        val areaInfo: AreaInfo?
         when (ability) {
             ShovelType.MINES -> {
                 if (result !is Int) throw IllegalStateException("Expected Int as result type for MINES")
                 val neighbours = board.getNeighbors(pos)
+                areaInfo = BombInfo(pos, result)
                 if (result == 0) {
                     neighbours.forEach { it.possibilities.remove(DropType.BOMB) }
                 } else {
@@ -114,10 +224,13 @@ object MyFruitDigging {
                     result.first as? DropType ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
                 val nPos = (result.second as? Int)?.let { f -> (result.third as? Int)?.let { f to it } }
                     ?: throw IllegalStateException("Expected Triple<DropType,Int,Int> as result type for ANCHOR")
-                val neighbours = board.getNeighbors(nPos)
+                val neighbours = board.getNeighbors(pos)
                 if (item == DropType.NONE) {
+                    areaInfo = NoFruitInfo(pos)
                     neighbours.forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
                 } else {
+                    areaInfo = null
+                    board.setResolve(nPos, item)
                     val notPossible = item.below
                     neighbours.forEach {
                         if (it.possibilities.size != 1) {
@@ -131,8 +244,10 @@ object MyFruitDigging {
                 if (result !is DropType) throw IllegalStateException("Expected DropType as result type for TREASURE")
                 val neighbours = board.getNeighbors(pos)
                 if (result == DropType.NONE) {
+                    areaInfo = NoFruitInfo(pos)
                     neighbours.forEach { it.possibilities.removeIf { it != DropType.RUM && it != DropType.BOMB } }
                 } else {
+                    areaInfo = FruitInfo(pos, result)
                     val amount = neighbours.count { it.possibilities.contains(drop) }
                     if (amount == 1) {
                         neighbours.first { it.possibilities.contains(drop) }.let {
@@ -149,8 +264,11 @@ object MyFruitDigging {
                 }
             }
 
-            else -> {} // RUM
+            else -> {
+                areaInfo = null
+            } // RUM
         }
+        board.setAreaInfo(pos, areaInfo)
         println(board)
     }
 
@@ -164,7 +282,7 @@ object MyFruitDigging {
         board.setResult(pos, drop)
     }
 
-    private val board = object {
+    private val board = object : Iterable<BlockInfo> {
 
         private val GRID_SIZE = 7
 
@@ -201,6 +319,14 @@ object MyFruitDigging {
             foundLogic(drop)
         }
 
+        fun setAreaInfo(pos: Pair<Int, Int>, areaInfo: AreaInfo?) {
+            if (areaInfo == null) return
+            cells[pos.first][pos.second].area = areaInfo
+            getFarNeighbors(pos).forEach {
+                it.area?.interact(areaInfo)
+            }
+        }
+
         private fun foundLogic(drop: DropType) {
             found.addOrPut(drop, 1)
             if (found[drop] == amountOnTheBoard[drop]) {
@@ -221,10 +347,21 @@ object MyFruitDigging {
         fun getNeighbors(pos: Pair<Int, Int>): List<BlockInfo> =
             directions.mapNotNull { cells.getOrNull(it.first + pos.first)?.getOrNull(it.second + pos.second) }
 
+        fun getFarNeighbors(pos: Pair<Int, Int>): List<BlockInfo> =
+            farDirections.mapNotNull { cells.getOrNull(it.first + pos.first)?.getOrNull(it.second + pos.second) }
+
+        override fun iterator(): Iterator<BlockInfo> = cells.flatten().iterator()
+
         override fun toString(): String {
             return "$found ${cells.contentDeepToString()}"
         }
+
+        fun getInfo(pos: Pair<Int, Int>) = cells[pos.first][pos.second]
+
+        fun getRemaining(fruit: DropType) = amountOnTheBoard[fruit]?.minus(found[fruit] ?: 0) ?: 0
     }
+
+    fun getBoardState() = board.iterator()
 
     val directions = listOf(
         1 to 0,
@@ -235,6 +372,26 @@ object MyFruitDigging {
         1 to -1,
         -1 to 1,
         -1 to -1,
+    )
+
+    val farDirections = listOf(
+        *directions.toTypedArray(),
+        2 to -2,
+        2 to -1,
+        2 to 0,
+        2 to 1,
+        2 to 2,
+        1 to 2,
+        0 to 2,
+        -1 to 2,
+        -2 to 2,
+        -2 to 1,
+        -2 to 0,
+        -2 to -1,
+        -2 to -2,
+        -1 to -2,
+        0 to -2,
+        1 to -2,
     )
 
     interface Strategy {
