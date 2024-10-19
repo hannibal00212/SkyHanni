@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.currency.CurrencyChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -41,10 +43,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -76,6 +81,16 @@ object GardenAPI {
             }
         }
 
+    var copper: Long = 0
+        private set
+
+    private val patternGroup = RepoPattern.group("garden")
+
+    val copperPattern by patternGroup.pattern(
+        "copper",
+        "(?:§.)*Copper: (?:§.)*(?<copper>[\\d,]+).*",
+    )
+
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     // TODO USE SH-REPO
@@ -104,6 +119,18 @@ object GardenAPI {
             if (inGarden()) {
                 checkItemInHand()
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        if (!inGarden()) return
+        copperPattern.firstMatcher(event.added) {
+            val newCopper = group("copper").formatLong()
+            val difference = (newCopper - copper).toInt()
+            if (difference == 0) return
+            copper = newCopper
+            CurrencyChangeEvent.Copper(difference, copper).post()
         }
     }
 
