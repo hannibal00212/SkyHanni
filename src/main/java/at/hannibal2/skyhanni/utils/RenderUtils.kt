@@ -204,7 +204,8 @@ object RenderUtils {
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
-    fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
+    fun getViewerPos(partialTicks: Float) =
+        Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
 
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -362,9 +363,9 @@ object RenderUtils {
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
     ) {
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
-        val viewer = Minecraft.getMinecraft().renderViewEntity
         val renderManager = Minecraft.getMinecraft().renderManager
         var x = location.x - renderManager.viewerPosX
         var y = location.y - renderManager.viewerPosY - viewer.eyeHeight
@@ -1003,15 +1004,16 @@ object RenderUtils {
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+
         val x = location.x
         val y = location.y
         val z = location.z
 
-        val render = Minecraft.getMinecraft().renderViewEntity
-        val renderOffsetX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val renderOffsetY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val renderOffsetZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
         val eyeHeight = thePlayer.eyeHeight
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
@@ -1621,13 +1623,13 @@ object RenderUtils {
         lineWidth: Int,
         depth: Boolean,
     ) {
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         GlStateManager.disableCull()
 
-        val render = Minecraft.getMinecraft().renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val realX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val realY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val realZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
         GlStateManager.pushMatrix()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()
