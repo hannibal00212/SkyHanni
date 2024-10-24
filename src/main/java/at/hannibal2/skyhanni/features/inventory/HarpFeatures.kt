@@ -121,7 +121,7 @@ object HarpFeatures {
         val scaledresolution = ScaledResolution(minecraft)
         val i = scaledresolution.scaledWidth
         val j = scaledresolution.scaledHeight
-        minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
+        minecraft.currentScreen?.setWorldAndResolution(minecraft, i, j)
     }
 
     @SubscribeEvent
