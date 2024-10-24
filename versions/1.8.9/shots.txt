@@ -48,13 +48,13 @@ net.minecraft.client.Minecraft:
         annotate org.jetbrains.annotations.Nullable
     getRenderViewEntity():
         annotate org.jetbrains.annotations.Nullable
+    pointedEntity:
+        annotate org.jetbrains.annotations.Nullable
+    objectMouseOver:
+        annotate org.jetbrains.annotations.Nullable
 #    thePlayer:
 #        annotate org.jetbrains.annotations.Nullable
-#    pointedEntity:
-#        annotate org.jetbrains.annotations.Nullable
 #    currentScreen:
-#        annotate org.jetbrains.annotations.Nullable
-#    objectMouseOver:
 #        annotate org.jetbrains.annotations.Nullable
 #    theWorld:
 #        annotate org.jetbrains.annotations.Nullable
