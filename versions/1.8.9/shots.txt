@@ -80,6 +80,6 @@ net.minecraft.item.ItemStack:
     <init>(net.minecraft.item.Item, int, int, net.minecraft.nbt.NBTTagCompound):
         annotateParameter 0 org.jetbrains.annotations.NotNull
         annotateParameter 3 org.jetbrains.annotations.Nullable
-#net.minecraft.entity.Entity:
-#    ridingEntity:
-#        annotate org.jetbrains.annotations.Nullable
+net.minecraft.entity.Entity:
+    ridingEntity:
+        annotate org.jetbrains.annotations.Nullable
