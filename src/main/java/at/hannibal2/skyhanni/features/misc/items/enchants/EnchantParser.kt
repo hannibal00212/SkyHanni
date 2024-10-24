@@ -394,7 +394,7 @@ object EnchantParser {
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = ChatComponentText(text)
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent.action, chatComponentText)
+        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }

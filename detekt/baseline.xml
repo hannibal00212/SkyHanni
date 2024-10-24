@@ -139,6 +139,7 @@
     <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$notFoundBaskets.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
+    <ID>UnsafeCallOnNullableType:ChatHoverEvent.kt$ChatHoverEvent$component.chatStyle.chatHoverEvent!!</ID>
     <ID>UnsafeCallOnNullableType:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$upgradeCost!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>

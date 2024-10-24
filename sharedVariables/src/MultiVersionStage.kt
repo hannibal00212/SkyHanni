@@ -14,7 +14,7 @@ enum class MultiVersionStage(val label: String) {
         return when (this) {
             OFF -> false
             PREPROCESS_ONLY -> false
-            FULL -> projectTarget == ProjectTarget.MODERN
+            FULL -> projectTarget == ProjectTarget.BRIDGE112
         }
     }
 
