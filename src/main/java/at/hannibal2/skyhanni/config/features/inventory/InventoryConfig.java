@@ -136,7 +136,7 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
-    @ConfigOption(name = "Cake Tracker", desc = "")
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
   

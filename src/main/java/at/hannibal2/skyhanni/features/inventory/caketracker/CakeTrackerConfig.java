@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class CakeTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "New Year Cake Tracker", desc = "Track which Cakes you have/need. §cWill not fully work with NEU Storage Overlay.")
+    @ConfigOption(name = "Enabled", desc = "Track which Cakes you have/need. §cWill not fully work with NEU Storage Overlay.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
