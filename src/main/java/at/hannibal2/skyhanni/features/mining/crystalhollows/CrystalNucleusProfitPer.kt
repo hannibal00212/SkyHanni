@@ -53,7 +53,7 @@ object CrystalNucleusProfitPer {
         val excludedEntries = map.filter { it.key !in hover }
         val excludedProfitSumFormat = excludedEntries.values.filter { it > 0 }.sum().shortFormat()
         val excludedCount = excludedEntries.size
-        if (excludedCount > 0) hover.add("§7$excludedCount cheap items are hidden §7(§6$excludedProfitSumFormat§7.")
+        if (excludedCount > 0) hover.add("§7$excludedCount cheap items are hidden §7(§6$excludedProfitSumFormat§7).")
 
         val jungleKeyPrice = jungleKeyItem.getPrice()
         map["§cUsed §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}"] = -jungleKeyPrice
