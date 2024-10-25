@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -39,7 +38,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CakeTracker {
 
-    private fun getCakeTrackerData() = ProfileStorageData.profileSpecific?.cakeTracker
+    private val storage get() = ProfileStorageData.profileSpecific?.cakeTracker
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
     private var currentYear = 0
 
@@ -68,7 +67,7 @@ object CakeTracker {
      */
     private val cakeContainerPattern by patternGroup.pattern(
         "cake.container",
-        "^(Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag)$",
+        "Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag",
     )
 
     /**
@@ -76,7 +75,7 @@ object CakeTracker {
      */
     private val cakeBagPattern by patternGroup.pattern(
         "cake.bag",
-        "^New Year Cake Bag$",
+        "New Year Cake Bag",
     )
 
     /**
@@ -113,8 +112,8 @@ object CakeTracker {
     }
 
     private fun addCake(cakeYear: Int) {
-        val cakeTrackerData = getCakeTrackerData() ?: return
-        if (cakeYear !in cakeTrackerData.cakesOwned) {
+        val storage = storage ?: return
+        if (cakeYear !in storage.cakesOwned) {
             tracker.modify {
                 it.cakesOwned.add(cakeYear)
             }
@@ -123,8 +122,8 @@ object CakeTracker {
     }
 
     private fun removeCake(cakeYear: Int) {
-        val cakeTrackerData = getCakeTrackerData() ?: return
-        if (cakeYear in cakeTrackerData.cakesOwned) {
+        val storage = storage ?: return
+        if (cakeYear in storage.cakesOwned) {
             tracker.modify {
                 it.cakesOwned.remove(cakeYear)
             }
@@ -154,8 +153,9 @@ object CakeTracker {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
+        val storage = storage
         if (inAuctionHouse) {
-            unobtainedCakesDisplayed = getCakeTrackerData()?.let { data ->
+            unobtainedCakesDisplayed = storage?.let { data ->
                 InventoryUtils.getItemsInOpenChest().onEach { cakeItem ->
                     cakeNamePattern.matchMatcher(cakeItem.stack.displayName) {
                         group("year").toInt().takeIf {
@@ -179,10 +179,9 @@ object CakeTracker {
             if (cakeBagPattern.matches(inventoryName)) inCakeBag = true
             knownCakesInCurrentInventory = event.inventoryItems.values.mapNotNull { item ->
                 cakeNamePattern.matchMatcher(item.displayName) {
-                    groupOrNull("year")?.formatInt()?.let {
-                        addCake(it)
-                        it
-                    }
+                    val year = group("year").formatInt()
+                    addCake(year)
+                    year
                 }
             }.toMutableList()
             inCakeInventory = true
@@ -219,10 +218,7 @@ object CakeTracker {
     private fun checkInventoryCakes() {
         if (timeOpenedCakeInventory.passedSince() < 500.milliseconds) return
         val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
-            cakeNamePattern.matchMatcher(item.stack.displayName) {
-                group("year")?.toInt()
-                cakeNamePattern.matchGroup(item.stack.displayName, "year")?.toInt()
-            }
+            cakeNamePattern.matchGroup(item.stack.displayName, "year")?.toInt()
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
@@ -262,9 +258,9 @@ object CakeTracker {
     }
 
     private fun setDisplayType(type: CakeTrackerDisplayType) {
-        val cakeTrackerData = getCakeTrackerData() ?: return
+        val storage = storage ?: return
         config.displayType = type
-        drawDisplay(cakeTrackerData)
+        drawDisplay(storage)
         tracker.update()
     }
 
@@ -296,9 +292,9 @@ object CakeTracker {
     )
 
     private fun setDisplayOrderType(type: CakeTrackerDisplayOrderType) {
-        val cakeTrackerData = getCakeTrackerData() ?: return
+        val storage = storage ?: return
         config.displayOrderType = type
-        drawDisplay(cakeTrackerData)
+        drawDisplay(storage)
         tracker.update()
     }
 
