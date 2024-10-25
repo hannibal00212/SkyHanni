@@ -37,11 +37,22 @@ object CrystalNucleusProfitPer {
         for ((internalName, amount) in loot) {
             internalName.getPrice().takeIf { price -> price != -1.0 }?.let { pricePer ->
                 val profit = amount * pricePer
-                val text = "§eFound ${internalName.itemName} §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
+                val nameFormat = internalName.itemName
+                val text = "§eFound $nameFormat §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
                 map.addOrPut(text, profit)
                 totalProfit += profit
             }
         }
+
+        val hover = map.sortedDesc().filter {
+            (it.value >= config.profitPerMinimum) || it.value < 0
+        }.keys.toMutableList()
+
+        // Account for excluded items
+        val excludedEntries = map.filter { it.key !in hover }
+        val excludedProfitSumFormat = excludedEntries.values.filter { it > 0 }.sum().shortFormat()
+        val excludedCount = excludedEntries.size
+        if (excludedCount > 0)  hover.add("§7$excludedCount cheap items are hidden §7(§6$excludedProfitSumFormat§7.")
 
         val jungleKeyPrice = jungleKeyItem.getPrice()
         map["§cUsed §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}"] = -jungleKeyPrice
@@ -52,11 +63,6 @@ object CrystalNucleusProfitPer {
         map["§cUsed §9Robot Parts§7: §c-${robotPartsPrice.shortFormat()}"] = -robotPartsPrice
         totalProfit -= robotPartsPrice
 
-        val hover = map.sortedDesc().filter {
-            (it.value >= config.profitPerMinimum) || it.value < 0
-        }.keys.toMutableList()
-
-        if (hover.size != map.size) hover.add("§7${map.size - hover.size} cheap items are hidden.")
         val profitPrefix =
             if (totalProfit < 0) "§c"
             else "§6"
