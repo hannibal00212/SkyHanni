@@ -102,6 +102,9 @@ object CrystalNucleusAPI {
         // This also nerfs the "§r§a§lREWARDS" message.
         message.takeIf { it.startsWith("    ") }?.substring(4)?.let { lootMessage ->
             ItemUtils.readItemAmount(lootMessage)?.let { pair ->
+                // Ignore Mithril and Gemstone Powder
+                if (pair.first.contains( " Powder")) return
+                // Books are not directly added to the loot map, but are checked for later.
                 if (pair.first.startsWith("§fEnchanted")) {
                     unCheckedBooks += pair.second
                     return

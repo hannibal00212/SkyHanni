@@ -109,8 +109,6 @@ object CrystalNucleusTracker {
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
         addCompletedRun()
         for ((internalName, amount) in event.loot) {
-            // Gemstone and Mithril Powder
-            if (internalName.itemName.contains(" Powder")) continue
             tracker.addItem(internalName, amount, false)
         }
     }
