@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -35,6 +33,9 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
@@ -93,26 +94,38 @@ object HoppityEventSummary {
 
         val stats = getYearStats(statYear).first
         val cardRenderable = Renderable.verticalContainer(
-            if(stats == null) mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
+            if (stats == null) mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
             else getStatsStrings(stats, statYear).map {
                 Renderable.string(it.string)
             }.toMutableList()
         )
 
+        val liveDisplayRenderableList = mutableListOf(
+            Renderable.string(
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            ),
+        )
+        if (Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } == true) {
+            buildYearSwitcherRenderables(statYear)?.let {
+                liveDisplayRenderableList.add(
+                    Renderable.horizontalContainer(
+                        it,
+                        spacing = 5,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    ),
+                )
+            }
+        }
+        liveDisplayRenderableList.add(cardRenderable)
+
         config.eventSummary.liveDisplayPosition.renderRenderables(
-            mutableListOf(
-                Renderable.string(
-                    "§d§lHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                ),
-                buildYearSwitcherContainer(statYear),
-                cardRenderable
-            ).filterNotNull(),
+            liveDisplayRenderableList,
             posLabel = "Hoppity's Hunt Stats",
         )
     }
 
-    private fun buildYearSwitcherContainer(currentStatYear: Int): Renderable? {
+    private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
         val profileStorage = ProfileStorageData.profileSpecific ?: return null
         val statsStorage = profileStorage.hoppityEventStats
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
@@ -121,30 +134,19 @@ object HoppityEventSummary {
         val successorYear = statsYearList.filter { it > currentStatYear }.takeIf { it.any() }?.min()
         if (predecessorYear == null && successorYear == null) return null
 
-        val predecessorRenderable = predecessorYear?.let {
-            Renderable.clickable(
-                Renderable.string("§d§l← §r§dHunt #${getHoppityEventNumber(it)}"),
-                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
-            )
-        }
-        val successorRenderable = successorYear?.let {
-            Renderable.clickable(
-                Renderable.string("§dHunt #${getHoppityEventNumber(it)} §r§d§l→"),
-                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
-            )
-        }
-
-        return Renderable.verticalContainer(
-            listOf(
-                Renderable.horizontalContainer(
-                    mutableListOf(
-                        predecessorRenderable,
-                        successorRenderable
-                    ).filterNotNull(),
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                ),
-                Renderable.string("")
-            )
+        return listOfNotNull(
+            predecessorYear?.let {
+                Renderable.optionalLink(
+                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
+                    onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+                )
+            },
+            successorYear?.let {
+                Renderable.optionalLink(
+                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
+                    onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+                )
+            }
         )
     }
 
@@ -173,15 +175,6 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         checkEnded()
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shhoppitystats") {
-            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
-            category = CommandCategory.USERS_ACTIVE
-            callback { sendStatsMessage(it) }
-        }
     }
 
     private fun checkInit() {
@@ -285,8 +278,8 @@ object HoppityEventSummary {
                 stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
                     sl.add(
                         StatString(
-                            "§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 " +
-                                "§7in the §6Chocolate Factory§7.",
+                            "§7You found §b$it §6§lSide Dish ${StringUtils.pluralize(it, "Egg")} " +
+                                "§r§7in the §6Chocolate Factory§7.",
                         ),
                     )
                 }
@@ -375,39 +368,6 @@ object HoppityEventSummary {
         }
     }
 
-    private fun sendStatsMessage(it: Array<String>) {
-        val statsStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
-        val currentYear = SkyBlockTime.now().year
-        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
-        val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            val additionalText =
-                if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r"
-                else ""
-
-            "§b${getHoppityEventNumber(it)}$additionalText"
-        }?.toMutableList() ?: mutableListOf()
-
-        val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
-
-        val availableYearsFormat =
-            "§eHoppity Event Stats are available for the following events:§r\n" +
-                statsYearFormatList.joinToString("§e, ") { it } +
-                "\n§7Use §b/shhoppitystats <year>§7 to view stats for a specific event."
-
-        if (parsedInt == null) {
-            if (HoppityAPI.isHoppityEvent()) {
-                val stats = getYearStats(currentYear).first ?: return
-                sendStatsMessage(stats, currentYear)
-            } else ChatUtils.chat(availableYearsFormat)
-        } else if (!statsYearList.contains(parsedInt)) {
-            ChatUtils.chat("Could not find data for year §b$parsedInt§e.\n$availableYearsFormat")
-        } else {
-            val stats = getYearStats(parsedInt).first ?: return
-            sendStatsMessage(stats, parsedInt)
-        }
-    }
-
-    // Return the StatString list for the stats to be displayed
     private fun getStatsStrings(stats: HoppityEventStats, eventYear: Int?): MutableList<StatString> {
         if (eventYear == null) return mutableListOf()
         val statList = mutableListOf<StatString>()

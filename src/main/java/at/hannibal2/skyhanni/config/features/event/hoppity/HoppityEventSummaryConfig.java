@@ -33,14 +33,6 @@ public class HoppityEventSummaryConfig {
 
     @Expose
     @ConfigOption(
-        name = "Viewing Stats",
-        desc = "View current and past event stats at any time using §b/shhoppitystats§7."
-    )
-    @ConfigEditorInfoText
-    public String commandInfo;
-
-    @Expose
-    @ConfigOption(
         name = "Stats List",
         desc = "Drag text to change what displays in the summary card."
     )
@@ -63,7 +55,7 @@ public class HoppityEventSummaryConfig {
     public enum HoppityStat {
         MEAL_EGGS_FOUND("§7You found §b45§7/§a47 §6Chocolate Meal Eggs§7."),
         HOPPITY_RABBITS_BOUGHT("§7You bought §b7 §fRabbits §7from §aHoppity§7."),
-        SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish §r§6Eggs §7in the §6Chocolate Factory§7."),
+        SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish Eggs §r§7in the §6Chocolate Factory§7."),
         MILESTONE_RABBITS("§7You claimed §b2 §6§lMilestone Rabbits§7."),
         EMPTY_1(""),
         NEW_RABBITS("§7Unique Rabbits: §b7\n §f1 §7- §a1 §7- §91 §7- §51 §7- §61 §7- §d1 §7- §b1"),
