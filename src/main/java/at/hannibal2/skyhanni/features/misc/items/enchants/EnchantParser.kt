@@ -130,7 +130,7 @@ object EnchantParser {
         // This does irreparable damage to the lore list of "Profit Per" chats.
         // See: https://discord.com/channels/997079228510117908/1094190239532208228/1299194328324902974
         // TODO: Find a way to not do said damage, without this early return
-        /*val containsProfitFor = lore.any { it.lowercase().contains("profit for") }
+        /* val containsProfitFor = lore.any { it.lowercase().contains("profit for") }
         val containsFoundText = lore.any { it.lowercase().contains("§efound") }
         if (containsFoundText || containsProfitFor) return*/
 
