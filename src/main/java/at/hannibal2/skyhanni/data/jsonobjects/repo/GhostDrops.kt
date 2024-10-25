@@ -5,5 +5,5 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class GhostDrops(
-    @Expose @SerializedName("ghost_drops") val ghostDrops: List<NEUInternalName>,
+    @Expose @SerializedName("ghost_drops") val ghostDrops: Set<NEUInternalName>,
 )

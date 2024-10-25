@@ -113,10 +113,17 @@ object GhostTracker {
 
     private val patternGroup = RepoPattern.group("combat.ghosttracker")
 
+    /**
+     * REGEX-TEST: §5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom
+     */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
         "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)",
     )
+
+    /**
+     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
+     */
     private val killComboEndPattern by patternGroup.pattern(
         "killcombo.end",
         "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!",
@@ -133,6 +140,10 @@ object GhostTracker {
         "tablist.bestiary",
         "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)/(?<killsToNext>[\\d,.]+)",
     )
+
+    /**
+     * REGEX-TEST:  Ghost 25§r§f: §r§b§lMAX
+     */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax",
         "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
@@ -256,7 +267,7 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghostDrops.toSet()
+        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghostDrops
     }
 
     @HandleEvent
