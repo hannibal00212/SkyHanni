@@ -499,6 +499,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Long bestiaryKills = 0L;
+
+        @Expose
+        public boolean migratedTotalKills = false;
     }
 
     @Expose

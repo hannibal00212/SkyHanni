@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDrops
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -304,6 +305,20 @@ object GhostTracker {
         }
     }
 
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        val storage = storage ?: return
+        if (storage.migratedTotalKills) return
+        tracker.modify {
+            var count = 0L
+            it.items.forEach { (_, item) ->
+                count += item.timesGained.toInt()
+            }
+            it.totalMagicFindKills = count
+        }
+        storage.migratedTotalKills = true
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetghosttracker") {
@@ -342,7 +357,7 @@ object GhostTracker {
     }
 
     @SubscribeEvent
-    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         fun migrateItem(oldData: JsonElement): JsonElement {
             val oldAmount = oldData.asInt

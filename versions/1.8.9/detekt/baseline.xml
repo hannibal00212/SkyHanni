@@ -150,7 +150,6 @@
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Int::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Long::plus)!!</ID>
-    <ID>UnsafeCallOnNullableType:CombatUtils.kt$CombatUtils$a!!</ID>
     <ID>UnsafeCallOnNullableType:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$it.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:ConfigManager.kt$ConfigManager$file!!</ID>
     <ID>UnsafeCallOnNullableType:CorpseTracker.kt$CorpseTracker$applicableKeys.first().key!!</ID>
