@@ -58,7 +58,7 @@ object CakeTracker {
      */
     private val cakeNamePattern by patternGroup.pattern(
         "cake.name",
-        "(?:§f§f)?§cNew Year Cake \\(Year (?<year>[\\d,]*)\\)",
+        "(?:§f§f)?§cNew Year Cake \\(Year (?<year>[\\d,]+)\\)",
     )
 
     /**
