@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
+import  at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -13,7 +12,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -27,18 +26,18 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object BitsAPI {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
-    private val playerStorage get() = SkyHanniMod.feature.storage
+    private val playerStorage get() = ProfileStorageData.playerSpecific
 
     var bits: Int
         get() = profileStorage?.bits ?: 0
         private set(value) {
             profileStorage?.bits = value
         }
-    var currentFameRank: FameRank?
-        get() = playerStorage?.currentFameRank?.let { getFameRankByNameOrNull(it) }
+    var fameRank: FameRank?
+        get() = playerStorage?.fameRank?.let(FameRanks::getByInternalName)
         private set(value) {
             if (value != null) {
-                playerStorage?.currentFameRank = value.name
+                playerStorage?.fameRank = value.internalName
             }
         }
     var bitsAvailable: Int
@@ -53,7 +52,7 @@ object BitsAPI {
             profileStorage?.boosterCookieExpiryTime = value
         }
 
-    private const val defaultCookieBits = 4800
+    private const val DEFAULT_COOKIE_BITS = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
 
@@ -151,16 +150,16 @@ object BitsAPI {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatInt()
-                if (amount == bits) return
+                val diff = amount - bits
+                if (diff == 0) return
 
-                if (amount > bits) {
-                    val difference = amount - bits
-                    bitsAvailable -= difference
+                if (diff > 0) {
+                    bitsAvailable -= diff
                     bits = amount
-                    sendBitsGainEvent(difference)
+                    sendBitsGainEvent(diff)
                 } else {
                     bits = amount
-                    sendBitsSpentEvent()
+                    sendBitsSpentEvent(diff)
                 }
             }
         }
@@ -182,7 +181,7 @@ object BitsAPI {
         fameRankUpPattern.matchMatcher(message) {
             val rank = group("rank")
 
-            currentFameRank = getFameRankByNameOrNull(rank)
+            fameRank = FameRanks.getByName(rank)
                 ?: return ErrorManager.logErrorWithData(
                     FameRankNotFoundException(rank),
                     "FameRank $rank not found",
@@ -204,7 +203,7 @@ object BitsAPI {
         }
     }
 
-    fun bitsPerCookie(): Int = (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
+    fun bitsPerCookie(): Int = (DEFAULT_COOKIE_BITS * (fameRank?.bitsMultiplier ?: 1.0)).toInt()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -223,7 +222,7 @@ object BitsAPI {
             }
 
             val lore = cookieStack.getLore()
-            lore.matchFirst(bitsAvailableMenuPattern) {
+            bitsAvailableMenuPattern.firstMatcher(lore) {
                 val amount = group("toClaim").formatInt()
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
@@ -235,11 +234,11 @@ object BitsAPI {
                     }
                 }
             }
-            lore.matchFirst(cookieDurationPattern) {
+            cookieDurationPattern.firstMatcher(lore) {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            lore.matchFirst(noCookieActiveSBMenuPattern) {
+            noCookieActiveSBMenuPattern.firstMatcher(lore) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }
@@ -252,34 +251,20 @@ object BitsAPI {
             val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName) } ?: return
 
             line@ for (line in fameRankStack.getLore()) {
-                fameRankCommunityShopPattern.matchMatcher(line) {
-                    val rank = group("rank")
+                for (pattern in listOf(fameRankCommunityShopPattern, fameRankSbMenuPattern)) {
+                    pattern.matchMatcher(line) {
+                        val rank = group("rank")
 
-                    currentFameRank = getFameRankByNameOrNull(rank)
-                        ?: return ErrorManager.logErrorWithData(
-                            FameRankNotFoundException(rank),
-                            "FameRank $rank not found",
-                            "Rank" to rank,
-                            "Lore" to fameRankStack.getLore(),
-                            "FameRanks" to FameRanks.fameRanks,
-                        )
-
-                    continue@line
-                }
-
-                fameRankSbMenuPattern.matchMatcher(line) {
-                    val rank = group("rank")
-
-                    currentFameRank = getFameRankByNameOrNull(rank)
-                        ?: return ErrorManager.logErrorWithData(
-                            FameRankNotFoundException(rank),
-                            "FameRank $rank not found",
-                            "Rank" to rank,
-                            "Lore" to fameRankStack.getLore(),
-                            "FameRanks" to FameRanks.fameRanks,
-                        )
-
-                    continue@line
+                        fameRank = FameRanks.getByName(rank)
+                            ?: return ErrorManager.logErrorWithData(
+                                FameRankNotFoundException(rank),
+                                "FameRank $rank not found",
+                                "Rank" to rank,
+                                "Lore" to fameRankStack.getLore(),
+                                "FameRanks" to FameRanks.fameRanks,
+                            )
+                        continue@line
+                    }
                 }
             }
 
@@ -311,10 +296,12 @@ object BitsAPI {
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
     private fun sendBitsGainEvent(difference: Int) =
-        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
 
-    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
-    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsSpentEvent(difference: Int) =
+        BitsUpdateEvent.BitsSpent(bits, bitsAvailable, difference).post()
+
+    private fun sendBitsAvailableGainedEvent() = BitsAvailableUpdateEvent(bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 
