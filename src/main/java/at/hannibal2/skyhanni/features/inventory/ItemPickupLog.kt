@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -79,6 +80,7 @@ object ItemPickupLog {
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
 
     private val coinIcon = "COIN_TALISMAN".asInternalName()
+    private val bitsIcon = "BITS_TALISMAN".asInternalName()
 
     private const val COIN_HASH = 0
     private const val BITS_HASH = 1
@@ -139,16 +141,18 @@ object ItemPickupLog {
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
     }
 
-    //TODO commented out for now as this event doesn't work in testing
-//     @SubscribeEvent
-//     fun onBitsChange(event: BitsUpdateEvent) {
-//         //TODO not sure if this event returns negative bits when spent
-//         //TODO update this event doesn't fire at all
-//         if (!isEnabled() || !config.bits || !worldChangeCooldown()) return
-//         updateItem(1, PickupEntry("§9Bits", event.difference.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.difference < 0)
-//
-//         println(event)
-//     }
+    //TODO this event doesn't work in testing - bits event needs to be updated to return negitive values when bits are spent
+    //TODO this event also doesn't seem to fire, not sure if it's an alpha specific thing
+    @SubscribeEvent
+    fun onBitsChange(event: BitsUpdateEvent) {
+        if (!isEnabled() || !config.bits || !worldChangeCooldown()) return
+        updateItem(
+            1,
+            PickupEntry("§9Bits", event.difference.absoluteValue.toLong(), bitsIcon),
+            bitsIcon.getItemStack(),
+            event.difference < 0,
+        )
+    }
 
 
     @SubscribeEvent
