@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -78,7 +77,11 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
+
     private val coinIcon = "COIN_TALISMAN".asInternalName()
+
+    private const val COIN_HASH = 0
+    private const val BITS_HASH = 1
 
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
@@ -136,6 +139,18 @@ object ItemPickupLog {
         updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
     }
 
+    //TODO commented out for now as this event doesn't work in testing
+//     @SubscribeEvent
+//     fun onBitsChange(event: BitsUpdateEvent) {
+//         //TODO not sure if this event returns negative bits when spent
+//         //TODO update this event doesn't fire at all
+//         if (!isEnabled() || !config.bits || !worldChangeCooldown()) return
+//         updateItem(1, PickupEntry("§9Bits", event.difference.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.difference < 0)
+//
+//         println(event)
+//     }
+
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
@@ -146,7 +161,7 @@ object ItemPickupLog {
         if (!InventoryUtils.inInventory()) {
             itemList.clear()
 
-            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val inventoryItems = getInventoryItems()
             val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
 
             if (cursorItem != null) {
@@ -184,7 +199,7 @@ object ItemPickupLog {
 
     // TODO merge with ItemAddInInventoryEvent
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
-        if (isBannedItem(item)) return
+//         if (isBannedItem(item)) return
 
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
         val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
@@ -229,17 +244,6 @@ object ItemPickupLog {
                 updateItem(key, item, stack, add)
             }
         }
-    }
-
-    private fun isBannedItem(item: ItemStack): Boolean {
-        val internalName = item.getInternalNameOrNull() ?: return true
-        if (internalName.startsWith("MAP") == true) return true
-        if (internalName in bannedItemsConverted) return true
-
-        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
-            return true
-        }
-        return false
     }
 
     private fun ItemStack.dynamicName(): String {
@@ -329,6 +333,36 @@ object ItemPickupLog {
                 removedItems.remove(item.key)
             }
         }
+    }
+
+//     private fun getInventoryItems(): MutableList<ItemStack> {
+//         val inventoryItems = mutableListOf<ItemStack>()
+//
+//         for (i in 0..39) {
+//             if (i == 8) continue
+//             Minecraft.getMinecraft().thePlayer?.inventory?.getStackInSlot(i)?.let { inventoryItems.add(it) }
+//         }
+//
+//         return inventoryItems
+//     }
+
+    private fun getInventoryItems(): MutableList<ItemStack> {
+        val inventoryItems = mutableListOf<ItemStack>()
+        val player = Minecraft.getMinecraft().thePlayer
+
+        player?.inventory?.mainInventory?.forEachIndexed { index, itemStack ->
+            if (index != 8 && itemStack != null) {
+                inventoryItems.add(itemStack)
+            }
+        }
+
+        if (config.armour) {
+            player?.inventory?.armorInventory?.forEach { itemStack ->
+                inventoryItems.add(itemStack)
+            }
+        }
+
+        return inventoryItems
     }
 
     private fun addRemainingRemovedItems(
