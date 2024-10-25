@@ -48,6 +48,7 @@
       <w>cinderbat</w>
       <w>citrine</w>
       <w>clickables</w>
+      <w>clientbound</w>
       <w>coflnet</w>
       <w>coords</w>
       <w>craftable</w>
@@ -224,6 +225,7 @@
       <w>scatha</w>
       <w>sepulture</w>
       <w>seraphine</w>
+      <w>serverbound</w>
       <w>sethome</w>
       <w>shcopytranslation</w>
       <w>shcropstartlocation</w>

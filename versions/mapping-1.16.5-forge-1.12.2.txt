@@ -1,75 +1,276 @@
-net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
-net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
-net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
-net.minecraft.world.entity.decoration.ArmorStand getArmorSlots() getArmorInventoryList()
-net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
-net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiContainer
 
-net.minecraft.world.entity.player.Inventory armor armorInventory
+com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
+com.mojang.blaze3d.systems.RenderSystem color4f() color()
+com.mojang.blaze3d.systems.RenderSystem translatef() translate()
 
-net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
-net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
-net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
-net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
-net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
-net.minecraft.world.entity.Entity net.minecraft.entity.Entity
-net.minecraft.world.entity.Entity xo posX
-net.minecraft.world.entity.Entity yo posY
-net.minecraft.world.entity.Entity zo posZ
-net.minecraft.world.entity.Entity xOld prevPosX
-net.minecraft.world.entity.Entity yOld prevPosY
-net.minecraft.world.entity.Entity zOld prevPosZ
-net.minecraft.world.entity.Entity level getEntityWorld()
-net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
-net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-com.mojang.blaze3d.platform.GlStateManager net.minecraft.client.renderer.GlStateManager
-com.mojang.blaze3d.platform.GlStateManager _disableRescaleNormal() disableRescaleNormal()
-com.mojang.blaze3d.platform.GlStateManager _viewport() viewport()
-com.mojang.blaze3d.platform.GlStateManager _enableCull() enableCull()
-com.mojang.blaze3d.platform.GlStateManager _disableCull() disableCull()
-com.mojang.blaze3d.platform.GlStateManager _enableBlend() enableBlend()
-com.mojang.blaze3d.platform.GlStateManager _disableBlend() disableBlend()
-com.mojang.blaze3d.platform.GlStateManager _blendFunc() blendFunc()
-com.mojang.blaze3d.platform.GlStateManager _depthFunc() depthFunc()
-com.mojang.blaze3d.platform.GlStateManager _depthMask() depthMask()
-com.mojang.blaze3d.platform.GlStateManager _enableLighting() enableLighting()
-com.mojang.blaze3d.platform.GlStateManager _enableDepthTest() enableDepth()
-com.mojang.blaze3d.platform.GlStateManager _disableDepthTest() disableDepth()
-com.mojang.blaze3d.platform.GlStateManager _disableLighting() disableLighting()
-com.mojang.blaze3d.platform.GlStateManager _pushMatrix() pushMatrix()
-com.mojang.blaze3d.platform.GlStateManager _popMatrix() popMatrix()
-com.mojang.blaze3d.platform.GlStateManager _bindTexture() bindTexture()
-com.mojang.blaze3d.platform.GlStateManager _deleteTexture() deleteTexture()
-com.mojang.blaze3d.platform.GlStateManager _clearColor() clearColor()
-com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
 com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
-net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
+com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
 
-net.minecraft.world.level.Level getEntity() getEntityByID()
-net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
-net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
+net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
+
+net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+
+net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
+
+net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
+net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
+
+net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
 net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
-net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
-net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
-net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+
+net.minecraft.client.multiplayer.PlayerInfo net.minecraft.client.network.NetworkPlayerInfo
+net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
+net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
+net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
+
 net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
-net.minecraft.client.Options net.minecraft.client.settings.GameSettings
-net.minecraft.client.renderer.texture.TextureManager register() loadTexture()
-net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
+
+net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
+net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
+net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
+
 net.minecraft.client.renderer.texture.AbstractTexture getId() getGlTextureId()
+net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
 net.minecraft.client.renderer.texture.AbstractTexture releaseId() deleteGlTexture()
+net.minecraft.client.renderer.texture.TextureManager register() loadTexture()
+
+net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
+
+net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
+
+net.minecraft.core.particles.ParticleTypes ANGRY_VILLAGER VILLAGER_ANGRY
+net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
+net.minecraft.core.particles.ParticleTypes DRIPPING_LAVA DRIP_LAVA
+net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
+net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+
+net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
+net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
+
+net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
+net.minecraft.nbt.CompoundTag getList() getTagList()
+net.minecraft.nbt.CompoundTag put() setTag()
+net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
+net.minecraft.nbt.CompoundTag putInt() setInteger()
+net.minecraft.nbt.CompoundTag putString() setString()
+net.minecraft.nbt.CompoundTag remove() removeTag()
+
+net.minecraft.nbt.ListTag getString() getStringTagAt()
+
+net.minecraft.nbt.ListTag getSize() tagCount()
+
+net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
+
+net.minecraft.network.protocol.Packet net.minecraft.network.Packet
+
+net.minecraft.network.protocol.game.ClientboundAddEntityPacket net.minecraft.network.play.server.SPacketSpawnObject
+net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.network.play.server.SPacketSpawnMob
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
+net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.SPacketBlockChange
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.SPacketSetSlot
+net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
+net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.SPacketPlayerListItem
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.SPacketDestroyEntities
+net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.SPacketEntityHeadLook
+net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket net.minecraft.network.play.server.SPacketMultiBlockChange
+net.minecraft.network.protocol.game.ClientboundSetBorderPacket net.minecraft.network.play.server.SPacketWorldBorder
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.SPacketEntityMetadata
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.SPacketEntityAttach
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.SPacketEntityVelocity
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
+net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.SPacketTeams
+net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.SPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
+net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.SPacketSoundEffect
+net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
+net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket net.minecraft.network.play.server.SPacketCollectItem
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
+net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
+net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
+
+net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAddMobPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket getEntityId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundAnimatePacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
+
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() getWindowId()
+
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket getPos() getSoundPos()
+
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getX() getXCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getY() getYCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZ() getZCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getCount() getParticleCount()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getMaxSpeed() getParticleSpeed()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getXDist() getXOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getYDist() getYOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZDist() getZOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket isOverrideLimiter() isLongDistance()
+
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket getSourceId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket getId() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket getEntity() getEntityID()
+
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
+
+net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.CPacketClickWindow
+net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
+net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
+net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
+
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
-net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
-net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
-net.minecraft.client.Minecraft setScreen() displayGuiScreen()
-net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
-net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
-net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
-net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
-net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
-net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
+
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
 
+net.minecraft.world.entity.Entity level getEntityWorld()
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity
+net.minecraft.world.entity.Entity xOld prevPosX
+net.minecraft.world.entity.Entity xo posX
+net.minecraft.world.entity.Entity yOld prevPosY
+net.minecraft.world.entity.Entity yo posY
+net.minecraft.world.entity.Entity zOld prevPosZ
+net.minecraft.world.entity.Entity zo posZ
+
+net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
+
+net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
+net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
+net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
+net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
+net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+
+net.minecraft.world.entity.decoration.ArmorStand getArmorSlots() getArmorInventoryList()
+net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
+
+net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
+
+net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
+net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot index slotNumber
+net.minecraft.world.entity.Entity removed isDead
+net.minecraft.world.entity.Entity getId() getEntityId()
+
+net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+
+net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
+
+net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.InventoryPlayer
+
+net.minecraft.world.entity.player.Inventory armor armorInventory
+net.minecraft.world.entity.player.Inventory items mainInventory
+net.minecraft.world.entity.player.Inventory getCarried() getItemStack()
+
+net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
+
+net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
+
+net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
+
+net.minecraft.world.entity.projectile.FishingHook net.minecraft.entity.projectile.EntityFishHook
+
+net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
+
+net.minecraft.world.item.Item net.minecraft.item.Item
+net.minecraft.world.item.Items net.minecraft.init.Items
+
+net.minecraft.world.level.Level getEntity() getEntityByID()
+
+net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
+
+net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+
+net.minecraftforge.api.distmarker.Dist net.minecraftforge.fml.relauncher.Side
+net.minecraftforge.api.distmarker.OnlyIn net.minecraftforge.fml.relauncher.SideOnly
+
+net.minecraftforge.event.TickEvent net.minecraftforge.fml.common.gameevent.TickEvent
+
+net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
+net.minecraftforge.eventbus.api.Cancelable net.minecraftforge.fml.common.eventhandler.Cancelable
+net.minecraftforge.eventbus.api.EventPriority net.minecraftforge.fml.common.eventhandler.EventPriority
+net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+org.lwjgl.glfw.GLFW org.lwjgl.input.Keyboard
+
+org.lwjgl.glfw.GLFW GLFW_KEY_0 KEY_0
+org.lwjgl.glfw.GLFW GLFW_KEY_1 KEY_1
+org.lwjgl.glfw.GLFW GLFW_KEY_2 KEY_2
+org.lwjgl.glfw.GLFW GLFW_KEY_3 KEY_3
+org.lwjgl.glfw.GLFW GLFW_KEY_4 KEY_4
+org.lwjgl.glfw.GLFW GLFW_KEY_5 KEY_5
+org.lwjgl.glfw.GLFW GLFW_KEY_6 KEY_6
+org.lwjgl.glfw.GLFW GLFW_KEY_7 KEY_7
+org.lwjgl.glfw.GLFW GLFW_KEY_8 KEY_8
+org.lwjgl.glfw.GLFW GLFW_KEY_9 KEY_9
+org.lwjgl.glfw.GLFW GLFW_KEY_A KEY_A
+org.lwjgl.glfw.GLFW GLFW_KEY_B KEY_B
+org.lwjgl.glfw.GLFW GLFW_KEY_C KEY_C
+org.lwjgl.glfw.GLFW GLFW_KEY_D KEY_D
+org.lwjgl.glfw.GLFW GLFW_KEY_E KEY_E
+org.lwjgl.glfw.GLFW GLFW_KEY_F KEY_F
+org.lwjgl.glfw.GLFW GLFW_KEY_G KEY_G
+org.lwjgl.glfw.GLFW GLFW_KEY_H KEY_H
+org.lwjgl.glfw.GLFW GLFW_KEY_I KEY_I
+org.lwjgl.glfw.GLFW GLFW_KEY_J KEY_J
+org.lwjgl.glfw.GLFW GLFW_KEY_K KEY_K
+org.lwjgl.glfw.GLFW GLFW_KEY_L KEY_L
+org.lwjgl.glfw.GLFW GLFW_KEY_M KEY_M
+org.lwjgl.glfw.GLFW GLFW_KEY_N KEY_N
+org.lwjgl.glfw.GLFW GLFW_KEY_O KEY_O
+org.lwjgl.glfw.GLFW GLFW_KEY_P KEY_P
+org.lwjgl.glfw.GLFW GLFW_KEY_Q KEY_Q
+org.lwjgl.glfw.GLFW GLFW_KEY_R KEY_R
+org.lwjgl.glfw.GLFW GLFW_KEY_S KEY_S
+org.lwjgl.glfw.GLFW GLFW_KEY_T KEY_T
+org.lwjgl.glfw.GLFW GLFW_KEY_U KEY_U
+org.lwjgl.glfw.GLFW GLFW_KEY_V KEY_V
+org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
+org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
+org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
+org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_CONTROL KEY_LCONTROL
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_CONTROL KEY_RCONTROL
+org.lwjgl.glfw.GLFW GLFW_KEY_HOME KEY_HOME
+org.lwjgl.glfw.GLFW GLFW_KEY_END KEY_END
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_SHIFT KEY_LSHIFT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_SHIFT KEY_RSHIFT
+org.lwjgl.glfw.GLFW GLFW_KEY_SPACE KEY_SPACE
+org.lwjgl.glfw.GLFW GLFW_KEY_TAB KEY_TAB
+org.lwjgl.glfw.GLFW GLFW_KEY_UNKNOWN KEY_NONE
+org.lwjgl.glfw.GLFW GLFW_KEY_F3 KEY_F3
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT KEY_LEFT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT KEY_RIGHT
+org.lwjgl.glfw.GLFW GLFW_KEY_UP KEY_UP
+org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
+org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE

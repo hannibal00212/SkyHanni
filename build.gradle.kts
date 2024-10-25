@@ -5,11 +5,20 @@ import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import moe.nea.shot.ShotParser
+import moe.nea.shot.Shots
+import net.fabricmc.loom.api.processor.MinecraftJarProcessor
+import net.fabricmc.loom.api.processor.ProcessorContext
+import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+import kotlin.io.path.moveTo
+import kotlin.io.path.outputStream
 
 plugins {
     idea
@@ -117,7 +126,15 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
+file("shots.txt")
+    .takeIf(File::exists)
+    ?.readText()
+    ?.lines()
+    ?.let(ShotParser()::parse)
+    ?.let(::Shots)
+    ?.let {
+        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+    }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -152,7 +169,10 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
-    } else if (target == ProjectTarget.MODERN)  {
+    } else if (target == ProjectTarget.BRIDGE116FABRIC) {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+    } else if (target == ProjectTarget.MODERN) {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
         modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
@@ -384,7 +404,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN
+        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {
@@ -402,4 +422,29 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
+}
+
+abstract class ShotApplicationJarProcessor @Inject constructor(val shots: Shots) : MinecraftJarProcessor<MinecraftJarProcessor.Spec> {
+    private class EnsureCompile(shots: Shots) : ShotApplicationJarProcessor(shots)
+    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? {
+        return object : MinecraftJarProcessor.Spec {}
+    }
+
+    override fun processJar(
+        source: java.nio.file.Path,
+        spec: MinecraftJarProcessor.Spec,
+        context: ProcessorContext?
+    ) {
+        val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
+        ZipFile(source.toFile()).use { input ->
+            ZipOutputStream(dest.outputStream()).use { output ->
+                shots.processZipFile(input, output)
+            }
+        }
+        dest.moveTo(source, overwrite = true)
+    }
+
+    override fun getName(): String {
+        return "Shots"
+    }
 }

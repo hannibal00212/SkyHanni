@@ -61,6 +61,24 @@ object ItemUtils {
         return list
     }
 
+    fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
+        this ?: return emptyList()
+        val tagList = mutableListOf<String>()
+        for (s in this.keySet) {
+            if (s == "Lore" && !includeLore) continue
+            val tag = this.getTag(s)
+
+            if (tag !is NBTTagCompound) {
+                tagList.add("$initSeparator$s: $tag")
+            } else {
+                val element = this.getCompoundTag(s)
+                tagList.add("$initSeparator$s:")
+                tagList.addAll(element.getReadableNBTDump("$initSeparator  ", includeLore))
+            }
+        }
+        return tagList
+    }
+
     fun getDisplayName(compound: NBTTagCompound?): String? {
         compound ?: return null
         val name = compound.getCompoundTag("display").getString("Name")
@@ -153,16 +171,15 @@ object ItemUtils {
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
-        val tag = tagCompound ?: NBTTagCompound()
-        tag.removeTag("ench")
-        tag.removeTag("StoredEnchantments")
-        tagCompound = tag
+        val tempTag = tagCompound ?: NBTTagCompound()
+        tempTag.removeTag("ench")
+        tempTag.removeTag("StoredEnchantments")
+        tagCompound = tempTag
     }
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
             .getCompoundTagAt(0).getString("Value")
@@ -170,8 +187,7 @@ object ItemUtils {
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }

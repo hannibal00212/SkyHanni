@@ -243,13 +243,15 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
+        require(keyShape.matches(key)) {
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers and dots."
+        }
     }
 
     /**
