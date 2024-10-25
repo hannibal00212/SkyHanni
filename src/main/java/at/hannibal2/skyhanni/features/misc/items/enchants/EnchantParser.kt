@@ -39,6 +39,11 @@ object EnchantParser {
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
+    // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
+    val enchantmentExclusivePattern by patternGroup.pattern(
+        "exclusive",
+        "(?:(?:§7§l|§d§l|§9)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:,\\d{3})*))+\$",
+    )
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
@@ -193,20 +198,6 @@ object EnchantParser {
             return
         }
 
-        // Remove enchantment lines so we can insert ours
-        try {
-            loreList.subList(startEnchant, endEnchant + 1).clear()
-        } catch (e: IndexOutOfBoundsException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Error parsing enchantment info from item",
-                "loreList" to loreList,
-                "startEnchant" to startEnchant,
-                "endEnchant" to endEnchant,
-            )
-            return
-        }
-
         val insertEnchants: MutableList<String> = mutableListOf()
 
         // Format enchants based on format config option
@@ -227,8 +218,22 @@ object EnchantParser {
                 "ConcurrentModificationException whilst formatting enchants",
                 "loreList" to loreList,
                 "format" to config.format.get(),
-                "orderedEnchants" to orderedEnchants
+                "orderedEnchants" to orderedEnchants.toString()
             )
+        }
+
+        // Remove enchantment lines so we can insert ours
+        try {
+            loreList.subList(startEnchant, endEnchant + 1).clear()
+        } catch (e: IndexOutOfBoundsException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error parsing enchantment info from item",
+                "loreList" to loreList,
+                "startEnchant" to startEnchant,
+                "endEnchant" to endEnchant,
+            )
+            return
         }
 
         // Add our parsed enchants back into the lore
