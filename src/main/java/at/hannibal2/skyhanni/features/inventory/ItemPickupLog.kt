@@ -130,7 +130,7 @@ object ItemPickupLog {
             val itemStack = (it.internalName.getItemStack())
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
-            updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
+            updateItem(itemStack.hash(), item, it.delta < 0)
         }
     }
 
@@ -138,18 +138,19 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(COIN_HASH, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
     //TODO this event doesn't work in testing - bits event needs to be updated to return negitive values when bits are spent
+
     //TODO this event also doesn't seem to fire, not sure if it's an alpha specific thing
+
     @SubscribeEvent
     fun onBitsChange(event: BitsUpdateEvent) {
         if (!isEnabled() || !config.bits || !worldChangeCooldown()) return
         updateItem(
-            1,
+            BITS_HASH,
             PickupEntry("§9Bits", event.difference.absoluteValue.toLong(), bitsIcon),
-            bitsIcon.getItemStack(),
             event.difference < 0,
         )
     }
@@ -202,7 +203,7 @@ object ItemPickupLog {
     }
 
     // TODO merge with ItemAddInInventoryEvent
-    private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
+    private fun updateItem(hash: Int, itemInfo: PickupEntry, removed: Boolean) {
 //         if (isBannedItem(item)) return
 
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
@@ -241,11 +242,11 @@ object ItemPickupLog {
 
             if (!listToCheckAgainst.containsKey(key)) {
                 val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             } else if (oldAmount > listToCheckAgainst[key]!!.second) {
                 val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
                 val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             }
         }
     }
