@@ -7,16 +7,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FameRanks {
-    var fameRanks = emptyMap<String, FameRank>()
+    var fameRanks = listOf<FameRank>()
         private set
 
-    fun getFameRankByNameOrNull(name: String) = fameRanks[name]
+    fun getByName(name: String) = fameRanks.find { it.name.equals(name, true) }
+
+    fun getByInternalName(internalName: String) = fameRanks.find { it.internalName == internalName }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ranks = event.getConstant<FameRankJson>("FameRank")
-        fameRanks = ranks.fameRank.values.map { FameRank(it.name, it.fameRequired, it.bitsMultiplier, it.votes) }
-            .associateBy { it.name }
+        fameRanks = ranks.fameRank.map { (internalName, rank) ->
+            FameRank(rank.name, rank.fameRequired, rank.bitsMultiplier, rank.votes, internalName)
+        }
     }
 }
 
@@ -24,5 +27,6 @@ data class FameRank(
     val name: String,
     val fameRequired: Int,
     val bitsMultiplier: Double,
-    val electionVotes: Int
+    val electionVotes: Int,
+    val internalName: String,
 )

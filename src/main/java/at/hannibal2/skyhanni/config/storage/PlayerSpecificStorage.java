@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,10 @@ public class PlayerSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopAccountUpgrade = null;
+
+    @Nullable
+    @Expose
+    public String fameRank = null;
 
     @Expose
     public List<String> guildMembers = new ArrayList<>();
