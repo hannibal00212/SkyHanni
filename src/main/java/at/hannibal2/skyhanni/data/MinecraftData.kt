@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 @SkyHanniModule
 object MinecraftData {
 
-    @HandleEvent
+    @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
         val packet = event.packet
         when (packet) {
