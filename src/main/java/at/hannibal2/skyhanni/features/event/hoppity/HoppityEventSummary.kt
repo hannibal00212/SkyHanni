@@ -33,8 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
@@ -229,23 +227,23 @@ object HoppityEventSummary {
         // If we're only showing the live display during the last {X} hours of the hunt,
         // check if we're in that time frame
         if (updateCfConfig.showForLastXHours > 0) {
-            val eventEndTm = HoppityAPI.millisToEventEnd().asTimeMark()
-            if (eventEndTm.timeUntil() >= updateCfConfig.showForLastXHours.hours) return
+            val eventEnd = SimpleTimeMark.now() + HoppityAPI.millisToEventEnd().milliseconds
+            if (eventEnd.timeUntil() >= updateCfConfig.showForLastXHours.hours) return
         }
 
         // If it's been less than {config} minutes since the last message, don't send another
-        lastSentCfUpdateMessage.takeIfInitialized().let {
+        lastSentCfUpdateMessage.takeIfInitialized()?.let {
             val configFrequency = updateCfConfig.reminderInterval
-            if (it != null && it.passedSince() < configFrequency.minutes) return
+            if (it.passedSince() < configFrequency.minutes) return
         }
-        val stats = getYearStats().first ?: return
-        val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: farFuture()
 
         // If it's been more than {config} since the last update, send a message
+        val stats = getYearStats().first ?: return
+        val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: farPast()
         if (lastLbUpdate.passedSince() >= updateCfConfig.reminderInterval.minutes) {
             lastSentCfUpdateMessage = SimpleTimeMark.now()
             ChatUtils.chat(
-                "§6§lReminder! §r§eSwitch to a new server and run §6/cf §e to " +
+                "§6§lReminder! §r§eSwitch to a new server and run §6/cf §eto " +
                     "update your leaderboard position in Hoppity Event stats.",
             )
         }

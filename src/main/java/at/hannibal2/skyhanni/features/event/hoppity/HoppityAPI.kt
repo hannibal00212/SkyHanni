@@ -68,7 +68,7 @@ object HoppityAPI {
     fun millisToEventEnd(): Long =
         if (isHoppityEvent()) {
             val now = SkyBlockTime.now()
-            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, now.month + 1)
+            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 3)
             eventEnd.toMillis() - now.toMillis()
         } else 0
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
