@@ -332,7 +332,9 @@ object HoppityEventSummary {
                     initial.percentile == -1.0 || final.percentile == -1.0 ||
                     initial.position == final.position
                 ) return@put
-                sl.add(StatString(getFullLeaderboardMessage(initial, final)))
+                getFullLeaderboardMessage(initial, final).forEach {
+                    sl.add(StatString(it))
+                }
             }
 
             val emptyStatString = StatString("", false)
@@ -343,8 +345,10 @@ object HoppityEventSummary {
         }
     }
 
-    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition): String =
-        "§6Leaderboard Change§7: ${getPrimaryLbString(initial, final)}\n ${getSecondaryLbLine(initial, final)}"
+    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition) = buildList<String> {
+        "§7Leaderboard: ${getPrimaryLbString(initial, final)}"
+        getSecondaryLbLine(initial, final)
+    }
 
     private fun getPrimaryLbString(initial: LeaderboardPosition, final: LeaderboardPosition): String {
         val iPo = initial.position
@@ -362,7 +366,7 @@ object HoppityEventSummary {
         val color = if (iPo > fPo) "§a+" else "§c"
 
         return buildString {
-            "§7(§b#$color${dPo.addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)"
+            append("§7(§b#$color${dPo.addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)")
             if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
             else append(" §7Top §a$iPe%")
         }
