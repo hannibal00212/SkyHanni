@@ -339,9 +339,9 @@ object HoppityEventSummary {
         }
     }
 
-    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition) = buildList<String> {
-        "§7Leaderboard: ${getPrimaryLbString(initial, final)}"
-        getSecondaryLbLine(initial, final)
+    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition) = buildList {
+        add("§7Leaderboard: ${getPrimaryLbString(initial, final)}")
+        add(getSecondaryLbLine(initial, final))
     }
 
     private fun getPrimaryLbString(initial: LeaderboardPosition, final: LeaderboardPosition): String {
@@ -360,7 +360,7 @@ object HoppityEventSummary {
         val color = if (iPo > fPo) "§a+" else "§c"
 
         return buildString {
-            append("§7(§b#$color${dPo.addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)")
+            append("§7(§b#$color${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)")
             if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
             else append(" §7Top §a$iPe%")
         }
