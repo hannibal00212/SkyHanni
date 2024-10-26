@@ -11,26 +11,25 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ### Download IntelliJ
 
-- Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
-    - Use the Community Edition. (Scroll down a bit.)
-- When you encounter any bug with IntelliJ, please make sure to use the version `2024.1.6`, not `2024.2.x` or above.
+-   Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
+    -   Use the Community Edition. (Scroll down a bit.)
+-   When you encounter any bug with IntelliJ, please make sure to use the version `2024.1.6`, not `2024.2.x` or above.
 
 ### Cloning the project
 
-- Create an account on GitHub
-    - Go to https://github.com/hannibal002/SkyHanni
-    - Click on the fork button to create a fork.
-        - Leave the settings unchanged
-        - Click on `create fork`
-    - Open IntelliJ
-        - Link the GitHub account with IntelliJ.
-        - Install Git in IntelliJ.
-        - In IntelliJ, go to `new` → `project from version control`.
-        - Select `SkyHanni` from the list.
-        - Open the project.
+-   Create an account on GitHub
+    -   Go to https://github.com/hannibal002/SkyHanni
+    -   Click on the fork button to create a fork.
+        -   Leave the settings unchanged
+        -   Click on `create fork`
+    -   Open IntelliJ
+        -   Link the GitHub account with IntelliJ.
+        -   Install Git in IntelliJ.
+        -   In IntelliJ, go to `new` → `project from version control`.
+        -   Select `SkyHanni` from the list.
+        -   Open the project.
 
 ### Setting up IntelliJ
-
 
 Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
 downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
@@ -85,10 +84,11 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-Proposed changes are better off being in their own branch, you can do this by doing the following from within IntelliJ with the SkyHanni project already open.
-- Click the beta dropdown at the top of IntelliJ
-- Click new branch
-- Give the branch a name relating to the changes you plan to make
+Proposed changes are better off being in their own branch as this makes development easier for both you and the maintainers of this repository, you can do this by following the instructions from within the IntelliJ window with the SkyHanni project already open.
+
+-   Click the beta dropdown at the top of the IntelliJ window
+-   Click new branch
+-   Give the branch a name relating to the changes you plan to make
 
 _A more in depth explanation how to use intellij and branches will follow here soon._
 
@@ -101,57 +101,55 @@ format like "- #821" to illustrate the dependency.
 
 ## Coding Styles and Conventions
 
-- Follow the [Hypixel Rules](https://hypixel.net/rules).
-- Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
-  and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
--  **My build is failing due to `detekt`, what do I do?**
-    - `detekt` is our code quality tool. It checks for code smells and style issues.
-    - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
-    - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
-      After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
-     `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
-- Do not copy features from other mods. Exceptions:
-    - Mods that are paid to use.
-  - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
-    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
-    - If you can improve the existing feature in a meaningful way.
-- All new classes should be written in Kotlin, with a few exceptions:
-    - Config files in `at.hannibal2.skyhanni.config.features`
-    - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-- New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register it to the forge event bus and load the repo patterns
-- Avoid using deprecated functions.
-    - These functions are marked for removal in future versions.
-    - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
-    - Config files should still be made in Java.
-- Please use the existing event system, or expand on it. Do not use Forge events.
-    - (We inject the calls with Mixin)
-- Please use existing utils methods.
-- We try to avoid calling the NEU code too often.
-    - (We plan to remove NEU as a dependency in the future.)
-- We try not to use Forge-specific methods if possible.
-    - (We plan to switch to Fabric and Minecraft 1.20 in the future.)
-- Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
-    - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
-      as an example.
-- Try to avoid using Kotlin's `!!` (catch if not null) feature.
-    - Replace it with `?:` (if null return this).
-    - This will most likely not be possible to avoid when working with objects from java.
-- Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
-- Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
-- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
-- Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
-    - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-for more information and usages.
-    - The pattern variables are named in the scheme `variableNamePattern`
-- Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
-- Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
-  the main thread.
-- When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
-- Use American English spelling conventions (e.g., "color" not "colour").
+-   Follow the [Hypixel Rules](https://hypixel.net/rules).
+-   Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
+    and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+-   **My build is failing due to `detekt`, what do I do?**
+    -   `detekt` is our code quality tool. It checks for code smells and style issues.
+    -   If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
+    -   **There are valid reasons to deviate from the norm**
+        -   If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
+            After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
+            `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
+-   Do not copy features from other mods. Exceptions:
+    -   Mods that are paid to use.
+    -   Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
+        -   The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
+        -   If you can improve the existing feature in a meaningful way.
+-   All new classes should be written in Kotlin, with a few exceptions:
+    -   Config files in `at.hannibal2.skyhanni.config.features`
+    -   Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+-   New features should be made in Kotlin objects unless there is a specific reason for it not to.
+    -   If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
+    -   This will automatically register it to the forge event bus and load the repo patterns
+-   Avoid using deprecated functions.
+    -   These functions are marked for removal in future versions.
+    -   If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+-   Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+    -   Config files should still be made in Java.
+-   Please use the existing event system, or expand on it. Do not use Forge events.
+    -   (We inject the calls with Mixin)
+-   Please use existing utils methods.
+-   We try to avoid calling the NEU code too often.
+    -   (We plan to remove NEU as a dependency in the future.)
+-   We try not to use Forge-specific methods if possible.
+    -   (We plan to switch to Fabric and Minecraft 1.20 in the future.)
+-   Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
+    -   See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
+        as an example.
+-   Try to avoid using Kotlin's `!!` (catch if not null) feature.
+    -   Replace it with `?:` (if null return this).
+    -   This will most likely not be possible to avoid when working with objects from java.
+-   Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
+-   Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+-   Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
+-   Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead. - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    for more information and usages. - The pattern variables are named in the scheme `variableNamePattern`
+-   Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
+-   Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
+    the main thread.
+-   When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+-   Use American English spelling conventions (e.g., "color" not "colour").
 
 ## Additional Useful Development Tools
 
@@ -160,11 +158,11 @@ for more information and usages.
 [DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
 debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
 
-- The library is already downloaded by Gradle.
-- SkyHanni will automatically set up DevAuth.
-- Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Microsoft account.
-    - The verification process will reappear every few days (after the session token expires).
+-   The library is already downloaded by Gradle.
+-   SkyHanni will automatically set up DevAuth.
+-   Start Minecraft inside IntelliJ normally.
+    -   Click on the link in the console and verify with a Microsoft account.
+    -   The verification process will reappear every few days (after the session token expires).
 
 ### Hot Swap
 
@@ -265,7 +263,7 @@ to make mappings translate more easily (more on that later).
 ### Goals
 
 It is the explicit goal of this operation to passively generate a 1.21 version of SH using preprocessor. To this end, contributors are
-encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very
+encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. _However_, this is considered a very
 low priority. Due to the confusing nature (and the slower initial setup time due to decompiling four versions of Minecraft), this feature
 is disabled by default. Similarly, it is up to each contributor to decide if they want to learn how to use preprocessor mappings and
 directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21 a task
@@ -346,7 +344,7 @@ this will not suffice.
 
 In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
 uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even within those directives,
-you only need to write code for the *lowest* version that your comment is active in. As such, I once again highly recommend to target your
+you only need to write code for the _lowest_ version that your comment is active in. As such, I once again highly recommend to target your
 directive to the lowest version in which it applies, so that other sections that call into that code as well as your code can make use of
 as many automatic renames as possible.
 
