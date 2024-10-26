@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import  at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -187,7 +187,7 @@ object BitsAPI {
                     "FameRank $rank not found",
                     "Rank" to rank,
                     "Message" to message,
-                    "FameRanks" to FameRanks.fameRanks,
+                    "FameRanks" to FameRanks.fameRanksMap,
                 )
 
             return
@@ -261,7 +261,7 @@ object BitsAPI {
                                 "FameRank $rank not found",
                                 "Rank" to rank,
                                 "Lore" to fameRankStack.getLore(),
-                                "FameRanks" to FameRanks.fameRanks,
+                                "FameRanks" to FameRanks.fameRanksMap,
                             )
                         continue@line
                     }
