@@ -30,4 +30,9 @@ public class HoppityEventSummaryLiveDisplayConfig {
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int toggleKeybind = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Show Holding Egglocator", desc = "Always show the card when holding an Egglocator.")
+    @ConfigEditorBoolean
+    public boolean showHoldingEgglocator = true;
 }

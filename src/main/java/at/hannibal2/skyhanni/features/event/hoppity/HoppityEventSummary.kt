@@ -19,8 +19,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -60,13 +62,15 @@ object HoppityEventSummary {
 
     private data class StatString(val string: String, val headed: Boolean = true)
 
+    private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
     private fun liveDisplayEnabled(): Boolean {
         val profileStorage = ProfileStorageData.profileSpecific ?: return false
         val isEnabled = liveDisplayConfig.enabled
         val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
         val isToggledOff = profileStorage.hoppityStatLiveDisplayToggled
+        val isEggLocatorOverridden = liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == EGGLOCATOR_ITEM
 
-        return LorenzUtils.inSkyBlock && isEnabled && !isToggledOff && isEventEnabled
+        return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden || (!isToggledOff && isEventEnabled))
     }
 
     @SubscribeEvent
