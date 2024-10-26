@@ -34,5 +34,5 @@ public class HoppityEventSummaryLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Holding Egglocator", desc = "Always show the card when holding an Egglocator.")
     @ConfigEditorBoolean
-    public boolean showHoldingEgglocator = true;
+    public boolean showHoldingEgglocator = false;
 }

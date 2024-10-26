@@ -66,7 +66,6 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
-    private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
 
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
@@ -82,7 +81,7 @@ object HoppityEventSummary {
         if (this.isUninitialized()) null else this
 
     private fun isEggLocatorOverridden(): Boolean =
-        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == EGGLOCATOR_ITEM
+        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId.equals("EGG_LOCATOR")
 
     private fun liveDisplayEnabled(): Boolean {
         val storage = storage ?: return false
