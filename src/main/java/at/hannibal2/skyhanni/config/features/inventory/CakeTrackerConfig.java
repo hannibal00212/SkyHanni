@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CakeTrackerConfig {
 
@@ -74,7 +75,7 @@ public class CakeTrackerConfig {
         desc = "The color that should be used to highlight unobtained cakes in the auction house."
     )
     @ConfigEditorColour
-    public String unobtainedAuctionHighlightColor = LorenzColor.RED.toConfigColor();
+    public Property<String> unobtainedAuctionHighlightColor = Property.of(LorenzColor.RED.toConfigColor());
 
     @Expose
     @ConfigOption(
@@ -82,7 +83,7 @@ public class CakeTrackerConfig {
         desc = "The color that should be used to highlight obtained cakes in the auction house."
     )
     @ConfigEditorColour
-    public String obtainedAuctionHighlightColor = LorenzColor.GREEN.toConfigColor();
+    public Property<String> obtainedAuctionHighlightColor = Property.of(LorenzColor.GREEN.toConfigColor());
 
     @Expose
     @ConfigOption(
@@ -90,5 +91,5 @@ public class CakeTrackerConfig {
         desc = "The maximum number of rows to display in the tracker, before a cutoff is imposed."
     )
     @ConfigEditorSlider(minValue = 5, maxValue = 40, minStep = 1)
-    public int maxDisplayRows = 20;
+    public Property<Integer> maxDisplayRows = Property.of(20);
 }

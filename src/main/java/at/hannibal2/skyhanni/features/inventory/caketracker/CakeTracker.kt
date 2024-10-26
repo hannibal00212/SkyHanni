@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTra
 import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CakeData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -56,6 +58,9 @@ object CakeTracker {
 
     private var cakeRenderables = listOf<Renderable>()
     private var lastKnownCakeDataHash = 0
+
+    private var unobtainedHighlightColor: Color = config.unobtainedAuctionHighlightColor.get().toChromaColor()
+    private var obtainedHighlightColor: Color = config.obtainedAuctionHighlightColor.get().toChromaColor()
 
     /**
      * REGEX-TEST: §cNew Year Cake (Year 360)
@@ -133,6 +138,19 @@ object CakeTracker {
     }
 
     @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.maxDisplayRows) {
+            lastKnownCakeDataHash = 0
+        }
+        ConditionalUtils.onToggle(config.unobtainedAuctionHighlightColor) {
+            unobtainedHighlightColor = config.unobtainedAuctionHighlightColor.get().toChromaColor()
+        }
+        ConditionalUtils.onToggle(config.obtainedAuctionHighlightColor) {
+            obtainedHighlightColor = config.obtainedAuctionHighlightColor.get().toChromaColor()
+        }
+    }
+
+    @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inCakeBag || (inAuctionHouse && (auctionCakesCache.isNotEmpty() || searchingForCakes))) {
@@ -164,8 +182,8 @@ object CakeTracker {
 
     private fun Slot.getHighlightColor(): Color? {
         cakeNamePattern.matchGroup(stack.displayName, "year") ?: return null
-        return if (auctionCakesCache[this.slotIndex] == true) config.obtainedAuctionHighlightColor.toChromaColor()
-        else config.unobtainedAuctionHighlightColor.toChromaColor()
+        return if (auctionCakesCache[this.slotIndex] == true) obtainedHighlightColor
+        else unobtainedHighlightColor
     }
 
     private fun reRenderDisplay() {
@@ -396,7 +414,7 @@ object CakeTracker {
         var hiddenRows = 0
         cakeRanges.forEach {
             // + 3 is to account for the header and selector boxes
-            if (this.size >= (config.maxDisplayRows + 3)) hiddenRows++
+            if (this.size >= (config.maxDisplayRows.get() + 3)) hiddenRows++
             else add(it.getRenderable(displayType))
         }
 
