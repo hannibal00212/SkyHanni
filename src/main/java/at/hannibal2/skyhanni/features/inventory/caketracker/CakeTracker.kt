@@ -126,7 +126,7 @@ object CakeTracker {
         if (inAuctionHouse) {
             event.container.inventorySlots.filter {
                 it.slotNumber in auctionCakesCache.keys &&
-                        cakeNamePattern.matches(it.stack?.displayName)
+                    cakeNamePattern.matches(it.stack?.displayName)
             }.forEach {
                 val highlightColor = if (auctionCakesCache[it.slotNumber] == true) LorenzColor.GREEN
                 else LorenzColor.RED
