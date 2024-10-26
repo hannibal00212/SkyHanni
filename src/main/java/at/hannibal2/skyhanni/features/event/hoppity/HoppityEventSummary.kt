@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -76,7 +78,20 @@ object HoppityEventSummary {
     }
 
     @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        reCheckInventoryState()
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        reCheckInventoryState()
+    }
+
+    @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {
+        reCheckInventoryState()
         if (liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         val profileStorage = ProfileStorageData.profileSpecific ?: return
@@ -117,6 +132,13 @@ object HoppityEventSummary {
     private fun isInInventory(): Boolean =
         Minecraft.getMinecraft().currentScreen is GuiInventory ||
             Minecraft.getMinecraft().currentScreen is GuiChest
+
+    private fun reCheckInventoryState() {
+        if (isInInventory() != lastKnownInInvState) {
+            lastKnownInInvState = !lastKnownInInvState
+            lastKnownStatHash = 0
+        }
+    }
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
@@ -194,10 +216,7 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (lastKnownInInvState != isInInventory()) {
-            lastKnownInInvState = !lastKnownInInvState
-            lastKnownStatHash = 0
-        }
+        reCheckInventoryState()
         checkEnded()
         if (!HoppityAPI.isHoppityEvent()) return
         checkInit()
