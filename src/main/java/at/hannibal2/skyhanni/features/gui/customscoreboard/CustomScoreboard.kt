@@ -124,6 +124,7 @@ object CustomScoreboard {
         dirty = true
     }
 
+    // TODO move those into their respective classes and make them private
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
     internal val alignmentConfig get() = displayConfig.alignment

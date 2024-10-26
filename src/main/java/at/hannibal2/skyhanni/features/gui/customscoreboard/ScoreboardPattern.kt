@@ -109,9 +109,14 @@ object ScoreboardPattern {
 
     // dungeon scoreboard
     private val dungeonSb = scoreboardGroup.group("dungeon")
+
+    /**
+     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c❤
+     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M
+     */
     val m7dragonsPattern by dungeonSb.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+§.❤",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.❤)?",
     )
     val keysPattern by dungeonSb.pattern(
         "keys",
@@ -334,9 +339,10 @@ object ScoreboardPattern {
         "magmabosshealth",
         "§7Boss Health:",
     )
+    // TODO add regex test
     val bossHealthBarPattern by combatSb.pattern(
         "magmabosshealthbar",
-        "§.(?:\\d+(?:\\.\\d)?M|\\d+k)§f/§a10M§c❤",
+        "§.[\\w,.]+§f/§a10M§c❤",
     )
     val bossHPPattern by combatSb.pattern(
         "bosshp",

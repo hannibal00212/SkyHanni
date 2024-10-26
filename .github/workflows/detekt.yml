@@ -1,0 +1,109 @@
+name: Detekt
+
+on:
+    pull_request_target:
+        branches:
+            - "*"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    detekt:
+        name: Run detekt
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        outputs:
+            sarif_exists: ${{ steps.check_sarif.outputs.exists }}
+        steps:
+            -   name: Checkout PR code
+                uses: actions/checkout@v4
+                with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+            -   uses: ./.github/actions/setup-normal-workspace
+            -   name: Run detekt main (w/ typing analysis)
+                run: |
+                  ./gradlew detektMain --stacktrace
+            -   name: Check if SARIF file exists
+                if: always()
+                id: check_sarif
+                run: |
+                    if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
+                        echo "exists=true" >> $GITHUB_OUTPUT
+                    else
+                        echo "exists=false" >> $GITHUB_OUTPUT
+                    fi
+            -   name: Annotate detekt failures
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                run: |
+                    chmod +x .github/scripts/process_detekt_sarif.sh
+                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif | tee detekt_output.txt
+            -   name: Upload detekt output as artifact
+                if: ${{ steps.check_sarif.outputs.exists == 'true' }}
+                uses: actions/upload-artifact@v4
+                with:
+                    name: detekt-output
+                    path: detekt_output.txt
+
+    detekt_comment:
+        name: Comment detekt failures on PR
+        runs-on: ubuntu-latest
+        needs: detekt
+        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() }}
+        permissions:
+            pull-requests: write
+        steps:
+            -   name: Checkout base repo code
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+            -   name: Download detekt output
+                uses: actions/download-artifact@v4
+                with:
+                    name: detekt-output
+                    path: .
+            -   name: Set up Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: '>=21'
+            -   name: Process detekt output and create comment
+                env:
+                    PR_SHA: ${{ github.event.pull_request.head.sha }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                run: |
+                    node .github/scripts/process_detekt_output.js
+            -   name: Check if this is the latest workflow run
+                id: check_latest
+                run: |
+                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                        | jq -r '.head.sha')
+                  
+                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
+                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
+                  
+                    # Compare the SHAs and set a result variable
+                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
+                        echo "is_latest=true" >> $GITHUB_ENV
+                    else
+                        echo "is_latest=false" >> $GITHUB_ENV
+                    fi
+            -   name: Add comment to PR
+                if: env.is_latest == 'true'
+                uses: actions/github-script@v6
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const fs = require('fs');
+                        const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
+                        github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
+                        })
