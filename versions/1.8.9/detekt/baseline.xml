@@ -29,7 +29,6 @@
     <ID>CyclomaticComplexMethod:SkillProgress.kt$SkillProgress$private fun drawDisplay()</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
-    <ID>Filename:AreaChangeEvents.kt$at.hannibal2.skyhanni.events.skyblock.AreaChangeEvents.kt</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
@@ -45,7 +44,6 @@
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
-    <ID>LoopWithTooManyJumpStatements:CustomScoreboard.kt$CustomScoreboard$for</ID>
     <ID>LoopWithTooManyJumpStatements:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt$GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenVisitorFeatures.kt$GardenVisitorFeatures$for</ID>
@@ -55,7 +53,6 @@
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
-    <ID>MatchingDeclarationName:AreaChangeEvents.kt$ScoreboardAreaChangeEvent : SkyHanniEvent</ID>
     <ID>MemberNameEqualsClassName:CaptureFarmingGear.kt$CaptureFarmingGear$fun captureFarmingGear()</ID>
     <ID>MemberNameEqualsClassName:FameRanks.kt$FameRanks$var fameRanks = emptyMap&lt;String, FameRank&gt;() private set</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NEUInternalName, Int&gt;, minions: MutableMap&lt;String, NEUInternalName&gt;, tierOneMinions: MutableList&lt;NEUInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NEUInternalName&gt;, )</ID>
@@ -66,12 +63,10 @@
     <ID>MemberNameEqualsClassName:Text.kt$Text$fun text(text: String, init: IChatComponent.() -&gt; Unit = {})</ID>
     <ID>NoNameShadowing:BucketedItemTrackerData.kt$BucketedItemTrackerData${ it.hidden = !it.hidden }</ID>
     <ID>NoNameShadowing:BurrowWarpHelper.kt$BurrowWarpHelper${ it.startsWith("§bWarp to ") }</ID>
-    <ID>NoNameShadowing:ChunkedStat.kt$ChunkedStat.Companion${ it.showWhen() }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:GraphEditorBugFinder.kt$GraphEditorBugFinder${ it.position.distanceSqToPlayer() }</ID>
-    <ID>NoNameShadowing:GuiOptionEditorUpdateCheck.kt$GuiOptionEditorUpdateCheck$width</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
     <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
@@ -97,7 +92,6 @@
     <ID>ReturnCount:DamageIndicatorManager.kt$DamageIndicatorManager$private fun checkThorn(realHealth: Long, realMaxHealth: Long): String?</ID>
     <ID>ReturnCount:DamageIndicatorManager.kt$DamageIndicatorManager$private fun getCustomHealth( entityData: EntityData, health: Long, entity: EntityLivingBase, maxHealth: Long, ): String?</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
-    <ID>ReturnCount:EstimatedItemValue.kt$EstimatedItemValue$private fun draw(stack: ItemStack): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>ReturnCount:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun calculateStarPrice( internalName: NEUInternalName, inputStars: Int, ): Pair&lt;EssenceItemUtils.EssenceUpgradePrice, Pair&lt;Int, Int&gt;&gt;?</ID>
     <ID>ReturnCount:FishingAPI.kt$FishingAPI$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
@@ -140,8 +134,6 @@
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:RenderUtils.kt$RenderUtils</ID>
     <ID>TooManyFunctions:Renderable.kt$Renderable$Companion</ID>
-    <ID>TooManyFunctions:ScoreboardElements.kt$at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElements.kt</ID>
-    <ID>TooManyFunctions:ScoreboardEvent.kt$at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.kt</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
@@ -215,7 +207,6 @@
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorCondition[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorMap[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderUtils.kt$RenderUtils$it.name!!</ID>
-    <ID>UnsafeCallOnNullableType:RepoManager.kt$RepoManager$latestRepoCommit!!</ID>
     <ID>UnsafeCallOnNullableType:RepoUtils.kt$RepoUtils$file!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$match.groups[2]!!</ID>
@@ -257,8 +248,6 @@
     <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var nbtNum: String? = null</ID>
     <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var stackLevel: TreeSet&lt;Int&gt;? = null</ID>
     <ID>VarCouldBeVal:ErrorManager.kt$ErrorManager$private var cache = TimeLimitedSet&lt;Pair&lt;String, Int&gt;&gt;(10.minutes)</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var comboPrice = combo.asInternalName().getPriceOrNull()</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var internalName = removeKuudraArmorPrefix(stack.getInternalName().asString().removePrefix("VANQUISHED_"))</ID>
     <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var nameColor = if (!useless) "§9" else "§7"</ID>
     <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var currentBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
     <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var lastBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>

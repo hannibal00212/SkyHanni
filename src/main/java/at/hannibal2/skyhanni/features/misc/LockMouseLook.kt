@@ -17,6 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object LockMouseLook {
 
+    /**
+     * REGEX-TEST: §aTeleported you to §r§aPlot
+     */
     private val gardenTeleportPattern by RepoPattern.pattern(
         "chat.garden.teleport",
         "§aTeleported you to .*",
@@ -46,7 +49,7 @@ object LockMouseLook {
     fun toggleLock() {
         lockedMouse = !lockedMouse
 
-        val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
+        val gameSettings = Minecraft.getMinecraft().gameSettings
         var mouseSensitivity = gameSettings.mouseSensitivity
         if (SensitivityReducer.isEnabled()) mouseSensitivity = SensitivityReducer.doTheMath(mouseSensitivity, true)
 
