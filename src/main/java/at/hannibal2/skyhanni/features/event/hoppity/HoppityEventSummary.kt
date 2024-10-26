@@ -45,6 +45,8 @@ object HoppityEventSummary {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val lineHeader = " ".repeat(4)
+    private var displayCardRenderables = listOf<Renderable>()
+    private var lastKnownStatHash = 0
 
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
@@ -93,36 +95,52 @@ object HoppityEventSummary {
             ?: SkyBlockTime.now().year
 
         val stats = getYearStats(statYear).first
-        val cardRenderable = Renderable.verticalContainer(
-            if (stats == null) mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
-            else getStatsStrings(stats, statYear).map {
-                Renderable.string(it.string)
-            }.toMutableList()
-        )
+        // Calculate a 'hash' of the stats to determine if they have changed
+        val statsHash = stats?.hashCode() ?: 0
+        if (statsHash != lastKnownStatHash) {
+            lastKnownStatHash = statsHash
+            displayCardRenderables = buildDisplayRenderables(stats, statYear)
+        }
 
-        val liveDisplayRenderableList = mutableListOf(
+        config.eventSummary.liveDisplayPosition.renderRenderables(
+            displayCardRenderables,
+            posLabel = "Hoppity's Hunt Stats",
+        )
+    }
+
+    private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
+        // Add title renderable with centered alignment
+        add(
             Renderable.string(
                 "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-            ),
+            )
         )
-        if (Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } == true) {
-            buildYearSwitcherRenderables(statYear)?.let {
-                liveDisplayRenderableList.add(
+
+        // Add card renderable based on stats availability
+        val cardRenderable = if (stats == null) {
+            Renderable.verticalContainer(
+                mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
+            )
+        } else {
+            Renderable.verticalContainer(
+                getStatsStrings(stats, statYear).map { Renderable.string(it.string) }.toMutableList()
+            )
+        }
+        add(cardRenderable)
+
+        // Conditionally add year switcher renderable for inventory or chest screens
+        if (Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest) {
+            buildYearSwitcherRenderables(statYear)?.let { yearSwitcher ->
+                add(
                     Renderable.horizontalContainer(
-                        it,
+                        yearSwitcher,
                         spacing = 5,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    ),
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    )
                 )
             }
         }
-        liveDisplayRenderableList.add(cardRenderable)
-
-        config.eventSummary.liveDisplayPosition.renderRenderables(
-            liveDisplayRenderableList,
-            posLabel = "Hoppity's Hunt Stats",
-        )
     }
 
     private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
