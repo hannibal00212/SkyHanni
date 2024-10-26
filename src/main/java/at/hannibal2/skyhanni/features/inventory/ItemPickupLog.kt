@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -130,16 +131,12 @@ object ItemPickupLog {
         updateItem(COIN_HASH, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
-    //TODO this event doesn't work in testing - bits event needs to be updated to return negitive values when bits are spent
-
-    //TODO this event also doesn't seem to fire, not sure if it's an alpha specific thing
-
-    @SubscribeEvent
+    @HandleEvent
     fun onBitsChange(event: BitsUpdateEvent) {
         if (!isEnabled() || !config.bits || !worldChangeCooldown()) return
         updateItem(
             BITS_HASH,
-            PickupEntry("§9Bits", event.difference.absoluteValue.toLong(), bitsIcon),
+            PickupEntry("§bBits", event.difference.absoluteValue.toLong(), bitsIcon),
             event.difference < 0,
         )
     }
