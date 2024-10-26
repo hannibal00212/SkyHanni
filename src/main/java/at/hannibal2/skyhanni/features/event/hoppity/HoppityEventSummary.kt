@@ -56,7 +56,7 @@ object HoppityEventSummary {
      */
     private val rabbitTheFishPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.thefish",
-        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish§(?:§.)*!.*"
+        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*"
     )
 
     private const val LINE_HEADER = "    "
