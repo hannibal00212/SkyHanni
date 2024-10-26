@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -105,7 +106,7 @@ object CakeTracker {
 
     private fun removeCake(cakeYear: Int) {
         val storage = storage ?: return
-        if (cakeYear in storage.neededCakes) storage.ownedCakes.remove(cakeYear)
+        if (cakeYear in storage.ownedCakes) storage.ownedCakes.remove(cakeYear)
         recalculateMissingCakes()
     }
 
@@ -120,6 +121,7 @@ object CakeTracker {
                 val storage = storage ?: return@callback
                 storage.ownedCakes.clear()
                 recalculateMissingCakes()
+                ChatUtils.chat("New Year Cake tracker data reset")
             }
         }
     }
@@ -229,7 +231,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.neededCakes = (1..currentYear).filterNot { year ->
+        storage.neededCakes = (1..currentYear).filter { year ->
             year !in storage.ownedCakes
         }
     }
