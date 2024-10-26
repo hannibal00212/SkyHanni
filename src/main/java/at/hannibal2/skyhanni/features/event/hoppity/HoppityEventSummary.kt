@@ -221,10 +221,7 @@ object HoppityEventSummary {
     fun updateCfPosition(position: Int?, percentile: Double?) {
         if (!HoppityAPI.isHoppityEvent() || position == null || percentile == null) return
         val stats = getYearStats().first ?: return
-        val snapshot = LeaderboardPosition()
-        snapshot.position = position
-        snapshot.percentile = percentile
-
+        val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
         stats.finalLeaderboardPosition = snapshot
     }
@@ -243,17 +240,14 @@ object HoppityEventSummary {
 
     private fun MutableList<StatString>.addExtraChocFormatLine(chocGained: Long) {
         if (chocGained <= 0) return
-        add(
-            StatString(
-                buildString {
-                    append(" §6+${chocGained.addSeparators()} Chocolate")
-                    if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                        val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
-                        append(" §7(§a+§b$timeFormatted§7)")
-                    }
-                },
-            )
-        )
+        val chocFormatLine = buildString {
+            append(" §6+${chocGained.addSeparators()} Chocolate")
+            if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
+                val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
+                append(" §7(§a+§b$timeFormatted§7)")
+            }
+        }
+        add(StatString(chocFormatLine))
     }
 
     private fun HoppityEventStats.getMilestoneCount(): Int =

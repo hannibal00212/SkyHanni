@@ -784,6 +784,11 @@ public class ProfileSpecificStorage {
 
             @Expose
             public double percentile = -1.0;
+
+            public LeaderboardPosition(int position, double percentile) {
+                this.position = position;
+                this.percentile = percentile;
+            }
         }
 
         @Expose
