@@ -780,10 +780,10 @@ public class ProfileSpecificStorage {
 
         public static class LeaderboardPosition {
             @Expose
-            public int position = -1;
+            public int position;
 
             @Expose
-            public double percentile = -1.0;
+            public double percentile;
 
             public LeaderboardPosition(int position, double percentile) {
                 this.position = position;
@@ -792,10 +792,10 @@ public class ProfileSpecificStorage {
         }
 
         @Expose
-        public LeaderboardPosition initialLeaderboardPosition = new LeaderboardPosition();
+        public LeaderboardPosition initialLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
 
         @Expose
-        public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition();
+        public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
 
         @Expose
         public boolean summarized = false;
