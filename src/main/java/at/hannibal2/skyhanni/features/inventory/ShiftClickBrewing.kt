@@ -19,7 +19,7 @@ object ShiftClickBrewing {
 
         if (event.gui !is GuiChest) return
 
-        if (event.slot == null) return
+        if (event.slot == null || event.slotId == 49) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (!chestName.startsWith("Brewing Stand")) return
