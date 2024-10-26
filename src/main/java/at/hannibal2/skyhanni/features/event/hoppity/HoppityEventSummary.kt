@@ -54,16 +54,14 @@ object HoppityEventSummary {
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish§(?:§.)*!.*"
     )
 
+    private const val LINE_HEADER = "    "
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
-    private val lineHeader = " ".repeat(4)
 
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
     private var lastKnownInInvState = false
     private var lastAddedCfMillis: SimpleTimeMark? = null
-
-    private data class StatString(val string: String, val headed: Boolean = true)
 
     private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
     private fun isEggLocatorOverridden(): Boolean =
@@ -76,6 +74,8 @@ object HoppityEventSummary {
 
         return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden() || (!isToggledOff && isEventEnabled))
     }
+
+    private data class StatString(val string: String, val headed: Boolean = true)
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -286,7 +286,7 @@ object HoppityEventSummary {
     }
 
     private fun StringBuilder.appendHeadedLine(line: String) {
-        appendLine("$lineHeader$line")
+        appendLine("$LINE_HEADER$line")
     }
 
     private fun MutableList<StatString>.addExtraChocFormatLine(chocGained: Long) {
@@ -411,7 +411,7 @@ object HoppityEventSummary {
         val preambleFormat = if (iPo > fPo) "§a+" else "§c"
 
         return buildString {
-            append("§7($preambleFormat${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")}§7)")
+            append(" §7($preambleFormat${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")}§7)")
             if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
             else append(" §7Top §a$iPe%")
         }
