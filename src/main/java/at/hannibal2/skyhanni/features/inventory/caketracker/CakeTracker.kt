@@ -148,7 +148,7 @@ object CakeTracker {
         if (!inAuctionHouse) return
         (event.gui.inventorySlots as ContainerChest).getAllItems().filter {
             auctionCakesCache.containsKey(it.key.slotIndex) &&
-            cakeNamePattern.matches(it.key.stack.displayName)
+                cakeNamePattern.matches(it.key.stack.displayName)
         }.forEach { (slot, _) ->
             slot.getHighlightColor()?.let { slot highlight it }
         }
@@ -395,11 +395,11 @@ object CakeTracker {
         // Store how many lines are 'hidden' as a result of the display limit
         var hiddenRows = 0
         cakeRanges.forEach {
-            if(this.size >= config.maxDisplayRows) hiddenRows ++
+            if (this.size >= config.maxDisplayRows) hiddenRows++
             else add(it.getRenderable(displayType))
         }
 
         // Add a line to indicate that there are more rows hidden
-        if(hiddenRows > 0) add(Renderable.string("§7§o($hiddenRows hidden rows)"))
+        if (hiddenRows > 0) add(Renderable.string("§7§o($hiddenRows hidden rows)"))
     }
 }
