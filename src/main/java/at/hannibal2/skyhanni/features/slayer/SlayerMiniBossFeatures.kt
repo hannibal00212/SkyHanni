@@ -20,10 +20,8 @@ object SlayerMiniBossFeatures {
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!SlayerAPI.isInAnyArea) return
-        val miniBossType = SlayerAPI.getSlayerTypeForCurrentArea()?.miniBossType ?: return
         val mob = event.mob
-        if (mob.name !in miniBossType.names) return
+        if (!SlayerMiniBossType.isMiniboss(mob.name)) return
         miniBosses += mob
         if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
     }
@@ -48,11 +46,18 @@ object SlayerMiniBossFeatures {
         }
     }
 
-    enum class SlayerMiniBossType(vararg val names: String) {
+    enum class SlayerMiniBossType(vararg names: String) {
         REVENANT("Revenant Sycophant", "Revenant Champion", "Deformed Revenant", "Atoned Champion", "Atoned Revenant"),
         TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula"),
         SVEN("Pack Enforcer", "Sven Follower", "Sven Alpha"),
         VOIDLING("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac"),
         INFERNAL("Flare Demon", "Kindleheart Demon", "Burningsoul Demon"),
+        ;
+
+        val names = names.toSet()
+
+        companion object {
+            fun isMiniboss(name: String) = entries.any { name in it.names }
+        }
     }
 }
