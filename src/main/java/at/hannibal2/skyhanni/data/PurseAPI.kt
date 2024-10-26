@@ -55,35 +55,26 @@ object PurseAPI {
 
     // TODO add more causes in the future (e.g. ah/bz/bank)
     private fun getCause(diff: Int): PurseChangeCause {
-        if (diff > 0) {
-            if (diff == 1) {
-                return PurseChangeCause.GAIN_TALISMAN_OF_COINS
-            }
-
-            // TODO relic of coins support
-            if (diff == 15.million || diff == 100.million) {
-                return PurseChangeCause.GAIN_DICE_ROLL
-            }
-
-            if (Minecraft.getMinecraft().currentScreen == null) {
-                if (inventoryCloseTime.passedSince() > 2.seconds) {
-                    return PurseChangeCause.GAIN_MOB_KILL
+        return if (diff > 0) {
+            when (diff) {
+                1 -> PurseChangeCause.GAIN_TALISMAN_OF_COINS
+                // TODO relic of coins support
+                15.million, 100.million -> PurseChangeCause.GAIN_DICE_ROLL
+                else -> {
+                    if (Minecraft.getMinecraft().currentScreen == null && inventoryCloseTime.passedSince() > 2.seconds) {
+                        PurseChangeCause.GAIN_MOB_KILL
+                    } else PurseChangeCause.GAIN_UNKNOWN
                 }
             }
-            return PurseChangeCause.GAIN_UNKNOWN
         } else {
-            if (SlayerAPI.questStartTime.passedSince() < 1.5.seconds) {
-                return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
+            when {
+                SlayerAPI.questStartTime.passedSince() < 1.5.seconds -> PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
+                diff == -6_666_666 || diff == -666_666 -> PurseChangeCause.LOSE_DICE_ROLL_COST
+                else -> PurseChangeCause.LOSE_UNKNOWN
             }
-
-            if (diff == -6_666_666 || diff == -666_666) {
-                return PurseChangeCause.LOSE_DICE_ROLL_COST
-            }
-
-            return PurseChangeCause.LOSE_UNKNOWN
         }
     }
 
-    @Deprecated("", ReplaceWith("PurseAPI.currentPurse"))
+    @Deprecated("", ReplaceWith("PurseAPI.currentPurse.toDouble()"))
     fun getPurse(): Double = currentPurse.toDouble()
 }
