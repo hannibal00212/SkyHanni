@@ -147,12 +147,10 @@ enum class OreBlock(
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_IRON(
-        // currently not detected
         checkBlock = { it.block == Blocks.iron_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_GOLD(
-        // currently not detected
         checkBlock = { it.block == Blocks.gold_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -161,17 +159,14 @@ enum class OreBlock(
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_REDSTONE(
-        // currently not detected
         checkBlock = { it.block == Blocks.redstone_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_EMERALD(
-        // currently not detected
         checkBlock = { it.block == Blocks.emerald_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
     PURE_DIAMOND(
-        // currently not detected
         checkBlock = { it.block == Blocks.diamond_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -255,7 +250,11 @@ enum class OreBlock(
     ),
     ;
 
+    fun hasInitSound() = this !in oresWithoutInitSound
+
     companion object {
+        private val oresWithoutInitSound = setOf(PURE_IRON, PURE_GOLD, PURE_REDSTONE, PURE_EMERALD, PURE_DIAMOND)
+
         fun getByStateOrNull(state: IBlockState): OreBlock? = currentAreaOreBlocks.firstOrNull { it.checkBlock(state) }
     }
 }
