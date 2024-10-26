@@ -110,7 +110,7 @@ class Mob(
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
-    fun canBeSeen() = baseEntity.canBeSeen()
+    fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
     fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
@@ -131,9 +131,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
             }
         }
     }
@@ -242,4 +242,5 @@ class Mob(
 
     // TODO add max distance
     fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }

@@ -116,18 +116,20 @@ object MinionCraftHelper {
         val allMinions = tierOneMinions.toMutableList()
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
-        for (item in mainInventory) {
-            val name = item?.name?.removeColor() ?: continue
-            if (item.hasEnchantments()) continue
+        for (item in mainInventory.filterNotNull()) {
+            val name = item.name.removeColor()
             val rawId = item.getInternalName()
-            if (!isMinionName(name)) {
-                if (!allIngredients.contains(rawId)) continue
-                if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
-                val old = otherItems.getOrDefault(itemId, 0)
-                otherItems[itemId] = old + item.stackSize * multiplier
-            }
+            if (
+                item.hasEnchantments() ||
+                !isMinionName(name) ||
+                !allIngredients.contains(rawId) ||
+                !isAllowed(allMinions, rawId)
+            ) continue
+
+            val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
+            val old = otherItems.getOrDefault(itemId, 0)
+            otherItems[itemId] = old + item.stackSize * multiplier
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -146,7 +148,8 @@ object MinionCraftHelper {
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
                     if (primitiveStack.internalName == ingredientPrimitive.internalName &&
-                        primitiveStack.amount < ingredientPrimitive.amount) return true
+                        primitiveStack.amount < ingredientPrimitive.amount
+                    ) return true
                 }
             }
         }

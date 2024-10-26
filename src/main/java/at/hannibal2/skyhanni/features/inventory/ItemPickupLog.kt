@@ -147,7 +147,7 @@ object ItemPickupLog {
             itemList.clear()
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-            val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -20,13 +21,18 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -37,6 +43,8 @@ object FlareDisplay {
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
     private var flares = mutableListOf<Flare>()
+
+    private var activeWarning = false
 
     class Flare(val type: FlareType, val entity: EntityArmorStand, val location: LorenzVec = entity.getLorenzVec())
 
@@ -85,6 +93,7 @@ object FlareDisplay {
             getFlareTypeForTexture(entity)?.let {
                 flares.add(Flare(it, entity))
             }
+            activeWarning = false
         }
         var newDisplay: List<Renderable>? = null
         for (type in FlareType.entries) {
@@ -103,7 +112,8 @@ object FlareDisplay {
                     }
                 }
             }
-            if (remainingTime !in 0.seconds..5.seconds) continue
+            if (remainingTime !in 0.seconds..config.warnWhenAboutToExpire.seconds) continue
+            activeWarning = true
             val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
             when (config.alertType) {
                 FlareConfig.AlertType.CHAT -> {
@@ -121,8 +131,11 @@ object FlareDisplay {
 
                 else -> {}
             }
+            if (config.expireSound) {
+                SoundUtils.playPlingSound()
+            }
         }
-        display = newDisplay ?: emptyList()
+        display = newDisplay.orEmpty()
     }
 
     private fun getRemainingTime(flare: Flare): Duration {
@@ -177,6 +190,21 @@ object FlareDisplay {
                 else -> {}
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!isEnabled() || !config.flashScreen || !activeWarning) return
+        val minecraft = Minecraft.getMinecraft()
+        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+        Gui.drawRect(
+            0,
+            0,
+            minecraft.displayWidth,
+            minecraft.displayHeight,
+            (alpha shl 24) or (config.flashColor.toChromaColorInt() and 0xFFFFFF),
+        )
+        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @SubscribeEvent

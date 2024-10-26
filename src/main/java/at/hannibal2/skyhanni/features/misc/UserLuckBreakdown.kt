@@ -119,7 +119,7 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.name ?: ""
+        val inventoryName = event.inventoryItems[4]?.name.orEmpty()
         if (inventoryName != "§dMisc Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItems)
@@ -252,17 +252,17 @@ object UserLuckBreakdown {
         mainLuckItem = ItemUtils.createItemStack(
             mainLuckID.getItemStack().item,
             "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
-            *createItemLore("mainMenu", totalLuck),
+            createItemLore("mainMenu", totalLuck),
         )
         limboItem = ItemUtils.createItemStack(
             limboID.getItemStack().item,
             LIMBO_NAME,
-            *createItemLore("limbo", limboLuck),
+            createItemLore("limbo", limboLuck),
         )
         skillsItem = ItemUtils.createItemStack(
             skillsID.getItemStack().item,
             SKILLS_NAME,
-            *createItemLore("skills"),
+            createItemLore("skills"),
         )
     }
 

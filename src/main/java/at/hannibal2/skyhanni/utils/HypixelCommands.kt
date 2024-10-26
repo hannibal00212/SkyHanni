@@ -161,7 +161,7 @@ object HypixelCommands {
     fun bank() {
         send("bank")
     }
-    
+
     fun pickupStash() {
         send("pickupstash")
     }

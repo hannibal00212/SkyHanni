@@ -20,7 +20,7 @@ object CollectionUtils {
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount) this.poll() ?: break
+        repeat(amount) { this.poll() ?: return this }
         return this
     }
 
@@ -272,6 +272,13 @@ object CollectionUtils {
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
     // TODO add cache
     fun MutableList<Renderable>.addString(

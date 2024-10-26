@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
@@ -335,6 +334,13 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
+    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    fun generateRandomString(length: Int): String {
+        var res: String = ""
+        repeat(length) { res += CHARS.random() }
+        return res
+    }
+
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
@@ -420,7 +426,7 @@ object StringUtils {
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
         val clickEvent = message.chatStyle.chatClickEvent
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
                 return
             }
             foundCommands.add(message)

@@ -86,11 +86,12 @@ object ToolTooltipTweaks {
                 val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
-                    CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: " +
-                        "§a+${displayedFortune.formatStat()}$ffdString$reforgeString"
-                    CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: " +
-                        "§a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
-                    else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                    CropTooltipFortuneEntry.DEFAULT ->
+                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+                    CropTooltipFortuneEntry.SHOW ->
+                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+                    else ->
+                        "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)
 

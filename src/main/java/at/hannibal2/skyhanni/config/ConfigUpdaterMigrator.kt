@@ -83,7 +83,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be relocated to $new, " +
-                    "since another element already inhabits that path"
+                        "since another element already inhabits that path"
                 )
                 return
             }
@@ -128,13 +128,11 @@ object ConfigUpdaterMigrator {
                         ?.flatMap { player ->
                             player.value.asJsonObject["profiles"]?.asJsonObject?.entrySet()?.map {
                                 "storage.players.${player.key}.profiles.${it.key}"
-                            } ?: listOf()
-                        }
-                        ?: listOf()
+                            }.orEmpty()
+                        }.orEmpty()
                     ),
                 "#player" to (
-                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
-                        ?: listOf()
+                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }.orEmpty()
                     ),
             )
             val migration = ConfigFixEvent(

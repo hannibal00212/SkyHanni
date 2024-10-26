@@ -276,6 +276,7 @@ object NEUItems {
             println("name: ${item.name}")
             println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
             println(" ")
+            @Suppress("PrintStackTrace")
             e.printStackTrace()
         }
         RenderHelper.disableStandardItemLighting()

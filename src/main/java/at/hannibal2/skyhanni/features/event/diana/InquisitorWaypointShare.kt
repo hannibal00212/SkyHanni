@@ -62,6 +62,7 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
      */
+    @Suppress("MaxLineLength")
     private val odinPattern by patternGroup.pattern(
         "party.odin",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
@@ -240,7 +241,11 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
+        //#if MC<1.12
         if (packet.type.toInt() != 0) return
+        //#else
+        //$$ if (packet.type.id.toInt() != 0) return
+        //#endif
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {

@@ -144,7 +144,7 @@ object ChocolateShopPrice {
                     factor,
                     product.item,
                     hover,
-                    highlightsOnHoverSlots = product.slot?.let { listOf(it) } ?: emptyList(),
+                    highlightsOnHoverSlots = product.slot?.let { listOf(it) }.orEmpty(),
                 ),
             )
         }

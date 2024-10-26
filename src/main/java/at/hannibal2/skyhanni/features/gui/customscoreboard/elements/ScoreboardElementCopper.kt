@@ -24,4 +24,4 @@ object ScoreboardElementCopper : ScoreboardElement() {
     override fun showIsland() = GardenAPI.inGarden()
 }
 
-// click: warp barn? 
+// click: warp barn?

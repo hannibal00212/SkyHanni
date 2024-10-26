@@ -403,7 +403,8 @@ object BestiaryData {
                             cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
                             cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
                             cat.familiesFound < cat.totalFamilies ->
-                                "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                                "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
+                                    "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
 
                             else -> continue
                         }

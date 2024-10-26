@@ -61,11 +61,12 @@ class RepoManager(private val configLocation: File) {
             return "${config.location.user}/${config.location.name}/${config.location.branch}"
         }
 
-        private val defaultUser = "hannibal002"
-        private val defaultName = "SkyHanni-REPO"
-        private val defaultBranch = "main"
+        private const val DEFAULT_USER = "hannibal002"
+        private const val DEFAULT_NAME = "SkyHanni-REPO"
+        private const val DEFAULT_BRANCH = "main"
 
-        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() = user == defaultUser && name == defaultName && branch == defaultBranch
+        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
+            user == DEFAULT_USER && name == DEFAULT_NAME && branch == DEFAULT_BRANCH
     }
 
     fun loadRepoInformation() {
@@ -246,7 +247,7 @@ class RepoManager(private val configLocation: File) {
                         ).asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
-                text.add("§7Backup Repo Value: §c${usingBackupRepo}".asComponent())
+                text.add("§7Backup Repo Value: §c$usingBackupRepo".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
                 text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
 
@@ -333,9 +334,9 @@ class RepoManager(private val configLocation: File) {
                 return
             }
 
-            user = defaultUser
-            name = defaultName
-            branch = defaultBranch
+            user = DEFAULT_USER
+            name = DEFAULT_NAME
+            branch = DEFAULT_BRANCH
             if (manual) {
                 ChatUtils.clickableChat(
                     "Reset Repo settings to default. " +

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,7 +41,7 @@ object SplatterHearts {
         shownHearts.forEach {
             val pos = it.add(-0.5, 0.3, -0.5)
             val aabb = pos.axisAlignedTo(pos.add(1, 1, 1))
-            event.drawFilledBoundingBox_nea(aabb, LorenzColor.RED.addOpacity(100))
+            event.drawFilledBoundingBoxNea(aabb, LorenzColor.RED.addOpacity(100))
         }
     }
 

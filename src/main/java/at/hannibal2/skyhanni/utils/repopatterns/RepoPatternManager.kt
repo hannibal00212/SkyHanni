@@ -45,7 +45,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf(),
+            else regexes?.regexes.orEmpty()
         )
 
     /**
@@ -103,9 +103,11 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". " +
-                            "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
-                            "tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash(
+                            "Non unique access to regex at \"$key\". " +
+                                "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                        )
                 } else {
                     exclusivity[key] = owner
                 }
@@ -241,13 +243,15 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
+        require(keyShape.matches(key)) {
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers and dots."
+        }
     }
 
     /**

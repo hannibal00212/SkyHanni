@@ -44,7 +44,7 @@ object SuperpairDataDisplay {
 
     private var display = emptyList<String>()
     private var uncoveredItems = mutableMapOf<Int, SuperpairItem>()
-    private var found = mutableMapOf<FoundType, MutableList<FoundData>>()
+    private val found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -231,17 +231,17 @@ object SuperpairDataDisplay {
         if (pairs.isNotEmpty()) add("§2Found")
         for (pair in pairs) {
             val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
-            add(" $prefix §a${pair.first?.reward ?: ""}")
+            add(" $prefix §a${pair.first?.reward.orEmpty()}")
         }
         if (matches.isNotEmpty()) add("§eMatched")
         for (match in matches) {
             val prefix = determinePrefix(matches.indexOf(match), matches.lastIndex)
-            add(" $prefix §e${match.first?.reward ?: ""}")
+            add(" $prefix §e${match.first?.reward.orEmpty()}")
         }
         if (powerups.isNotEmpty()) add("§bPowerUp")
         for (powerup in powerups) {
             val prefix = determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
-            add(" $prefix §b${powerup.item?.reward ?: ""}")
+            add(" $prefix §b${powerup.item?.reward.orEmpty()}")
         }
         val toAdd = mutableListOf<String>()
         if (possiblePairs >= 1) toAdd.add("§ePairs - $possiblePairs")

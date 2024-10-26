@@ -153,7 +153,7 @@ class ConfigManager {
             println("")
             println(
                 "This crash is here to remind you to fix the missing " +
-                "@ConfigLink annotation over your new config position config element."
+                    "@ConfigLink annotation over your new config position config element."
             )
             println("")
             println("Steps to fix:")

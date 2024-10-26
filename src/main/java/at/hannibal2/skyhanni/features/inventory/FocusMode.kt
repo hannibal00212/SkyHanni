@@ -20,7 +20,7 @@ object FocusMode {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onLorenzToolTip(event: LorenzToolTipEvent) {
         if (!isEnabled() || !toggle) return
-        if(event.toolTip.isEmpty()) return
+        if (event.toolTip.isEmpty()) return
         event.toolTip = mutableListOf(event.toolTip.first())
     }
 

@@ -14,7 +14,7 @@ object ScoreboardElementPurse : ScoreboardElement() {
         var purse = formatNumber(PurseAPI.currentPurse)
 
         if (!displayConfig.hideCoinsDifference) {
-            purse += getPurseEarned() ?: ""
+            purse += getPurseEarned().orEmpty()
         }
 
         return when {

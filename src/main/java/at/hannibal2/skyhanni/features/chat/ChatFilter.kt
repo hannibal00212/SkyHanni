@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -163,6 +164,8 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
+        // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
+        "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
@@ -569,7 +572,7 @@ object ChatFilter {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
-                val reward = groupOrNull("reward") ?: ""
+                val reward = groupOrEmpty("reward")
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
@@ -619,10 +622,10 @@ object ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
-        (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-        (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
-        (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
+    private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
+        (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
+        (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

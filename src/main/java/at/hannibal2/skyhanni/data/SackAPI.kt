@@ -233,12 +233,12 @@ object SackAPI {
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
-        } ?: ""
+        }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
-        } ?: ""
+        }.orEmpty()
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
@@ -345,7 +345,10 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    ) : AbstractSackItem()
+    ) : AbstractSackItem() {
+        val priceSum: Long
+            get() = roughPrice + flawedPrice + finePrice
+    }
 
     data class SackRune(
         var stack: ItemStack? = null,

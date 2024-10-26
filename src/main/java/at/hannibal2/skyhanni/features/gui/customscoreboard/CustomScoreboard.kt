@@ -73,6 +73,8 @@ object CustomScoreboard {
         // We want to update the background every time, so we can have a smooth transition when using chroma as the color
         val finalRenderable = RenderBackground.addBackground(render)
 
+        RenderBackground.updatePosition(finalRenderable)
+
         config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
@@ -122,6 +124,7 @@ object CustomScoreboard {
         dirty = true
     }
 
+    // TODO move those into their respective classes and make them private
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
     internal val alignmentConfig get() = displayConfig.alignment

@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.rift
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -10,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.item.ItemStack
 
+@SkyHanniModule
 object RiftAPI {
 
     fun inRift() = IslandType.THE_RIFT.isInIsland()
@@ -33,9 +37,15 @@ object RiftAPI {
         return pricePer * stackSize
     }
 
+    var inMirrorVerse = false
     var inRiftRace = false
     var trackingButtons = false
     var allButtonsHit = false
+
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inMirrorVerse = event.area == "Mirrorverse"
+    }
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"

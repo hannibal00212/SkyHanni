@@ -437,7 +437,6 @@ object SkillAPI {
                         val neededXp = levelingMap.filter { it.key < level }.values.sum().toLong()
                         ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to be level §b${level.toDouble()}")
                     } else {
-                        val base = levelingMap.values.sum().toLong()
                         val neededXP = xpRequiredForLevel(level.toDouble())
                         ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${level.toDouble()}")
                     }

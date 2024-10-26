@@ -230,7 +230,7 @@ object CropMoneyDisplay {
             }
 
             val coinsColor = if (isCurrent && config.compact) "§e" else "§6"
-            val moneyArray = moneyPerHourData[internalName] ?: emptyArray()
+            val moneyArray = moneyPerHourData[internalName].orEmpty()
 
             for (price in moneyArray) {
                 val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins + extraArmorCoins

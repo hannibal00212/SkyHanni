@@ -103,7 +103,7 @@ object KloonHacking {
             if (!config.colour) return
             val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack.getLore().any { it.contains(targetColor?.name ?: "") }) {
+                if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
                     slot highlight LorenzColor.GREEN
                 }
             }
