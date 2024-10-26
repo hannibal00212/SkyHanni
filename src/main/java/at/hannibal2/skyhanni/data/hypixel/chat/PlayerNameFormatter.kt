@@ -128,16 +128,15 @@ object PlayerNameFormatter {
     @SubscribeEvent
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
-        event.chatComponent =
-            StringUtils.replaceIfNeeded(
-                event.chatComponent,
-                Text.text("§d${event.direction}") {
-                    appendText(" ")
-                    appendSibling(nameFormat(event.authorComponent))
-                    appendText("§f: ")
-                    appendSibling(event.messageComponent.intoComponent())
-                },
-            ) ?: return
+        event.chatComponent = StringUtils.replaceIfNeeded(
+            event.chatComponent,
+            Text.text("§d${event.direction}") {
+                appendText(" ")
+                appendSibling(nameFormat(event.authorComponent))
+                appendText("§f: ")
+                appendSibling(event.messageComponent.intoComponent())
+            },
+        ) ?: return
     }
 
     @SubscribeEvent
@@ -239,23 +238,35 @@ object PlayerNameFormatter {
         return Pair(slice(0, space + 1), slice(space + 1))
     }
 
-
     private fun formatAuthor(author: ComponentSpan, levelColor: String?): ComponentSpan {
         if (author.getText().contains("ADMIN")) return author
         if (config.ignoreYouTube && author.getText().contains("YOUTUBE")) return author
         val (rank, name) = author.splitPlayerNameAndExtras()
-        val coloredName =
-            if (MarkedPlayerManager.isMarkedPlayer(name.getText().removeColor()) && MarkedPlayerManager.config.highlightInChat)
-                ChatComponentText(MarkedPlayerManager.replaceInChat(name.getText().removeColor()))
-                    .setChatStyle(name.sampleStyleAtStart()).intoSpan()
-            else if (levelColor != null && config.useLevelColorForName)
-                ChatComponentText(levelColor + name.getText().removeColor())
-                    .setChatStyle(name.sampleStyleAtStart()).intoSpan()
-            else if (config.playerRankHider)
-                ChatComponentText(name.getText().removeColor()).setChatStyle(name.sampleStyleAtStart()?.createShallowCopy())
-                    .style { color = EnumChatFormatting.AQUA }.intoSpan()
-            else name
+        val coloredName = createColoredName(name, levelColor, name.getText().removeColor())
         return if (config.playerRankHider || rank == null) coloredName else rank + coloredName
+    }
+
+    private fun createColoredName(
+        name: ComponentSpan,
+        levelColor: String?,
+        removeColor: String,
+    ): ComponentSpan = when {
+        MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
+            ChatComponentText(MarkedPlayerManager.replaceInChat(removeColor))
+                .setChatStyle(name.sampleStyleAtStart()).intoSpan()
+
+        levelColor != null && config.useLevelColorForName ->
+            ChatComponentText(levelColor + removeColor)
+                .setChatStyle(name.sampleStyleAtStart())
+                .intoSpan()
+
+        config.playerRankHider ->
+            ChatComponentText(removeColor)
+                .setChatStyle(name.sampleStyleAtStart()?.createShallowCopy())
+                .style { color = EnumChatFormatting.AQUA }
+                .intoSpan()
+
+        else -> name
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
