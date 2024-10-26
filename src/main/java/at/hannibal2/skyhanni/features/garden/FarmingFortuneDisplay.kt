@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 import kotlin.math.log10
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -223,22 +222,24 @@ object FarmingFortuneDisplay {
         if (!GardenAPI.inGarden()) return
         if (event.isMod(2)) update()
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-            if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
+            if (lastUniversalFortuneMissingError.passedSince() < 20.seconds) return
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show the Farming Fortune stat, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
+            if (lastCropFortuneMissingError.passedSince() < 20.seconds || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show latest Crop Fortune, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }

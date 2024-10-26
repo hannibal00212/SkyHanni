@@ -73,8 +73,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             val hiddenErrors = errors - 3
             ChatUtils.chat(
                 Text.text(
-                    "§c[SkyHanni/${SkyHanniMod.version}] $hiddenErrors more errors in $name are hidden!"
-                )
+                    "§c[SkyHanni/${SkyHanniMod.version}] $hiddenErrors more errors in $name are hidden!",
+                ),
             )
         }
         return event.isCancelled

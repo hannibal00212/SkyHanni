@@ -32,10 +32,11 @@ object PlayerChatManager {
     /**
      * REGEX-TEST: [58] §7nea89o§7: haiiiii
      * REGEX-TEST: [266] ♫ §b[MVP§d+§b] lrg89§f: a
+     * REGEX-TEST: [302] ♫ [MVP+] lrg89: problematic
      */
     private val globalPattern by patternGroup.pattern(
         "global",
-        "(?:\\[(?<level>\\d+)] )?(?<author>.+)(?<chatColor>§f|§7): (?<message>.*)"
+        "(?:\\[(?<level>\\d+)] )?(?<author>.+?)(?<chatColor>§f|§7|): (?<message>.*)"
     )
 
     /**
@@ -205,25 +206,20 @@ object PlayerChatManager {
 
     private fun sendSystemMessage(event: SkyHanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
-            val cancelled = post()
-            event.handleChat(cancelled, blockedReason, chatComponent)
+            post()
+            event.handleChat(blockedReason, chatComponent)
         }
     }
 
     private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
-        val cancelled = post()
-        event.handleChat(cancelled, blockedReason, chatComponent)
+        post()
+        event.handleChat(blockedReason, chatComponent)
     }
 
     private fun SkyHanniChatEvent.handleChat(
-        cancelled: Boolean,
         blockedReason: String?,
         chatComponent: IChatComponent,
     ) {
-        if (cancelled) {
-            // This event can't be cancelled this is a lie
-
-        }
         blockedReason?.let {
             this.blockedReason = it
         }
