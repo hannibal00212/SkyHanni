@@ -71,7 +71,7 @@ public class HoppityEventSummaryConfig {
         EMPTY_4(""),
         TIME_IN_CF("§7You spent §b4h 36m §7in the §6Chocolate Factory§7."),
         RABBIT_THE_FISH_FINDS("§7You found §cRabbit the Fish §7in Meal Eggs §b2 §7times."),
-        LEADERBOARD_CHANGE("§6Leaderboard Change§7: §b#107 §c-> §b#99\n §7(§a+8 Spots§7) Top §a0.003% §c-> §7Top §a0.002%\n§4* §c§oSyncs on first §4§o/cf §c§orun per server swap§4§o.")
+        LEADERBOARD_CHANGE("§7Leaderboard: §b#107 §c-> §b#99\n §7(§a+8 Spots§7) Top §a0.003% §c-> §7Top §a0.002%\n§4* §c§oSyncs on first §4§o/cf §c§orun per server swap§4§o.")
         ;
 
         private final String display;
