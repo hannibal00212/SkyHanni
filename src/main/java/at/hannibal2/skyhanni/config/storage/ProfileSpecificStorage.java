@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class ProfileSpecificStorage {
@@ -764,6 +765,11 @@ public class ProfileSpecificStorage {
 
             @Expose
             public int strays = 0;
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(uniques, dupes, strays);
+            }
         }
 
         @Expose
@@ -789,6 +795,11 @@ public class ProfileSpecificStorage {
                 this.position = position;
                 this.percentile = percentile;
             }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(position, percentile);
+            }
         }
 
         @Expose
@@ -799,5 +810,20 @@ public class ProfileSpecificStorage {
 
         @Expose
         public boolean summarized = false;
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                mealsFound,
+                rabbitsFound,
+                dupeChocolateGained,
+                strayChocolateGained,
+                millisInCf,
+                rabbitTheFishFinds,
+                initialLeaderboardPosition,
+                finalLeaderboardPosition,
+                summarized
+            );
+        }
     }
 }
