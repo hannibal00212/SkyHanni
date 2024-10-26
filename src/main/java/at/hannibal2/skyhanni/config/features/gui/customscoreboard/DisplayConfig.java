@@ -150,6 +150,11 @@ public class DisplayConfig {
     public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
 
     @Expose
+    @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
+    @ConfigEditorBoolean
+    public boolean showProfileName = false;
+
+    @Expose
     @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
     @ConfigEditorBoolean
     public boolean dateInLobbyCode = true;
