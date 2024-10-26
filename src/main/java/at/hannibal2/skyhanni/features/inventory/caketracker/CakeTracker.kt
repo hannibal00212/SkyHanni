@@ -395,7 +395,8 @@ object CakeTracker {
         // Store how many lines are 'hidden' as a result of the display limit
         var hiddenRows = 0
         cakeRanges.forEach {
-            if (this.size >= config.maxDisplayRows) hiddenRows++
+            // + 3 is to account for the header and selector boxes
+            if (this.size >= (config.maxDisplayRows + 3)) hiddenRows++
             else add(it.getRenderable(displayType))
         }
 
