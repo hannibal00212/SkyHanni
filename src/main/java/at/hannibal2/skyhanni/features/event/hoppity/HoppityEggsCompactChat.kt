@@ -102,14 +102,14 @@ object HoppityEggsCompactChat {
             } else ""
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
-            val rarityFormat = if (showDupeRarity) lastRarity else ""
+            val rarityFormat = if (showDupeRarity) "$lastRarity " else ""
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
             val dupeChocColor =
                 if (eventConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d"
                 else "§6"
 
-            "$mealNameFormat! §7Duplicate $rarityFormat $lastName$dupeNumberFormat " +
+            "$mealNameFormat! §7Duplicate $rarityFormat$lastName$dupeNumberFormat " +
                 "§7(§6+$dupeChocColor$dupeChocFormat §6Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
