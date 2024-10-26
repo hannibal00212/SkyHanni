@@ -40,10 +40,15 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
+    /**
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
         "(?:(?:§7§l|§d§l|§9)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:,\\d{3})*))+\$",
     )
+    // Above regex tests apply to this pattern also
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
         "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
