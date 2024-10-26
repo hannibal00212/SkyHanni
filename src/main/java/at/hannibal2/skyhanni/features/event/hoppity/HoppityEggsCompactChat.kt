@@ -102,7 +102,7 @@ object HoppityEggsCompactChat {
             } else ""
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
-            val rarityFormat = if (showDupeRarity) "$lastRarity " else ""
+            val rarityFormat = if (showDupeRarity) lastRarity else ""
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
             val dupeChocColor =
