@@ -95,6 +95,15 @@
 
 + Improved the Time Tower Usage Warning so it doesn't spam messages. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2730)
 
+#### Great Spook Improvements
+
++ Highlight Great Spook's answer in blue. - not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2798)
+
+#### Custom Scoreboard Improvements
+
++ Added the date to the Custom Scoreboard Lobby code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2802)
++ Added an option to display the profile type instead of the name in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2810)
+
 #### Misc Improvements
 
 + Added distance display to waypoints created by Patcher's Send Coords feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2704)
@@ -128,6 +137,8 @@
 + Fixed Compact Item Stars. - Empa, Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2741)
 + Fixed an Estimated Item Value issue where +10 stars were accidentally added to certain items and unstarred items were not showing stars. - Fazfoxy and Empa (https://github.com/hannibal002/SkyHanni/pull/2758)
 + Fixed an issue with Estimated Item Value erroring when multiple mods affect the same item. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2787)
++ Fixed "Dungeon Potion level as stack size" not working in shop menus. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2825)
++ Fixed being unable to use the "Close" button when "Change all clicks to shift clicks in brewing stands" is enabled. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2824)
 
 #### Combat Fixes
 
@@ -144,6 +155,7 @@
 + Fixed Custom Scoreboard duplicating the Party Leader. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2780)
 + Fixed some Custom Scoreboard errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2779)
 + Fixed party leader not displaying correctly in the Custom Scoreboard. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2783)
++ Fixed the Broodmother line in the Custom Scoreboard having a leading space. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2810)
 
 #### Hoppity Fixes
 
@@ -151,11 +163,14 @@
 + Fixed El Dorado not receiving a compacted chat message. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2742)
 + Fixed issues with El Dorado stray detection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2786)
 + Fixed an error when Rabbit the Fish was found in Meal Eggs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2785)
++ Fixed dyes being incorrectly modified in Hoppity's Collection after disabling "Re-Color Missing Rabbit Dyes". - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2803)
 
 #### Garden Fixes
 
 + Fixed farming weight not disappearing when the config option is off. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2731)
 + Fixed New Visitor Ping triggering too late if the player is actively farming. - Luna (https://github.com/hannibal002/SkyHanni/pull/2767)
++ Fixed the mouse not unlocking when teleporting to the Barn. - not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2799)
++ Fixed API error when sending Jacob Contests. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/2819)
 
 #### Crimson Isle Fixes
 
@@ -183,6 +198,7 @@
 
 + Fixed Fear Stat Display. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2766)
 + Fixed Carnival Goal display rarely showing outside the Hub Island. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2772)
++ Fixed the Great Spook features. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2804)
 
 #### Rift Fixes
 
@@ -191,6 +207,8 @@
 #### Chat Fixes
 
 + Fixed item stash messages not being compacted correctly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2781)
++ Fixed own player messages not being reformatted by chat formatting. - !nea (https://github.com/hannibal002/SkyHanni/pull/2806)
+    +  Also fixed ranks losing their "+" colors.
 
 #### Misc Fixes
 
@@ -198,6 +216,7 @@
 + Fixed the formatting of negative durations. - Empa (https://github.com/hannibal002/SkyHanni/pull/2726)
 + Fixed debug messages not sending when debug mode is enabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2793)
 + Fixed TPS display not working outside Skyblock. - Empa (https://github.com/hannibal002/SkyHanni/pull/2791)
++ Fixed the "Colored Class Level" tab list displaying "null". - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2814)
 
 ### Technical Details
 
@@ -227,6 +246,9 @@
 + Added informative comments on PRs when failures are detected. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2790)
 + Added in-file annotations when 'Detekt' failures occur. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2790)
 + Added some preprocessing mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2776)
++ Added Shot support to the multi-version build. - !nea (https://github.com/hannibal002/SkyHanni/pull/2800)
+    +  This allows adding nullability annotations (and other simple annotations) to vanilla code.
++ Added an event handler check to SkyHanni Events. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2755)
 
 ## Version 0.27
 
