@@ -90,7 +90,7 @@ object GardenAPI {
     private val patternGroup = RepoPattern.group("garden")
 
     val copperPattern by patternGroup.pattern(
-        "copper",
+        "scoreboard.copper",
         "(?:§.)*Copper: (?:§.)*(?<copper>[\\d,]+).*",
     )
 
