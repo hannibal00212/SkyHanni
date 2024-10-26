@@ -17,8 +17,6 @@ object ScoreboardElementPowder : ScoreboardElement() {
 
         add("§9§lPowder")
 
-        val displayNumbersFirst = displayConfig.displayNumbersFirst
-
         for (type in powderTypes) {
             val name = type.displayName
             val color = type.color
@@ -27,7 +25,7 @@ object ScoreboardElementPowder : ScoreboardElement() {
 
             when (displayConfig.powderDisplay) {
                 PowderDisplay.AVAILABLE -> {
-                    add(" §7 - ${CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(name, current, color)}")
+                    add(" §7- ${CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(name, current, color)}")
                 }
 
                 PowderDisplay.TOTAL -> {
