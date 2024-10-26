@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
@@ -18,18 +18,15 @@ object ScoreboardElementTuning : ScoreboardElement() {
         return if (maxwellConfig.compactTuning) {
             val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
                 with(tuning) {
-                    if (displayConfig.displayNumbersFirst) "$color$value$icon"
-                    else "$color$icon$value"
+                    CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(value, icon, color)
                 }
             }
-            if (displayConfig.displayNumbersFirst) "$tuningDisplay §f$title"
-            else "$title: $tuningDisplay"
+            CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(title, tuningDisplay, "§f")
         } else {
             val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
             val tuningList = tunings.take(tuningAmount).map { tuning ->
                 with(tuning) {
-                    " §7- §f" + if (displayConfig.displayNumbersFirst) "$color$value $icon $name"
-                    else "$name: $color$value$icon"
+                    " §7- §f" + CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(value, icon, color)
                 }
             }
             listOf("$title:") + tuningList
