@@ -63,14 +63,15 @@ object HoppityEventSummary {
     private data class StatString(val string: String, val headed: Boolean = true)
 
     private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
+    private fun isEggLocatorOverridden(): Boolean =
+        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == EGGLOCATOR_ITEM
     private fun liveDisplayEnabled(): Boolean {
         val profileStorage = ProfileStorageData.profileSpecific ?: return false
         val isEnabled = liveDisplayConfig.enabled
         val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
         val isToggledOff = profileStorage.hoppityStatLiveDisplayToggled
-        val isEggLocatorOverridden = liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == EGGLOCATOR_ITEM
 
-        return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden || (!isToggledOff && isEventEnabled))
+        return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden() || (!isToggledOff && isEventEnabled))
     }
 
     @SubscribeEvent
