@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -34,17 +35,16 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FruitDigging {
 
-    val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
+    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
 
-    var shovelMode = ""
-    var lastTimeDigging = SimpleTimeMark.farPast()
-    var lastMined = mutableListOf<LorenzVec>()
-    var lastDrop = mutableListOf<DropType>()
-    var hasStarted = false
+    private var shovelMode = ""
+    private var lastTimeDigging = SimpleTimeMark.farPast()
+    private var lastMined = mutableListOf<LorenzVec>()
+    private var hasStarted = false
 
     private var itemsOnGround = mutableMapOf<LorenzVec, EntityInfo>()
 
-    var mineBlocks = mutableMapOf<LorenzVec, PosInfo>()
+    private var mineBlocks = mutableMapOf<LorenzVec, PosInfo>()
 
     private val patternGroup = RepoPattern.group("event.carnival")
 
@@ -110,11 +110,11 @@ object FruitDigging {
         if (event.location.distanceToPlayer() <= 7) {
             val itemHeld = InventoryUtils.getItemInHand() ?: return
             shovelMode = modePattern.matchMatcher(itemHeld.getLore()[3].removeColor()) { group("mode") }.toString()
-            MyFruitDigging.ShovelType.active = when (shovelMode) {
-                "Mines" -> MyFruitDigging.ShovelType.MINES
-                "Treasure" -> MyFruitDigging.ShovelType.TREASURE
-                "Anchor" -> MyFruitDigging.ShovelType.ANCHOR
-                else -> MyFruitDigging.ShovelType.MINES
+            FruitDiggingSolver.ShovelType.active = when (shovelMode) {
+                "Mines" -> FruitDiggingSolver.ShovelType.MINES
+                "Treasure" -> FruitDiggingSolver.ShovelType.TREASURE
+                "Anchor" -> FruitDiggingSolver.ShovelType.ANCHOR
+                else -> FruitDiggingSolver.ShovelType.MINES
             }
 
             if (event.new == "sandstone") {
@@ -126,7 +126,7 @@ object FruitDigging {
                 val entry = mineBlocks.entries.find { it.key == lastMined.last() } ?: return
                 entry.value.uncovered = true;
                 entry.value.dropTypes = mutableSetOf(DropType.BOMB)
-                MyFruitDigging.setBombed(event.location.convertCords())
+                FruitDiggingSolver.setBombed(event.location.convertCords())
             }
 
             if (mineBlocks.size != 49) {
@@ -174,9 +174,6 @@ object FruitDigging {
             mineBlocksEntry.value.dropTypes = types
             if (lastMined.lastOrNull() == position) mineBlocksEntry.value.uncovered = true
             itemsOnGround[position] = EntityInfo(itemStack, dropType)
-
-            //println(itemsOnGround)
-            //println(mineBlocks)
         }
         if (ticksSinceLastFound > (fruitStack.count { itemsOnGround[it]!!.type == DropType.WATERMELON } * 5 + 3) * 3) {
             if (lastPos == fruitStack.firstOrNull()) {
@@ -200,29 +197,29 @@ object FruitDigging {
     private var lastChat: String = ""
     private var rummed = false
 
-    fun dig(drop: DropType) {
+    private fun dig(drop: DropType) {
         try {
             println("Fruit Stack: $fruitStack")
             val watermeloned = fruitStack.filter { isDug(it) }.drop(1).toSet()
             val anchor = (fruitStack - watermeloned).drop(1).firstOrNull()
-            val result = if (rummed) 0 else when (MyFruitDigging.ShovelType.active) {
-                MyFruitDigging.ShovelType.ANCHOR -> MyFruitDigging.ShovelType.active.getResult(lastChat)?.also { lastChat = "" }
+            val result = if (rummed) 0 else when (FruitDiggingSolver.ShovelType.active) {
+                FruitDiggingSolver.ShovelType.ANCHOR -> FruitDiggingSolver.ShovelType.active.getResult(lastChat)?.also { lastChat = "" }
                     ?: (anchor ?: watermeloned.firstOrNull())?.let {
                         val (x, z) = it.convertCords()
                         Triple(itemsOnGround[it]!!.type, x, z)
                     }
 
-                else -> MyFruitDigging.ShovelType.active.getResult(lastChat)
+                else -> FruitDiggingSolver.ShovelType.active.getResult(lastChat)
             }
             if (result != null) {
-                MyFruitDigging.onDig(
+                FruitDiggingSolver.onDig(
                     lastMined.get(lastMined.size - 1 - watermeloned.size).convertCords(),
                     drop,
-                    if (rummed) null else MyFruitDigging.ShovelType.active,
+                    if (rummed) null else FruitDiggingSolver.ShovelType.active,
                     result,
                 )
                 for (it in watermeloned) {
-                    MyFruitDigging.setWatermeloned(
+                    FruitDiggingSolver.setWatermeloned(
                         it.convertCords(),
                         itemsOnGround[it]!!.type,
                     ) // TODO Fix ANCHOR + WATERMELON on same Block
@@ -242,7 +239,7 @@ object FruitDigging {
         lastChat = ""
         fruitStack.clear()
         lastPos = LorenzVec()
-        MyFruitDigging.reset()
+        FruitDiggingSolver.reset()
     }
 
     @SubscribeEvent
@@ -270,21 +267,12 @@ object FruitDigging {
             "Mines" -> minesPattern.matchMatcher(message) {
                 entry.value.uncovered = true
                 entry.value.minesNear = group("amount").toInt()
-//                 mineBlocks[lastMined.last()] = PosInfo(
-//                     true, mutableListOf(drop), null,
-//                     null, group("amount").toInt(),
-//                 )
             }
 
             "Treasure" -> {
                 treasurePattern.matchMatcher(message) {
                     entry.value.uncovered = true
                     entry.value.highestFruit = convertToType(group("fruit"), null)
-
-//                 mineBlocks[lastMined.last()] = PosInfo(
-//                     true, mutableListOf(drop), null,
-//                     group("fruit"), null,
-//                 )
 
                 }
 
@@ -299,10 +287,6 @@ object FruitDigging {
             "Anchor" -> if (message == "ANCHOR! There are no fruits nearby!") {
                 entry.value.uncovered = true
                 entry.value.lowestFruit = DropType.NONE
-//                 mineBlocks[lastMined.last()] = PosInfo(
-//                     true, mutableListOf(drop), "NONE",
-//                     null, null,
-//                 )
                 getAdjacent(lastMined.last()).forEach {
                     val types = mutableSetOf(DropType.BOMB, DropType.RUM)
                     if (it.value.dropTypes == null) it.value.dropTypes = types
@@ -311,93 +295,11 @@ object FruitDigging {
         }
     }
 
-    /* @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
-
-        mineBlocks.entries.forEach { (loc, info) ->
-            val amt = info.minesNear
-
-            val adjacent = getAdjacent(loc)
-
-            if (adjacent.isNotEmpty()) for (adjacentBlock in adjacent) {
-                val crossing = getCrossingAdjacent(mutableMapOf(loc to info), getAdjacent(adjacentBlock.key))
-
-                var crossingHighest = 0F
-                var crossingLowest = 0F
-                var crossingMines = 0F
-
-                for (cross in crossing) {
-                    val crossInfo = cross.value
-                    if (crossInfo.highestFruit != null && crossInfo.highestFruit == info.highestFruit) crossingHighest += 1F
-                    if (crossInfo.lowestFruit != null && crossInfo.lowestFruit == info.lowestFruit) crossingLowest += 1F
-                    if (crossInfo.minesNear != null && crossInfo.minesNear == info.minesNear) crossingMines += 1F
-                }
-
-                val values = listOf(crossingHighest, crossingLowest, crossingMines)
-                if (values.all { it == 0F }) continue
-
-                val size = crossing.size
-                val percentages = values.map { if (it != 0F) size / it else 999F }
-
-                val text = percentages.joinToString(" §7or ") {
-                    if (it != 999F) "${(it * (100 / size)).round(2)}" else ""
-                }
-
-                event.drawWaypointFilled(loc, Color.PINK, minimumAlpha = 0.5F)
-                event.drawDynamicText(loc.add(0.0, 1.5, 0.0), text, 1.0)
-            }
-
-            val uncoveredColor = config.uncoveredText.chatColorCode
-
-            var types = getTypes(info.dropTypes)
-
-            val surroundingBombs = adjacent.filter { it.value.dropTypes == types }
-            val surroundingNormals = adjacent.filter { it.value.dropTypes == types && !it.value.uncovered }
-            val surroundingUncovered = adjacent.filter { it.value.uncovered }.size
-
-            val enoughBombs = if (amt != null) surroundingBombs.size >= (amt - surroundingUncovered) else false
-
-            val template = if (info.uncovered) "§${uncoveredColor}Uncovered (INFO§${uncoveredColor})" else "INFO"
-
-            handleSurroundings(enoughBombs, surroundingBombs, surroundingNormals, event)
-
-            types = getTypes(info.dropTypes)
-
-            val (text, color) = when (types.size) {
-                0 -> if (info.dropTypes == null && info.uncovered) "§${uncoveredColor}Uncovered" to config.uncovered.toColor() else null to null
-
-                1 -> {
-                    val displayText = types.first().display
-                    val color = if (info.uncovered) {
-                        config.uncovered.toColor()
-                    } else {
-                        if (types.first() == DropType.BOMB) config.mine.toColor() else
-                            if (types.first() == DropType.NOT_BOMB) config.safe.toColor()
-                            else Color.BLUE
-                    }
-                    template.replace("INFO", displayText) to color
-                }
-
-                else -> {
-                    val displayTexts = types.joinToString(separator = " §7or ") { it.display }
-                    val color = config.uncovered.toColor()
-                    displayTexts to color
-                }
-            }
-
-            if (text == null || color == null) return@forEach
-
-            event.drawWaypointFilled(loc, color, minimumAlpha = 0.5F)
-            event.drawDynamicText(loc.add(0.0, 1.5, 0.0), text, 1.0)
-        }
-    } */
-
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        for (info in MyFruitDigging.getBoardState()) {
+        for (info in FruitDiggingSolver.getBoardState()) {
             val text: String
             val color: Color
             when {
@@ -435,58 +337,6 @@ object FruitDigging {
         }
     }
 
-    private fun updateMineBlocks(
-        position: LorenzVec,
-        dropTypes: MutableSet<DropType>,
-        lowest: DropType?,
-        highest: DropType?,
-        amount: Int?,
-    ) {
-        mineBlocks[position] = PosInfo(true, dropTypes, lowest, highest, amount)
-        lastMined.removeLast()
-    }
-
-    private fun handleSurroundings(
-        enoughBombs: Boolean,
-        surroundingBombs: Map<LorenzVec, PosInfo>,
-        surroundingNormals: Map<LorenzVec, PosInfo>,
-        event: LorenzRenderWorldEvent,
-    ) {
-        val mineColor = config.mineText.chatColorCode
-        val safeColor = config.safeText.chatColorCode
-
-        if (!enoughBombs) return
-
-        for (normal in surroundingNormals) {
-            event.drawWaypointFilled(normal.key, config.safe.toColor(), minimumAlpha = 1F)
-            event.drawDynamicText(normal.key.add(0.0, 1.5, 0.0), "§${safeColor}Safe", 1.0)
-            val entry = mineBlocks[normal.key] ?: continue
-            entry.dropTypes = mutableSetOf(DropType.NOT_BOMB)
-        }
-
-        for (bomb in surroundingBombs) {
-            event.drawWaypointFilled(bomb.key, config.mine.toColor(), minimumAlpha = 1F)
-            event.drawDynamicText(bomb.key.add(0.0, 1.5, 0.0), "§${mineColor}Mine", 1.0)
-            val entry = mineBlocks[bomb.key] ?: continue
-            entry.dropTypes = mutableSetOf(DropType.BOMB)
-        }
-    }
-
-    private fun getCrossingAdjacent(vararg adjacents: MutableMap<LorenzVec, PosInfo>): MutableMap<LorenzVec, PosInfo> {
-        if (adjacents.isEmpty()) return mutableMapOf()
-
-        val result = mutableMapOf<LorenzVec, PosInfo>()
-        val firstMap = adjacents[0]
-
-        for ((key, value) in firstMap) {
-            if (adjacents.all { it.containsKey(key) }) {
-                result[key] = value
-            }
-        }
-
-        return result
-    }
-
     private fun getAdjacent(blockPos: LorenzVec): MutableMap<LorenzVec, PosInfo> {
         val directions = listOf(
             LorenzVec(1, 0, 0),
@@ -511,9 +361,6 @@ object FruitDigging {
         return validBlocks.ifEmpty { return mutableMapOf() }
     }
 
-    private fun getTypes(types: MutableSet<DropType>?): MutableSet<DropType> =
-        if (!types.isNullOrEmpty()) types else mutableSetOf()
-
     fun convertToType(name: String?, itemStack: ItemStack?): DropType? {
         val skullTextureURL = if (itemStack != null) Gson().fromJson(
             itemStack.getSkullTexture()?.let { decodeBase64(it) },
@@ -526,5 +373,5 @@ object FruitDigging {
     }
 
     private fun isEnabled() =
-        config.enabled //LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Carnival"
+        config.enabled && LorenzUtils.inSkyBlock && LorenzUtils.skyBlockArea == "Carnival"
 }

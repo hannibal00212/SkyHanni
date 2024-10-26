@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.features.event.carnival.DropType
-import at.hannibal2.skyhanni.features.event.carnival.MyFruitDigging.ShovelType
-import at.hannibal2.skyhanni.features.event.carnival.MyFruitDigging.directions
-import at.hannibal2.skyhanni.features.event.carnival.amountOnTheBoard
+import at.hannibal2.skyhanni.features.event.carnival.DropType.Companion.amountOnTheBoard
+import at.hannibal2.skyhanni.features.event.carnival.FruitDiggingSolver.ShovelType
+import at.hannibal2.skyhanni.features.event.carnival.FruitDiggingSolver.directions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
-import at.hannibal2.skyhanni.features.event.carnival.MyFruitDigging as Solver
+import at.hannibal2.skyhanni.features.event.carnival.FruitDiggingSolver as Solver
 
 object CarnivalPirateSolverTest {
 
@@ -187,76 +187,6 @@ object CarnivalPirateSolverTest {
         simulatedDig(0 to 6, ShovelType.MINES)
         simulatedDig(6 to 0, ShovelType.MINES)
         simulatedDig(6 to 6, ShovelType.MINES)
-    }
-
-    // TODO find a better way
-    fun main() {
-        clearSolver()
-        createBoard()
-        var shouldEnd = false
-        var shovelType = ShovelType.MINES
-        while (!shouldEnd) {
-            println()
-            println(printWithBoardState())
-            println()
-            val it = readlnOrNull()
-            when (it) {
-                "a" -> shovelType = ShovelType.ANCHOR
-                "m" -> shovelType = ShovelType.MINES
-                "t" -> shovelType = ShovelType.TREASURE
-                "00" -> simulatedDig(0 to 0, shovelType)
-                "01" -> simulatedDig(0 to 1, shovelType)
-                "02" -> simulatedDig(0 to 2, shovelType)
-                "03" -> simulatedDig(0 to 3, shovelType)
-                "04" -> simulatedDig(0 to 4, shovelType)
-                "05" -> simulatedDig(0 to 5, shovelType)
-                "06" -> simulatedDig(0 to 6, shovelType)
-                "10" -> simulatedDig(1 to 0, shovelType)
-                "11" -> simulatedDig(1 to 1, shovelType)
-                "12" -> simulatedDig(1 to 2, shovelType)
-                "13" -> simulatedDig(1 to 3, shovelType)
-                "14" -> simulatedDig(1 to 4, shovelType)
-                "15" -> simulatedDig(1 to 5, shovelType)
-                "16" -> simulatedDig(1 to 6, shovelType)
-                "20" -> simulatedDig(2 to 0, shovelType)
-                "21" -> simulatedDig(2 to 1, shovelType)
-                "22" -> simulatedDig(2 to 2, shovelType)
-                "23" -> simulatedDig(2 to 3, shovelType)
-                "24" -> simulatedDig(2 to 4, shovelType)
-                "25" -> simulatedDig(2 to 5, shovelType)
-                "26" -> simulatedDig(2 to 6, shovelType)
-                "30" -> simulatedDig(3 to 0, shovelType)
-                "31" -> simulatedDig(3 to 1, shovelType)
-                "32" -> simulatedDig(3 to 2, shovelType)
-                "33" -> simulatedDig(3 to 3, shovelType)
-                "34" -> simulatedDig(3 to 4, shovelType)
-                "35" -> simulatedDig(3 to 5, shovelType)
-                "36" -> simulatedDig(3 to 6, shovelType)
-                "40" -> simulatedDig(4 to 0, shovelType)
-                "41" -> simulatedDig(4 to 1, shovelType)
-                "42" -> simulatedDig(4 to 2, shovelType)
-                "43" -> simulatedDig(4 to 3, shovelType)
-                "44" -> simulatedDig(4 to 4, shovelType)
-                "45" -> simulatedDig(4 to 5, shovelType)
-                "46" -> simulatedDig(4 to 6, shovelType)
-                "50" -> simulatedDig(5 to 0, shovelType)
-                "51" -> simulatedDig(5 to 1, shovelType)
-                "52" -> simulatedDig(5 to 2, shovelType)
-                "53" -> simulatedDig(5 to 3, shovelType)
-                "54" -> simulatedDig(5 to 4, shovelType)
-                "55" -> simulatedDig(5 to 5, shovelType)
-                "56" -> simulatedDig(5 to 6, shovelType)
-                "60" -> simulatedDig(6 to 0, shovelType)
-                "61" -> simulatedDig(6 to 1, shovelType)
-                "62" -> simulatedDig(6 to 2, shovelType)
-                "63" -> simulatedDig(6 to 3, shovelType)
-                "64" -> simulatedDig(6 to 4, shovelType)
-                "65" -> simulatedDig(6 to 5, shovelType)
-                "66" -> simulatedDig(6 to 6, shovelType)
-                else -> shouldEnd = true
-            }
-        }
-        println("Play Ended")
     }
 
 }

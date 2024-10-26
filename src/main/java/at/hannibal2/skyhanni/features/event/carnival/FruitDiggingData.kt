@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
-import at.hannibal2.skyhanni.features.event.carnival.FruitDigging.config
+import at.hannibal2.skyhanni.SkyHanniMod
 import net.minecraft.item.ItemStack
 
 data class PosInfo(
@@ -20,36 +20,7 @@ data class Skin(val url: String)
 data class Textures(val SKIN: Skin)
 data class MinecraftTextures(val textures: Textures)
 
-val amountOnTheBoard = mapOf(
-    DropType.MANGO to 10,
-    DropType.APPLE to 8,
-    DropType.WATERMELON to 4,
-    DropType.POMEGRANATE to 4,
-    DropType.COCONUT to 3,
-    DropType.CHERRY to 2,
-    DropType.DURIAN to 2,
-    DropType.DRAGONFRUIT to 1,
-    DropType.RUM to 5,
-    DropType.BOMB to 15,
-    //DropType.NOT_BOMB to 34,
-    //DropType.NONE to 0,
-)
-
-class DropTypeManager {
-    private val amountsLeft = amountOnTheBoard.toMutableMap()
-
-    fun getAmountLeft(dropType: DropType): Int {
-        return amountsLeft[dropType] ?: 0
-    }
-
-    fun setAmountLeft(dropType: DropType, amount: Int) {
-        amountsLeft[dropType] = amount
-    }
-
-    fun getAllAmountsLeft(): IntArray {
-        return amountsLeft.values.toIntArray()
-    }
-}
+private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
 
 enum class DropType(
     val basePoints: Int,
@@ -108,9 +79,8 @@ enum class DropType(
     BOMB(
         0,
         "http://textures.minecraft.net/texture/a76a2811d1e176a07b6d0a657b910f134896ce30850f6e80c7c83732d85381ea",
-        "§${config.mineText.chatColorCode}Bomb",
+        "§eBomb",
     ),
-    NOT_BOMB(0, "", "§${config.safeText.chatColorCode}Safe"),
     NONE(0, "", "")
     ;
 
@@ -121,4 +91,19 @@ enum class DropType(
     val above by lazy { entries.filter { it.below.contains(this) }.toSet() }
 
     val absoluteRanking: Int = below.maxOfOrNull { it.absoluteRanking }?.plus(1) ?: 0
+
+    companion object {
+        val amountOnTheBoard = mapOf(
+            MANGO to 10,
+            APPLE to 8,
+            WATERMELON to 4,
+            POMEGRANATE to 4,
+            COCONUT to 3,
+            CHERRY to 2,
+            DURIAN to 2,
+            DRAGONFRUIT to 1,
+            RUM to 5,
+            BOMB to 15,
+        )
+    }
 }
