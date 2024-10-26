@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -128,6 +129,11 @@ public class DisplayConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Number Display Format", desc = "TODO")
+    @ConfigEditorDropdown
+    public CustomScoreboardUtils.ScoreboardNumberDisplayFormat numberDisplayFormat = CustomScoreboardUtils.ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER;
 
     @Expose
     @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")

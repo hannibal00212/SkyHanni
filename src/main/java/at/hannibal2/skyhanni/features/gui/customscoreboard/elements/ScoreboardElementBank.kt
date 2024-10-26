@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
@@ -10,12 +10,9 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 object ScoreboardElementBank : ScoreboardElement() {
     override fun getDisplay(): String? {
         val bank = getBank()
+        if (informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60")) return null
 
-        return when {
-            informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60") -> null
-            displayConfig.displayNumbersFirst -> "§6$bank Bank"
-            else -> "Bank: §6$bank"
-        }
+        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Bank", bank, "§6")
     }
 
     override val configLine = "Bank: §6249M"
