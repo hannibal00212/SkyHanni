@@ -379,10 +379,10 @@ object HoppityEventSummary {
         val iPe = initial.percentile
         val fPe = final.percentile
         val dPe = fPe - iPe
-        val color = if (iPo > fPo) "§a+" else "§c"
+        val preambleFormat = if (iPo > fPo) "§a+" else "§c"
 
         return buildString {
-            append("§7(#$color${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)")
+            append("§7($preambleFormat${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)")
             if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
             else append(" §7Top §a$iPe%")
         }
