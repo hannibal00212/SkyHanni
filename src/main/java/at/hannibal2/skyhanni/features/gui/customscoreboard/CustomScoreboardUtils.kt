@@ -24,7 +24,7 @@ object CustomScoreboardUtils {
     fun formatScoreboardNumberDisplayDisplay(text: String, number: String, color: String) = when (displayConfig.numberDisplayFormat) {
         ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$number"
         ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $number"
-        ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$number $text"
+        ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$number $color$text"
         ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$number §f$text"
     }
 
