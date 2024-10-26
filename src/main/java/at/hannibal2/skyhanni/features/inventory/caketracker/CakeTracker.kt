@@ -16,8 +16,10 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -29,7 +31,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
 private typealias DisplayOrder = CakeTrackerDisplayOrderType
@@ -40,8 +45,8 @@ object CakeTracker {
 
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
-    private var currentYear = 0
 
+    private var currentYear = 0
     private var inCakeBag = false
     private var inCakeInventory = false
     private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
@@ -57,6 +62,7 @@ object CakeTracker {
      * REGEX-TEST: §cNew Year Cake (Year 360)
      * REGEX-TEST: §cNew Year Cake (Year 1,000)
      * REGEX-TEST: §f§f§cNew Year Cake (Year 330)
+     * REGEX-TEST: §f§f§cNew Year Cake (Year 49)
      */
     private val cakeNamePattern by patternGroup.pattern(
         "cake.name",
@@ -84,6 +90,7 @@ object CakeTracker {
     /**
      * REGEX-TEST: Auctions Browser
      * REGEX-TEST: Auctions: "Test"
+     * REGEX-TEST: Auctions: "New Year Cake (Year
      */
     private val auctionBrowserPattern by patternGroup.pattern(
         "auction.search",
@@ -129,7 +136,7 @@ object CakeTracker {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (inCakeBag || (inAuctionHouse && (auctionCakesCache.any() || searchingForCakes))) {
+        if (inCakeBag || (inAuctionHouse && (auctionCakesCache.isNotEmpty() || searchingForCakes))) {
             reRenderDisplay()
         }
     }
@@ -137,16 +144,15 @@ object CakeTracker {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (inAuctionHouse) {
-            event.container.inventorySlots.filter {
-                it.slotNumber in auctionCakesCache.keys && cakeNamePattern.matches(it.stack?.displayName)
-            }.forEach {
-                val highlightColor = if (auctionCakesCache[it.slotNumber] == true) LorenzColor.GREEN
-                else LorenzColor.RED
-                it highlight highlightColor
-            }
-        }
         if (inCakeInventory) checkInventoryCakes()
+
+        if (!inAuctionHouse) return
+        (event.gui.inventorySlots as ContainerChest).getAllItems().filter {
+            auctionCakesCache.containsKey(it.key.slotIndex) &&
+            cakeNamePattern.matches(it.key.stack.displayName)
+        }.forEach { (slot, _) ->
+            slot.getHighlightColor()?.let { slot highlight it }
+        }
     }
 
     @SubscribeEvent
@@ -155,6 +161,12 @@ object CakeTracker {
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
         inAuctionHouse = checkAuctionCakes(event)
+    }
+
+    private fun Slot.getHighlightColor(): Color? {
+        cakeNamePattern.matchGroup(stack.displayName, "year") ?: return null
+        return if (auctionCakesCache[this.slotIndex] == true) config.obtainedAuctionHighlightColor.toChromaColor()
+        else config.unobtainedAuctionHighlightColor.toChromaColor()
     }
 
     private fun reRenderDisplay() {
@@ -186,7 +198,7 @@ object CakeTracker {
         }.map {
             val year = cakeNamePattern.matchGroup(it.value.displayName, "year")?.toInt() ?: 0
             val owned = storage?.ownedCakes?.contains(year) ?: false
-            year to owned
+            it.key to owned
         }.toMap().filter { it.key != 0 }
         return true
     }
@@ -256,7 +268,6 @@ object CakeTracker {
     private fun setDisplayType(type: DisplayType) {
         config.displayType = type
         lastKnownCakeDataHash = 0
-        reRenderDisplay()
     }
 
     private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
@@ -289,7 +300,6 @@ object CakeTracker {
     private fun setDisplayOrderType(type: DisplayOrder) {
         config.displayOrderType = type
         lastKnownCakeDataHash = 0
-        reRenderDisplay()
     }
 
     private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
@@ -383,6 +393,14 @@ object CakeTracker {
         if (start != end) cakeRanges.add(CakeRange(start, end))
         else cakeRanges.add(CakeRange(start))
 
-        cakeRanges.forEach { add(it.getRenderable(displayType)) }
+        // Store how many lines are 'hidden' as a result of the display limit
+        var hiddenRows = 0
+        cakeRanges.forEach {
+            if(this.size >= config.maxDisplayRows) hiddenRows ++
+            else add(it.getRenderable(displayType))
+        }
+
+        // Add a line to indicate that there are more rows hidden
+        if(hiddenRows > 0) add(Renderable.string("§7§o($hiddenRows hidden rows)"))
     }
 }

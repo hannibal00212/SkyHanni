@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -68,7 +69,26 @@ public class CakeTrackerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Auction Highlight Color", desc = "The color that should be used to highlight unobtained cakes in the auction house.")
+    @ConfigOption(
+        name = "Missing Auction Highlight Color",
+        desc = "The color that should be used to highlight unobtained cakes in the auction house."
+    )
     @ConfigEditorColour
-    public String auctionHighlightColor = LorenzColor.RED.toConfigColor();
+    public String unobtainedAuctionHighlightColor = LorenzColor.RED.toConfigColor();
+
+    @Expose
+    @ConfigOption(
+        name = "Obtained Auction Highlight Color",
+        desc = "The color that should be used to highlight obtained cakes in the auction house."
+    )
+    @ConfigEditorColour
+    public String obtainedAuctionHighlightColor = LorenzColor.GREEN.toConfigColor();
+
+    @Expose
+    @ConfigOption(
+        name = "Maximum Rows to Display",
+        desc = "The maximum number of rows to display in the tracker, before a cutoff is imposed."
+    )
+    @ConfigEditorSlider(minValue = 5, maxValue = 40, minStep = 1)
+    public int maxDisplayRows = 20;
 }
