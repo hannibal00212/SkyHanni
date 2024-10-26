@@ -33,6 +33,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
@@ -61,23 +63,31 @@ object HoppityEventSummary {
 
     private const val LINE_HEADER = "    "
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
+    private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
 
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
     private var lastKnownInInvState = false
-    private var lastAddedCfMillis: SimpleTimeMark? = null
-    private var lastSentCfUpdateMessage: SimpleTimeMark? = null
+    private var lastAddedCfMillis: SimpleTimeMark = farPast()
+    private var lastSentCfUpdateMessage: SimpleTimeMark = farPast()
 
-    private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
+    private fun SimpleTimeMark.isUninitialized(): Boolean =
+        this.toMillis() == 0L || this.toMillis() == Long.MAX_VALUE
+
+    private fun SimpleTimeMark.takeIfInitialized(): SimpleTimeMark? =
+        if (this.isUninitialized()) null else this
+
     private fun isEggLocatorOverridden(): Boolean =
         liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == EGGLOCATOR_ITEM
+
     private fun liveDisplayEnabled(): Boolean {
-        val profileStorage = ProfileStorageData.profileSpecific ?: return false
+        val storage = storage ?: return false
         val isEnabled = liveDisplayConfig.enabled
         val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
-        val isToggledOff = profileStorage.hoppityStatLiveDisplayToggled
+        val isToggledOff = storage.hoppityStatLiveDisplayToggled
 
         return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden() || (!isToggledOff && isEventEnabled))
     }
@@ -123,8 +133,8 @@ object HoppityEventSummary {
         reCheckInventoryState()
         if (liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
-        val profileStorage = ProfileStorageData.profileSpecific ?: return
-        profileStorage.hoppityStatLiveDisplayToggled = !profileStorage.hoppityStatLiveDisplayToggled
+        val storage = storage ?: return
+        storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
     }
 
     @SubscribeEvent
@@ -140,8 +150,8 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
-        val profileStorage = ProfileStorageData.profileSpecific ?: return
-        val statYear = profileStorage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
+        val storage = storage ?: return
+        val statYear = storage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
             ?: SkyBlockTime.now().year
 
         val stats = getYearStats(statYear).first
@@ -165,7 +175,6 @@ object HoppityEventSummary {
         reCheckInventoryState()
         checkEnded()
         if (!HoppityAPI.isHoppityEvent()) return
-        checkInit()
         checkAddCfTime()
     }
 
@@ -199,7 +208,7 @@ object HoppityEventSummary {
     }
 
     private fun resetStats() {
-        ProfileStorageData.profileSpecific?.let {
+        storage?.let {
             it.hoppityEventStats.clear()
             ChatUtils.chat("Hoppity Event stats have been reset.")
         } ?: ErrorManager.skyHanniError("Could not reset Hoppity Event stats.")
@@ -219,15 +228,15 @@ object HoppityEventSummary {
         }
 
         // If it's been less than {config} minutes since the last message, don't send another
-        lastSentCfUpdateMessage.let {
+        lastSentCfUpdateMessage.takeIfInitialized().let {
             val configFrequency = updateCfConfig.reminderInterval
             if (it != null && it.passedSince() < configFrequency.minutes) return
         }
         val stats = getYearStats().first ?: return
-        val markDiff = stats.lastLbUpdateMarkMillis.asTimeMark().passedSince()
+        val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: farFuture()
 
         // If it's been more than {config} since the last update, send a message
-        if (markDiff >= updateCfConfig.reminderInterval.minutes) {
+        if (lastLbUpdate.passedSince() >= updateCfConfig.reminderInterval.minutes) {
             lastSentCfUpdateMessage = SimpleTimeMark.now()
             ChatUtils.chat(
                 "§6§lReminder! §r§eSwitch to a new server and run §6/cf §e to " +
@@ -272,48 +281,42 @@ object HoppityEventSummary {
     }
 
     private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
-        val profileStorage = ProfileStorageData.profileSpecific ?: return null
-        val statsStorage = profileStorage.hoppityEventStats
-        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
+        val storage = storage ?: return null
+        val statsStorage = storage.hoppityEventStats
 
-        val predecessorYear = statsYearList.filter { it < currentStatYear }.takeIf { it.any() }?.max()
-        val successorYear = statsYearList.filter { it > currentStatYear }.takeIf { it.any() }?.min()
+        val predecessorYear = statsStorage.keys.filter { it < currentStatYear }.maxOrNull()
+        val successorYear = statsStorage.keys.filter { it > currentStatYear }.minOrNull()
         if (predecessorYear == null && successorYear == null) return null
 
         return listOfNotNull(
             predecessorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
-                    onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+                    onClick = { storage.hoppityStatLiveDisplayYear = it }
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
-                    onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+                    onClick = { storage.hoppityStatLiveDisplayYear = it }
                 )
             }
         )
     }
 
-    private fun checkInit() {
-        val statStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
-        val currentYear = SkyBlockTime.now().year
-        if (statStorage.containsKey(currentYear)) return
-        statStorage[currentYear] = HoppityEventStats()
-    }
-
     private fun getYearStats(year: Int? = null): Pair<HoppityEventStats?, Int> {
         val queryYear = year ?: SkyBlockTime.now().year
-        val storage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return Pair(null, queryYear)
-        if (!storage.containsKey(queryYear)) return Pair(null, queryYear)
-        return Pair(storage[queryYear], queryYear)
+        val yearStorage = storage?.hoppityEventStats?.getOrPut(
+            (year ?: SkyBlockTime.now().year),
+            ::HoppityEventStats
+        )
+        return Pair(yearStorage, queryYear)
     }
 
     private fun checkAddCfTime() {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         val stats = getYearStats().first ?: return
-        lastAddedCfMillis?.let {
+        lastAddedCfMillis.takeIfInitialized()?.let {
             stats.millisInCf += (SimpleTimeMark.now().toMillis() - it.toMillis())
         }
         lastAddedCfMillis = SimpleTimeMark.now()
@@ -329,8 +332,9 @@ object HoppityEventSummary {
 
         if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
             sendStatsMessage(stats, year)
-            ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
-                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
+            storage?.let {
+                it.hoppityEventStats[year]?.summarized = true
+            } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
         }
     }
 
@@ -343,7 +347,7 @@ object HoppityEventSummary {
         val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
         stats.finalLeaderboardPosition = snapshot
-        stats.lastLbUpdateMarkMillis = SimpleTimeMark.now().toMillis()
+        stats.lastLbUpdate = SimpleTimeMark.now()
     }
 
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {

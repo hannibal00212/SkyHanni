@@ -778,6 +778,7 @@ public class ProfileSpecificStorage {
         @Expose
         public long strayChocolateGained = 0;
 
+        // Todo: Convert to Duration
         @Expose
         public long millisInCf = 0;
 
@@ -809,7 +810,7 @@ public class ProfileSpecificStorage {
         public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
 
         @Expose
-        public long lastLbUpdateMarkMillis = Long.MAX_VALUE;
+        public SimpleTimeMark lastLbUpdate = SimpleTimeMarkFarPast();
 
         @Expose
         public boolean summarized = false;
