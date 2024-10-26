@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
-import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
@@ -53,7 +52,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import scala.Int;
 
 import java.util.ArrayList;
 import java.util.HashMap;
