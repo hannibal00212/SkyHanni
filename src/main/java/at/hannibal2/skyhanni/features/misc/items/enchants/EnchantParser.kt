@@ -41,7 +41,7 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
+        "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
@@ -415,8 +415,8 @@ object EnchantParser {
         val removeGrayEnchants = config.hideVanillaEnchants.get()
 
         var i = 1
-        for (total in 0 until 2) { // Using the fact that there should be at most 2 vanilla enchants
-            if (i + 1 >= loreList.size) break // In case the tooltip is very short (i.e, hovering over a short chat component)
+        repeat(2) { // Using the fact that there should be at most 2 vanilla enchants
+            if (i + 1 >= loreList.size) return@repeat // In case the tooltip is very short (i.e, hovering over a short chat component)
             val line = loreList[i]
             if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i

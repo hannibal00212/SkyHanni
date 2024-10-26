@@ -56,7 +56,8 @@ object VoltHighlighter {
 
             if (config.voltMoodMeter)
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-                    entity, when (state) {
+                    entity,
+                    when (state) {
                         VoltState.FRIENDLY -> 0x8000FF00.toInt()
                         VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
                         VoltState.HOSTILE -> 0x80FF0000.toInt()
@@ -77,9 +78,9 @@ object VoltHighlighter {
                 val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()
                 if (dischargeTimeLeft > Duration.ZERO) {
                     event.drawDynamicText(
-                        event.exactLocation(entity).add(y = 2.5),
+                        event.exactLocation(entity).up(2.5),
                         "§eLightning: ${dischargeTimeLeft.format(showMilliSeconds = true)}",
-                        2.5
+                        2.5,
                     )
                 }
             }
@@ -93,6 +94,7 @@ object VoltHighlighter {
         DOING_LIGHTNING,
     }
 
+    @Suppress("MaxLineLength")
     private fun getVoltState(itemStack: ItemStack): VoltState {
         return when (itemStack.getSkullTexture()) {
             // TODO: Move these textures to the repo

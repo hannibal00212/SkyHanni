@@ -306,9 +306,9 @@ object SkyHanniDebugsAndTests {
 
     private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
-    fun clearContestData() {
+    fun resetContestData() {
         if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
-            ChatUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+            ChatUtils.userError("§cYou already reset Jacob's Contest data recently!")
             return
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()

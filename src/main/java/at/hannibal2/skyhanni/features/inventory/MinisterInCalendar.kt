@@ -26,7 +26,7 @@ object MinisterInCalendar {
     private var ministerItemStack: ItemStack? = null
 
     private val prefix = listOf(
-        "§8(from SkyHanni)",
+        "§8(From SkyHanni)",
         "",
         "§8§m--------------------------",
     )

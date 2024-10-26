@@ -96,7 +96,7 @@ object TrophyFishMessages {
     }
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
-        val text = "$displayName\n$displayRarity $amount!"
+        val text = "$displayName $displayRarity §8$amount§c!"
         LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
     }
 

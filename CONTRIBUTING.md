@@ -85,7 +85,12 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-_An explanation how to use intellij and branches will follow here soon._
+Proposed changes are better off being in their own branch as this makes development easier for both you and the maintainers of this repository, you can do this by following the instructions from within the IntelliJ window with the SkyHanni project already open.
+- Click the beta dropdown at the top of IntelliJ
+- Click new branch
+- Give the branch a name relating to the changes you plan to make
+
+_A more in depth explanation how to use intellij and branches will follow here soon._
 
 Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
 
@@ -147,6 +152,37 @@ for more information and usages.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
+
+## Additional Useful Development Tools
+
+### DevAuth
+
+[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
+
+- The library is already downloaded by Gradle.
+- SkyHanni will automatically set up DevAuth.
+- Start Minecraft inside IntelliJ normally.
+    - Click on the link in the console and verify with a Microsoft account.
+    - The verification process will reappear every few days (after the session token expires).
+
+### Hot Swap
+
+Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
+
+We use [dcevm](https://dcevm.github.io/) and the IntelliJ
+Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
+
+Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
+tutorial.
+
+### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
+
+Allows project specific plugins to run. Eg: Regex Intention
+
+### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
+
+Imports our custom live templates automatically. Live Templates allow for quicker code writing.
 
 ## Software Used in SkyHanni
 
@@ -212,29 +248,6 @@ For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002
 ### Auto Updater
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
-
-## Additional Useful Development Tools
-
-### DevAuth
-
-[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
-debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
-
-- The library is already downloaded by Gradle.
-- SkyHanni will automatically set up DevAuth.
-- Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Microsoft account.
-    - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
-
-Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
-tutorial.
 
 ## 1.21 / Modern version development
 

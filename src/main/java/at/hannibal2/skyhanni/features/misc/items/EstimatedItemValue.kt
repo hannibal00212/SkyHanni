@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -27,7 +27,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -39,9 +40,9 @@ import kotlin.math.roundToLong
 @SkyHanniModule
 object EstimatedItemValue {
 
-    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
-    private var display = emptyList<List<Any>>()
-    private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
+    val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    private var display = emptyList<Renderable>()
+    private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
@@ -90,16 +91,29 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        // TODO add "is debug enabled" check once users notice this easteregg
-        if (Keyboard.KEY_RIGHT.isKeyClicked()) {
-            EstimatedItemValueCalculator.starChange += 1
-            cache.clear()
-        } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
-            EstimatedItemValueCalculator.starChange -= 1
-            cache.clear()
+        if (LorenzUtils.debug) {
+            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange += 1
+                cache.clear()
+            } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange -= 1
+                cache.clear()
+            }
         }
 
-        config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
+        try {
+            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+        } catch (ex: RuntimeException) {
+            // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
+            // that tries to over-render the tooltip, and is not explicitly something we can solve here?
+            // TODO start a deep sea activity: read mixin dumps, pinpoint the culprit, write over engineered workaround
+            if (ex.message?.contains("No OpenGL context found in the current thread.") == true) return
+            ErrorManager.logErrorWithData(
+                ex, "Error in Estimated Item Value renderer",
+                "display" to display,
+                "posLabel" to "Estimated Item Value"
+            )
+        }
     }
 
     @SubscribeEvent
@@ -186,31 +200,30 @@ object EstimatedItemValue {
         lastToolTipTime = System.currentTimeMillis()
     }
 
-    private fun draw(stack: ItemStack): List<List<Any>> {
-        val internalName = stack.getInternalNameOrNull() ?: return listOf()
+    private fun ItemStack.shouldIgnoreDraw(): Boolean {
+        this.getInternalNameOrNull()?.let { internalName ->
+            val name = this.name
+            return (
+                this.item == Items.enchanted_book ||
+                    name.contains("Salesperson") ||
+                    name == "§6☘ Category: Item Ability (Passive)" ||
+                    internalName.isRune() ||
+                    internalName.startsWith("ULTIMATE_ULTIMATE_") ||
+                    internalName.startsWith("CATACOMBS_PASS_") ||
+                    internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
+                    internalName.startsWith("MAP-") ||
+                    internalName.contains("UNIQUE_RUNE") ||
+                    internalName.contains("WISP_POTION") ||
+                    (
+                        !InventoryUtils.isSlotInPlayerInventory(this) &&
+                            InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
+                        )
+                )
+        } ?: return true
+    }
 
-        // Stats Breakdown
-        val name = stack.name
-        if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
-        if (name.contains("Salesperson")) return listOf()
-
-        // Autopet rule > Create Rule
-        if (!InventoryUtils.isSlotInPlayerInventory(stack)) {
-            if (InventoryUtils.openInventoryName() == "Choose a wardrobe slot") return listOf()
-        }
-
-        // FIX neu item list
-        if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
-        // We don't need this feature to work on books at all
-        if (stack.item == Items.enchanted_book) return listOf()
-        // Block catacombs items in mort inventory
-        if (internalName.startsWith("CATACOMBS_PASS_") || internalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
-        // Blocks the dungeon map
-        if (internalName.startsWith("MAP-")) return listOf()
-        // Hides the rune item
-        if (internalName.isRune()) return listOf()
-        if (internalName.contains("UNIQUE_RUNE")) return listOf()
-        if (internalName.contains("WISP_POTION")) return listOf()
+    private fun draw(stack: ItemStack): List<Renderable> {
+        if (stack.shouldIgnoreDraw()) return listOf()
 
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")
@@ -226,9 +239,9 @@ object EstimatedItemValue {
         }
         list.add("§aTotal: §6§l$numberFormat coins")
 
-        val newDisplay = mutableListOf<List<Any>>()
+        val newDisplay = mutableListOf<Renderable>()
         for (line in list) {
-            newDisplay.addAsSingletonList(line)
+            newDisplay.add(Renderable.string(line))
         }
         return newDisplay
     }

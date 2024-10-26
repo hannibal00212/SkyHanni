@@ -32,6 +32,7 @@ object GardenVisitorCompactChat {
      * REGEX-TEST:     §7§8+§d1,241 Gemstone Powder
      * REGEX-TEST:     §7§8+§2Crystal Hollows Pass
      */
+    @Suppress("MaxLineLength")
     private val visitorRewardPattern by patternGroup.pattern(
         "visitorreward",
         "^ {4}(?:(?:§.)+\\+)?(?:(?<amountcolor>§.)(?<amount>[\\d,]+(?:\\.?(?:\\d)?k)?)x? )?(?:(?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: (?:(?:§.)?)?x(?<altamount>\\d+))?\$"

@@ -15,8 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -115,12 +114,11 @@ object MobHighlight {
 
         if (arachne.distanceToPlayer() > 10) return
 
-        event.draw3DLine(
-            event.exactPlayerEyeLocation(),
-            arachne.getLorenzVec().add(y = 1),
+        event.drawLineToEye(
+            arachne.getLorenzVec().up(),
             LorenzColor.RED.toColor(),
             config.lineToArachneWidth,
-            true
+            true,
         )
     }
 

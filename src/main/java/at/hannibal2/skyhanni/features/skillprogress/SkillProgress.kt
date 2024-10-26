@@ -297,16 +297,19 @@ object SkillProgress {
                     add("§6Total XP: §b${totalXp.addSeparators()}")
                 }
                 val nameColor = if (skill == activeSkill) "§2" else "§a"
-                Renderable.hoverTips(buildString {
-                    append("$nameColor${skill.displayName} $level ")
-                    append("§7(")
-                    append("§b${currentXp.addSeparators()}")
-                    if (currentXpMax != 0L) {
-                        append("§6/")
-                        append("§b${currentXpMax.addSeparators()}")
-                    }
-                    append("§7)")
-                }, tips)
+                Renderable.hoverTips(
+                    buildString {
+                        append("$nameColor${skill.displayName} $level ")
+                        append("§7(")
+                        append("§b${currentXp.addSeparators()}")
+                        if (currentXpMax != 0L) {
+                            append("§6/")
+                            append("§b${currentXpMax.addSeparators()}")
+                        }
+                        append("§7)")
+                    },
+                    tips
+                )
             }
         }
     }
@@ -317,8 +320,11 @@ object SkillProgress {
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
-        val level =
-            if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) skillInfo.overflowLevel else skillInfo.level
+        val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) {
+            skillInfo.overflowLevel
+        } else {
+            skillInfo.level
+        }
 
         val useCustomGoalLevel =
             skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
@@ -376,7 +382,8 @@ object SkillProgress {
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(
-            Renderable.clickAndHover("§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
+            Renderable.clickAndHover(
+                "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
                 listOf("§eClick to reset!"),
                 onClick = {
                     xpInfo.sessionTimerActive = false
@@ -421,45 +428,49 @@ object SkillProgress {
             add(Renderable.itemStack(activeSkill.item, 1.0))
         }
 
-        add(Renderable.string(buildString {
-            append("§b+${skill.lastGain} ")
+        add(
+            Renderable.string(
+                buildString {
+                    append("§b+${skill.lastGain} ")
 
-            if (config.useSkillName.get())
-                append("${activeSkill.displayName} ")
+                    if (config.useSkillName.get())
+                        append("${activeSkill.displayName} ")
 
-            val (barCurrent, barMax) =
-                if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
-                    Pair(have, need)
-                else if (config.overflowConfig.enableInProgressBar.get())
-                    Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
-                else
-                    Pair(skill.currentXp, skill.currentXpMax)
+                    val (barCurrent, barMax) =
+                        if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
+                            Pair(have, need)
+                        else if (config.overflowConfig.enableInProgressBar.get())
+                            Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
+                        else
+                            Pair(skill.currentXp, skill.currentXpMax)
 
-            val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
-            skillExpPercentage = (barPercent.toDouble() / 100)
+                    val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
+                    skillExpPercentage = (barPercent.toDouble() / 100)
 
-            val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
+                    val percent = if (currentXpMax == 0L) 100F else 100F * currentXp / currentXpMax
 
-            if (config.usePercentage.get())
-                append("§7(§6${percent.roundTo(2)}%§7)")
-            else {
-                if (currentXpMax == 0L)
-                    append("§7(§6${currentXp.addSeparators()}§7)")
-                else
-                    append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
-            }
+                    if (config.usePercentage.get())
+                        append("§7(§6${percent.roundTo(2)}%§7)")
+                    else {
+                        if (currentXpMax == 0L)
+                            append("§7(§6${currentXp.addSeparators()}§7)")
+                        else
+                            append("§7(§6${currentXp.addSeparators()}§7/§6${currentXpMax.addSeparators()}§7)")
+                    }
 
-            if (config.showActionLeft.get() && percent != 100f) {
-                append(" - ")
-                val gain = skill.lastGain.formatDouble()
-                val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
-                if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                    append("§6$actionLeft Left")
-                } else {
-                    append("§6∞ Left")
+                    if (config.showActionLeft.get() && percent != 100f) {
+                        append(" - ")
+                        val gain = skill.lastGain.formatDouble()
+                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
+                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                            append("§6$actionLeft Left")
+                        } else {
+                            append("§6∞ Left")
+                        }
+                    }
                 }
-            }
-        }))
+            )
+        )
     }
 
     private fun updateSkillInfo() {

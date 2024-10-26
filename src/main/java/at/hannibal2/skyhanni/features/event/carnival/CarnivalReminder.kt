@@ -49,6 +49,7 @@ object CarnivalReminder {
 
     /** REGEX-TEST: §e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.
      */
+    @Suppress("MaxLineLength")
     private val alreadyClaimedPattern by repoGroup.pattern(
         "already",
         "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",

@@ -155,7 +155,7 @@ object PestAPI {
     private fun updatePests() {
         if (!firstScoreboardCheck) return
         fixPests()
-        PestUpdateEvent().post()
+        PestUpdateEvent.post()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -54,12 +55,14 @@ object ItemAbilityCooldown {
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
+    private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
     private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
     private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
     private val SOS_FLARE = "SOS_FLARE".asInternalName()
+    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".asInternalName()
 
 
     @SubscribeEvent
@@ -191,20 +194,30 @@ object ItemAbilityCooldown {
             event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
             }
+            // Totem of Corruption
+            event.soundName == "random.wood_click" && event.pitch == 0.84126985f && event.volume == 0.5f -> {
+                if (TOTEM_OF_CORRUPTION in recentItemsInHand) {
+                    ItemAbility.TOTEM_OF_CORRUPTION.sound()
+                }
+            }
+            // Enrager
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2.0f -> {
+                ItemAbility.ENRAGER.sound()
+            }
+
             // Blaze Slayer Flares
             event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
-                val recent = InventoryUtils.recentItemsInHand.values
-                if (WARNING_FLARE in recent || ALERT_FLARE in recent) {
+                if (WARNING_FLARE in recentItemsInHand || ALERT_FLARE in recentItemsInHand) {
                     ItemAbility.ALERT_FLARE.sound()
                 }
-                if (SOS_FLARE in recent) {
+                if (SOS_FLARE in recentItemsInHand) {
                     ItemAbility.SOS_FLARE.sound()
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)

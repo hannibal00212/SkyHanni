@@ -38,6 +38,12 @@ public class CarnivalConfig {
     public boolean doubleClickToStart = true;
 
     @Expose
+    @ConfigOption(name = "Token Shop Helper", desc = "Show extra information about remaining upgrades in Event Shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tokenShopHelper = true;
+
+    @Expose
     @ConfigOption(name = "Fruit Digging", desc = "")
     @Accordion
     public FruitDiggingConfig fruitDigging = new FruitDiggingConfig();

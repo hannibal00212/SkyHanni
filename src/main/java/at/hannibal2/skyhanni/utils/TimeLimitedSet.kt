@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.utils
 
+import com.google.common.cache.RemovalCause
 import kotlin.time.Duration
 
 class TimeLimitedSet<T : Any>(
     expireAfterWrite: Duration,
-    private val removalListener: (T) -> Unit = {},
+    private val removalListener: (T, RemovalCause) -> Unit = { _, _ -> },
 ) : Iterable<T> {
 
-    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _ -> key?.let { removalListener(it) } }
+    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _, cause ->
+        key?.let {
+            removalListener(it, cause)
+        }
+    }
 
     fun add(element: T) {
         cache[element] = Unit

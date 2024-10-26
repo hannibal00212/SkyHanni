@@ -45,7 +45,7 @@ class NEUInternalName private constructor(private val internalName: String) {
         fun fromItemName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: run {
             val name = "itemName:$itemName"
             ItemUtils.addMissingRepoItem(name, "Could not find internal name for $name")
-            return NEUInternalName.MISSING_ITEM
+            return MISSING_ITEM
         }
     }
 
@@ -62,6 +62,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     override fun hashCode(): Int = internalName.hashCode()
 
+    @Suppress("WrongEqualsTypeParameter")
     fun equals(other: String) = internalName == other
 
     fun contains(other: String) = internalName.contains(other)

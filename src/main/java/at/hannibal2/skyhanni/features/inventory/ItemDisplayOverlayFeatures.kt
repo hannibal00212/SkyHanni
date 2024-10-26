@@ -149,7 +149,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getNewYearCake()?.toString() ?: ""
+            val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"
         }
 
@@ -298,7 +298,13 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) && lore.any { it.contains("Deaths: ") }) {
+        if (BESTIARY_LEVEL.isSelected() && (
+                chestName.contains("Bestiary ➜") ||
+                    chestName.contains("Fishing ➜")
+                ) && lore.any {
+                it.contains("Deaths: ")
+            }
+        ) {
             lore.matchFirst(bestiaryStackPattern) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()

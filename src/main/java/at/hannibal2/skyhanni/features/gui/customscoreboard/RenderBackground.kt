@@ -62,7 +62,6 @@ object RenderBackground {
             )
         }
 
-
     internal fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
         val alignmentConfig = CustomScoreboard.alignmentConfig

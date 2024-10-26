@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityCreature
 import net.minecraft.entity.monster.EntityBlaze
@@ -61,14 +60,13 @@ object SlayerMiniBossFeatures {
         for (mob in miniBosses) {
             if (mob.health <= 0) continue
             if (mob.isDead) continue
-            if (mob.distanceToPlayer() > 10) continue
+            if (!mob.canBeSeen(10)) continue
 
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
-                mob.getLorenzVec().add(y = 1),
+            event.drawLineToEye(
+                mob.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
                 config.slayerMinibossLineWidth,
-                true
+                true,
             )
         }
     }

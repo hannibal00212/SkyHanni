@@ -174,4 +174,28 @@ object UpdateManager {
     }
 
     private var potentialUpdate: PotentialUpdate? = null
+
+    fun updateCommand(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        if (switchingToBeta) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    UpdateManager.checkUpdate(true, updateStream)
+                },
+                "§eClick to confirm!",
+                oneTimeClick = true,
+            )
+        } else {
+            UpdateManager.checkUpdate(true, updateStream)
+        }
+    }
 }

@@ -100,7 +100,8 @@ object HighlightVisitorsOutsideOfGarden {
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             event.cancel()
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
-                ChatUtils.chatAndOpenConfig("Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                ChatUtils.chatAndOpenConfig(
+                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     GardenAPI.config.visitors::blockInteracting
                 )
             }

@@ -44,7 +44,7 @@ object SuperpairDataDisplay {
 
     private var display = emptyList<String>()
     private var uncoveredItems = mutableMapOf<Int, SuperpairItem>()
-    private var found = mutableMapOf<FoundType, MutableList<FoundData>>()
+    private val found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -174,9 +174,9 @@ object SuperpairDataDisplay {
                     // TODO extract logic in some way
                     if (it.value.any { data ->
                             (data.first?.index ?: -1).equalsOneOf(item.index, match.index) ||
-                                (data.second?.index
-                                    ?: -1).equalsOneOf(item.index, match.index)
-                        }) {
+                                (data.second?.index ?: -1).equalsOneOf(item.index, match.index)
+                        }
+                    ) {
                         return
                     }
                 }
@@ -199,12 +199,16 @@ object SuperpairDataDisplay {
                 key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
                     if (value.any { data ->
                             item.index.equalsOneOf(data.first?.index ?: -1, data.second?.index ?: -1)
-                        }) return
+                        }
+                    ) return
                 }
 
-                else -> if (value.any { data ->
-                        (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
-                    }) return
+                else ->
+                    if (
+                        value.any { data ->
+                            (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
+                        }
+                    ) return
             }
         }
 
@@ -227,17 +231,17 @@ object SuperpairDataDisplay {
         if (pairs.isNotEmpty()) add("§2Found")
         for (pair in pairs) {
             val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
-            add(" $prefix §a${pair.first?.reward ?: ""}")
+            add(" $prefix §a${pair.first?.reward.orEmpty()}")
         }
         if (matches.isNotEmpty()) add("§eMatched")
         for (match in matches) {
             val prefix = determinePrefix(matches.indexOf(match), matches.lastIndex)
-            add(" $prefix §e${match.first?.reward ?: ""}")
+            add(" $prefix §e${match.first?.reward.orEmpty()}")
         }
         if (powerups.isNotEmpty()) add("§bPowerUp")
         for (powerup in powerups) {
             val prefix = determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
-            add(" $prefix §b${powerup.item?.reward ?: ""}")
+            add(" $prefix §b${powerup.item?.reward.orEmpty()}")
         }
         val toAdd = mutableListOf<String>()
         if (possiblePairs >= 1) toAdd.add("§ePairs - $possiblePairs")
@@ -293,7 +297,7 @@ object SuperpairDataDisplay {
             slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this?.damage == other.damage
+    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
     private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
 }

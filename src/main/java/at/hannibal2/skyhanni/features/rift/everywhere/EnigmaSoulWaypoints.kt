@@ -124,7 +124,8 @@ object EnigmaSoulWaypoints {
                             it,
                             "$name Enigma Soul",
                             config.color.toChromaColor(),
-                            condition = { config.showPathFinder })
+                            condition = { config.showPathFinder }
+                        )
                     }
                 }
             }
@@ -162,7 +163,7 @@ object EnigmaSoulWaypoints {
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
                 event.drawWaypointFilled(it, config.color.toChromaColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
+                event.drawDynamicText(it.up(), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }

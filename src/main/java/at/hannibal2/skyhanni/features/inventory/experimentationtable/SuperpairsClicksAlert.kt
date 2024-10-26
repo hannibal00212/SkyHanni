@@ -47,20 +47,29 @@ object SuperpairsClicksAlert {
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
 
         if ( // checks if we have succeeded in either minigame
-            (event.inventoryName.contains("Chronomatron") &&
-                ((event.inventoryItems[4]?.displayName?.removeColor()
-                ?.let { currentRoundRegex.find(it) }
-                ?.groups?.get(1)?.value?.toInt() ?: -1) > roundsNeeded)) ||
-            (event.inventoryName.contains("Ultrasequencer") &&
-                event.inventoryItems.entries
-                .filter { it.key < 45 }
-                .any { it.value.stackSize > roundsNeeded })
+            isChronomatron(event) || isUltraSequencer(event)
         ) {
             SoundUtils.playBeepSound()
             ChatUtils.chat("You have reached the maximum extra Superpairs clicks from this add-on!")
             roundsNeeded = -1
         }
     }
+
+    private fun isChronomatron(event: InventoryOpenEvent) =
+        event.inventoryName.contains("Chronomatron") &&
+            (
+                (
+                    event.inventoryItems[4]?.displayName?.removeColor()?.let {
+                        currentRoundRegex.find(it)
+                    }?.groups?.get(1)?.value?.toInt() ?: -1
+                    ) > roundsNeeded
+                )
+
+    private fun isUltraSequencer(event: InventoryUpdatedEvent) =
+        event.inventoryName.contains("Ultrasequencer") &&
+            event.inventoryItems.entries
+                .filter { it.key < 45 }
+                .any { it.value.stackSize > roundsNeeded }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

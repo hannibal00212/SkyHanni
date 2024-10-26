@@ -30,4 +30,10 @@ public class GunthersRaceConfig {
     @ConfigOption(name = "Monochrome Color", desc = "Set a boring monochrome color for the guide waypoints.")
     @ConfigEditorColour
     public Property<String> monochromeColor = Property.of("0:60:0:0:255");
+
+    @Expose
+    @ConfigOption(name = "Hide Other Players", desc = "Hide other players while in the race.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hidePlayers = false;
 }

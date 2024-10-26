@@ -30,15 +30,12 @@ import net.minecraft.potion.Potion
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
-
 //#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
 //#endif
 
 @SkyHanniModule
-@Suppress("ImportOrdering")
 object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -52,7 +49,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers() ?: emptyList()) {
+        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
             if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -63,7 +60,7 @@ object EntityUtils {
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
         it.getNameAsString().contains(contains)
     }
 
@@ -84,7 +81,7 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
+        val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.getNameAsString().contains(contains)
             if (debugWrongEntity && !result) {
@@ -181,14 +178,17 @@ object EntityUtils {
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
         if (Minecraft.getMinecraft()
                 .isOnMainThread()
-        ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+        ) it
+        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        //  but *does* make crashes because of it rarer.
+        else it.toMutableList()
+    }?.asSequence().orEmpty()
 
     fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+        if (Minecraft.getMinecraft().isOnMainThread()) it else it.toMutableList()
+    }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 

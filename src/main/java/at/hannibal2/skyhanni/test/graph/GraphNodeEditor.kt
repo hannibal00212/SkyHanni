@@ -179,7 +179,9 @@ object GraphNodeEditor {
     )
 
     private fun drawNodeNames(): List<Searchable> = buildList {
-        for ((node, distance: Double) in GraphEditor.nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
+        for ((node, distance: Double) in GraphEditor.nodes.map {
+            it to it.position.distanceSqToPlayer()
+        }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
             }

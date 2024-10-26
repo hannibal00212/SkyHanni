@@ -1,16 +1,36 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+
+internal var allUnknownLines = listOf<UnknownLine>()
+internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
+
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
+
+internal class UnknownLine(val line: String) {
+    val firstFound = SimpleTimeMark.now()
+    var lastFound = SimpleTimeMark.now()
+    var lastWarned = SimpleTimeMark.farPast()
+}
 
 object UnknownLinesHandler {
 
@@ -78,7 +98,7 @@ object UnknownLinesHandler {
         SbPattern.reformingPattern,
         SbPattern.bossHealthPattern,
         SbPattern.bossHealthBarPattern,
-        SbPattern.broodmotherPattern,
+        SpidersDenAPI.broodmotherPattern,
         SbPattern.bossHPPattern,
         SbPattern.bossDamagePattern,
         SbPattern.slayerQuestPattern,
@@ -107,7 +127,7 @@ object UnknownLinesHandler {
         SbPattern.wtfAreThoseLinesPattern,
         SbPattern.timeLeftPattern,
         SbPattern.darkAuctionCurrentItemPattern,
-        SbPattern.coldPattern,
+        MiningAPI.coldPattern,
         SbPattern.riftHotdogTitlePattern,
         SbPattern.riftHotdogEatenPattern,
         SbPattern.mineshaftNotStartedPattern,
@@ -133,7 +153,7 @@ object UnknownLinesHandler {
     private var remoteOnlyPatternsAdded = false
 
     fun handleUnknownLines() {
-        val sidebarLines = CustomScoreboard.activeLines
+        val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
@@ -141,7 +161,6 @@ object UnknownLinesHandler {
             patternsToExclude.addAll(remoteOnlyPatterns)
             remoteOnlyPatternsAdded = true
         }
-
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
@@ -205,19 +224,51 @@ object UnknownLinesHandler {
         /*
          * Handle broken scoreboard lines
          */
-        confirmedUnknownLines = confirmedUnknownLines.filter { it in unknownLines }
+        if (unknownLines.isEmpty()) return
 
-        unknownLines = unknownLines.filter { it !in confirmedUnknownLines }
-
-        unconfirmedUnknownLines = unknownLines
-
-        unknownLines = unknownLines.filter { it !in unknownLinesSet }
-
-        unknownLines.forEach {
-            if (LorenzUtils.inSkyBlock) {
-                ChatUtils.debug("Unknown Scoreboard line: '$it'")
+        for (line in unknownLines) {
+            val unknownLine = allUnknownLines.firstOrNull { it.line == line }
+            if (unknownLine == null) {
+                if (LorenzUtils.inSkyBlock) {
+                    ChatUtils.debug("Unknown Scoreboard line: '$line'")
+                }
+                allUnknownLines = allUnknownLines.editCopy {
+                    add(UnknownLine(line))
+                }
+            } else {
+                unknownLine.lastFound = SimpleTimeMark.now()
+                val firstFoundSince = unknownLine.firstFound.passedSince()
+                val lastWarnedSince = unknownLine.lastWarned.passedSince()
+                if (firstFoundSince > 3.seconds && lastWarnedSince > 30.minutes) {
+                    unknownLine.lastWarned = SimpleTimeMark.now()
+                    warn(line, "same line active for 3 seconds")
+                    continue
+                }
             }
-            unknownLinesSet.add(it)
         }
+
+        if (lastRecentAlarmWarning.passedSince() > 30.minutes) {
+            val recentAlarms = allUnknownLines.filter { it.firstFound.passedSince() < 6.seconds }
+            if (recentAlarms.size >= 5) {
+                warn(recentAlarms.first().line, "5 different lines in 5 seconds")
+            }
+        }
+    }
+
+    private fun warn(line: String, reason: String) {
+        if (!CustomScoreboard.config.unknownLinesWarning) return
+        ErrorManager.logErrorWithData(
+            // line included in chat message to not cache a previous message
+            Exception(line),
+            "CustomScoreboard detected a unknown line: '$line'",
+            "Unknown Line" to line,
+            "reason" to reason,
+            "Island" to LorenzUtils.skyBlockIsland,
+            "Area" to HypixelData.skyBlockArea,
+            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+            noStackTrace = true,
+            betaOnly = true,
+        )
+
     }
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -51,10 +52,12 @@ object PabloHelper {
 
         if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0) return
 
-        GetFromSackAPI.getFromChatMessageSackItems(
-            itemName.asInternalName().makePrimitiveStack(),
-            "Click here to grab an $itemName from sacks!",
-        )
+        DelayedRun.runNextTick {
+            GetFromSackAPI.getFromChatMessageSackItems(
+                itemName.asInternalName().makePrimitiveStack(),
+                "Click here to grab an $itemName from sacks!",
+            )
+        }
 
         lastSentMessage = SimpleTimeMark.now()
     }

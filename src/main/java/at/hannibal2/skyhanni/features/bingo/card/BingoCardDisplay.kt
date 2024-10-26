@@ -37,7 +37,6 @@ object BingoCardDisplay {
     private var hasHiddenPersonalGoals = false
 
     private const val MAX_PERSONAL_GOALS = 20
-    private const val MAX_COMMUNITY_GOALS = 5
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
@@ -85,12 +84,15 @@ object BingoCardDisplay {
 
         if (BingoAPI.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
-            newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
-                listOf("Click to run §e/bingo"),
-                onClick = {
-                    HypixelCommands.bingo()
-                }
-            ))
+            newList.add(
+                Renderable.clickAndHover(
+                    "§cOpen the §e/bingo §ccard.",
+                    listOf("Click to run §e/bingo"),
+                    onClick = {
+                        HypixelCommands.bingo()
+                    }
+                )
+            )
         } else {
             if (!config.hideCommunityGoals.get()) {
                 newList.addCommunityGoals()
@@ -126,7 +128,7 @@ object BingoCardDisplay {
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
         " " + BingoAPI.getCommunityPercentageColor(it)
-    } ?: ""
+    }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()

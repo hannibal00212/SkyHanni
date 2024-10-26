@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -62,6 +64,16 @@ open class VisualWordGui : GuiScreen() {
     private val shouldDrawImport get() = drawImport && !SkyHanniMod.feature.storage.visualWordsImported
 
     companion object {
+
+        @JvmStatic
+        fun onCommand() {
+            if (!LorenzUtils.onHypixel) {
+                ChatUtils.userError("You need to join Hypixel to use this feature!")
+            } else {
+                if (sbeConfigPath.exists()) drawImport = true
+                SkyHanniMod.screenToOpen = VisualWordGui()
+            }
+        }
 
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
@@ -511,7 +523,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (KeyboardManager.isPastingKeysDown()) {
             SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard() ?: ""
+                val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
                         currentText += char

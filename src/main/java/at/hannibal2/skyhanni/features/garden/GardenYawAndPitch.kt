@@ -60,8 +60,10 @@ object GardenYawAndPitch {
     }
 
     private fun isEnabled() =
-        config.enabled && ((OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
+        config.enabled && (
+            (OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+                (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
+            )
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
