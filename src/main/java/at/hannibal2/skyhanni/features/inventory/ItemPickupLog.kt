@@ -133,7 +133,7 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(0, PickupEntry("§6Coins", event.oldCoins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.oldCoins < 0)
     }
 
     @SubscribeEvent

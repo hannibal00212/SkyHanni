@@ -486,8 +486,8 @@ object GhostCounter {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea != "The Mist") return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        Option.SCAVENGERCOINS.add(event.coins, true)
-        Option.SCAVENGERCOINS.add(event.coins)
+        Option.SCAVENGERCOINS.add(event.oldCoins, true)
+        Option.SCAVENGERCOINS.add(event.oldCoins)
     }
 
     @SubscribeEvent

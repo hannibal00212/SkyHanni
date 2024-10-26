@@ -14,6 +14,8 @@ import java.time.Month
 @SkyHanniModule
 object WinterAPI {
 
+    private val storage get() = ProfileStorageData.profileSpecific?.winter
+
     private val patternGroup = RepoPattern.group("winter")
 
     val northstarsPattern by patternGroup.pattern(
@@ -21,8 +23,11 @@ object WinterAPI {
         "North Stars: §d(?<northstars>[\\w,]+).*",
     )
 
-    var northStars: Long = 0
-        private set
+    var northStars: Long
+        get() = storage?.northStars ?: 0
+        private set(value) {
+            storage?.northStars = value
+        }
 
     fun inWorkshop() = IslandType.WINTER.isInIsland()
 

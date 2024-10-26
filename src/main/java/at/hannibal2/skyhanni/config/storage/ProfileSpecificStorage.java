@@ -68,6 +68,9 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
+    public long purse = -1;
+
+    @Expose
     public ExperimentationStorage experimentation = new ExperimentationStorage();
 
     public static class ExperimentationStorage {
@@ -311,6 +314,9 @@ public class ProfileSpecificStorage {
         public Long experience = null;
 
         @Expose
+        public long copper = -1;
+
+        @Expose
         public Map<CropType, Long> cropCounter = new HashMap<>();
 
         @Expose
@@ -519,6 +525,7 @@ public class ProfileSpecificStorage {
     @Expose
     public PowderTracker.Data powderTracker = new PowderTracker.Data();
 
+    // TODO: move to WinterStorage
     @Expose
     public FrozenTreasureTracker.Data frozenTreasureTracker = new FrozenTreasureTracker.Data();
 
@@ -526,9 +533,21 @@ public class ProfileSpecificStorage {
     public EnderNodeTracker.Data enderNodeTracker = new EnderNodeTracker.Data();
 
     @Expose
+    public WinterStorage winter = new WinterStorage();
+
+    public static class WinterStorage {
+
+        @Expose
+        public long northStars = -1;
+    }
+
+    @Expose
     public RiftStorage rift = new RiftStorage();
 
     public static class RiftStorage {
+
+        @Expose
+        public long motes = -1;
 
         @Expose
         public List<KloonTerminal> completedKloonTerminals = new ArrayList<>();

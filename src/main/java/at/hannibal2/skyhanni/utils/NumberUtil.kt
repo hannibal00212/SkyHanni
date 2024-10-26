@@ -251,7 +251,7 @@ object NumberUtil {
             1_000.0
         } else if (text.endsWith("m")) {
             text = text.substring(0, text.length - 1)
-            1.million
+            1.0.million
         } else if (text.endsWith("b")) {
             text = text.substring(0, text.length - 1)
             1.billion
@@ -262,9 +262,9 @@ object NumberUtil {
     }
 
     // Sometimes we just take an L, never find it and forget to write it down
-    val Int.million get() = this * 1_000_000.0
+    val Int.million get(): Int = this * 1_000_000
+    val Double.million get(): Double = this * 1_000_000.0
     private val Int.billion get() = this * 1_000_000_000.0
-    val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->

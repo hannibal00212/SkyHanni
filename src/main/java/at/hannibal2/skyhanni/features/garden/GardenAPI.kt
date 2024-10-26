@@ -81,8 +81,11 @@ object GardenAPI {
             }
         }
 
-    var copper: Long = 0
-        private set
+    var copper: Long
+        get() = storage?.copper ?: 0
+        private set(value) {
+            storage?.copper = value
+        }
 
     private val patternGroup = RepoPattern.group("garden")
 

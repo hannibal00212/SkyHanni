@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -16,6 +16,9 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PurseAPI {
+
+    private val storage get() = ProfileStorageData.profileSpecific
+
     private val patternGroup = RepoPattern.group("data.purse")
     val coinsPattern by patternGroup.pattern(
         "coins",
@@ -27,8 +30,11 @@ object PurseAPI {
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
-    var currentPurse = 0.0
-        private set
+    var currentPurse: Long
+        get() = storage?.purse ?: 0
+        private set(value) {
+            storage?.purse = value
+        }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -38,9 +44,9 @@ object PurseAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         coinsPattern.firstMatcher(event.added) {
-            val newPurse = group("coins").formatDouble()
-            val diff = newPurse - currentPurse
-            if (diff == 0.0) return
+            val newPurse = group("coins").formatLong()
+            val diff = (newPurse - currentPurse).toInt()
+            if (diff == 0) return
             currentPurse = newPurse
 
             PurseChangeEvent(diff, currentPurse, getCause(diff)).postAndCatch()
@@ -48,9 +54,9 @@ object PurseAPI {
     }
 
     // TODO add more causes in the future (e.g. ah/bz/bank)
-    private fun getCause(diff: Double): PurseChangeCause {
+    private fun getCause(diff: Int): PurseChangeCause {
         if (diff > 0) {
-            if (diff == 1.0) {
+            if (diff == 1) {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
@@ -70,7 +76,7 @@ object PurseAPI {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
             }
 
-            if (diff == -6_666_666.0 || diff == -666_666.0) {
+            if (diff == -6_666_666 || diff == -666_666) {
                 return PurseChangeCause.LOSE_DICE_ROLL_COST
             }
 
@@ -78,5 +84,6 @@ object PurseAPI {
         }
     }
 
-    fun getPurse(): Double = currentPurse
+    @Deprecated("", ReplaceWith("PurseAPI.currentPurse"))
+    fun getPurse(): Double = currentPurse.toDouble()
 }

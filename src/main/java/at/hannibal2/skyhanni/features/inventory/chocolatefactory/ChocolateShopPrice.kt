@@ -111,7 +111,7 @@ object ChocolateShopPrice {
     private fun update() {
         if (callUpdate) updateProducts()
 
-        val multiplier = 1.million
+        val multiplier = 1.0.million
         // TODO merge core with SkyMartCopperPrice into a utils
         val table = mutableListOf<DisplayTableEntry>()
 
