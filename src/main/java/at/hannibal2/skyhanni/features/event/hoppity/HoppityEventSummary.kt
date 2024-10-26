@@ -44,12 +44,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object HoppityEventSummary {
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
-    private val liveDisplayConfig get() = config.eventSummary.liveDisplay
-    private val lineHeader = " ".repeat(4)
-    private var displayCardRenderables = listOf<Renderable>()
-    private var lastKnownStatHash = 0
-
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
      */
@@ -58,6 +52,13 @@ object HoppityEventSummary {
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish§(?:§.)*!.*"
     )
 
+    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val liveDisplayConfig get() = config.eventSummary.liveDisplay
+    private val lineHeader = " ".repeat(4)
+
+    private var displayCardRenderables = listOf<Renderable>()
+    private var lastKnownStatHash = 0
+    private var lastKnownInInvState = false
     private var lastAddedCfMillis: SimpleTimeMark? = null
 
     private data class StatString(val string: String, val headed: Boolean = true)
@@ -113,6 +114,10 @@ object HoppityEventSummary {
         )
     }
 
+    private fun isInInventory(): Boolean =
+        Minecraft.getMinecraft().currentScreen is GuiInventory ||
+            Minecraft.getMinecraft().currentScreen is GuiChest
+
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
         add(
@@ -121,6 +126,19 @@ object HoppityEventSummary {
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
             )
         )
+
+        // Conditionally add year switcher renderable for inventory or chest screens
+        if (isInInventory()) {
+            buildYearSwitcherRenderables(statYear)?.let { yearSwitcher ->
+                add(
+                    Renderable.horizontalContainer(
+                        yearSwitcher,
+                        spacing = 5,
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    )
+                )
+            }
+        }
 
         // Add card renderable based on stats availability
         val cardRenderable = if (stats == null) {
@@ -133,19 +151,6 @@ object HoppityEventSummary {
             )
         }
         add(cardRenderable)
-
-        // Conditionally add year switcher renderable for inventory or chest screens
-        if (Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest) {
-            buildYearSwitcherRenderables(statYear)?.let { yearSwitcher ->
-                add(
-                    Renderable.horizontalContainer(
-                        yearSwitcher,
-                        spacing = 5,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                    )
-                )
-            }
-        }
     }
 
     private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
@@ -189,6 +194,10 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (lastKnownInInvState != isInInventory()) {
+            lastKnownInInvState = !lastKnownInInvState
+            lastKnownStatHash = 0
+        }
         checkEnded()
         if (!HoppityAPI.isHoppityEvent()) return
         checkInit()
