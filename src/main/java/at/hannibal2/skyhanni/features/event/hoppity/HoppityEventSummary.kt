@@ -59,7 +59,7 @@ object HoppityEventSummary {
      */
     private val rabbitTheFishPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.thefish",
-        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*"
+        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
     )
 
     private const val LINE_HEADER = "    "
@@ -209,7 +209,7 @@ object HoppityEventSummary {
         ChatUtils.clickableChat(
             "§c§lWARNING! §r§7This will reset all Hoppity Event stats for all years. " +
                 "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
-            onClick = ::resetStats
+            onClick = ::resetStats,
         )
     }
 
@@ -246,7 +246,7 @@ object HoppityEventSummary {
             lastSentCfUpdateMessage = SimpleTimeMark.now()
             ChatUtils.chat(
                 "§6§lReminder! §r§eSwitch to a new server and run §6/cf §e to " +
-                    "update your leaderboard position in Hoppity Event stats."
+                    "update your leaderboard position in Hoppity Event stats.",
             )
         }
     }
@@ -256,8 +256,8 @@ object HoppityEventSummary {
         add(
             Renderable.string(
                 "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-            )
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            ),
         )
 
         // Conditionally add year switcher renderable for inventory or chest screens
@@ -267,8 +267,8 @@ object HoppityEventSummary {
                     Renderable.horizontalContainer(
                         yearSwitcher,
                         spacing = 5,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
-                    )
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    ),
                 )
             }
         }
@@ -276,11 +276,11 @@ object HoppityEventSummary {
         // Add card renderable based on stats availability
         val cardRenderable = if (stats == null) {
             Renderable.verticalContainer(
-                mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
+                mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}.")),
             )
         } else {
             Renderable.verticalContainer(
-                getStatsStrings(stats, statYear).map { Renderable.string(it.string) }.toMutableList()
+                getStatsStrings(stats, statYear).map { Renderable.string(it.string) }.toMutableList(),
             )
         }
         add(cardRenderable)
@@ -298,15 +298,15 @@ object HoppityEventSummary {
             predecessorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
-                    onClick = { storage.hoppityStatLiveDisplayYear = it }
+                    onClick = { storage.hoppityStatLiveDisplayYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
-                    onClick = { storage.hoppityStatLiveDisplayYear = it }
+                    onClick = { storage.hoppityStatLiveDisplayYear = it },
                 )
-            }
+            },
         )
     }
 
@@ -314,7 +314,7 @@ object HoppityEventSummary {
         val queryYear = year ?: SkyBlockTime.now().year
         val yearStorage = storage?.hoppityEventStats?.getOrPut(
             (year ?: SkyBlockTime.now().year),
-            ::HoppityEventStats
+            ::HoppityEventStats,
         )
         return Pair(yearStorage, queryYear)
     }
