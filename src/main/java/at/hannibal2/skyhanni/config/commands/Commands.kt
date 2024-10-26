@@ -152,10 +152,6 @@ object Commands {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
         }
-        event.register("shcarry") {
-            description = "Keep track of carries you do."
-            callback { CarryTracker.onCommand(it) }
-        }
         event.register("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
             callback { MarkedPlayerManager.command(it) }
