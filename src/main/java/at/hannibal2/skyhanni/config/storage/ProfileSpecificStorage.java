@@ -809,6 +809,9 @@ public class ProfileSpecificStorage {
         public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
 
         @Expose
+        public long lastLbUpdateMarkMillis = Long.MAX_VALUE;
+
+        @Expose
         public boolean summarized = false;
 
         @Override

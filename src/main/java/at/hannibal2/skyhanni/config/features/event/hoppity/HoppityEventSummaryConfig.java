@@ -28,6 +28,11 @@ public class HoppityEventSummaryConfig {
     public HoppityEventSummaryLiveDisplayConfig liveDisplay = new HoppityEventSummaryLiveDisplayConfig();
 
     @Expose
+    @Accordion
+    @ConfigOption(name = "Update CF Reminders", desc = "")
+    public HoppityEventSummaryCFReminderConfig cfReminder = new HoppityEventSummaryCFReminderConfig();
+
+    @Expose
     @ConfigLink(owner = HoppityEventSummaryConfig.class, field = "liveDisplay")
     public Position liveDisplayPosition = new Position(0, 0);
 

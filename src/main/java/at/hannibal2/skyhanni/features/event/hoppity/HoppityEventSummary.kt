@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -30,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
@@ -42,7 +45,9 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object HoppityEventSummary {
@@ -57,11 +62,13 @@ object HoppityEventSummary {
     private const val LINE_HEADER = "    "
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
+    private val updateCfConfig get() = config.eventSummary.cfReminder
 
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
     private var lastKnownInInvState = false
     private var lastAddedCfMillis: SimpleTimeMark? = null
+    private var lastSentCfUpdateMessage: SimpleTimeMark? = null
 
     private val EGGLOCATOR_ITEM = "EGG_LOCATOR".asInternalName()
     private fun isEggLocatorOverridden(): Boolean =
@@ -76,6 +83,28 @@ object HoppityEventSummary {
     }
 
     private data class StatString(val string: String, val headed: Boolean = true)
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresethoppityeventstats") {
+            description = "Reset Hoppity Event stats for all years."
+            category = CommandCategory.USERS_RESET
+            callback { handleResetRequest(it) }
+        }
+    }
+
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        if (!HoppityAPI.isHoppityEvent()) return
+        val stats = getYearStats().first ?: return
+
+        stats.mealsFound.addOrPut(event.eggType, 1)
+        val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
+        val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
+        if (event.duplicate) rarityMap.dupes++
+        else rarityMap.uniques++
+        if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
+    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -129,6 +158,22 @@ object HoppityEventSummary {
         )
     }
 
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        checkLbUpdateWarning()
+        reCheckInventoryState()
+        checkEnded()
+        if (!HoppityAPI.isHoppityEvent()) return
+        checkInit()
+        checkAddCfTime()
+    }
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        checkEnded()
+    }
+
     private fun isInInventory(): Boolean =
         Minecraft.getMinecraft().currentScreen is GuiInventory ||
             Minecraft.getMinecraft().currentScreen is GuiChest
@@ -137,6 +182,57 @@ object HoppityEventSummary {
         if (isInInventory() != lastKnownInInvState) {
             lastKnownInInvState = !lastKnownInInvState
             lastKnownStatHash = 0
+        }
+    }
+
+    private fun handleResetRequest(args: Array<String>) {
+        // Send a confirmation message confirming this is destructive
+        if (args.any { it.equals("confirm", ignoreCase = true) }) {
+            resetStats()
+            return
+        }
+        ChatUtils.clickableChat(
+            "§c§lWARNING! §r§7This will reset all Hoppity Event stats for all years. " +
+                "Click here or type §c/shresethoppityeventstats confirm §7to confirm.",
+            onClick = ::resetStats
+        )
+    }
+
+    private fun resetStats() {
+        ProfileStorageData.profileSpecific?.let {
+            it.hoppityEventStats.clear()
+            ChatUtils.chat("Hoppity Event stats have been reset.")
+        } ?: ErrorManager.skyHanniError("Could not reset Hoppity Event stats.")
+    }
+
+    private fun checkLbUpdateWarning() {
+        if (!LorenzUtils.inSkyBlock || !HoppityAPI.isHoppityEvent() || !updateCfConfig.enabled) return
+
+        // Only run if the user has leaderboard stats enabled
+        if (!config.eventSummary.statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
+
+        // If we're only showing the live display during the last {X} hours of the hunt,
+        // check if we're in that time frame
+        if (updateCfConfig.showForLastXHours > 0) {
+            val eventEndTm = HoppityAPI.millisToEventEnd().asTimeMark()
+            if (eventEndTm.timeUntil() >= updateCfConfig.showForLastXHours.hours) return
+        }
+
+        // If it's been less than {config} minutes since the last message, don't send another
+        lastSentCfUpdateMessage.let {
+            val configFrequency = updateCfConfig.reminderInterval
+            if (it != null && it.passedSince() < configFrequency.minutes) return
+        }
+        val stats = getYearStats().first ?: return
+        val markDiff = stats.lastLbUpdateMarkMillis.asTimeMark().passedSince()
+
+        // If it's been more than {config} since the last update, send a message
+        if (markDiff >= updateCfConfig.reminderInterval.minutes) {
+            lastSentCfUpdateMessage = SimpleTimeMark.now()
+            ChatUtils.chat(
+                "§6§lReminder! §r§eSwitch to a new server and run §6/cf §e to " +
+                    "update your leaderboard position in Hoppity Event stats."
+            )
         }
     }
 
@@ -200,34 +296,6 @@ object HoppityEventSummary {
         )
     }
 
-    @HandleEvent
-    fun onRabbitFound(event: RabbitFoundEvent) {
-        if (!HoppityAPI.isHoppityEvent()) return
-        val stats = getYearStats().first ?: return
-
-        stats.mealsFound.addOrPut(event.eggType, 1)
-        val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
-        val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
-        if (event.duplicate) rarityMap.dupes++
-        else rarityMap.uniques++
-        if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
-    }
-
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        reCheckInventoryState()
-        checkEnded()
-        if (!HoppityAPI.isHoppityEvent()) return
-        checkInit()
-        checkAddCfTime()
-    }
-
-    @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        checkEnded()
-    }
-
     private fun checkInit() {
         val statStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
         val currentYear = SkyBlockTime.now().year
@@ -275,6 +343,7 @@ object HoppityEventSummary {
         val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
         stats.finalLeaderboardPosition = snapshot
+        stats.lastLbUpdateMarkMillis = SimpleTimeMark.now().toMillis()
     }
 
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
