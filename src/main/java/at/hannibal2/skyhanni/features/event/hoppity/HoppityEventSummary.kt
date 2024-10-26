@@ -130,7 +130,7 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {
         reCheckInventoryState()
-        if (liveDisplayConfig.enabled) return
+        if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
