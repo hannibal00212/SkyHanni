@@ -73,7 +73,7 @@ object HoppityEventSummary {
     private var lastKnownInInvState = false
     private var lastAddedCfMillis: SimpleTimeMark = farPast()
     private var lastSentCfUpdateMessage: SimpleTimeMark = farPast()
-    private var lastToggleMark = SimpleTimeMark.farPast()
+    private var lastToggleMark: SimpleTimeMark = farPast()
 
     private fun SimpleTimeMark.isUninitialized(): Boolean =
         this.toMillis() == 0L || this.toMillis() == Long.MAX_VALUE
