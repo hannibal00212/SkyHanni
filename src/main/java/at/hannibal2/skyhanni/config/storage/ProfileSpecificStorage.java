@@ -53,6 +53,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import scala.Int;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -522,8 +523,16 @@ public class ProfileSpecificStorage {
 
     }
 
+    public static class CakeData {
+        @Expose
+        public List<Integer> ownedCakes = new ArrayList<>();
+
+        @Expose
+        public List<Integer> neededCakes = new ArrayList<>();
+    }
+
     @Expose
-    public CakeTracker.Data cakeTracker = new CakeTracker.Data();
+    public CakeData cakeData = new CakeData();
 
     @Expose
     public PowderTracker.Data powderTracker = new PowderTracker.Data();

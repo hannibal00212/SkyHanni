@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.caketracker;
+package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
