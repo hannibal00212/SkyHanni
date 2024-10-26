@@ -49,6 +49,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityEventSummary {
@@ -72,6 +73,7 @@ object HoppityEventSummary {
     private var lastKnownInInvState = false
     private var lastAddedCfMillis: SimpleTimeMark = farPast()
     private var lastSentCfUpdateMessage: SimpleTimeMark = farPast()
+    private var lastToggleMark = SimpleTimeMark.farPast()
 
     private fun SimpleTimeMark.isUninitialized(): Boolean =
         this.toMillis() == 0L || this.toMillis() == Long.MAX_VALUE
@@ -132,8 +134,10 @@ object HoppityEventSummary {
         reCheckInventoryState()
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
+        if (lastToggleMark.passedSince() < 1.seconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
+        lastToggleMark = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
