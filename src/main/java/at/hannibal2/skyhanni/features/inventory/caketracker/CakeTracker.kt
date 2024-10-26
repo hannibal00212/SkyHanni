@@ -49,6 +49,9 @@ object CakeTracker {
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
 
+    private var cakeRenderables = listOf<Renderable>()
+    private var lastKnownCakeDataHash = 0
+
     /**
      * REGEX-TEST: §cNew Year Cake (Year 360)
      * REGEX-TEST: §cNew Year Cake (Year 1,000)
@@ -91,7 +94,7 @@ object CakeTracker {
      */
     private val auctionCakeSearchPattern by patternGroup.pattern(
         "auction.cakesearch",
-        "^Auctions: \"New Year C.*$",
+        "Auctions: \"New Year C.*",
     )
 
     private fun addCake(cakeYear: Int) {
@@ -125,10 +128,7 @@ object CakeTracker {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inCakeBag || (inAuctionHouse && (auctionCakesCache.any() || searchingForCakes))) {
-            config.cakeTrackerPosition.renderRenderables(
-                drawDisplay(storage ?: return),
-                posLabel = "New Year Cake Tracker",
-            )
+            reRenderDisplay()
         }
     }
 
@@ -153,6 +153,13 @@ object CakeTracker {
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
         inAuctionHouse = checkAuctionCakes(event)
+    }
+
+    private fun reRenderDisplay() {
+        config.cakeTrackerPosition.renderRenderables(
+            drawDisplay(storage ?: return),
+            posLabel = "New Year Cake Tracker",
+        )
     }
 
     private fun checkCakeContainer(event: InventoryFullyOpenedEvent) {
@@ -227,7 +234,7 @@ object CakeTracker {
         }
     }
 
-    private class CakeRange(var start: Int, var end: Int = 0) {
+    private data class CakeRange(var start: Int, var end: Int = 0) {
         fun getRenderable(displayType: DisplayType): Renderable {
             val colorCode =
                 if (displayType == DisplayType.OWNED_CAKES) "§a"
@@ -245,9 +252,9 @@ object CakeTracker {
     }
 
     private fun setDisplayType(type: DisplayType) {
-        val storage = storage ?: return
         config.displayType = type
-        drawDisplay(storage)
+        lastKnownCakeDataHash = 0
+        reRenderDisplay()
     }
 
     private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
@@ -278,9 +285,9 @@ object CakeTracker {
     )
 
     private fun setDisplayOrderType(type: DisplayOrder) {
-        val storage = storage ?: return
         config.displayOrderType = type
-        drawDisplay(storage)
+        lastKnownCakeDataHash = 0
+        reRenderDisplay()
     }
 
     private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
@@ -311,6 +318,16 @@ object CakeTracker {
     )
 
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
+        val dataHash = data.hashCode()
+        if (dataHash != lastKnownCakeDataHash) {
+            cakeRenderables = buildCakeRenderables(data)
+            lastKnownCakeDataHash = dataHash
+        }
+
+        addAll(cakeRenderables)
+    }
+
+    private fun buildCakeRenderables(data: CakeData) = buildList {
         add(
             Renderable.hoverTips(
                 "§c§lNew §f§lYear §c§lCake §f§lTracker",

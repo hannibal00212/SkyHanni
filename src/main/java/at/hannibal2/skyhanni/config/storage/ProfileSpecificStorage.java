@@ -527,6 +527,11 @@ public class ProfileSpecificStorage {
 
         @Expose
         public List<Integer> neededCakes = new ArrayList<>();
+
+        @Override
+        public int hashCode() {
+            return ownedCakes.hashCode() + neededCakes.hashCode();
+        }
     }
 
     @Expose
