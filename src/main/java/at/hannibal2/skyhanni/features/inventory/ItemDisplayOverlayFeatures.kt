@@ -80,7 +80,7 @@ object ItemDisplayOverlayFeatures {
     )
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion",
+        "Dungeon (?<level>.*) Potion(?: x1)?",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
