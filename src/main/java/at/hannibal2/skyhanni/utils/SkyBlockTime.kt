@@ -43,9 +43,10 @@ data class SkyBlockTime(
 
         fun fromSbYearAndMonth(year: Int, month: Int): SkyBlockTime =
             fromInstant(
-                Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS +
-                    (SKYBLOCK_YEAR_MILLIS * year) +
-                    (SKYBLOCK_MONTH_MILLIS * month)
+                Instant.ofEpochMilli(
+                    SKYBLOCK_EPOCH_START_MILLIS +
+                        (SKYBLOCK_YEAR_MILLIS * year) +
+                        (SKYBLOCK_MONTH_MILLIS * month)
                 )
             )
 
