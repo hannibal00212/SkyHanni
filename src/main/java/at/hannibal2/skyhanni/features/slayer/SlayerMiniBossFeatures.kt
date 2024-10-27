@@ -57,7 +57,9 @@ object SlayerMiniBossFeatures {
         val names = names.toSet()
 
         companion object {
-            fun isMiniboss(name: String) = entries.any { name in it.names }
+            private val allNames = entries.flatMap { it.names }.toSet()
+
+            fun isMiniboss(name: String) = name in allNames
         }
     }
 }
