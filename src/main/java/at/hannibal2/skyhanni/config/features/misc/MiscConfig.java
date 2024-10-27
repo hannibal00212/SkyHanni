@@ -232,6 +232,12 @@ public class MiscConfig {
     public boolean accountUpgradeReminder = true;
 
     @Expose
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixNeuHeavyPearls = true;
+
+    @Expose
     @ConfigOption(
         name = "Fix Patcher Lines",
         desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
