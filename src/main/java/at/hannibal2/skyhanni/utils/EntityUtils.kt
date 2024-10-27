@@ -185,7 +185,7 @@ object EntityUtils {
     }?.asSequence().orEmpty()
 
     fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
+        if (Minecraft.getMinecraft().isOnMainThread()) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)

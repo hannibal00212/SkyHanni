@@ -54,7 +54,7 @@ object InventoryUtils {
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar() =
-        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull().orEmpty()
+        getItemsInOwnInventoryWithNull()?.slice(0..8)?.filterNotNull().orEmpty()
 
     fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
         countItemsInLowerInventory(predicate) > 0

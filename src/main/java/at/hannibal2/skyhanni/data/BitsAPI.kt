@@ -146,7 +146,7 @@ object BitsAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.scoreboard) {
+        for (line in event.added) {
             val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
