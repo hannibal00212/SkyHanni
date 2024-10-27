@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SpreadOperator")
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
@@ -187,7 +187,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (SkyHanniMod.feature.dev.debug.enabled) {
+        if (LorenzUtils.debug) {
             add("")
             add("§7$internalName")
         }

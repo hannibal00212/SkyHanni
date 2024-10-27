@@ -157,11 +157,12 @@ object GardenVisitorTimer {
             else -> "e"
         }
 
+        val adjustedMillis = if (GardenAPI.isCurrentlyFarming()) millis / 3 else millis
         val extraSpeed = if (GardenAPI.isCurrentlyFarming()) {
-            val duration = (millis / 3) * (GardenCropSpeed.getRecentBPS() / 20)
+            val duration = adjustedMillis * (GardenCropSpeed.getRecentBPS() / 20)
             "§7/§$formatColor" + duration.format()
         } else ""
-        if (config.newVisitorPing && millis < 10.seconds) {
+        if (config.newVisitorPing && adjustedMillis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
 

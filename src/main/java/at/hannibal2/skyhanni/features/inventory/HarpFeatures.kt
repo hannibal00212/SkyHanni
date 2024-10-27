@@ -141,7 +141,7 @@ object HarpFeatures {
     private var isGUIScaled = false
 
     private fun setGUIScale() {
-        val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
+        val gameSettings = Minecraft.getMinecraft().gameSettings
         guiSetting = gameSettings.guiScale
         gameSettings.guiScale = 0
         isGUIScaled = true

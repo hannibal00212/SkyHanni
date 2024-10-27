@@ -89,6 +89,7 @@ object DungeonBossAPI {
      * REGEX-TEST: §bmartimavocado§r§a completed a device! (§r§c3§r§a/8)
      * REGEX-TEST: §bmartimavocado§r§a activated a terminal! (§r§c4§r§a/7)
      */
+    @Suppress("MaxLineLength")
     val goldorTerminalPattern by patternGroup.pattern(
         "f7.goldor.terminalcomplete",
         "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)",
@@ -119,13 +120,13 @@ object DungeonBossAPI {
     )
 
     private fun handlePhaseMessage(message: String) {
-        if (dungeonFloor == "F6" || dungeonFloor == "M6") when { //move to enum
+        if (dungeonFloor == "F6" || dungeonFloor == "M6") when { // TODO: move to enum
             terracottaStartPattern.matches(message) -> changePhase(DungeonBossPhase.F6_TERRACOTTA)
             giantsStartPattern.matches(message) -> changePhase(DungeonBossPhase.F6_GIANTS)
             sadanStartPattern.matches(message) -> changePhase(DungeonBossPhase.F6_SADAN)
         }
 
-        if (dungeonFloor == "F7" || dungeonFloor == "M7") { //move to enum
+        if (dungeonFloor == "F7" || dungeonFloor == "M7") { // TODO: move to enum
             goldorTerminalPattern.matchMatcher(message) {
                 val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
                 val totalTerminals = group("total").toIntOrNull() ?: return

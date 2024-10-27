@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
 
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
     private fun canAccessClipboard(): Boolean {

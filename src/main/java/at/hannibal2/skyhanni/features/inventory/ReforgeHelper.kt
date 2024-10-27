@@ -106,7 +106,7 @@ object ReforgeHelper {
             reforgeToSearch = null
         }
         itemToReforge = newItem
-        val newReforgeName = itemToReforge?.getReforgeName() ?: ""
+        val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
         if (newReforgeName == currentReforge?.lowercaseName) return
         currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
         updateDisplay()
@@ -272,16 +272,16 @@ object ReforgeHelper {
         val addEffectText: String
         val click: List<Renderable>
         if (currentReforge == reforge) {
-            stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
+            stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
             click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
-            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
+            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
-            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
+            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
             click = if (reforgeToSearch != reforge) {
                 listOf(renderableString(""), renderableString("§eClick to select!"))
@@ -290,7 +290,7 @@ object ReforgeHelper {
 
         val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
             listOf(renderableString(addEffectText)) + it
-        } ?: emptyList()
+        }.orEmpty()
 
         return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }

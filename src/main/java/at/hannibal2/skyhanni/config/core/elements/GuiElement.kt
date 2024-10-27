@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.core.elements
 
 import net.minecraft.client.gui.Gui
 
+@Suppress("EmptyFunctionBlock", "UnusedParameter")
 abstract class GuiElement : Gui() {
     abstract fun render(x: Int, y: Int)
 

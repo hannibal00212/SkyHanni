@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
@@ -68,7 +68,7 @@ object NucleusBarriersBox {
         if (!isEnabled()) return
 
         Crystal.entries.forEach { crystal ->
-            event.drawFilledBoundingBox_nea(
+            event.drawFilledBoundingBoxNea(
                 crystal.boundingBox,
                 crystal.color.addOpacity(config.opacity),
                 renderRelativeToCamera = false,

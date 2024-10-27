@@ -24,7 +24,8 @@ object ScoreboardElementQuiver : ScoreboardElement() {
                     QuiverAPI.currentAmount.toLong(),
                     QuiverAPI.MAX_ARROW_AMOUNT.toLong(),
                 ).getChatColor()
-            } else "") +
+            } else ""
+            ) +
             if (QuiverAPI.wearingSkeletonMasterChestplate) "∞"
             else {
                 when (arrowConfig.arrowAmountDisplay) {

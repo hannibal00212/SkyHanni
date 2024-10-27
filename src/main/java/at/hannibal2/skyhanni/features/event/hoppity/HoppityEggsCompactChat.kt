@@ -84,7 +84,7 @@ object HoppityEggsCompactChat {
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
             STRAY -> "§aStray Rabbit"
-            else -> "${lastChatMeal?.coloredName ?: ""} Egg"
+            else -> "${lastChatMeal?.coloredName.orEmpty()} Egg"
         }
 
         val rarityConfig = HoppityEggsManager.config.rarityInCompact
@@ -97,7 +97,7 @@ object HoppityEggsCompactChat {
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
                 (HoppityCollectionStats.getRabbitCount(this.lastName)).takeIf { it > 0 }?.let {
                     " §7(§b#$it§7)"
-                } ?: ""
+                }.orEmpty()
             } else ""
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }

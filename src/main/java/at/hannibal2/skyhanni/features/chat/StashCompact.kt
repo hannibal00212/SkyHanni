@@ -23,10 +23,11 @@ object StashCompact {
     /**
      * REGEX-TEST: §f                 §7You have §3226 §7materials stashed away!
      * REGEX-TEST: §f                 §7You have §31,000 §7items stashed away!
+     * REGEX-TEST: §f                     §7You have §a2 §7items stashed away!
      */
     private val materialCountPattern by patternGroup.pattern(
         "material.count",
-        "§f *§7You have §3(?<count>[\\d,]+) (?:§.)+(?<type>item|material)s? stashed away!.*",
+        "§f *§7You have §.(?<count>[\\d,]+) (?:§.)+(?<type>item|material)s? stashed away!.*",
     )
 
     /**
@@ -42,10 +43,11 @@ object StashCompact {
 
     /**
      * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
+     * REGEX-TEST: §f                §6§l>>> §6§lCLICK HERE§e to pick them up! §6§l<<<
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
-        "§f *§3§l>>> §3§lCLICK HERE§b to pick (?:them|it) up! §3§l<<<.*",
+        "§f *§.§l>>> §.§lCLICK HERE§. to pick (?:them|it) up! §.§l<<<.*",
     )
 
     /**
@@ -104,11 +106,13 @@ object StashCompact {
 
     private fun sendCompactedStashMessage() {
         val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
-        val typeFormat = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
+        val typeStringExtra = lastDifferingMaterialsCount.let {
+            if (it == 0) "." else ", §etotalling §6$it ${StringUtils.pluralize(it, "type")}§6."
+        }
+
         ChatUtils.clickableChat(
-            "§eYou have §6${lastMaterialCount} §e$typeNameFormat in stash§6, " +
-                "§etotalling §6$lastDifferingMaterialsCount $typeFormat§6. " +
-                "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §estash§6.",
+            "§eYou have §6$lastMaterialCount §e$typeNameFormat in stash§6$typeStringExtra " +
+                "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §eyour stash!",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
@@ -116,6 +120,9 @@ object StashCompact {
         )
         lastSentMaterialCount = lastMaterialCount
         lastSentType = lastType
+        // Dirty, but item stash doesn't always have differing materials count,
+        // and we don't compare this value to the last one, so we can reset it here
+        lastDifferingMaterialsCount = 0
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

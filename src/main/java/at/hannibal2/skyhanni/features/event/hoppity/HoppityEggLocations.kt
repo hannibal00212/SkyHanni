@@ -33,13 +33,13 @@ object HoppityEggLocations {
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
     val islandLocations
-        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()
+        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet().orEmpty()
 
     val islandCollectedLocations
-        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet() ?: emptySet()
+        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet().orEmpty()
 
     fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
-        return collectedEggStorage[islandType] ?: emptySet()
+        return collectedEggStorage[islandType].orEmpty()
     }
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)

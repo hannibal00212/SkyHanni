@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -26,7 +27,9 @@ public class GreatSpookConfig {
     public Position positionTimer = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Fear Stat Display", desc = "Show your current Fear stat value.")
+    @ConfigOption(name = "Fear Stat Display",
+        desc = "Show Fear stat as single GUI element.\n" +
+        "§eRequires tab list widget enabled and Fear selected to update live.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fearStatDisplay = false;
@@ -45,4 +48,8 @@ public class GreatSpookConfig {
     @ConfigLink(owner = GreatSpookConfig.class, field = "greatSpookTimeLeft")
     public Position positionTimeLeft = new Position(40, 40, false, true);
 
+    @ConfigOption(name = "Primal Fear Solvers", desc = "Solvers for the Primal Fears.")
+    @Accordion
+    @Expose
+    public PrimalFearSolverConfig primalFearSolver = new PrimalFearSolverConfig();
 }

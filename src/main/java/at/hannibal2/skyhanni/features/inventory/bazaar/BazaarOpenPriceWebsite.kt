@@ -26,6 +26,8 @@ object BazaarOpenPriceWebsite {
         ItemUtils.createItemStack(
             neuItem.item,
             "§bPrice History",
+            "§8(From SkyHanni)",
+            "",
             "§7Click here to open",
             "§7the price history",
             "§7on §cskyblock.bz",

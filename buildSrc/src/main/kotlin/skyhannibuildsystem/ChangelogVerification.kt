@@ -25,7 +25,7 @@ abstract class ChangelogVerification : DefaultTask() {
     val prBodyLines get() = prBody.lines()
 
     private val prLink = "ignored"
-    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md"
+    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md?plain=1"
 
     @TaskAction
     fun scanChangelog() {

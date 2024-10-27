@@ -8,7 +8,11 @@ class TimeLimitedSet<T : Any>(
     private val removalListener: (T, RemovalCause) -> Unit = { _, _ -> },
 ) : Iterable<T> {
 
-    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _, cause -> key?.let { removalListener(it, cause) } }
+    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _, cause ->
+        key?.let {
+            removalListener(it, cause)
+        }
+    }
 
     fun add(element: T) {
         cache[element] = Unit

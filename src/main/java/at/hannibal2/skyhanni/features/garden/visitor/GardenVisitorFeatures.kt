@@ -253,7 +253,7 @@ object GardenVisitorFeatures {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
-            ?.ingredients ?: emptySet()
+            ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventActiveTablist
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventAnniversary
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventBroodmother
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventQueue
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventRedstone
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventRift
-import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventServerClose
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventSpooky
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventStartingSoonTablist

@@ -83,7 +83,7 @@ object FishingProfitTracker {
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {
             // TODO find better way to tell if the item is a trophy
-            val neuInternalNames = itemCategories["Trophy Fish"]!!
+            val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
             return if (internalName in neuInternalNames) {
                 SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingAPI.getFilletPerTrophy(internalName)
@@ -163,8 +163,7 @@ object FishingProfitTracker {
         val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
-            val items = itemCategories[currentCategory]!!
-            { it in items }
+            { it in (itemCategories[currentCategory].orEmpty()) }
         }
         return filter
     }

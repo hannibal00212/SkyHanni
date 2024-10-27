@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import java.util.regex.Pattern
 
+@Suppress("TooManyFunctions")
 object CustomScoreboardUtils {
 
     private fun getGroup(pattern: Pattern, list: List<String>, group: String) =
@@ -50,7 +51,7 @@ object CustomScoreboardUtils {
     internal fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
-        group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" } ?: "")
+        group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
     } ?: "0"
 
     internal fun getBits() = formatNumber(BitsAPI.bits.coerceAtLeast(0))
@@ -69,7 +70,7 @@ object CustomScoreboardUtils {
 
     internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
 
-    internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSbLines(), "symbol") ?: ""
+    internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSbLines(), "symbol").orEmpty()
 
     internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { groupOrNull("color") + group("event") }
 

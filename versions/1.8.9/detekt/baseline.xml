@@ -2,8 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>AnnotationOnSeparateLine:GraphEditor.kt$GraphEditor$@Suppress("MapGetWithNotNullAssertionOperator") node.neighbours.map { GraphingEdge( translation[node]!!, translation[it.key]!!, ) }</ID>
-    <ID>AnnotationOnSeparateLine:GraphEditor.kt$GraphEditor$@Suppress("MapGetWithNotNullAssertionOperator") nodes[indexedTable[otherNode.id]!!]</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(npcPrice)</ID>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$arrayOf(sellOffer)</ID>
@@ -22,38 +20,30 @@
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
     <ID>CyclomaticComplexMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
-    <ID>CyclomaticComplexMethod:GraphEditorBugFinder.kt$GraphEditorBugFinder$private fun asyncTest()</ID>
-    <ID>CyclomaticComplexMethod:IslandAreas.kt$IslandAreas$private fun buildDisplay()</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
     <ID>CyclomaticComplexMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
-    <ID>CyclomaticComplexMethod:OverviewPage.kt$OverviewPage$private fun getPage(): Pair&lt;List&lt;List&lt;Renderable&gt;&gt;, List&lt;Renderable&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>CyclomaticComplexMethod:ParkourHelper.kt$ParkourHelper$fun render(event: LorenzRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
     <ID>CyclomaticComplexMethod:SkillProgress.kt$SkillProgress$private fun drawDisplay()</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
-    <ID>DestructuringDeclarationWithTooManyEntries:SackDisplay.kt$SackDisplay$val (internalName, rough, flawed, fine, roughPrice, flawedPrice, finePrice) = gem</ID>
-    <ID>Filename:AreaChangeEvents.kt$at.hannibal2.skyhanni.events.skyblock.AreaChangeEvents.kt</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
     <ID>InjectDispatcher:MayorAPI.kt$MayorAPI$IO</ID>
     <ID>LongMethod:CopyNearbyEntitiesCommand.kt$CopyNearbyEntitiesCommand$fun command(args: Array&lt;String&gt;)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
-    <ID>LongMethod:DefaultConfigOptionGui.kt$DefaultConfigOptionGui$override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float)</ID>
     <ID>LongMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
-    <ID>LongMethod:OverviewPage.kt$OverviewPage$private fun getPage(): Pair&lt;List&lt;List&lt;Renderable&gt;&gt;, List&lt;Renderable&gt;&gt;</ID>
     <ID>LongMethod:RenderableTooltips.kt$RenderableTooltips$private fun drawHoveringText()</ID>
     <ID>LongMethod:TabListRenderer.kt$TabListRenderer$private fun drawTabList()</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
-    <ID>LoopWithTooManyJumpStatements:CustomScoreboard.kt$CustomScoreboard$for</ID>
     <ID>LoopWithTooManyJumpStatements:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt$GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenVisitorFeatures.kt$GardenVisitorFeatures$for</ID>
@@ -63,10 +53,7 @@
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
-    <ID>MatchingDeclarationName:AreaChangeEvents.kt$ScoreboardAreaChangeEvent : SkyHanniEvent</ID>
-    <ID>MaxLineLength:GraphEditor.kt$GraphEditor$@Suppress("MapGetWithNotNullAssertionOperator") nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)</ID>
     <ID>MemberNameEqualsClassName:CaptureFarmingGear.kt$CaptureFarmingGear$fun captureFarmingGear()</ID>
-    <ID>MemberNameEqualsClassName:Commands.kt$Commands$// command -&gt; description private val commands = mutableListOf&lt;CommandInfo&gt;()</ID>
     <ID>MemberNameEqualsClassName:FameRanks.kt$FameRanks$var fameRanks = emptyMap&lt;String, FameRank&gt;() private set</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NEUInternalName, Int&gt;, minions: MutableMap&lt;String, NEUInternalName&gt;, tierOneMinions: MutableList&lt;NEUInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NEUInternalName&gt;, )</ID>
     <ID>MemberNameEqualsClassName:LastServers.kt$LastServers$private val lastServers = mutableMapOf&lt;String, SimpleTimeMark&gt;()</ID>
@@ -76,12 +63,10 @@
     <ID>MemberNameEqualsClassName:Text.kt$Text$fun text(text: String, init: IChatComponent.() -&gt; Unit = {})</ID>
     <ID>NoNameShadowing:BucketedItemTrackerData.kt$BucketedItemTrackerData${ it.hidden = !it.hidden }</ID>
     <ID>NoNameShadowing:BurrowWarpHelper.kt$BurrowWarpHelper${ it.startsWith("§bWarp to ") }</ID>
-    <ID>NoNameShadowing:ChunkedStat.kt$ChunkedStat.Companion${ it.showWhen() }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
     <ID>NoNameShadowing:GraphEditorBugFinder.kt$GraphEditorBugFinder${ it.position.distanceSqToPlayer() }</ID>
-    <ID>NoNameShadowing:GuiOptionEditorUpdateCheck.kt$GuiOptionEditorUpdateCheck$width</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
     <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
     <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
@@ -107,13 +92,11 @@
     <ID>ReturnCount:DamageIndicatorManager.kt$DamageIndicatorManager$private fun checkThorn(realHealth: Long, realMaxHealth: Long): String?</ID>
     <ID>ReturnCount:DamageIndicatorManager.kt$DamageIndicatorManager$private fun getCustomHealth( entityData: EntityData, health: Long, entity: EntityLivingBase, maxHealth: Long, ): String?</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
-    <ID>ReturnCount:EstimatedItemValue.kt$EstimatedItemValue$private fun draw(stack: ItemStack): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>ReturnCount:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun calculateStarPrice( internalName: NEUInternalName, inputStars: Int, ): Pair&lt;EssenceItemUtils.EssenceUpgradePrice, Pair&lt;Int, Int&gt;&gt;?</ID>
     <ID>ReturnCount:FishingAPI.kt$FishingAPI$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
     <ID>ReturnCount:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>ReturnCount:HideNotClickableItems.kt$HideNotClickableItems$private fun hideSalvage(chestName: String, stack: ItemStack): Boolean</ID>
-    <ID>ReturnCount:IslandGraphs.kt$IslandGraphs$private fun handleTick()</ID>
     <ID>ReturnCount:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>ReturnCount:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
     <ID>ReturnCount:ItemPriceUtils.kt$ItemPriceUtils$fun NEUInternalName.getPriceOrNull( priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes: List&lt;PrimitiveRecipe&gt; = emptyList(), ): Double?</ID>
@@ -134,7 +117,6 @@
     <ID>ReturnCount:ShowFishingItemName.kt$ShowFishingItemName$fun inCorrectArea(): Boolean</ID>
     <ID>ReturnCount:SkillAPI.kt$SkillAPI$fun onCommand(it: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
-    <ID>ReturnCount:TabComplete.kt$TabComplete$private fun customTabComplete(command: String): List&lt;String&gt;?</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:Text.kt$Text$(*component.toTypedArray(), separator = separator)</ID>
@@ -152,8 +134,6 @@
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:RenderUtils.kt$RenderUtils</ID>
     <ID>TooManyFunctions:Renderable.kt$Renderable$Companion</ID>
-    <ID>TooManyFunctions:ScoreboardElements.kt$at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElements.kt</ID>
-    <ID>TooManyFunctions:ScoreboardEvent.kt$at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.kt</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
@@ -168,8 +148,6 @@
     <ID>UnsafeCallOnNullableType:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$it.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:ConfigManager.kt$ConfigManager$file!!</ID>
     <ID>UnsafeCallOnNullableType:CorpseTracker.kt$CorpseTracker$applicableKeys.first().key!!</ID>
-    <ID>UnsafeCallOnNullableType:CosmeticFollowingLine.kt$CosmeticFollowingLine$latestLocations[b]!!</ID>
-    <ID>UnsafeCallOnNullableType:CosmeticFollowingLine.kt$CosmeticFollowingLine$locations[b]!!</ID>
     <ID>UnsafeCallOnNullableType:CropMoneyDisplay.kt$CropMoneyDisplay$cropNames[internalName]!!</ID>
     <ID>UnsafeCallOnNullableType:DailyMiniBossHelper.kt$DailyMiniBossHelper$getByDisplayName(name)!!</ID>
     <ID>UnsafeCallOnNullableType:DamageIndicatorManager.kt$DamageIndicatorManager$data.deathLocation!!</ID>
@@ -196,8 +174,6 @@
     <ID>UnsafeCallOnNullableType:FarmingWeightDisplay.kt$FarmingWeightDisplay$weightPerCrop[CropType.SUGAR_CANE]!!</ID>
     <ID>UnsafeCallOnNullableType:FeatureToggleProcessor.kt$FeatureToggleProcessor$latestCategory!!</ID>
     <ID>UnsafeCallOnNullableType:FeatureTogglesByDefaultAdapter.kt$FeatureTogglesByDefaultAdapter$gson!!</ID>
-    <ID>UnsafeCallOnNullableType:FishingProfitTracker.kt$FishingProfitTracker$itemCategories[currentCategory]!!</ID>
-    <ID>UnsafeCallOnNullableType:FishingProfitTracker.kt$FishingProfitTracker.Data$itemCategories["Trophy Fish"]!!</ID>
     <ID>UnsafeCallOnNullableType:FortuneUpgrades.kt$FortuneUpgrades$nextTalisman.upgradeCost?.first!!</ID>
     <ID>UnsafeCallOnNullableType:GardenComposterUpgradesData.kt$GardenComposterUpgradesData$ComposterUpgrade.getByName(name)!!</ID>
     <ID>UnsafeCallOnNullableType:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$cultivatingData[crop]!!</ID>
@@ -231,13 +207,11 @@
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorCondition[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderLivingEntityHelper.kt$RenderLivingEntityHelper$entityColorMap[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderUtils.kt$RenderUtils$it.name!!</ID>
-    <ID>UnsafeCallOnNullableType:RepoManager.kt$RepoManager$latestRepoCommit!!</ID>
     <ID>UnsafeCallOnNullableType:RepoUtils.kt$RepoUtils$file!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$match.groups[2]!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$match.groups[3]!!</ID>
     <ID>UnsafeCallOnNullableType:SackAPI.kt$SackAPI$oldData!!</ID>
-    <ID>UnsafeCallOnNullableType:SimpleCommand.kt$SimpleCommand$tabRunnable!!</ID>
     <ID>UnsafeCallOnNullableType:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker$it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!</ID>
     <ID>UnsafeCallOnNullableType:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker$it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!</ID>
     <ID>UnsafeCallOnNullableType:SkyHanniMod.kt$SkyHanniMod.Companion$Loader.instance().indexedModList[MODID]!!</ID>
@@ -267,21 +241,16 @@
     <ID>VarCouldBeVal:CarnivalZombieShootout.kt$CarnivalZombieShootout$private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())</ID>
     <ID>VarCouldBeVal:ChocolateFactoryStrayTracker.kt$ChocolateFactoryStrayTracker$private var claimedStraysSlots = mutableListOf&lt;Int&gt;()</ID>
     <ID>VarCouldBeVal:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$private var bestiaryDescription = mutableListOf&lt;String&gt;()</ID>
-    <ID>VarCouldBeVal:CompactExperimentRewards.kt$CompactExperimentRewards$private var gainedRewards = mutableListOf&lt;String&gt;()</ID>
     <ID>VarCouldBeVal:CraftRoomHolographicMob.kt$CraftRoomHolographicMob$private var entityToHolographicEntity = mapOf( EntityZombie::class.java to HolographicEntities.zombie, EntitySlime::class.java to HolographicEntities.slime, EntityCaveSpider::class.java to HolographicEntities.caveSpider, )</ID>
     <ID>VarCouldBeVal:CustomWardrobe.kt$CustomWardrobe$private var guiName = "Custom Wardrobe"</ID>
     <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var goodLevel = 0</ID>
     <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var maxLevel = 0</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose @Suppress("unused") private var statLabel: String? = null</ID>
     <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var nbtNum: String? = null</ID>
     <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var stackLevel: TreeSet&lt;Int&gt;? = null</ID>
     <ID>VarCouldBeVal:ErrorManager.kt$ErrorManager$private var cache = TimeLimitedSet&lt;Pair&lt;String, Int&gt;&gt;(10.minutes)</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var comboPrice = combo.asInternalName().getPriceOrNull()</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var internalName = removeKuudraArmorPrefix(stack.getInternalName().asString().removePrefix("VANQUISHED_"))</ID>
     <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var nameColor = if (!useless) "§9" else "§7"</ID>
     <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var currentBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
     <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var lastBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
-    <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var lastSplashes = mutableListOf&lt;ItemStack&gt;()</ID>
     <ID>VarCouldBeVal:FarmingWeightDisplay.kt$FarmingWeightDisplay$private var nextPlayers = mutableListOf&lt;UpcomingLeaderboardPlayer&gt;()</ID>
     <ID>VarCouldBeVal:FlareDisplay.kt$FlareDisplay$private var flares = mutableListOf&lt;Flare&gt;()</ID>
     <ID>VarCouldBeVal:FontRendererHook.kt$FontRendererHook$private var CHROMA_COLOR: Int = -0x1</ID>
@@ -321,13 +290,8 @@
     <ID>VarCouldBeVal:SlayerItemsOnGround.kt$SlayerItemsOnGround$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(2.seconds)</ID>
     <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var dingSlope = mutableListOf&lt;Float&gt;()</ID>
     <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var locations = mutableListOf&lt;LorenzVec&gt;()</ID>
-    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$// TODO remove string. use enum instead! maybe even create new data type instead of map of pairs private var found = mutableMapOf&lt;Pair&lt;Item?, ItemPair?&gt;, String&gt;()</ID>
-    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var lastClicked = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var toCheck = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var uncoveredItems = mutableListOf&lt;Pair&lt;Int, String&gt;&gt;()</ID>
     <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var resultDisplay = mutableMapOf&lt;Int, Int&gt;()</ID>
     <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var sounds = mutableMapOf&lt;Int, Sound&gt;()</ID>
-    <ID>VarCouldBeVal:Translator.kt$Translator$var lang = config.languageCode.get()</ID>
     <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var backupTrapperID: Int = 17</ID>
     <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var trapperID: Int = 56</ID>
     <ID>VarCouldBeVal:TrophyFishDisplay.kt$TrophyFishDisplay$private var recentlyDroppedTrophies = TimeLimitedCache&lt;NEUInternalName, TrophyRarity&gt;(5.seconds)</ID>

@@ -24,6 +24,9 @@ object CombatUtils {
     var killGainHourLast = -1
     var killGainHour = -1
     private var gainTimer = 0
+
+    // Todo: Why do we have two isKilling variables?
+    @Suppress("ObjectPropertyNaming")
     var _isKilling = false
 
     private fun getSkillInfo(xpInformation: XPInformation.SkillInfo?): Float {

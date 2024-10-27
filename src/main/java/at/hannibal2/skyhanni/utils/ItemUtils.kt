@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -58,6 +59,24 @@ object ItemUtils {
             list.add(tagList.getStringTagAt(i))
         }
         return list
+    }
+
+    fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
+        this ?: return emptyList()
+        val tagList = mutableListOf<String>()
+        for (s in this.keySet) {
+            if (s == "Lore" && !includeLore) continue
+            val tag = this.getTag(s)
+
+            if (tag !is NBTTagCompound) {
+                tagList.add("$initSeparator$s: $tag")
+            } else {
+                val element = this.getCompoundTag(s)
+                tagList.add("$initSeparator$s:")
+                tagList.addAll(element.getReadableNBTDump("$initSeparator  ", includeLore))
+            }
+        }
+        return tagList
     }
 
     fun getDisplayName(compound: NBTTagCompound?): String? {
@@ -152,16 +171,15 @@ object ItemUtils {
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
-        val tag = tagCompound ?: NBTTagCompound()
-        tag.removeTag("ench")
-        tag.removeTag("StoredEnchantments")
-        tagCompound = tag
+        val tempTag = tagCompound ?: NBTTagCompound()
+        tempTag.removeTag("ench")
+        tempTag.removeTag("StoredEnchantments")
+        tagCompound = tempTag
     }
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
             .getCompoundTagAt(0).getString("Value")
@@ -169,8 +187,7 @@ object ItemUtils {
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
@@ -203,6 +220,9 @@ object ItemUtils {
         return createItemStack(item, displayName, lore.toList())
     }
 
+    // Overload to avoid spread operators
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount, damage)
     // Taken from NEU
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
         val stack = ItemStack(item, amount, damage)
@@ -547,6 +567,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
+        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()

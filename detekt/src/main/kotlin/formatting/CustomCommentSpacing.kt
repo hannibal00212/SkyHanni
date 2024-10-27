@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.detektrules.formatting
 
+import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
@@ -17,18 +18,9 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
         Debt.FIVE_MINS
     )
 
-    private val allowedPatterns = listOf(
-        "#if",
-        "#else",
-        "#elseif",
-        "#endif",
-        "$$"
-    )
 
     override fun visitComment(comment: PsiComment) {
-        if (allowedPatterns.any { comment.text.contains(it) }) {
-            return
-        }
+        if (comment.text.containsPreprocessingPattern()) return
 
         /**
          * REGEX-TEST: // Test comment

@@ -162,6 +162,11 @@ public class DebugConfig {
     @ConfigEditorBoolean
     public boolean alwaysHoppitys = false;
 
+    @Expose
+    @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
+    @ConfigEditorBoolean
+    public Property<Boolean> forceGreatSpook = Property.of(false);
+
     // Does not have a config element!
     @Expose
     public Position trackSoundPosition = new Position(0, 0);
