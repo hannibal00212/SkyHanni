@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
-object MayorAPI {
+object ElectionAPI {
 
     private val group = RepoPattern.group("mayorapi")
 
