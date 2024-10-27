@@ -23,7 +23,7 @@ public class FocusModeConfig {
     public int toggleKey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Disable Hint", desc = "Disable the line in item tooltips that show how to enable or disable this feature via key press.")
+    @ConfigOption(name = "Disable Hint", desc = "Disable the line in item tooltips that shows how to enable or disable this feature via key press.")
     @ConfigEditorBoolean
     public boolean disableHint = false;
 
