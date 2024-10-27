@@ -49,7 +49,7 @@ object LockMouseLook {
     fun toggleLock() {
         lockedMouse = !lockedMouse
 
-        val gameSettings = Minecraft.getMinecraft().gameSettings ?: return
+        val gameSettings = Minecraft.getMinecraft().gameSettings
         var mouseSensitivity = gameSettings.mouseSensitivity
         if (SensitivityReducer.isEnabled()) mouseSensitivity = SensitivityReducer.doTheMath(mouseSensitivity, true)
 

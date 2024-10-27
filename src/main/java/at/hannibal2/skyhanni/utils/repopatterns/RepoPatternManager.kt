@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
@@ -60,11 +61,6 @@ object RepoPatternManager {
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
-    private val isInDevEnv = try {
-        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    } catch (_: Exception) {
-        true
-    }
 
     private val insideTest = Launch.blackboard == null
 
@@ -88,8 +84,9 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (isInDevEnv || LorenzEvent.isInGuardedEventHandler)
+        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
+        }
     }
 
     /**

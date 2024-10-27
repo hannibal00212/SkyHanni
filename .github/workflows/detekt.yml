@@ -29,6 +29,7 @@ jobs:
                 run: |
                   ./gradlew detektMain --stacktrace
             -   name: Check if SARIF file exists
+                if: always()
                 id: check_sarif
                 run: |
                     if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
@@ -42,7 +43,7 @@ jobs:
                     chmod +x .github/scripts/process_detekt_sarif.sh
                     ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif | tee detekt_output.txt
             -   name: Upload detekt output as artifact
-                if: ${{ steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 uses: actions/upload-artifact@v4
                 with:
                     name: detekt-output
