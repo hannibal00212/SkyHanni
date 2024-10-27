@@ -109,7 +109,8 @@ object StashCompact {
         val action = if (config.useViewStash) "view" else "pickup"
 
         ChatUtils.clickableChat(
-            "${mainColor}You have $accentColor${materialCount.shortFormat()} $mainColor$typeNameFormat in stash$typeStringExtra. " + "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
+            "${mainColor}You have $accentColor${materialCount.shortFormat()} $mainColor$typeNameFormat in stash$typeStringExtra. " +
+                "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(type)
                 else HypixelCommands.pickupStash()
