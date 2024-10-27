@@ -183,7 +183,7 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val newCold = coldPattern.firstMatcher(event.scoreboard) {
+        val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
         } ?: return
 
