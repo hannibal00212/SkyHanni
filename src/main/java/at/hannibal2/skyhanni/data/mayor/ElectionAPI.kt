@@ -1,10 +1,9 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.mayor
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Candidate.Companion.getMayorFromPerk
-import at.hannibal2.skyhanni.data.Candidate.Companion.setAssumeMayorJson
-import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
+import at.hannibal2.skyhanni.data.Candidate
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
@@ -28,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,7 +42,7 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object ElectionAPI {
 
-    private val group = RepoPattern.group("mayorapi")
+    private val group = RepoPattern.Companion.group("mayorapi")
 
     /**
      * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
@@ -92,17 +90,17 @@ object ElectionAPI {
     var currentMinister: Candidate? = null
         private set
     private var lastMayor: Candidate? = null
-    var jerryExtraMayor: Pair<Candidate?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
+    var jerryExtraMayor: Pair<Candidate?, SimpleTimeMark> = null to SimpleTimeMark.Companion.farPast()
         private set
-    private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
+    private var lastJerryExtraMayorReminder = SimpleTimeMark.Companion.farPast()
 
-    private var lastUpdate = SimpleTimeMark.farPast()
+    private var lastUpdate = SimpleTimeMark.Companion.farPast()
     private val dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
 
-    var nextMayorTimestamp = SimpleTimeMark.farPast()
+    var nextMayorTimestamp = SimpleTimeMark.Companion.farPast()
         private set
 
     private const val ELECTION_END_MONTH = 3 // Late Spring
@@ -112,7 +110,7 @@ object ElectionAPI {
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
      */
-    fun mayorNameToColorCode(input: String): String = Candidate.getMayorFromName(input)?.color ?: "§c"
+    fun mayorNameToColorCode(input: String): String = Candidate.Companion.getMayorFromName(input)?.color ?: "§c"
 
     /**
      * @param input: The name of the mayor
@@ -131,17 +129,17 @@ object ElectionAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (!Candidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
-            jerryExtraMayor = null to SimpleTimeMark.farPast()
+            jerryExtraMayor = null to SimpleTimeMark.Companion.farPast()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
             )
         }
-        val misc = SkyHanniMod.feature.misc
+        val misc = SkyHanniMod.Companion.feature.misc
         if (jerryExtraMayor.first == null && misc.unknownPerkpocalypseMayorWarning) {
             if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
             if (ReminderUtils.isBusy()) return
-            lastJerryExtraMayorReminder = SimpleTimeMark.now()
+            lastJerryExtraMayorReminder = SimpleTimeMark.Companion.now()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
@@ -175,9 +173,10 @@ object ElectionAPI {
 
         val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }, 2) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
-        val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
+        val jerryMayor =
+            Candidate.Companion.getMayorFromPerk(Perk.Companion.getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
-        val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
+        val lastMayorTimestamp = nextMayorTimestamp - SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS.milliseconds
 
         val expireTime = (1..21)
             .map { lastMayorTimestamp + (6.hours * it) }
@@ -201,7 +200,7 @@ object ElectionAPI {
     }
 
     private fun calculateNextMayorTime(): SimpleTimeMark {
-        val now = SkyBlockTime.now()
+        val now = SkyBlockTime.Companion.now()
 
         return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
     }
@@ -215,12 +214,12 @@ object ElectionAPI {
             if (lastUpdate.passedSince() < 20.minutes) return
             if (currentMayor == Candidate.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
         }
-        lastUpdate = SimpleTimeMark.now()
+        lastUpdate = SimpleTimeMark.Companion.now()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.Companion.coroutineScope.launch {
             val url = "https://api.hypixel.net/v2/resources/skyblock/election"
             val jsonObject = withContext(dispatcher) { APIUtils.getJSONResponse(url) }
-            rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
+            rawMayorData = ConfigManager.Companion.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launch
             val map = mutableMapOf<Int, MayorCandidate>()
             map put data.mayor.election.getPairs()
@@ -231,8 +230,8 @@ object ElectionAPI {
 
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
-                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                currentMayor = Candidate.Companion.setAssumeMayorJson(currentMayorName, data.mayor.perks)
+                currentMinister = data.mayor.minister?.let { Candidate.Companion.setAssumeMayorJson(it.name, listOf(it.perk)) }
             }
         }
     }
@@ -243,7 +242,7 @@ object ElectionAPI {
 
     @SubscribeEvent
     fun onConfigReload(event: ConfigLoadEvent) {
-        val config = SkyHanniMod.feature.dev.debug.assumeMayor
+        val config = SkyHanniMod.Companion.feature.dev.debug.assumeMayor
         config.onToggle {
             val mayor = config.get()
 

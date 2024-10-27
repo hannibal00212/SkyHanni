@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.mayor.ElectionAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.TimeUtils.format
