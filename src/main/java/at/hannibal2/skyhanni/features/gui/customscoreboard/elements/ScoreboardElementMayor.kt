@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 // set 1s timer
 object ScoreboardElementMayor : ScoreboardElement() {
     override fun getDisplay() = buildList {
-        val currentMayorName = ElectionAPI.currentMayor?.mayorName?.let { ElectionAPI.mayorNameWithColorCode(it) } ?: return@buildList
+        val currentMayorName = ElectionAPI.currentMayor?.mayorName?.let {
+            ElectionAPI.mayorNameWithColorCode(it)
+        } ?: return@buildList
         val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
             "§7 (§e${ElectionAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
         } else ""
@@ -32,7 +34,9 @@ object ScoreboardElementMayor : ScoreboardElement() {
     override fun showIsland() = !RiftAPI.inRift()
 
     private fun addMinister() = buildList {
-        val ministerName = ElectionAPI.currentMinister?.mayorName?.let { ElectionAPI.mayorNameWithColorCode(it) } ?: return@buildList
+        val ministerName = ElectionAPI.currentMinister?.mayorName?.let {
+            ElectionAPI.mayorNameWithColorCode(it)
+        } ?: return@buildList
         add(ministerName)
 
         if (mayorConfig.showMayorPerks) {
