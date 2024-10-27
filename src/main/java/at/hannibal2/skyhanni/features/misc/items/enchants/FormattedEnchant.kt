@@ -23,8 +23,4 @@ data class FormattedEnchant(
 
         return if (!stacking.contains("empty")) builder.append("§8$stacking").toString() else builder.toString()
     }
-
-    override fun toString(): String {
-        return "FormattedEnchant[enchant: " + enchant.nbtName + ", level: " + level + ", isRoman: " + isRoman + "]"
-    }
 }
