@@ -33,7 +33,7 @@ public class FocusModeConfig {
     public boolean alwaysEnabled = false;
 
     @Expose
-    @ConfigOption(name = "Hide Menu Items", desc = "Also hide the item lore of no real SkyBlock items in menus.")
+    @ConfigOption(name = "Hide Menu Items", desc = "Also hide the lore of non-SkyBlock items in menus.")
     @ConfigEditorBoolean
     public boolean hideMenuItems = true;
 }
