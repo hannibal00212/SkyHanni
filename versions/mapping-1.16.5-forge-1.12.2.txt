@@ -1,4 +1,3 @@
-
 com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 com.mojang.blaze3d.systems.RenderSystem color4f() color()
 com.mojang.blaze3d.systems.RenderSystem translatef() translate()
@@ -7,6 +6,8 @@ com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
 com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
 
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
+
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
 net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
@@ -46,11 +47,12 @@ net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
 net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
 
 net.minecraft.core.particles.ParticleTypes ANGRY_VILLAGER VILLAGER_ANGRY
-net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
 net.minecraft.core.particles.ParticleTypes DRIPPING_LAVA DRIP_LAVA
-net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
-net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
+net.minecraft.core.particles.ParticleTypes ENCHANTED_HIT CRIT_MAGIC
 net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
+net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
@@ -156,6 +158,7 @@ net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEnt
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+net.minecraft.world.effect.MobEffects net.minecraft.init.PotionTypes
 
 net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
 net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
