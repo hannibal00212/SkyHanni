@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 object ScoreboardElementPowder : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val powderTypes = HotmAPI.PowderType.entries
-        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) return@buildList
+        if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.total == 0L }) return@buildList
 
         add("§9§lPowder")
 
@@ -21,8 +21,8 @@ object ScoreboardElementPowder : ScoreboardElement() {
         for (type in powderTypes) {
             val name = type.displayName
             val color = type.color
-            val current = formatNumber(type.getCurrent())
-            val total = formatNumber(type.getTotal())
+            val current = formatNumber(type.current)
+            val total = formatNumber(type.total)
 
             when (displayConfig.powderDisplay) {
                 PowderDisplay.AVAILABLE -> {
