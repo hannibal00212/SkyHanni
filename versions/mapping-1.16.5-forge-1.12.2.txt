@@ -50,6 +50,7 @@ net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
 net.minecraft.core.particles.ParticleTypes DRIPPING_LAVA DRIP_LAVA
 net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
 net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
@@ -163,8 +164,10 @@ net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Entity level getEntityWorld()
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity
 net.minecraft.world.entity.Entity xOld prevPosX
+net.minecraft.world.entity.Entity xRot rotationPitch
 net.minecraft.world.entity.Entity xo posX
 net.minecraft.world.entity.Entity yOld prevPosY
+net.minecraft.world.entity.Entity yRot rotationYaw
 net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
