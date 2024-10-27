@@ -118,13 +118,21 @@ object MiningAPI {
 
     // oreblock data
     var inGlacite = false
+        private set
     var inTunnels = false
+        private set
     var inMineshaft = false
+        private set
     var inDwarvenMines = false
+        private set
     var inCrystalHollows = false
+        private set
     var inCrimsonIsle = false
+        private set
     var inEnd = false
+        private set
     var inSpidersDen = false
+        private set
 
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
@@ -365,6 +373,7 @@ object MiningAPI {
         }.countBy { it.first.ore }
 
         OreMinedEvent(originalBlock.ore, extraBlocks).post()
+        lastOreMinedTime = SimpleTimeMark.now()
 
         surroundingMinedBlocks.clear()
         recentClickedBlocks.removeIf { it.second.passedSince() >= originalBlock.time.passedSince() }
@@ -402,11 +411,6 @@ object MiningAPI {
         pickobulusWaitingForBlock = false
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onOreMined(event: OreMinedEvent) {
-        lastOreMinedTime = SimpleTimeMark.now()
-    }
-
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
@@ -419,16 +423,27 @@ object MiningAPI {
             return
         }
 
+        fun SimpleTimeMark.formatTime(): String {
+            if (isFarPast()) return "never"
+            return passedSince().format()
+        }
+
         event.addData {
-            if (lastInitSound.isFarPast()) {
-                add("lastInitSound: never")
-            } else {
-                add("lastInitSound: ${lastInitSound.passedSince().format()}")
-            }
+            add("lastClickedPos: ${lastClickedPos?.toCleanString()}")
+            add("lastClicked: ${lastClicked.formatTime()}")
+            add("ignoreInit: $ignoreInit")
+            add("lastInitSound: ${lastInitSound.formatTime()}")
+            add("initBlockPos: ${initBlockPos?.toCleanString()}")
             add("waitingForInitSound: $waitingForInitSound")
-            add("waitingForInitBlockPos: $initBlockPos")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
+            add("")
+            add("lastPickobulusUse: ${lastPickobulusUse.formatTime()}")
+            add("lastPickobulusExplosion: ${lastPickobulusExplosion.formatTime()}")
+            add("pickobulusExplosionPos: ${pickobulusExplosionPos?.toCleanString()}")
+            add("pickobulusWaitingForSound: $pickobulusWaitingForSound")
+            add("pickobulusWaitingForBlock: $pickobulusWaitingForBlock")
+            add("")
             add("recentlyClickedBlocks: ${recentClickedBlocks.joinToString { "(${it.first.toCleanString()}" }}")
         }
     }
