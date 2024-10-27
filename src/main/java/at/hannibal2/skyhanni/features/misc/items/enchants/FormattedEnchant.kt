@@ -3,14 +3,12 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import net.minecraft.item.ItemStack
 
-class FormattedEnchant(
+data class FormattedEnchant(
     private val enchant: Enchant,
     private val level: Int,
-    stacking: String,
+    private val stacking: String,
     private val isRoman: Boolean,
 ) : Comparable<FormattedEnchant> {
-    private val stacking: String = stacking
-        get() = "§8$field"
     private val loreDescription: MutableList<String> = mutableListOf()
 
     fun addLore(lineOfLore: String) = loreDescription.add(lineOfLore)
@@ -23,7 +21,7 @@ class FormattedEnchant(
         val builder = StringBuilder()
         builder.append(enchant.getFormattedName(level, itemStack)).append(" ").append(if (isRoman) level.toRoman() else level)
 
-        return if (!stacking.contains("empty")) builder.append(stacking).toString() else builder.toString()
+        return if (!stacking.contains("empty")) builder.append("§8$stacking").toString() else builder.toString()
     }
 
     override fun toString(): String {
