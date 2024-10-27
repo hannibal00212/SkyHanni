@@ -168,7 +168,7 @@ object TheGreatSpook {
             return
         }
         ChatUtils.clickToActionOrDisable(
-            "The answer is §b$answer§e.",
+            "The answer is: §b$answer§e.",
             config.primalFearSolver::math,
             actionName = "send the answer",
             action = {
@@ -179,7 +179,7 @@ object TheGreatSpook {
 
     private fun publicSpeakingSolver() {
         ChatUtils.clickToActionOrDisable(
-            "Solving Public Speak puzzle for you.",
+            "Solving Public Speaking puzzle for you.",
             config.primalFearSolver::publicSpeaking,
             actionName = "send a random string",
             action = {
