@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,7 +71,7 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
@@ -109,7 +109,7 @@ object TheGreatSpook {
         displayGreatSpookEnd = Renderable.string(timeLeftString)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
@@ -129,7 +129,7 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
         val currentTime = SimpleTimeMark.now()
         val timeRange = greatSpookTimeRange ?: run {
@@ -140,7 +140,7 @@ object TheGreatSpook {
         isGreatSpookActive = currentTime in timeRange
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
@@ -188,8 +188,8 @@ object TheGreatSpook {
         )
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
@@ -221,7 +221,7 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 
@@ -232,7 +232,7 @@ object TheGreatSpook {
         greatSpookEndTime = if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Great Spook")
 
