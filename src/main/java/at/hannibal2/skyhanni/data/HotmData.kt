@@ -626,7 +626,7 @@ enum class HotmData(
                     it.pattern(isHeartItem).matchMatcher(line) {
                         val powder = group("powder").formatLong()
                         if (isHeartItem) it.setAmount(powder)
-                        else it.total = powder
+                        else it.total += powder
                         continue@lore
                     }
                 }
