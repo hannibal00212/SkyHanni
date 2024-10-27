@@ -181,9 +181,16 @@ object APIUtils {
 
     private fun readResponse(entity: HttpEntity): JsonObject {
         val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
-        val parsed = parser.parse(retSrc)
-        if (parsed.isJsonNull) return JsonObject()
-        return parsed as JsonObject
+
+        try {
+            val parsed = parser.parse(retSrc)
+            if (parsed.isJsonNull) return JsonObject()
+
+            return parsed as JsonObject
+        } catch (_: Throwable) {
+            // This causes content types that aren't JSON to be ignored
+            return JsonObject()
+        }
     }
 
     fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {

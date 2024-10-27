@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
@@ -46,6 +47,11 @@ object HoppityEventSummary {
         if (event.duplicate) rarityMap.dupes++
         else rarityMap.uniques++
         if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
     }
 
     @SubscribeEvent
