@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.data.MayorAPI.foxyExtraEventPattern
+import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -102,12 +103,11 @@ enum class Mayor(
     DISABLED("§cDisabled", "§7"),
     ;
 
-    val activePerks: MutableList<Perk> = mutableListOf()
+    val activePerks get() = perks.filter { it.isActive }
 
     override fun toString() = mayorName
 
     fun addAllPerks(): Mayor {
-        activePerks.addAll(perks)
         perks.forEach { it.isActive = true }
         return this
     }
@@ -133,37 +133,13 @@ enum class Mayor(
                 return null
             }
 
-            val perks = perksJson.mapNotNull { perkJson ->
-                val perk = Perk.entries.firstOrNull { it.perkName == perkJson.renameIfFoxyExtraEventPerkFound() }
-                perk?.also {
-                    it.description = perkJson.description
-                }
-            }
-
-            mayor.addPerks(perks)
+            mayor.addPerks(perksJson.mapNotNull { it.toPerk() })
             return mayor
         }
 
         fun Mayor.addPerks(perks: List<Perk>) {
-            perks.forEach { it.isActive = false }
-            activePerks.forEach { it.isActive = false }
-            activePerks.clear()
-            for (perk in perks.filter { perks.contains(it) }) {
-                perk.isActive = true
-                activePerks.add(perk)
-            }
-        }
-
-        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String {
-            val foxyExtraEventPairs = mapOf(
-                "Spooky Festival" to "Extra Event (Spooky)",
-                "Mining Fiesta" to "Extra Event (Mining)",
-                "Fishing Festival" to "Extra Event (Fishing)",
-            )
-
-            return foxyExtraEventPattern.matchMatcher(this.description) {
-                foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
-            } ?: this.name
+            this.perks.forEach { it.isActive = false }
+            perks.forEach { it.isActive = true }
         }
     }
 }
@@ -235,10 +211,29 @@ enum class Perk(val perkName: String) {
 
     var isActive = false
     var description = "§cDescription failed to load from the API."
+    var minister = false
 
     override fun toString(): String = "$perkName: $description"
 
     companion object {
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
+
+        fun MayorPerk.toPerk(): Perk? = getPerkFromName(this.renameIfFoxyExtraEventPerkFound())?.let {
+            it.description = this.description
+            it.minister = this.minister
+            it
+        }
+
+        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String {
+            val foxyExtraEventPairs = mapOf(
+                "Spooky Festival" to "Extra Event (Spooky)",
+                "Mining Fiesta" to "Extra Event (Mining)",
+                "Fishing Festival" to "Extra Event (Fishing)",
+            )
+
+            return foxyExtraEventPattern.matchMatcher(this.description) {
+                foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
+            } ?: this.name
+        }
     }
 }
