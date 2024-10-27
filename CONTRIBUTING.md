@@ -85,7 +85,7 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-Proposed changes are better off being in their own branch, you can do this by doing the following from within IntelliJ with the SkyHanni project already open.
+Proposed changes are better off being in their own branch as this makes development easier for both you and the maintainers of this repository, you can do this by following the instructions from within the IntelliJ window with the SkyHanni project already open.
 - Click the beta dropdown at the top of IntelliJ
 - Click new branch
 - Give the branch a name relating to the changes you plan to make

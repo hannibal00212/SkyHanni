@@ -78,9 +78,14 @@ object ItemDisplayOverlayFeatures {
         "harvest",
         "§7§7You may harvest §6(?<amount>.).*",
     )
+
+    /**
+     * REGEX-TEST: Dungeon VII Potion
+     * REGEX-TEST: Dungeon VII Potion x1
+     */
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion",
+        "Dungeon (?<level>.*) Potion(?: x1)?",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",

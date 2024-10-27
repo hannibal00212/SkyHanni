@@ -11,6 +11,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 
 @SkyHanniModule
 object ShiftClickBrewing {
+    private const val closeButtonIndex = 49
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -19,7 +20,7 @@ object ShiftClickBrewing {
 
         if (event.gui !is GuiChest) return
 
-        if (event.slot == null) return
+        if (event.slot == null || event.slotId == closeButtonIndex) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (!chestName.startsWith("Brewing Stand")) return

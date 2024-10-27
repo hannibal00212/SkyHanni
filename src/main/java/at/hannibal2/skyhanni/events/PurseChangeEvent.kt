@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
-class PurseChangeEvent(val coins: Double, val reason: PurseChangeCause) : SkyHanniEvent()
+class PurseChangeEvent(val coins: Double, val purse: Double, val reason: PurseChangeCause) : SkyHanniEvent()
 
 enum class PurseChangeCause {
     GAIN_MOB_KILL,
