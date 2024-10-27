@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.Item
@@ -36,7 +36,7 @@ object HarpFeatures {
     private val config get() = SkyHanniMod.feature.inventory.helper.harp
     private var lastClick = SimpleTimeMark.farPast()
 
-    private const val closeButtonSlot = 40
+    private const val CLOSE_BUTTON_SLOT = 40
 
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
@@ -117,10 +117,9 @@ object HarpFeatures {
         }
         // Copied from Minecraft Code to update the scale
         val minecraft = Minecraft.getMinecraft()
-        val scaledresolution = ScaledResolution(minecraft)
-        val i = scaledresolution.scaledWidth
-        val j = scaledresolution.scaledHeight
-        minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
+        val width = GuiScreenUtils.scaledWindowWidth
+        val height = GuiScreenUtils.scaledWindowHeight
+        minecraft.currentScreen.setWorldAndResolution(minecraft, width, height)
     }
 
     @HandleEvent
@@ -169,7 +168,7 @@ object HarpFeatures {
 
         if (!config.quickRestart) return
         if (!isMenuGui(InventoryUtils.openInventoryName())) return
-        if (event.slot?.slotNumber != closeButtonSlot) return
+        if (event.slot?.slotNumber != CLOSE_BUTTON_SLOT) return
         if (openTime.passedSince() > 2.seconds) return
         event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())

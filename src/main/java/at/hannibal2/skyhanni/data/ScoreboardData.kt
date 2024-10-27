@@ -118,7 +118,7 @@ object ScoreboardData {
         if (new != sidebarLinesFormatted) {
             val old = sidebarLinesFormatted
             sidebarLinesFormatted = new
-            ScoreboardUpdateEvent(old, new).post()
+            ScoreboardUpdateEvent(new, old).post()
         }
     }
 

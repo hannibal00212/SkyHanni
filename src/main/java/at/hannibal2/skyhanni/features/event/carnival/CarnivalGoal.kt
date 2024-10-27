@@ -23,7 +23,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import org.intellij.lang.annotations.Language
 
-private val repoGroup = RepoPattern.group("carnvial.goals")
+private val patternGroup = RepoPattern.group("event.carnival.goals")
 
 enum class CarnivalGoal(
     private val type: GoalType,
@@ -125,8 +125,8 @@ enum class CarnivalGoal(
 
     private val patternKeyName = name.lowercase().replace("_", ".")
 
-    private val lorePattern by repoGroup.pattern("lore.$patternKeyName", loreLine)
-    private val chatPattern by repoGroup.pattern("chat.$patternKeyName", chatLine)
+    private val lorePattern by patternGroup.pattern("lore.$patternKeyName", loreLine)
+    private val chatPattern by patternGroup.pattern("chat.$patternKeyName", chatLine)
 
     private var isReached: Boolean
         get() {
@@ -160,9 +160,9 @@ enum class CarnivalGoal(
         private val config get() = SkyHanniMod.feature.event.carnival
         private val storage get() = ProfileStorageData.profileSpecific?.carnival
 
-        private val inventoryPattern by repoGroup.pattern("inventory", "Carnival Goals")
+        private val inventoryPattern by patternGroup.pattern("inventory", "Carnival Goals")
 
-        private val completePattern by repoGroup.pattern("complete", "§a§lCOMPLETE")
+        private val completePattern by patternGroup.pattern("complete", "§a§lCOMPLETE")
 
         private var dirty = true
 

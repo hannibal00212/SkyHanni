@@ -168,9 +168,9 @@ object TheGreatSpook {
             return
         }
         ChatUtils.clickToActionOrDisable(
-            "The answer is §b$answer§e.",
+            "The answer is: §b$answer§e.",
             config.primalFearSolver::math,
-            actionName = "Send the answer",
+            actionName = "send the answer",
             action = {
                 HypixelCommands.allChat(answer.toString())
             },
@@ -179,9 +179,9 @@ object TheGreatSpook {
 
     private fun publicSpeakingSolver() {
         ChatUtils.clickToActionOrDisable(
-            "Solving Public Speak puzzle for you.",
+            "Solving Public Speaking puzzle for you.",
             config.primalFearSolver::publicSpeaking,
-            actionName = "send a random string.",
+            actionName = "send a random string",
             action = {
                 HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
             },

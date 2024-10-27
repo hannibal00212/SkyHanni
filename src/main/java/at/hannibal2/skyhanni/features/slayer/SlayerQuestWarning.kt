@@ -43,8 +43,8 @@ object SlayerQuestWarning {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
-        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val slayerType = event.full.nextAfter("Slayer Quest")
+        val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
