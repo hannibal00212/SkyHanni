@@ -170,7 +170,7 @@ object TheGreatSpook {
         ChatUtils.clickToActionOrDisable(
             "The answer is §b$answer§e.",
             config.primalFearSolver::math,
-            actionName = "Send the answer",
+            actionName = "send the answer",
             action = {
                 HypixelCommands.allChat(answer.toString())
             },
