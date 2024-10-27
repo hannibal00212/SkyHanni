@@ -165,7 +165,7 @@ class ComponentSpan internal constructor(
      */
     fun slice(start: Int = 0, end: Int = length): ComponentSpan {
         require(0 <= start) { "start is bigger than 0: start=$start, cachedText=$cachedText" }
-        require(start <= end) { "start is bigger than length: start=$start, length=$length, cachedText=$cachedText" }
+        require(start <= end) { "start is bigger than end: start=$start, end=$end, cachedText=$cachedText" }
         require(end <= length) { "end is bigger than length: end=$end, length=$length, cachedText=$cachedText" }
         return ComponentSpan(textComponent, cachedText, this.start + start, this.start + end)
     }
