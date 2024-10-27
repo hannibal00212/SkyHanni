@@ -397,6 +397,9 @@ object MiningAPI {
         resetOreEvent()
         resetPickobulusEvent()
         lastOreMinedTime = SimpleTimeMark.farPast()
+        inDwarvenMines = false
+        inCrystalHollows = false
+        inGlacite = false
     }
 
     private fun resetOreEvent() {
