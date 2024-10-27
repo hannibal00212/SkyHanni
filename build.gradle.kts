@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
+import java.io.Serializable
+import java.nio.file.Path
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -424,17 +426,13 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     outputs.cacheIf { false } // Custom rules won't work if cached
 }
 
-abstract class ShotApplicationJarProcessor @Inject constructor(val shots: Shots) : MinecraftJarProcessor<MinecraftJarProcessor.Spec> {
-    private class EnsureCompile(shots: Shots) : ShotApplicationJarProcessor(shots)
-    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? {
-        return object : MinecraftJarProcessor.Spec {}
-    }
+abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
+    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
+    Serializable {
 
-    override fun processJar(
-        source: java.nio.file.Path,
-        spec: MinecraftJarProcessor.Spec,
-        context: ProcessorContext?
-    ) {
+    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
+
+    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
         val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
         ZipFile(source.toFile()).use { input ->
             ZipOutputStream(dest.outputStream()).use { output ->
@@ -444,7 +442,17 @@ abstract class ShotApplicationJarProcessor @Inject constructor(val shots: Shots)
         dest.moveTo(source, overwrite = true)
     }
 
-    override fun getName(): String {
-        return "Shots"
+    override fun getName(): String = "Shots"
+
+    private class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is ShotSpec) return false
+            return shots == other.shots
+        }
+
+        override fun hashCode(): Int {
+            return shots.hashCode()
+        }
     }
 }
