@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
-enum class Candidate(
+enum class ElectionCandidate(
     val mayorName: String,
     val color: String,
     vararg val perks: Perk,
@@ -112,7 +112,7 @@ enum class Candidate(
         perks.forEach { it.isActive = true }
     }
 
-    fun addAllPerks(): Candidate {
+    fun addAllPerks(): ElectionCandidate {
         this.perks.forEach { it.isActive = true }
         return this
     }
@@ -121,11 +121,11 @@ enum class Candidate(
 
     companion object {
 
-        fun getMayorFromName(name: String): Candidate? = entries.firstOrNull { it.mayorName == name }
+        fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name }
 
-        fun getMayorFromPerk(perk: Perk): Candidate? = entries.firstOrNull { it.perks.contains(perk) }
+        fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
 
-        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Candidate? {
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): ElectionCandidate? {
             val mayor = getMayorFromName(name) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Unknown mayor found",

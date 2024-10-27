@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Candidate.Companion.getMayorFromPerk
-import at.hannibal2.skyhanni.data.Candidate.Companion.setAssumeMayorJson
+import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.getMayorFromPerk
+import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.setAssumeMayorJson
 import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
@@ -87,12 +87,12 @@ object ElectionAPI {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: Candidate? = null
+    var currentMayor: ElectionCandidate? = null
         private set
-    var currentMinister: Candidate? = null
+    var currentMinister: ElectionCandidate? = null
         private set
-    private var lastMayor: Candidate? = null
-    var jerryExtraMayor: Pair<Candidate?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
+    private var lastMayor: ElectionCandidate? = null
+    var jerryExtraMayor: Pair<ElectionCandidate?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
@@ -112,7 +112,7 @@ object ElectionAPI {
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
      */
-    fun mayorNameToColorCode(input: String): String = Candidate.getMayorFromName(input)?.color ?: "§c"
+    fun mayorNameToColorCode(input: String): String = ElectionCandidate.getMayorFromName(input)?.color ?: "§c"
 
     /**
      * @param input: The name of the mayor
@@ -129,7 +129,7 @@ object ElectionAPI {
         }
 
         if (!LorenzUtils.inSkyBlock) return
-        if (!Candidate.JERRY.isActive()) return
+        if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
             ChatUtils.clickableChat(
@@ -156,7 +156,7 @@ object ElectionAPI {
 
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
-            currentMayor = Candidate.UNKNOWN
+            currentMayor = ElectionCandidate.UNKNOWN
             currentMinister = null
         }
     }
@@ -213,7 +213,7 @@ object ElectionAPI {
     private fun checkHypixelAPI(forceReload: Boolean = false) {
         if (!forceReload) {
             if (lastUpdate.passedSince() < 20.minutes) return
-            if (currentMayor == Candidate.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
+            if (currentMayor == ElectionCandidate.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
         }
         lastUpdate = SimpleTimeMark.now()
 
@@ -247,7 +247,7 @@ object ElectionAPI {
         config.onToggle {
             val mayor = config.get()
 
-            if (mayor == Candidate.DISABLED) {
+            if (mayor == ElectionCandidate.DISABLED) {
                 checkHypixelAPI(forceReload = true)
             } else {
                 mayor.addPerks(mayor.perks.toList())
