@@ -444,15 +444,5 @@ abstract class ShotApplicationJarProcessor @Inject constructor(private val shots
 
     override fun getName(): String = "Shots"
 
-    private class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is ShotSpec) return false
-            return shots == other.shots
-        }
-
-        override fun hashCode(): Int {
-            return shots.hashCode()
-        }
-    }
+    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }
