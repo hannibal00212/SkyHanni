@@ -29,7 +29,8 @@ object FocusMode {
             event.toolTip = buildList {
                 add(event.toolTip.first())
                 if (hint) {
-                    add("§7Focus Mode from SkyHanni active! (Press $keyName to disable)")
+                    add("§7Focus Mode from SkyHanni active!")
+                    add("Press $keyName to disable!")
                 }
             }.toMutableList()
         } else {
