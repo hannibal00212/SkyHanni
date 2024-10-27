@@ -181,7 +181,7 @@ object TheGreatSpook {
         ChatUtils.clickToActionOrDisable(
             "Solving Public Speak puzzle for you.",
             config.primalFearSolver::publicSpeaking,
-            actionName = "send a random string.",
+            actionName = "send a random string",
             action = {
                 HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
             },
