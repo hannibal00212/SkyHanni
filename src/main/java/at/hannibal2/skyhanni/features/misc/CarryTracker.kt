@@ -262,6 +262,7 @@ object CarryTracker {
                                 add("§7Set a price with §e/shcarry <type> <price>")
                             }
                             add("")
+                            add("§7Run §e/shcarry remove ${customer.name} §7to remove the whole customer!")
                             add("§eClick to send current progress in the party chat!")
                             add("§eControl-click to remove this carry!")
                         },
