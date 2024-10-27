@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
-enum class Mayor(
+enum class Candidate(
     val mayorName: String,
     val color: String,
     vararg val perks: Perk,
@@ -103,12 +103,17 @@ enum class Mayor(
     DISABLED("§cDisabled", "§7"),
     ;
 
-    val activePerks get() = perks.filter { it.isActive }
+    val activePerks get() = this.perks.filter { it.isActive }
 
     override fun toString() = mayorName
 
-    fun addAllPerks(): Mayor {
+    fun addPerks(perks: List<Perk>) {
+        this.perks.forEach { it.isActive = false }
         perks.forEach { it.isActive = true }
+    }
+
+    fun addAllPerks(): Candidate {
+        this.perks.forEach { it.isActive = true }
         return this
     }
 
@@ -116,13 +121,12 @@ enum class Mayor(
 
     companion object {
 
-        fun getMayorFromName(name: String): Mayor? = entries.firstOrNull { it.mayorName == name }
+        fun getMayorFromName(name: String): Candidate? = entries.firstOrNull { it.mayorName == name }
 
-        fun getMayorFromPerk(perk: Perk): Mayor? = entries.firstOrNull { it.perks.contains(perk) }
+        fun getMayorFromPerk(perk: Perk): Candidate? = entries.firstOrNull { it.perks.contains(perk) }
 
-        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Mayor? {
-            val mayor = getMayorFromName(name)
-            if (mayor == null) {
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): Candidate? {
+            val mayor = getMayorFromName(name) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Unknown mayor found",
                     "mayor name not in Mayor enum",
@@ -135,11 +139,6 @@ enum class Mayor(
 
             mayor.addPerks(perksJson.mapNotNull { it.toPerk() })
             return mayor
-        }
-
-        fun Mayor.addPerks(perks: List<Perk>) {
-            this.perks.forEach { it.isActive = false }
-            perks.forEach { it.isActive = true }
         }
     }
 }

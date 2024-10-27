@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.data.Mayor;
+import at.hannibal2.skyhanni.data.Candidate;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -145,7 +145,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
+    public Property<Candidate> assumeMayor = Property.of(Candidate.DISABLED);
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")

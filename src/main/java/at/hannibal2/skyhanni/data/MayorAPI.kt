@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.Mayor.Companion.addPerks
-import at.hannibal2.skyhanni.data.Mayor.Companion.getMayorFromPerk
-import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayorJson
+import at.hannibal2.skyhanni.data.Candidate.Companion.getMayorFromPerk
+import at.hannibal2.skyhanni.data.Candidate.Companion.setAssumeMayorJson
 import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorElection
@@ -88,12 +87,12 @@ object MayorAPI {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: Mayor? = null
+    var currentMayor: Candidate? = null
         private set
-    var currentMinister: Mayor? = null
+    var currentMinister: Candidate? = null
         private set
-    private var lastMayor: Mayor? = null
-    var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
+    private var lastMayor: Candidate? = null
+    var jerryExtraMayor: Pair<Candidate?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
@@ -113,11 +112,11 @@ object MayorAPI {
      * @param input: The name of the mayor
      * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
      */
-    fun mayorNameToColorCode(input: String): String = Mayor.getMayorFromName(input)?.color ?: "§c"
+    fun mayorNameToColorCode(input: String): String = Candidate.getMayorFromName(input)?.color ?: "§c"
 
     /**
      * @param input: The name of the mayor
-     * @return: The NotEnoughUpdates color of the mayor + the name of the mayor; If no mayor was found, it will return "§c[input]"
+     * @return: The NotEnoughUpdates color of the mayor with the name of the mayor; If no mayor was found, it will return "§c[input]"
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
@@ -130,7 +129,8 @@ object MayorAPI {
         }
 
         if (!LorenzUtils.inSkyBlock) return
-        if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast() && Mayor.JERRY.isActive()) {
+        if (!Candidate.JERRY.isActive()) return
+        if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
@@ -138,7 +138,7 @@ object MayorAPI {
             )
         }
         val misc = SkyHanniMod.feature.misc
-        if (Mayor.JERRY.isActive() && jerryExtraMayor.first == null && misc.unknownPerkpocalypseMayorWarning) {
+        if (jerryExtraMayor.first == null && misc.unknownPerkpocalypseMayorWarning) {
             if (lastJerryExtraMayorReminder.passedSince() < 5.minutes) return
             if (ReminderUtils.isBusy()) return
             lastJerryExtraMayorReminder = SimpleTimeMark.now()
@@ -156,7 +156,7 @@ object MayorAPI {
 
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
-            currentMayor = Mayor.UNKNOWN
+            currentMayor = Candidate.UNKNOWN
             currentMinister = null
         }
     }
@@ -213,7 +213,7 @@ object MayorAPI {
     private fun checkHypixelAPI(forceReload: Boolean = false) {
         if (!forceReload) {
             if (lastUpdate.passedSince() < 20.minutes) return
-            if (currentMayor == Mayor.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
+            if (currentMayor == Candidate.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
         }
         lastUpdate = SimpleTimeMark.now()
 
@@ -243,10 +243,11 @@ object MayorAPI {
 
     @SubscribeEvent
     fun onConfigReload(event: ConfigLoadEvent) {
-        SkyHanniMod.feature.dev.debug.assumeMayor.onToggle {
-            val mayor = SkyHanniMod.feature.dev.debug.assumeMayor.get()
+        val config = SkyHanniMod.feature.dev.debug.assumeMayor
+        config.onToggle {
+            val mayor = config.get()
 
-            if (mayor == Mayor.DISABLED) {
+            if (mayor == Candidate.DISABLED) {
                 checkHypixelAPI(forceReload = true)
             } else {
                 mayor.addPerks(mayor.perks.toList())
