@@ -65,27 +65,24 @@ object StashCompact {
 
     private var lastMaterialCount = -1
     private var lastDifferingMaterialsCount: Int? = null
-    private var lastType = "null"
+    private var lastType = "error"
 
     private var lastSentMaterialCount = -1
-    private var lastSentType = "null"
+    private var lastSentType = "error"
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        genericAddedToStashPattern.matchMatcher(event.message) {
-            event.blockedReason = "stash_compact"
-        }
-
+        // TODO make a system for detecting message "groups" (multiple consecutive messages)
         materialCountPattern.matchMatcher(event.message) {
-            group("count")?.formatIntOrNull()?.let { lastMaterialCount = it }
+            group("count").formatIntOrNull()?.let { lastMaterialCount = it }
             lastType = group("type")
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            group("count")?.formatIntOrNull()?.let { lastDifferingMaterialsCount = it }
+            group("count").formatIntOrNull()?.let { lastDifferingMaterialsCount = it }
             event.blockedReason = "stash_compact"
         }
 
@@ -96,6 +93,11 @@ object StashCompact {
 
             sendCompactedStashMessage()
         }
+
+        if (!config.hideAddedMessages) return
+        genericAddedToStashPattern.matchMatcher(event.message) {
+            event.blockedReason = "stash_compact"
+        }
     }
 
     private fun sendCompactedStashMessage() {
@@ -103,8 +105,9 @@ object StashCompact {
         val (mainColor, accentColor) = if (lastType == "item") "§e" to "§6" else "§b" to "§3"
         val typeStringExtra = lastDifferingMaterialsCount?.let {
             ", ${mainColor}totalling $accentColor$it ${StringUtils.pluralize(it, "type")}$mainColor"
-        } ?: ""
+        }.orEmpty()
         val action = if (config.useViewStash) "view" else "pickup"
+
         ChatUtils.clickableChat(
             "${mainColor}You have $accentColor${lastMaterialCount.shortFormat()} ${mainColor}$typeNameFormat in stash$typeStringExtra. " +
                 "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
@@ -112,7 +115,7 @@ object StashCompact {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
             },
-            hover = "§eClick to $action your $lastType stash!"
+            hover = "§eClick to $action your $lastType stash!",
         )
         lastSentMaterialCount = lastMaterialCount
         lastSentType = lastType

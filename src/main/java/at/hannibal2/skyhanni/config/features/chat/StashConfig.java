@@ -24,6 +24,11 @@ public class StashConfig {
     public String notice = "";
 
     @Expose
+    @ConfigOption(name = "Hide Added Messages", desc = "Hide the messages when something is added to your stash.")
+    @ConfigEditorBoolean
+    public boolean hideAddedMessages = true;
+
+    @Expose
     @ConfigOption(name = "Hide Duplicate Warnings", desc = "Hide duplicate warnings for previously reported stash counts.")
     @ConfigEditorBoolean
     public boolean hideDuplicateCounts = true;
