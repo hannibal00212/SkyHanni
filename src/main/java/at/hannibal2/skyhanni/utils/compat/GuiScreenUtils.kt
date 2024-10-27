@@ -32,7 +32,6 @@ object GuiScreenUtils {
 //$$            mc.window.width
 //#endif
 
-
     val displayHeight
         get() =
 //#if MC < 1.16
@@ -44,8 +43,7 @@ object GuiScreenUtils {
     private val globalMouseX get() = Mouse.getX()
     private val globalMouseY get() = Mouse.getY()
 
-    val mouseX
-        get() = globalMouseX * scaledWindowWidth / displayWidth
+    val mouseX get() = globalMouseX * scaledWindowWidth / displayWidth
 
     val mouseY: Int
         get() {
@@ -59,7 +57,5 @@ object GuiScreenUtils {
 //#endif
         }
 
-    val mousePos: Pair<Int, Int>
-        get() = mouseX to mouseY
-
+    val mousePos: Pair<Int, Int> get() = mouseX to mouseY
 }
