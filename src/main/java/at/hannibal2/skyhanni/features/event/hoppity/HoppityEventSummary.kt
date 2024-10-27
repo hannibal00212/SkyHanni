@@ -80,7 +80,7 @@ object HoppityEventSummary {
         if (this.isUninitialized()) null else this
 
     private fun isEggLocatorOverridden(): Boolean =
-        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId.equals("EGG_LOCATOR")
+        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId.equals("EGGLOCATOR")
 
     private fun liveDisplayEnabled(): Boolean {
         val storage = storage ?: return false

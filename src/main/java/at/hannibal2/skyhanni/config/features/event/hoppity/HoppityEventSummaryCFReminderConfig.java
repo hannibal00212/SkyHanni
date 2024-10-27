@@ -29,7 +29,7 @@ public class HoppityEventSummaryCFReminderConfig {
     @Expose
     @ConfigOption(name = "Reminder Interval", desc = "How often to remind you to switch servers, in minutes.")
     @ConfigEditorSlider(minValue = 1, minStep = 1, maxValue = 120)
-    public long reminderInterval = 30;
+    public int reminderInterval = 30;
 
     @Expose
     @ConfigOption(
@@ -37,6 +37,6 @@ public class HoppityEventSummaryCFReminderConfig {
         desc = "Only show the reminder for the last X hours of the event.\n0: Off\n30: Entire event"
     )
     @ConfigEditorSlider(minValue = 0, minStep = 1, maxValue = 30)
-    public long showForLastXHours = 2;
+    public int showForLastXHours = 2;
 
 }
