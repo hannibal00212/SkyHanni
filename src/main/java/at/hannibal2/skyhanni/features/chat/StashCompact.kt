@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -63,12 +63,12 @@ object StashCompact {
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
 
-    private var lastMaterialCount = -1
-    private var lastDifferingMaterialsCount: Int? = null
-    private var lastType = "error"
+    private var currentMessage: StashMessage? = null
+    private var lastMessage: StashMessage? = null
 
-    private var lastSentMaterialCount = -1
-    private var lastSentType = "error"
+    data class StashMessage(val materialCount: Int, val type: String) {
+        var differingMaterialsCount: Int? = null
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -76,22 +76,22 @@ object StashCompact {
 
         // TODO make a system for detecting message "groups" (multiple consecutive messages)
         materialCountPattern.matchMatcher(event.message) {
-            group("count").formatIntOrNull()?.let { lastMaterialCount = it }
-            lastType = group("type")
+            currentMessage = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            group("count").formatIntOrNull()?.let { lastDifferingMaterialsCount = it }
+            currentMessage?.differingMaterialsCount = group("count").formatInt()
             event.blockedReason = "stash_compact"
         }
 
         if (pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
-            if (lastMaterialCount <= config.hideLowWarningsThreshold) return
-            if (config.hideDuplicateCounts && lastMaterialCount == lastSentMaterialCount && lastType == lastSentType) return
+            val current = currentMessage ?: return
+            if (current.materialCount <= config.hideLowWarningsThreshold) return
+            if (config.hideDuplicateCounts && current == lastMessage) return
 
-            sendCompactedStashMessage()
+            current.sendCompactedStashMessage()
         }
 
         if (!config.hideAddedMessages) return
@@ -100,28 +100,24 @@ object StashCompact {
         }
     }
 
-    private fun sendCompactedStashMessage() {
-        val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
-        val (mainColor, accentColor) = if (lastType == "item") "§e" to "§6" else "§b" to "§3"
-        val typeStringExtra = lastDifferingMaterialsCount?.let {
+    private fun StashMessage.sendCompactedStashMessage() {
+        val typeNameFormat = StringUtils.pluralize(materialCount, type)
+        val (mainColor, accentColor) = if (type == "item") "§e" to "§6" else "§b" to "§3"
+        val typeStringExtra = differingMaterialsCount?.let {
             ", ${mainColor}totalling $accentColor$it ${StringUtils.pluralize(it, "type")}$mainColor"
         }.orEmpty()
         val action = if (config.useViewStash) "view" else "pickup"
 
         ChatUtils.clickableChat(
-            "${mainColor}You have $accentColor${lastMaterialCount.shortFormat()} ${mainColor}$typeNameFormat in stash$typeStringExtra. " +
-                "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
+            "${mainColor}You have $accentColor${materialCount.shortFormat()} $mainColor$typeNameFormat in stash$typeStringExtra. " + "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
             onClick = {
-                if (config.useViewStash) HypixelCommands.viewStash(lastType)
+                if (config.useViewStash) HypixelCommands.viewStash(type)
                 else HypixelCommands.pickupStash()
             },
-            hover = "§eClick to $action your $lastType stash!",
+            hover = "§eClick to $action your $type stash!",
         )
-        lastSentMaterialCount = lastMaterialCount
-        lastSentType = lastType
-        // Dirty, but item stash doesn't have differing materials count,
-        // and we don't compare this value to the last one, so we can reset it here
-        lastDifferingMaterialsCount = null
+        currentMessage = null
+        lastMessage = this
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
