@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -132,4 +133,6 @@ object InventoryUtils {
         val controller = Minecraft.getMinecraft().playerController
         controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
+
+    fun Slot.isTopInventory() = inventory is ContainerLocalMenu
 }

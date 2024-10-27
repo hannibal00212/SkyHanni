@@ -31,4 +31,9 @@ public class FocusModeConfig {
     @ConfigOption(name = "Always Enabled", desc = "Ignore the keybind and enable this feature all the time.")
     @ConfigEditorBoolean
     public boolean alwaysEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Menu Items", desc = "Also hide the item lore of no real SkyBlock items in menus.")
+    @ConfigEditorBoolean
+    public boolean hideMenuItems = true;
 }
