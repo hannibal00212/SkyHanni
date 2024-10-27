@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 public class FocusModeConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "In focus mode you only see the name of the item instead of the whole description.")
+    @ConfigOption(name = "Enabled", desc = "In focus mode you only see the name of the item instead of the whole description. §eSet a Toggle key below to use.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -19,4 +19,14 @@ public class FocusModeConfig {
     @ConfigOption(name = "Toggle Key", desc = "Key to toggle the focus mode on and off.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int toggleKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Disable Hint", desc = "Disable the line in item tooltips that show how to enable or disable this feature via key press.")
+    @ConfigEditorBoolean
+    public boolean disableHint = false;
+
+    @Expose
+    @ConfigOption(name = "Always Enabled", desc = "Ignore the keybind and enable this feature all the time.")
+    @ConfigEditorBoolean
+    public boolean alwaysEnabled = false;
 }
