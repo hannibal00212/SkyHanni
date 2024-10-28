@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.data.ElectionCandidate
+import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
