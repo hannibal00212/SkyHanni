@@ -125,7 +125,7 @@ object CarnivalZombieShootout {
                 else entity.entityBoundingBox
 
                 event.drawHitbox(
-                    boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.5, 0.0),
+                    boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
                     lineWidth = 3,
                     type.color,
                     depth = false,
