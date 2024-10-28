@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -70,5 +69,5 @@ object TubulatorParkour {
     }
 
     fun isEnabled() =
-        RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled && puzzleRoom.isPlayerInside()
+        RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled && puzzleRoom.isPlayerInside()
 }

@@ -520,13 +520,12 @@ object RenderUtils {
     }
 
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
-        if (string == null) return
-        if (string == "") return
+        if (string.isNullOrBlank()) return
         val x = renderString0(string, offsetX, offsetY, isCenter)
         GuiEditManager.add(this, posLabel, x, 10)
     }
 
-    private fun Position.renderString0(string: String?, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
+    private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()

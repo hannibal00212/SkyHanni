@@ -59,12 +59,10 @@ object ItemStars {
 
     private fun ItemStack.grabStarCount(): Int? {
         val internalName = getInternalNameOrNull() ?: return null
-        val baseStars = getDungeonStarCount() ?: getStarCount() ?: return null
-        if (internalName.isKuudraArmor()) {
-            val tier = internalName.getKuudraTier() ?: return baseStars
-            return baseStars + tier * 10
-        }
-        return baseStars
+        val baseStars = getDungeonStarCount() ?: getStarCount()
+        if (!internalName.isKuudraArmor()) return baseStars
+        val tier = internalName.getKuudraTier() ?: return baseStars
+        return (baseStars ?: 0) + (tier - 1) * 10
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars

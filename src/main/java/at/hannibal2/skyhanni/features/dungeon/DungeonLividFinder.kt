@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.block.BlockStainedGlass
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
@@ -85,7 +85,7 @@ object DungeonLividFinder {
                 posZ - 0.5,
                 posX + 0.5,
                 posY,
-                posZ + 0.5
+                posZ + 0.5,
             )
         }
         val world = Minecraft.getMinecraft().theWorld
@@ -96,7 +96,7 @@ object DungeonLividFinder {
         lividEntity = newLivid
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             newLivid,
-            color.toColor().withAlpha(30)
+            color.toColor().withAlpha(30),
         ) { shouldHighlight() }
     }
 

@@ -17,11 +17,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -75,7 +77,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (SkyHanniMod.feature.dev.debug.enabled) field else 0
+        get() = if (LorenzUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -253,6 +255,7 @@ object EstimatedItemValueCalculator {
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
                         "item name" to stack.name,
+                        "item nbt" to stack.readNbtDump(),
                     )
                     return null
                 }
@@ -269,6 +272,7 @@ object EstimatedItemValueCalculator {
                 "internal name" to stack.getInternalName(),
                 "item name" to stack.name,
                 "reforgeStone" to reforgeStone,
+                "item nbt" to stack.readNbtDump(),
             )
             null
         }
@@ -478,7 +482,7 @@ object EstimatedItemValueCalculator {
     ): Pair<EssenceItemUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
-            val tier = internalName.getKuudraTier() ?: 0
+            val tier = (internalName.getKuudraTier() ?: 0) - 1
             totalStars += tier * 10
 
             var remainingStars = totalStars
@@ -845,6 +849,9 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
+        ?: "no tag compound"
+
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName()
 
@@ -864,6 +871,7 @@ object EstimatedItemValueCalculator {
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
                 "item name" to stack.name,
+                "item nbt" to stack.readNbtDump(),
             )
             return 0.0
         }

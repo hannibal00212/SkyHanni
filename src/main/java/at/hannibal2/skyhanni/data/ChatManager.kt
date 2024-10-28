@@ -118,7 +118,11 @@ object ChatManager {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
+        //#if MC<1.12
         if (event.type.toInt() == 2) return
+        //#else
+        //$$ if (event.type.id.toInt() == 2) return
+        //#endif
 
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
