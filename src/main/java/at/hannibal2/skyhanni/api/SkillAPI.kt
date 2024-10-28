@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.LevelingJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
@@ -137,8 +137,8 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<LevelingJson>("Leveling")
+    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+        val data = event.readConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXp
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }
