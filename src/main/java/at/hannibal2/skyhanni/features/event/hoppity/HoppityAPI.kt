@@ -52,7 +52,7 @@ object HoppityAPI {
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
     private var lastDoradoFire: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastHoppityCallAccept: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastHoppityCallAccept: SimpleTimeMark? = null
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -110,8 +110,8 @@ object HoppityAPI {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        DelayedRun.runDelayed(3.seconds) {
-            lastHoppityCallAccept = SimpleTimeMark.farPast()
+        DelayedRun.runDelayed(1.seconds) {
+            lastHoppityCallAccept = null
         }
     }
 
@@ -230,7 +230,7 @@ object HoppityAPI {
     }
 
     fun getBoughtType(): HoppityEggType =
-        if (lastHoppityCallAccept.passedSince() <= 1.minutes) HoppityEggType.BOUGHT_ABIPHONE
+        if (lastHoppityCallAccept != null) HoppityEggType.BOUGHT_ABIPHONE
         else HoppityEggType.BOUGHT
 
     fun attemptFireRabbitFound(lastDuplicateAmount: Long? = null) {
