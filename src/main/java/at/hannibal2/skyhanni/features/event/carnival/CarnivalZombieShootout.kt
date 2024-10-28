@@ -41,7 +41,7 @@ object CarnivalZombieShootout {
 
     private var content = Renderable.horizontalContainer(listOf())
     private var drawZombies = listOf<Zombie>()
-    private var zombieTimes = mutableMapOf<Zombie, SimpleTimeMark>()
+    private val zombieTimes = mutableMapOf<Zombie, SimpleTimeMark>()
     private var maxType = ZombieType.LEATHER
     private var lamp: Lamp? = null
     private var started = false
