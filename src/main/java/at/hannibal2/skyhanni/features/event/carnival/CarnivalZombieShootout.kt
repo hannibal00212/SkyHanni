@@ -65,15 +65,15 @@ object CarnivalZombieShootout {
     )
 
     enum class ZombieType(val points: Int, val helmet: String, val color: Color, val lifetime: Duration) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42), 8.seconds), //Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192), 7.seconds), //Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0), 6.seconds), //Gold
-        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250), 5.seconds) //Diamond
+        LEATHER(30, "Leather Cap", Color(165, 42, 42), 8.seconds), // Brown
+        IRON(50, "Iron Helmet", Color(192, 192, 192), 7.seconds), // Silver
+        GOLD(80, "Golden Helmet", Color(255, 215, 0), 6.seconds), // Gold
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250), 5.seconds) // Diamond
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLine && !config.zombieTimer)) return
+        if (!isEnabled() || (!config.coloredHitboxes && !config.coloredLines && !config.zombieTimer)) return
 
         if (config.zombieTimer) {
             val zombiesToRemove = mutableListOf<Zombie>()
@@ -107,7 +107,7 @@ object CarnivalZombieShootout {
 
         if (config.coloredHitboxes) {
             lamp?.let {
-                if (config.coloredLine) event.draw3DLine(
+                if (config.coloredLines) event.draw3DLine(
                     event.exactPlayerEyeLocation(),
                     it.pos.add(0.0, 0.5, 0.0),
                     Color.RED,
@@ -120,7 +120,7 @@ object CarnivalZombieShootout {
             for ((zombie, type) in drawZombies) {
                 val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
                 val isSmall = (entity as? EntityZombie)?.isChild ?: false
-              
+
                 val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
                 else entity.entityBoundingBox
 
@@ -209,7 +209,7 @@ object CarnivalZombieShootout {
         return Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(lamp),
-                Renderable.string("§6Disappears in $prefix${timer}"),
+                Renderable.string("§6Disappears in $prefix$timer"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
