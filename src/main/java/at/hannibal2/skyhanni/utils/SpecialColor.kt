@@ -10,16 +10,16 @@ object SpecialColor {
     private const val RADIX = 10
     private const val MIN_CHROMA_SECS = 1
     private const val MAX_CHROMA_SECS = 60
-    private var startTime: Long = -1
+    private var startTime = SimpleTimeMark.farPast()
 
     @Deprecated("", ReplaceWith("this.toChromaColor()"))
     fun specialToChromaRGB(special: String): Int {
-        if (startTime < 0) startTime = System.currentTimeMillis()
+        if (startTime.isFarPast()) startTime = SimpleTimeMark.now()
 
         val (b, g, r, a, chroma) = decompose(special)
         val (hue, sat, bri) = Color.RGBtoHSB(r, g, b, null)
 
-        val adjustedHue = if (chroma > 0) (hue + ((System.currentTimeMillis() - startTime) / 1000f / chromaSpeed(chroma) % 1)).let {
+        val adjustedHue = if (chroma > 0) (hue + (startTime.passedSince().inWholeMilliseconds / 1000f / chromaSpeed(chroma) % 1)).let {
             if (it < 0) it + 1f else it
         } else hue
 
