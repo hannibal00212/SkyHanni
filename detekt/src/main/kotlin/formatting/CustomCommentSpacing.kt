@@ -21,15 +21,15 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
 
     override fun visitComment(comment: PsiComment) {
         if (comment.text.containsPreprocessingPattern()) return
-        if (regionRegex.matches(comment.text)) return
-        if (commentRegex.matches(comment.text)) return
-        report(
-            CodeSmell(
-                issue,
-                Entity.from(comment),
-                "Expected space after opening comment."
+        if (!regionRegex.matches(comment.text) && !commentRegex.matches(comment.text)) {
+            report(
+                CodeSmell(
+                    issue,
+                    Entity.from(comment),
+                    "Expected space after opening comment."
+                )
             )
-        )
+        }
 
         // Fallback to super (ostensibly a no-check)
         super.visitComment(comment)
