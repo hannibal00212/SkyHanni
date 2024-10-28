@@ -127,7 +127,9 @@ object HoppityEggsCompactChat {
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
-        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type) || event.type == BOUGHT) return
+        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type)) return
+        // Bought eggs handled separately, as they provide their own chat messages
+        if (event.type.isBought()) return
         lastChatMeal = event.type
         hoppityEggChat.add(
             when (event.type) {
@@ -165,7 +167,7 @@ object HoppityEggsCompactChat {
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
-                lastChatMeal = BOUGHT
+                lastChatMeal = HoppityAPI.getBoughtType()
                 compactChat(event)
             }
         }

@@ -40,6 +40,8 @@ enum class HoppityEggType(
         claimed = false
     }
 
+    fun isBought() = this == BOUGHT || this == BOUGHT_ABIPHONE
+
     fun isClaimed() = claimed
     val isResetting get() = resettingEntries.contains(this)
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"

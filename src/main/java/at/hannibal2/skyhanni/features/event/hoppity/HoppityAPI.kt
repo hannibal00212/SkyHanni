@@ -201,9 +201,7 @@ object HoppityAPI {
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
                 // If there is a reasonable timeframe since lastHoppityCallAccept, we can assume this is an abiphone call
-                val newType =
-                    if (lastHoppityCallAccept.passedSince() <= 1.minutes) HoppityEggType.BOUGHT_ABIPHONE
-                    else HoppityEggType.BOUGHT
+                val newType = getBoughtType()
                 lastMeal = newType
                 EggFoundEvent(newType).post()
                 attemptFireRabbitFound()
@@ -230,6 +228,10 @@ object HoppityAPI {
     fun setLatestCallAccept() {
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
+
+    fun getBoughtType(): HoppityEggType =
+        if (lastHoppityCallAccept.passedSince() <= 1.minutes) HoppityEggType.BOUGHT_ABIPHONE
+        else HoppityEggType.BOUGHT
 
     fun attemptFireRabbitFound(lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
