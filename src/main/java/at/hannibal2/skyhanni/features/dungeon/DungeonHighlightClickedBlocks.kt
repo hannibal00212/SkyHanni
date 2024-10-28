@@ -37,12 +37,6 @@ object DungeonHighlightClickedBlocks {
         "§cThat chest is locked!",
     )
 
-    private const val WATER_ROOM_ID = "-60,-60"
-
-    private val inWaterRoom by RecalculatingValue<Boolean>(1.seconds) {
-        DungeonAPI.getRoomID() == WATER_ROOM_ID
-    }
-
     private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
     private var colorIndex = 0
     private val undesirableColors = listOf(
@@ -77,7 +71,7 @@ object DungeonHighlightClickedBlocks {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonAPI.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         val type = event.blockType
 
