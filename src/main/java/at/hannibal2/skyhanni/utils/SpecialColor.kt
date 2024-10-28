@@ -1,72 +1,35 @@
-package at.hannibal2.skyhanni.utils;
+package at.hannibal2.skyhanni.utils
 
-import java.awt.Color;
+import java.awt.Color
 
 /**
- * Taken from NotEnoughUpdates
+ * Taken from NotEnoughUpdates,
+ * translated to Kotlin and slightly modified.
  */
-public class SpecialColor {
+object SpecialColor {
+    private const val RADIX = 10
+    private const val MIN_CHROMA_SECS = 1
+    private const val MAX_CHROMA_SECS = 60
 
-    private static final int RADIX = 10;
+    private var startTime: Long = -1
 
-    private static int[] decompose(String csv) {
-        String[] split = csv.split(":");
+    @Deprecated("", ReplaceWith("this.toChromaColor()"))
+    fun specialToChromaRGB(special: String): Int {
+        if (startTime < 0) startTime = System.currentTimeMillis()
 
-        int[] arr = new int[split.length];
+        val (r, g, b, a, chroma) = decompose(special)
+        var (hue, saturation, brightness) = Color.RGBtoHSB(r, g, b, null)
 
-        for (int i = 0; i < split.length; i++) {
-            arr[i] = Integer.parseInt(split[split.length - 1 - i], RADIX);
-        }
-        return arr;
-    }
-
-    public static int getSpeed(String special) {
-        return decompose(special)[4];
-    }
-
-    public static float getSecondsForSpeed(int speed) {
-        return (255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS;
-    }
-
-    private static final int MIN_CHROMA_SECS = 1;
-    private static final int MAX_CHROMA_SECS = 60;
-
-    public static long startTime = -1;
-
-    @Deprecated // use String.toChromaColor()
-    public static int specialToChromaRGB(String special) {
-        if (startTime < 0) startTime = System.currentTimeMillis();
-
-        int[] d = decompose(special);
-        int chr = d[4];
-        int a = d[3];
-        int r = d[2];
-        int g = d[1];
-        int b = d[0];
-
-        float[] hsv = Color.RGBtoHSB(r, g, b, null);
-
-        if (chr > 0) {
-            float seconds = getSecondsForSpeed(chr);
-            hsv[0] += (System.currentTimeMillis() - startTime) / 1000f / seconds;
-            hsv[0] %= 1;
-            if (hsv[0] < 0) hsv[0] += 1;
+        if (chroma > 0) {
+            hue += ((System.currentTimeMillis() - startTime) / 1000f / getSecondsForSpeed(chroma) % 1)
+            if (hue < 0) hue += 1f
         }
 
-        return (a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF);
+        return (a and 0xFF) shl 24 or (Color.HSBtoRGB(hue, saturation, brightness) and 0x00FFFFFF)
     }
 
-    public static int rotateHue(int argb, int degrees) {
-        int a = (argb >> 24) & 0xFF;
-        int r = (argb >> 16) & 0xFF;
-        int g = (argb >> 8) & 0xFF;
-        int b = (argb) & 0xFF;
+    private fun decompose(csv: String) = csv.split(":").dropLastWhile { it.isEmpty() }.toTypedArray().map { it.toInt(RADIX) }.toIntArray()
 
-        float[] hsv = Color.RGBtoHSB(r, g, b, null);
+    private fun getSecondsForSpeed(speed: Int) = (255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS
 
-        hsv[0] += degrees / 360f;
-        hsv[0] %= 1;
-
-        return (a & 0xFF) << 24 | (Color.HSBtoRGB(hsv[0], hsv[1], hsv[2]) & 0x00FFFFFF);
-    }
 }
