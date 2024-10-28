@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha

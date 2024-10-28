@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
