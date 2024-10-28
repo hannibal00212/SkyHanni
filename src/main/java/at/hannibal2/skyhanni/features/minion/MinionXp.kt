@@ -152,8 +152,8 @@ object MinionXp {
             MinionFeatures.minionInventoryOpen -> {
                 addXpInfoToTooltip(event)
                 if (collectItem == event.itemStack.item) {
-                    collectItemXpList.forEachIndexed { i, it ->
-                        event.toolTip.add(i + 1, it)
+                    collectItemXpList.forEachIndexed { i, item ->
+                        event.toolTip.add(i + 1, item)
                     }
                 }
             }

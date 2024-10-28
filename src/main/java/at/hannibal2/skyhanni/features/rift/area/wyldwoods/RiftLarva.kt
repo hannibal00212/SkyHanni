@@ -18,6 +18,9 @@ object RiftLarva {
 
     private val config get() = RiftAPI.config.area.wyldWoods.larvas
     private var hasHookInHand = false
+
+    // TODO: Move to repo
+    @Suppress("MaxLineLength")
     private const val LARVA_SKULL_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTgzYjMwZTlkMTM1YjA1MTkwZWVhMmMzYWM2MWUyYWI1NWEyZDgxZTFhNThkYmIyNjk4M2ExNDA4MjY2NCJ9fX0="
 

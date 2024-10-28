@@ -59,7 +59,7 @@ object CorpseLocator {
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
-                            location = entity.getLorenzVec().add(y = 1),
+                            location = entity.getLorenzVec().up(),
                             isCorpse = true,
                         ),
                     )

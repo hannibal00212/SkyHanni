@@ -182,7 +182,7 @@ object GetFromSackAPI {
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
-        val replacedString = itemString.replace("_"," ")
+        val replacedString = itemString.replace("_", " ")
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()

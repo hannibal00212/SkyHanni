@@ -21,7 +21,7 @@ public class ExperimentationTableConfig {
     public ExperimentsDryStreakConfig dryStreak = new ExperimentsDryStreakConfig();
 
     @Expose
-    @ConfigOption(name = "Superpair Data", desc = "Shows a display with useful information while doing the Superpair experiment.")
+    @ConfigOption(name = "Superpair Data", desc = "Displays useful data while doing the Superpair experiment.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean superpairDisplay = false;

@@ -64,7 +64,11 @@ object ChumBucketHider {
         }
 
         // Chum Bucket
-        if (config.hideBucket.get() && entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket") }) {
+        if (config.hideBucket.get() &&
+            entity.inventory.any {
+                it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket")
+            }
+        ) {
             val entityLocation = entity.getLorenzVec()
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {

@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -224,6 +226,13 @@ object NEUItems {
 
     fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
+    fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
+        if (prefix.isEmpty()) return this
+        val string = asString()
+        if (!string.startsWith(prefix)) return this
+        return string.substring(prefix.length).asInternalName()
+    }
+
     const val itemFontSize = 2.0 / 3.0
 
     fun ItemStack.renderOnScreen(
@@ -259,7 +268,17 @@ object NEUItems {
 
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            println(" ")
+            println("item: $item")
+            println("name: ${item.name}")
+            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+            println(" ")
+            @Suppress("PrintStackTrace")
+            e.printStackTrace()
+        }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()

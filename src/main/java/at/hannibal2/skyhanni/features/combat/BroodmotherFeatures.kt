@@ -50,7 +50,7 @@ object BroodmotherFeatures {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
-        val newStage = event.widget.matchMatcherFirstLine { group("stage") } ?: ""
+        val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
         if (newStage.isNotEmpty() && newStage != lastStage.toString()) {
             lastStage = currentStage
             currentStage = StageEntry.valueOf(newStage.replace("!", "").uppercase())
@@ -97,11 +97,9 @@ object BroodmotherFeatures {
         // this is so that two messages aren't immediately sent upon joining a server
         if (!(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
             val duration = currentStage?.duration
-            val minutes = duration?.inWholeMinutes?.toInt() ?: 0
-            val pluralize = StringUtils.pluralize(minutes, "minute")
             var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
             if (duration != 0.minutes) {
-                message += " It will spawn §bwithin $duration $pluralize§e."
+                message += " It will spawn §bwithin $duration§e."
             }
             ChatUtils.chat(message)
             return true

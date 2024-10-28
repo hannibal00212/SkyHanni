@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -35,7 +36,13 @@ object TrackParticlesCommand {
     private var display: List<Renderable> = emptyList()
     private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
 
+    // TODO write abstract code for this and TrackSoundsCommand
     fun command(args: Array<String>) {
+        if (!LorenzUtils.inSkyBlock) {
+            ChatUtils.userError("This command only works in SkyBlock!")
+            return
+        }
+
         if (args.firstOrNull() == "end") {
             if (!isRecording) {
                 ChatUtils.userError("Nothing to end")
@@ -105,19 +112,19 @@ object TrackParticlesCommand {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} particles", 0.8)
 
-                var offset = -0.2
+                var offset = 0.2
                 value.groupBy { it.type }.forEach { (particleType, particles) ->
-                    event.drawDynamicText(key.up(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
-                    offset -= 0.2
+                    event.drawDynamicText(key.down(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
+                    offset += 0.2
                 }
             } else {
                 val particle = value.first()
 
                 event.drawDynamicText(key, "§7§l${particle.type}", 0.8)
                 event.drawDynamicText(
-                    key.up(-0.2),
+                    key.down(0.2),
                     "§7C: §e${particle.count} §7S: §a${particle.speed.roundTo(2)}",
-                    scaleMultiplier = 0.8
+                    scaleMultiplier = 0.8,
                 )
             }
         }

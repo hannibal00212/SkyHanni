@@ -76,8 +76,8 @@ object DefaultConfigFeatures {
             return
         }
         optionList = optionList
-            .mapValues { it ->
-                it.value.filter {
+            .mapValues { option ->
+                option.value.filter {
                     (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
                         (togglesInOldVersion == null || it.path !in togglesInOldVersion)
                 }

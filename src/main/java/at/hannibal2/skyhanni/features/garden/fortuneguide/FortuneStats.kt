@@ -15,7 +15,8 @@ enum class FortuneStats(
     ),
     CROP_TOTAL(
         { crop -> "§6${crop.niceName.firstLetterUppercase()} Farming Fortune" },
-        { "§7§2Farming fortune for this crop" }),
+        { "§7§2Farming fortune for this crop" }
+    ),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),
     BASE_TOOL("§2Base tool fortune", "§7§2Crop specific fortune from your tool"),

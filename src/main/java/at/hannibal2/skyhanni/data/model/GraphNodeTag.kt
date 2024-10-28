@@ -17,6 +17,7 @@ enum class GraphNodeTag(
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map."),
+
     //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
     TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
 
@@ -42,7 +43,13 @@ enum class GraphNodeTag(
 
     // Rift
     RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the Rift.", onlyIsland = IslandType.THE_RIFT),
-    RIFT_BUTTONS_QUEST("rift_buttons_quest", LorenzColor.LIGHT_PURPLE, "Wooden Buttons", "A spot to hit wooden buttons for the Dreadfarm Enigma Soul.", onlyIsland = IslandType.THE_RIFT),
+    RIFT_BUTTONS_QUEST(
+        "rift_buttons_quest",
+        LorenzColor.LIGHT_PURPLE,
+        "Wooden Buttons",
+        "A spot to hit wooden buttons for the Dreadfarm Enigma Soul.",
+        onlyIsland = IslandType.THE_RIFT,
+    ),
     RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the Rift to teleport to.", onlyIsland = IslandType.THE_RIFT),
     RIFT_MONTEZUMA(
         "rift_montezuma",

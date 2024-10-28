@@ -38,7 +38,6 @@ object AnitaMedalProfit {
         GOLD("§6Gold medal", 8),
         SILVER("§fSilver medal", 2),
         BRONZE("§cBronze medal", 1),
-        ;
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
@@ -77,7 +76,7 @@ object AnitaMedalProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item) ?: return
+        val itemName = getItemName(item)
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return

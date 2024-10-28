@@ -77,7 +77,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
      */
-    private val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.dorado",
         ".*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
@@ -104,6 +104,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
      */
+    @Suppress("MaxLineLength")
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
@@ -125,8 +126,18 @@ object ChocolateFactoryStrayTracker {
         "(?:§.)*already have captured him before.*",
     )
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
-    { drawDisplay(it) }
+    /**
+     * REGEX-TEST: §7but he escaped and left behind
+     * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
+     */
+    val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.doradoescape",
+        "(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!)"
+    )
+
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
         override fun reset() {
@@ -145,7 +156,7 @@ object ChocolateFactoryStrayTracker {
         var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
     }
 
-    private fun formLoreToSingleLine(lore: List<String>): String {
+    fun formLoreToSingleLine(lore: List<String>): String {
         val notEmptyLines = lore.filter { it.isNotEmpty() }
         return notEmptyLines.joinToString(" ")
     }
@@ -182,7 +193,7 @@ object ChocolateFactoryStrayTracker {
         val caughtString = caughtOfRarity?.toString() ?: return null
 
         val rarityExtraChocMs = data.straysExtraChocMs[rarity]?.milliseconds
-        val extraChocFormat = rarityExtraChocMs?.format() ?: ""
+        val extraChocFormat = rarityExtraChocMs?.format().orEmpty()
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"

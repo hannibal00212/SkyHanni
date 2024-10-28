@@ -62,10 +62,7 @@ object MiningCommissionsBlocksColor {
     }
 
     private var oldSneakState = false
-
     private var dirty = false
-    private var forceDirty = false
-
     private var replaceBlocksMapCache = mutableMapOf<IBlockState, IBlockState>()
 
     // TODO Commission API

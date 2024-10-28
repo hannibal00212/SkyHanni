@@ -246,7 +246,7 @@ object CustomWardrobe {
             val mcSlotId = slot.inventorySlots[armorIndex]
             // if the slot is null, we don't fire LorenzToolTipEvent at all.
             val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-            LorenzToolTipEvent(mcSlot, stack, toolTips).postWithoutCatch()
+            LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
 
             return toolTips
         } catch (e: Exception) {

@@ -53,10 +53,21 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
+    @Suppress("MaxLineLength")
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
+
+    /**
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     */
+    @Suppress("MaxLineLength")
+    private val odinPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
@@ -230,9 +241,18 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
+        //#if MC<1.12
         if (packet.type.toInt() != 0) return
+        //#else
+        //$$ if (packet.type.id.toInt() != 0) return
+        //#endif
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.cancel()
+            }
+        }
+        odinPattern.matchMatcher(message) {
             if (detectFromChat()) {
                 event.cancel()
             }

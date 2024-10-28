@@ -49,7 +49,8 @@ object DungeonArchitectFeatures {
         if (architectItemAmount <= 0) return
 
         GetFromSackAPI.getFromChatMessageSackItems(
-            architectsFirstDraft, "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
+            architectsFirstDraft,
+            "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
         )
 

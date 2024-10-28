@@ -265,6 +265,7 @@ object IslandGraphs {
 
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
+        if (path.isEmpty()) return false
         val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
         val distance = closest.position.distanceToPlayer()
         if (distance > 7) return false
@@ -441,12 +442,14 @@ object IslandGraphs {
         if (label == "") return
         val path = fastestPath ?: return
         var distance = 0.0
-        for ((a, b) in path.zipWithNext()) {
-            distance += a.position.distance(b.position)
+        if (path.isNotEmpty()) {
+            for ((a, b) in path.zipWithNext()) {
+                distance += a.position.distance(b.position)
+            }
+            val distanceToPlayer = path.first().position.distanceToPlayer()
+            distance += distanceToPlayer
+            distance = distance.roundTo(1)
         }
-        val distanceToPlayer = path.first().position.distanceToPlayer()
-        distance += distanceToPlayer
-        distance = distance.roundTo(1)
 
         if (distance == lastDistance) return
         lastDistance = distance
@@ -463,7 +466,7 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
-                "§e[SkyHanni] Navigation manually stopped!".asComponent().send(PATHFIND_ID)
+                "§e[SkyHanni] Navigation stopped!".asComponent().send(PATHFIND_ID)
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()

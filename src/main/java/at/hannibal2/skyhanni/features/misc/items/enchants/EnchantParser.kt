@@ -39,9 +39,19 @@ object EnchantParser {
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
+    // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
+    /**
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     */
+    val enchantmentExclusivePattern by patternGroup.pattern(
+        "exclusive",
+        "(?:(?:§7§l|§d§l|§9)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:,\\d{3})*))+\$",
+    )
+    // Above regex tests apply to this pattern also
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
+        "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
@@ -186,20 +196,6 @@ object EnchantParser {
             return
         }
 
-        // Remove enchantment lines so we can insert ours
-        try {
-            loreList.subList(startEnchant, endEnchant + 1).clear()
-        } catch (e: IndexOutOfBoundsException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Error parsing enchantment info from item",
-                "loreList" to loreList,
-                "startEnchant" to startEnchant,
-                "endEnchant" to endEnchant,
-            )
-            return
-        }
-
         val insertEnchants: MutableList<String> = mutableListOf()
 
         // Format enchants based on format config option
@@ -220,8 +216,22 @@ object EnchantParser {
                 "ConcurrentModificationException whilst formatting enchants",
                 "loreList" to loreList,
                 "format" to config.format.get(),
-                "orderedEnchants" to orderedEnchants
+                "orderedEnchants" to orderedEnchants.toString()
             )
+        }
+
+        // Remove enchantment lines so we can insert ours
+        try {
+            loreList.subList(startEnchant, endEnchant + 1).clear()
+        } catch (e: IndexOutOfBoundsException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Error parsing enchantment info from item",
+                "loreList" to loreList,
+                "startEnchant" to startEnchant,
+                "endEnchant" to endEnchant,
+            )
+            return
         }
 
         // Add our parsed enchants back into the lore
@@ -415,8 +425,8 @@ object EnchantParser {
         val removeGrayEnchants = config.hideVanillaEnchants.get()
 
         var i = 1
-        for (total in 0 until 2) { // Using the fact that there should be at most 2 vanilla enchants
-            if (i + 1 >= loreList.size) break // In case the tooltip is very short (i.e, hovering over a short chat component)
+        repeat(2) { // Using the fact that there should be at most 2 vanilla enchants
+            if (i + 1 >= loreList.size) return@repeat // In case the tooltip is very short (i.e, hovering over a short chat component)
             val line = loreList[i]
             if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i

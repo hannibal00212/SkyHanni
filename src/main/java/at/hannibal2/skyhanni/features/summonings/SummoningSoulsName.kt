@@ -83,7 +83,7 @@ object SummoningSoulsName {
 
         for ((entity, name) in souls) {
             val vec = entity.getLorenzVec()
-            event.drawString(vec.add(y = 2.5), name)
+            event.drawString(vec.up(2.5), name)
         }
     }
 

@@ -88,7 +88,8 @@ object MaxPurseItems {
                 "§7Max items with purse",
                 "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",
                 "§7Instant buy: §e${buyInstant.addSeparators()}x"
-            ), posLabel = "Max Items With Purse"
+            ),
+            posLabel = "Max Items With Purse"
         )
     }
 

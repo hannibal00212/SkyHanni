@@ -97,7 +97,7 @@ object DungeonHighlightClickedBlocks {
         blocks.forEach { (position, block) ->
             event.drawColor(position, block.color)
             if (config.showText) {
-                event.drawString(position.add(0.5, 0.5, 0.5), block.displayText, true)
+                event.drawString(position.blockCenter(), block.displayText, true)
             }
         }
     }
