@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -107,8 +108,27 @@ object HoppityAPI {
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
 
+    /**
+     * REGEX-TEST: /selectnpcoption hoppity r_2_1
+     */
+    val pickupOutgoingCommandPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hoppity.call.pickup.outgoing",
+        "\\/selectnpcoption hoppity r_2_1",
+    )
+
+    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = false)
+    fun onCommandSend(event: MessageSendToServerEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!pickupOutgoingCommandPattern.matches(event.message)) return
+        // TODO: Although it's unlikely someone would manually run this command without there actually being a call
+        //  there is a possibility that someone can attempt to pickup an expired call, which would be a false positive.
+        //  Realistically, we should check if the Hoppity call GUI opens before setting this.
+        lastHoppityCallAccept = SimpleTimeMark.now()
+    }
+
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (lastHoppityCallAccept == null) return
         DelayedRun.runDelayed(1.seconds) {
             lastHoppityCallAccept = null
         }
@@ -199,7 +219,6 @@ object HoppityAPI {
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
-                // If there is a reasonable timeframe since lastHoppityCallAccept, we can assume this is an abiphone call
                 val newType = getBoughtType()
                 lastMeal = newType
                 EggFoundEvent(newType).post()
@@ -224,10 +243,7 @@ object HoppityAPI {
         }
     }
 
-    fun setLatestCallAccept() {
-        lastHoppityCallAccept = SimpleTimeMark.now()
-    }
-
+    // If there is a reasonable timeframe since lastHoppityCallAccept, we can assume this is an abiphone call
     fun getBoughtType(): HoppityEggType =
         if (lastHoppityCallAccept != null) HoppityEggType.BOUGHT_ABIPHONE
         else HoppityEggType.BOUGHT

@@ -63,14 +63,6 @@ object HoppityCallWarning {
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
 
-    /**
-     * REGEX-TEST: /selectnpcoption hoppity r_2_1
-     */
-    private val pickupOutgoingCommandPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hoppity.call.pickup.outgoing",
-        "\\/selectnpcoption hoppity r_2_1",
-    )
-
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
     private var warningSound = SoundUtils.createSound("note.pling", 1f)
     private var activeWarning = false
@@ -144,13 +136,9 @@ object HoppityCallWarning {
     @SubscribeEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!pickupOutgoingCommandPattern.matches(event.message)) return
-        if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds ||
-            PurseAPI.getPurse() >= config.coinThreshold
-        ) {
-            HoppityAPI.setLatestCallAccept()
-            return
-        }
+        if (!HoppityAPI.pickupOutgoingCommandPattern.matches(event.message)) return
+        if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
+        if (PurseAPI.getPurse() >= config.coinThreshold) return
 
         commandSentTimer = SimpleTimeMark.now()
         event.cancel()
