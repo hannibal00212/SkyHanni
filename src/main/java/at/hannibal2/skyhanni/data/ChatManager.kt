@@ -43,7 +43,7 @@ object ChatManager {
             override fun removeEldestEntry(
                 eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
             ): Boolean {
-                return size > config.chatHistoryLength
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 
