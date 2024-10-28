@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
+import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
@@ -17,9 +18,9 @@ object CurrentMayorScreen : ElectionViewerScreen() {
     override val posLabel = "Election Viewer - Current Mayor"
 
     override fun updateDisplay() {
-        val mayor = MayorAPI.currentMayor ?: return
-        val minister = MayorAPI.currentMinister
-        val jerryMayor = MayorAPI.jerryExtraMayor
+        val mayor = ElectionAPI.currentMayor ?: return
+        val minister = ElectionAPI.currentMinister
+        val jerryMayor = ElectionAPI.jerryExtraMayor
 
         display = Renderable.verticalContainer(
             listOf(
@@ -43,7 +44,7 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         )
     }
 
-    private fun getMayorRenderable(mayor: Mayor?, type: String, time: SimpleTimeMark? = null): Renderable? {
+    private fun getMayorRenderable(mayor: ElectionCandidate?, type: String, time: SimpleTimeMark? = null): Renderable? {
         if (mayor == null) return null
 
         val fakePlayer = getFakeMayorRenderable(mayor)
@@ -63,8 +64,8 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         }
     }
 
-    private fun getMayorDescription(mayor: Mayor, type: String, time: SimpleTimeMark? = null): Renderable {
-        val color = MayorAPI.mayorNameToColorCode(mayor.mayorName)
+    private fun getMayorDescription(mayor: ElectionCandidate, type: String, time: SimpleTimeMark? = null): Renderable {
+        val color = ElectionAPI.mayorNameToColorCode(mayor.mayorName)
         return Renderable.verticalContainer(
             buildList {
                 add("$color$type ${mayor.mayorName}")

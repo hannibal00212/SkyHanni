@@ -74,7 +74,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
             currentScreen is CurrentMayorScreen,
         ) { SkyHanniMod.screenToOpen = CurrentMayorScreen }
 
-        val electionButton = if (MayorAPI.rawMayorData?.current != null) {
+        val electionButton = if (ElectionAPI.rawMayorData?.current != null) {
             createButton(
                 "Election",
                 currentScreen is CurrentElectionScreen,

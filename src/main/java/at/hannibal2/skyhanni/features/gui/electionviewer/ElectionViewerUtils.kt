@@ -3,12 +3,11 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.mojang.authlib.GameProfile
@@ -27,10 +26,10 @@ object ElectionViewerUtils {
 
     private val mayorRenderables = mutableMapOf<String, Renderable>()
 
-    fun getFakeMayorRenderable(mayor: Mayor) = mayorRenderables.getOrPut(mayor.name) { getFakeMayor(mayor) }
+    fun getFakeMayorRenderable(mayor: ElectionCandidate) = mayorRenderables.getOrPut(mayor.name) { getFakeMayor(mayor) }
 
     fun getFakeCandidateRenderable(candidate: MayorCandidate) =
-        getFakeMayorRenderable(Mayor.getMayorFromName(candidate.name) ?: Mayor.UNKNOWN)
+        getFakeMayorRenderable(ElectionCandidate.getMayorFromName(candidate.name) ?: ElectionCandidate.UNKNOWN)
 
     /**
      * The code doesn't work correctly if the [currentYear] is below 17
@@ -40,9 +39,9 @@ object ElectionViewerUtils {
     fun getNextSpecialMayors(currentYear: Int) =
         specialMayorStart.map { it.key to it.value + ((currentYear - it.value) / 24 + 1) * 24 }.sortedBy { it.second }
 
-    private fun getFakeMayor(mayor: Mayor): Renderable {
+    private fun getFakeMayor(mayor: ElectionCandidate): Renderable {
         // Jerry is a Villager, not a player
-        val entity = if (mayor == Mayor.JERRY) {
+        val entity = if (mayor == ElectionCandidate.JERRY) {
             EntityVillager(Minecraft.getMinecraft().theWorld)
         } else {
             FakePlayer(getGameProfileFromMayor(mayor))
@@ -55,14 +54,14 @@ object ElectionViewerUtils {
         )
     }
 
-    private fun getGameProfileFromMayor(mayor: Mayor): GameProfile? {
+    private fun getGameProfileFromMayor(mayor: ElectionCandidate): GameProfile? {
         val mayorName = if (mayor.isSpecial()) {
             "${mayor.name}_SPECIAL"
         } else {
             mayor.name
         } + "_MAYOR_MONSTER"
 
-        val skullOwner = mayorName.asInternalName().getItemStack().getSkullOwner() ?: return null
+        val skullOwner = mayorName.toInternalName().getItemStack().getSkullOwner() ?: return null
         return NBTUtil.readGameProfileFromNBT(skullOwner)
     }
 

@@ -3,10 +3,6 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.data.ElectionCandidate
-import at.hannibal2.skyhanni.data.ElectionAPI
-import at.hannibal2.skyhanni.data.ElectionCandidate
-import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -16,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -50,7 +46,7 @@ object MinisterInCalendar {
         if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         val minister = ElectionAPI.currentMinister ?: return
 
-        val itemStack = "${minister.name}_MAYOR_MONSTER".asInternalName().getItemStack()
+        val itemStack = "${minister.name}_MAYOR_MONSTER".toInternalName().getItemStack()
         val ministerColor = ElectionAPI.mayorNameToColorCode(minister.mayorName)
 
         ministerItemStack = changeItem(ministerColor, minister, itemStack)
@@ -91,7 +87,7 @@ object MinisterInCalendar {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
 
         if (event.slotId in listOf(37, 38)) {
             event.cancel()
