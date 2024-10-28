@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -112,9 +113,9 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toChromaColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
-                useChroma = barConfig.useChroma.get()
+                useChroma = barConfig.useChroma.get(),
             )
 
         } else {
@@ -122,11 +123,11 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toChromaColor(),
+                endColor = barConfig.barStartColor.toChromaColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
-                useChroma = barConfig.useChroma.get()
+                useChroma = barConfig.useChroma.get(),
             )
         }
 

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SpecialColor
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -30,6 +31,6 @@ object PartyMemberOutlines {
     private fun getEntityOutlineColor(entity: Entity): Int? {
         if (entity !is EntityOtherPlayerMP || !PartyAPI.partyMembers.contains(entity.name)) return null
 
-        return SpecialColor.specialToChromaRGB(config.outlineColor)
+        return config.outlineColor.toChromaColor().rgb
     }
 }

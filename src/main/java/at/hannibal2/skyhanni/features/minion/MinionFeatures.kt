@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -143,8 +144,7 @@ object MinionFeatures {
         if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
-        val special = config.lastClickedMinion.color
-        val color = Color(SpecialColor.specialToChromaRGB(special), true)
+        val color = config.lastClickedMinion.color.toChromaColor()
 
         val loc = lastMinion
         if (loc != null) {
