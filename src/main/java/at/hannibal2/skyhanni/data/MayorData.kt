@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.ElectionAPI.currentMayor
 import at.hannibal2.skyhanni.data.ElectionAPI.foxyExtraEventPattern
+import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
