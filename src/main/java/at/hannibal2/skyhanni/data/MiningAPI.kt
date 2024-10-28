@@ -267,7 +267,7 @@ object MiningAPI {
                 if (lastClicked.passedSince() > 1.seconds) return
                 val block = lastClickedPos ?: return
                 val ore = OreBlock.getByStateOrNull(block.getBlockStateAt()) ?: return
-                if (ore.hasInitSound()) return
+                if (ore.hasInitSound) return
                 ignoreInit = true
                 waitingForInitSound = false
                 waitingForEffMinerBlock = true
@@ -318,7 +318,7 @@ object MiningAPI {
             return
         }
 
-        if (waitingForEffMinerBlock && (!ignoreInit || !ore.hasInitSound())) {
+        if (waitingForEffMinerBlock && (!ignoreInit || !ore.hasInitSound)) {
             if (surroundingMinedBlocks.any { it.second == pos }) return
             waitingForEffMinerBlock = false
             surroundingMinedBlocks += MinedBlock(ore, false) to pos
