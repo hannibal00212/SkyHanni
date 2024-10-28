@@ -143,10 +143,14 @@ object HoppityCallWarning {
 
     @SubscribeEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.ensureCoins) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
-        if (commandSentTimer.passedSince() < 5.seconds) return
-        if (PurseAPI.getPurse() >= config.coinThreshold) return
+        if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds ||
+            PurseAPI.getPurse() >= config.coinThreshold
+        ) {
+            HoppityAPI.setLatestCallAccept()
+            return
+        }
 
         commandSentTimer = SimpleTimeMark.now()
         event.cancel()

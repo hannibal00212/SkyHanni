@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -35,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -49,6 +52,7 @@ object HoppityAPI {
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
     private var lastDoradoFire: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastHoppityCallAccept: SimpleTimeMark = SimpleTimeMark.farPast()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -103,6 +107,13 @@ object HoppityAPI {
         "milestone.shop",
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        DelayedRun.runDelayed(3.seconds) {
+            lastHoppityCallAccept = SimpleTimeMark.farPast()
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTick(event: SecondPassedEvent) {
@@ -189,8 +200,12 @@ object HoppityAPI {
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
-                lastMeal = HoppityEggType.BOUGHT
-                EggFoundEvent(HoppityEggType.BOUGHT).post()
+                // If there is a reasonable timeframe since lastHoppityCallAccept, we can assume this is an abiphone call
+                val newType =
+                    if (lastHoppityCallAccept.passedSince() <= 1.minutes) HoppityEggType.BOUGHT_ABIPHONE
+                    else HoppityEggType.BOUGHT
+                lastMeal = newType
+                EggFoundEvent(newType).post()
                 attemptFireRabbitFound()
             }
         }
@@ -210,6 +225,10 @@ object HoppityAPI {
             }
             attemptFireRabbitFound()
         }
+    }
+
+    fun setLatestCallAccept() {
+        lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
     fun attemptFireRabbitFound(lastDuplicateAmount: Long? = null) {

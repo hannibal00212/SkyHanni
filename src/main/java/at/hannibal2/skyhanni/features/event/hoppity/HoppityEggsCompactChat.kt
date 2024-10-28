@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT_ABIPHONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
@@ -81,6 +82,7 @@ object HoppityEggsCompactChat {
     private fun createCompactMessage(): String {
         val mealNameFormat = when (lastChatMeal) {
             BOUGHT -> "§aBought Rabbit"
+            BOUGHT_ABIPHONE -> "§a✆ Bought Rabbit"
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
             STRAY -> "§aStray Rabbit"

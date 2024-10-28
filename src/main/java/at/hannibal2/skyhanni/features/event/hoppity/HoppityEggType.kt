@@ -16,6 +16,7 @@ enum class HoppityEggType(
     DINNER("Dinner", "§a", 21),
     SIDE_DISH("Side Dish", "§6§l", -1),
     BOUGHT("Bought", "§a", -1),
+    BOUGHT_ABIPHONE("✆ Bought", "§a", -1),
     CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6", -1),
     CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1),
     STRAY("Stray Rabbit", "§a", -1)
