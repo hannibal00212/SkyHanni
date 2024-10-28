@@ -3,6 +3,8 @@
  *
  * This file is part of NotEnoughUpdates.
  *
+ * This file was translated to Kotlin and modified, 2024.
+ *
  * NotEnoughUpdates is free software: you can redistribute it
  * and/or modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation, either
@@ -16,238 +18,168 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with NotEnoughUpdates. If not, see <https://www.gnu.org/licenses/>.
  */
+package at.hannibal2.skyhanni.config.core.config
 
-package at.hannibal2.skyhanni.config.core.config;
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
+import java.lang.reflect.Field
 
-import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.config.ConfigGuiManager;
-import at.hannibal2.skyhanni.config.Features;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper;
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
-import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Field;
-
-public class Position {
-    @Expose
-    private int x;
-    @Expose
-    private int y;
-    @Expose
-    private float scale = 1F;
-    @Expose
-    private boolean center = false;
-
-    @Expose
-    private boolean centerX;
-    @Expose
-    private boolean centerY;
+class Position @JvmOverloads constructor(
+    x: Int,
+    y: Int,
+    scale: Float = DEFAULT_SCALE,
+    centerX: Boolean = false,
+    centerY: Boolean = false,
+) {
+    @JvmOverloads
+    constructor(
+        x: Int,
+        y: Int,
+        centerX: Boolean,
+        centerY: Boolean = false,
+    ) : this(x, y, DEFAULT_SCALE, centerX, centerY)
 
     @Expose
-    private boolean ignoreCustomScale = false;
+    var rawX: Int = x
+        private set
 
-    public transient Field linkField;
+    @Expose
+    var rawY: Int = y
+        private set
 
-    private boolean clicked = false;
-    public String internalName = null;
+    @Expose
+    var scale: Float = scale
+        get() = if (field == 0f) DEFAULT_SCALE else field
 
-    public Position() {
-        this(0, 0);
+    @Expose
+    var centerX: Boolean = centerX
+        private set
+
+    // Note: currently unused?
+    @Expose
+    var centerY: Boolean = centerY
+        private set
+
+    @Expose
+    private var ignoreCustomScale = false
+
+    @Transient
+    var linkField: Field? = null
+
+    var clicked: Boolean = false
+    var internalName: String? = null
+
+    val effectiveScale: Float
+        get() = if (ignoreCustomScale) DEFAULT_SCALE else (scale * SkyHanniMod.feature.gui.globalScale).coerceIn(MIN_SCALE, MAX_SCALE)
+
+    fun set(other: Position) {
+        this.rawX = other.rawX
+        this.rawY = other.rawY
+        this.centerX = other.centerX
+        this.centerY = other.centerY
+        this.scale = other.scale
     }
 
-    public Position(int x, int y) {
-        this(x, y, false, false);
+    fun setIgnoreCustomScale(ignoreCustomScale: Boolean): Position {
+        this.ignoreCustomScale = ignoreCustomScale
+        return this
     }
 
-    public Position(int x, int y, float scale) {
-        this.x = x;
-        this.y = y;
-        this.centerX = false;
-        this.centerY = true;
-        this.scale = scale;
+    fun moveTo(x: Int, y: Int) {
+        this.rawX = x
+        this.rawY = y
     }
 
-    public Position(int x, int y, float scale, boolean center) {
-        this.x = x;
-        this.y = y;
-        this.centerX = false;
-        this.centerY = true;
-        this.scale = scale;
-        this.center = center;
+    fun getAbsX0(objWidth: Int): Int {
+        val width = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+
+        return calcAbs0(rawX, width, objWidth)
     }
 
-    public Position(int x, int y, boolean centerX, boolean centerY) {
-        this.x = x;
-        this.y = y;
-        this.centerX = centerX;
-        this.centerY = centerY;
+    fun getAbsY0(objHeight: Int): Int {
+        val height = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+
+        return calcAbs0(rawY, height, objHeight)
     }
 
-    public void set(Position other) {
-        this.x = other.x;
-        this.y = other.y;
-        this.centerX = other.centerX;
-        this.centerY = other.centerY;
-        this.scale = other.getScale();
-        this.center = other.isCenter();
-    }
-
-    public Position setIgnoreCustomScale(boolean ignoreCustomScale) {
-        this.ignoreCustomScale = ignoreCustomScale;
-        return this;
-    }
-
-    public float getEffectiveScale() {
-        if (ignoreCustomScale) return 1F;
-        return Math.max(Math.min(getScale() * SkyHanniMod.feature.gui.globalScale, 10F), 0.1F);
-    }
-
-    public float getScale() {
-        if (scale == 0) return 1f;
-        return scale;
-    }
-
-    public boolean isCenter() {
-        return center;
-    }
-
-    public void setScale(float newScale) {
-        scale = Math.max(Math.min(10F, newScale), 0.1f);
-    }
-
-    public int getRawX() {
-        return x;
-    }
-
-    public int getRawY() {
-        return y;
-    }
-
-    public void moveTo(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void setClicked(boolean state) {
-        this.clicked = state;
-    }
-
-    public boolean getClicked() {
-        return clicked;
-    }
-
-    public int getAbsX0(int objWidth) {
-        int width = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
-
-        return calcAbs0(x, width, objWidth);
-    }
-
-    public int getAbsY0(int objHeight) {
-        int height = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
-
-        return calcAbs0(y, height, objHeight);
-    }
-
-    private int calcAbs0(int axis, int length, int objLength) {
-        int ret = axis;
+    private fun calcAbs0(axis: Int, length: Int, objLength: Int): Int {
+        var ret = axis
         if (axis < 0) {
-            ret = length + axis - objLength;
+            ret = length + axis - objLength
         }
 
-        if (ret < 0) ret = 0;
-        if (ret > length - objLength) ret = length - objLength;
+        if (ret < 0) ret = 0
+        if (ret > length - objLength) ret = length - objLength
 
-        return ret;
+        return ret
     }
 
-    public int moveX(int deltaX, int objWidth) {
-        int screenWidth = new ScaledResolution(Minecraft.getMinecraft()).getScaledWidth();
-        boolean wasPositiveX = this.x >= 0;
-        this.x += deltaX;
-
-        if (wasPositiveX) {
-            if (this.x < 0) {
-                deltaX -= this.x;
-                this.x = 0;
-            }
-            if (this.x > screenWidth) {
-                deltaX += screenWidth - this.x;
-                this.x = screenWidth;
-            }
-        } else {
-            if (this.x + 1 > 0) {
-                deltaX += -1 - this.x;
-                this.x = -1;
-            }
-            if (this.x + screenWidth < 0) {
-                deltaX += -screenWidth - this.x;
-                this.x = -screenWidth;
-            }
-        }
-
-        if (this.x >= 0 && this.x + objWidth / 2 > screenWidth / 2) {
-            this.x -= screenWidth - objWidth;
-        }
-        if (this.x < 0 && this.x + objWidth / 2 <= -screenWidth / 2) {
-            this.x += screenWidth - objWidth;
-        }
-        return deltaX;
+    fun moveX(deltaX: Int, objWidth: Int): Int {
+        val (newX, newDeltaX) = adjustWithinBounds(rawX, deltaX, ScaledResolution(Minecraft.getMinecraft()).scaledWidth, objWidth)
+        this.rawX = newX
+        return newDeltaX
     }
 
-    public int moveY(int deltaY, int objHeight) {
-        int screenHeight = new ScaledResolution(Minecraft.getMinecraft()).getScaledHeight();
-        boolean wasPositiveY = this.y >= 0;
-        this.y += deltaY;
-
-        if (wasPositiveY) {
-            if (this.y < 0) {
-                deltaY -= this.y;
-                this.y = 0;
-            }
-            if (this.y > screenHeight) {
-                deltaY += screenHeight - this.y;
-                this.y = screenHeight;
-            }
-        } else {
-            if (this.y + 1 > -0) {
-                deltaY += -1 - this.y;
-                this.y = -1;
-            }
-            if (this.y + screenHeight < 0) {
-                deltaY += -screenHeight - this.y;
-                this.y = -screenHeight;
-            }
-        }
-
-        if (this.y >= 0 && this.y - objHeight / 2 > screenHeight / 2) {
-            this.y -= screenHeight - objHeight;
-        }
-        if (this.y < 0 && this.y - objHeight / 2 <= -screenHeight / 2) {
-            this.y += screenHeight - objHeight;
-        }
-        return deltaY;
+    fun moveY(deltaY: Int, objHeight: Int): Int {
+        val (newY, newDeltaY) = adjustWithinBounds(rawY, deltaY, ScaledResolution(Minecraft.getMinecraft()).scaledHeight, objHeight)
+        this.rawY = newY
+        return newDeltaY
     }
 
-    public boolean canJumpToConfigOptions() {
-        return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getProcessedConfig().getOptionFromField(linkField) != null;
+    private fun adjustWithinBounds(axis: Int, delta: Int, length: Int, objLength: Int): Pair<Int, Int> {
+        var adjustedAxis = axis + delta
+        var adjustedDelta = delta
+
+        if (adjustedAxis < 0) {
+            adjustedDelta -= adjustedAxis
+            adjustedAxis = 0
+        } else if (adjustedAxis + objLength > length) {
+            adjustedDelta += length - adjustedAxis - objLength
+            adjustedAxis = length - objLength
+        }
+
+        return adjustedAxis to adjustedDelta
     }
 
-    public void jumpToConfigOptions() {
-        MoulConfigEditor<Features> editor = ConfigGuiManager.INSTANCE.getEditorInstance();
-        if (linkField == null) return;
-        ProcessedOption option = editor.getProcessedConfig().getOptionFromField(linkField);
-        if (option == null) return;
-        editor.search("");
-        if (!editor.goToOption(option)) return;
-        SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+    fun canJumpToConfigOptions(): Boolean {
+        val field = linkField ?: return false
+        return getEditorInstance().processedConfig.getOptionFromField(field) != null
     }
 
-    public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
-        linkField = configLink.owner().getField(configLink.field());
+    fun jumpToConfigOptions() {
+        val editor = getEditorInstance()
+        val field = linkField ?: return
+        val option = editor.processedConfig.getOptionFromField(field) ?: return
+        editor.search("")
+        if (!editor.goToOption(option)) return
+        SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+    }
+
+    fun setLink(configLink: ConfigLink) {
+        try {
+            linkField = configLink.owner.java.getField(configLink.field)
+        } catch (e: NoSuchFieldException) {
+            ErrorManager.logErrorWithData(
+                FieldNotFoundException(configLink.field, configLink.owner.java),
+                "Failed to set ConfigLink for ${configLink.field} in ${configLink.owner}",
+                "owner" to configLink.owner,
+                "field" to configLink.field,
+            )
+        }
+    }
+
+    companion object {
+        const val DEFAULT_SCALE = 1f
+        const val MIN_SCALE = 0.1f
+        const val MAX_SCALE = 10.0f
+
+        private class FieldNotFoundException(field: String, owner: Class<*>) :
+            Exception("Config Link for field $field in class $owner not found")
     }
 }

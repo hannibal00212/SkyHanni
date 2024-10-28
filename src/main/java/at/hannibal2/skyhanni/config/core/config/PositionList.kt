@@ -9,10 +9,9 @@ class PositionList() : ArrayList<Position>(), MutableList<Position> {
     }
 
     constructor(size: Int) : this() {
-        this.addAll((0..<size).map { Position() })
+        this.addAll(List(size) { Position(0, 0) })
     }
 
-    @Throws(NoSuchFieldException::class)
     fun setLink(configLink: ConfigLink) {
         this.configLink = configLink
         forEach {
@@ -23,24 +22,24 @@ class PositionList() : ArrayList<Position>(), MutableList<Position> {
     private var configLink: ConfigLink? = null
 
     override fun add(element: Position): Boolean {
-        if (configLink != null) {
-            element.setLink(configLink!!)
+        configLink?.let {
+            element.setLink(it)
         }
         return super.add(element)
     }
 
     override fun addAll(elements: Collection<Position>): Boolean {
-        if (configLink != null) {
+        configLink?.let { link ->
             elements.forEach {
-                it.setLink(configLink!!)
+                it.setLink(link)
             }
         }
         return super.addAll(elements)
     }
 
     override fun set(index: Int, element: Position): Position {
-        if (configLink != null) {
-            element.setLink(configLink!!)
+        configLink?.let {
+            element.setLink(it)
         }
         return super.set(index, element)
     }

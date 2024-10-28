@@ -228,7 +228,7 @@ class GuiPositionEditor(
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-            GuiEditManager.handleGuiPositionMoved(position.internalName)
+            GuiEditManager.handleGuiPositionMoved(position.internalName ?: return)
         }
     }
 
