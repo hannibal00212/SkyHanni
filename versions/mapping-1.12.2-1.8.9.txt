@@ -1,4 +1,5 @@
 
+net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resources.model.IBakedModel
 net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
 
 net.minecraft.client.renderer.BufferBuilder net.minecraft.client.renderer.WorldRenderer
