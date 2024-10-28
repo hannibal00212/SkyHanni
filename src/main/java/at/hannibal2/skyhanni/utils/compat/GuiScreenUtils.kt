@@ -5,7 +5,9 @@ import net.minecraft.client.gui.ScaledResolution
 import org.lwjgl.input.Mouse
 
 object GuiScreenUtils {
+
     private val mc get() = Minecraft.getMinecraft()
+
     val scaledWindowHeight
         get() =
 //#if MC < 1.16
@@ -30,7 +32,6 @@ object GuiScreenUtils {
 //$$            mc.window.width
 //#endif
 
-
     val displayHeight
         get() =
 //#if MC < 1.16
@@ -39,11 +40,11 @@ object GuiScreenUtils {
 //$$            mc.window.height
 //#endif
 
-    val globalMouseX get() = Mouse.getX()
-    val globalMouseY get() = Mouse.getY()
+    private val globalMouseX get() = Mouse.getX()
+    private val globalMouseY get() = Mouse.getY()
 
-    val mouseX
-        get() = globalMouseX * scaledWindowWidth / displayWidth
+    val mouseX get() = globalMouseX * scaledWindowWidth / displayWidth
+
     val mouseY: Int
         get() {
             val height = this.scaledWindowHeight
@@ -56,4 +57,5 @@ object GuiScreenUtils {
 //#endif
         }
 
+    val mousePos: Pair<Int, Int> get() = mouseX to mouseY
 }
