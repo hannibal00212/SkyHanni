@@ -16,13 +16,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -86,7 +84,7 @@ object SulphurSkitterBox {
                     axis,
                     color,
                     partialTicks = partialTicks,
-                    renderRelativeToCamera = false
+                    renderRelativeToCamera = false,
                 )
             }
 
