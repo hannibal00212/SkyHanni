@@ -42,7 +42,7 @@ object DungeonLividFinder {
         private set
     private var lividArmorStandId: Int? = null
 
-    val lividEntity: Entity?
+    val lividEntityOrArmorstand: Entity?
         get() = livid?.baseEntity ?: lividArmorStandId?.let { EntityUtils.getEntityByID(it) }
 
     private var fakeLivids = mutableSetOf<Mob>()
@@ -110,7 +110,7 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.enabled) return
         if (isBlind) return
 
-        val entity = lividEntity ?: return
+        val entity = lividEntityOrArmorstand ?: return
         val lorenzColor = color ?: return
 
         val location = event.exactLocation(entity)
