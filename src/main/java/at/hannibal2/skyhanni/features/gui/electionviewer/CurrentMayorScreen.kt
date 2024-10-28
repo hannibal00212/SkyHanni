@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.ElectionAPI
-import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -26,7 +24,7 @@ object CurrentMayorScreen : ElectionViewerScreen() {
             listOf(
                 Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
                 Renderable.string(
-                    "New Mayor in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
+                    "New Mayor in §e${ElectionAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
                     horizontalAlign = HorizontalAlignment.CENTER,
                 ),
                 Renderable.horizontalContainer(

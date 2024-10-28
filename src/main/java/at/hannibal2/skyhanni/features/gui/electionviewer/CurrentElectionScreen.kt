@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.ElectionAPI
-import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidateRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
