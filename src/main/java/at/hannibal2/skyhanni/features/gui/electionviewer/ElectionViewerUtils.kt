@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
@@ -55,7 +56,7 @@ object ElectionViewerUtils {
     }
 
     private fun getGameProfileFromMayor(mayor: ElectionCandidate): GameProfile? {
-        val mayorName = if (mayor.isSpecial()) {
+        val mayorName = if (mayor.isSpecial) {
             "${mayor.name}_SPECIAL"
         } else {
             mayor.name
