@@ -31,14 +31,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -97,7 +95,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.CENTERED,
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
-            -> {
+                -> {
                 val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
@@ -183,7 +181,7 @@ object SkillProgress {
                 "",
             "  §r§a§lREWARDS",
             rewards.joinToString("\n"),
-            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+            "§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
         )
 
         chat(messages.joinToString("\n"), false)
@@ -210,7 +208,7 @@ object SkillProgress {
             barConfig.useChroma,
             barConfig.useTexturedBar,
             allSkillConfig.enabled,
-            etaConfig.enabled
+            etaConfig.enabled,
         ) {
             updateDisplay()
             update()
@@ -279,7 +277,7 @@ object SkillProgress {
                         skillInfo.overflowLevel,
                         skillInfo.overflowCurrentXp,
                         skillInfo.overflowCurrentXpMax,
-                        skillInfo.overflowTotalXp
+                        skillInfo.overflowTotalXp,
                     )
                 else
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
@@ -288,7 +286,7 @@ object SkillProgress {
                 Renderable.clickAndHover(
                     "§cOpen your skills menu!",
                     listOf("§eClick here to execute §6/skills"),
-                    onClick = { HypixelCommands.skills() }
+                    onClick = { HypixelCommands.skills() },
                 )
             } else {
                 val tips = buildList {
@@ -309,7 +307,7 @@ object SkillProgress {
                         }
                         append("§7)")
                     },
-                    tips
+                    tips,
                 )
             }
         }
@@ -364,8 +362,8 @@ object SkillProgress {
             add(
                 Renderable.string(
                     "§7In §b$format " +
-                        if (xpInfo.isActive) "" else "§c(PAUSED)"
-                )
+                        if (xpInfo.isActive) "" else "§c(PAUSED)",
+                ),
             )
         }
 
@@ -376,8 +374,8 @@ object SkillProgress {
             add(
                 Renderable.string(
                     "§7XP/h: §e${xpInterp.toLong().addSeparators()} " +
-                        if (xpInfo.isActive) "" else "§c(PAUSED)"
-                )
+                        if (xpInfo.isActive) "" else "§c(PAUSED)",
+                ),
             )
         }
 
@@ -391,8 +389,8 @@ object SkillProgress {
 
                     xpInfo.timeActive = 0L
                     chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
-                }
-            )
+                },
+            ),
         )
     }
 
@@ -469,8 +467,8 @@ object SkillProgress {
                             append("§6∞ Left")
                         }
                     }
-                }
-            )
+                },
+            ),
         )
     }
 

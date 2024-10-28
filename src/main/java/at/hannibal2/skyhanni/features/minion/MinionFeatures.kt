@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -61,7 +60,6 @@ import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 @SkyHanniModule
 object MinionFeatures {
@@ -78,19 +76,19 @@ object MinionFeatures {
     private val patternGroup = RepoPattern.group("minion")
     private val minionUpgradePattern by patternGroup.pattern(
         "chat.upgrade",
-        "§aYou have upgraded your Minion to Tier (?<tier>.*)"
+        "§aYou have upgraded your Minion to Tier (?<tier>.*)",
     )
     private val minionCoinPattern by patternGroup.pattern(
         "chat.coin",
-        "§aYou received §r§6(.*) coins§r§a!"
+        "§aYou received §r§6(.*) coins§r§a!",
     )
     private val minionTitlePattern by patternGroup.pattern(
         "title",
-        "Minion [^➜]"
+        "Minion [^➜]",
     )
     private val minionCollectItemPattern by patternGroup.pattern(
         "item.collect",
-        "^§aCollect All$"
+        "^§aCollect All$",
     )
 
     var lastMinion: LorenzVec? = null
@@ -156,7 +154,7 @@ object MinionFeatures {
                     true,
                     extraSize = -0.25,
                     extraSizeTopY = 0.2,
-                    extraSizeBottomY = 0.0
+                    extraSizeBottomY = 0.0,
                 )
             }
         }
