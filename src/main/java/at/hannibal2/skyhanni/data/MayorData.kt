@@ -220,8 +220,6 @@ enum class Perk(val perkName: String) {
     companion object {
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
 
-        fun MayorPerk.getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
-
         fun MayorPerk.toPerk(): Perk? = getPerkFromName(this.renameIfFoxyExtraEventPerkFound())?.let {
             it.description = this.description
             it.minister = this.minister
