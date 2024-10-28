@@ -83,7 +83,7 @@ object MaxwellAPI {
     private const val THAUMATURGY_TUNINGS_SLOT = 51
     private const val THAUMATURGY_MP_SLOT = 48
 
-    //region Patterns
+    // region Patterns
     private val patternGroup = RepoPattern.group("data.maxwell")
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
@@ -153,7 +153,7 @@ object MaxwellAPI {
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
     )
-    //endregion
+    // endregion
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
