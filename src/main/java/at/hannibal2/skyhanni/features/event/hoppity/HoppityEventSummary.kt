@@ -154,7 +154,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { sb, stats, _ ->
-                stats.getBoughtCount().takeIf {it > 0}?.let {
+                stats.getBoughtCount().takeIf { it > 0 }?.let {
                     sb.appendHeadedLine("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
                 }
             }
