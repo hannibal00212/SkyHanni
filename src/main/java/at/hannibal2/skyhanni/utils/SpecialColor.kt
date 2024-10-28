@@ -4,7 +4,7 @@ import java.awt.Color
 
 /**
  * Taken from NotEnoughUpdates,
- * translated to Kotlin and slightly modified.
+ * translated to Kotlin and modified.
  */
 object SpecialColor {
     private const val MIN_CHROMA_SECS = 1
