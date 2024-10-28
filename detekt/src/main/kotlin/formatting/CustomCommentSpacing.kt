@@ -21,23 +21,26 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
 
     override fun visitComment(comment: PsiComment) {
         if (comment.text.containsPreprocessingPattern()) return
+        if (regionRegex.matches(comment.text)) return
+        if (commentRegex.matches(comment.text)) return
+        report(
+            CodeSmell(
+                issue,
+                Entity.from(comment),
+                "Expected space after opening comment."
+            )
+        )
 
+        // Fallback to super (ostensibly a no-check)
+        super.visitComment(comment)
+    }
+
+    companion object {
         /**
          * REGEX-TEST: // Test comment
          * REGEX-TEST: /* Test comment */
          */
-        val commentRegex = Regex("""^(?:\/{2}|\/\*)(?:\s.*|$)""", RegexOption.DOT_MATCHES_ALL)
-        if (!commentRegex.matches(comment.text)) {
-            report(
-                CodeSmell(
-                    issue,
-                    Entity.from(comment),
-                    "Expected space after opening comment."
-                )
-            )
-        }
-
-        // Fallback to super (ostensibly a no-check)
-        super.visitComment(comment)
+        private val commentRegex = Regex("""^(?:\/{2}|\/\*)(?:\s.*|$)""", RegexOption.DOT_MATCHES_ALL)
+        private val regionRegex = Regex("""^//\s*(?:region\b.*|endregion\b)""", RegexOption.DOT_MATCHES_ALL)
     }
 }

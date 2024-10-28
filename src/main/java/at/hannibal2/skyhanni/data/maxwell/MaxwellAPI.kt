@@ -214,7 +214,7 @@ object MaxwellAPI {
             for (stack in inventoryItems.values) {
                 for (line in stack.getLore()) {
                     val tuning = statsTuningDataPattern.readTuningFromLine(line) ?: continue
-                    tuning.name = tuningNamePattern.matchGroup(stack.name, "name") 
+                    tuning.name = tuningNamePattern.matchGroup(stack.name, "name")
                         ?: ErrorManager.skyHanniError(
                             "found no name in thaumaturgy",
                             "stack name" to stack.name,
