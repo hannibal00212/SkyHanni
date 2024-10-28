@@ -38,7 +38,7 @@ public class DevConfig {
     @Expose
     @ConfigOption(
         name = "Chat History Length",
-        desc = "The number of messages to keep in chat history.\n" +
+        desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +
             "§cExcessively large values may cause memory allocation issues."
     )
     @ConfigEditorSlider(minValue = 100, maxValue = 5000, minStep = 10)
