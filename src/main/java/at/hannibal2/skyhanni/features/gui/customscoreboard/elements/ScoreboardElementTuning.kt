@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.maxwell.MaxwellAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 // power update event
 object ScoreboardElementTuning : ScoreboardElement() {
     override fun getDisplay(): Any {
-        val tunings = MaxwellAPI.tunings ?: return "§cTalk to \"Maxwell\"!"
+        val tunings = MaxwellAPI.tunings
         if (tunings.isEmpty()) return "§cNo Maxwell Tunings :("
 
         val title = pluralize(tunings.size, "Tuning")

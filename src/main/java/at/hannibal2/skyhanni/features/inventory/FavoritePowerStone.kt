@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MaxwellAPI
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.maxwell.MaxwellAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -20,7 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FavoritePowerStone {
 
     private val config get() = SkyHanniMod.feature.inventory
-    private val storage get() = ProfileStorageData.profileSpecific
 
     private var highlightedSlots = setOf<Int>()
     private var inInventory = false
@@ -52,7 +50,7 @@ object FavoritePowerStone {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled() || !MaxwellAPI.isThaumaturgyInventory(event.inventoryName)) return
+        if (!isEnabled() || !MaxwellAPI.inInventory) return
 
         inInventory = true
     }
@@ -62,14 +60,18 @@ object FavoritePowerStone {
         if (!isEnabled() || !inInventory) return
 
         highlightedSlots = event.inventoryItems
-            .filter { (_, item) -> item.displayName.removeColor() in MaxwellAPI.favoritePowers }
+            .filterValues { item ->
+                val power = MaxwellAPI.getPowerByNameOrNull(item.name.removeColor().trim())
+                power in MaxwellAPI.favoritePowers
+            }
             .keys
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
+        highlightedSlots = setOf()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null && config.favoritePowerStone
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.favoritePowerStone
 }

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.config.storage;
 import at.hannibal2.skyhanni.api.HotmAPI;
 import at.hannibal2.skyhanni.api.SkillAPI;
 import at.hannibal2.skyhanni.data.IslandType;
-import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
+import at.hannibal2.skyhanni.data.maxwell.MaxwellTunings;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
@@ -223,10 +223,14 @@ public class ProfileSpecificStorage {
         public int magicalPower = -1;
 
         @Expose
-        public List<MaxwellAPI.ThaumaturgyPowerTuning> tunings = new ArrayList<>();
+        public List<MaxwellTunings> tunings = new ArrayList<>();
 
         @Expose
         public List<String> favoritePowers = new ArrayList<>();
+
+        // Migration from storing powers with display name to internal name
+        @Expose
+        public boolean hasMigrated = false;
     }
 
     @Expose

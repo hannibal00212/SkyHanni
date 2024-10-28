@@ -1,9 +1,13 @@
-package at.hannibal2.skyhanni.data
+package at.hannibal2.skyhanni.data.maxwell
 
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MaxwellPowersJson
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.skyblock.MaxwellUpdateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
@@ -14,15 +18,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,35 +35,55 @@ import java.util.regex.Pattern
 @SkyHanniModule
 object MaxwellAPI {
 
-    private val storage get() = ProfileStorageData.profileSpecific
+    private val storage get() = ProfileStorageData.profileSpecific?.maxwell
 
-    var currentPower: String?
-        get() = storage?.maxwell?.currentPower
-        set(value) {
-            storage?.maxwell?.currentPower = value ?: return
+    var currentPower: MaxwellPower
+        get() = storage?.currentPower?.let(::getPowerByInternalNameOrNull) ?: NO_POWER
+        private set(value) {
+            if (storage?.currentPower == value.internalName) return
+            storage?.currentPower = value.internalName
+            MaxwellUpdateEvent.Power(value).post()
         }
 
-    var magicalPower: Int?
-        get() = storage?.maxwell?.magicalPower
-        set(value) {
-            storage?.maxwell?.magicalPower = value ?: return
+    var magicalPower: Int
+        get() = storage?.magicalPower ?: 0
+        private set(value) {
+            if (storage?.magicalPower == value) return
+            storage?.magicalPower = value
+            MaxwellUpdateEvent.MagicalPower(value).post()
         }
 
-    var tunings: List<ThaumaturgyPowerTuning>?
-        get() = storage?.maxwell?.tunings
-        set(value) {
-            storage?.maxwell?.tunings = value ?: return
+    var tunings: List<MaxwellTunings>
+        get() = storage?.tunings.orEmpty()
+        private set(value) {
+            if (storage?.tunings == value) return
+            storage?.tunings = value
+            MaxwellUpdateEvent.Tuning(value).post()
         }
 
-    var favoritePowers: List<String>
-        get() = storage?.maxwell?.favoritePowers.orEmpty()
+    var favoritePowers: List<MaxwellPower>
+        get() = storage?.favoritePowers?.mapNotNull(::getPowerByInternalNameOrNull).orEmpty()
         set(value) {
-            storage?.maxwell?.favoritePowers = value
+            storage?.favoritePowers = value.map(MaxwellPower::internalName)
         }
 
-    private val NO_POWER by lazy { getPowerByNameOrNull("No Power") }
-    private var powers = mutableListOf<String>()
+    var inInventory: Boolean = false
+        private set
 
+    var inTuningGui: Boolean = false
+        private set
+
+    fun getPowerByNameOrNull(name: String): MaxwellPower? = powers.values.find { it.name == name }
+
+    fun getPowerByInternalNameOrNull(name: String): MaxwellPower? = powers[name]
+
+    val NO_POWER = MaxwellPower("No Power", "NO_POWER")
+
+    private var powers = mapOf<String, MaxwellPower>()
+    private const val THAUMATURGY_TUNINGS_SLOT = 51
+    private const val THAUMATURGY_MP_SLOT = 48
+
+    //region Patterns
     private val patternGroup = RepoPattern.group("data.maxwell")
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
@@ -101,6 +125,10 @@ object MaxwellAPI {
         "thaumaturgy.statstuning",
         "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)",
     )
+    private val tuningNamePattern by patternGroup.pattern(
+        "gui.thaumaturgy.tunings.name",
+        "§.. (?<name>.+)"
+    )
     private val tuningAutoAssignedPattern by patternGroup.pattern(
         "tuningpoints.chat.autoassigned",
         "§aYour §r§eTuning Points §r§awere auto-assigned as convenience!",
@@ -125,8 +153,7 @@ object MaxwellAPI {
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
     )
-
-    fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
+    //endregion
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -136,7 +163,7 @@ object MaxwellAPI {
         chatPowerPattern.tryReadPower(message)
         chatPowerUnlockedPattern.tryReadPower(message)
         if (!tuningAutoAssignedPattern.matches(event.message)) return
-        if (tunings.isNullOrEmpty()) return
+        if (tunings.isEmpty()) return
         with(CustomScoreboard.config) {
             if (!enabled.get() || ScoreboardConfigElement.TUNING !in scoreboardEntries.get()) return
             ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
@@ -144,15 +171,12 @@ object MaxwellAPI {
     }
 
     private fun Pattern.tryReadPower(message: String) {
-        matchMatcher(message) {
-            val power = group("power")
-            currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
-                UnknownMaxwellPower("Unknown power: $power"),
-                "Unknown power: $power",
-                "power" to power,
-                "message" to message,
-            )
-        }
+        val power = matchGroup(message, "power") ?: return
+        currentPower = getPowerByName(
+            power,
+            "power" to power,
+            "message" to message,
+        )
     }
 
     // load earlier, so that other features can already use the api in this event
@@ -160,7 +184,10 @@ object MaxwellAPI {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
-        if (isThaumaturgyInventory(event.inventoryName)) {
+        inInventory = thaumaturgyGuiPattern.matches(event.inventoryName)
+        inTuningGui = statsTuningGuiPattern.matches(event.inventoryName)
+
+        if (inInventory) {
             loadThaumaturgyCurrentPower(event.inventoryItems)
             loadThaumaturgyTunings(event.inventoryItems)
             loadThaumaturgyMagicalPower(event.inventoryItems)
@@ -171,37 +198,41 @@ object MaxwellAPI {
                 if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
         }
-        if (statsTuningGuiPattern.matches(event.inventoryName)) {
+        if (inTuningGui) {
             loadThaumaturgyTuningsFromTuning(event.inventoryItems)
         }
     }
 
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
+        inTuningGui = false
+    }
+
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, ItemStack>) {
-        val map = mutableListOf<ThaumaturgyPowerTuning>()
-        for (stack in inventoryItems.values) {
-            for (line in stack.getLore()) {
-                statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.name) {
-                        group("name")
-                    } ?: ErrorManager.skyHanniError(
-                        "found no name in thaumaturgy",
-                        "stack name" to stack.name,
-                        "line" to line,
-                    )
-                    map.add(it)
+        tunings = buildList {
+            for (stack in inventoryItems.values) {
+                for (line in stack.getLore()) {
+                    val tuning = statsTuningDataPattern.readTuningFromLine(line) ?: continue
+                    tuning.name = tuningNamePattern.matchGroup(stack.name, "name") 
+                        ?: ErrorManager.skyHanniError(
+                            "found no name in thaumaturgy",
+                            "stack name" to stack.name,
+                            "line" to line,
+                        )
+                    add(tuning)
                 }
             }
         }
-        tunings = map
     }
 
-    private fun Pattern.readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
+    private fun Pattern.readTuningFromLine(line: String): MaxwellTunings? {
         return matchMatcher(line) {
             val color = "§" + group("color")
             val icon = group("icon")
             val name = groupOrNull("name") ?: "<missing>"
             val value = group("amount")
-            ThaumaturgyPowerTuning(value, color, name, icon)
+            MaxwellTunings(value, color, name, icon)
         }
     }
 
@@ -212,42 +243,37 @@ object MaxwellAPI {
             } ?: return
         val displayName = selectedPowerStack.displayName.removeColor().trim()
 
-        currentPower = getPowerByNameOrNull(displayName)
-            ?: return ErrorManager.logErrorWithData(
-                UnknownMaxwellPower("Unknown power: $displayName"),
-                "Unknown power: $displayName",
-                "displayName" to displayName,
-                "lore" to selectedPowerStack.getLore(),
-                noStackTrace = true,
-            )
+        currentPower = getPowerByName(
+            displayName,
+            "displayName" to displayName,
+            "lore" to selectedPowerStack.getLore(),
+        )
     }
 
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
-        val tunings = tunings ?: return
-
         // Only load those rounded values if we don't have any values at all
         if (tunings.isNotEmpty()) return
 
-        val item = inventoryItems[51] ?: return
+        val item = inventoryItems[THAUMATURGY_TUNINGS_SLOT] ?: return
         var active = false
-        val map = mutableListOf<ThaumaturgyPowerTuning>()
-        for (line in item.getLore()) {
-            if (thaumaturgyStartPattern.matches(line)) {
-                active = true
-                continue
-            }
-            if (!active) continue
-            if (line.isEmpty()) break
-            thaumaturgyDataPattern.readTuningFromLine(line)?.let {
-                map.add(it)
+        tunings = buildList {
+            for (line in item.getLore()) {
+                if (thaumaturgyStartPattern.matches(line)) {
+                    active = true
+                    continue
+                }
+                if (!active) continue
+                if (line.isEmpty()) break
+                thaumaturgyDataPattern.readTuningFromLine(line)?.let {
+                    add(it)
+                }
             }
         }
-        this.tunings = map
     }
 
     private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
-        val item = inventoryItems[48] ?: return
-        item.getLore().matchFirst(thaumaturgyMagicalPowerPattern) {
+        val item = inventoryItems[THAUMATURGY_MP_SLOT] ?: return
+        thaumaturgyMagicalPowerPattern.firstMatcher(item.getLore()) {
             magicalPower = group("mp").formatInt()
         }
     }
@@ -255,7 +281,7 @@ object MaxwellAPI {
     private fun processStack(stack: ItemStack) {
         var foundMagicalPower = false
         for (line in stack.getLore()) {
-            redstoneCollectionRequirementPattern.matchMatcher(line) {
+            if (redstoneCollectionRequirementPattern.matches(line)) {
                 if (magicalPower == 0 && currentPower == NO_POWER) return
                 ChatUtils.chat(
                     "Seems like you don't have the Requirement for the Accessory Bag yet, " +
@@ -278,15 +304,12 @@ object MaxwellAPI {
             }
 
             inventoryPowerPattern.matchMatcher(line) {
-                val power = group("power")
-                currentPower = getPowerByNameOrNull(power)
-                    ?: return@matchMatcher ErrorManager.logErrorWithData(
-                        UnknownMaxwellPower("Unknown power: ${stack.displayName}"),
-                        "Unknown power: ${stack.displayName}",
-                        "displayName" to stack.displayName,
-                        "lore" to stack.getLore(),
-                        noStackTrace = true,
-                    )
+                val powerName = group("power")
+                currentPower = getPowerByName(
+                    powerName,
+                    "displayName" to stack.displayName,
+                    "lore" to stack.getLore(),
+                )
             }
         }
 
@@ -297,23 +320,44 @@ object MaxwellAPI {
         }
     }
 
-    fun getPowerByNameOrNull(name: String) = powers.find { it == name }
+    @Suppress("SpreadOperator")
+    private fun getPowerByName(
+        name: String,
+        vararg data: Pair<String, Any?>
+    ): MaxwellPower {
+        return getPowerByNameOrNull(name) ?: run {
+            ErrorManager.logErrorWithData(
+                UnknownMaxwellPower("Unkonwn power: $name"),
+                "Unknown power: $name",
+                *data,
+                noStackTrace = true,
+            )
+            return NO_POWER
+        }
+    }
+
+    @SubscribeEvent
+    fun onProfileChange(event: ProfileJoinEvent) {
+        val storage = storage ?: return
+        if (storage.hasMigrated) return
+        storage.currentPower = getPowerByNameOrNull(storage.currentPower)?.internalName
+        storage.favoritePowers = storage.favoritePowers.mapNotNull { getPowerByNameOrNull(it)?.internalName }
+        storage.hasMigrated = true
+    }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 
-    // Load powers from repo
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
-        powers = data.powers
+        this.powers = buildMap {
+            put(NO_POWER.internalName, NO_POWER)
+            data.maxwellPowers.entries.forEach { (internalName, power) ->
+                put(internalName, MaxwellPower(power.name, internalName))
+            }
+        }
     }
 
-    class UnknownMaxwellPower(message: String) : Exception(message)
+    private class UnknownMaxwellPower(message: String) : Exception(message)
 
-    class ThaumaturgyPowerTuning(
-        @Expose val value: String,
-        @Expose val color: String,
-        @Expose var name: String,
-        @Expose val icon: String,
-    )
 }
