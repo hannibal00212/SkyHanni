@@ -16,6 +16,8 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
+        outputs:
+            sarif_exists: ${{ steps.check_sarif.outputs.exists }}
         steps:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
@@ -26,23 +28,32 @@ jobs:
             -   name: Run detekt main (w/ typing analysis)
                 run: |
                   ./gradlew detektMain --stacktrace
-            -   name: Annotate detekt failures
-                if: ${{ !cancelled() }}
-                run: |
-                  chmod +x .github/scripts/process_detekt_sarif.sh
-                  ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
-            -   name: Upload SARIF file as artifact
+            -   name: Check if SARIF file exists
                 if: always()
+                id: check_sarif
+                run: |
+                    if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
+                        echo "exists=true" >> $GITHUB_OUTPUT
+                    else
+                        echo "exists=false" >> $GITHUB_OUTPUT
+                    fi
+            -   name: Annotate detekt failures
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                run: |
+                    chmod +x .github/scripts/process_detekt_sarif.sh
+                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif | tee detekt_output.txt
+            -   name: Upload detekt output as artifact
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 uses: actions/upload-artifact@v4
                 with:
-                    name: detekt-sarif-report
-                    path: versions/1.8.9/build/reports/detekt/main.sarif
+                    name: detekt-output
+                    path: detekt_output.txt
 
     detekt_comment:
         name: Comment detekt failures on PR
         runs-on: ubuntu-latest
         needs: detekt
-        if: ${{ failure() }}
+        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() }}
         permissions:
             pull-requests: write
         steps:
@@ -51,83 +62,48 @@ jobs:
                 with:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
-            -   name: Download SARIF file
+            -   name: Download detekt output
                 uses: actions/download-artifact@v4
                 with:
-                    name: detekt-sarif-report
+                    name: detekt-output
                     path: .
-            -   name: Process detekt SARIF and create comment
-                shell: bash
+            -   name: Set up Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: '>=21'
+            -   name: Process detekt output and create comment
                 env:
                     PR_SHA: ${{ github.event.pull_request.head.sha }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
-                    set -e  # Exit on errors
-                    set -x  # Print each command for debugging
-                    
-                    # Ensure the SARIF file exists in the project root
-                    if [ ! -f main.sarif ]; then
-                        echo "SARIF file not found!"
-                        exit 1
+                    node .github/scripts/process_detekt_output.js
+            -   name: Check if this is the latest workflow run
+                id: check_latest
+                run: |
+                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                        | jq -r '.head.sha')
+                  
+                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
+                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
+                  
+                    # Compare the SHAs and set a result variable
+                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
+                        echo "is_latest=true" >> $GITHUB_ENV
+                    else
+                        echo "is_latest=false" >> $GITHUB_ENV
                     fi
-        
-                    chmod +x .github/scripts/process_detekt_sarif.sh
-                    
-                    # Process the SARIF file
-                    ./.github/scripts/process_detekt_sarif.sh main.sarif > detekt_output.txt
-                    
-                    # Check if the detekt_output.txt file was created
-                    if [ ! -s detekt_output.txt ]; then
-                        echo "detekt_output.txt is empty or missing!"
-                        exit 1
-                    fi
-        
-                    DETEKT_OUTPUT=$(cat detekt_output.txt)
-        
-                    COMMENT="### One or more Detekt Failures were detected:\n\n"
-        
-                    while read -r line; do
-                        echo "Processing line: $line"
-                        
-                        # Extract the full file path and line number using regex
-                        FILE_PATH=$(echo "$line" | grep -oP '(?<=file=)[^,]+')
-                        LINE_NUMBER=$(echo "$line" | grep -oP '(?<=line=)\d+')
-                      
-                        # Check if extraction worked
-                        if [ -z "$FILE_PATH" ] || [ -z "$LINE_NUMBER" ]; then
-                            echo "Failed to extract file path or line number from: $line"
-                            continue
-                        fi
-                        
-                        echo "Original file path: $FILE_PATH, Line number: $LINE_NUMBER"
-                        
-                        # Remove everything before 'src/' in the file path (if it exists)
-                        CLEANED_FILE_PATH=$(echo "$FILE_PATH" | sed 's/.*\(src\/.*\)/\1/')
-                        echo "Cleaned file path: $CLEANED_FILE_PATH"
-                        
-                        # Extract just the file name from the file path
-                        FILE_NAME=$(basename "$CLEANED_FILE_PATH")
-                        echo "File name: $FILE_NAME"
-                        
-                        # Clean up the line to remove everything between '::' and '::' (inclusive)
-                        CLEAN_MESSAGE=$(echo "$line" | sed 's/::.*:://g')
-                        echo "Clean message: $CLEAN_MESSAGE"
-                        
-                        # Append the comment with the cleaned-up message, using PR_SHA
-                        COMMENT+="- [ ] [$FILE_NAME#L$LINE_NUMBER](https://github.com/${GITHUB_REPOSITORY}/blob/${PR_SHA}/$CLEANED_FILE_PATH#L$LINE_NUMBER): $CLEAN_MESSAGE\n"
-                    done <<< "$DETEKT_OUTPUT"
-                    
-                    echo -e "$COMMENT" > detekt_comment.txt
             -   name: Add comment to PR
+                if: env.is_latest == 'true'
                 uses: actions/github-script@v6
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
                     script: |
-                      const fs = require('fs');
-                      const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
-                      github.rest.issues.createComment({
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body: commentBody
-                      })
+                        const fs = require('fs');
+                        const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
+                        github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
+                        })
