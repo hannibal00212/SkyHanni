@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,7 +19,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     MAYOR(
         "Mayor",
         {
-            val currentMayor = MayorAPI.currentMayor
+            val currentMayor = ElectionAPI.currentMayor
             renderPerson(
                 "Mayor",
                 currentMayor?.mayorName,
@@ -31,7 +30,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     MINISTER(
         "Minister",
         {
-            val currentMinister = MayorAPI.currentMinister
+            val currentMinister = ElectionAPI.currentMinister
             renderPerson(
                 "Minister",
                 currentMinister?.mayorName,
@@ -42,7 +41,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     CANDIDATES(
         "Candidates",
         {
-            val candidates = MayorAPI.rawMayorData?.current?.candidates.orEmpty()
+            val candidates = ElectionAPI.rawMayorData?.current?.candidates.orEmpty()
 
             Renderable.verticalContainer(
                 candidates.map { candidate ->
@@ -59,7 +58,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     NEW_MAYOR(
         "New Mayor Time",
         {
-            Renderable.string("§7New Mayor in: §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
+            Renderable.string("§7New Mayor in: §e${ElectionAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
         },
     ),
     ;
@@ -89,7 +88,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 }
 
 private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
-    val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
+    val colorCode = ElectionAPI.mayorNameToColorCode(name.orEmpty())
     val perkLines = perks?.takeIf { config.showPerks }?.map { perk ->
         "${if (perk.minister) "§6✯ " else ""}§e${perk.perkName}" to "§7${perk.description}"
     }.orEmpty()
