@@ -192,8 +192,8 @@ object GardenOptimalSpeed {
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         val cropInHand = cropInHand ?: return
 
-        var text = "§cWrong speed while farming ${cropInHand.cropName} detected!"
-        text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
+        var text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +
+            "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
         
         if (InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots) {
             ChatUtils.clickToActionOrDisable(
