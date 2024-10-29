@@ -163,26 +163,36 @@ object ChatFilter {
     // Slayer Drop
     @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
-        // Zombie
+        /** Zombie
+         *
+         * REGEX-TEST: §5§lVERY RARE DROP! §r§7(§r§f§r§5Revenant Catalyst§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §9§lVERY RARE DROP! §r§7(§r§f§r§2◆ Pestilence Rune I§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §5§lVERY RARE DROP! §r§7(§r§f§r§9Undead Catalyst§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §5§lVERY RARE DROP! §r§7(§r§9Smite VI§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §d§lCRAZY RARE DROP! §r§7(§r§f§r§a◆ Snake Rune I§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §d§lCRAZY RARE DROP! §r§7(§r§f§r§5Beheaded Horror§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §b§lRARE DROP! §r§7(§r§f§r§72x §r§f§r§9Revenant Viscera§r§7) §r§b(+253% §r§b? Magic Find§r§b)
+         * REGEX-TEST: §b§lRARE DROP! §r§7(§r§f§r§9Revenant Viscera§r§7) §r§b(+253% §r§b? Magic Find§r§b)
+         * REGEX-TEST: §6§lRARE DROP! §r§5Golden Powder §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §b§lRARE DROP! §r§7(§r§f§r§72x §r§f§r§9Foul Flesh§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §b§lRARE DROP! §r§7(§r§f§r§9Foul Flesh§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)
+         */
+        @Suppress("MaxLineLength")
+        "§.§l(?:(?:VERY|CRAZY) )?RARE DROP! §r§.\\(?(?:.*x )?(?:§r§.)?(?:§r§.)?(?:◆ )?(?:Revenant Viscera|Foul Flesh|Smite VI|Snake|Pestilence|Beheaded Horror|Undead|Revenant|Golden Powder)(?: Rune I| Catalyst)?(?:§r§7)?(?:\\) )?.*".toPattern(),
+
+        /** Tarantula
+         *
+         * REGEX-TEST: §6§lRARE DROP! §r§aEnchanted Spider Eye §r§b(+§r§b191% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest §r§b(+§r§b192% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §b§lRARE DROP! §r§7(§r§f§r§762x §r§f§r§aToxic Arrow Poison§r§7) §r§b(+211% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §6§lRARE DROP! §r§9Arachne's Calling §r§b(+§r§b181% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §9§lVERY RARE DROP! §r§7(§r§f§r§a◆ Bite Rune I§r§7) §r§b(+211% §r§b✯ Magic Find§r§b)
+         * REGEX-TEST: §5§lVERY RARE DROP! §r§7(§r§9Bane of Arthropods VI§r§7) §r§b(+211% §r§b✯ Magic Find§r§b)
+         */
+        @Suppress("MaxLineLength")
+        "§.§l(?:VERY )?RARE DROP! §r§.\\(?(?:.*x )?(?:§r§.)?(?:§r§.)?(?:◆ )?(?:Enchanted Spider Eye|Arachne's Calling|Travel Scroll to Spider's Den Top of Nest|Toxic Arrow Poison|Bite|Bane of Arthropods VI)(?: Rune I)?(?:§r§7)?(?:\\) )?.*".toPattern(),
+
         // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
-        "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
-        "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
-        "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
-        "§b§lRARE DROP! §r§7\\(§r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
-        "§6§lRARE DROP! §r§5Golden Powder (.*)".toPattern(),
-        "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§2(.*) Pestilence Rune I§r§7\\) (.*)".toPattern(),
-        "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§5Revenant Catalyst§r§7\\) (.*)".toPattern(),
-        "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§9Undead Catalyst§r§7\\) (.*)".toPattern(),
-        "§5§lVERY RARE DROP! {2}§r§7\\(§r§f§r§2◆ Pestilence Rune I§r§7\\) §r§b(.*)".toPattern(),
-
-        // Tarantula
-        "§6§lRARE DROP! §r§9Arachne's Keeper Fragment (.+)".toPattern(),
-        "§6§lRARE DROP! §r§5Travel Scroll to Spider's Den Top of Nest (.+)".toPattern(),
-        "§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§a◆ Bite Rune I§r§7\\) (.+)".toPattern(),
-        "§b§lRARE DROP! §r§7\\(§r§f§r§7(.+)x §r§f§r§aToxic Arrow Poison§r§7\\) (.+)".toPattern(),
-        "§b§lRARE DROP! §r§7\\(§r§f§r§aToxic Arrow Poison§r§7\\) (.+)".toPattern(),
-        "§5§lVERY RARE DROP! {2}§r§7\\(§r§9Bane of Arthropods VI§r§7\\) (.+)".toPattern(),
-
         // Enderman
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§aTwilight Arrow Poison§r§7\\) (.*)".toPattern(),
         "§5§lVERY RARE DROP! {2}§r§7\\(§r§fMana Steal I§r§7\\) (.*)".toPattern(),
