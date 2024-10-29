@@ -258,7 +258,9 @@ object SackAPI {
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
         sackEvent.postAndCatch()
-        if (chatConfig.hideSacksChange) {
+        if (chatConfig.hideSacksChange && HypixelData.skyBlockIsland != IslandType.GARDEN) {
+            event.blockedReason = "sacks_change"
+        } else if (HypixelData.skyBlockIsland == IslandType.GARDEN && chatConfig.onlyHideSacksChangeOnGarden) {
             event.blockedReason = "sacks_change"
         }
     }

@@ -111,6 +111,14 @@ public class ChatConfig {
     @FeatureToggle
     public boolean hideSacksChange = false;
 
+    @Expose
+    @ConfigOption(
+        name = "Only Hide Sack Changes on Garden",
+        desc = "Only hide the sack change message in the Garden."
+    )
+    @ConfigEditorBoolean
+    public boolean onlyHideSacksChangeOnGarden = false;
+
     @Category(name = "Translator", desc = "Chat translator settings.")
     @Expose
     public TranslatorConfig translator = new TranslatorConfig();
