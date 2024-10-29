@@ -205,7 +205,7 @@ object GardenOptimalSpeed {
         } else {
             ChatUtils.clickableChat(
                 text,
-                onClick = { config::warning.jumpToEditor() }
+                onClick = { config::warning.jumpToEditor() },
                 hover = "Click to disable this feature!",
             )
         }
