@@ -3,6 +3,7 @@ net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resou
 net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
 
 net.minecraft.client.renderer.BufferBuilder net.minecraft.client.renderer.WorldRenderer
+net.minecraft.client.renderer.RenderItem net.minecraft.client.renderer.entity.RenderItem
 
 net.minecraft.entity.player.EntityPlayer getHeldItemMainhand() getHeldItem()
 
