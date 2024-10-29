@@ -25,6 +25,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.inContainer
+import at.hannibal2.skyhanni.utils.InventoryUtils.inInventory
+import at.hannibal2.skyhanni.utils.InventoryUtils.inStorage
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -48,7 +51,6 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityEventSummary {
@@ -132,7 +134,9 @@ object HoppityEventSummary {
         reCheckInventoryState()
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
-        if (lastToggleMark.passedSince() < 1.seconds) return
+        // Only toggle from inventory if the user is in the Chocolate Factory
+        if ((inInventory() || inContainer() || inStorage()) && !ChocolateFactoryAPI.inChocolateFactory) return
+        if (lastToggleMark.passedSince() < 500.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
         lastToggleMark = SimpleTimeMark.now()
