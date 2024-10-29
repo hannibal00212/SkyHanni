@@ -194,7 +194,7 @@ object GardenOptimalSpeed {
 
         val text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +
             "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
-        
+
         if (InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots) {
             ChatUtils.clickToActionOrDisable(
                 text,
