@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -185,7 +186,6 @@ object GardenOptimalSpeed {
         if (GardenAPI.onBarnPlot) return
         if (!config.warning) return
         if (!GardenAPI.isCurrentlyFarming()) return
-        if (InventoryUtils.getBoots()?.getInternalNameOrNull() != rancherBoots) return
         if (lastWarnTime.passedSince() < 20.seconds) return
 
         lastWarnTime = SimpleTimeMark.now()
@@ -194,12 +194,21 @@ object GardenOptimalSpeed {
 
         var text = "§cWrong speed while farming ${cropInHand.cropName} detected!"
         text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
-        ChatUtils.clickToActionOrDisable(
-            text,
-            config::warning,
-            actionName = "change the speed",
-            action = { HypixelCommands.setMaxSpeed() },
-        )
+        
+        if (InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots) {
+            ChatUtils.clickToActionOrDisable(
+                text,
+                config::warning,
+                actionName = "change the speed",
+                action = { HypixelCommands.setMaxSpeed() },
+            )
+        } else {
+            ChatUtils.clickableChat(
+                text,
+                onClick = { config::warning.jumpToEditor() }
+                hover = "Click to disable this feature!",
+            )
+        }
     }
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
