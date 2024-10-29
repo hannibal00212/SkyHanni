@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CrystalNucleusChatFilter {
@@ -28,6 +30,7 @@ object CrystalNucleusChatFilter {
     private var crystalCount = 0
     private var crystalCollected = ""
     private var lastKeeper = ""
+    private var inCompListPreamble = false
 
     /**
      * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -119,6 +122,37 @@ object CrystalNucleusChatFilter {
         "(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
     )
 
+    /**
+     * REGEX-TEST: §rThat's not one of the components I need! Bring me one of the missing components:
+     */
+    private val componentListPreamblePattern by patternGroup.pattern(
+        "component.list.preamble",
+        "§rThat's not one of the components I need! Bring me one of the missing components:",
+    )
+
+    /**
+     * REGEX-TEST:  §r§9FTX 3070
+     * REGEX-TEST:  §r§9Electron Transmitter
+     * REGEX-TEST:  §r§9Superlite Motor
+     * REGEX-TEST:  §r§9Synthetic Heart
+     * REGEX-TEST:  §r§9Control Switch
+     * REGEX-TEST:  §r§9Robotron Reflector
+     */
+    private val componentListPattern by patternGroup.pattern(
+        "component.list",
+        " {2}§r§9(?<component>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §8§oWhew! That was a close one, better get out of here...
+     * REGEX-TEST: §cThe Goblin King's §r§afoul stench §r§chas dissipated!
+     */
+    private val goblinGuardExitMessagePattern by patternGroup.pattern(
+        "goblin.guard.exit",
+        "§8§oWhew! That was a close one, better get out of here\\.{3}|§cThe Goblin King's §r§afoul stench §r§chas dissipated!",
+    )
+
+
     fun block(message: String): NucleusChatFilterRes? {
         if (!isEnabled()) return null
 
@@ -190,6 +224,9 @@ object CrystalNucleusChatFilter {
 
     private fun blockGoblinGuards(message: String): NucleusChatFilterRes? {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS)) return null
+        if (goblinGuardExitMessagePattern.matches(message)) {
+            return NucleusChatFilterRes("npc_goblin_guard")
+        }
 
         // §c[GUARD] Ooblak§r§f: §r§eTHEY'RE STEALING THE CRYSTAL! GET THEM!
         if (!message.startsWith("§c[GUARD]")) return null
@@ -207,7 +244,18 @@ object CrystalNucleusChatFilter {
 
     private fun blockProfessorRobot(message: String): NucleusChatFilterRes? {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_PROF_ROBOT)) return null
+        if (inCompListPreamble && componentListPattern.matches(message)) {
+            return NucleusChatFilterRes("npc_prof_robot")
+        }
         if (!message.startsWith("§e[NPC] Professor Robot")) return null
+
+        if (componentListPreamblePattern.matches(message)) {
+            inCompListPreamble = true
+            DelayedRun.runDelayed(2.seconds) {
+                inCompListPreamble = false
+            }
+            return NucleusChatFilterRes("npc_prof_robot")
+        }
 
         componentSubmittedPattern.findMatcher(message) {
             if (message.contains("brought me all") || message.contains("This will work just fine.")) {
