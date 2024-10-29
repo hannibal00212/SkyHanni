@@ -334,7 +334,7 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
-    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    private const val CHARS = "BCDFGHJMPQRTVWXYbcdfghjmpqrtvwxy"
     fun generateRandomString(length: Int): String {
         var res: String = ""
         repeat(length) { res += CHARS.random() }
