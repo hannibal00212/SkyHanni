@@ -262,7 +262,7 @@ object SackAPI {
         if (chatConfig.hideSacksChange) {
             if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
                 event.blockedReason = "sacks_change"
-			}
+            }
         }
     }
 
