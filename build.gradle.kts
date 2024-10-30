@@ -25,7 +25,7 @@ import kotlin.io.path.outputStream
 plugins {
     idea
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
