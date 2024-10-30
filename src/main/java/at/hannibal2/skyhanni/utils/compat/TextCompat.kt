@@ -16,7 +16,7 @@ fun IChatComponent.getDirectlyContainedText() =
 //#elseif MC < 1.20
 //$$    this.contents
 //#else
-//$$        (this.content as? PlainTextContent)?.string() ?: ""
+//$$        (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 
 fun IChatComponent.getFormattedTextCompat() =
