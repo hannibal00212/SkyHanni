@@ -1,2 +1,2 @@
-at/hannibal2/skyhanni/utils/compat/World.kt
+at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 TestLegacyColorFormat.kt
