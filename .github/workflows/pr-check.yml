@@ -43,6 +43,7 @@ jobs:
                     labels: 'Wrong Title/Changelog'
 
             -   name: Check if this is the latest workflow run
+                if: failure()
                 id: check_latest
                 run: |
                     PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
