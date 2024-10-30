@@ -39,6 +39,6 @@ object Effects {
         //#if MC <1.12
         Potion.invisibility
     //#else
-    //$$    PotionTypes.INVISIBILITY
+    //$$    net.minecraft.init.PotionTypes.INVISIBILITY
     //#endif
 }
