@@ -135,7 +135,7 @@ object HoppityEventSummary {
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if ((inInventory() || inContainer() || inStorage()) && !ChocolateFactoryAPI.inChocolateFactory) return
+        if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryAPI.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 500.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
