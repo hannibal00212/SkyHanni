@@ -25,9 +25,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.inContainer
-import at.hannibal2.skyhanni.utils.InventoryUtils.inInventory
-import at.hannibal2.skyhanni.utils.InventoryUtils.inStorage
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -136,7 +133,7 @@ object HoppityEventSummary {
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryAPI.inChocolateFactory) return
-        if (lastToggleMark.passedSince() < 500.milliseconds) return
+        if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
         lastToggleMark = SimpleTimeMark.now()
