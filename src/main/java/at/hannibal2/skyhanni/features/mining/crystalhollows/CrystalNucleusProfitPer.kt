@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 
@@ -18,15 +18,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 object CrystalNucleusProfitPer {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
 
-    val jungleKeyItem = "JUNGLE_KEY".asInternalName()
-    val robotPartItems = listOf(
-        "CONTROL_SWITCH",
-        "ELECTRON_TRANSMITTER",
-        "FTX_3070",
-        "ROBOTRON_REFLECTOR",
-        "SUPERLITE_MOTOR",
-        "SYNTHETIC_HEART",
-    ).map { it.asInternalName() }
+    val jungleKeyItem by lazy { "JUNGLE_KEY".toInternalName() }
+    val robotPartItems by lazy {
+        listOf(
+            "CONTROL_SWITCH",
+            "ELECTRON_TRANSMITTER",
+            "FTX_3070",
+            "ROBOTRON_REFLECTOR",
+            "SUPERLITE_MOTOR",
+            "SYNTHETIC_HEART",
+        ).map { it.toInternalName() }
+    }
 
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
@@ -46,22 +48,20 @@ object CrystalNucleusProfitPer {
         }
 
         val hover = map.sortedDesc().filter {
-            (it.value >= config.profitPerMinimum) || it.value < 0
+            (it.value >= config.profitPerMinimum)
         }.keys.toMutableList()
 
         // Account for excluded items
-        val excludedEntries = map.filter { it.key !in hover }
-        val excludedProfitSumFormat = excludedEntries.values.filter { it > 0 }.sum().shortFormat()
-        val excludedCount = excludedEntries.size
-        if (excludedCount > 0) hover.add("§7$excludedCount cheap items are hidden §7(§6$excludedProfitSumFormat§7).")
+        map.filter { it.key !in hover }.takeIf { it.isNotEmpty() }?.let {
+            hover.add("§7${it.size} cheap items are hidden §7(§6${it.values.sum().shortFormat()}§7).")
+        }
 
+        hover.add("")
         val jungleKeyPrice = jungleKeyItem.getPrice()
-        map["§cUsed §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}"] = -jungleKeyPrice
+        hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}")
         totalProfit -= jungleKeyPrice
-
-        var robotPartsPrice = 0.0
-        robotPartItems.forEach { robotPartsPrice += it.getPrice() }
-        map["§cUsed §9Robot Parts§7: §c-${robotPartsPrice.shortFormat()}"] = -robotPartsPrice
+        val robotPartsPrice = robotPartItems.sumOf { it.getPrice() }
+        hover.add("§cUsed §9Robot Parts§7: §c-${robotPartsPrice.shortFormat()}")
         totalProfit -= robotPartsPrice
 
         val profitPrefix =
