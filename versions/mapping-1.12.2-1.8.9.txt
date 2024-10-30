@@ -50,7 +50,6 @@ net.minecraft.network.play.server.SPacketPlayerListHeaderFooter net.minecraft.ne
 net.minecraft.network.play.server.SPacketPlayerListItem net.minecraft.network.play.server.S38PacketPlayerListItem
 net.minecraft.network.play.server.SPacketSetSlot net.minecraft.network.play.server.S2FPacketSetSlot
 net.minecraft.network.play.server.SPacketSoundEffect net.minecraft.network.play.server.S29PacketSoundEffect
-net.minecraft.network.play.server.SPacketSoundEffect net.minecraft.network.play.server.S29PacketSoundEffect
 net.minecraft.network.play.server.SPacketSpawnMob net.minecraft.network.play.server.S0FPacketSpawnMob
 net.minecraft.network.play.server.SPacketSpawnObject net.minecraft.network.play.server.S0EPacketSpawnObject
 net.minecraft.network.play.server.SPacketSpawnPlayer net.minecraft.network.play.server.S0CPacketSpawnPlayer

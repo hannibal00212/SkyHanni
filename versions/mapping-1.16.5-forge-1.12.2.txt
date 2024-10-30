@@ -85,6 +85,7 @@ net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecr
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
 net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
 net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.SPacketOpenWindow
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.SPacketPlayerListItem
