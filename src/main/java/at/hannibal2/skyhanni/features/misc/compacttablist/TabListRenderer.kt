@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -100,8 +100,7 @@ object TabListRenderer {
         }
 
         val minecraft = Minecraft.getMinecraft()
-        val scaledResolution = ScaledResolution(minecraft)
-        val screenWidth = scaledResolution.scaledWidth / 2
+        val screenWidth = GuiScreenUtils.scaledWindowWidth / 2
         val x = screenWidth - totalWidth / 2
         val y = 10
 

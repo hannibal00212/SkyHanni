@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
-import net.minecraft.client.Minecraft
 
 object RoundedRectangleOutlineShader : Shader("rounded_rect_outline", "rounded_rect_outline") {
 
@@ -14,7 +14,7 @@ object RoundedRectangleOutlineShader : Shader("rounded_rect_outline", "rounded_r
     var halfSize: FloatArray = floatArrayOf(0f, 0f)
     var centerPos: FloatArray = floatArrayOf(0f, 0f)
         set(value) {
-            field = floatArrayOf(value[0], Minecraft.getMinecraft().displayHeight - value[1])
+            field = floatArrayOf(value[0], GuiScreenUtils.displayHeight - value[1])
         }
     var borderThickness: Float = 5f
     var borderBlur: Float = 0.3f

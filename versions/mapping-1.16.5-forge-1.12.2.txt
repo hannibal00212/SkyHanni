@@ -1,4 +1,3 @@
-
 com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 com.mojang.blaze3d.systems.RenderSystem color4f() color()
 com.mojang.blaze3d.systems.RenderSystem translatef() translate()
@@ -146,6 +145,7 @@ net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.netw
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+net.minecraft.world.effect.MobEffects net.minecraft.init.PotionTypes
 
 net.minecraft.world.entity.Entity level getEntityWorld()
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity
