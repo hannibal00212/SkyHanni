@@ -260,13 +260,9 @@ object SackAPI {
         updateSacks(sackEvent)
         sackEvent.postAndCatch()
         if (chatConfig.hideSacksChange) {
-            if (!chatConfig.onlyHideSacksChangeOnGarden) {
-                event.blockedReason = "sacks_change"
-            } else {
-                if (LorenzUtils.skyBlockIsland == IslandType.GARDEN) {
-                    event.blockedReason = "sacks_change"
-                }
-            }
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN..isInIsland())) {
+    		event.blockedReason = "sacks_change"
+			}
         }
     }
 
