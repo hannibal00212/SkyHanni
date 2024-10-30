@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -258,10 +259,14 @@ object SackAPI {
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
         sackEvent.postAndCatch()
-        if (chatConfig.hideSacksChange && HypixelData.skyBlockIsland != IslandType.GARDEN) {
-            event.blockedReason = "sacks_change"
-        } else if (HypixelData.skyBlockIsland == IslandType.GARDEN && chatConfig.onlyHideSacksChangeOnGarden) {
-            event.blockedReason = "sacks_change"
+        if (chatConfig.hideSacksChange) {
+            if (!chatConfig.onlyHideSacksChangeOnGarden) {
+                event.blockedReason = "sacks_change"
+            } else {
+                if (LorenzUtils.skyBlockIsland == IslandType.GARDEN) {
+                    event.blockedReason = "sacks_change"
+                }
+            }
         }
     }
 
