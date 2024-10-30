@@ -113,7 +113,7 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Only Hide Sack Changes on Garden",
+        name = "Only Hide on Garden",
         desc = "Only hide the sack change message in the Garden."
     )
     @ConfigEditorBoolean

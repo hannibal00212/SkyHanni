@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -260,7 +261,7 @@ object SackAPI {
         updateSacks(sackEvent)
         sackEvent.postAndCatch()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN..isInIsland())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
     		event.blockedReason = "sacks_change"
 			}
         }
