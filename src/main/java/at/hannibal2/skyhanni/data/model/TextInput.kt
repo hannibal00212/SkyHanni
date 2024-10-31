@@ -131,7 +131,7 @@ class TextInput {
                 }
                 return
             }
-            if (Keyboard.KEY_BACK.isKeyClicked()) { // Does not work for some reason
+            if (Keyboard.KEY_BACK.isKeyClicked()) {
                 if (carriage != null) {
                     textBox.removeRange(carriage, carriage + 1)
                 } else {
