@@ -87,12 +87,9 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled())
-
-        if (event.isMod(2) && hasMoved) {
-            hasMoved = false
-            updatePosition()
-        }
+        if (isEnabled() || !(event.isMod(2) && hasMoved)) return
+        hasMoved = false
+        updatePosition()
     }
 
     @SubscribeEvent
@@ -241,7 +238,7 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled())
+        if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
