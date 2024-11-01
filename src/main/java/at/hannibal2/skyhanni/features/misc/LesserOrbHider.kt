@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -20,10 +21,7 @@ object LesserOrbHider {
     private val config get() = SkyHanniMod.feature.misc
     private val hiddenEntities = CollectionUtils.weakReferenceList<EntityArmorStand>()
 
-    // TODO: Move to repo
-    @Suppress("MaxLineLength")
-    private const val LESSER_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzMjM2NjM5NjA3MDM2YzFiYTM5MWMyYjQ2YTljN2IwZWZkNzYwYzhiZmEyOTk2YTYwNTU1ODJiNGRhNSJ9fX0="
+    private val LESSER_TEXTURE by lazy { SkullTextureHolder.getTexture("") }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onArmorChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
