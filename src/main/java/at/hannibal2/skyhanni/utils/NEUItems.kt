@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,23 +12,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import com.google.gson.stream.JsonWriter
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -61,40 +50,7 @@ object NEUItems {
     private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
-    private val hypixelApiGson by lazy {
-        BaseGsonBuilder.gson()
-            .registerTypeAdapter(
-                HypixelApiTrophyFish::class.java,
-                object : TypeAdapter<HypixelApiTrophyFish>() {
-                    @Suppress("EmptyFunctionBlock")
-                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
-                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                        val trophyFish = mutableMapOf<String, Int>()
-                        var totalCaught = 0
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            val key = reader.nextName()
-                            if (key == "total_caught") {
-                                totalCaught = reader.nextInt()
-                                continue
-                            }
-                            if (reader.peek() == JsonToken.NUMBER) {
-                                val valueAsString = reader.nextString()
-                                if (valueAsString.isInt()) {
-                                    trophyFish[key] = valueAsString.toInt()
-                                    continue
-                                }
-                            }
-                            reader.skipValue()
-                        }
-                        reader.endObject()
-                        return HypixelApiTrophyFish(totalCaught, trophyFish)
-                    }
-                }.nullSafe(),
-            )
-            .create()
-    }
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -117,21 +73,6 @@ object NEUItems {
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         allItemsCache = readAllNeuItems()
-    }
-
-    @SubscribeEvent
-    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
-        val apiData = event.data ?: return
-        try {
-            val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error reading hypixel player api data",
-                "data" to apiData,
-            )
-        }
     }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
@@ -382,6 +323,7 @@ object NEUItems {
     fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
+        if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
         // TODO add RecipeSearchOverlay via RecalculatingValue and reflection

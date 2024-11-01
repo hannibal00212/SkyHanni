@@ -93,7 +93,7 @@ object CollectionUtils {
         val map = mutableMapOf<K, Int>()
         for (item in this) {
             val key = selector(item)
-            map[key] = map.getOrDefault(key, 0) + 1
+            map.addOrPut(key, 1)
         }
         return map
     }

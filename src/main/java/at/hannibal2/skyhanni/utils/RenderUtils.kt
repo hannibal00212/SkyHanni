@@ -1100,6 +1100,12 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    fun LorenzRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
+        if (entity.isDead) return entity.entityBoundingBox
+        val offset = exactLocation(entity) - entity.getLorenzVec()
+        return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
+    }
+
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add

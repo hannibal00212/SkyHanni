@@ -148,9 +148,6 @@ object MiningCommissionsBlocksColor {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         enabled = false
-        inDwarvenMines = false
-        inCrystalHollows = false
-        inGlacite = false
         replaceBlocksMapCache = mutableMapOf()
     }
 
