@@ -68,6 +68,15 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
     )
 
+    /**
+     * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
+     */
+    @Suppress("MaxLineLength")
+    private val sboPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) \\| Minos Inquisitor spawned at (?<area>.*)!"
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
