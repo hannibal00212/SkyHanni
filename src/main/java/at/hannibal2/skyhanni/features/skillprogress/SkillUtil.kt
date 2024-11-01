@@ -70,10 +70,7 @@ object SkillUtil {
         var overflowXp = 0L
 
         if (level >= maxLevel) {
-            val xpNeeded = when (maxSkillCap) {
-                50 -> XP_NEEDED_FOR_50
-                else -> XP_NEEDED_FOR_60
-            }
+            val xpNeeded = if (maxSkillCap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
 
             if (currentXp >= xpNeeded) {
                 overflowXp = currentXp - xpNeeded
