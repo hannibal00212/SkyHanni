@@ -96,11 +96,11 @@ object TotemOfCorruption {
             // The center of the totem is the upper part of the armor stand
             when (config.outlineType) {
                 OutlineType.FILLED -> {
-                    event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
+                    event.drawSphereInWorld(color, totem.location.up(), 16f)
                 }
 
                 OutlineType.WIREFRAME -> {
-                    event.drawSphereWireframeInWorld(color, totem.location.add(y = 1), 16f)
+                    event.drawSphereWireframeInWorld(color, totem.location.up(), 16f)
                 }
 
                 else -> return

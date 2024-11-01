@@ -33,13 +33,13 @@ object HoppityEggLocations {
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
     val islandLocations
-        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()
+        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet().orEmpty()
 
     val islandCollectedLocations
-        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet() ?: emptySet()
+        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet().orEmpty()
 
     fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
-        return collectedEggStorage[islandType] ?: emptySet()
+        return collectedEggStorage[islandType].orEmpty()
     }
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
@@ -142,9 +142,9 @@ object HoppityEggLocations {
             val nameColorCode = (if (name != null) LorenzColor.GREEN else LorenzColor.RED).getChatColor()
 
             event.drawColor(location, color, false, 0.5f)
-            event.drawDynamicText(location.add(y = 0.5), "$nameColorCode$name", 1.2)
+            event.drawDynamicText(location.up(0.5), "$nameColorCode$name", 1.2)
             if (location.distanceSqToPlayer() < 100) {
-                event.drawDynamicText(location.add(y = 0.5), location.toCleanString(), 1.0, yOff = 12f)
+                event.drawDynamicText(location.up(0.5), location.toCleanString(), 1.0, yOff = 12f)
             }
         }
     }

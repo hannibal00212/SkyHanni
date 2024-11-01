@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -137,7 +138,8 @@ object FishingAPI {
         return info?.getFilletValue(rarity) ?: 0
     }
 
-    fun isFishing(checkRodInHand: Boolean = true) = IsFishingDetection.isFishing || (checkRodInHand && holdingRod)
+    fun isFishing(checkRodInHand: Boolean = true) =
+        (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonAPI.inDungeon()
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         val name = entity.name

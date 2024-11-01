@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
 import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -115,23 +113,7 @@ object PartyCommands {
         if (command == "pk" || command == "pt" || command == "pp" && config.shortCommands) {
             return PartyAPI.partyMembers
         }
-
-        if (command == "p" || command == "party") {
-            val friends = if (config.tabComplete.friends) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || !config.tabComplete.onlyBestFriends }.map { it.name }
-            } else {
-                emptyList<String>()
-            }
-            val allOnLobby = EntityUtils.getPlayerEntities().map { it.name }
-            return friends + getPartyCommands() + allOnLobby
-        }
         return null
-    }
-
-    private fun getPartyCommands(): List<String> {
-        return if (config.tabComplete.partyCommands && PartyAPI.partyMembers.isNotEmpty()) {
-            otherPartyCommands
-        } else emptyList()
     }
 
     @SubscribeEvent
@@ -157,14 +139,3 @@ object PartyCommands {
         )
     }
 }
-
-private val otherPartyCommands = listOf(
-    "Disband",
-    "KickOffline",
-    "Leave",
-    "List",
-    "Mute",
-    "Private",
-    "Warp",
-    "Settings",
-)

@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -41,18 +42,20 @@ object InventoryUtils {
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
+    fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
     fun getItemsInOwnInventory() =
-        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
     fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar() =
-        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.slice(0..8)?.filterNotNull().orEmpty()
 
     fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
         countItemsInLowerInventory(predicate) > 0
@@ -130,4 +133,6 @@ object InventoryUtils {
         val controller = Minecraft.getMinecraft().playerController
         controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
+
+    fun Slot.isTopInventory() = inventory is ContainerLocalMenu
 }

@@ -260,7 +260,7 @@ object CarryTracker {
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
-	            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
+            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
@@ -276,7 +276,8 @@ object CarryTracker {
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " + "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
+                                "still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),

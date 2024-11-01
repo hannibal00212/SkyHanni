@@ -67,6 +67,11 @@ public class FishingConfig {
     public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Lava Replacement", desc = "")
+    @Accordion
+    public LavaReplacementConfig lavaReplacement = new LavaReplacementConfig();
+
+    @Expose
     @ConfigOption(
         name = "Shark Fish Counter",
         desc = "Counts how many Sharks have been caught."

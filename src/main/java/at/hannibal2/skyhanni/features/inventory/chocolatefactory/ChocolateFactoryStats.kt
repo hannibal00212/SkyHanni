@@ -49,7 +49,7 @@ object ChocolateFactoryStats {
 
         val position = ChocolateFactoryAPI.leaderboardPosition
         val positionText = position?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" }.orEmpty()
         val leaderboard = "#$positionText $percentile"
         ChocolatePositionChange.update(position, leaderboard)
 
@@ -135,7 +135,7 @@ object ChocolateFactoryStats {
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n") ?: listOf() }
+        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
 
         display = listOf(
             Renderable.clickAndHover(

@@ -76,7 +76,7 @@ object AnitaMedalProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item) ?: return
+        val itemName = getItemName(item)
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return

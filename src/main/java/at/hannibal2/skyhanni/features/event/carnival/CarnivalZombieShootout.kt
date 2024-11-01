@@ -86,9 +86,13 @@ object CarnivalZombieShootout {
                 zombie to type
             }.toMap()
 
-            drawZombies =
-                if (config.highestOnly) nearbyZombies.filterValues { zombieType -> zombieType == nearbyZombies.values.maxByOrNull { it.points } }
-                else nearbyZombies
+            drawZombies = if (config.highestOnly)
+                nearbyZombies.filterValues { zombieType ->
+                    zombieType == nearbyZombies.values.maxByOrNull {
+                        it.points
+                    }
+                }
+            else nearbyZombies
 
             lastUpdate.zombie = SimpleTimeMark.now()
         }

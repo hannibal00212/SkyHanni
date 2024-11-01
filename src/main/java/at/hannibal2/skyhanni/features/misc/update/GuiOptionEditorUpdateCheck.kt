@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import io.github.moulberry.notenoughupdates.itemeditor.GuiElementButton
+import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -20,7 +20,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
-        val width = width - 20
+        val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
@@ -29,24 +29,24 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.render(getButtonPosition(width), 10)
+        button.render(getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
             TextRenderUtils.drawStringCentered(
                 "${GREEN}The update will be installed after your next restart.",
                 fr,
-                width / 2F,
+                adjustedWidth / 2F,
                 40F,
                 true,
-                -1
+                -1,
             )
         }
 
-        val widthRemaining = width - button.width - 10
+        val widthRemaining = adjustedWidth - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
         val currentVersion = SkyHanniMod.version
-        val sameVersion = currentVersion.equals(nextVersion, true)
+        val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
                 if (nextVersion != null && !sameVersion) "➜ $GREEN$nextVersion" else "",
@@ -67,8 +67,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
-        val width = width - 20
-        if (Mouse.getEventButtonState() && (mouseX - getButtonPosition(width) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
+        val adjustedWidth = width - 20
+        if (Mouse.getEventButtonState() &&
+            (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
+            (mouseY - 10 - y) in (0..button.height)
+        ) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}

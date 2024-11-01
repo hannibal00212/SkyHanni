@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
@@ -43,8 +44,8 @@ object SlayerQuestWarning {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
-        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val slayerType = event.full.nextAfter("Slayer Quest")
+        val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -148,7 +149,7 @@ object SlayerQuestWarning {
         return getSlayerData().lastSlayerType == slayerType
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 

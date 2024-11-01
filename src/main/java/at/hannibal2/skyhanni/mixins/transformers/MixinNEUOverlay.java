@@ -12,7 +12,7 @@ public class MixinNEUOverlay {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true, remap = false)
     private void render(boolean hoverInv, CallbackInfo ci) {
-        if (new NEURenderEvent().postAndCatch()) {
+        if (new NEURenderEvent().post()) {
             ci.cancel();
         }
     }

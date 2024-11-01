@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,6 +11,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.command
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
@@ -44,8 +44,11 @@ object ChatUtils {
      *
      * @see DEBUG_PREFIX
      */
-    fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+    fun debug(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }
@@ -58,8 +61,11 @@ object ChatUtils {
      *
      * @see USER_ERROR_PREFIX
      */
-    fun userError(message: String) {
-        internalChat(USER_ERROR_PREFIX + message)
+    fun userError(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        internalChat(USER_ERROR_PREFIX + message, replaceSameMessage)
     }
 
     /**
@@ -67,22 +73,39 @@ object ChatUtils {
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun chat(
+        message: String,
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
+    ) {
+
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
         } else {
-            internalChat(message)
+            internalChat(message, replaceSameMessage)
         }
     }
 
-    private fun internalChat(message: String): Boolean {
-        return chat(ChatComponentText(message))
+    private fun internalChat(
+        message: String,
+        replaceSameMessage: Boolean,
+    ): Boolean {
+        val text = ChatComponentText(message)
+
+        return if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+            chat(text, false)
+        } else {
+            chat(text)
+        }
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -98,7 +121,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
@@ -110,6 +133,7 @@ object ChatUtils {
      * @param expireAt When the click action should expire, default never
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
@@ -121,13 +145,29 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         oneTimeClick: Boolean = false,
+        replaceSameMessage: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.text(msgPrefix + message) {
+
+        val rawText = msgPrefix + message
+        val text = Text.text(rawText) {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
-        })
+        }
+        if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(rawText))
+        } else {
+            chat(text)
+        }
     }
+
+    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+
+    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+
+    var lastUniqueMessageId = 123242
+
+    fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -148,12 +188,14 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        chat(Text.text(msgPrefix + message) {
-            this.hover = Text.multiline(hover)
-            if (command != null) {
-                this.command = command
+        chat(
+            Text.text(msgPrefix + message) {
+                this.hover = Text.multiline(hover)
+                if (command != null) {
+                    this.command = command
+                }
             }
-        })
+        )
     }
 
     /**
@@ -176,10 +218,12 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.text(msgPrefix + message) {
-            this.url = url
-            this.hover = "$prefixColor$hover".asComponent()
-        })
+        chat(
+            Text.text(msgPrefix + message) {
+                this.url = url
+                this.hover = "$prefixColor$hover".asComponent()
+            }
+        )
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
@@ -271,6 +315,7 @@ object ChatUtils {
             },
             hover = "§eClick to $actionName!\n" +
                 "§eShift-Click or Control-Click to disable this feature!",
+            replaceSameMessage = true,
         )
     }
 }

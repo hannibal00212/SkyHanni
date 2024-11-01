@@ -322,7 +322,7 @@ object CaptureFarmingGear {
                 item.setItem(slot)
                 outdatedItems[item] = false
                 FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
-                val enchantments = slot.getEnchantments() ?: emptyMap()
+                val enchantments = slot.getEnchantments().orEmpty()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
                 val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
                 GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
@@ -385,6 +385,13 @@ object CaptureFarmingGear {
                 return
             }
         }
+    }
+
+    fun onResetGearCommand() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        ChatUtils.chat("Resets farming items")
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     @SubscribeEvent

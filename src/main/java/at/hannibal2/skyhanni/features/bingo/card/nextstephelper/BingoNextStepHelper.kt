@@ -167,7 +167,9 @@ object BingoNextStepHelper {
                     }
                 }
             }
-            if (currentStep is PartialProgressItemsStep && currentStep.displayName == RHYS_TASK_NAME && event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
+            if (currentStep is PartialProgressItemsStep && currentStep.displayName == RHYS_TASK_NAME &&
+                event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r"
+            ) {
                 currentStep.amountHavingHidden -= 10
             }
         }
@@ -275,7 +277,8 @@ object BingoNextStepHelper {
                     "Emerald",
                     160 * 32,
                     mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
-                ) requires IslandType.DWARVEN_MINES.getStep())
+                ) requires IslandType.DWARVEN_MINES.getStep()
+                )
         }
 
         if (description == "Obtain a Mathematical Hoe Blueprint.") {
@@ -285,7 +288,8 @@ object BingoNextStepHelper {
                     "Jacob's Ticket",
                     32,
                     mapOf("Jacob's Ticket" to 1)
-                ).addItemRequirements() requires IslandType.GARDEN.getStep())
+                ).addItemRequirements() requires IslandType.GARDEN.getStep()
+                )
         }
 
         crystalPattern.matchMatcher(description) {

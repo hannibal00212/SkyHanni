@@ -8,7 +8,7 @@ import net.minecraft.block.state.IBlockState
 enum class OreType(
     val oreName: String,
     internalName: String,
-    vararg val oreBlocks: OreBlock,
+    vararg oreBlocks: OreBlock,
 ) {
     MITHRIL(
         "Mithril",
@@ -186,6 +186,8 @@ enum class OreType(
         OreBlock.GLACITE,
     ),
     ;
+
+    val oreBlocks = oreBlocks.toSet()
 
     val internalName: NEUInternalName = internalName.asInternalName()
 

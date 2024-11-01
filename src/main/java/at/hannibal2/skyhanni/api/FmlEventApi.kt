@@ -12,7 +12,7 @@ object FmlEventApi {
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
-        ClientDisconnectEvent().post()
+        ClientDisconnectEvent.post()
     }
 
     @SubscribeEvent

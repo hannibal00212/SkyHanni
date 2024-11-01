@@ -24,7 +24,7 @@ object GuiData {
 
     var preDrawEventCancelled = false
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onNeuRenderEvent(event: NEURenderEvent) {
         if (preDrawEventCancelled) event.cancel()
     }

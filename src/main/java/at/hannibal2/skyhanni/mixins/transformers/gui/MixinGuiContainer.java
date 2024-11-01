@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -24,6 +25,13 @@ public abstract class MixinGuiContainer extends GuiScreen {
     @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;closeScreen()V", shift = At.Shift.BEFORE), cancellable = true)
     private void closeWindowPressed(CallbackInfo ci) {
         skyHanni$hook.closeWindowPressed(ci);
+    }
+
+    @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
+    private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
+        if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
