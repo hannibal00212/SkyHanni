@@ -170,7 +170,7 @@ private fun isHardStoneHollows(state: IBlockState): Boolean {
             EnumDyeColor.CYAN, EnumDyeColor.BROWN, EnumDyeColor.GRAY, EnumDyeColor.BLACK,
             EnumDyeColor.LIME, EnumDyeColor.GREEN, EnumDyeColor.BLUE, EnumDyeColor.RED,
             EnumDyeColor.SILVER,
-                -> true
+            -> true
 
             else -> false
         }

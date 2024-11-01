@@ -8,8 +8,8 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.entity.IMerchant
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
