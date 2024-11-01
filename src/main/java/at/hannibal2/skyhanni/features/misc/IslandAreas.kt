@@ -87,8 +87,7 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!IslandGraphs.existsForThisIsland) return
+        if (!isEnabled())
 
         if (event.isMod(2) && hasMoved) {
             hasMoved = false
@@ -98,10 +97,8 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+        if (isEnabled() && event.entity == Minecraft.getMinecraft().thePlayer) {
+            hasMoved = true
         }
     }
 
@@ -244,7 +241,7 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled())
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
@@ -296,5 +293,5 @@ object IslandAreas {
         hasMoved = true
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }
