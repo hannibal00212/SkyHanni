@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,10 +45,18 @@ object MiningAPI {
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
-    // TODO add regex test
+    // TODO add regex tests
     private val coldResetPattern by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+    )
+
+    /**
+     * REGEX-TEST: Cold: §b-1❄
+     */
+    val coldPattern by group.pattern(
+        "cold",
+        "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
     private val pickbobulusGroup = group.group("pickobulus")
@@ -150,11 +157,15 @@ object MiningAPI {
         IslandType.SPIDER_DEN,
     )
 
+    fun inAdvancedMiningIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.CRYSTAL_HOLLOWS, IslandType.MINESHAFT)
+
+    fun inMiningIsland() = inAdvancedMiningIsland() || inAnyIsland(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS)
+
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val newCold = ScoreboardPattern.coldPattern.firstMatcher(event.scoreboard) {
+        val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
         } ?: return
 

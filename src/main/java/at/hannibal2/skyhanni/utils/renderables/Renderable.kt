@@ -260,7 +260,16 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
+                isGuiScreen &&
+                    isGuiPositionEditor &&
+                    inMenu &&
+                    isNotInSignAndOnSlot &&
+                    isConfigScreen &&
+                    !isInNeuPv &&
+                    !isInSkytilsPv &&
+                    !neuFocus &&
+                    !isInSkytilsSettings &&
+                    !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -614,7 +623,12 @@ interface Renderable {
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
-            val searchWidth get() = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(searchPrefix + textInput.editTextWithAlwaysCarriage()) * scale).toInt() + 1
+            val searchWidth: Int
+                get() {
+                    val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                    val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
+                    return (fontRenderer.getStringWidth(string) * scale).toInt() + 1
+                }
 
             init {
                 textInput.registerToEvent(key) {

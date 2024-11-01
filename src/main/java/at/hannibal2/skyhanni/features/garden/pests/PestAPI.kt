@@ -155,7 +155,7 @@ object PestAPI {
     private fun updatePests() {
         if (!firstScoreboardCheck) return
         fixPests()
-        PestUpdateEvent().post()
+        PestUpdateEvent.post()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -223,7 +223,7 @@ object PestAPI {
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
-        checkScoreboardLines(event.scoreboard)
+        checkScoreboardLines(event.added)
     }
 
     @SubscribeEvent

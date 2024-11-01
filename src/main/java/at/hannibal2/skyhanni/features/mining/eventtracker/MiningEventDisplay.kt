@@ -68,7 +68,7 @@ object MiningEventDisplay {
             } else {
                 Renderable.string("§a${islandType.displayName}§8:")
             }
-            add(Renderable.horizontalContainer(listOf(islandName, *upcomingEvents), 3))
+            add(Renderable.horizontalContainer(listOf(islandName) + upcomingEvents, 3))
         }
     }
 

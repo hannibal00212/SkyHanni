@@ -12,6 +12,11 @@ FormattingRules:
     CustomCommentSpacing:
         active: true
 
+ImportRules:
+    active: true
+    CustomImportOrdering:
+        active: true
+
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
@@ -72,6 +77,8 @@ formatting:
     SpacingBetweenDeclarationsWithAnnotations: # nah
         active: false
     SpacingBetweenDeclarationsWithComments: # also nah
+        active: false
+    ImportOrdering: # handled by custom rule
         active: false
 
 complexity:

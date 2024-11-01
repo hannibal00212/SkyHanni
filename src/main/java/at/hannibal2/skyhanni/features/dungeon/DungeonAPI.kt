@@ -63,6 +63,8 @@ object DungeonAPI {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
+    // TODO: Move to repo
+    @Suppress("MaxLineLength")
     private const val WITHER_ESSENCE_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
@@ -121,7 +123,7 @@ object DungeonAPI {
         val message = rawMessage.removeColor()
         val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
         if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
-            DungeonBossRoomEnterEvent().postAndCatch()
+            DungeonBossRoomEnterEvent.post()
             inBossRoom = true
         }
     }
@@ -145,7 +147,7 @@ object DungeonAPI {
 
     fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
         "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
-    } ?: ""
+    }.orEmpty()
 
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
@@ -182,7 +184,7 @@ object DungeonAPI {
         if (dungeonFloor != null && playerClass == null) {
             val playerTeam = TabListData.getTabList().firstOrNull {
                 it.contains(LorenzUtils.getPlayerName())
-            }?.removeColor() ?: ""
+            }?.removeColor().orEmpty()
 
             for (dungeonClass in DungeonClass.entries) {
                 if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {

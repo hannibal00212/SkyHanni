@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
@@ -85,7 +85,7 @@ object DungeonLividFinder {
                 posZ - 0.5,
                 posX + 0.5,
                 posY,
-                posZ + 0.5
+                posZ + 0.5,
             )
         }
         val world = Minecraft.getMinecraft().theWorld
@@ -96,7 +96,7 @@ object DungeonLividFinder {
         lividEntity = newLivid
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             newLivid,
-            color.toColor().withAlpha(30)
+            color.toColor().withAlpha(30),
         ) { shouldHighlight() }
     }
 

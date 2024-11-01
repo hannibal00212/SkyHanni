@@ -349,6 +349,7 @@ class MobFinder {
     }
 
     // TODO testing and use sidebar data
+    @Suppress("UnusedParameter")
     private fun tryAddEntityDragon(entity: EntityLivingBase) = when {
         IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
         IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)

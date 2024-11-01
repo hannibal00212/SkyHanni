@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -324,7 +324,14 @@ object SkillAPI {
                 val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
                 val nextLevelProgress = nextLevelDiff * xpPercentage / 100
                 val totalXp = levelXp + nextLevelProgress
-                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), matcher.group("gained"))
+                updateSkillInfo(
+                    existingLevel,
+                    level,
+                    nextLevelProgress.toLong(),
+                    nextLevelDiff.toLong(),
+                    totalXp.toLong(),
+                    matcher.group("gained"),
+                )
             } else {
                 val exactLevel = getLevelExact(needed)
                 val levelXp = calculateLevelXp(existingLevel.level - 1).toLong() + current
@@ -430,7 +437,6 @@ object SkillAPI {
                         val neededXp = levelingMap.filter { it.key < level }.values.sum().toLong()
                         ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to be level §b${level.toDouble()}")
                     } else {
-                        val base = levelingMap.values.sum().toLong()
                         val neededXP = xpRequiredForLevel(level.toDouble())
                         ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to be level §b${level.toDouble()}")
                     }
@@ -468,7 +474,9 @@ object SkillAPI {
                     val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel) {
-                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        ChatUtils.userError(
+                            "Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel})."
+                        )
                         return
                     }
 

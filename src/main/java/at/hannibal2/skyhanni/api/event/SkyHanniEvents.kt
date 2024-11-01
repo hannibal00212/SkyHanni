@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.lang.reflect.Method
 
@@ -60,7 +61,7 @@ object SkyHanniEvents {
                 .filter { it.invokeCount > 0 }
                 .sortedWith(compareBy({ -it.invokeCount }, { it.name }))
                 .forEach {
-                    add("- ${it.name} (${it.invokeCount} ${it.invokeCount / (MinecraftData.totalTicks / 20)}/s)")
+                    add("- ${it.name} (${it.invokeCount.addSeparators()} ${it.invokeCount / (MinecraftData.totalTicks / 20)}/s)")
                 }
         }
     }

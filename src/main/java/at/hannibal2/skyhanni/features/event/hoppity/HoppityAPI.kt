@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -23,15 +24,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityAPI {
@@ -44,6 +48,7 @@ object HoppityAPI {
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    private var lastDoradoFire: SimpleTimeMark = SimpleTimeMark.farPast()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -117,15 +122,24 @@ object HoppityAPI {
                         duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
-                    "El Dorado" -> {
-                        EggFoundEvent(STRAY, it.slotNumber).post()
-                        lastName = "§6El Dorado"
-                        lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
-                        attemptFireRabbitFound()
-                    }
                     else -> return@matchMatcher
                 }
+            }
+            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(it.stack.getLore())) {
+                // If the lore contains the escape pattern, we don't want to fire the event.
+                // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
+                val escaped = ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(it.stack.getLore())
+                if (escaped || lastDoradoFire.passedSince() <= 10.seconds) return@matchMatcher
+
+                // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
+                // §6§lGolden Rabbit §d§lCAUGHT!
+                // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
+                EggFoundEvent(STRAY, it.slotNumber).post()
+                lastName = "§6El Dorado"
+                lastMeal = STRAY
+                duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
+                attemptFireRabbitFound()
+                lastDoradoFire = SimpleTimeMark.now()
             }
         }
     }

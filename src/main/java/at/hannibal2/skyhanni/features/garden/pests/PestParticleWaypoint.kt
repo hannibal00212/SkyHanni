@@ -144,7 +144,11 @@ object PestParticleWaypoint {
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
-        if (config.drawLine) event.drawLineToEye(waypoint, color, 3, false,
+        if (config.drawLine) event.drawLineToEye(
+            waypoint,
+            color,
+            3,
+            false,
         )
     }
 

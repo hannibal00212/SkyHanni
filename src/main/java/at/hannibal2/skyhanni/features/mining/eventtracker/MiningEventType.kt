@@ -22,6 +22,7 @@ enum class MiningEventType(
     val eventName: String,
     private val shortName: String,
     val defaultLength: Duration,
+    // TODO change to LorenzColor
     private val colorCode: Char,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
@@ -68,14 +69,18 @@ enum class MiningEventType(
 
         },
     ),
+
+    @Suppress("MaxLineLength")
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
-        ItemUtils.createSkull(
+        ItemUtils.createSkull( // TODO: Move skull texture to repo
             "Goblin",
             "32518c29-6127-3c71-b2a7-be4c3251e76f",
             "ewogICJ0aW1lc3RhbXAiIDogMTYwNzQ2NDg4MTMwOCwKICAicHJvZmlsZUlkIiA6ICJhMmY4MzQ1OTVjODk0YTI3YWRkMzA0OTcxNmNhOTEwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiUHVuY2giLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcyODUwOTA2YjdmMGQ5NTJjMGU1MDgwNzNjYzQzOWZkMzM3NGNjZjViODg5YzA2ZjdlOGQ5MGNjMGNjMjU1YyIKICAgIH0KICB9Cn0=",
         ),
     ),
+
+    @Suppress("MaxLineLength")
     BETTER_TOGETHER(
         "BETTER TOGETHER", "Better", 18.minutes, 'd', false,
         object : Renderable {
@@ -86,7 +91,7 @@ enum class MiningEventType(
 
             val steveHead = Renderable.itemStack(Items.skull.toItemStack(3), 0.36)
             val alexHead = Renderable.itemStack(
-                ItemUtils.createSkull(
+                ItemUtils.createSkull( // TODO: Move skull texture to repo
                     "Alex",
                     "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
                     "fRBfVNlIWW6cL478st/8NsNEHVxjvwQDp4+MbKbFj1tPZvxXgpIXRaQsLeDl/0+E4tipPKNANAbmqj9EKAVx3b3gDqLLrTTk/NfuH2RD3I5ppzio8w5oYk1022SopaayGBP4+kuwktDHzlR8IgAUb1RiavldKp+TGRdCbqw8vHHBm9pnuOePzTOOADQgdanRj98bOcfIXe69tSS/VHxDe9tkpYFPkQR8zsJcjUxf+nS83iFU9CW9lKtQlyoU6/BPbHFILvcR1KDR5Imj7GJe2OJefghI6OqtHNZP2tzkia2IDU0Yc4ikwC+7yN3i6I3Do4G3gTtCZVfNXiSdFyU9nCMyBxggTaG9zaljZpN0BynG4FzYMujIVgeNa6FLqwoaFT0iELW2w9JgJFgyVlaDKEqMSGyxgqtcQMPBuvCwMFFjeFd2EhtfTjQ4hcpva+NXXoYPP7yfTk/0DErNZV2dUTasekar8lH6U58B7ECNxDUwcon4z7sSO5mdlPJoiT7zllgpwQn5NUPaxZxaKkGdUIFEGzjmBfnCmk6MOqzi05Rr18wnkdic9hz/fIzzTMhn9mbMG6VF9eBkE4mNu1K5jai6II5Mz9BV49U0ZcA874N1VHpJpQE6762TYv+u7ICTRIOf2LD9wEgu3py/nX+IHma5j22ClUtXH3hYdZmHg+s=\",Value:\"ewogICJ0aW1lc3RhbXAiIDogMTcxMTY1OTI2NDg1NSwKICAicHJvZmlsZUlkIiA6ICI2YWI0MzE3ODg5ZmQ0OTA1OTdmNjBmNjdkOWQ3NmZkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJNSEZfQWxleCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84M2NlZTVjYTZhZmNkYjE3MTI4NWFhMDBlODA0OWMyOTdiMmRiZWJhMGVmYjhmZjk3MGE1Njc3YTFiNjQ0MDMyIiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0=",
@@ -108,17 +113,24 @@ enum class MiningEventType(
         "RAFFLE",
         "Raffle",
         160.seconds,
-        '6',
-        true,
-        Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
+        colorCode = '6',
+        dwarvenSpecific = true,
+        iconInput = Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
     ),
-    MITHRIL_GOURMAND("MITHRIL GOURMAND", "Gourmand", 10.minutes, 'b', true, Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")),
+    MITHRIL_GOURMAND(
+        "MITHRIL GOURMAND",
+        "Gourmand", 10.minutes,
+        colorCode = 'b',
+        dwarvenSpecific = true,
+        iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
+    ),
     ;
 
     constructor(
         eventName: String,
         shortName: String,
         defaultLength: Duration,
+        // TODO change to LorenzColor
         colorCode: Char,
         dwarvenSpecific: Boolean,
         iconInput: ItemStack,

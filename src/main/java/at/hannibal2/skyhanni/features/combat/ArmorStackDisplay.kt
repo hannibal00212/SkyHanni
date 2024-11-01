@@ -29,7 +29,7 @@ object ArmorStackDisplay {
         if (!isEnabled()) return
         val stacks = armorStackPattern.findMatcher(event.actionBar) {
             "§6§l" + group("stack")
-        } ?: ""
+        }.orEmpty()
         display = stacks
     }
 

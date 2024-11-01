@@ -226,6 +226,13 @@ object NEUItems {
 
     fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
+    fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
+        if (prefix.isEmpty()) return this
+        val string = asString()
+        if (!string.startsWith(prefix)) return this
+        return string.substring(prefix.length).asInternalName()
+    }
+
     const val itemFontSize = 2.0 / 3.0
 
     fun ItemStack.renderOnScreen(
@@ -269,6 +276,7 @@ object NEUItems {
             println("name: ${item.name}")
             println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
             println(" ")
+            @Suppress("PrintStackTrace")
             e.printStackTrace()
         }
         RenderHelper.disableStandardItemLighting()

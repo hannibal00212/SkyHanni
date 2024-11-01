@@ -94,6 +94,7 @@ object VoltHighlighter {
         DOING_LIGHTNING,
     }
 
+    @Suppress("MaxLineLength")
     private fun getVoltState(itemStack: ItemStack): VoltState {
         return when (itemStack.getSkullTexture()) {
             // TODO: Move these textures to the repo

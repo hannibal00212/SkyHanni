@@ -36,28 +36,12 @@ jobs:
                 with:
                     name: "Test Results"
                     path: versions/1.8.9/build/reports/tests/test/
-    #detekt:
-    #    name: Run detekt
-    #    runs-on: ubuntu-latest
-
-    #    steps:
-    #        -   name: Checkout code
-    #            uses: actions/checkout@v4
-    #        -   uses: ./.github/actions/setup-normal-workspace
-    #        # detektMain is a LOT slower than detekt, but it does type analysis
-    #        -   name: Run detekt main (w/typing analysis)
-    #            run: |
-    #                ./gradlew detektMain --stacktrace
-    #        -   name: Annotate detekt failures
-    #            if: ${{ !cancelled() }}
-    #            run: |
-    #                chmod +x .github/scripts/process_detekt_sarif.sh
-    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
-    
 
     preprocess:
         runs-on: ubuntu-latest
         name: "Build multi version"
+        env:
+            SKIP_DETEKT: "true"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
@@ -76,7 +77,7 @@ object CropSpeedMeter {
         return list
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!isEnabled()) return
         val counters = mutableMapOf<CropType, Long>()

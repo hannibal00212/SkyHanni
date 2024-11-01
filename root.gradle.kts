@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("dev.deftu.gradle.preprocess") version "0.6.1"
+    id("dev.deftu.gradle.preprocess") version "0.7.1"
     id("net.kyori.blossom") version "1.3.2" apply false
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "at.hannibal2.skyhanni"
-    version = "0.28.Beta.2"
+    version = "0.28.Beta.9"
     repositories {
         mavenCentral()
         mavenLocal()

@@ -4,14 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -63,6 +66,16 @@ open class VisualWordGui : GuiScreen() {
 
     companion object {
 
+        @JvmStatic
+        fun onCommand() {
+            if (!LorenzUtils.onHypixel) {
+                ChatUtils.userError("You need to join Hypixel to use this feature!")
+            } else {
+                if (sbeConfigPath.exists()) drawImport = true
+                SkyHanniMod.screenToOpen = VisualWordGui()
+            }
+        }
+
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
@@ -94,8 +107,8 @@ open class VisualWordGui : GuiScreen() {
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
 
-        mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        mouseX = GuiScreenUtils.mouseX
+        mouseY = GuiScreenUtils.mouseY
 
         GlStateManager.pushMatrix()
         drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
@@ -511,7 +524,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (KeyboardManager.isPastingKeysDown()) {
             SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard() ?: ""
+                val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
                         currentText += char

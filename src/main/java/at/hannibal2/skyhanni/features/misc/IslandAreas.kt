@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -51,6 +53,7 @@ object IslandAreas {
         display = null
         targetNode = null
         hasMoved = true
+        updateArea("no_area", onlyInternal = true)
     }
 
     fun nodeMoved() {
@@ -159,10 +162,11 @@ object IslandAreas {
             val distance = difference.roundTo(0).toInt()
             val text = "$coloredName§7: §e$distance$suffix"
 
+            val isConfigVisible = node.getAreaTag(useConfig = true) != null
             if (!foundCurrentArea) {
                 foundCurrentArea = true
 
-                val inAnArea = name != "no_area"
+                val inAnArea = name != "no_area" && isConfigVisible
                 if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
                         addSearchString("§eCurrent area: $coloredName")
@@ -170,18 +174,14 @@ object IslandAreas {
                         addSearchString("§7Not in an area.")
                     }
                 }
-                if (name != currentAreaName) {
-                    if (inAnArea && config.enterTitle) {
-                        LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
-                    }
-                    currentAreaName = name
-                }
+                updateArea(name, onlyInternal = !isConfigVisible)
 
                 addSearchString("§eAreas nearby:")
                 continue
             }
 
             if (name == "no_area") continue
+            if (!isConfigVisible) continue
             foundAreas++
 
             add(
@@ -223,6 +223,25 @@ object IslandAreas {
         }
     }
 
+    private fun updateArea(name: String, onlyInternal: Boolean) {
+        if (name != currentAreaName) {
+            val oldArea = currentAreaName
+            currentAreaName = name
+            GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
+        }
+    }
+
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        val name = event.area
+        val inAnArea = name != "no_area"
+        // when this is a small area and small areas are disabled via config
+        if (event.onlyInternal) return
+        if (inAnArea && config.enterTitle) {
+            LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
+        }
+    }
+
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -232,7 +251,8 @@ object IslandAreas {
             if (name == currentAreaName) continue
             if (name == "no_area") continue
             val position = node.position
-            val color = node.getAreaTag()?.color?.getChatColor() ?: ""
+            val areaTag = node.getAreaTag(useConfig = true) ?: continue
+            val color = areaTag.color.getChatColor()
             if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
         }
@@ -254,8 +274,8 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(useConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {

@@ -75,7 +75,8 @@ enum class CropType(
             if (itemName == "Red Mushroom" || itemName == "Brown Mushroom") return MUSHROOM
             if (itemName == "Seeds") return WHEAT
             return entries.firstOrNull {
-                it.cropName.equals(itemName, ignoreCase = true) || it.simpleName.equals(itemName, ignoreCase = true)
+                it.cropName.equals(itemName, ignoreCase = true) ||
+                    it.simpleName.equals(itemName, ignoreCase = true)
             }
         }
 

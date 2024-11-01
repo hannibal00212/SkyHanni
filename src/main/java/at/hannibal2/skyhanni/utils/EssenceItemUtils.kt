@@ -25,13 +25,13 @@ object EssenceItemUtils {
         for ((name, data) in unformattedData) {
 
             val essencePrices = loadEssencePrices(data)
-            val extraItems = data.extraItems ?: emptyMap()
+            val extraItems = data.extraItems.orEmpty()
             val (coinPrices, iemPrices) = loadCoinAndItemPrices(extraItems)
 
             val upgradePrices = mutableMapOf<Int, EssenceUpgradePrice>()
             for ((tier, essencePrice) in essencePrices) {
                 val coinPrice = coinPrices[tier]
-                val itemPrice = iemPrices[tier] ?: emptyMap()
+                val itemPrice = iemPrices[tier].orEmpty()
                 upgradePrices[tier] = EssenceUpgradePrice(essencePrice, coinPrice, itemPrice)
             }
 

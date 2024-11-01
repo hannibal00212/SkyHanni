@@ -87,38 +87,16 @@ object GardenCropMilestonesCommunityFix {
 
         val lore = stack.getLore()
         val next = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 3) ?: return
-        val total = lore.nextAfter({ GardenCropMilestones.totalPattern.matches(it) }, 6) ?: return
-
-//         debug(" ")
-//         debug("crop: $crop")
-//         debug("realTier: $realTier")
 
         val guessNextMax = nextMax(realTier, crop)
-        //         debug("guessNextMax: ${guessNextMax.addSeparators()}")
         val nextMax = amountPattern.matchMatcher(next) {
             group("max").formatLong()
         } ?: return
-//         debug("nextMax real: ${nextMax.addSeparators()}")
+
         if (nextMax != guessNextMax) {
-//             debug("wrong, add to list")
             wrongData.add("$crop:$realTier:${nextMax.addSeparators()}")
         }
-
-        val guessTotalMax = GardenCropMilestones.getCropsForTier(46, crop) // no need to overflow here
-//         println("guessTotalMax: ${guessTotalMax.addSeparators()}")
-        val totalMax = amountPattern.matchMatcher(total) {
-            group("max").formatLong()
-        } ?: return
-//         println("totalMax real: ${totalMax.addSeparators()}")
-        val totalOffBy = guessTotalMax - totalMax
-//         debug("$crop total offf by: ${totalOffBy.addSeparators()}")
     }
-
-    //     fun debug(message: String) {
-//         if (SkyHanniMod.feature.dev.debug.enabled) {
-//             println(message)
-//         }
-//     }
 
     /**
      * This helps to fix wrong crop milestone data

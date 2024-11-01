@@ -77,7 +77,8 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     public void walkDir(Path file) {
         System.out.println("Trying to find mixins from directory");
         try (Stream<Path> classes = Files.walk(file.resolve(mixinBaseDir))) {
-            classes.map(it -> file.relativize(it).toString())
+            classes.filter(Files::isRegularFile)
+                .map(it -> file.relativize(it).toString())
                 .forEach(this::tryAddMixinClass);
         } catch (IOException e) {
             throw new RuntimeException(e);

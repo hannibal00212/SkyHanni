@@ -74,6 +74,10 @@ object CopyNearbyEntitiesCommand {
                 val ridingEntity = entity.ridingEntity
                 resultList.add("ridingEntity: $ridingEntity")
 
+                if (entity.isInvisible) {
+                    resultList.add("Invisible: true")
+                }
+
                 if (entity is EntityLivingBase) {
                     resultList.add("EntityLivingBase:")
                     val baseMaxHealth = entity.baseMaxHealth
