@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
@@ -35,6 +36,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
@@ -49,8 +51,6 @@ object NEUItems {
     private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
     private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
-
-
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -210,20 +210,28 @@ object NEUItems {
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
         try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+            // TODO remove workaround once rendering goblin raid textures doesnt cause errors
+//             if (item.name != "Goblin" || Minecraft.getMinecraft().thePlayer.isSneaking) {
+            if (item.name != "Goblin") {
+                Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+            }
         } catch (e: Exception) {
-            println(" ")
-            println("item: $item")
-            println("name: ${item.name}")
-            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
-            println(" ")
-            @Suppress("PrintStackTrace")
-            e.printStackTrace()
+            if (lastWarn.passedSince() > 1.seconds) {
+                lastWarn = SimpleTimeMark.now()
+                println(" ")
+                println("item: $item")
+                println("name: ${item.name}")
+                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+                println(" ")
+                ChatUtils.debug("rendering an item has failed.")
+            }
         }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
     }
+
+    private var lastWarn = SimpleTimeMark.farPast()
 
     private object AdjustStandardItemLighting {
 
@@ -250,9 +258,11 @@ object NEUItems {
         itemIdCache[item]?.let {
             return it
         }
-        val result = allNeuRepoItems()
-            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
-            .keys.map { it.asInternalName() }
+        val result = allNeuRepoItems().filter {
+            Item.getByNameOrId(it.value["itemid"].asString) == item
+        }.keys.map {
+            it.toInternalName()
+        }
         itemIdCache[item] = result
         return result
     }

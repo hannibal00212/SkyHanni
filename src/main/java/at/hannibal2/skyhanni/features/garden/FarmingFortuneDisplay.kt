@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -54,6 +55,7 @@ object FarmingFortuneDisplay {
         "collection",
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
     )
+
     @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
@@ -144,12 +146,11 @@ object FarmingFortuneDisplay {
     }
 
     private fun update() {
-        display =
-            if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-                drawMissingFortuneDisplay(false)
-            } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-                drawMissingFortuneDisplay(true)
-            } else drawDisplay()
+        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+            drawMissingFortuneDisplay(false)
+        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+            drawMissingFortuneDisplay(true)
+        } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -227,8 +228,8 @@ object FarmingFortuneDisplay {
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 20.seconds) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "show the Farming Fortune stat, also give the widget enough priority.",
+                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and show the Farming Fortune " +
+                    "stat, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -238,8 +239,8 @@ object FarmingFortuneDisplay {
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
             if (lastCropFortuneMissingError.passedSince() < 20.seconds || !GardenAPI.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "show latest Crop Fortune, also give the widget enough priority.",
+                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and show latest Crop Fortune, " +
+                    "also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -281,7 +282,13 @@ object FarmingFortuneDisplay {
             return 0.0
         }
         return if (string.startsWith("THEORETICAL_HOE")) {
-            listOf(10.0, 25.0, 50.0)[string.last().digitToInt() - 1]
+            val digit = string.last().digitToIntOrNull() ?: ErrorManager.skyHanniError(
+                "Failed to read the tool fortune.",
+                "internalName" to internalName,
+                "string" to string,
+                "string.last()" to string.last(),
+            )
+            listOf(10.0, 25.0, 50.0)[digit - 1]
         } else when (string) {
             "FUNGI_CUTTER" -> 30.0
             "COCO_CHOPPER" -> 20.0
