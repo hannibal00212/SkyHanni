@@ -76,9 +76,9 @@ object IslandExceptions {
             MobUtils.getArmorStand(baseEntity, 9)
                 .makeMobResult { MobFactories.boss(baseEntity, it) }
 
-                baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains(
-                    "Livid",
-                ) -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+        baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && (nextEntity is EntityGiantZombie || nextEntity == null) && baseEntity.name.contains(
+            "Livid",
+        ) -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
         baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->
@@ -211,19 +211,19 @@ object IslandExceptions {
             MobUtils.getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true ->
             petCareHandler(baseEntity)
 
-                baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
-                baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
-                baseEntity is EntityPig && MobFilter.shinyPig.matches(armorStand?.cleanName()) -> MobData.MobResult.found(
-                    Mob(
-                        baseEntity,
-                        Mob.Type.SPECIAL,
-                        armorStand,
-                        "SHINY PIG",
-                    ),
-                )
+        baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
+        baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
+        baseEntity is EntityPig && MobFilter.shinyPig.matches(armorStand?.cleanName()) -> MobData.MobResult.found(
+            Mob(
+                baseEntity,
+                Mob.Type.SPECIAL,
+                armorStand,
+                "SHINY PIG",
+            ),
+        )
 
-                else -> null
-            }
+        else -> null
+    }
 
     private fun garden(baseEntity: EntityLivingBase) = when {
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() ->
