@@ -123,7 +123,7 @@ object ItemPickupLog {
 
         event.sackChanges.forEach {
             var itemStack = (it.internalName.getItemStack())
-            //TODO this should not need to be done here but the whole internal name resolving needs a rework and this fixes it for now
+            // TODO this should not need to be done here but the whole internal name resolving needs a rework and this fixes it for now
             if (it.internalName == "HAY_BALE".asInternalName()) itemStack = "HAY_BLOCK".asInternalName().getItemStack()
 
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
