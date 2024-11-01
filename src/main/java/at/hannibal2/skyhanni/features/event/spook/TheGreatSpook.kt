@@ -192,6 +192,7 @@ object TheGreatSpook {
             action = {
                 HypixelCommands.allChat(solution)
             },
+            oneTimeClick = true
         )
     }
 
