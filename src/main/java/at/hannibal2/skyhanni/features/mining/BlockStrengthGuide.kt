@@ -214,11 +214,15 @@ object BlockStrengthGuide {
     private fun requestSpeed(): SpeedClass {
         val itemInHand = InventoryUtils.getItemInHand()
         speed = SpeedClass(
-            base = (SkyblockStat.MINING_SPEED.lastKnownValue
-                ?: 0.0) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
+            base = (
+                SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
+                ) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
             dwarven = HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
-            gemstone = (HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0) + (itemInHand?.getEnchantments()?.get("lapidary")
-                ?.times(20.0) ?: 0.0) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
+            gemstone = (
+                HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0
+                ) + (
+                itemInHand?.getEnchantments()?.get("lapidary")?.times(20.0) ?: 0.0
+                ) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
                 "GEMSTONE_DRILL_1", "GEMSTONE_DRILL_2", "GEMSTONE_DRILL_3", "GEMSTONE_DRILL_4" -> 800.0
                 else -> 0.0
             },
