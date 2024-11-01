@@ -241,7 +241,11 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
+        //#if MC<1.12
         if (packet.type.toInt() != 0) return
+        //#else
+        //$$ if (packet.type.id.toInt() != 0) return
+        //#endif
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {

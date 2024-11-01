@@ -232,6 +232,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
     +  In Focus Mode, only the name of the item is displayed instead of the full description.
 + Added WASD keybinds to the Abiphone Snake Game. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1968)
++ Added Attribute Overlay. - Empa (https://github.com/hannibal002/SkyHanni/pull/2001)
+    +  Options to highlight good rolls in different colors, show only certain attributes, etc.
++ Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
+    +  Assists with maxing upgrades.
 
 </details>
 <details open><summary>
@@ -1034,6 +1038,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Zombie Shootout QoL improvements for the Carnival. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2497)
     + Colored hitboxes.
     + Lamp timer + line.
+
+### The Great Spook
+
++ Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
+    +  Added solvers for Math and Public Speaking Primal Fears.
 
 </details>
 <details open><summary>
