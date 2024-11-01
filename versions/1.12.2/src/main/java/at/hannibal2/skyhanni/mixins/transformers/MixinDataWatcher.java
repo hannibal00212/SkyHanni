@@ -20,6 +20,6 @@ public class MixinDataWatcher {
 
     @Inject(method = "setEntryValues", at = @At("TAIL"))
     public void onSetEntryValues(List<EntityDataManager.DataEntry<?>> list, CallbackInfo ci) {
-        new DataWatcherUpdatedEvent(entity, list).postAndCatch();
+        new DataWatcherUpdatedEvent(this.entity, list).postAndCatch();
     }
 }
