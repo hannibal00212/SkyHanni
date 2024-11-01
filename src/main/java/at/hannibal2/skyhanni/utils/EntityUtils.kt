@@ -178,8 +178,6 @@ object EntityUtils {
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.entityWorld?.getEntityByID(entityId)
 
-//#if FORGE
-
     @SubscribeEvent
     fun onEntityRenderPre(
         event:
@@ -226,9 +224,7 @@ object EntityUtils {
     ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
-//#endif
-
-//#endif
+    //#endif
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
