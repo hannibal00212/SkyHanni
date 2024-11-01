@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.ResourceLocation
 
 object RenderBackground {
@@ -74,8 +73,8 @@ object RenderBackground {
 
         val position = CustomScoreboard.config.position
 
-        val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
-        val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val scaledWidth = GuiScreenUtils.scaledWindowWidth
+        val scaledHeight = GuiScreenUtils.scaledWindowHeight
         val elementWidth = (renderable.width * position.effectiveScale).toInt()
         val elementHeight = (renderable.height * position.effectiveScale).toInt()
 

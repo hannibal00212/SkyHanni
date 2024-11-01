@@ -272,7 +272,6 @@ object GoldenFishTimer {
         if (!isActive()) return
         if (isGoldenFishActive()) return
         val entity = event.entity as? EntityArmorStand ?: return
-        entity.inventory.forEach { it?.getSkullTexture()?.let { texture -> println(texture) } }
 
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }
