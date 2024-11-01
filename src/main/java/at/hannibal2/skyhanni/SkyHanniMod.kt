@@ -57,7 +57,7 @@ class SkyHanniMod {
 
         loadModule(CrimsonIsleReputationHelper(this))
 
-         SkyHanniEvents.init(modules)
+        SkyHanniEvents.init(modules)
 
         CommandRegistrationEvent.post()
 
