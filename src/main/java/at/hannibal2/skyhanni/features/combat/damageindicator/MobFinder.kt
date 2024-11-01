@@ -223,7 +223,7 @@ class MobFinder {
     }
 
     private fun tryAddDungeonF5(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.lividEntity) {
+        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid?.baseEntity) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F5,
                 ignoreBlocks = true,
@@ -579,7 +579,7 @@ class MobFinder {
 
             // F5
             "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                floor5lividEntity = DungeonLividFinder.lividEntity
+                floor5lividEntity = DungeonLividFinder.livid?.baseEntity as? EntityOtherPlayerMP?
                 floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
             }
 

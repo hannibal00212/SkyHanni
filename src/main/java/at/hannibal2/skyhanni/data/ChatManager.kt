@@ -32,6 +32,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChatManager {
 
+    private val config get() = SkyHanniMod.feature.dev
+
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
     private val loggerAllowed = LorenzLogger("chat/allowed")
@@ -42,7 +44,7 @@ object ChatManager {
             override fun removeEldestEntry(
                 eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
             ): Boolean {
-                return size > 100
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 

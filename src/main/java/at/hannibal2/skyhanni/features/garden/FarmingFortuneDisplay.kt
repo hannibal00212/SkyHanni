@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -97,6 +98,8 @@ object FarmingFortuneDisplay {
     private var firstBrokenCropTime = SimpleTimeMark.farPast()
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
+
+    private val ZORROS_CAPE by lazy { "ZORROS_CAPE".toInternalName() }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -273,12 +276,13 @@ object FarmingFortuneDisplay {
     fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
     fun getToolFortune(internalName: NEUInternalName?): Double {
         if (internalName == null) return 0.0
-        if (internalName.equals("THEORETICAL_HOE")) {
+        val string = internalName.asString()
+        if (string == "THEORETICAL_HOE") {
             return 0.0
         }
-        return if (internalName.startsWith("THEORETICAL_HOE")) {
-            listOf(10.0, 25.0, 50.0)[internalName.asString().last().digitToInt() - 1]
-        } else when (internalName.asString()) {
+        return if (string.startsWith("THEORETICAL_HOE")) {
+            listOf(10.0, 25.0, 50.0)[string.last().digitToInt() - 1]
+        } else when (string) {
             "FUNGI_CUTTER" -> 30.0
             "COCO_CHOPPER" -> 20.0
             else -> 0.0
@@ -361,14 +365,14 @@ object FarmingFortuneDisplay {
 
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
-            } else if (tool.getInternalName().equals("ZORROS_CAPE")) {
+            } else if (tool.getInternalName() == ZORROS_CAPE) {
                 10.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
                 displayedFortune - reforgeFortune - gemstoneFortune - pesterminatorFortune - enchantmentFortune - dummiesFF
             }
 
-            greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it.equals("ZORROS_CAPE") }) {
+            greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it == ZORROS_CAPE }) {
                 displayedFortune - reforgeFortune - itemBaseFortune
             } else 0.0
         }
