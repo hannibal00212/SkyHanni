@@ -42,7 +42,7 @@ object DataWatcherAPI {
     //#if MC < 1.12
     private const val DATA_VALUE_HEALTH = 6
     //#else
-    //$$ private val DATA_VALUE_HEALTH = EntityDataManager.createKey(Entity::class.java, DataSerializers.FLOAT)
+    //$$ private val DATA_VALUE_HEALTH = EntityDataManager.createKey(EntityLivingBase::class.java, DataSerializers.FLOAT)
     //#endif
 
     @SubscribeEvent
