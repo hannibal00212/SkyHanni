@@ -104,11 +104,10 @@ enum class OreBlock(
     GLACITE(Blocks.packed_ice, { inGlacite }),
     ;
 
-    constructor(block: Block, checkArea: () -> Boolean, hasInitSound: Boolean = true) :
-        this({ it.block == block }, checkArea, hasInitSound)
+    constructor(block: Block, checkArea: () -> Boolean, hasInitSound: Boolean = true) : this({ it.block == block }, checkArea, hasInitSound)
 
-    constructor(gemstoneColor: EnumDyeColor, checkArea: () -> Boolean, hasInitSound: Boolean = true) :
-        this({ it.isGemstoneWithColor(gemstoneColor) }, checkArea, hasInitSound)
+    constructor(gemstoneColor: EnumDyeColor, checkArea: () -> Boolean, hasInitSound: Boolean = true) : this(
+        { it.isGemstoneWithColor(gemstoneColor) }, checkArea, hasInitSound)
 
     companion object {
         fun getByStateOrNull(state: IBlockState): OreBlock? = currentAreaOreBlocks.find { it.checkBlock(state) }
@@ -155,19 +154,20 @@ private fun isHardStoneHollows(state: IBlockState): Boolean {
 }
 
 private fun isHardstoneTunnels(state: IBlockState): Boolean =
-    (state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE) ||
-        (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
+    (state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE) || (state.block == Blocks.wool && state.getValue(
+        BlockColored.COLOR,
+    ) == EnumDyeColor.SILVER)
 
 private fun isHardstoneMineshaft(state: IBlockState): Boolean =
-    (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
-        (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
+    (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) || (state.block == Blocks.wool && state.getValue(
+        BlockColored.COLOR,
+    ) == EnumDyeColor.SILVER)
 
 private fun isRedSand(state: IBlockState): Boolean =
     (state.block == Blocks.sand && state.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND)
 
 private fun isLowTierUmber(state: IBlockState): Boolean =
-    state.block == Blocks.hardened_clay ||
-        (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
+    state.block == Blocks.hardened_clay || (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
 
 private fun isHighTierUmber(state: IBlockState): Boolean =
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
