@@ -42,14 +42,14 @@ jobs:
                 uses: actions-ecosystem/action-add-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Wrong Title/Changelog'
+                    labels: 'Detekt'
 
             -   name: Remove label if changelog verification passes
                 if: success()
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Wrong Title/Changelog'
+                    labels: 'Detekt'
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
