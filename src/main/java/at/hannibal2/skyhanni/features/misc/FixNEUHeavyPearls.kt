@@ -10,7 +10,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 
-@SkyHanniModule
+@SkyHanniModule(neuRequired = true)
 object FixNEUHeavyPearls {
 
     private val config get() = SkyHanniMod.feature.misc

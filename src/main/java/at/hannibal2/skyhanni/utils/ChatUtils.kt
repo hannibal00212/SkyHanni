@@ -44,8 +44,11 @@ object ChatUtils {
      *
      * @see DEBUG_PREFIX
      */
-    fun debug(message: String) {
-        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message)) {
+    fun debug(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }
@@ -58,8 +61,11 @@ object ChatUtils {
      *
      * @see USER_ERROR_PREFIX
      */
-    fun userError(message: String) {
-        internalChat(USER_ERROR_PREFIX + message)
+    fun userError(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        internalChat(USER_ERROR_PREFIX + message, replaceSameMessage)
     }
 
     /**
@@ -87,7 +93,7 @@ object ChatUtils {
 
     private fun internalChat(
         message: String,
-        replaceSameMessage: Boolean = false,
+        replaceSameMessage: Boolean,
     ): Boolean {
         val text = ChatComponentText(message)
 

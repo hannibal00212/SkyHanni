@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -115,8 +114,9 @@ class GuiPositionEditor(
         GlStateManager.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
-        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         for ((index, position) in positions.withIndex()) {
             var elementWidth = position.getDummySize(true).x
             var elementHeight = position.getDummySize(true).y
@@ -154,8 +154,8 @@ class GuiPositionEditor(
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
 
-        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val elementWidth = position.getDummySize().x
@@ -222,8 +222,8 @@ class GuiPositionEditor(
         for (position in positions) {
             if (!position.clicked) continue
 
-            val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-            val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+            val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
             val elementWidth = position.getDummySize(true).x
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
@@ -236,13 +236,14 @@ class GuiPositionEditor(
         super.handleMouseInput()
         val mw = Mouse.getEventDWheel()
         if (mw == 0) return
-        val mx = Mouse.getEventX() * width / mc.displayWidth
-        val my = height - Mouse.getEventY() * height / mc.displayHeight - 1
+
+        val (mouseX, mouseY) = GuiScreenUtils.mousePos
+
         val hovered = positions.firstOrNull { it.clicked }
             ?: positions.lastOrNull {
                 val size = it.getDummySize()
                 GuiRenderUtils.isPointInRect(
-                    mx, my,
+                    mouseX, mouseY,
                     it.getAbsX() - border, it.getAbsY() - border,
                     size.x + border * 2, size.y + border * 2,
                 )
