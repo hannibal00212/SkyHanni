@@ -79,6 +79,8 @@ object ItemPickupLog {
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
     private val coinIcon = "COIN_TALISMAN".toInternalName()
+    private val HAY_BALE = "HAY_BALE".toInternalName()
+    private val HAY_BLOCK = "HAY_BLOCK".toInternalName()
 
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
@@ -124,7 +126,7 @@ object ItemPickupLog {
         event.sackChanges.forEach {
 
             // TODO this should not need to be done here but the whole internal name resolving needs a rework and this fixes it for now
-            val internalName = if (it.internalName == "HAY_BALE".toInternalName()) "HAY_BLOCK".toInternalName() else it.internalName
+            val internalName = if (it.internalName == HAY_BALE) HAY_BLOCK else it.internalName
             val itemStack = internalName.getItemStack()
 
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
