@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
@@ -116,24 +117,28 @@ class Mob(
 
     private var highlightColor: Color? = null
 
+    fun highlight(color: LorenzColor, alpha: Int = 127, condition: () -> Boolean = { true }) {
+        highlight(color.addOpacity(alpha.coerceIn(0..255)), condition)
+    }
+
     /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
      * If [color] is set to null it removes a highlight*/
-    fun highlight(color: Color?) {
+    fun highlight(color: Color?, condition: () -> Boolean = { true }) {
         if (color == highlightColor) return
         if (color == null) {
             internalRemoveColor()
             highlightColor = null
         } else {
             highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-            internalHighlight()
+            internalHighlight(condition)
         }
     }
 
-    private fun internalHighlight() {
+    private fun internalHighlight(condition: () -> Boolean = { true }) {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { condition() && !isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { condition() && !isInvisible() }
             }
         }
     }

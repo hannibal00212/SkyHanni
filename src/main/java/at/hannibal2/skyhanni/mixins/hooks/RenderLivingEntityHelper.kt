@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
@@ -20,6 +22,11 @@ object RenderLivingEntityHelper {
         entityColorCondition.clear()
 
         entityNoHurtTimeCondition.clear()
+    }
+
+    @HandleEvent
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<EntityLivingBase>) {
+        removeCustomRender(event.entity)
     }
 
     fun <T : EntityLivingBase> removeEntityColor(entity: T) {

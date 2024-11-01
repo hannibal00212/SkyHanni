@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -30,6 +32,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 @SkyHanniModule
 object EntityUtils {
@@ -230,7 +233,26 @@ object EntityUtils {
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.getNameAsString().removeColor()
+    fun EntityLivingBase.matchesHealth(checkedHealth: Int, ignoreDerpy: Boolean = false): Boolean {
+        var targetHealth = checkedHealth
+        if (isRunic()) targetHealth *= 4
+        if (isCorrupted()) targetHealth *= 3
+        val derpyHealth = if (ignoreDerpy) health.toInt() else health.toInt().derpy()
+        return derpyHealth == targetHealth
+    }
+
+    fun Entity.cleanName() = getNameAsString().removeColor()
+
+    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
+    fun EntityLivingBase.highlight(color: LorenzColor, alpha: Int = 127, condition: () -> Boolean = { true }) {
+        highlight(color.addOpacity(alpha.coerceIn(0..255)), condition)
+    }
+
+    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
+    fun EntityLivingBase.highlight(color: Color, condition: () -> Boolean = { true }) {
+        val highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(this, highlightColor.rgb, condition)
+    }
 }
 
 //#if FORGE
