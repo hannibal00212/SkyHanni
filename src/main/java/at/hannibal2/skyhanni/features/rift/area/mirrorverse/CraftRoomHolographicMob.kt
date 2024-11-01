@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -67,7 +68,7 @@ object CraftRoomHolographicMob {
                     append("§a$mobName ")
                 }
                 if (config.showHealth) {
-                    append("§c${theMob.health}♥")
+                    append("§c${theMob.health.roundTo(1)}♥")
                 }
             }.trim()
 

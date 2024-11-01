@@ -88,7 +88,7 @@ object DungeonLividFinder {
                 posZ - 0.5,
                 posX + 0.5,
                 posY,
-                posZ + 0.5
+                posZ + 0.5,
             )
         }
         val world = Minecraft.getMinecraft().theWorld
@@ -99,7 +99,7 @@ object DungeonLividFinder {
         lividEntity = newLivid
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             newLivid,
-            color.toColor().withAlpha(30)
+            color.toColor().withAlpha(30),
         ) { shouldHighlight() }
     }
 

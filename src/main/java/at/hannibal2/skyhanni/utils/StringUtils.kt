@@ -334,6 +334,13 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
+    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    fun generateRandomString(length: Int): String {
+        var res: String = ""
+        repeat(length) { res += CHARS.random() }
+        return res
+    }
+
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
@@ -419,7 +426,7 @@ object StringUtils {
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
         val clickEvent = message.chatStyle.chatClickEvent
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
                 return
             }
             foundCommands.add(message)
@@ -502,6 +509,7 @@ object StringUtils {
 
     fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
+    @Deprecated("This function strips internal formatting changes like the color of the pluses of the MVP+ rank")
     fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
         formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
 

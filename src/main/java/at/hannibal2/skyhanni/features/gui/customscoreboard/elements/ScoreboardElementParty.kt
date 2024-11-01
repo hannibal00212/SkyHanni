@@ -18,7 +18,7 @@ object ScoreboardElementParty : ScoreboardElement() {
         add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
 
         if (partyConfig.showPartyLeader && PartyAPI.partyLeader != null) {
-            add(" §7- §f$PartyAPI.partyLeader §e♚")
+            add(" §7- §f${PartyAPI.partyLeader} §e♚")
         }
 
         if (partyConfig.showPartyLeader) {

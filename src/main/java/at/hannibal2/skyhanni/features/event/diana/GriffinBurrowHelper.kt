@@ -3,10 +3,9 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
@@ -403,7 +402,7 @@ object GriffinBurrowHelper {
         }
 
         if (!isEnabled()) {
-            if (currentMayor != Mayor.DIANA) {
+            if (!ElectionCandidate.DIANA.isActive()) {
                 ChatUtils.chatAndOpenConfig(
                     "§cSelect Diana as mayor overwrite!",
                     SkyHanniMod.feature.dev.debug::assumeMayor,

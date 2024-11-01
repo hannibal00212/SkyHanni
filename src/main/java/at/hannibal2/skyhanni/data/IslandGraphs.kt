@@ -467,7 +467,7 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
-                "§e[SkyHanni] Navigation manually stopped!".asComponent().send(PATHFIND_ID)
+                "§e[SkyHanni] Navigation stopped!".asComponent().send(PATHFIND_ID)
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
