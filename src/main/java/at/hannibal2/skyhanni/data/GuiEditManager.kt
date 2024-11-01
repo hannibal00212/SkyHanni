@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -24,7 +25,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
-import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -82,7 +82,7 @@ object GuiEditManager {
     fun add(position: Position, posLabel: String, width: Int, height: Int) {
         var name = position.internalName
         if (name == null) {
-            name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
+            name = if (posLabel == "none") "none " + StringUtils.generateRandomId() else posLabel
             position.internalName = name
         }
         currentPositions[name] = position
