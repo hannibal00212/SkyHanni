@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -124,7 +125,7 @@ object ItemPickupLog {
         event.sackChanges.forEach {
             var itemStack = (it.internalName.getItemStack())
             // TODO this should not need to be done here but the whole internal name resolving needs a rework and this fixes it for now
-            if (it.internalName == "HAY_BALE".asInternalName()) itemStack = "HAY_BLOCK".asInternalName().getItemStack()
+            if (it.internalName == "HAY_BALE".toInternalName()) itemStack = "HAY_BLOCK".toInternalName().getItemStack()
 
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
