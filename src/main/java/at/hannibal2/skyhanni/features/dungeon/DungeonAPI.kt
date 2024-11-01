@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -72,13 +73,8 @@ object DungeonAPI {
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
-    // TODO: Move to repo
-    @Suppress("MaxLineLength")
-    private const val WITHER_ESSENCE_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
-
-    // region Patterns
     private val patternGroup = RepoPattern.group("dungeon")
+    private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -109,7 +105,6 @@ object DungeonAPI {
         "noblessings",
         "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
     )
-    // endregion
 
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
