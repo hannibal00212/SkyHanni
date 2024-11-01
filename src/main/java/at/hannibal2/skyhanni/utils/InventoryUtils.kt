@@ -86,10 +86,10 @@ object InventoryUtils {
             val config = NotEnoughUpdates.INSTANCE.config
 
             val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField.get(config)
+            val storage = storageField[config]
 
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField.get(storage) as Boolean
+            booleanField[storage] as Boolean
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false

@@ -25,6 +25,7 @@ object PlatformUtils {
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
 
     var validNeuInstalled = false
+
     fun isNeuLoaded() = validNeuInstalled
 
 }
