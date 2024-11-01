@@ -6,7 +6,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
-import net.minecraft.util.IChatComponent
 
 fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
 //#if MC < 1.14
@@ -15,18 +14,17 @@ fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
 //$$ this.players()
 //#endif
 
-
 fun Entity.getNameAsString(): String =
     this.name
 //#if MC >= 1.14
-//$$ .getString()
+//$$ .string
 //#endif
 
 fun EntityArmorStand.getArmorOrFullInventory() =
 //#if MC < 1.12
     this.inventory
 //#else
-//$$ this.getArmorInventoryList()
+//$$ this.armorInventoryList
 //#endif
 
 fun Minecraft.isOnMainThread() =
@@ -34,21 +32,6 @@ fun Minecraft.isOnMainThread() =
     this.isCallingFromMinecraftThread
 //#else
 //$$ this.isSameThread
-//#endif
-
-fun IChatComponent.getFormattedTextCompat() =
-//#if MC < 1.16
-    this.formattedText
-//#else
-//$$     run {
-//$$         val sb = StringBuilder()
-//$$         for (component in iterator()) {
-//$$             sb.append(component.style.formattingCode)
-//$$             sb.append(component.unformattedComponentText)
-//$$             sb.append("§r")
-//$$         }
-//$$         sb.toString()
-//$$     }
 //#endif
 
 object Effects {
@@ -59,5 +42,3 @@ object Effects {
     //$$    net.minecraft.init.PotionTypes.INVISIBILITY
     //#endif
 }
-
-
