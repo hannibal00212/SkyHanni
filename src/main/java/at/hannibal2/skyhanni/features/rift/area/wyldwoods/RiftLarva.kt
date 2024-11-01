@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,6 +22,8 @@ object RiftLarva {
     private var hasHookInHand = false
 
     private val LARVA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
+
+    private val LARVA_HOOK by lazy { "LARVA_HOOK".toInternalName() }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -35,7 +38,7 @@ object RiftLarva {
     }
 
     private fun checkHand() {
-        hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName()?.equals("LARVA_HOOK") ?: false
+        hasHookInHand = InventoryUtils.getItemInHand()?.getInternalName() == LARVA_HOOK
     }
 
     private fun findLarvas() {

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -104,8 +105,8 @@ open class VisualWordGui : GuiScreen() {
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
 
-        mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        mouseX = GuiScreenUtils.mouseX
+        mouseY = GuiScreenUtils.mouseY
 
         GlStateManager.pushMatrix()
         drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
