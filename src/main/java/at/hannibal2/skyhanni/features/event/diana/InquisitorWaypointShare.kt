@@ -73,7 +73,7 @@ object InquisitorWaypointShare {
      */
     @Suppress("MaxLineLength")
     private val sboPattern by patternGroup.pattern(
-        "party.odin",
+        "party.sbo",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) \\| Minos Inquisitor spawned at (?<area>.*)!"
     )
 
