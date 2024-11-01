@@ -26,7 +26,7 @@ enum class MiningEventType(
     // TODO change to LorenzColor
     private val colorCode: Char,
     val dwarvenSpecific: Boolean,
-    iconInput: Renderable,
+    var iconInput: Renderable,
     var itemStack: ItemStack? = null,
 ) {
     GONE_WITH_THE_WIND(
@@ -75,8 +75,9 @@ enum class MiningEventType(
         "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
         ItemUtils.createSkull(
             "Goblin",
-            "32518c29-6127-3c71-b2a7-be4c3251e76f",
-            "" // Late init when SkullTextureHolder is loaded
+            "a2f83459-5c89-4a27-add3-049716ca910c",
+
+            "", // Late init when SkullTextureHolder is loaded
         ),
     ),
 
@@ -123,7 +124,7 @@ enum class MiningEventType(
         "Gourmand", 10.minutes,
         colorCode = 'b',
         dwarvenSpecific = true,
-        iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
+        iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND"),
     ),
     ;
 
@@ -165,10 +166,14 @@ enum class MiningEventType(
 
         // Because we don't want to hard-code the goblin texture, this gets called by SkullTextureHolder when the repository is loaded
         fun fixGoblinItemStack() {
-            GOBLIN_RAID.itemStack = ItemUtils.createSkull(
+            val itemStack = ItemUtils.createSkull(
                 "Goblin",
-                "32518c29-6127-3c71-b2a7-be4c3251e76f",
+                "a2f83459-5c89-4a27-add3-049716ca910c",
                 SkullTextureHolder.getTexture("GOBLIN_RAID"),
+            )
+            GOBLIN_RAID.itemStack = itemStack
+            GOBLIN_RAID.iconInput = Renderable.itemStack(
+                itemStack, xSpacing = 0,
             )
         }
 

@@ -96,10 +96,12 @@ object MiningEventDisplay {
             .flatMap {
                 if (it.isDoubleEvent) listOf(it.event, it.event) else listOf(it.event)
                 /* if (it.isDoubleEvent) "${it.event} §8-> ${it.event}" else it.event.toString() */
-            }.map { it.getRenderable() }.toMutableList()
+//             }.map { it.getRenderable() }.toMutableList()
+            }.map { MiningEventType.GOBLIN_RAID.getRenderable() }.toMutableList()
 
         if (upcoming.isEmpty()) upcoming.add(unknownDisplay)
-        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderableAsPast()) }
+//         if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, it.getRenderableAsPast()) }
+        if (config.passedEvents && upcoming.size < 4) lastEvent?.let { upcoming.add(0, MiningEventType.GOBLIN_RAID.getRenderableAsPast()) }
         return upcoming.flatMap { listOf(it, transitionDisplay) }.dropLast(1).toTypedArray()
         /* return upcoming.joinToString(" §8-> ") */
     }
