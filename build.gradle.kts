@@ -25,7 +25,7 @@ import kotlin.io.path.outputStream
 plugins {
     idea
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
@@ -276,6 +276,21 @@ if (target == ProjectTarget.MAIN) {
         dependsOn(tasks.processResources)
     }
 }
+
+fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+    if (buildPathsFile.exists()) {
+        sourceSet.get().apply {
+            val buildPaths = buildPathsFile.readText().lineSequence()
+                .map { it.substringBefore("#").trim() }
+                .filter { it.isNotBlank() }
+                .toSet()
+            kotlin.include(buildPaths)
+            java.include(buildPaths)
+        }
+    }
+}
+includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
+includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
