@@ -93,7 +93,7 @@ object CollectionUtils {
         val map = mutableMapOf<K, Int>()
         for (item in this) {
             val key = selector(item)
-            map[key] = map.getOrDefault(key, 0) + 1
+            map.addOrPut(key, 1)
         }
         return map
     }
@@ -272,6 +272,13 @@ object CollectionUtils {
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
     // TODO add cache
     fun MutableList<Renderable>.addString(
