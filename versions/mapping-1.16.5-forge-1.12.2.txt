@@ -1,6 +1,4 @@
 
-net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
-
 com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 
 com.mojang.blaze3d.systems.RenderSystem color4f() color()
@@ -262,6 +260,7 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
+net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
