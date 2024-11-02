@@ -80,11 +80,11 @@ object MinionUpgradeHelper {
             add("")
 
             if (itemsInSacks > 0) {
-                add("§7In sacks: §a${itemsInSacks}§7x §b$itemName")
+                add("§7In sacks: §a$itemsInSacks§7x §b$itemName")
             }
 
             if (itemsRemaining > 0) {
-                add("§7From Bazaar: §a${itemsRemaining}§7x §b$itemName")
+                add("§7From Bazaar: §a$itemsRemaining§7x §b$itemName")
                 add("§7Cost: §6${remainingCost.shortFormat()} §7coins")
             } else {
                 add("§7All items in sacks")
