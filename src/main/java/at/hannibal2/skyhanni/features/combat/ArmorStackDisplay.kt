@@ -30,6 +30,7 @@ object ArmorStackDisplay {
     private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
     private val pistonSounds = setOf("tile.piston.out", "tile.piston.in")
+
     /**
      * REGEX-TEST: §66,171/4,422❤  §6§l10ᝐ§r     §a1,295§a❈ Defense     §b525/1,355✎ §3400ʬ
      * REGEX-TEST: §66,171/4,422❤  §65ᝐ     §b-150 Mana (§6Wither Impact§b)     §b1,016/1,355✎ §3400ʬ
@@ -90,7 +91,9 @@ object ArmorStackDisplay {
         val decayTimeString = if (config.armorStackDecayTimer) {
             val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
             remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
-        } else ""
+        } else {
+            ""
+        }
 
         val colorCode = when {
             isMaxStack && config.maxStackOnly -> "§b"
@@ -99,25 +102,29 @@ object ArmorStackDisplay {
         }
 
         return if (config.showInSingleLine) {
-            listOf(buildString {
-                if (config.armorStackDisplay) {
-                    append("§6")
-                    if (config.armorStackType) append("$stackType: ")
-                    append("§l$stackCount$stackSymbol ")
-                }
-
-                if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
-                    append("$colorCode($decayTimeString)")
-                }
-            })
-        } else {
-            buildList {
-                if (config.armorStackDisplay) {
-                    add(buildString {
+            listOf(
+                buildString {
+                    if (config.armorStackDisplay) {
                         append("§6")
                         if (config.armorStackType) append("$stackType: ")
                         append("§l$stackCount$stackSymbol ")
-                    })
+                    }
+
+                    if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
+                        append("$colorCode($decayTimeString)")
+                    }
+                }
+            )
+        } else {
+            buildList {
+                if (config.armorStackDisplay) {
+                    add(
+                        buildString {
+                            append("§6")
+                            if (config.armorStackType) append("$stackType: ")
+                            append("§l$stackCount$stackSymbol ")
+                        }
+                    )
                 }
 
                 if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
@@ -127,12 +134,13 @@ object ArmorStackDisplay {
         }
     }
 
-
-
     private fun resetDecayTime() {
         armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->
             armor?.getLore()?.let {
-                armorStackTierBonus.firstMatcher(it) { stackType = group("type"); group("amount") }
+                armorStackTierBonus.firstMatcher(it) {
+                    stackType = group("type")
+                    group("amount")
+                }
                     ?.toInt()
             }
         } ?: 0
