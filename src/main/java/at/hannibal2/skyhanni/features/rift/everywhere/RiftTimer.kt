@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -26,11 +28,6 @@ object RiftTimer {
     private val config get() = RiftAPI.config.timer
 
     private val repoGroup = RepoPattern.group("rift.everywhere")
-    private val timePattern by repoGroup.pattern(
-        "timer",
-        "§(?<color>[a7])(?<time>.*)ф Left.*"
-    )
-
     /**
      * REGEX-TEST: 3150 §aф
      */
@@ -53,23 +50,28 @@ object RiftTimer {
         currentTime = 0.seconds
     }
 
-    //todo use ActionBarValueUpdateEvent
     @SubscribeEvent
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        if (!isEnabled()) return
+    fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
+        if (event.updated != ActionBarStatsData.RIFT_TIME) return
+        if (!isEnabled() || RiftAPI.inRiftRace) return
 
-        event.actionBar.split("     ").matchFirst(timePattern) {
-            val color = group("color")
-            val newTime = TimeUtils.getDuration(group("time").replace("m", "m "))
-
-            if (color == "7") {
-                if (newTime > maxTime) {
-                    maxTime = newTime
-                }
-            }
-            currentTime = newTime
-            update()
+        val newTime = TimeUtils.getDuration(event.updated.value.replace("m", "m "))
+        if (newTime > maxTime) {
+            maxTime = newTime
         }
+        currentTime = newTime
+        update()
+    }
+
+    // prevents rift time from pausing during Rift Race
+    // (hypixel hides the action bar during the race)
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled() || !RiftAPI.inRiftRace) return
+        if (!event.isMod(5)) return
+        val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
+        currentTime = newTime
+        update()
     }
 
     private fun update() {
@@ -123,7 +125,7 @@ object RiftTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea == "Mirrorverse") return
+        if (RiftAPI.inMirrorVerse) return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.max
@@ -41,7 +42,7 @@ data class LorenzVec(
 
     fun distance(x: Double, y: Double, z: Double): Double = distance(LorenzVec(x, y, z))
 
-    fun distanceChebyshevIgnoreY(other: LorenzVec) = max(abs(this.x - other.x), abs(this.z - other.z))
+    fun distanceChebyshevIgnoreY(other: LorenzVec) = max(abs(x - other.x), abs(z - other.z))
 
     fun distanceSq(other: LorenzVec): Double {
         val dx = other.x - x
@@ -85,11 +86,11 @@ data class LorenzVec(
 
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
-    fun angleAsCos(other: LorenzVec) = this.normalize().dotProduct(other.normalize())
+    fun angleAsCos(other: LorenzVec) = normalize().dotProduct(other.normalize())
 
-    fun angleInRad(other: LorenzVec) = acos(this.angleAsCos(other))
+    fun angleInRad(other: LorenzVec) = acos(angleAsCos(other))
 
-    fun angleInDeg(other: LorenzVec) = Math.toDegrees(this.angleInRad(other))
+    fun angleInDeg(other: LorenzVec) = Math.toDegrees(angleInRad(other))
 
     @Deprecated("Use operator fun plus instead", ReplaceWith("this + other"))
     fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
@@ -124,7 +125,9 @@ data class LorenzVec(
     fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
     fun lengthSquared(): Double = x * x + y * y + z * z
-    fun length(): Double = sqrt(this.lengthSquared())
+    fun length(): Double = sqrt(lengthSquared())
+
+    fun isNormalized(tolerance: Double = 0.01) = (lengthSquared() - 1.0).absoluteValue < tolerance
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
@@ -150,21 +153,27 @@ data class LorenzVec(
         return result
     }
 
-    fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun round(precision: Int) = roundTo(precision)
+
+    fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
     fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).round(0)
-        val y = (y - .499999).round(0)
-        val z = (z - .499999).round(0)
+        val x = (x - .499999).roundTo(0)
+        val y = (y - .499999).roundTo(0)
+        val z = (z - .499999).roundTo(0)
         return LorenzVec(x, y, z)
     }
 
+    fun blockCenter() = roundLocationToBlock().add(0.5, 0.5, 0.5)
+
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
+    // TODO better name. dont confuse with roundTo()
     fun roundLocation(): LorenzVec {
-        val x = if (this.x < 0) x.toInt() - 1 else x.toInt()
+        val x = if (x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
-        val z = if (this.z < 0) z.toInt() - 1 else z.toInt()
+        val z = if (z < 0) z.toInt() - 1 else z.toInt()
         return LorenzVec(x, y, z)
     }
 
@@ -179,14 +188,16 @@ data class LorenzVec(
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
 
-    fun up(offset: Double): LorenzVec = copy(y = y + offset)
+    fun up(offset: Number = 1): LorenzVec = copy(y = y + offset.toDouble())
+
+    fun down(offset: Number = 1): LorenzVec = copy(y = y - offset.toDouble())
 
     fun interpolate(other: LorenzVec, factor: Double): LorenzVec {
         require(factor in 0.0..1.0) { "Percentage must be between 0 and 1: $factor" }
 
-        val x = (1 - factor) * this.x + factor * other.x
-        val y = (1 - factor) * this.y + factor * other.y
-        val z = (1 - factor) * this.z + factor * other.z
+        val x = (1 - factor) * x + factor * other.x
+        val y = (1 - factor) * y + factor * other.y
+        val z = (1 - factor) * z + factor * other.z
 
         return LorenzVec(x, y, z)
     }
@@ -237,7 +248,7 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
-        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().add(y = -1.0)
+        fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
 
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
     }
@@ -261,6 +272,6 @@ fun Array<Double>.toLorenzVec(): LorenzVec {
 
 fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = this.expand(vec.x, vec.y, vec.z)
+fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
 
-fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = this.expand(amount, amount, amount)
+fun AxisAlignedBB.expand(amount: Double): AxisAlignedBB = expand(amount, amount, amount)

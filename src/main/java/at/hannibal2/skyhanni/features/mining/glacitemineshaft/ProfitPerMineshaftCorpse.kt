@@ -18,7 +18,7 @@ object ProfitPerMineshaftCorpse {
     private val config get() = SkyHanniMod.feature.mining.mineshaft
 
     @SubscribeEvent
-    fun onFossilExcavation(event: CorpseLootedEvent) {
+    fun onCorpseLooted(event: CorpseLootedEvent) {
         if (!config.profitPerCorpseLoot) return
         val loot = event.loot
 

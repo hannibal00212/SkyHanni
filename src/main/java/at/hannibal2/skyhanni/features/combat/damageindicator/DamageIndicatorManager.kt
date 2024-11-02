@@ -34,10 +34,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -67,6 +67,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
+// TODO cut class into smaller pieces
+@Suppress("LargeClass")
 object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
@@ -74,7 +76,6 @@ object DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
-
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
@@ -90,7 +91,7 @@ object DamageIndicatorManager {
         return damagePattern.matcher(name).matches()
     }
 
-    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(type: BossType) = data.entries.any { it.value.bossType == type }
 
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
@@ -288,7 +289,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+            // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -366,8 +367,8 @@ object DamageIndicatorManager {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
+            data[entity.uniqueID]?.let {
+                val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 
@@ -718,7 +719,7 @@ object DamageIndicatorManager {
                 if (existed > 40) {
                     val end = (20 * 26) - existed
                     val time = end.toDouble() / 20
-                    entityData.nameAbove = "Mania Circles: §b${time.round(1)}s"
+                    entityData.nameAbove = "Mania Circles: §b${time.roundTo(1)}s"
                     return ""
                 }
             }

@@ -48,7 +48,8 @@ object RepoUtils {
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, please report this on the SkyHanni discord."
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
                         )
                     }
                     val fos = FileOutputStream(newFile)

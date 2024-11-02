@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
@@ -29,7 +31,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -260,7 +261,16 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
+                isGuiScreen &&
+                    isGuiPositionEditor &&
+                    inMenu &&
+                    isNotInSignAndOnSlot &&
+                    isConfigScreen &&
+                    !isInNeuPv &&
+                    !isInSkytilsPv &&
+                    !neuFocus &&
+                    !isInSkytilsSettings &&
+                    !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -370,7 +380,7 @@ interface Renderable {
                 horizontalAlign = horizontalAlign,
                 verticalAlign = verticalAlign,
             ),
-            item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            item.getTooltipCompat(false),
             stack = item,
         )
 
@@ -438,23 +448,27 @@ interface Renderable {
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+            internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
         ) = object : Renderable {
 
-            val list by lazy {
-                Minecraft.getMinecraft().fontRendererObj.listFormattedStringToWidth(
+            val fontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
+
+            val map by lazy {
+                fontRenderer.listFormattedStringToWidth(
                     text, (width / scale).toInt(),
-                )
+                ).associateWith { fontRenderer.getStringWidth(it) }
             }
 
-            override val width by lazy {
-                if (list.size == 1) {
-                    (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1
-                } else {
-                    width
-                }
+            override val width by lazy { (rawWidth * scale).toInt() + 1 }
+
+            val rawWidth by lazy {
+                if (map.size == 1)
+                    map.entries.first().value
+                else
+                    map.maxOf { it.value }
             }
 
-            override val height by lazy { list.size * ((9 * scale).toInt() + 1) }
+            override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -464,8 +478,13 @@ interface Renderable {
                 val fontRenderer = Minecraft.getMinecraft().fontRendererObj
                 GlStateManager.translate(1.0, 1.0, 0.0)
                 GlStateManager.scale(scale, scale, 1.0)
-                list.forEachIndexed { index, text ->
-                    fontRenderer.drawStringWithShadow(text, 0f, index * 10.0f, color.rgb)
+                map.entries.forEachIndexed { index, (text, size) ->
+                    fontRenderer.drawStringWithShadow(
+                        text,
+                        RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
+                        index * 10.0f,
+                        color.rgb,
+                    )
                 }
                 GlStateManager.scale(inverseScale, inverseScale, 1.0)
                 GlStateManager.translate(-1.0, -1.0, 0.0)
@@ -555,7 +574,7 @@ interface Renderable {
                     for ((index, renderable) in row.withIndex()) {
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
+                        renderable.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
@@ -605,7 +624,12 @@ interface Renderable {
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
-            val searchWidth get() = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(searchPrefix + textInput.editTextWithAlwaysCarriage()) * scale).toInt() + 1
+            val searchWidth: Int
+                get() {
+                    val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                    val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
+                    return (fontRenderer.getStringWidth(string) * scale).toInt() + 1
+                }
 
             init {
                 textInput.registerToEvent(key) {
@@ -1130,8 +1154,11 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: yOffsets.size) - 1
+                @Suppress("SpacingAroundCurly")
+                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                        ?: yOffsets.size
+                    ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1
@@ -1263,18 +1290,9 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
+
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(
-                    0f,
-                    0f,
-                    width.toFloat(),
-                    height.toFloat(),
-                    uMin,
-                    uMax,
-                    vMin,
-                    vMax,
-                    GL11.GL_NEAREST,
-                )
+                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
@@ -1303,17 +1321,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(
-                    0f,
-                    0f,
-                    width.toFloat(),
-                    height.toFloat(),
-                    uMin,
-                    uMax,
-                    vMin,
-                    vMax,
-                    GL11.GL_NEAREST,
-                )
+                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }

@@ -30,7 +30,7 @@ public class BestiaryFormattingConfig {
     @ConfigOption(name = "Progress to Max", desc = "Text to show progress when the §eMaxed Bestiary §7option is §aON\n" +
         "§e%currentKill% §7is replaced with your current total kill.")
     @ConfigEditorText
-    public String showMax_progress = "%currentKill%/250k (%percentNumber%%)";
+    public String showMax_progress = "%currentKill%/100k (%percentNumber%%)";
 
     @Expose
     @ConfigOption(name = "Progress", desc = "Text to show progress when the §eMaxed Bestiary §7option is §cOFF\n" +

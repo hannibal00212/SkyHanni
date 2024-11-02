@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -62,10 +62,10 @@ object CarnivalZombieShootout {
     )
 
     enum class ZombieType(val points: Int, val helmet: String, val color: Color) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42)), //Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192)), //Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0)), //Gold
-        DIAMOND(120, "Diamond Helmet", Color(185, 242, 255)) //Diamond
+        LEATHER(30, "Leather Cap", Color(165, 42, 42)), // Brown
+        IRON(50, "Iron Helmet", Color(192, 192, 192)), // Silver
+        GOLD(80, "Golden Helmet", Color(255, 215, 0)), // Gold
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
     }
 
     @SubscribeEvent
@@ -82,14 +82,18 @@ object CarnivalZombieShootout {
         if (lastUpdate.zombie.passedSince() >= 0.25.seconds) {
             val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
                 if (zombie.health <= 0) return@mapNotNull null
-                val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-                val type = toType(armor) ?: return@mapNotNull null
+                val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+                val type = toType(helmet) ?: return@mapNotNull null
                 zombie to type
             }.toMap()
 
-            drawZombies =
-                if (config.highestOnly) nearbyZombies.filterValues { zombieType -> zombieType == nearbyZombies.values.maxByOrNull { it.points } }
-                else nearbyZombies
+            drawZombies = if (config.highestOnly)
+                nearbyZombies.filterValues { zombieType ->
+                    zombieType == nearbyZombies.values.maxByOrNull {
+                        it.points
+                    }
+                }
+            else nearbyZombies
 
             lastUpdate.zombie = SimpleTimeMark.now()
         }
@@ -98,19 +102,11 @@ object CarnivalZombieShootout {
             val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
             val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
-            val boundingBox = entity.entityBoundingBox.let {
-                if (isSmall) {
-                    val widthScale = 0.5
-                    val heightScale = 0.85
-                    val newMin = it.minX + (it.maxX - it.minX) * (1 - widthScale) / 2
-                    val newMax = it.maxX - (it.maxX - it.minX) * (1 - widthScale) / 2
-                    val newHeight = it.minY + (it.maxY - it.minY) * heightScale / 1.75
-                    AxisAlignedBB(newMin, it.minY, it.minZ, newMax, newHeight, it.maxZ)
-                } else it
-            }.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0)
+            val boundingBox = if (isSmall) entity.entityBoundingBox.expand(0.0, -0.4, 0.0).offset(0.0, -0.4, 0.0)
+            else entity.entityBoundingBox
 
             event.drawHitbox(
-                boundingBox,
+                boundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
                 lineWidth = 3,
                 type.color,
                 depth = false,
@@ -136,7 +132,7 @@ object CarnivalZombieShootout {
             content = Renderable.horizontalContainer(
                 listOf(
                     Renderable.itemStack(lamp),
-                    Renderable.string("§6Disappears in $prefix${timer}"),
+                    Renderable.string("§6Disappears in $prefix$timer"),
                 ),
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,

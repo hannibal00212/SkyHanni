@@ -50,7 +50,6 @@ object ArmorStackDisplay {
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
-
         stackPattern.findMatcher(event.actionBar) {
             updateStack(group("stack").toInt(), group("symbol"))
         } ?: resetStack()

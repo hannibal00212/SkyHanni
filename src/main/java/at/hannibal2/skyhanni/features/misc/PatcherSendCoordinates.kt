@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -67,9 +69,12 @@ object PatcherSendCoordinates {
 
         for (beacon in patcherBeacon) {
             val location = beacon.location
+            val distance = location.distanceToPlayer()
+            val formattedDistance = distance.toInt().addSeparators()
+
             event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
             event.drawWaypointFilled(location, config.color.toChromaColor(), true, true)
-            event.drawString(location.add(0.5, 0.5, 0.5), beacon.name, true, LorenzColor.DARK_BLUE.toColor())
+            event.drawString(location.blockCenter(), beacon.name + " §e[${formattedDistance}m]", true, LorenzColor.DARK_BLUE.toColor())
         }
     }
 

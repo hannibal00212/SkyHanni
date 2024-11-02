@@ -1,0 +1,64 @@
+name: "Assign relevant labels"
+on:
+    pull_request_target:
+        types: [ opened, edited ]
+jobs:
+    assign-label:
+        if: github.event.pull_request.state == 'open'
+        runs-on: ubuntu-latest
+        permissions:
+            issues: write
+            pull-requests: write
+            contents: read
+        steps:
+            -   name: label
+                env:
+                    TITLE: ${{ github.event.pull_request.title }}
+                    LABEL_FIX: Bug Fix
+                    LABEL_BACKEND: Backend
+                uses: actions/github-script@v7
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN}}
+                    script: |
+                        const labelsToAdd = [];
+                        const labelsToRemove = [];
+                        const title = process.env.TITLE.split(":")[0].toUpperCase();
+                        
+                        if(title.includes("FIX")){
+                          labelsToAdd.push(process.env.LABEL_FIX);
+                        } else {
+                          labelsToRemove.push(process.env.LABEL_FIX);
+                        }
+                        
+                        if(title.includes("BACKEND")){
+                          labelsToAdd.push(process.env.LABEL_BACKEND);
+                        } else {
+                          labelsToRemove.push(process.env.LABEL_BACKEND);
+                        }
+                        
+                        for (const label of labelsToAdd) {
+                          github.rest.issues.addLabels({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            labels: [label]
+                          });
+                        }
+                        
+                        const {data} = await github.rest.issues.listLabelsOnIssue({
+                          issue_number: context.issue.number,
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                        });
+                        
+                        for (const label of labelsToRemove) {
+                          const filtered = data.filter(l => l.name == label);
+                          if(filtered.length == 1){
+                            github.rest.issues.removeLabel({
+                              issue_number: context.issue.number,
+                              owner: context.repo.owner,
+                              repo: context.repo.repo,
+                              name: label
+                            });
+                          }
+                        }

@@ -1,12 +1,11 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.findShortestDistance
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -18,8 +17,8 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -28,6 +27,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -73,7 +73,7 @@ object TunnelsMaps {
             field = value
         }
 
-    private var closedNote: GraphNode? = null
+    private var closestNode: GraphNode? = null
     private var path: Pair<Graph, Double>? = null
 
     private var possibleLocations = mapOf<String, List<GraphNode>>()
@@ -81,6 +81,8 @@ object TunnelsMaps {
     private var active: String = ""
 
     private lateinit var fairySouls: Map<String, GraphNode>
+
+    // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
@@ -93,11 +95,11 @@ object TunnelsMaps {
             return it
         }
 
-        val closed = closedNote ?: return null
+        val closest = closestNode ?: return null
         val list = possibleLocations[name] ?: return null
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
-        val best = offCooldown.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
+        val best = offCooldown.minByOrNull { GraphUtils.findShortestDistance(closest, it) } ?: list.minBy {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
         if (cooldowns[best]?.isInPast() != false) {
@@ -147,7 +149,7 @@ object TunnelsMaps {
 
     /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
+        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) }.orEmpty()
     }
 
     private var clickTranslate = mapOf<Int, String>()
@@ -221,7 +223,7 @@ object TunnelsMaps {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -235,7 +237,12 @@ object TunnelsMaps {
                 key.contains("Fairy") -> fairy[key] = value.first()
                 newGemstonePattern.matches(key) -> newGemstone[key] = value
                 oldGemstonePattern.matches(key) -> oldGemstone[key] = value
-                else -> other[key] = value
+                else -> {
+                    // ignore node names without color codes
+                    if (key.removeColor() != key) {
+                        other[key] = value
+                    }
+                }
             }
         }
         fairySouls = fairy
@@ -243,7 +250,8 @@ object TunnelsMaps {
         this.oldGemstones = oldGemstone
         normalLocations = other
         translateTable.clear()
-        DelayedRun.runNextTick { // Needs to be delayed since the config may not be loaded
+        DelayedRun.runNextTick {
+            // Needs to be delayed since the config may not be loaded
             locationDisplay = generateLocationsDisplay()
         }
     }
@@ -323,7 +331,7 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
@@ -359,9 +367,11 @@ object TunnelsMaps {
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
         Renderable.string(
-            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
-                it.key.removeColor().removeSuffix("stone"),
-            ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
+            (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
+                "ROUGH_".plus(
+                    it.key.removeColor().removeSuffix("stone"),
+                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
@@ -387,12 +397,12 @@ object TunnelsMaps {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
-        val prevClosed = closedNote
-        closedNote = graph.minBy { it.position.distanceSqToPlayer() }
-        val closest = closedNote ?: return
+        val prevclosest = closestNode
+        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        val closest = closestNode ?: return
         val goal = goal ?: return
-        if (closest == prevClosed && goal == prevGoal) return
-        val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
+        if (closest == prevclosest && goal == prevGoal) return
+        val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
@@ -447,7 +457,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
-            showNoteNames = true,
+            showNodeNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -475,7 +485,7 @@ object TunnelsMaps {
         nextSpotKey(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
         if (event.clickType != ClickType.LEFT_CLICK) return
@@ -492,8 +502,8 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
-    fun onLorenzWarp(event: LorenzWarpEvent) {
+    @HandleEvent
+    fun onWarp(event: SkyHanniWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {
             DelayedRun.runNextTick {
@@ -504,8 +514,8 @@ object TunnelsMaps {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (closedNote == null) return // Value that must be none null if it was active
-        closedNote = null
+        if (closestNode == null) return // Value that must be none null if it was active
+        closestNode = null
         clearPath()
         cooldowns.clear()
         goalReached = false
@@ -524,7 +534,7 @@ object TunnelsMaps {
         goal = getNext()
     }
 
-    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center")
+    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }

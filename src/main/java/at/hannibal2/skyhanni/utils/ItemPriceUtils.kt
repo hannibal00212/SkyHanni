@@ -6,21 +6,24 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 
 object ItemPriceUtils {
 
+    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
+    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".toInternalName() }
+
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ) = getPriceOrNull(priceSource, pastRecipes) ?: 0.0
 
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
         when (this) {
             NEUInternalName.JASPER_CRYSTAL -> return 0.0
@@ -38,11 +41,11 @@ object ItemPriceUtils {
                 return it
             }
 
-            if (equals("JACK_O_LANTERN")) {
+            if (this == JACK_O_LANTERN) {
                 return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
             }
         }
-        if (equals("GOLDEN_CARROT")) {
+        if (this == GOLDEN_CARROT) {
             // 6.8 for some players
             return 7.0 // NPC price
         }
@@ -60,7 +63,7 @@ object ItemPriceUtils {
     // NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost
     fun NEUInternalName.getRawCraftCostOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? = getRecipes(this).filter { it !in pastRecipes }
         .map { it.getRecipePrice(priceSource, pastRecipes + it) }
         .filter { it >= 0 }

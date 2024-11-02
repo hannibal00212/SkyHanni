@@ -33,7 +33,7 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(display, posLabel = "Upcoming Events Display")
+        config.position.renderRenderables(display, posLabel = "Upcoming Mining Events")
     }
 
     private fun updateDisplay() {
@@ -68,7 +68,7 @@ object MiningEventDisplay {
             } else {
                 Renderable.string("§a${islandType.displayName}§8:")
             }
-            add(Renderable.horizontalContainer(listOf(islandName, *upcomingEvents), 3))
+            add(Renderable.horizontalContainer(listOf(islandName) + upcomingEvents, 3))
         }
     }
 

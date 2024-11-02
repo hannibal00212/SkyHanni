@@ -8,11 +8,11 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 
-const val selectedColor = 0x50000000
-const val notSelectedColor = 0x50303030
-const val tabSpacing = 5
-const val tabShortSide = 25
-const val tabLongSide = 28
+const val SELECTED_COLOR = 0x50000000
+const val NOT_SELECTED_COLOR = 0x50303030
+const val TAB_SPACING = 5
+const val TAB_SHORT_SIDE = 25
+const val TAB_LONG_SIDE = 28
 
 abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
 
@@ -50,11 +50,11 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
     }
 
     private fun renderHorizontalTabs() {
-        var offset = Pair(tabSpacing.toFloat() * 3f, -tabLongSide.toFloat())
+        var offset = Pair(TAB_SPACING.toFloat() * 3f, -TAB_LONG_SIDE.toFloat())
         GlStateManager.translate(offset.first, offset.second, 0f)
         for (tab in horizontalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
-            val xShift = (tabShortSide + tabSpacing).toFloat()
+            val xShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first + xShift to offset.second
             GlStateManager.translate(xShift, 0f, 0f)
         }
@@ -62,11 +62,11 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
     }
 
     private fun renderVerticalTabs() {
-        var offset = Pair(-tabLongSide.toFloat(), tabSpacing.toFloat() * 3f)
+        var offset = Pair(-TAB_LONG_SIDE.toFloat(), TAB_SPACING.toFloat() * 3f)
         GlStateManager.translate(offset.first, offset.second, 0f)
         for (tab in verticalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
-            val yShift = (tabShortSide + tabSpacing).toFloat()
+            val yShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first to offset.second + yShift
             GlStateManager.translate(0f, yShift, 0f)
         }

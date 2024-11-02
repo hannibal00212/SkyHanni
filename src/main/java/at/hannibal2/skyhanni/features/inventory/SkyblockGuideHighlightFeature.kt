@@ -21,8 +21,8 @@ import org.intellij.lang.annotations.Language
 
 val patternGroup = RepoPattern.group("skyblockguide.highlight")
 
-private const val keyPrefixInventory = "inventory"
-private const val keyPrefixCondition = "condition"
+private const val KEY_PREFIX_INVENTORY = "inventory"
+private const val KEY_PREFIX_CONDITION = "condition"
 
 class SkyblockGuideHighlightFeature private constructor(
     private val config: () -> Boolean,
@@ -44,8 +44,8 @@ class SkyblockGuideHighlightFeature private constructor(
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
         config,
-        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
-        patternGroup.pattern("$key.$keyPrefixCondition", loreCondition),
+        patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
+        patternGroup.pattern("$key.$KEY_PREFIX_CONDITION", loreCondition),
         onSlotClicked,
         onTooltip
     )
@@ -59,7 +59,7 @@ class SkyblockGuideHighlightFeature private constructor(
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
         config,
-        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
+        patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
         loreCondition,
         onSlotClicked,
         onTooltip
@@ -132,13 +132,13 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         private val taskOnlyCompleteOncePattern =
-            patternGroup.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
-        private val xPattern = patternGroup.pattern("$keyPrefixCondition.x", "§c ?✖.*")
+            patternGroup.pattern("$KEY_PREFIX_CONDITION.once", "§7§eThis task can only be completed once!")
+        private val xPattern = patternGroup.pattern("$KEY_PREFIX_CONDITION.x", "§c ?✖.*")
         private val totalProgressPattern =
-            patternGroup.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
+            patternGroup.pattern("$KEY_PREFIX_CONDITION.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
         private val categoryProgressPattern =
             patternGroup.pattern(
-                "$keyPrefixCondition.category",
+                "$KEY_PREFIX_CONDITION.category",
                 "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
             )
 
@@ -175,7 +175,8 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") },
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(
@@ -250,6 +251,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern
             )
+            @Suppress("MaxLineLength")
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",

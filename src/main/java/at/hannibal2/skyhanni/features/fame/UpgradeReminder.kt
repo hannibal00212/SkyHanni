@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -52,6 +56,7 @@ object UpgradeReminder {
         "claimed",
         "§eYou claimed the §r§a(?<upgrade>.+) §r§eupgrade!",
     )
+    @Suppress("UnusedPrivateProperty")
     private val upgradePattern by patternGroup.pattern(
         "upgrade",
         "§eClick to start upgrade!",
@@ -92,6 +97,36 @@ object UpgradeReminder {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
+        if (!inInventory) return
+
+        if (currentProfileUpgrade == null && currentAccountUpgrade == null) return
+        detectWrongAccountUpgradeData(event.inventoryItems)
+    }
+
+    private fun detectWrongAccountUpgradeData(items: Map<Int, ItemStack>) {
+        val hasProfileUpgrade = foundActiveUpgrade(items, 27..35)
+        if (!hasProfileUpgrade && currentProfileUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Profile Upgrade information.")
+            currentProfileUpgrade = null
+        }
+
+        val hasAccountUpgrade = foundActiveUpgrade(items, 36..44)
+        if (!hasAccountUpgrade && currentAccountUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Account Upgrade information.")
+            currentAccountUpgrade = null
+        }
+    }
+
+    private fun foundActiveUpgrade(items: Map<Int, ItemStack>, slots: IntRange): Boolean {
+        for (slot in slots) {
+            val item = items[slot] ?: continue
+            val isUpgrading = item.getLore().any { it == "§aCurrently upgrading!" }
+            val isDone = item.getLore().any { it == "§cClick to claim!" }
+            val isReadyForUpgrade = item.getLore().any { it == "§eClick to start upgrade!" }
+            if (isUpgrading || isDone) return true
+            if (isReadyForUpgrade) return false
+        }
+        return false
     }
 
     @SubscribeEvent
@@ -162,7 +197,16 @@ object UpgradeReminder {
                 "The §a$name §eupgrade has completed!",
                 config::accountUpgradeReminder,
                 actionName = "warp to Hub",
-                action = { HypixelCommands.warp("hub") },
+                action = {
+                    HypixelCommands.warp("hub")
+                    EntityMovementData.onNextTeleport(IslandType.HUB) {
+                        IslandGraphs.pathFind(
+                            LorenzVec(-2.6, 73.0, -101.6),
+                            "§eCommunity Shop",
+                            condition = { config.accountUpgradeReminder },
+                        )
+                    }
+                },
             )
         }
 

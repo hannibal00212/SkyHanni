@@ -68,7 +68,8 @@ object BitsAPI {
 
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "rankup.bits",
-        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
+        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your " +
+            "§epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
     )
 
     private val fameRankUpPattern by bitsChatGroup.pattern(
@@ -145,7 +146,7 @@ object BitsAPI {
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.scoreboard) {
+        for (line in event.added) {
             val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {

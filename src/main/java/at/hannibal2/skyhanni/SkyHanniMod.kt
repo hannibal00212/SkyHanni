@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -42,7 +42,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "0.27.Beta.8",
+    version = "@MOD_VERSION@",
 )
 class SkyHanniMod {
 
@@ -59,9 +59,9 @@ class SkyHanniMod {
 
         SkyHanniEvents.init(modules)
 
-        Commands.init()
+        CommandRegistrationEvent.post()
 
-        PreInitFinishedEvent().post()
+        PreInitFinishedEvent.post()
     }
 
     @Mod.EventHandler

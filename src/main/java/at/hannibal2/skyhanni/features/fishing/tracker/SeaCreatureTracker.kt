@@ -4,11 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
@@ -25,11 +27,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SeaCreatureTracker {
+    private var needMigration = true
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
 
@@ -55,12 +59,12 @@ object SeaCreatureTracker {
         }
     }
 
-    private val nameAll: CategoryName = "All"
-    private var currentCategory: CategoryName = nameAll
+    private const val NAME_ALL: CategoryName = "All"
+    private var currentCategory: CategoryName = NAME_ALL
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[nameAll] = data.amount.size
+        map[NAME_ALL] = data.amount.size
         for ((category, names) in SeaCreatureManager.allVariants) {
             val amount = names.count { it in data.amount }
             if (amount > 0) {
@@ -71,7 +75,15 @@ object SeaCreatureTracker {
         return map
     }
 
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        needMigration = true
+    }
+
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        // manually migrating from "Phlhlegblast" to "Plhlegblast" when the new name is in the repo
+        tryToMigrate(data.amount)
+
         addSearchString("§7Sea Creature Tracker:")
 
         val filter: (String) -> Boolean = addCategories(data)
@@ -84,7 +96,7 @@ object SeaCreatureTracker {
                     "Sea Creature Tracker can not display a name correctly",
                     "Could not find sea creature by name",
                     "SeaCreatureManager.allFishingMobs.keys" to SeaCreatureManager.allFishingMobs.keys,
-                    "name" to name
+                    "name" to name,
                 )
                 name
             }
@@ -99,11 +111,30 @@ object SeaCreatureTracker {
         addSearchString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
     }
 
+    private fun tryToMigrate(
+        data: MutableMap<String, Int>,
+    ) {
+        if (!needMigration) return
+        needMigration = false
+
+        val oldName = "Phlhlegblast"
+        val newName = "Plhlegblast"
+
+        // only migrate once the repo contains the new name
+        if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
+            data[oldName]?.let {
+                ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
+                data[newName] = it
+                data.remove(oldName)
+            }
+        }
+    }
+
     private fun MutableList<Searchable>.addCategories(data: Data): (String) -> Boolean {
         val amounts = getCurrentCategories(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = nameAll
+            currentCategory = NAME_ALL
         }
 
         if (tracker.isInventoryOpen()) {
@@ -114,11 +145,11 @@ object SeaCreatureTracker {
                     val id = list.indexOf(currentCategory)
                     currentCategory = list[(id + 1) % list.size]
                     tracker.update()
-                }
+                },
             )
         }
 
-        return if (currentCategory == nameAll) {
+        return if (currentCategory == NAME_ALL) {
             { true }
         } else filterCurrentCategory()
     }
@@ -160,6 +191,5 @@ object SeaCreatureTracker {
         tracker.resetCommand()
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && !FishingAPI.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingAPI.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }

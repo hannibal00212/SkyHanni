@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -30,7 +30,7 @@ object GardenYawAndPitch {
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         val player = Minecraft.getMinecraft().thePlayer
-        var yaw = LocationUtils.calculatePlayerYaw()
+        val yaw = LocationUtils.calculatePlayerYaw()
         val pitch = player.rotationPitch
 
         if (yaw != lastYaw || pitch != lastPitch) {
@@ -41,8 +41,8 @@ object GardenYawAndPitch {
 
         if (!config.showAlways && lastChange.passedSince() > config.timeout.seconds) return
 
-        val yawText = yaw.round(config.yawPrecision).toBigDecimal().toPlainString()
-        val pitchText = pitch.round(config.pitchPrecision).toBigDecimal().toPlainString()
+        val yawText = yaw.roundTo(config.yawPrecision).toBigDecimal().toPlainString()
+        val pitchText = pitch.roundTo(config.pitchPrecision).toBigDecimal().toPlainString()
         val displayList = listOf(
             "§aYaw: §f$yawText",
             "§aPitch: §f$pitchText",
@@ -60,8 +60,10 @@ object GardenYawAndPitch {
     }
 
     private fun isEnabled() =
-        config.enabled && ((OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
+        config.enabled && (
+            (OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+                (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
+            )
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

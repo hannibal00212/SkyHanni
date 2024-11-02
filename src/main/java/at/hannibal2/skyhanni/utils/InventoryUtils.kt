@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -41,18 +43,20 @@ object InventoryUtils {
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
+    fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
     fun getItemsInOwnInventory() =
-        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
     fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar() =
-        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
+        getItemsInOwnInventoryWithNull()?.slice(0..8)?.filterNotNull().orEmpty()
 
     fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
         countItemsInLowerInventory(predicate) > 0
@@ -61,8 +65,8 @@ object InventoryUtils {
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
     fun inStorage() = openInventoryName().let {
-        (it.contains("Storage") && !it.contains("Rift Storage"))
-            || it.contains("Ender Chest") || it.contains("Backpack")
+        (it.contains("Storage") && !it.contains("Rift Storage")) ||
+            it.contains("Ender Chest") || it.contains("Backpack")
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
@@ -75,14 +79,17 @@ object InventoryUtils {
     fun getBoots(): ItemStack? = getArmor()[0]
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
+        if (!PlatformUtils.isNeuLoaded()) {
+            return@RecalculatingValue false
+        }
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 
             val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField.get(config)
+            val storage = storageField[config]
 
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField.get(storage) as Boolean
+            booleanField[storage] as Boolean
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false
@@ -130,4 +137,6 @@ object InventoryUtils {
         val controller = Minecraft.getMinecraft().playerController
         controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
+
+    fun Slot.isTopInventory() = inventory is ContainerLocalMenu
 }

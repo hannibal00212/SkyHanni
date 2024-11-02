@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -139,7 +139,9 @@ object DianaProfitTracker {
             tryHide(event)
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" || message == "§eFollow the arrows to find the §r§6treasure§r§e!") {
+        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
+            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
+        ) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }

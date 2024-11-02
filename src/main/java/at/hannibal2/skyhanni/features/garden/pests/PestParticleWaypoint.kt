@@ -17,10 +17,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S0EPacketSpawnObject
@@ -49,7 +48,7 @@ object PestParticleWaypoint {
     private var isPointingToPest = false
     private var color: Color? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
@@ -86,7 +85,7 @@ object PestParticleWaypoint {
         val yellow = LorenzVec(0.8, 0.8, 0.0)
         val redPest = LorenzVec(0.8, 0.4, 0.0)
         val redPlot = LorenzVec(0.8, 0.0, 0.0)
-        isPointingToPest = when (event.offset.round(5)) {
+        isPointingToPest = when (event.offset.roundTo(5)) {
             redPlot -> false
             redPest, yellow, darkYellow -> true
             else -> return
@@ -121,7 +120,7 @@ object PestParticleWaypoint {
         ++particles
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
         if (!config.hideParticles) return
@@ -145,12 +144,11 @@ object PestParticleWaypoint {
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
-        if (config.drawLine) event.draw3DLine(
-            event.exactPlayerEyeLocation(),
+        if (config.drawLine) event.drawLineToEye(
             waypoint,
             color,
             3,
-            false
+            false,
         )
     }
 

@@ -6,9 +6,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import io.github.moulberry.notenoughupdates.util.Utils
 import java.io.FileReader
 
 object GhostUtil {
@@ -71,7 +70,7 @@ object GhostUtil {
             }
             val json = ConfigManager.gson.fromJson(
                 FileReader(GhostCounter.ghostCounterV3File),
-                com.google.gson.JsonObject::class.java
+                com.google.gson.JsonObject::class.java,
             )
             GhostData.Option.GHOSTSINCESORROW.add(json["ghostsSinceSorrow"].asDouble)
             GhostData.Option.SORROWCOUNT.add(json["sorrowCount"].asDouble)
@@ -91,34 +90,25 @@ object GhostUtil {
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
 
-    fun String.formatText(value: Int, session: Int = -1) = Utils.chromaStringByColourCode(
-        this.replace("%value%", value.addSeparators())
-            .replace("%session%", session.addSeparators())
-            .replace("&", "§")
-    )
+    fun String.formatText(value: Int, session: Int = -1) = this.replace("%value%", value.addSeparators())
+        .replace("%session%", session.addSeparators())
+        .replace("&", "§")
 
-    fun String.formatText(t: String) = Utils.chromaStringByColourCode(this.replace("%value%", t).replace("&", "§"))
+    fun String.formatText(t: String) = this.replace("%value%", t).replace("&", "§")
 
     fun String.preFormat(t: String, level: Int, nextLevel: Int) = if (nextLevel == 26) {
-        Utils.chromaStringByColourCode(
-            replace("%value%", t)
-                .replace("%display%", "25")
-        )
+        replace("%value%", t).replace("%display%", "25")
     } else {
-        Utils.chromaStringByColourCode(
-            this.replace("%value%", t)
-                .replace(
-                    "%display%",
-                    "$level->${if (SkyHanniMod.feature.combat.ghostCounter.showMax) "25" else nextLevel}"
-                )
-        )
+        this.replace("%value%", t)
+            .replace(
+                "%display%",
+                "$level->${if (SkyHanniMod.feature.combat.ghostCounter.showMax) "25" else nextLevel}",
+            )
     }
 
-    fun String.formatText(value: Double, session: Double) = Utils.chromaStringByColourCode(
-        this.replace("%value%", value.roundToPrecision(2).addSeparators())
-            .replace("%session%", session.roundToPrecision(2).addSeparators())
-            .replace("&", "§")
-    )
+    fun String.formatText(value: Double, session: Double) = this.replace("%value%", value.roundTo(2).addSeparators())
+        .replace("%session%", session.roundTo(2).addSeparators())
+        .replace("&", "§")
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
         val bestiaryNextLevel = GhostCounter.storage?.bestiaryNextLevel
@@ -127,19 +117,17 @@ object GhostUtil {
         val nextLevel = bestiaryNextLevel?.let { if (GhostCounter.config.showMax) "25" else "${it.toInt()}" }
             ?: "§cNo Bestiary Level data!"
 
-        return Utils.chromaStringByColourCode(
-            this.replace(
-                "%currentKill%",
-                if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators()
-            )
-                .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
-                .replace("%killNeeded%", killNeeded.shortFormat())
-                .replace("%currentLevel%", currentLevel)
-                .replace("%nextLevel%", nextLevel)
-                .replace("&", "§")
+        return this.replace(
+            "%currentKill%",
+            if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators(),
         )
+            .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
+            .replace("%killNeeded%", killNeeded.shortFormat())
+            .replace("%currentLevel%", currentLevel)
+            .replace("%nextLevel%", nextLevel)
+            .replace("&", "§")
     }
 
     private fun percent(number: Double) =
-        100.0.coerceAtMost(((number / 250_000) * 100).roundToPrecision(4)).toString()
+        100.0.coerceAtMost(((number / 100_000) * 100).roundTo(4)).toString()
 }

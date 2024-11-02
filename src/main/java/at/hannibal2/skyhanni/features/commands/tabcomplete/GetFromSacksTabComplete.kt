@@ -19,7 +19,7 @@ object GetFromSacksTabComplete {
         return GetFromSackAPI.sackListNames.map { it.replace(" ", "_") }
     }
 
-    //No subscribe since it needs to be called from the GetFromSackAPI
+    // No subscribe since it needs to be called from the GetFromSackAPI
     fun handleUnderlineReplace(event: MessageSendToServerEvent): MessageSendToServerEvent {
         if (!isEnabled()) return event
 

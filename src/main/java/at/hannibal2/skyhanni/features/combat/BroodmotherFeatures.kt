@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KMutableProperty0
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -27,13 +28,13 @@ import kotlin.time.DurationUnit
 @SkyHanniModule
 object BroodmotherFeatures {
 
-    enum class StageEntry(private val str: String, val minutes: Int) {
-        SLAIN("§eSlain", 10),
-        DORMANT("§eDormant", 9),
-        SOON("§6Soon", 6),
-        AWAKENING("§6Awakening", 3),
-        IMMINENT("§4Imminent", 1),
-        ALIVE("§4Alive!", 0);
+    enum class StageEntry(private val str: String, val duration: Duration) {
+        SLAIN("§eSlain", 10.minutes),
+        DORMANT("§eDormant", 9.minutes),
+        SOON("§6Soon", 6.minutes),
+        AWAKENING("§6Awakening", 3.minutes),
+        IMMINENT("§4Imminent", 1.minutes),
+        ALIVE("§4Alive!", 0.minutes);
 
         override fun toString() = str
     }
@@ -49,8 +50,8 @@ object BroodmotherFeatures {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
-        val newStage = event.widget.matchMatcherFirstLine { group("stage") } ?: ""
-        if (newStage.isNotEmpty()) {
+        val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
+        if (newStage.isNotEmpty() && newStage != lastStage.toString()) {
             lastStage = currentStage
             currentStage = StageEntry.valueOf(newStage.replace("!", "").uppercase())
             onStageUpdate()
@@ -60,7 +61,7 @@ object BroodmotherFeatures {
     private fun onStageUpdate() {
         ChatUtils.debug("New Broodmother stage: $currentStage")
 
-        if (lastStage == null && onServerJoin()) return
+        if (onServerJoin()) return
 
         // ignore Hypixel bug where the stage may temporarily revert to Imminent after the Broodmother's death
         if (currentStage == StageEntry.IMMINENT && lastStage == StageEntry.ALIVE) return
@@ -70,14 +71,14 @@ object BroodmotherFeatures {
             return
         }
 
+        val lastStage = lastStage ?: return
+        val timeUntilSpawn = currentStage?.duration ?: return
+        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
+
         if (currentStage == StageEntry.IMMINENT && config.imminentWarning) {
             playImminentWarning()
             return
         }
-
-        val lastStage = lastStage ?: return
-        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
-        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
 
         if (currentStage !in config.stages) return
         if (currentStage == StageEntry.SLAIN) {
@@ -91,19 +92,19 @@ object BroodmotherFeatures {
     }
 
     private fun onServerJoin(): Boolean {
+        if (lastStage != null || !config.stageOnJoin) return false
         // don't send if user has config enabled for either of the alive messages
         // this is so that two messages aren't immediately sent upon joining a server
-        if (config.stageOnJoin && !(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
-            val pluralize = StringUtils.pluralize(currentStage?.minutes ?: 0, "minute")
+        if (!(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
+            val duration = currentStage?.duration
             var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
-            if (currentStage?.minutes != 0) {
-                message += " It will spawn §bwithin ${currentStage?.minutes} $pluralize§e."
+            if (duration != 0.minutes) {
+                message += " It will spawn §bwithin $duration§e."
             }
             ChatUtils.chat(message)
             return true
-        } else {
-            return false
         }
+        return false
     }
 
     private fun onBroodmotherSpawn() {
@@ -150,6 +151,9 @@ object BroodmotherFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display.isEmpty()) return
+        if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
+            display = "§4Broodmother spawning now!"
+        }
 
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
@@ -159,7 +163,7 @@ object BroodmotherFeatures {
         if (!isCountdownEnabled()) return
 
         if (broodmotherSpawnTime.isFarPast()) {
-            if (lastStage != null && currentStage == StageEntry.ALIVE) {
+            if (currentStage == StageEntry.ALIVE) {
                 display = "§4Broodmother spawned!"
             }
         } else {

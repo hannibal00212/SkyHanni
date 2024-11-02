@@ -15,6 +15,7 @@ object CompactSplashPotionMessage {
 
     private val config get() = SkyHanniMod.feature.chat.compactPotionMessages
 
+    @Suppress("MaxLineLength")
     private val potionEffectPatternList = listOf(
         "§a§lBUFF! §fYou were splashed by (?<playerName>.*) §fwith §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
         "§a§lBUFF! §fYou have gained §r(?<effectName>.*)§r§f! Press TAB or type /effects to view your active effects!".toPattern(),
@@ -55,7 +56,7 @@ object CompactSplashPotionMessage {
                 val byPlayer = groupOrNull("playerName")?.let { player ->
                     val displayName = player.cleanPlayerName(displayName = true)
                     " §aby $displayName"
-                } ?: ""
+                }.orEmpty()
                 sendMessage("§a§lPotion Effect! §r$effectName$byPlayer")
             } != null
         }

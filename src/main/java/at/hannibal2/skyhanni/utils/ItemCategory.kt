@@ -53,6 +53,10 @@ enum class ItemCategory {
     SACK,
     CHISEL,
     DYE,
+    ORE,
+    BLOCK,
+    DWARVEN_METAL,
+    GEMSTONE,
 
     NONE,
     ;

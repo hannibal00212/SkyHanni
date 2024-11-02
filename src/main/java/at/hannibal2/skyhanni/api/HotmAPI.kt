@@ -74,7 +74,7 @@ object HotmAPI {
 
         /** Use when new powder gets collected*/
         fun gain(difference: Long) {
-            ChatUtils.debug("Gained §a${difference.addSeparators()} §e${displayName} Powder")
+            ChatUtils.debug("Gained §a${difference.addSeparators()} $color$displayName Powder")
             addTotal(difference)
             addCurrent(difference)
             PowderGainEvent(this, difference).post()
@@ -91,10 +91,10 @@ object HotmAPI {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(chat: String, itemString: String) {
-        MINING_SPEED("Gain §r§a\\+100 §r§6⸕ Mining Speed§r§f\\.", "Gain §a\\+100 §6⸕ Mining Speed§7\\."),
-        MINING_FORTUNE("Gain §r§a\\+50 §r§6☘ Mining Fortune§r§f\\.", "Gain §a\\+50 §6☘ Mining Fortune§7\\."),
+        MINING_SPEED("Gain §r§6\\+100⸕ Mining Speed§r§f\\.", "Gain §6\\+100⸕ Mining Speed§7\\."),
+        MINING_FORTUNE("Gain §r§6\\+50☘ Mining Fortune§r§f\\.", "Gain §6\\+50☘ Mining Fortune§7\\."),
         EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
-        ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f\\.", "Reduce Pickaxe Ability cooldown by"),
+        ABILITY_COOLDOWN("§r§a-20%§r§f Pickaxe Ability cooldowns\\.", "§a-20%§7 Pickaxe Ability cooldowns\\."),
         GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
         TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\.")
         ;

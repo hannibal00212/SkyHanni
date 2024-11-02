@@ -76,7 +76,10 @@ object NonGodPotEffectDisplay {
         CURSE_OF_GREED("§4Curse of Greed I"),
 
         COLD_RESISTANCE_4("§bCold Resistance IV"),
-        ;
+
+        POWDER_PUMPKIN("§fPowder Pumpkin I"),
+        FILET_O_FORTUNE("§fFilet O' Fortune I"),
+        CHILLED_PRISTINE_POTATO("§fChilled Pristine Potato I"),
     }
 
     private val effectsCountPattern by RepoPattern.pattern(
@@ -93,6 +96,7 @@ object NonGodPotEffectDisplay {
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @SubscribeEvent
+    @Suppress("MaxLineLength")
     fun onChat(event: LorenzChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -11,6 +12,7 @@ public class CorpseTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Corpse Tracker overlay for Glacite Mineshafts.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = false;
 
     @Expose

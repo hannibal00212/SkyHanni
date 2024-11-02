@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -46,12 +48,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -80,9 +82,14 @@ object GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
 
     private val patternGroup = RepoPattern.group("garden.visitor")
+
+    /**
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
+     */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§bGarden§r§e!",
+        ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -170,6 +177,8 @@ object GardenVisitorFeatures {
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
 
+            if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
+
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
                 newVisitors.add(visitorName)
@@ -245,19 +254,17 @@ object GardenVisitorFeatures {
 
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: emptySet()
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
-        val requiredIngredients = mutableMapOf<String, Int>()
-        for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
-            requiredIngredients[key] =
-                requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        for ((key, count) in ingredients.toPrimitiveItemStacks()) {
+            requiredIngredients.addOrPut(key, count)
         }
         var hasIngredients = true
         for ((key, value) in requiredIngredients) {
-            val sackItem = key.asInternalName().getAmountInSacks()
+            val sackItem = key.getAmountInSacks()
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break
@@ -332,7 +339,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackUpdate(event: SackDataUpdateEvent) {
         update()
     }
@@ -357,12 +364,12 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(y = 2.23), text)
+        event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
+                event.parent.drawString(location.up(2.73), "§c!$name§c!")
             }
         }
     }
@@ -578,7 +585,9 @@ object GardenVisitorFeatures {
                 }
             }
 
-            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) && entity is EntityLivingBase) {
+            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) &&
+                entity is EntityLivingBase
+            ) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
@@ -678,7 +687,7 @@ object GardenVisitorFeatures {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
                 visitor.offer?.offerItem?.getInternalName()?.let {
-                    add("offer: '${it}'")
+                    add("offer: '$it'")
                 }
             }
         }

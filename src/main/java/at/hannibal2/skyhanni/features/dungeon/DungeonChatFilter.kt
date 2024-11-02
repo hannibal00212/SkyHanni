@@ -16,7 +16,7 @@ object DungeonChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    /// <editor-fold desc="Patterns, Messages, and Maps">
+    // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO
     private val endPatterns = listOf(
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
@@ -25,6 +25,7 @@ object DungeonChatFilter {
     private val endMessagesEndWith = listOf(
         " Experience §r§b(Team Bonus)"
     )
+    @Suppress("MaxLineLength")
     private val abilityPatterns = listOf(
         "§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.".toPattern(),
         "§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!".toPattern(),
@@ -99,11 +100,13 @@ object DungeonChatFilter {
     private val buffMessages = listOf(
         "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!"
     )
+    @Suppress("MaxLineLength")
     private val puzzlePatterns = listOf(
         "§a§lPUZZLE SOLVED! (.*) §r§ewasn't fooled by §r§c(.*)§r§e! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§a§lPUZZLE SOLVED! (.*) §r§etied Tic Tac Toe! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§4\\[STATUE] Oruo the Omniscient§r§f: §r(.*) §r§fthinks the answer is §r§6 . §r(.*)§r§f! §r§fLock in your party's answer in my Chamber!".toPattern(),
     )
+    @Suppress("MaxLineLength")
     private val puzzleMessages = listOf(
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fThough I sit stationary in this prison that is §r§cThe Catacombs§r§f, my knowledge knows no bounds.",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
@@ -122,6 +125,7 @@ object DungeonChatFilter {
         "§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
         "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!"
     )
+    @Suppress("MaxLineLength")
     private val pickupPatterns = listOf(
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!".toPattern(),
@@ -140,9 +144,12 @@ object DungeonChatFilter {
     private val pickupMessages = listOf(
         "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
     )
+
+    /**
+     * REGEX-TEST: §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
+     * REGEX-TEST: §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
+     */
     private val startPatterns = listOf(
-        //§a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
-        //§a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
         "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern()
     )
     private val startMessages = listOf(
@@ -157,6 +164,7 @@ object DungeonChatFilter {
         "(.*)§a is now ready!".toPattern(),
         "§aDungeon starts in (.*) seconds.".toPattern(),
     )
+    @Suppress("MaxLineLength")
     private val prepareMessages = listOf(
         "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
         "§aDungeon starts in 1 second.",
@@ -188,7 +196,7 @@ object DungeonChatFilter {
     private val messagesEndsWithMap: Map<MessageTypes, List<String>> = mapOf(
         MessageTypes.END to endMessagesEndWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -240,8 +248,8 @@ object DungeonChatFilter {
      * @see messagesEndsWithMap
      */
     private fun String.isPresent(key: MessageTypes): Boolean {
-        return this in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-            (messagesEndsWithMap[key] ?: emptyList()).any { this.endsWith(it) }
+        return this in (messagesMap[key].orEmpty()) ||
+            (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+            (messagesEndsWithMap[key].orEmpty()).any { this.endsWith(it) }
     }
 }

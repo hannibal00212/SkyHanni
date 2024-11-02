@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -8,8 +10,8 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -22,7 +24,7 @@ object LivingCaveLivingMetalHelper {
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType == ClickType.LEFT_CLICK) {
@@ -72,8 +74,8 @@ object LivingCaveLivingMetalHelper {
         } else b
         event.drawWaypointFilled(
             location,
-            LorenzColor.AQUA.toColor(),
-            seeThroughBlocks = location.distanceToPlayer() < 10
+            color,
+            seeThroughBlocks = location.distanceToPlayer() < 10,
         )
     }
 
@@ -96,6 +98,8 @@ object LivingCaveLivingMetalHelper {
             pair = null
         }
     }
+
+    val color get() = config.color.get().toChromaColor()
 
     fun isEnabled() = RiftAPI.inRift() && (RiftAPI.inLivingCave() || RiftAPI.inLivingStillness()) && config.enabled
 }

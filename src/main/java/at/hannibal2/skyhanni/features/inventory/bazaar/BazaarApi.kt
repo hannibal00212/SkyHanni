@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -66,13 +66,13 @@ object BazaarApi {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
-    fun searchForBazaarItem(displayName: String, amount: Int = -1) {
+    fun searchForBazaarItem(displayName: String, amount: Int? = null) {
         if (!LorenzUtils.inSkyBlock) return
         if (NEUItems.neuHasFocus()) return
         if (LorenzUtils.noTradeMode) return
         if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
         HypixelCommands.bazaar(displayName.removeColor())
-        if (amount != -1) OSUtils.copyToClipboard(amount.toString())
+        amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
     }
 
@@ -96,12 +96,12 @@ object BazaarApi {
                 orderOptionProduct = internalName
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
-                OwnInventoryData.ignoreItem(1.seconds, { it == internalName })
+                OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
             }
         }
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
-            OwnInventoryData.ignoreItem(1.seconds, { it == orderOptionProduct })
+            OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
         }
     }
 
@@ -123,6 +123,7 @@ object BazaarApi {
         }
     }
 
+    // TODO cache
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -134,7 +135,7 @@ object BazaarApi {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for ((slot, stack) in chest.getAllItems()) {
+        for ((slot, stack) in chest.getUpperItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
                 continue
             }

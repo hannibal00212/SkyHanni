@@ -42,7 +42,7 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("${prefix}${formattedAmount}")
+                Renderable.string("$prefix$formattedAmount")
             },
         ),
         ICON(
@@ -97,6 +97,9 @@ object ItemPickupLog {
         "SKYBLOCK_MENU",
         "CANCEL_PARKOUR_ITEM",
         "CANCEL_RACE_ITEM",
+        "MAXOR_ENERGY_CRYSTAL",
+        "ELLE_SUPPLIES",
+        "ELLE_FUEL_CELL",
     )
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
 
@@ -144,11 +147,11 @@ object ItemPickupLog {
             itemList.clear()
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-            val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
-                //this prevents items inside hypixel guis counting when picked up
+                // this prevents items inside hypixel guis counting when picked up
                 if (oldItemList.contains(hash)) {
                     inventoryItems.add(cursorItem)
                 }

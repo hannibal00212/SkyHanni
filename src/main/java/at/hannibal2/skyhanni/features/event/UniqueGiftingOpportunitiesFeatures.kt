@@ -57,12 +57,13 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private fun isEnabled() = holdingGift
 
-    private val hasNotGiftedNametag = "§a§lꤥ"
-    private val hasGiftedNametag = "§c§lꤥ"
+    @Suppress("UnusedPrivateProperty")
+    private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
+    private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 
     private fun analyzeArmorStand(entity: EntityArmorStand) {
         if (!config.useArmorStandDetection) return
-        if (entity.name != hasGiftedNametag) return
+        if (entity.name != HAS_GIFTED_NAMETAG) return
 
         val matchedPlayer = EntityUtils.getEntitiesNearby<EntityPlayer>(entity.getLorenzVec(), 2.0)
             .singleOrNull { !it.isNPC() } ?: return
