@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelId
+import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelIdOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
@@ -75,7 +77,7 @@ object PersonalCompactorOverlay {
             val slots = slotsMap[tier] ?: return
             val itemList = (0 until slots).map { slot ->
                 val skyblockId = itemStack.getAttributeString(prefix + slot)
-                skyblockId?.let { getInternalNameFromHypixelId(it) }?.getItemStack()
+                skyblockId?.let { getInternalNameFromHypixelIdOrNull(it) }?.getItemStack()
             }
 
             RenderableInventory.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)

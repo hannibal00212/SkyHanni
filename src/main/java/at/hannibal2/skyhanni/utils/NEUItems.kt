@@ -114,7 +114,7 @@ object NEUItems {
 
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
-        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+        return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
 
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
