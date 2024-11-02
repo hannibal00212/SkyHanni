@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -219,8 +220,8 @@ object CarnivalZombieShootout {
     private fun getZombies() =
         EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
             if (zombie.health <= 0) return@mapNotNull null
-            val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-            val type = toType(armor) ?: return@mapNotNull null
+            val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+            val type = toType(helmet) ?: return@mapNotNull null
             Zombie(zombie, type)
         }.toList()
 

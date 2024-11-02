@@ -23,7 +23,7 @@ public class FocusModeConfig {
     public int toggleKey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Disable Hint", desc = "Disable the line in item tooltips that show how to enable or disable this feature via key press.")
+    @ConfigOption(name = "Disable Hint", desc = "Disable the line in item tooltips that shows how to enable or disable this feature via key press.")
     @ConfigEditorBoolean
     public boolean disableHint = false;
 
@@ -31,4 +31,9 @@ public class FocusModeConfig {
     @ConfigOption(name = "Always Enabled", desc = "Ignore the keybind and enable this feature all the time.")
     @ConfigEditorBoolean
     public boolean alwaysEnabled = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Menu Items", desc = "Also hide the lore of non-SkyBlock items in menus.")
+    @ConfigEditorBoolean
+    public boolean hideMenuItems = true;
 }

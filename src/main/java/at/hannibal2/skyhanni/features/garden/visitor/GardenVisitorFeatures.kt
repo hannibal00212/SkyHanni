@@ -177,6 +177,8 @@ object GardenVisitorFeatures {
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
 
+            if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
+
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
                 newVisitors.add(visitorName)
