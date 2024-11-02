@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -209,6 +210,13 @@ public class InventoryConfig {
     public boolean highlightWidgets = true;
 
     @Expose
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.")
+    @SearchTag("skyblockxp")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skyblockXpBar = false;
+
+    @Expose
     @ConfigOption(name = " Vacuum Bag Cap", desc = "Cap the Garden Vacuum Bag item number display to 40.")
     @ConfigEditorBoolean
     public boolean vacuumBagCap = true;
@@ -216,8 +224,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). " +
-            "Sack items can be crafted normally."
+            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
