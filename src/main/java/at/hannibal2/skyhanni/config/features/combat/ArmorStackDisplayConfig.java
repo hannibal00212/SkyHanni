@@ -9,10 +9,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArmorStackDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enable the armor stack display feature.")
+    @ConfigOption(name = "Enable", desc = "Enable the armor stack display feature. This will show the count and expiration time of stacks for armors like Crimson, Terror, and others.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Single Line Display", desc = "Show the overlay in a single line.")

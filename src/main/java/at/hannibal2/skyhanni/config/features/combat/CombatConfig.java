@@ -28,7 +28,7 @@ public class CombatConfig {
     @Expose
     @ConfigOption(name = "Armor Stack", desc = "")
     @Accordion
-    public ArmorStackDisplayConfig armorStackDisplayConfig = new ArmorStackDisplayConfig();
+    public ArmorStackDisplayConfig armorStackDisplay = new ArmorStackDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")

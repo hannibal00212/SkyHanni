@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -20,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ArmorStackDisplay {
-    private val config get() = SkyHanniMod.feature.combat.armorStackDisplayConfig
+    private val config get() = SkyHanniMod.feature.combat.armorStackDisplay
     private var stackCount = 0
     private var stackSymbol = ""
     private var stackType = ""
@@ -28,6 +29,7 @@ object ArmorStackDisplay {
     private var display = listOf<String>()
     private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
+    private val pistonSounds = setOf("tile.piston.out", "tile.piston.in")
     /**
      * REGEX-TEST: §66,171/4,422❤  §6§l10ᝐ§r     §a1,295§a❈ Defense     §b525/1,355✎ §3400ʬ
      * REGEX-TEST: §66,171/4,422❤  §65ᝐ     §b-150 Mana (§6Wither Impact§b)     §b1,016/1,355✎ §3400ʬ
@@ -58,16 +60,14 @@ object ArmorStackDisplay {
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!isEnabled() && !config.armorStackDecayTimer) return
-        if (event.soundName in listOf("tile.piston.out", "tile.piston.in") &&
-            event.pitch == 1.0f && event.volume == 3.0f) {
+        if (!isEnabled() || !config.armorStackDecayTimer) return
+        if (event.soundName in pistonSounds && event.pitch == 1.0f && event.volume == 3.0f) {
             resetDecayTime()
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!isEnabled()) return
         resetStack()
     }
 
@@ -80,45 +80,40 @@ object ArmorStackDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() && !event.isMod(2)) return
         display = drawDisplay()
     }
 
     private fun drawDisplay(): List<String> {
-        if (stackCount == 0 || armorPieceCount < 3) return emptyList()
-        val displaySingleLine = config.showInSingleLine
-        val showStack = config.armorStackDisplay
-        val showTimer = config.armorStackDecayTimer
-        val maxStackOnly = config.maxStackOnly
+        if (stackCount == 0 || armorPieceCount < 2) return emptyList()
         val isMaxStack = stackCount == 10
 
-        val decayTimeString = if (showTimer) {
+        val decayTimeString = if (config.armorStackDecayTimer) {
             val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
             remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
         } else ""
 
         val colorCode = when {
-            isMaxStack && maxStackOnly -> "§b"
+            isMaxStack && config.maxStackOnly -> "§b"
             isMaxStack -> "§9"
             else -> "§b"
         }
 
-        if (displaySingleLine) {
-            return listOf(buildString {
-                if (showStack) {
+        return if (config.showInSingleLine) {
+            listOf(buildString {
+                if (config.armorStackDisplay) {
                     append("§6")
                     if (config.armorStackType) append("$stackType: ")
                     append("§l$stackCount$stackSymbol ")
                 }
 
-                if (showTimer && (!maxStackOnly || isMaxStack)) {
+                if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
                     append("$colorCode($decayTimeString)")
-
                 }
             })
         } else {
-            return buildList {
-                if (showStack) {
+            buildList {
+                if (config.armorStackDisplay) {
                     add(buildString {
                         append("§6")
                         if (config.armorStackType) append("$stackType: ")
@@ -126,25 +121,27 @@ object ArmorStackDisplay {
                     })
                 }
 
-                if (showTimer && (!maxStackOnly || isMaxStack)) {
+                if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
                     add("$colorCode$decayTimeString")
                 }
             }
         }
     }
 
+
+
     private fun resetDecayTime() {
         armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->
-            val lore = armor?.getLore().toString()
-            armorStackTierBonus.findMatcher(lore) { stackType = group("type"); group("amount") }
-                ?.toInt()
+            armor?.getLore()?.let {
+                armorStackTierBonus.firstMatcher(it) { stackType = group("type"); group("amount") }
+                    ?.toInt()
+            }
         } ?: 0
 
-
         val stackDecayTime = when (armorPieceCount) {
-            2 -> 4000
-            3 -> 7000
-            4 -> 10000
+            2 -> 5000
+            3 -> 8000
+            4 -> 11000
             else -> 0
         }.milliseconds
         stackDecayTimeCurrent = SimpleTimeMark.now() + stackDecayTime
