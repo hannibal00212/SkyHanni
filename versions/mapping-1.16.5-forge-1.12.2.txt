@@ -1,4 +1,6 @@
 
+net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
+
 com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 
 com.mojang.blaze3d.systems.RenderSystem color4f() color()
@@ -172,9 +174,11 @@ net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
+net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
 net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 net.minecraft.world.entity.Entity getId() getEntityId()
-net.minecraft.world.entity.Entity level getEntityWorld()
+net.minecraft.world.entity.Entity getUUID() getUniqueID()
+net.minecraft.world.entity.Entity level world
 net.minecraft.world.entity.Entity removed isDead
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
