@@ -47,9 +47,8 @@ object MinionUpgradeHelper {
                 itemsNeeded = group("amount")?.toInt() ?: 0
             } ?: resetItems()
 
-            if (itemName.isNotEmpty() && itemsNeeded > 0) {
-                itemsInSacks = itemName.asInternalName().getAmountInSacksOrNull() ?: 0
-                displayItem = createDisplayItem()
+            if (itemsInSacks > 0) {
+                add("§7In sacks: §a$itemsInSacks§7x §b$itemName")
             }
         }
     }

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -44,7 +45,11 @@ object CorpseTracker {
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val divisor = 1.coerceAtLeast(getSelectedBucket()?.let { corpsesLooted[it]?.toInt() } ?: corpsesLooted.sumAllValues().toInt())
+            val divisor = 1.coerceAtLeast(
+                getSelectedBucket()?.let {
+                    corpsesLooted[it]?.toInt()
+                } ?: corpsesLooted.sumAllValues().toInt()
+            )
             val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
@@ -65,9 +70,10 @@ object CorpseTracker {
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
 
     @SubscribeEvent
-    fun onCorpseLoot(event: CorpseLootedEvent) {
+    fun onCorpseLooted(event: CorpseLootedEvent) {
         addLootedCorpse(event.corpseType)
         for ((itemName, amount) in event.loot) {
+            if (itemName.removeColor().trim() == "Glacite Powder") continue
             NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
                 tracker.modify {
                     it.addItem(event.corpseType, item, amount)
@@ -83,7 +89,9 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
+        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let {
+            listOf(it)
+        } ?: enumValues<CorpseType>().toList()
             .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
@@ -139,5 +147,8 @@ object CorpseTracker {
     }
 
     fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
+        LorenzUtils.inSkyBlock && config.enabled && (
+            IslandType.MINESHAFT.isInIsland() ||
+                (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels())
+            )
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -12,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,7 +25,7 @@ object GardenCropMilestoneInventory {
     private var average = -1.0
     private val config get() = GardenAPI.config
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!config.number.averageCropMilestone) return
 
@@ -35,7 +36,7 @@ object GardenCropMilestoneInventory {
             val tier = GardenCropMilestones.getTierForCropCount(counter, cropType, allowOverflow)
             tiers.add(tier.toDouble())
         }
-        average = (tiers.sum() / CropType.entries.size).round(2)
+        average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
 
     @SubscribeEvent

@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -41,8 +40,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
     var factionType = FactionType.NONE
-
-    private var lastUpdate = SimpleTimeMark.farPast()
 
     private var display = emptyList<List<Any>>()
     private var dirty = true

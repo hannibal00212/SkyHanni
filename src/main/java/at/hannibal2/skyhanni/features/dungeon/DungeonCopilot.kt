@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
@@ -133,7 +134,7 @@ object DungeonCopilot {
         searchForKey = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonBossRoomEnter(event: DungeonBossRoomEnterEvent) {
         changeNextStep("Defeat the boss! Good luck :)")
     }

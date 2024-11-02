@@ -49,7 +49,7 @@ object ComposterDisplay {
         val pattern by lazy { rawPattern.toPattern() }
 
         fun addToList(map: Map<DataType, String>): List<Any> {
-            return listOf(displayItem, map[this]!!)
+            return map[this]?.let { listOf(displayItem, it) }.orEmpty()
         }
     }
 
@@ -71,7 +71,6 @@ object ComposterDisplay {
         if (!config.displayEnabled) return
         val newDisplay = mutableListOf<List<Any>>()
         newDisplay.addAsSingletonList("§bComposter")
-
 
         newDisplay.add(DataType.TIME_LEFT.addToList(tabListData))
 

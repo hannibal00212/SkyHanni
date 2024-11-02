@@ -25,6 +25,11 @@ public class HoppityEggsConfig {
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
 
     @Expose
+    @ConfigOption(name = "Warp Menu", desc = "")
+    @Accordion
+    public HoppityWarpMenuConfig warpMenu = new HoppityWarpMenuConfig();
+
+    @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -198,6 +203,11 @@ public class HoppityEggsConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
@@ -206,4 +216,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Prevent Missing Rabbit the Fish", desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventMissingRabbitTheFish = true;
 }

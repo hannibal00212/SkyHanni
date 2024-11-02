@@ -57,6 +57,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + More chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
++ Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
 
 </details>
 <details open><summary>
@@ -115,6 +116,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optionally draws a line to them as well.
 + Added a Secret Chime for Dungeons with adjustable pitch and sound. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2478)
     + The sound and pitch of chimes in dungeons are customizable.
++ Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
+    +  Displays waypoints during the F7/M7 Goldor Phase.
 
 </details>
 <details open><summary>
@@ -224,6 +227,15 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be enabled/disabled on the Item Number list.
 + Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
 + Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
++ Added Ultimate Enchant Star. - Empa (https://github.com/hannibal002/SkyHanni/pull/2612)
+    + Shows a star on Enchanted Books with an Ultimate Enchant.
++ Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
+    +  In Focus Mode, only the name of the item is displayed instead of the full description.
++ Added WASD keybinds to the Abiphone Snake Game. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1968)
++ Added Attribute Overlay. - Empa (https://github.com/hannibal002/SkyHanni/pull/2001)
+    +  Options to highlight good rolls in different colors, show only certain attributes, etc.
++ Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
+    +  Assists with maxing upgrades.
 
 </details>
 <details open><summary>
@@ -369,6 +381,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Includes an option to warn you when to throw your rod.
     + Shows how weak the golden fish is, as a nametag.
     + Also works on Stranded.
++ Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
+    + Displays a popup with the trophy name, rarity, and amount of the catch.
+    + Optionally, also plays a sound.
++ Added Lava Replacement. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1885)
+    +  Replaces the lava texture with the water texture.
+    +  Primarily used for lava fishing in the Crimson Isle, but can be used anywhere else if the option is enabled.
 
 </details>
 <details open><summary>
@@ -836,6 +854,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Crafting Room Helper. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2178)
     + Shows a holographic mob at the location where the mob is present in the real room inside the Mirrorverse in Rift.
 + Added Rift Time Real-Time Nametag Format. - Empa (https://github.com/hannibal002/SkyHanni/pull/2015)
++ Added a helper for tracking the Buttons Enigma Soul in the Rift. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
+    + Using pathfinding to guide the player to the nearest spot with unpressed buttons and highlights them.
++ Added a route helper for Gunther's Rift Race in the West Village. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
++ Added the ability to mute Wilted Berberis sounds when not farming. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
 
 </details>
 <details open><summary>
@@ -864,6 +886,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to show the walls also when inside the Nucleus.
 + Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
     + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
++ Hides tooltips of items inside the Fossil Excavator in Glacite Tunnels. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2539)
 + Excavation Profit Tracker. - hannibal2 + Empa (https://github.com/hannibal002/SkyHanni/pull/1432)
     + Count all drops you gain while excavating in the Fossil Research Center.
     + Track Glacite Powder gained as well (no profit, but progress).
@@ -899,6 +922,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
 + Added Tracker for Glacite Corpses. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2306)
     + Tracks overall loot and loot per type.
++ Added Precision Mining Highlighter. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2614)
+    +  Draws a box over the Precision Mining particles.
++ Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
++ Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
+    +  Displays stats for the Flowstate enchantment on mining tools.
 
 </details>
 <details open><summary>
@@ -994,6 +1022,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stray rabbits = Dark Aqua.
     + Abi = Dark Green.
 + Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
++ Added the ability to change the color of missing rabbit dyes in Hoppity's Collection to reflect rabbit rarity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2522)
++ Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
+    +  Shows your progress in the Warp Menu.
+    +  Can be automatically hidden when an island is complete.
++ Added the ability to block opening the Chocolate Factory when Booster Cookie is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2713)
++ Added a feature to block opening Hoppity's trade menu from Abiphone calls if you do not have coins in your purse. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2664)
++ Added the ability to prevent closing Meal Eggs that have Rabbit the Fish inside. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2712)
 
 ### The Carnival
 
@@ -1003,6 +1038,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Zombie Shootout QoL improvements for the Carnival. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2497)
     + Colored hitboxes.
     + Lamp timer + line.
+
+### The Great Spook
+
++ Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
+    +  Added solvers for Math and Public Speaking Primal Fears.
 
 </details>
 <details open><summary>
@@ -1155,6 +1195,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable GUI
     + Option to hide the chat messages
 + While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added a message to warp to Winter Island spawn when a Reindrake spawns. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2569)
 + **Custom Text Box** - CalMWolfs
     + Write fancy text into a gui element to show on your screen at all time
     + Supports color codes
@@ -1327,9 +1368,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added to the Item Number list.
 + Added Compact Experimentation Table chat rewards. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2209)
     + Uses a compact chat message of rewards gained from Add-ons/Experiments.
++ Added Superpair Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Displays found and matched pairs, power-ups, and missing pairs/normals.
++ Added Experiments Dry-Streak Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Shows attempts and XP since the last ULTRA-RARE.
++ Added Experiments Profit Tracker. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Tracks profits in Coins and Enchanting XP.
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
++ Added highlighting for the active Beacon Effect. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2546)
 + Added Hide Useless Armor Stands. - Empa (https://github.com/hannibal002/SkyHanni/pull/1962)
     + Hides armor stands that briefly appear on Hypixel.
 + **Custom Wardrobe**, a new look for the wardrobe. - j10an15, Empa (https://github.com/hannibal002/SkyHanni/pull/2039)
@@ -1366,12 +1414,23 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Get a title warning when entering an area.
     + See area names in the world.
     + Does not yet work with Spider's Den and Dungeon Hub. Only partial support for Farming Islands and the Rift.
++ Added navigation command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2575)
+    + Use `/shnavigate <name>` to find interesting locations on your current SkyBlock island by searching for them.
+    + Displays a pathfinder to the location.
+    + Works with NPCs, points of interest, areas, slayer spots, emissaries, crimson mini-bosses, spots to mine ores, break crops, and kill mobs.
+    + Does not yet work with Spider's Den and Dungeon Hub (still needs to be mapped out).
 + Added `/gfs` to fix a broken Piggy Bank. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2150)
 + Added Broodmother spawn alert, countdown and stage change messages. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2325)
     + Countdown will not show until a spawning stage change is observed, and may be off by a few seconds.
 + Added option to hide pet nametag text. - Empa + j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1880)
 + Added Transfer Cooldown Prevention. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/1751)
     + Wait for the transfer cooldown to complete before sending commands like warp/is/hub.
++ Added Carry Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2185)
+    + Use `/shcarry` to add carries to a customer, and set a price for a slayer boss.
+    + Automatically counts slayer bosses you carry.
+    + Automatically tracks coins received from customers via `/trade`.
++ Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
+    +  Tracks items and profit while using the Draconic Altar in the End.
 
 </details>
 <details open><summary>

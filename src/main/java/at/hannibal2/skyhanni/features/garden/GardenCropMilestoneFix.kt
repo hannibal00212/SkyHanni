@@ -29,6 +29,7 @@ object GardenCropMilestoneFix {
      * REGEX-TEST:  Cocoa Beans 31: §r§a68%
      * REGEX-TEST:  Potato 32: §r§a97.7%
      */
+    @Suppress("MaxLineLength")
     private val tabListPattern by patternGroup.pattern(
         "tablist",
         " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"

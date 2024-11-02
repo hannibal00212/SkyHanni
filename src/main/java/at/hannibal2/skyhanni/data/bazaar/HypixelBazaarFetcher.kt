@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,9 +30,28 @@ object HypixelBazaarFetcher {
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NEUInternalName, BazaarData>()
+    private var lastSuccessfulFetch = SimpleTimeMark.farPast()
     private var nextFetchTime = SimpleTimeMark.farPast()
     private var failedAttempts = 0
     private var nextFetchIsManual = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Bazaar Data Fetcher from API")
+
+        val data = listOf(
+            "failedAttempts: $failedAttempts",
+            "nextFetchIsManual: $nextFetchIsManual",
+            "nextFetchTime: ${nextFetchTime.timeUntil()}",
+            "lastSuccessfulFetch: ${lastSuccessfulFetch.passedSince()}",
+        )
+
+        if (failedAttempts == 0) {
+            event.addIrrelevant(data)
+        } else {
+            event.addData(data)
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -46,11 +66,12 @@ object HypixelBazaarFetcher {
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = withContext(Dispatchers.IO) { APIUtil.getJSONResponse(URL) }.asJsonObject
+            val jsonResponse = withContext(Dispatchers.IO) { APIUtils.getJSONResponse(URL) }.asJsonObject
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)
                 failedAttempts = 0
+                lastSuccessfulFetch = SimpleTimeMark.now()
             } else {
                 val rawResponse = jsonResponse.toString()
                 onError(fetchType, Exception("success=false, cause=${response.cause}"), rawResponse)
@@ -98,13 +119,20 @@ object HypixelBazaarFetcher {
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
-            ErrorManager.logErrorWithData(
-                e,
-                userMessage,
-                "fetchType" to fetchType,
-                "failedAttempts" to failedAttempts,
-                "rawResponse" to rawResponse,
-            )
+            if (rawResponse == null || rawResponse.toString() == "{}") {
+                ChatUtils.chat(
+                    "§cFailed loading Bazaar Price data!\n" +
+                        "Please wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                )
+            } else {
+                ErrorManager.logErrorWithData(
+                    e,
+                    userMessage,
+                    "fetchType" to fetchType,
+                    "failedAttempts" to failedAttempts,
+                    "rawResponse" to rawResponse,
+                )
+            }
         }
     }
 

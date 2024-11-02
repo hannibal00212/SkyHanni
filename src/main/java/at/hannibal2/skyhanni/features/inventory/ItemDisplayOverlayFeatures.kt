@@ -66,11 +66,11 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val masterSkullPattern by patternGroup.pattern(
-        "masterskull",
-        "(.*)Master Skull - Tier .",
+    private val masterSkullIDPattern by patternGroup.pattern(
+        "masterskull.id",
+        "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
-    private val gardenVacuumPatterm by patternGroup.pattern(
+    private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
         "§7Vacuum Bag: §6(?<amount>\\d*) Pests?",
     )
@@ -78,9 +78,14 @@ object ItemDisplayOverlayFeatures {
         "harvest",
         "§7§7You may harvest §6(?<amount>.).*",
     )
+
+    /**
+     * REGEX-TEST: Dungeon VII Potion
+     * REGEX-TEST: Dungeon VII Potion x1
+     */
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion",
+        "Dungeon (?<level>.*) Potion(?: x1)?",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
@@ -131,25 +136,25 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (MASTER_SKULL_TIER.isSelected()) {
-            masterSkullPattern.matchMatcher(itemName) {
-                return itemName.substring(itemName.length - 1)
+            masterSkullIDPattern.matchMatcher(internalName.asString()) {
+                return group("tier")
             }
         }
 
-        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (itemName.contains("Golden ") || itemName.contains("Diamond "))) {
+        if (DUNGEON_HEAD_FLOOR_NUMBER.isSelected() && (internalName.contains("GOLD_") || internalName.contains("DIAMOND_"))) {
             when {
-                itemName.contains("Bonzo") -> return "1"
-                itemName.contains("Scarf") -> return "2"
-                itemName.contains("Professor") -> return "3"
-                itemName.contains("Thorn") -> return "4"
-                itemName.contains("Livid") -> return "5"
-                itemName.contains("Sadan") -> return "6"
-                itemName.contains("Necron") -> return "7"
+                internalName.contains("BONZO") -> return "1"
+                internalName.contains("SCARF") -> return "2"
+                internalName.contains("PROFESSOR") -> return "3"
+                internalName.contains("THORN") -> return "4"
+                internalName.contains("LIVID") -> return "5"
+                internalName.contains("SADAN") -> return "6"
+                internalName.contains("NECRON") -> return "7"
             }
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getNewYearCake()?.toString() ?: ""
+            val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"
         }
 
@@ -252,7 +257,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
-            lore.matchFirst(gardenVacuumPatterm) {
+            lore.matchFirst(gardenVacuumPattern) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
@@ -298,7 +303,13 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) && lore.any { it.contains("Deaths: ") }) {
+        if (BESTIARY_LEVEL.isSelected() && (
+                chestName.contains("Bestiary ➜") ||
+                    chestName.contains("Fishing ➜")
+                ) && lore.any {
+                it.contains("Deaths: ")
+            }
+        ) {
             lore.matchFirst(bestiaryStackPattern) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()

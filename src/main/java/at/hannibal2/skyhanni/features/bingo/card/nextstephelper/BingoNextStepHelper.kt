@@ -61,7 +61,7 @@ object BingoNextStepHelper {
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
     private val itemPreconditions = mutableMapOf<String, NextStep>()
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
-    private val rhysTaskName = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
+    private const val RHYS_TASK_NAME = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
 
     private val finalSteps = mutableListOf<NextStep>()
     private var currentSteps = emptyList<NextStep>()
@@ -167,7 +167,9 @@ object BingoNextStepHelper {
                     }
                 }
             }
-            if (currentStep is PartialProgressItemsStep && currentStep.displayName == rhysTaskName && event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
+            if (currentStep is PartialProgressItemsStep && currentStep.displayName == RHYS_TASK_NAME &&
+                event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r"
+            ) {
                 currentStep.amountHavingHidden -= 10
             }
         }
@@ -275,7 +277,8 @@ object BingoNextStepHelper {
                     "Emerald",
                     160 * 32,
                     mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
-                ) requires IslandType.DWARVEN_MINES.getStep())
+                ) requires IslandType.DWARVEN_MINES.getStep()
+                )
         }
 
         if (description == "Obtain a Mathematical Hoe Blueprint.") {
@@ -285,7 +288,8 @@ object BingoNextStepHelper {
                     "Jacob's Ticket",
                     32,
                     mapOf("Jacob's Ticket" to 1)
-                ).addItemRequirements() requires IslandType.GARDEN.getStep())
+                ).addItemRequirements() requires IslandType.GARDEN.getStep()
+                )
         }
 
         crystalPattern.matchMatcher(description) {
@@ -365,7 +369,7 @@ object BingoNextStepHelper {
 
     private fun rhys() {
         val redstoneForRhys = PartialProgressItemsStep(
-            rhysTaskName,
+            RHYS_TASK_NAME,
             "Redstone",
             160 * 10,
             mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
@@ -373,7 +377,7 @@ object BingoNextStepHelper {
         redstoneForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
         val lapisForRhys = PartialProgressItemsStep(
-            rhysTaskName,
+            RHYS_TASK_NAME,
             "Lapis Lazuli",
             160 * 10,
             mapOf("Lapis Lazuli" to 1, "Enchanted Lapis Lazuli" to 160)
@@ -381,7 +385,7 @@ object BingoNextStepHelper {
         lapisForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
         val coalForRhys = PartialProgressItemsStep(
-            rhysTaskName,
+            RHYS_TASK_NAME,
             "Coal",
             160 * 10,
             mapOf("Coal" to 1, "Enchanted Coal" to 160)

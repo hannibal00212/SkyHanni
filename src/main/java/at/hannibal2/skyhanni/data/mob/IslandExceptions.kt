@@ -58,29 +58,31 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ) = when {
-        baseEntity is EntityZombie && armorStand != null &&
+        baseEntity is EntityZombie &&
+            armorStand != null &&
             (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") ->
             MobData.MobResult.found(
                 MobFactories.special(baseEntity, armorStand.cleanName(), armorStand),
             )
 
-        baseEntity is EntityCaveSpider -> MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault()
+        baseEntity is EntityCaveSpider -> MobUtils.getClosestArmorStand(baseEntity, 2.0).takeNonDefault()
             .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" ->
-            MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
+            MobUtils.getClosestArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
                 .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" ->
             MobUtils.getArmorStand(baseEntity, 9)
                 .makeMobResult { MobFactories.boss(baseEntity, it) }
 
-        baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() &&
+        baseEntity is EntityOtherPlayerMP &&
+            baseEntity.isNPC() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
-            baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+            baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
-        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name ?: "") ->
+        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
 
         else -> null
@@ -174,7 +176,8 @@ object IslandExceptions {
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand?,
     ) = when {
-        baseEntity is EntityMagmaCube && armorStand != null &&
+        baseEntity is EntityMagmaCube &&
+            armorStand != null &&
             armorStand.cleanName() == "[Lv100] Bal ???❤" ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BOSS, armorStand, "Bal", levelOrTier = 100),
@@ -188,7 +191,8 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ) = when {
-        baseEntity is EntityOcelot && armorStand?.isDefaultValue() == false &&
+        baseEntity is EntityOcelot &&
+            armorStand?.isDefaultValue() == false &&
             armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") ->
             MobUtils.getArmorStand(baseEntity, 1)
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
@@ -203,7 +207,8 @@ object IslandExceptions {
             MobUtils.getArmorStand(baseEntity, 2)
                 .makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
 
-        baseEntity is EntityZombie && armorStand?.isDefaultValue() == true &&
+        baseEntity is EntityZombie &&
+            armorStand?.isDefaultValue() == true &&
             MobUtils.getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true ->
             petCareHandler(baseEntity)
 
@@ -250,8 +255,9 @@ object IslandExceptions {
             .take(RAT_SEARCH_UP_TO - RAT_SEARCH_START + 1)
             .map { i -> MobUtils.getArmorStand(baseEntity, i) }
             .firstOrNull {
-                it != null && it.distanceTo(baseEntity) < 4.0 &&
-                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL
+                it != null &&
+                    it.distanceTo(baseEntity) < 4.0 &&
+                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL_TEXTURE
             }?.let {
                 MobData.MobResult.found(Mob(baseEntity, mobType = Mob.Type.BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is EntityZombie) MobData.MobResult.notYetFound else null

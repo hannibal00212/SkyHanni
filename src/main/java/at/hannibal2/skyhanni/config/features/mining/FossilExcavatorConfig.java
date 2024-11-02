@@ -19,6 +19,11 @@ public class FossilExcavatorConfig {
     public ExcavatorProfitTrackerConfig profitTracker = new ExcavatorProfitTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Excavator Tooltip Hider", desc = "")
+    @Accordion
+    public ExcavatorTooltipHiderConfig tooltipHider = new ExcavatorTooltipHiderConfig();
+
+    @Expose
     @ConfigOption(
         name = "Profit per Excavation",
         desc = "Show profit/loss in chat after each excavation. Also includes breakdown information on hover."

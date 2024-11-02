@@ -56,30 +56,4 @@ public class HelperConfig {
     @ConfigOption(name = "Reforge Helper", desc = "")
     @Accordion
     public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
-
-    @Expose
-    @ConfigOption(name = "Enchanting", desc = "")
-    @Accordion
-    public EnchantingConfig enchanting = new EnchantingConfig();
-
-    public static class EnchantingConfig {
-        @Expose
-        @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean superpairsClicksAlert = false;
-
-        @Expose
-        @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Send a chat message, title and sound when you find an ULTRA-RARE book.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean ultraRareBookAlert = false;
-
-        @Expose
-        @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        public boolean guardianReminder = false;
-    }
-
 }

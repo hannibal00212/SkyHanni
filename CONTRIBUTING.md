@@ -13,6 +13,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 - Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
     - Use the Community Edition. (Scroll down a bit.)
+- When you encounter any bug with IntelliJ, please make sure to use the version `2024.1.6`, not `2024.2.x` or above.
 
 ### Cloning the project
 
@@ -29,6 +30,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
         - Open the project.
 
 ### Setting up IntelliJ
+
 
 Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
 downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
@@ -83,7 +85,12 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-_An explanation how to use intellij and branches will follow here soon._
+Proposed changes are better off being in their own branch as this makes development easier for both you and the maintainers of this repository, you can do this by following the instructions from within the IntelliJ window with the SkyHanni project already open.
+- Click the beta dropdown at the top of IntelliJ
+- Click new branch
+- Give the branch a name relating to the changes you plan to make
+
+_A more in depth explanation how to use intellij and branches will follow here soon._
 
 Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
 
@@ -97,6 +104,13 @@ format like "- #821" to illustrate the dependency.
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+-  **My build is failing due to `detekt`, what do I do?**
+    - `detekt` is our code quality tool. It checks for code smells and style issues.
+    - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
+    - **There are valid reasons to deviate from the norm**
+        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
+      After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
+     `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
   - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -138,6 +152,37 @@ for more information and usages.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
+
+## Additional Useful Development Tools
+
+### DevAuth
+
+[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
+
+- The library is already downloaded by Gradle.
+- SkyHanni will automatically set up DevAuth.
+- Start Minecraft inside IntelliJ normally.
+    - Click on the link in the console and verify with a Microsoft account.
+    - The verification process will reappear every few days (after the session token expires).
+
+### Hot Swap
+
+Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
+
+We use [dcevm](https://dcevm.github.io/) and the IntelliJ
+Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
+
+Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
+tutorial.
+
+### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
+
+Allows project specific plugins to run. Eg: Regex Intention
+
+### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
+
+Imports our custom live templates automatically. Live Templates allow for quicker code writing.
 
 ## Software Used in SkyHanni
 
@@ -204,29 +249,6 @@ For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
-## Additional Useful Development Tools
-
-### DevAuth
-
-[DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
-debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
-
-- The library is already downloaded by Gradle.
-- SkyHanni will automatically set up DevAuth.
-- Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Microsoft account.
-    - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
-
-Follow [this](https://forums.Minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/)
-tutorial.
-
 ## 1.21 / Modern version development
 
 You might have noticed that while the SkyHanni source code is found in `src/`, the actual tasks for compiling, building and running the mod
@@ -267,7 +289,7 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
-operations since the compile will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
+operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
 
 ### Improving mappings
 
@@ -394,7 +416,7 @@ Let's look at the syntax of those `#if` expressions.
 
 First of all, the `#else` block is optional. If you just want code on some versions (for example for adding a method call that is implicitly
 done on newer versions, or simply because the corresponding code for newer versions has to be done in some other place), you can just omit
-the `#else` section and you will simply not compile any code at that spot.
+the `#else` section, and you will simply not compile any code at that spot.
 
 There is also an `#elseif` in case you want to switch behaviour based on multiple version brackets. Again, while we don't actually target
 1.12 or 1.16, making those versions compile will help other parts of the code to upgrade to 1.21 more cleanly and easily. So, making those
@@ -417,3 +439,8 @@ for the variable using `#if FORGE`.
 Sadly, `#if` expressions cannot be applied globally (unlike name changes), so it is often very helpful to create a helper method and call
 that method from various places in the codebase. This is generally already policy in SH for a lot of things. For more complex types that
 change beyond just their name (for example different generics), a `typealias` can be used in combination with `#if` expressions.
+
+These helper methods should generally be placed in the `at.hannibal2.skyhanni.utils.compat` package and should be named after what they are
+compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
+it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files 
+themselves.

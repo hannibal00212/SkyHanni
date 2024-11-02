@@ -201,7 +201,7 @@ object VisitorAPI {
         val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
         val totalPrice = totalPrice ?: error("totalPrice is null")
         val totalReward = totalReward ?: error("totalReward is null")
-        val loss = totalPrice - totalReward;
+        val loss = totalPrice - totalReward
         return when {
             preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
             preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED

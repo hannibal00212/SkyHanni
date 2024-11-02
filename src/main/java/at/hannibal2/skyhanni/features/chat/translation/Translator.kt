@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -66,7 +66,7 @@ object Translator {
             if (text.isEmpty()) {
                 config.languageName.set(TranslatableLanguage.ENGLISH)
             } else {
-                for (language in TranslatableLanguage.values()) {
+                for (language in TranslatableLanguage.entries) {
                     if (language.languageCode.equals(text, ignoreCase = true)) {
                         config.languageName.set(language)
                         return@onToggle
@@ -107,102 +107,107 @@ object Translator {
      *     ]
      *   ],
      *   null,
-     *   '"target language as a two-letter code following ISO 639-1"',
+     *   '"target language as a (usually) two-letter code following ISO 639-1"',
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) =
-        APIUtil.getJSONResponseAsElement(urlString, false, "Google Translate API")
+    private fun getJSONResponse(urlString: String) = APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
-    private fun getTranslationToEnglish(message: String): String {
-        val url =
-            "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=" +
-                URLEncoder.encode(message, "UTF-8")
+    fun getTranslation(
+        message: String,
+        targetLanguage: String,
+        sourceLanguage: String = "auto",
+    ): Array<String>? {
+        // TODO add &dj=1 to use named json
+        val encode = URLEncoder.encode(message, "UTF-8")
+        val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
-        val layer1 = getJSONResponse(url).asJsonArray
-        if (layer1.size() <= 2) return "Error!"
+        val fullResponse = getJSONResponse(url).asJsonArray
+        if (fullResponse.size() < 3) return null
 
-        val language = layer1[2].toString()
-        if (language == "\"en\"") return "Unable to translate!"
-        if (language.length != 4) return "Error!"
+        val language = fullResponse[2].toString() // the detected language the message is in
+        val sentences = fullResponse[0] as? JsonArray ?: return null
 
-        val layer2 = try {
-            layer1[0] as JsonArray
-        } catch (_: Exception) {
-            return "Error!"
-        }
-
-        for (layer3 in layer2) {
-            val arrayLayer3 = layer3 as? JsonArray ?: continue
-            val sentence = arrayLayer3[0].toString()
+        for (rawSentence in sentences) {
+            val arrayPhrase = rawSentence as? JsonArray ?: continue
+            val sentence = arrayPhrase[0].toString()
             val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
             messageToSend = "$messageToSend$sentenceWithoutQuotes"
         }
-        messageToSend = "$messageToSend §7(Language: $language)"
-
-        return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
+        messageToSend = URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "") // Not sure if this is actually needed
+        return arrayOf(messageToSend, language)
     }
 
-    private fun getTranslationFromEnglish(message: String, lang: String): String {
-        val url =
-            "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" +
-                URLEncoder.encode(message, "UTF-8")
-
-        val layer1 = getJSONResponse(url).asJsonArray
-        if (layer1.size() < 1) return "Error!"
-        val layer2 = layer1[0] as? JsonArray
-
-        val firstSentence = (layer2?.get(0) as? JsonArray)?.get(0).toString()
-        var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
-        if (layer2 != null) {
-            for (sentenceIndex in 1..<layer2.size()) {
-                val sentence = (layer2.get(sentenceIndex) as JsonArray).get(0).toString()
-                val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
-                messageToSend = "$messageToSend$sentenceWithoutQuotes"
-            }
-        } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
-        messageToSend = messageToSend.substring(1, messageToSend.length)
-        return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
-    }
-
+    @Deprecated("Use toNativeLanguage() instead", ReplaceWith("Translator.toNativeLanguage(args)"))
     fun toEnglish(args: Array<String>) {
+        toNativeLanguage(args)
+    }
+
+    @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
+    fun fromEnglish(args: Array<String>) {
+        fromNativeLanguage(args)
+    }
+
+    fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
         coroutineScope.launch {
-            var lang = config.languageCode.get()
-            val translation = if (lang.isEmpty()) {
-                getTranslationToEnglish(message)
-            } else {
-                getTranslationFromEnglish(message, lang)
-            }
-            if (message == translation) {
+            val translation = getTranslation(message, nativeLanguage())
+            val translatedMessage = translation?.get(0) ?: "Error!"
+            val detectedLanguage = translation?.get(1) ?: "Error!"
+
+            if (message == translatedMessage) {
                 ChatUtils.userError("Translation is the same as the original message!")
                 return@launch
             }
-
-            if (translation == "Unable to translate!") {
-                ChatUtils.userError("Unable to translate message :( (is it in English?)")
-                return@launch
-            }
-            ChatUtils.chat("Found translation: §f$translation")
+            ChatUtils.clickableChat(
+                "Found translation: §f$translatedMessage",
+                onClick = { OSUtils.copyToClipboard(translatedMessage) },
+                "§eClick to copy!\n§eOriginal message: §f$message §7(Language: $detectedLanguage)",
+            )
         }
     }
 
-    fun fromEnglish(args: Array<String>) {
-        if (args.size < 2 || args[0].length != 2) { // args[0] is the language code
-            ChatUtils.userError("Usage: /shcopytranslation <two letter language code (at the end of a translation)> <message>")
+    fun fromNativeLanguage(args: Array<String>) {
+        if (args.size < 2) {
+            ChatUtils.userError("Usage: /shcopytranslation <language code (found at the end of a translation)> <message>")
             return
         }
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
         coroutineScope.launch {
-            val translation = getTranslationFromEnglish(message, language)
-            ChatUtils.chat("Copied translation to clipboard: §f$translation")
-            OSUtils.copyToClipboard(translation)
+            val translation = getTranslation(message, language, nativeLanguage())?.get(0) ?: "Error!"
+            ChatUtils.clickableChat(
+                "Copied §f$language §etranslation to clipboard: §f$translation",
+                onClick = { OSUtils.copyToClipboard(translation) },
+                "§eClick to copy!\n§eOriginal message: §f$message",
+            )
         }
     }
+
+    fun translateAdvancedCommand(args: Array<String>) {
+        if (args.size < 3) {
+            ChatUtils.userError("Usage: /shtranslateadvanced <source lang code> <target lang code> <message>")
+            return
+        }
+        val sourceLanguage = args[0]
+        val targetLanguage = args[1]
+        val message = args.drop(2).joinToString(" ")
+
+        val translation = getTranslation(message, sourceLanguage, targetLanguage)
+        val translatedMessage = translation?.get(0) ?: "Error!"
+        val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
+
+        ChatUtils.clickableChat(
+            "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
+            onClick = { OSUtils.copyToClipboard(translatedMessage) },
+            "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)",
+        )
+    }
+
+    fun nativeLanguage(): String = config.languageCode.get().ifEmpty { "en" }
 
     fun isEnabled() = config.translateOnClick
 }

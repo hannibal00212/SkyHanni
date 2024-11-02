@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.TimeFormatEntry
@@ -26,8 +27,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -99,7 +100,7 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         needsInventory = false
         GardenBestCropTime.updateTimeTillNextCrop()
@@ -156,14 +157,16 @@ object GardenCropMilestoneDisplay {
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
-        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(buildList {
-            addCropIconRenderable(crop)
-            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-                addString("§7" + crop.cropName + " §eMAXED")
-            } else {
-                addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
+        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(
+            buildList {
+                addCropIconRenderable(crop)
+                if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+                    addString("§7" + crop.cropName + " §eMAXED")
+                } else {
+                    addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
+                }
             }
-        })
+        )
 
         val allowOverflowOrCustom = overflowDisplay || useCustomGoal
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
@@ -187,7 +190,7 @@ object GardenCropMilestoneDisplay {
 
         val farmingFortune = FarmingFortuneDisplay.getCurrentFarmingFortune()
         val speed = GardenCropSpeed.averageBlocksPerSecond
-        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).round(1).toInt()
+        val farmingFortuneSpeed = ((100.0 + farmingFortune) * crop.baseDrops * speed / 100).roundTo(1).toInt()
 
         if (farmingFortuneSpeed > 0) {
             crop.setSpeed(farmingFortuneSpeed)
@@ -219,7 +222,7 @@ object GardenCropMilestoneDisplay {
             val hourFormat = (farmingFortuneSpeed * 60 * 60).addSeparators()
             lineMap[MilestoneTextEntry.CROPS_PER_HOUR] = Renderable.string("§7Crops/Hour§8: §e$hourFormat")
 
-            val formatBps = speed.round(config.blocksBrokenPrecision).addSeparators()
+            val formatBps = speed.roundTo(config.blocksBrokenPrecision).addSeparators()
             lineMap[MilestoneTextEntry.BLOCKS_PER_SECOND] = Renderable.string("§7Blocks/Second§8: §e$formatBps")
         }
 
@@ -302,10 +305,12 @@ object GardenCropMilestoneDisplay {
         val missing = need - have
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
-        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(buildList {
-            addCropIconRenderable(mushroom)
-            addString("§7Mushroom Milestone $nextTier")
-        })
+        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(
+            buildList {
+                addCropIconRenderable(mushroom)
+                addString("§7Mushroom Milestone $nextTier")
+            }
+        )
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
 

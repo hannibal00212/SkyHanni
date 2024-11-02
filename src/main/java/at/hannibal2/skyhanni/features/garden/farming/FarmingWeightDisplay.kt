@@ -20,11 +20,11 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -123,12 +123,6 @@ object FarmingWeightDisplay {
     private var nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
 
-    private val recalculate by lazy {
-        ({
-            resetData()
-        })
-    }
-
     private val eliteWeightApiGson by lazy {
         BaseGsonBuilder.gson()
             .registerTypeAdapter(CropType::class.java, SkyHanniTypeAdapters.CROP_TYPE.nullSafe())
@@ -141,22 +135,22 @@ object FarmingWeightDisplay {
             Renderable.clickAndHover(
                 "§cFarming Weight error: Cannot load",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§cdata from Elite Farmers!",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§eRejoin the garden or",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§eclick here to fix it.",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
         )
     }
@@ -234,7 +228,7 @@ object FarmingWeightDisplay {
         }
 
         val totalWeight = (localWeight + weight)
-        return "§e" + totalWeight.round(2).addSeparators()
+        return "§e" + totalWeight.roundTo(2).addSeparators()
     }
 
     private fun getRankGoal(): Int {
@@ -268,7 +262,7 @@ object FarmingWeightDisplay {
         val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
             "§cWaiting for leaderboard update...",
             listOf("§eClick here to load new data right now!"),
-            onClick = recalculate,
+            onClick = ::resetData,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
         var nextName =
@@ -304,7 +298,7 @@ object FarmingWeightDisplay {
             return Renderable.clickAndHover(
                 "§cRejoin the garden to show ETA!",
                 listOf("Click here to calculate the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             )
         }
 
@@ -326,7 +320,7 @@ object FarmingWeightDisplay {
             " §7(§b$format§7)"
         } else ""
 
-        val weightFormat = weightUntilOvertake.round(2).addSeparators()
+        val weightFormat = weightUntilOvertake.roundTo(2).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
             Renderable.string(text)
@@ -366,14 +360,15 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun isEnabled() = ((OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock) ||
-        (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+    private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
+    private fun outsideEnabled() = OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
+    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenAPI.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
 
     fun addCrop(crop: CropType, addedCounter: Int) {
-        //Prevent div-by-0 errors
-        if (addedCounter == 0) return;
+        // Prevent div-by-0 errors
+        if (addedCounter == 0) return
 
         val before = getExactWeight()
         localCounter[crop] = crop.getLocalCounter() + addedCounter
@@ -447,7 +442,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -477,7 +472,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         var error: Throwable? = null
 
@@ -573,7 +568,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)

@@ -254,10 +254,12 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) { config.trapperTalkCooldown }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
+                config.trapperTalkCooldown
+            }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.add(y = 2.23), currentLabel)
+                    event.drawString(it.up(2.23), currentLabel)
                 }
             }
         }
@@ -273,11 +275,11 @@ object TrevorFeatures {
                     TrevorSolver.currentMob!!.mobName
                 }
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.add(y = -2), LorenzColor.GREEN.toColor(), true, true)
-                event.drawDynamicText(location.add(y = 1), displayName, 1.5)
+                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawDynamicText(location.up(), displayName, 1.5)
             } else {
                 event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
-                event.drawDynamicText(location.add(y = 1), TrevorSolver.mobLocation.location, 1.5)
+                event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
         }
     }

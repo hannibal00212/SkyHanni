@@ -14,13 +14,13 @@ public class ObjectHighlighterConfig {
     // TODO move some stuff from DungeonConfig into this
 
     @Expose
-    @ConfigOption(name = "Stared", desc = "")
+    @ConfigOption(name = "Starred Mobs", desc = "")
     @Accordion
     public StarredConfig starred = new StarredConfig();
 
     public static class StarredConfig {
         @Expose
-        @ConfigOption(name = "Highlight Starred", desc = "Highlights all starred mobs in one colour.")
+        @ConfigOption(name = "Highlight Starred", desc = "Highlights starred mobs in a color.")
         @ConfigEditorBoolean
         @FeatureToggle
         public Property<Boolean> highlight = Property.of(true);
@@ -40,7 +40,7 @@ public class ObjectHighlighterConfig {
         public String info;
 
         @Expose
-        @ConfigOption(name = "Colour", desc = "Color in which the stared mobs are highlighted.")
+        @ConfigOption(name = "Color", desc = "The color used to highlight starred mobs.")
         @ConfigEditorColour
         public Property<String> colour = Property.of("0:60:255:255:0");
     }
@@ -53,18 +53,18 @@ public class ObjectHighlighterConfig {
     public static class FelConfig {
 
         @Expose
-        @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not yet active.")
+        @ConfigOption(name = "Highlight Fels Skull", desc = "Highlights fels that are not active.")
         @ConfigEditorBoolean
         @FeatureToggle
         public Property<Boolean> highlight = Property.of(true);
 
         @Expose
-        @ConfigOption(name = "Draw Line", desc = "Draws a line to fels skulls. Works only if the highlight is enabled.")
+        @ConfigOption(name = "Draw Line", desc = "Draws a line to fels skulls. Requires highlight to be enabled.")
         @ConfigEditorBoolean
         public Boolean line = false;
 
         @Expose
-        @ConfigOption(name = "Colour", desc = "Color for the fel skull and line.")
+        @ConfigOption(name = "Color", desc = "The color used to highlight fel skulls and draw the line.")
         @ConfigEditorColour
         public Property<String> colour = Property.of("0:200:255:0:255");
     }

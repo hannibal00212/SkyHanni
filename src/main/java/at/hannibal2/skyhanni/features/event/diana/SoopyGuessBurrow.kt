@@ -136,6 +136,7 @@ object SoopyGuessBurrow {
         }
     }
 
+    @Suppress("MaxLineLength")
     private fun solveEquationThing(x: LorenzVec, y: LorenzVec): LorenzVec {
         val a =
             (-y.x * x.y * x.x - y.y * x.y * x.z + y.y * x.y * x.x + x.y * x.z * y.z + x.x * x.z * y.x - x.x * x.z * y.z) / (x.y * y.x - x.y * y.z + x.x * y.z - y.x * x.z + y.y * x.z - y.y * x.x)
@@ -175,7 +176,8 @@ object SoopyGuessBurrow {
                     }
 
                     val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
+                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                        LorenzVec(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
                             slopeThing[slopeThing.size - 1]

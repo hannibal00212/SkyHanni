@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -29,7 +30,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.UUID
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,6 +42,7 @@ object TotemOfCorruption {
 
     private var display = emptyList<String>()
     private var totems: List<Totem> = emptyList()
+    private val warnedTotems = TimeLimitedSet<UUID>(2.minutes)
 
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
     private val totemNamePattern by patternGroup.pattern(
@@ -92,11 +96,11 @@ object TotemOfCorruption {
             // The center of the totem is the upper part of the armor stand
             when (config.outlineType) {
                 OutlineType.FILLED -> {
-                    event.drawSphereInWorld(color, totem.location.add(y = 1), 16f)
+                    event.drawSphereInWorld(color, totem.location.up(), 16f)
                 }
 
                 OutlineType.WIREFRAME -> {
-                    event.drawSphereWireframeInWorld(color, totem.location.add(y = 1), 16f)
+                    event.drawSphereWireframeInWorld(color, totem.location.up(), 16f)
                 }
 
                 else -> return
@@ -154,9 +158,10 @@ object TotemOfCorruption {
             val owner = getOwner(totem) ?: return@mapNotNull null
 
             val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining == timeToWarn) {
+            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
                 playPlingSound()
                 sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
+                warnedTotems.add(totem.uniqueID)
             }
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }

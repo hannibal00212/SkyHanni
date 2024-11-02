@@ -106,7 +106,7 @@ object ReforgeHelper {
             reforgeToSearch = null
         }
         itemToReforge = newItem
-        val newReforgeName = itemToReforge?.getReforgeName() ?: ""
+        val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
         if (newReforgeName == currentReforge?.lowercaseName) return
         currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
         updateDisplay()
@@ -272,23 +272,25 @@ object ReforgeHelper {
         val addEffectText: String
         val click: List<Renderable>
         if (currentReforge == reforge) {
-            stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
+            stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
             click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
-            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
+            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
-            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
+            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
             click = if (reforgeToSearch != reforge) {
                 listOf(renderableString(""), renderableString("§eClick to select!"))
             } else emptyList()
         }
 
-        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
+        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
+            listOf(renderableString(addEffectText)) + it
+        }.orEmpty()
 
         return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }
@@ -379,8 +381,6 @@ object ReforgeHelper {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
-
-                //?.get(reforgeItem)?. = hoverColor
             }
             hoveredReforge = null
         }
@@ -416,15 +416,17 @@ object ReforgeHelper {
 
     private fun SkyblockStatList.print(appliedReforge: SkyblockStatList? = null): List<Renderable> {
         val diff = appliedReforge?.takeIf { config.showDiff }?.let { this - it }
-        val main = ((diff ?: this).mapNotNull {
-            val key = it.key
-            val value = this[key] ?: 0.0
-            buildList<Renderable> {
-                add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                add(renderableString(key.iconWithName))
+        val main = (
+            (diff ?: this).mapNotNull {
+                val key = it.key
+                val value = this[key] ?: 0.0
+                buildList {
+                    add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
+                    diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
+                    add(renderableString(key.iconWithName))
+                }
             }
-        })
+            )
         val table = Renderable.table(main, 5)
         return listOf(table)
     }

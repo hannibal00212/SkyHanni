@@ -126,7 +126,7 @@ object SensitivityReducer {
 
     fun manualToggle() {
         if (isToggled) {
-            ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
+            ChatUtils.userError("This command is disabled while the Sensitivity is lowered!")
             return
         }
         isManualToggle = !isManualToggle
@@ -142,7 +142,7 @@ object SensitivityReducer {
         if (!LockMouseLook.lockedMouse) {
             storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
             val newSens = doTheMath(storage.savedMouseloweredSensitivity)
-            gameSettings?.mouseSensitivity = newSens
+            gameSettings.mouseSensitivity = newSens
         } else {
             storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
         }
@@ -150,7 +150,7 @@ object SensitivityReducer {
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        if (!LockMouseLook.lockedMouse) gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
+        if (!LockMouseLook.lockedMouse) gameSettings.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 

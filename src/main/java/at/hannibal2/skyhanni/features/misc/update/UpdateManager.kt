@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
-import io.github.moulberry.notenoughupdates.util.ApiUtil
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
@@ -161,7 +161,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                ApiUtil.patchHttpsRequest(it)
+                APIUtils.patchHttpsRequest(it)
             }
         }
     }
@@ -174,4 +174,28 @@ object UpdateManager {
     }
 
     private var potentialUpdate: PotentialUpdate? = null
+
+    fun updateCommand(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        if (switchingToBeta) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    UpdateManager.checkUpdate(true, updateStream)
+                },
+                "§eClick to confirm!",
+                oneTimeClick = true,
+            )
+        } else {
+            UpdateManager.checkUpdate(true, updateStream)
+        }
+    }
 }

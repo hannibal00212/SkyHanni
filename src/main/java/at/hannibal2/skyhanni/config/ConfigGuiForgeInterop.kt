@@ -12,6 +12,7 @@ import java.io.IOException
 @Suppress("unused")
 class ConfigGuiForgeInterop : IModGuiFactory {
 
+    @Suppress("EmptyFunctionBlock")
     override fun initialize(minecraft: Minecraft) {}
     override fun mainConfigGuiClass() = WrappedSkyHanniConfig::class.java
 

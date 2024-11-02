@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -188,7 +188,7 @@ object FossilSolverDisplay {
 
         if (inExcavatorMenu) {
             // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
-            config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator Solver")
+            config.position.renderString("§eExcavator solver GUI", posLabel = "Fossil Excavator Solver")
             return
         }
 
@@ -218,7 +218,7 @@ object FossilSolverDisplay {
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
-        val formattedPercentage = (correctPercentage * 100).round(1)
+        val formattedPercentage = (correctPercentage * 100).roundTo(1)
 
         possibleFossilsRemaining = fossilsRemaining
         FossilSolverDisplay.slotToClick = slotToClick.toSlotIndex()

@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.api.event
 
+/**
+ * Use @[HandleEvent]
+ */
 abstract class SkyHanniEvent protected constructor() {
 
     var isCancelled: Boolean = false

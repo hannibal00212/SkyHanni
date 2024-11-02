@@ -163,7 +163,7 @@ object GetFromSackAPI {
     }
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
-        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
+        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax$amount §9$item §efrom bazaar",
         onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
     )
 
@@ -173,8 +173,6 @@ object GetFromSackAPI {
         // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
         val argsNull = !args.last().last().isDigit()
         val arguments = if (argsNull) {
-            if (!config.defaultGFS) return CommandResult.WRONG_ARGUMENT to null
-
             args + config.defaultAmountGFS.toString()
         } else args
 
@@ -184,7 +182,7 @@ object GetFromSackAPI {
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
         val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
-        val replacedString = itemString.replace("_"," ")
+        val replacedString = itemString.replace("_", " ")
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()

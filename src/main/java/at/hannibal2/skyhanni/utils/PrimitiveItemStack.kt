@@ -15,6 +15,8 @@ data class PrimitiveItemStack(val internalName: NEUInternalName, val amount: Int
 
     val itemName by lazy { internalName.itemName }
 
+    fun toPair() = Pair(internalName, amount)
+
     companion object {
 
         fun NEUInternalName.makePrimitiveStack(amount: Int = 1) = PrimitiveItemStack(this, amount)

@@ -11,12 +11,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,7 +37,7 @@ object PetExpTooltip {
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack
-        val petExperience = itemStack.getPetExp()?.round(1) ?: return
+        val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
         val name = itemStack.name
         try {
 
@@ -80,7 +81,7 @@ object PetExpTooltip {
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
 
-            val offset = if (isNeuExtendedExpEnabled) 4 else 3
+            val offset = if (PlatformUtils.isNeuLoaded() && isNeuExtendedExpEnabled) 4 else 3
             return index + offset
         }
 
@@ -105,7 +106,7 @@ object PetExpTooltip {
         val maxLevel = if (useGoldenDragonLevels) 200 else 100
 
         val maxXp = when {
-            useGoldenDragonLevels -> LEVEL_200_LEGENDARY // lvl 200 legendary
+            useGoldenDragonLevels -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY

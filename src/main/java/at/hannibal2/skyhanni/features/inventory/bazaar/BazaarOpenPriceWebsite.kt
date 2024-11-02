@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,12 +23,14 @@ object BazaarOpenPriceWebsite {
 
     private val item by lazy {
         val neuItem = "PAPER".asInternalName().getItemStack()
-        Utils.createItemStack(
+        ItemUtils.createItemStack(
             neuItem.item,
             "§bPrice History",
+            "§8(From SkyHanni)",
+            "",
             "§7Click here to open",
             "§7the price history",
-            "§7on §cskyblock.bz"
+            "§7on §cskyblock.bz",
         )
     }
 

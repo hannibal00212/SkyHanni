@@ -1,25 +1,34 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPatterns
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias RarityType = HoppityEggsConfig.CompactRarityTypes
 
+@SkyHanniModule
 object HoppityEggsCompactChat {
 
     private var hoppityEggChat = mutableListOf<String>()
@@ -30,31 +39,32 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    private var rabbitBought = false
     private val config get() = ChocolateFactoryAPI.config
+    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
-    fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
+    fun compactChat(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+        if (!HoppityEggsManager.config.compactChat) return
         lastDuplicateAmount?.let {
             this.lastDuplicateAmount = it
-        }
-        if (!HoppityEggsManager.config.compactChat) return
-        event.blockedReason = "compact_hoppity"
-        hoppityEggChat.add(event.message)
-        if (lastDuplicateAmount != null) {
             this.duplicate = true
         }
-        if (hoppityEggChat.size == 3) {
-            DelayedRun.runDelayed(200.milliseconds) {
-                sendCompact()
-            }
+        event?.let {
+            it.blockedReason = "compact_hoppity"
+            hoppityEggChat.add(it.message)
         }
+        if (hoppityEggChat.size == 3) sendCompact()
     }
 
     private fun sendCompact() {
-        if (hoppityEggChat.isNotEmpty()) {
+        if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
+            DelayedRun.runDelayed(5.milliseconds) {
+                clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick())
+                resetCompactData()
+            }
+        } else {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
+            resetCompactData()
         }
-        resetCompactData()
     }
 
     private fun resetCompactData() {
@@ -66,15 +76,16 @@ object HoppityEggsCompactChat {
         this.lastProfit = ""
         this.lastChatMeal = null
         this.lastDuplicateAmount = null
-        this.rabbitBought = false
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: ""
-        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit"
-        else if (lastChatMeal == SIDE_DISH) "§6§lSide Dish §r§6Egg"
-        else if (lastChatMeal == CHOCOLATE_SHOP_MILESTONE || lastChatMeal == CHOCOLATE_FACTORY_MILESTONE) "§6§lMilestone Rabbit"
-        else "$mealName Egg"
+        val mealNameFormat = when (lastChatMeal) {
+            BOUGHT -> "§aBought Rabbit"
+            SIDE_DISH -> "§6§lSide Dish §r§6Egg"
+            CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
+            STRAY -> "§aStray Rabbit"
+            else -> "${lastChatMeal?.coloredName.orEmpty()} Egg"
+        }
 
         val rarityConfig = HoppityEggsManager.config.rarityInCompact
         return if (duplicate) {
@@ -83,41 +94,81 @@ object HoppityEggsCompactChat {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
 
+            val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
+                (HoppityCollectionStats.getRabbitCount(this.lastName)).takeIf { it > 0 }?.let {
+                    " §7(§b#$it§7)"
+                }.orEmpty()
+            } else ""
+
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormatted! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}" +
+                "$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormatted! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7($lastProfit§7)"
         } else "?"
     }
 
-    fun handleChat(event: LorenzChatEvent) {
-        eggFoundPatterns.forEach {
-            it.matchMatcher(event.message) {
-                resetCompactData()
-                lastChatMeal = getEggType(event)
-                compactChat(event)
-            }
+    private fun clickableCompact(onClick: () -> Unit) {
+        val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
+        hoppityEggChat.clear()
+        ChatUtils.clickableChat(
+            createCompactMessage(),
+            hover = hover,
+            onClick = onClick,
+            expireAt = 30.seconds.fromNow(),
+            oneTimeClick = true,
+            prefix = false,
+        )
+    }
+
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type) || event.type == BOUGHT) return
+        lastChatMeal = event.type
+        hoppityEggChat.add(
+            when (event.type) {
+                SIDE_DISH ->
+                    "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
+
+                CHOCOLATE_FACTORY_MILESTONE ->
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
+                CHOCOLATE_SHOP_MILESTONE ->
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
+                STRAY -> {
+                    "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!".also {
+                        // If it was an El Dorado dupe stray, we don't want hanging data
+                        DelayedRun.runDelayed(300.milliseconds) { resetCompactData() }
+                    }
+                }
+
+                else ->
+                    "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type?"
+            },
+        )
+        if (hoppityEggChat.size == 3) sendCompact()
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        eggFoundPattern.matchMatcher(event.message) {
+            resetCompactData()
+            lastChatMeal = getEggType(event)
+            compactChat(event)
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            if (group("rabbitname").equals(lastName)) {
-                rabbitBought = true
+            if (group("rabbitname") == lastName) {
+                lastChatMeal = BOUGHT
                 compactChat(event)
             }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
-            // The only cases where "You found ..." will come in with more than 1 message,
-            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity,
-            // In the case of buying, we want to reset variables to a clean state during this capture,
-            // as the important capture for the purchased message is the final message in
-            // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
-            if ((hoppityEggChat.isEmpty() || hoppityEggChat.size > 1)) {
-                resetCompactData()
-            }
-
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)
@@ -138,20 +189,4 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
     }
-
-    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty() && !rabbitBought && lastChatMeal != null &&
-        HoppityEggType.resettingEntries.contains(lastChatMeal)
-    ) {
-        val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
-        hoppityEggChat.clear()
-        ChatUtils.clickableChat(
-            createCompactMessage(),
-            hover = hover,
-            onClick = onClick,
-            expireAt = 30.seconds.fromNow(),
-            oneTimeClick = true,
-            prefix = false,
-        )
-        true
-    } else false
 }

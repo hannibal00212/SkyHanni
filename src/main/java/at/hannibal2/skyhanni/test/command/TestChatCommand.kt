@@ -12,7 +12,14 @@ object TestChatCommand {
 
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
-            ChatUtils.userError("Specify a chat message to test!")
+            val syntaxStrings = listOf(
+                "§7Syntax: §e/shtestmessage §7<§e-chat message§7> §7[-lines] [-complex] [-clipboard] [-s]",
+                "   §7[-lines]§e: §7Split the message into multiple by newlines",
+                "   §7[-complex]§e: §7Parse the message as a JSON chat component",
+                "   §7[-clipboard]§e: §7Read the message from the clipboard",
+                "   §7[-s]§e: §7Hide the output message",
+            )
+            ChatUtils.userError("Specify a chat message to test!\n${syntaxStrings.joinToString("\n")}")
             return
         }
 

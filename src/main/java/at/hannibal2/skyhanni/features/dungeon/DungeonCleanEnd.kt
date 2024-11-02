@@ -99,11 +99,11 @@ object DungeonCleanEnd {
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (config.F3IgnoreGuardians
-            && DungeonAPI.isOneOf("F3", "M3")
-            && entity is EntityGuardian
-            && entity.entityId != lastBossId
-            && Minecraft.getMinecraft().thePlayer.isSneaking
+        if (config.F3IgnoreGuardians &&
+            DungeonAPI.isOneOf("F3", "M3") &&
+            entity is EntityGuardian &&
+            entity.entityId != lastBossId &&
+            Minecraft.getMinecraft().thePlayer.isSneaking
         ) {
             return
         }

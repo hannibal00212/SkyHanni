@@ -58,7 +58,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.HUB], priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
@@ -93,20 +93,25 @@ object GriffinBurrowParticleFinder {
 
     private enum class ParticleType(val check: S2APacketParticles.() -> Boolean) {
         EMPTY({
-            particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC && particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC &&
+                particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
         }),
         MOB({
-            particleType == net.minecraft.util.EnumParticleTypes.CRIT && particleCount == 3 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.CRIT &&
+                particleCount == 3 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
 
         }),
         TREASURE({
-            particleType == net.minecraft.util.EnumParticleTypes.DRIP_LAVA && particleCount == 2 && particleSpeed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
+            particleType == net.minecraft.util.EnumParticleTypes.DRIP_LAVA &&
+                particleCount == 2 && particleSpeed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
         }),
         FOOTSTEP({
-            particleType == net.minecraft.util.EnumParticleTypes.FOOTSTEP && particleCount == 1 && particleSpeed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
+            particleType == net.minecraft.util.EnumParticleTypes.FOOTSTEP &&
+                particleCount == 1 && particleSpeed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
         }),
         ENCHANT({
-            particleType == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE && particleCount == 5 && particleSpeed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE &&
+                particleCount == 5 && particleSpeed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
         });
 
         companion object {
@@ -165,7 +170,7 @@ object GriffinBurrowParticleFinder {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return

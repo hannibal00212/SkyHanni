@@ -54,7 +54,7 @@ object ModifyVisualWords {
                     it.groupValues[1] + it.groupValues[2].reversed()
                 }
             }
-            */
+             */
             modifiedText
         }
     }

@@ -27,9 +27,12 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
+
+    private val config get() = SkyHanniMod.feature.dev
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
@@ -38,8 +41,10 @@ object ChatManager {
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
     private val messageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
-            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?): Boolean {
-                return size > 100
+            override fun removeEldestEntry(
+                eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
+            ): Boolean {
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 
@@ -116,13 +121,20 @@ object ChatManager {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
+        //#if MC<1.12
         if (event.type.toInt() == 2) return
+        //#else
+        //$$ if (event.type.id.toInt() == 2) return
+        //#endif
 
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
+                event.isCanceled = true
+            }
             return
         }
         val key = IdentityCharacteristics(original)

@@ -33,6 +33,11 @@ public class GraphConfig {
     public int selectKey = -98;
 
     @Expose
+    @ConfigOption(name = "Select near look", desc = "Select the node closest to where you are looking.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int selectRaycastKey = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigOption(name = "Connect Key", desc = "Connect the nearest node with the active node. If the nodes are already connected removes the connection.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_C)
     public int connectKey = Keyboard.KEY_C;

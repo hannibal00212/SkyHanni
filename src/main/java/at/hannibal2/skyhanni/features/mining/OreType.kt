@@ -7,186 +7,191 @@ import net.minecraft.block.state.IBlockState
 
 enum class OreType(
     val oreName: String,
-    private val internalNameString: String,
-    val oreBlocks: List<OreBlock>,
-    val internalName: NEUInternalName = internalNameString.asInternalName(),
+    internalName: String,
+    vararg oreBlocks: OreBlock,
 ) {
     MITHRIL(
         "Mithril",
         "MITHRIL_ORE",
-        listOf(OreBlock.LOW_TIER_MITHRIL, OreBlock.MID_TIER_MITHRIL, OreBlock.HIGH_TIER_MITHRIL),
+        OreBlock.LOW_TIER_MITHRIL, OreBlock.MID_TIER_MITHRIL, OreBlock.HIGH_TIER_MITHRIL,
     ),
     TITANIUM(
         "Titanium",
         "TITANIUM_ORE",
-        listOf(OreBlock.TITANIUM),
+        OreBlock.TITANIUM,
     ),
     COBBLESTONE(
         "Cobblestone",
         "COBBLESTONE",
-        listOf(OreBlock.STONE, OreBlock.COBBLESTONE),
+        OreBlock.STONE, OreBlock.COBBLESTONE,
     ),
     COAL(
         "Coal",
         "COAL",
-        listOf(OreBlock.COAL_ORE, OreBlock.PURE_COAL),
+        OreBlock.COAL_ORE, OreBlock.PURE_COAL,
     ),
     IRON(
         "Iron",
         "IRON_INGOT",
-        listOf(OreBlock.IRON_ORE, OreBlock.PURE_IRON),
+        OreBlock.IRON_ORE, OreBlock.PURE_IRON,
     ),
     GOLD(
         "Gold",
         "GOLD_INGOT",
-        listOf(OreBlock.GOLD_ORE, OreBlock.PURE_GOLD),
+        OreBlock.GOLD_ORE, OreBlock.PURE_GOLD,
     ),
     LAPIS(
         "Lapis Lazuli",
         "INK_SACK-4",
-        listOf(OreBlock.LAPIS_ORE, OreBlock.PURE_LAPIS),
+        OreBlock.LAPIS_ORE, OreBlock.PURE_LAPIS,
     ),
     REDSTONE(
         "Redstone",
         "REDSTONE",
-        listOf(OreBlock.REDSTONE_ORE, OreBlock.PURE_REDSTONE),
+        OreBlock.REDSTONE_ORE, OreBlock.PURE_REDSTONE,
     ),
     EMERALD(
         "Emerald",
         "EMERALD",
-        listOf(OreBlock.EMERALD_ORE, OreBlock.PURE_EMERALD),
+        OreBlock.EMERALD_ORE, OreBlock.PURE_EMERALD,
     ),
     DIAMOND(
         "Diamond",
         "DIAMOND",
-        listOf(OreBlock.DIAMOND_ORE, OreBlock.PURE_DIAMOND),
+        OreBlock.DIAMOND_ORE, OreBlock.PURE_DIAMOND,
     ),
     NETHERRACK(
         "Netherrack",
         "NETHERRACK",
-        listOf(OreBlock.NETHERRACK),
+        OreBlock.NETHERRACK,
     ),
     QUARTZ(
         "Nether Quartz",
         "QUARTZ",
-        listOf(OreBlock.QUARTZ_ORE),
+        OreBlock.QUARTZ_ORE,
     ),
     GLOWSTONE(
         "Glowstone",
         "GLOWSTONE_DUST",
-        listOf(OreBlock.GLOWSTONE),
+        OreBlock.GLOWSTONE,
     ),
     MYCELIUM(
         "Mycelium",
         "MYCEL",
-        listOf(OreBlock.MYCELIUM),
+        OreBlock.MYCELIUM,
     ),
     RED_SAND(
         "Red Sand",
         "SAND-1",
-        listOf(OreBlock.RED_SAND),
+        OreBlock.RED_SAND,
     ),
     SULPHUR(
         "Sulphur",
         "SULPHUR_ORE",
-        listOf(OreBlock.SULPHUR),
+        OreBlock.SULPHUR,
     ),
     GRAVEL(
         "Gravel",
         "GRAVEL",
-        listOf(OreBlock.GRAVEL),
+        OreBlock.GRAVEL,
     ),
     END_STONE(
         "End Stone",
         "ENDER_STONE",
-        listOf(OreBlock.END_STONE),
+        OreBlock.END_STONE,
     ),
     OBSIDIAN(
         "Obsidian",
         "OBSIDIAN",
-        listOf(OreBlock.OBSIDIAN),
+        OreBlock.OBSIDIAN,
     ),
     HARD_STONE(
         "Hard Stone",
         "HARD_STONE",
-        listOf(OreBlock.HARD_STONE_HOLLOWS, OreBlock.HARD_STONE_GLACIAL),
+        OreBlock.HARD_STONE_HOLLOWS, OreBlock.HARD_STONE_TUNNELS, OreBlock.HARD_STONE_MINESHAFT,
     ),
     RUBY(
         "Ruby",
         "ROUGH_RUBY_GEM",
-        listOf(OreBlock.RUBY),
+        OreBlock.RUBY,
     ),
     AMBER(
         "Amber",
         "ROUGH_AMBER_GEM",
-        listOf(OreBlock.AMBER),
+        OreBlock.AMBER,
     ),
     AMETHYST(
         "Amethyst",
         "ROUGH_AMETHYST_GEM",
-        listOf(OreBlock.AMETHYST),
+        OreBlock.AMETHYST,
     ),
     JADE(
         "Jade",
         "ROUGH_JADE_GEM",
-        listOf(OreBlock.JADE),
+        OreBlock.JADE,
     ),
     SAPPHIRE(
         "Sapphire",
         "ROUGH_SAPPHIRE_GEM",
-        listOf(OreBlock.SAPPHIRE),
+        OreBlock.SAPPHIRE,
     ),
     TOPAZ(
         "Topaz",
         "ROUGH_TOPAZ_GEM",
-        listOf(OreBlock.TOPAZ),
+        OreBlock.TOPAZ,
     ),
     JASPER(
         "Jasper",
         "ROUGH_JASPER_GEM",
-        listOf(OreBlock.JASPER),
+        OreBlock.JASPER,
     ),
     OPAL(
         "Opal",
         "ROUGH_OPAL_GEM",
-        listOf(OreBlock.OPAL),
+        OreBlock.OPAL,
     ),
     AQUAMARINE(
         "Aquamarine",
         "ROUGH_AQUAMARINE_GEM",
-        listOf(OreBlock.AQUAMARINE),
+        OreBlock.AQUAMARINE,
     ),
     CITRINE(
         "Citrine",
         "ROUGH_CITRINE_GEM",
-        listOf(OreBlock.CITRINE),
+        OreBlock.CITRINE,
     ),
     ONYX(
         "Onyx",
         "ROUGH_ONYX_GEM",
-        listOf(OreBlock.ONYX),
+        OreBlock.ONYX,
     ),
     PERIDOT(
         "Peridot",
         "ROUGH_PERIDOT_GEM",
-        listOf(OreBlock.PERIDOT),
+        OreBlock.PERIDOT,
     ),
     UMBER(
         "Umber",
         "UMBER",
-        listOf(OreBlock.LOW_TIER_UMBER, OreBlock.HIGH_TIER_UMBER),
+        OreBlock.LOW_TIER_UMBER, OreBlock.HIGH_TIER_UMBER,
     ),
     TUNGSTEN(
         "Tungsten",
         "TUNGSTEN",
-        listOf(OreBlock.LOW_TIER_TUNGSTEN, OreBlock.HIGH_TIER_TUNGSTEN),
+        OreBlock.LOW_TIER_TUNGSTEN_TUNNELS, OreBlock.LOW_TIER_TUNGSTEN_MINESHAFT, OreBlock.HIGH_TIER_TUNGSTEN,
     ),
     GLACITE(
         "Glacite",
         "GLACITE",
-        listOf(OreBlock.GLACITE),
+        OreBlock.GLACITE,
     ),
     ;
+
+    val oreBlocks = oreBlocks.toSet()
+
+    val internalName: NEUInternalName = internalName.asInternalName()
+
+    fun isGemstone(): Boolean = this in gemstones
 
     companion object {
 
@@ -197,11 +202,14 @@ enum class OreType(
         )
 
         fun IBlockState.isOreType(oreType: OreType): Boolean {
-            return oreType.oreBlocks.intersect(MiningAPI.currentAreaOreBlocks)
-                .any { it.checkBlock.invoke(this) }
+            for (oreBlock in oreType.oreBlocks) {
+                if (oreBlock !in MiningAPI.currentAreaOreBlocks) continue
+                if (oreBlock.checkBlock(this)) {
+                    return true
+                }
+            }
+            return false
         }
-
-        fun OreType.isGemstone(): Boolean = this in gemstones
 
         fun OreBlock.getOreType(): OreType? {
             return OreType.entries.firstOrNull { this in it.oreBlocks }
