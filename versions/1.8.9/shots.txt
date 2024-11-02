@@ -6,26 +6,18 @@ net.minecraft.client.Minecraft:
         annotate org.jetbrains.annotations.NotNull
     renderGlobal:
         annotate org.jetbrains.annotations.NotNull
-    thePlayer:
-        annotate org.jetbrains.annotations.Nullable
-    pointedEntity:
-        annotate org.jetbrains.annotations.Nullable
     effectRenderer:
         annotate org.jetbrains.annotations.NotNull
     fontRendererObj:
         annotate org.jetbrains.annotations.NotNull
     standardGalacticFontRenderer:
         annotate org.jetbrains.annotations.NotNull
-    currentScreen:
-        annotate org.jetbrains.annotations.Nullable
     entityRenderer:
         annotate org.jetbrains.annotations.NotNull
     guiAchievement:
         annotate org.jetbrains.annotations.NotNull
     ingameGUI:
         annotate org.jetbrains.annotations.NotNull
-    objectMouseOver:
-        annotate org.jetbrains.annotations.Nullable
     gameSettings:
         annotate org.jetbrains.annotations.NotNull
     mouseHelper:
@@ -38,8 +30,6 @@ net.minecraft.client.Minecraft:
         annotate org.jetbrains.annotations.NotNull
     mcDefaultResourcePack:
         annotate org.jetbrains.annotations.NotNull
-    theWorld:
-        annotate org.jetbrains.annotations.Nullable
     <init>(net.minecraft.client.main.GameConfiguration):
         annotateParameter 0 org.jetbrains.annotations.NotNull
     getFrameBuffer():
@@ -50,12 +40,39 @@ net.minecraft.client.Minecraft:
         annotate org.jetbrains.annotations.NotNull
     getSaveLoader():
         annotate org.jetbrains.annotations.NotNull
-    displayGuiScreen(net.minecraft.client.gui.GuiScreen):
-        annotateParameter 0 org.jetbrains.annotations.Nullable
     getMusicTicker():
         annotate org.jetbrains.annotations.NotNull
-net.minecraft.util.ChatStyle:
-    getChatClickEvent():
-        annotate org.jetbrains.annotations.Nullable
-    getChatHoverEvent():
-        annotate org.jetbrains.annotations.Nullable
+    displayGuiScreen(net.minecraft.client.gui.GuiScreen):
+        annotateParameter 0 org.jetbrains.annotations.Nullable
+#    thePlayer:
+#        annotate org.jetbrains.annotations.Nullable
+#    pointedEntity:
+#        annotate org.jetbrains.annotations.Nullable
+#    currentScreen:
+#        annotate org.jetbrains.annotations.Nullable
+#    objectMouseOver:
+#        annotate org.jetbrains.annotations.Nullable
+#    theWorld:
+#        annotate org.jetbrains.annotations.Nullable
+#net.minecraft.util.ChatStyle:
+#    getChatClickEvent():
+#        annotate org.jetbrains.annotations.Nullable
+#    getChatHoverEvent():
+#        annotate org.jetbrains.annotations.Nullable
+#
+net.minecraft.item.ItemStack:
+    <init>(net.minecraft.block.Block):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.block.Block, int):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.block.Block, int, int):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.item.Item):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.item.Item, int):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.item.Item, int, int):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+    <init>(net.minecraft.item.Item, int, int, net.minecraft.nbt.NBTTagCompound):
+        annotateParameter 0 org.jetbrains.annotations.NotNull
+        annotateParameter 3 org.jetbrains.annotations.Nullable

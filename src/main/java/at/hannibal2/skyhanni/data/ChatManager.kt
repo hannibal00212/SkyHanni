@@ -27,9 +27,12 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
+
+    private val config get() = SkyHanniMod.feature.dev
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
@@ -41,7 +44,7 @@ object ChatManager {
             override fun removeEldestEntry(
                 eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
             ): Boolean {
-                return size > 100
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 
@@ -129,6 +132,9 @@ object ChatManager {
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
+                event.isCanceled = true
+            }
             return
         }
         val key = IdentityCharacteristics(original)

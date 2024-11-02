@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
@@ -379,7 +380,7 @@ interface Renderable {
                 horizontalAlign = horizontalAlign,
                 verticalAlign = verticalAlign,
             ),
-            item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            item.getTooltipCompat(false),
             stack = item,
         )
 
