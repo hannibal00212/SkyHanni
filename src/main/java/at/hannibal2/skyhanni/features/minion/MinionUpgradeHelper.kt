@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -47,8 +48,9 @@ object MinionUpgradeHelper {
                 itemsNeeded = group("amount")?.toInt() ?: 0
             } ?: resetItems()
 
-            if (itemsInSacks > 0) {
-                add("§7In sacks: §a$itemsInSacks§7x §b$itemName")
+            if (itemName.isNotEmpty() && itemsNeeded > 0) {
+                itemsInSacks = itemName.toInternalName().getAmountInSacksOrNull() ?: 0
+                displayItem = createDisplayItem()
             }
         }
     }
