@@ -20,7 +20,7 @@ object MobUtils {
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
 
-    fun getNextEntity(entity: Entity, offset: Int) = EntityUtils.getEntityByID(entity.entityId + offset)
+    fun getNextEntity(entity: Entity, offset: Int): Entity? = EntityUtils.getEntityByID(entity.entityId + offset)
 
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)

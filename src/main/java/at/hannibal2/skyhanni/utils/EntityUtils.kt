@@ -177,7 +177,7 @@ object EntityUtils {
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.entityWorld?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int): Entity? = Minecraft.getMinecraft().thePlayer?.entityWorld?.getEntityByID(entityId)
 
     @SubscribeEvent
     fun onEntityRenderPre(
