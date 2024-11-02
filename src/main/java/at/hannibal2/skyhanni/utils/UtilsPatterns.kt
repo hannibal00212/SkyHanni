@@ -114,4 +114,9 @@ object UtilsPatterns {
         "inventory.shopoptions",
         "Shop Trading Options",
     )
+
+    val skyblockMenuGuiPattern by patternGroup.pattern(
+        "inventory.skyblockmenu",
+        "SkyBlock Menu",
+    )
 }
