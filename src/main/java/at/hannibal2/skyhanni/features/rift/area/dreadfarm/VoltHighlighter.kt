@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -37,7 +38,6 @@ object VoltHighlighter {
     private val VOLT_HOSTILE by lazy { SkullTextureHolder.getTexture("VOLT_HOSTILE") }
 
     private const val LIGHTNING_DISTANCE = 7F
-    private const val ARMOR_SLOT_HEAD = 3
     private val CHARGE_TIME = 12.seconds
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
@@ -112,7 +112,7 @@ object VoltHighlighter {
 
     private fun getVoltState(entity: Entity): VoltState {
         if (entity !is EntityArmorStand) return VoltState.NO_VOLT
-        val helmet = entity.getCurrentArmor(ARMOR_SLOT_HEAD) ?: return VoltState.NO_VOLT
+        val helmet = entity.getStandHelmet() ?: return VoltState.NO_VOLT
         return getVoltState(helmet)
     }
 }

@@ -24,12 +24,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.init.Blocks
-import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -99,8 +100,7 @@ object DungeonLividFinder {
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
-    private fun isCurrentlyBlind() =
-        Minecraft.getMinecraft().thePlayer?.getActivePotionEffect(Potion.blindness)?.duration?.let { it > 10 } ?: false
+    private fun isCurrentlyBlind() = (Minecraft.getMinecraft().thePlayer?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun Mob.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
