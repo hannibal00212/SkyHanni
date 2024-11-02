@@ -18,5 +18,5 @@ fun C08PacketPlayerBlockPlacement.getUsedItem(): ItemStack? =
     //#if MC < 1.12
     stack
 //#else
-//$$ Minecraft.getMinecraft().player.getHeldItem(hand)
+//$$ Minecraft.getMinecraft().player?.getHeldItem(hand)
 //#endif
