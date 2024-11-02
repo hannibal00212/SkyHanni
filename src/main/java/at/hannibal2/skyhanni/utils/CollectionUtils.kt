@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
@@ -307,7 +307,7 @@ object CollectionUtils {
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(Enchantment.protection, 0)
+            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
     }

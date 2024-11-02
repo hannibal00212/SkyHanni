@@ -16,6 +16,7 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: read
+            pull-requests: write
         outputs:
             sarif_exists: ${{ steps.check_sarif.outputs.exists }}
         steps:
