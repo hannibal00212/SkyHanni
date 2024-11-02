@@ -36,6 +36,15 @@ public class DevConfig {
     public int logExpiryTime = 14;
 
     @Expose
+    @ConfigOption(
+        name = "Chat History Length",
+        desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +
+            "§cExcessively large values may cause memory allocation issues."
+    )
+    @ConfigEditorSlider(minValue = 100, maxValue = 5000, minStep = 10)
+    public int chatHistoryLength = 100;
+
+    @Expose
     @ConfigOption(name = "Slot Number", desc = "Show slot number in inventory while pressing this key.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int showSlotNumberKey = Keyboard.KEY_NONE;
@@ -107,6 +116,13 @@ public class DevConfig {
         desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
     @ConfigEditorBoolean
     public boolean fancySbaContributors = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Number Format Override",
+        desc = "Forces the number format to use the en_US locale.")
+    @ConfigEditorBoolean
+    public boolean numberFormatOverride = false;
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")

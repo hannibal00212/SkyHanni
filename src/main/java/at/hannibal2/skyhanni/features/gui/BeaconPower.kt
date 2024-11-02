@@ -58,8 +58,8 @@ object BeaconPower {
 
     private var display = ""
 
-    private val BEACON_POWER_SLOT = 22
-    private val STATS_SLOT = 23
+    private const val BEACON_POWER_SLOT = 22
+    private const val STATS_SLOT = 23
 
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {

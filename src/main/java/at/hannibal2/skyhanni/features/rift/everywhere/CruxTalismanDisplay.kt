@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,12 +23,13 @@ object CruxTalismanDisplay {
 
     private val config get() = RiftAPI.config.cruxTalisman
 
+    @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(
         "rift.everywhere.crux.progress",
         ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
     )
 
-    private val partialName = "CRUX_TALISMAN"
+    private const val PARTIAL_NAME = "CRUX_TALISMAN"
     private var display = emptyList<List<Any>>()
     private val displayLine = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
@@ -80,7 +81,7 @@ object CruxTalismanDisplay {
                 }
             }
         }
-        percentValue = ((percent.toDouble() / 600) * 100).roundToPrecision(1)
+        percentValue = ((percent.toDouble() / 600) * 100).roundTo(1)
         if (bonusesLine.isNotEmpty() && config.showBonuses.get()) {
             addAsSingletonList("§7Bonuses:")
             bonusesLine.forEach { addAsSingletonList("  $it") }
@@ -91,7 +92,7 @@ object CruxTalismanDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
-        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(partialName) }) return
+        if (!InventoryUtils.getItemsInOwnInventory().any { it.getInternalName().startsWith(PARTIAL_NAME) }) return
 
         displayLine.clear()
         bonusesLine.clear()

@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -38,7 +38,7 @@ object MineshaftWaypoints {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        val playerLocation = LocationUtils.playerLocation().round(0).add(y = -1)
+        val playerLocation = LorenzVec.getBlockBelowPlayer()
 
         if (config.mineshaftWaypoints.entranceLocation) {
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))

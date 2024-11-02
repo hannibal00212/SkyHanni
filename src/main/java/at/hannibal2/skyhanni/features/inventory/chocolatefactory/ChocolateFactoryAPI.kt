@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.Chocolat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
@@ -80,7 +81,9 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var chocolateMilestones = TreeSet<Long>()
+    private var chocolateMilestones = TreeSet<Long>()
+    private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
+    private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -143,6 +146,8 @@ object ChocolateFactoryAPI {
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
         chocolateMilestones = data.chocolateMilestones
+        chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
+        chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
@@ -226,4 +231,16 @@ object ChocolateFactoryAPI {
         val basePerSecond = rawChocolatePerSecond * baseMultiplier
         return (needed / basePerSecond + secondsUntilTowerExpires).seconds
     }
+
+    fun milestoneByRabbit(rabbitName: String): MilestoneJson? {
+        return chocolateFactoryMilestones.firstOrNull {
+            it.rabbit.removeColor() == rabbitName.removeColor()
+        } ?: chocolateShopMilestones.firstOrNull {
+            it.rabbit.removeColor() == rabbitName.removeColor()
+        }
+    }
+
+    fun isMax(): Boolean = profileStorage?.let {
+        it.maxChocolate == it.currentChocolate
+    } ?: false
 }

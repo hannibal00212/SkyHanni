@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,7 +41,7 @@ object JacobContestStatsSummary {
 
             FarmingContestPhase.STOP -> {
                 val duration = startTime.passedSince()
-                val blocksPerSecond = (blocksBroken.toDouble() / duration.inWholeSeconds).round(2)
+                val blocksPerSecond = (blocksBroken.toDouble() / duration.inWholeSeconds).roundTo(2)
                 val cropName = event.crop.cropName
                 ChatUtils.chat("Stats for $cropName Contest:")
                 val time = duration.format()

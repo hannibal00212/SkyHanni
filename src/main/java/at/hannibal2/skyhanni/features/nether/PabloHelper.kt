@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -33,8 +34,10 @@ object PabloHelper {
 //     )
 
     private val patterns = listOf(
-        "\\[NPC] Pablo: (?:✆ )?Could you bring me an (?<flower>[\\w ]+).*".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?<flower>[\\w ]+) today\\.".toPattern(),
         "\\[NPC] Pablo: (?:✆ )?Bring me that (?<flower>[\\w ]+) as soon as you can!".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?<flower>[\\w ]+)\\?".toPattern(),
+        "\\[NPC] Pablo: (?:✆ )?I really need an? (?<flower>[\\w ]+) today, do you have one you could spare\\?".toPattern(),
     )
 
     private var lastSentMessage = SimpleTimeMark.farPast()
@@ -49,10 +52,12 @@ object PabloHelper {
 
         if (InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) } > 0) return
 
-        GetFromSackAPI.getFromChatMessageSackItems(
-            itemName.asInternalName().makePrimitiveStack(),
-            "Click here to grab an $itemName from sacks!",
-        )
+        DelayedRun.runNextTick {
+            GetFromSackAPI.getFromChatMessageSackItems(
+                itemName.asInternalName().makePrimitiveStack(),
+                "Click here to grab an $itemName from sacks!",
+            )
+        }
 
         lastSentMessage = SimpleTimeMark.now()
     }

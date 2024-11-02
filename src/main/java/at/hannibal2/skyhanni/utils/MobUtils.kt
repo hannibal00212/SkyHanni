@@ -25,10 +25,10 @@ object MobUtils {
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
 
-    fun getClosedArmorStand(entity: Entity, range: Double) =
+    fun getClosestArmorStand(entity: Entity, range: Double) =
         getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
 
-    fun getClosedArmorStandWithName(entity: Entity, range: Double, name: String) =
+    fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
             .sortedBy { it.distanceTo(entity) }.firstOrNull()
 
@@ -71,14 +71,17 @@ object MobUtils {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntities = MobData.entityToMob.filterKeys {
-            it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
-                pos, look
-            )
+            it !is EntityArmorStand &&
+                it.entityBoundingBox.rayIntersects(
+                    pos, look
+                )
         }.values
         if (possibleEntities.isEmpty()) return null
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
-    val EntityLivingBase.mob get() = MobData.entityToMob[this]
+    val EntityLivingBase.mob: Mob? get() = MobData.entityToMob[this]
+
+    val Entity.mob: Mob? get() = (this as? EntityLivingBase)?.mob
 
 }

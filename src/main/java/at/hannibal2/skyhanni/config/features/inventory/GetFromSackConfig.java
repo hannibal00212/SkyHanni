@@ -26,11 +26,6 @@ public class GetFromSackConfig {
     public boolean superCraftGFS = true;
 
     @Expose
-    @ConfigOption(name = "Default GfS", desc = "If you don't provide an amount, a default one will be used instead. Queued GfS needs to be on in order for this to work.")
-    @ConfigEditorBoolean
-    public boolean defaultGFS = false;
-
-    @Expose
     @ConfigOption(name = "Default Amount GfS", desc = "The default amount of items used when an amount isn't provided.")
     @ConfigEditorSlider(minValue = 1, maxValue = 64, minStep = 1)
     public int defaultAmountGFS = 1;

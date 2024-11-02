@@ -193,6 +193,11 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
+    @ConfigOption(name = "Re-color Missing Rabbit Dyes", desc = "Replace the gray dye in Hoppity's Collection with a color for the rarity of the rabbit.")
+    @ConfigEditorBoolean
+    public boolean rarityDyeRecolor = true;
+
+    @Expose
     @ConfigOption(
         name = "Show Missing Location Rabbits",
         desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
@@ -226,6 +231,12 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean mythicRabbitRequirement = false;
+
+    @Expose
+    @ConfigOption(name = "Booster Cookie", desc = "Blocks running /cf without a §6§lBooster Cookie §7active.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean boosterCookieRequirement = false;
 
     @Expose
     @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")

@@ -4,10 +4,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
@@ -44,10 +43,9 @@ object RenderableTooltips {
         val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val x = Utils.getMouseX() + 12
-        val y = Utils.getMouseY() - if (tips.size > 1) 1 else -7
+        val x = GuiScreenUtils.mouseX + 12
+        val y = GuiScreenUtils.mouseY - if (tips.size > 1) 1 else -7
         val borderColorStart = tooltip.getBorderColor()
-        val scaled = ScaledResolution(Minecraft.getMinecraft())
         val isSpacedTitle = tooltip.isSpacedTitle()
 
         val tooltipTextWidth = tips.maxOf { it.width }
@@ -55,19 +53,19 @@ object RenderableTooltips {
 
         val tooltipY = when {
             y < 16 -> 4 // Limit Top
-            y + tooltipHeight > scaled.scaledHeight -> {
-                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
+            y + tooltipHeight > GuiScreenUtils.scaledWindowHeight -> {
+                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > GuiScreenUtils.scaledWindowHeight)
                     4 // Snap to Top if to Long
                 else
-                    scaled.scaledHeight - tooltipHeight - 6 // Limit Bottom
+                    GuiScreenUtils.scaledWindowHeight - tooltipHeight - 6 // Limit Bottom
             }
 
             else -> {
                 y - 10 // normal
             }
         }
-        val tooltipX = if (x + tooltipTextWidth + 4 > scaled.scaledWidth) {
-            scaled.scaledWidth - tooltipTextWidth - 4 // Limit Right
+        val tooltipX = if (x + tooltipTextWidth + 4 > GuiScreenUtils.scaledWindowWidth) {
+            GuiScreenUtils.scaledWindowWidth - tooltipTextWidth - 4 // Limit Right
         } else {
             x // normal
         }

@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.NEUItems.isVanillaItem
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 
@@ -71,7 +71,7 @@ object CraftableItemList {
 
             val recipes = NEUItems.getRecipes(internalName)
             for (recipe in recipes) {
-                if (recipe !is CraftingRecipe) continue
+                if (!recipe.isCraftingRecipe()) continue
                 val renderable = createItemRenderable(recipe, availableMaterial, pricePer, internalName) ?: continue
                 lines[internalName] = renderable
             }
@@ -79,7 +79,7 @@ object CraftableItemList {
     }
 
     private fun createItemRenderable(
-        recipe: CraftingRecipe,
+        recipe: PrimitiveRecipe,
         availableMaterial: Map<NEUInternalName, Long>,
         pricePer: MutableMap<NEUInternalName, Double>,
         internalName: NEUInternalName,
@@ -124,7 +124,9 @@ object CraftableItemList {
         inInventory = false
     }
 
-    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map { it.key.getPrice() * it.value }.sum()
+    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map {
+        it.key.getPrice() * it.value
+    }.sum()
 
     private fun canCraftAmount(
         need: Map<NEUInternalName, Int>,

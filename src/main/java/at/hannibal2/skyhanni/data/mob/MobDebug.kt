@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
@@ -34,7 +34,7 @@ object MobDebug {
 
     private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
         for (mob in filter { it.isNotInvisible() }) {
-            event.drawFilledBoundingBox_nea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
+            event.drawFilledBoundingBoxNea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
     }
 
@@ -42,7 +42,7 @@ object MobDebug {
         val map = filter { it.canBeSeen() && it.isNotInvisible() }
             .map { it.boundingBox.getTopCenter() to it.name }
         for ((location, text) in map) {
-            event.drawString(location.add(y = 0.5), "§5$text", seeThroughBlocks = true)
+            event.drawString(location.up(0.5), "§5$text", seeThroughBlocks = true)
         }
     }
 
@@ -82,7 +82,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
     }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SpreadOperator")
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
@@ -119,9 +119,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
-            val name = cleanName.removeColor(keepFormatting = true).replace("§r", "")
+            val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             var displayName = if (hidden) {
-                "§8§m$name"
+                "§8§m$formattedName"
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
@@ -152,7 +152,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.add(renderable.toSearchable(name))
+            lists.add(renderable.toSearchable(formattedName))
         }
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
@@ -187,9 +187,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (SkyHanniMod.feature.dev.debug.enabled) {
+        if (LorenzUtils.debug) {
             add("")
-            add("§7${internalName}")
+            add("§7$internalName")
         }
     }
 

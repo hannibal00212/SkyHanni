@@ -37,7 +37,7 @@ object SprayDisplay {
                     val timer = it.expiry.timeUntil()
                     "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
                 } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
-            } ?: ""
+            }.orEmpty()
         }
 
         if (config.expiryNotification) {

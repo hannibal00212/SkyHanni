@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -24,10 +23,10 @@ object RiftUpsideDownParkour {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(
-            data.locations.map { it.add(-1.0, -1.0, -1.0) },// TODO remove offset. change repo instead
+            data.locations.map { it.add(-1.0, -1.0, -1.0) }, // TODO remove offset. change repo instead
             data.shortCuts,
             platformSize = 2.0,
-            detectionRange = 2.0
+            detectionRange = 2.0,
         )
         updateConfig()
     }
@@ -76,5 +75,5 @@ object RiftUpsideDownParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled
 }

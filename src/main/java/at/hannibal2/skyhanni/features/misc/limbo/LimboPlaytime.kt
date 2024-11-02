@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,7 +43,7 @@ object LimboPlaytime {
     private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
     private val itemID = "ENDER_PEARL".asInternalName()
-    private val itemName = "§aLimbo"
+    private const val ITEM_NAME = "§aLimbo"
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
@@ -58,9 +58,9 @@ object LimboPlaytime {
 
         if (lastCreateCooldown.passedSince() > 3.seconds) {
             lastCreateCooldown = SimpleTimeMark.now()
-            limboItem = Utils.createItemStack(
+            limboItem = ItemUtils.createItemStack(
                 itemID.getItemStack().item,
-                itemName,
+                ITEM_NAME,
                 *createItemLore()
             )
         }
@@ -105,7 +105,7 @@ object LimboPlaytime {
         if ((wholeMinutes % 60) == 0) {
             hoursString = "$wholeHours"
         } else {
-            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).round(1)
+            val minutes: Float = ((wholeMinutes - wholeHours * 60).toFloat() / 60).roundTo(1)
             hoursString = wholeHours.addSeparators()
             if (findFloatDecimalPlace(minutes) != 0) {
                 val minutesString = minutes.toString()

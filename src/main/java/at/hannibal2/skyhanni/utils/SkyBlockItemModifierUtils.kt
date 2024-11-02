@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -272,7 +273,7 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeByte(label: String) =
         getExtraAttributes()?.getByte(label) ?: 0
 
-    fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
+    fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
 
     class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
 

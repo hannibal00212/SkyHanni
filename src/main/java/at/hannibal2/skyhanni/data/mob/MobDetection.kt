@@ -97,8 +97,9 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.worldObj != world || (this.armorStand?.let { it.worldObj != world }
-            ?: false) || this.extraEntities.any { it.worldObj != world }
+        this.baseEntity.worldObj != world || (
+            this.armorStand?.let { it.worldObj != world } ?: false
+            ) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -126,7 +127,7 @@ object MobDetection {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
-        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
+        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) } // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
 
         MobData.notSeenMobs.removeIf(::canBeSeen)
@@ -158,13 +159,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.postAndCatch()
         }
         return isVisible
     }
@@ -302,13 +305,13 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
-                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
-                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
-                        + "DistanceC: ${
-                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                    }\n"
-                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n " +
+                        "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
+                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
+                        "DistanceC: ${
+                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                        }\n" +
+                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop
@@ -338,7 +341,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
@@ -352,8 +355,9 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
                 shouldClear.set(true)
                 allEntitiesViaPacketId.clear()
             }

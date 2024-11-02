@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
@@ -81,7 +81,7 @@ object JacobContestFFNeededDisplay {
             addAsSingletonList("§cassuming 19.9 instead.")
         } else {
             if (blocksPerSecond < 15.0) {
-                add(listOf("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.round(2)}"))
+                add(listOf("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.roundTo(2)}"))
                 add(listOf("§cThis is too low, showing 19.9 Blocks/second instead!"))
                 blocksPerSecond = 19.9
             }

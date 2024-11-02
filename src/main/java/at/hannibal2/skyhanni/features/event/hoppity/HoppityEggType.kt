@@ -17,7 +17,8 @@ enum class HoppityEggType(
     SIDE_DISH("Side Dish", "§6§l", -1),
     BOUGHT("Bought", "§a", -1),
     CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6", -1),
-    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1)
+    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1),
+    STRAY("Stray Rabbit", "§a", -1)
     ;
 
     fun timeUntil(): Duration {
@@ -39,6 +40,7 @@ enum class HoppityEggType(
     }
 
     fun isClaimed() = claimed
+    val isResetting get() = resettingEntries.contains(this)
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
     val coloredName get() = "$mealColor$mealName"
 

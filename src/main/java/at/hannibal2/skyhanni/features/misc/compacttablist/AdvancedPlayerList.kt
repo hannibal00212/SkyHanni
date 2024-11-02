@@ -195,7 +195,7 @@ object AdvancedPlayerList {
         var suffix = if (config.hideEmblem) {
             if (data.ironman) "§7♲" else data.bingoLevel?.let {
                 BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
-            } ?: ""
+            }.orEmpty()
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -206,7 +206,7 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
-            suffix += data.faction.icon ?: ""
+            suffix += data.faction.icon.orEmpty()
         }
 
         return "$level $playerName ${suffix.trim()}"

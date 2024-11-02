@@ -1,0 +1,78 @@
+name: "PR Changelog Verification"
+
+on:
+    pull_request_target:
+        types: [ opened, edited, ready_for_review ]
+
+jobs:
+    verify-changelog:
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: ./.github/actions/setup-normal-workspace
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Run ChangeLog verification
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                run: |
+                    ./gradlew checkPrDescription -PprTitle="${PR_TITLE}" -PprBody="${PR_BODY}"
+
+            -   name: Add label if changelog verification fails
+                if: failure()
+                uses: actions-ecosystem/action-add-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Wrong Title/Changelog'
+
+            -   name: Remove label if changelog verification passes
+                if: success()
+                uses: actions-ecosystem/action-remove-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Wrong Title/Changelog'
+
+            -   name: Check if this is the latest workflow run
+                if: failure()
+                id: check_latest
+                run: |
+                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                        | jq -r '.head.sha')
+
+                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
+                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
+
+                    # Compare the SHAs and set a result variable
+                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
+                        echo "is_latest=true" >> $GITHUB_ENV
+                    else
+                        echo "is_latest=false" >> $GITHUB_ENV
+                    fi
+
+            -   name: Add comment to PR if changelog verification fails
+                if: ${{ failure() && env.is_latest == 'true' }}
+                uses: actions/github-script@v6
+                with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                        const fs = require('fs');
+                        const test = fs.readFileSync('versions/1.8.9/build/changelog_errors.txt', 'utf8');
+                        const commentBody = `${test}`
+                        
+                        github.rest.issues.createComment({
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
+                        })

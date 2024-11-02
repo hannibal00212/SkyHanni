@@ -80,7 +80,7 @@ object ArachneSpawnTimer {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.SPIDER_DEN], priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return
@@ -99,7 +99,7 @@ object ArachneSpawnTimer {
 
         val packet = event.packet
         if (packet is S2APacketParticles) {
-            val location = packet.toLorenzVec().round(2)
+            val location = packet.toLorenzVec().roundTo(2)
             if (arachneAltarLocation.distance(location) > 30) return
             if (packet.particleType == EnumParticleTypes.REDSTONE && packet.particleSpeed == 1.0f) {
                 particleCounter += 1

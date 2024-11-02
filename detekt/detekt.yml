@@ -1,0 +1,139 @@
+
+config:
+    validation: true
+
+GrammarRules:
+    active: true
+    AvoidBritishSpelling: # custom rule to prefer american spellings over british ones
+        active: true
+
+FormattingRules:
+    active: true
+    CustomCommentSpacing:
+        active: true
+
+UseRepoRules:
+    active: true
+    SkullTexturesUseRepo:
+        active: true
+
+ImportRules:
+    active: true
+    CustomImportOrdering:
+        active: true
+
+
+style:
+    MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
+        active: false
+    UnusedParameter:
+        active: true
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
+    ReturnCount:
+        active: true
+        max: 5
+        excludeGuardClauses: true
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
+    MaxLineLength:
+        active: true
+        maxLineLength: 140
+        excludeCommentStatements: true
+    LoopWithTooManyJumpStatements:
+        active: true
+        maxJumpCount: 3
+    UnnecessaryAbstractClass: # gets horrendously messed up with Event classes
+        active: false
+    UnusedPrivateMember: # gets tripped up by API methods
+        active: false
+    UnusedPrivateProperty: # loops that don't use their iterator
+        active: true
+        allowedNames: "^(unused|_)$"
+    UseCheckOrError:
+        active: false
+    ForbiddenComment: # every TODO gets flagged
+        active: false
+    DestructuringDeclarationWithTooManyEntries: # too aggressive
+        active: true
+        maxDestructuringEntries: 5
+
+formatting:
+    MaximumLineLength: # ktlint - handled by detekt
+        active: false
+    MultiLineIfElse:
+        active: false
+    ArgumentListWrapping: # ktlint - way too aggressive
+        active: false
+    NoBlankLineBeforeRbrace: # pedantic
+        active: false
+    NoConsecutiveBlankLines: # pedantic
+        active: false
+    NoEmptyFirstLineInMethodBlock: # pedantic
+        active: false
+    ParameterListWrapping: # pedantic, can be useful in compact code
+        active: false
+    CommentSpacing: # handled by custom rule
+        active: false
+    SpacingBetweenDeclarationsWithAnnotations: # nah
+        active: false
+    SpacingBetweenDeclarationsWithComments: # also nah
+        active: false
+    ImportOrdering: # handled by custom rule
+        active: false
+
+complexity:
+    CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
+        active: true
+        threshold: 25
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
+    LongParameterList: # too aggressive, classes can need a lot of params
+        active: false
+    NestedBlockDepth: # too aggressive
+        active: false
+    TooManyFunctions: # ktlint - also way too aggressive by default (11 on all file types)
+        active: true
+        thresholdInFiles: 15
+        thresholdInClasses: 20
+        thresholdInInterfaces: 20
+        thresholdInObjects: 20
+        thresholdInEnums: 11
+        ignoreAnnotated:
+            - 'SkyHanniModule'
+    ComplexCondition: # aggressive by default, at a complexity of 4
+        active: true
+        threshold: 6
+    LongMethod: # default max length of 60, caught way too much
+        active: true
+        threshold: 100
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
+
+exceptions:
+    SwallowedException: # there are valid reasons to do this
+        active: false
+    ThrowingExceptionsWithoutMessageOrCause: # again, valid reasons
+        active: false
+    TooGenericExceptionCaught: # sometimes you just need to catch Exception
+        active: false
+    TooGenericExceptionThrown: # we don't have our own custom exceptions
+        active: false
+
+naming:
+    ConstructorParameterNaming: # pedantic
+        active: false
+
+potential-bugs:
+    DoubleMutabilityForCollection: # went crazy about all the mutable collections
+        active: false
+    HasPlatformType: # false positives on config get() methods
+        active: false

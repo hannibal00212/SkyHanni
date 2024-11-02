@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
 
 object FirstMinionTier {
 
@@ -30,20 +29,20 @@ object FirstMinionTier {
     ) {
         for (minionId in tierOneMinionsFiltered) {
             for (recipe in NEUItems.getRecipes(minionId)) {
-                if (recipe !is CraftingRecipe) continue
+                if (!recipe.isCraftingRecipe()) continue
                 checkOne(recipe, help, minions, minionId)
             }
         }
     }
 
     private fun checkOne(
-        recipe: CraftingRecipe,
+        recipe: PrimitiveRecipe,
         help: Map<NEUInternalName, Int>,
         minions: MutableMap<String, NEUInternalName>,
         minionId: NEUInternalName,
     ) {
-        if (recipe.getCachedIngredients().any { help.contains(it.internalItemId.asInternalName()) }) {
-            val name = recipe.output.itemStack.name.removeColor()
+        if (recipe.getCachedIngredients().any { help.contains(it.internalName) }) {
+            val name = recipe.output?.internalName?.getItemStackOrNull()?.displayName?.removeColor() ?: return
             val abc = name.replace(" I", " 0")
             minions[abc] = minionId.replace("_1", "_0")
         }

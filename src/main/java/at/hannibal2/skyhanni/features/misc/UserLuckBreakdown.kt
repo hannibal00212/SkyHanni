@@ -10,17 +10,17 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -38,19 +38,19 @@ object UserLuckBreakdown {
 
     private lateinit var mainLuckItem: ItemStack
     private val mainLuckID = "ENDER_PEARL".asInternalName()
-    private val mainLuckName = "§a✴ SkyHanni User Luck"
+    private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
     private var fillerID = "STAINED_GLASS_PANE".asInternalName()
-    private val fillerName = " "
+    private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
     private var limboID = "ENDER_PEARL".asInternalName()
-    private val limboName = "§a✴ Limbo Personal Best"
+    private const val LIMBO_NAME = "§a✴ Limbo Personal Best"
 
     private lateinit var skillsItem: ItemStack
     private var skillsID = "DIAMOND_SWORD".asInternalName()
-    private val skillsName = "§a✴ Category: Skills"
+    private const val SKILLS_NAME = "§a✴ Category: Skills"
 
     private var showAllStats = true
 
@@ -63,7 +63,7 @@ object UserLuckBreakdown {
         "§7Show all stats: §.(?<toggle>.*)",
     )
 
-    private val luckTooltipString = "§5§o §a✴ SkyHanni User Luck §f"
+    private const val LUCK_TOOLTIP = "§5§o §a✴ SkyHanni User Luck §f"
     private var inCustomBreakdown = false
 
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
@@ -119,7 +119,7 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.name ?: ""
+        val inventoryName = event.inventoryItems[4]?.name.orEmpty()
         if (inventoryName != "§dMisc Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItems)
@@ -160,7 +160,7 @@ object UserLuckBreakdown {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
-        val limboLuck = storage?.limbo?.userLuck?.round(1) ?: 0.0f
+        val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
         when (event.slot.inventory.name) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
@@ -178,7 +178,7 @@ object UserLuckBreakdown {
         if (lastIndex == -1) return
 
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
+        event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
     private fun statsBreakdownLoreTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
@@ -205,7 +205,7 @@ object UserLuckBreakdown {
         if (totalLuck == 0f) return
 
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add(lastIndex, "$luckTooltipString$luckString")
+        event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
     private fun tryTruncateFloat(input: Float): String {
@@ -237,9 +237,11 @@ object UserLuckBreakdown {
     }
 
     private fun createItems() {
-        fillerItem = Utils.createItemStack(
+        fillerItem = ItemUtils.createItemStack(
             fillerID.getItemStack().item,
-            fillerName,
+            FILLER_NAME,
+            listOf(),
+            1,
             15,
         )
 
@@ -247,20 +249,20 @@ object UserLuckBreakdown {
         val skillLuck = skillOverflowLuck.values.sum()
         val totalLuck = skillLuck + limboLuck
 
-        mainLuckItem = Utils.createItemStack(
+        mainLuckItem = ItemUtils.createItemStack(
             mainLuckID.getItemStack().item,
-            "$mainLuckName §f${tryTruncateFloat(totalLuck)}",
-            *createItemLore("mainMenu", totalLuck),
+            "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
+            createItemLore("mainMenu", totalLuck),
         )
-        limboItem = Utils.createItemStack(
+        limboItem = ItemUtils.createItemStack(
             limboID.getItemStack().item,
-            limboName,
-            *createItemLore("limbo", limboLuck),
+            LIMBO_NAME,
+            createItemLore("limbo", limboLuck),
         )
-        skillsItem = Utils.createItemStack(
+        skillsItem = ItemUtils.createItemStack(
             skillsID.getItemStack().item,
-            skillsName,
-            *createItemLore("skills"),
+            SKILLS_NAME,
+            createItemLore("skills"),
         )
     }
 
@@ -268,7 +270,7 @@ object UserLuckBreakdown {
         calcSkillLuck()
         return when (type) {
             "mainMenu" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 if (luckInput == 0.0f) {
                     arrayOf(
                         "§7SkyHanni User Luck is the best stat.",
@@ -291,7 +293,7 @@ object UserLuckBreakdown {
             }
 
             "limbo" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 arrayOf(
                     "§8Action",
                     "",

@@ -31,15 +31,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -105,7 +106,10 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".asInternalName() }
+    private val COMPOST by lazy { "COMPOST".toInternalName() }
+    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
+    private val VOLTA by lazy { "VOLTA".toInternalName() }
+    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -338,13 +342,13 @@ object ComposterOverlay {
         val multiplier = multiDropFactor * timeMultiplier
         val multiplierPreview = multiDropFactorPreview * timeMultiplierPreview
         val compostPerTitlePreview =
-            if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.round(2) else ""
+            if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.roundTo(2) else ""
         val compostPerTitle =
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
-        newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
+        newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
 
         val organicMatterPrice = getPrice(organicMatterItem)
-        val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
+        val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 1.0
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
         val organicMatterRequiredPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
@@ -353,7 +357,7 @@ object ComposterOverlay {
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
         val fuelPrice = getPrice(fuelItem)
-        val fuelFactor = fuelFactors[fuelItem]!!
+        val fuelFactor = fuelFactors[fuelItem] ?: 1.0
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPreview = ComposterAPI.fuelRequiredPer(upgrade)
@@ -386,7 +390,7 @@ object ComposterOverlay {
         bigList: MutableList<List<Any>>,
         factors: Map<NEUInternalName, Double>,
         missing: Double,
-        testOffset_: Int = 0,
+        testOffsetRec: Int = 0,
         onClick: (NEUInternalName) -> Unit,
     ): NEUInternalName {
         val map = mutableMapOf<NEUInternalName, Double>()
@@ -394,11 +398,11 @@ object ComposterOverlay {
             map[internalName] = factor / getPrice(internalName)
         }
 
-        val testOffset = if (testOffset_ > map.size) {
+        val testOffset = if (testOffsetRec > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
-        } else testOffset_
+        } else testOffsetRec
 
         val first: NEUInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
         if (testOffset != 0) {
@@ -427,7 +431,7 @@ object ComposterOverlay {
             i++
             if (i < testOffset) continue
             if (first == null) first = internalName
-            val factor = factors[internalName]!!
+            val factor = factors[internalName] ?: 1.0
 
             val item = internalName.getItemStack()
             val price = getPrice(internalName)
@@ -481,14 +485,14 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")
+            !LorenzUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
         val havingInInventory = internalName.getAmountInInventory()
         if (havingInInventory >= itemsNeeded) {
-            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x$itemsNeeded §ealready found in inventory!")
             return
         }
 
@@ -496,8 +500,7 @@ object ComposterOverlay {
             HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
-            val isDwarvenMineable =
-                internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
+            val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
@@ -535,7 +538,7 @@ object ComposterOverlay {
 
     private fun getPrice(internalName: NEUInternalName): Double {
         val price = internalName.getPrice(config.priceSource)
-        if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
+        if (internalName == BIOFUEL && price > 20_000) return 20_000.0
 
         return price
     }
@@ -564,18 +567,24 @@ object ComposterOverlay {
         }
     }
 
+    private val blockedItems = listOf(
+        "POTION_AFFINITY_TALISMAN",
+        "CROPIE_TALISMAN",
+        "SPEED_TALISMAN",
+        "SIMPLE_CARROT_CANDY",
+    )
+
+    private fun isBlockedArmor(internalName: String): Boolean {
+        return internalName.endsWith("_BOOTS") ||
+            internalName.endsWith("_HELMET") ||
+            internalName.endsWith("_CHESTPLATE") ||
+            internalName.endsWith("_LEGGINGS")
+    }
+
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
-            if (internalName == "POTION_AFFINITY_TALISMAN"
-                || internalName == "CROPIE_TALISMAN"
-                || internalName.endsWith("_BOOTS")
-                || internalName.endsWith("_HELMET")
-                || internalName.endsWith("_CHESTPLATE")
-                || internalName.endsWith("_LEGGINGS")
-                || internalName == "SPEED_TALISMAN"
-                || internalName == "SIMPLE_CARROT_CANDY"
-            ) continue
+            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
             var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
@@ -633,20 +642,20 @@ object ComposterOverlay {
             add("currentOrganicMatterItem: $currentOrganicMatterItem")
             add("currentFuelItem: $currentFuelItem")
 
-            println(" ")
+            add(" ")
             val composterUpgrades = ComposterAPI.composterUpgrades
             if (composterUpgrades == null) {
-                println("composterUpgrades is null")
+                add("composterUpgrades is null")
             } else {
                 for ((a, b) in composterUpgrades) {
-                    println("upgrade $a: $b")
+                    add("upgrade $a: $b")
                 }
             }
 
-            println(" ")
+            add(" ")
             val tabListData = ComposterAPI.tabListData
             for ((a, b) in tabListData) {
-                println("tabListData $a: $b")
+                add("tabListData $a: $b")
             }
         }
     }

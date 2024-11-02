@@ -26,7 +26,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -40,12 +42,30 @@ object EnderNodeTracker {
 
     private var miteGelInInventory = 0
 
-    private val enderNodeRegex = Regex("""ENDER NODE!.+You found (\d+x )?§r(.+)§r§f!""")
+    private val patternGroup = RepoPattern.group("combat.endernodetracker.chat")
+
+    /**
+     * REGEX-TEST: §5§lENDER NODE! §r§fYou found §r§8§r§aEnchanted Obsidian§r§f!
+     */
+    private val patternOne by patternGroup.pattern(
+        "one",
+        "§5§lENDER NODE! §r§fYou found §r(?:§8§r)?(?<name>.*)§r§f!",
+    )
+
+    /**
+     * REGEX-TEST: §5§lENDER NODE! §r§fYou found §r§85x §r§aEnchanted Ender Pearl§r§f!
+     */
+    private val patternMulti by patternGroup.pattern(
+        "multi",
+        "§5§lENDER NODE! §r§fYou found §r§8(?<amount>\\d+)x §r(?<name>.*)§r§f!",
+    )
+
+    // TODO add abstract logic with ohter pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
     private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
         formatDisplay(
-            drawDisplay(it)
+            drawDisplay(it),
         )
     }
 
@@ -77,14 +97,17 @@ object EnderNodeTracker {
         var item: String? = null
         var amount = 1
 
-        // check whether the loot is from an ender node or an enderman
-        enderNodeRegex.find(message)?.let {
-            tracker.modify { storage ->
-                storage.totalNodesMined++
-            }
-            amount = it.groups[1]?.value?.substringBefore("x")?.toIntOrNull() ?: 1
-            item = it.groups[2]?.value
-        } ?: endermanRegex.find(message)?.let {
+        patternMulti.matchMatcher(message) {
+            item = group("name")
+            amount = group("amount").toInt()
+            addOneNodeMined()
+        } ?: patternOne.matchMatcher(message) {
+            item = group("name")
+            amount = 1
+            addOneNodeMined()
+        }
+
+        endermanRegex.find(message)?.let {
             amount = 1
             item = it.groups[2]?.value
         }
@@ -106,12 +129,18 @@ object EnderNodeTracker {
         }
     }
 
+    private fun addOneNodeMined() {
+        tracker.modify { storage ->
+            storage.totalNodesMined++
+        }
+    }
+
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
-        miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-            .sumOf { it.stackSize }
+        miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
+            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        }.sumOf { it.stackSize }
     }
 
     @SubscribeEvent
@@ -119,9 +148,9 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        val change = event.sackChanges
-            .firstOrNull { it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0 }
-            ?: return
+        val change = event.sackChanges.firstOrNull {
+            it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0
+        } ?: return
 
         tracker.modify { storage ->
             storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
@@ -133,9 +162,9 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
-            .filter { it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName }
-            .sumOf { it.stackSize }
+        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
+            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        }.sumOf { it.stackSize }
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {
             tracker.modify { storage ->
@@ -176,18 +205,16 @@ object EnderNodeTracker {
             val price = if (isEnderArmor(item)) {
                 10_000.0
             } else {
-                (if (!LorenzUtils.noTradeMode) item.internalName.getPriceOrNull() else 0.0)
-                    ?.coerceAtLeast(item.internalName.getNpcPriceOrNull() ?: 0.0)
-                    ?.coerceAtLeast(georgePrice(item) ?: 0.0)
-                    ?: 0.0
+                (if (!LorenzUtils.noTradeMode) item.internalName.getPriceOrNull() else 0.0)?.coerceAtLeast(
+                    item.internalName.getNpcPriceOrNull() ?: 0.0,
+                )?.coerceAtLeast(georgePrice(item) ?: 0.0) ?: 0.0
             }
             newProfit[item] = price * amount
         }
         return newProfit
     }
 
-    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled &&
-        (!config.onlyPickaxe || hasItemInHand())
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled && (!config.onlyPickaxe || hasItemInHand())
 
     private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
@@ -230,7 +257,7 @@ object EnderNodeTracker {
 
         val totalEnderArmor = calculateEnderArmor(data)
         addSearchString(
-            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)"
+            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
@@ -243,10 +270,11 @@ object EnderNodeTracker {
         addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
-    private fun calculateEnderArmor(storage: Data) =
-        storage.lootCount.filter { isEnderArmor(it.key) }
-            .map { it.value }
-            .sum()
+    private fun calculateEnderArmor(storage: Data) = storage.lootCount.filter {
+        isEnderArmor(it.key)
+    }.map {
+        it.value
+    }.sum()
 
     private fun formatDisplay(map: List<Searchable>): List<Searchable> {
         if (!ProfileStorageData.loaded) return emptyList()

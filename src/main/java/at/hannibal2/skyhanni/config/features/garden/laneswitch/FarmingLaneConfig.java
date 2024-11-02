@@ -2,12 +2,17 @@ package at.hannibal2.skyhanni.config.features.garden.laneswitch;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.garden.CropType;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FarmingLaneConfig {
 
@@ -37,4 +42,11 @@ public class FarmingLaneConfig {
     @FeatureToggle
     public boolean cornerWaypoints = false;
 
+    @Expose
+    @ConfigOption(
+        name = "Ignored Crops",
+        desc = "Add the crops you wish to not setup a lane for."
+    )
+    @ConfigEditorDraggableList()
+    public List<CropType> ignoredCrops = new ArrayList<>();
 }

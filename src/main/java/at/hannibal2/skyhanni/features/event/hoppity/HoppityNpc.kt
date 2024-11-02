@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -15,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -58,7 +62,16 @@ object HoppityNpc {
             "New rabbits are available at §aHoppity's Shop§e!",
             config::hoppityShopReminder,
             actionName = "warp to hub",
-            action = { HypixelCommands.warp("hub") },
+            action = {
+                HypixelCommands.warp("hub")
+                EntityMovementData.onNextTeleport(IslandType.HUB) {
+                    IslandGraphs.pathFind(
+                        LorenzVec(6.4, 70.0, 7.4),
+                        "§aHoppity's Shop",
+                        condition = { config.hoppityShopReminder }
+                    )
+                }
+            },
         )
 
         lastReminderSent = SimpleTimeMark.now()

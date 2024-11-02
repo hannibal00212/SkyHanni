@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -160,7 +160,7 @@ object MiningEventTracker {
 
     private fun sendData(json: String) {
         val response = try {
-            APIUtil.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+            APIUtils.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
         } catch (e: IOException) {
             if (LorenzUtils.debug) {
                 ErrorManager.logErrorWithData(
@@ -194,13 +194,14 @@ object MiningEventTracker {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
             val data = try {
-                APIUtil.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+                APIUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
             } catch (e: Exception) {
                 apiErrorCount++
                 canRequestAt = SimpleTimeMark.now() + 20.minutes
                 if (LorenzUtils.debug) {
                     ErrorManager.logErrorWithData(
-                        e, "Receiving mining event data was unsuccessful",
+                        e,
+                        "Failed to load Mining Event data!",
                     )
                 }
                 return@launch
@@ -208,11 +209,19 @@ object MiningEventTracker {
             val miningEventData = ConfigManager.gson.fromJson(data, MiningEventDataReceive::class.java)
 
             if (!miningEventData.success) {
-                ErrorManager.logErrorWithData(
-                    Exception("PostFailure"), "Receiving mining event data was unsuccessful",
-                    "cause" to miningEventData.cause,
-                    "recievedData" to data
-                )
+                if (data.toString() == "{}") {
+                    ChatUtils.chat(
+                        "§cFailed loading Mining Event data!\n" +
+                            "Please wait until the server problem fixes itself! There is nothing else to do at the moment."
+                    )
+                } else {
+                    ErrorManager.logErrorWithData(
+                        Exception("miningEventData.success = false"),
+                        "Failed to load Mining Event data!",
+                        "cause" to miningEventData.cause,
+                        "recievedData" to data
+                    )
+                }
                 return@launch
             }
             apiErrorCount = 0

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,14 +19,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -58,6 +60,11 @@ object HoppityEggLocator {
     var possibleEggLocations = listOf<LorenzVec>()
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
+
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (event.type.isResetting) resetData()
+    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -113,11 +120,10 @@ object HoppityEggLocator {
     }
 
     private fun LorenzRenderWorldEvent.drawGuessLocations() {
-        val eyeLocation = exactPlayerEyeLocation()
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
             drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
             if (config.showLine) {
-                draw3DLine(eyeLocation, eggLocation.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
             }
         }
     }
@@ -129,7 +135,7 @@ object HoppityEggLocator {
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
                 val alpha = ((10 - dist) / 10).coerceAtMost(0.5).toFloat()
                 drawColor(eggLocation, LorenzColor.RED, false, alpha)
-                drawDynamicText(eggLocation.add(y = 1), "§cDuplicate Location!", 1.5)
+                drawDynamicText(eggLocation.up(), "§cDuplicate Location!", 1.5)
             }
         }
     }
@@ -145,10 +151,10 @@ object HoppityEggLocator {
                             config.waypointColor.toChromaColor(),
                             seeThroughBlocks = true,
                         )
-                        drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
+                        drawDynamicText(it.up(), "§aGuess", 1.5)
                     }
                     if (!drawLocations && config.showLine) {
-                        draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
+                        drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
                     }
                 }
             }
@@ -163,14 +169,10 @@ object HoppityEggLocator {
         } else {
             drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
-        drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
+        drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
-
-    fun eggFound() {
-        resetData()
-    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -206,7 +208,7 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
@@ -246,7 +248,7 @@ object HoppityEggLocator {
         }.sortedBy { it.second }
 
         eggLocationWeights = sortedEggs.map {
-            it.second.round(3)
+            it.second.roundTo(3)
         }.take(5)
 
         val filteredEggs = sortedEggs.filter {
@@ -277,10 +279,12 @@ object HoppityEggLocator {
 
         val color = config.waypointColor.toChromaColor()
 
-        IslandGraphs.pathFind(location, color, condition = { config.showPathFinder })
+        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { config.showPathFinder })
     }
 
-    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
+    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any {
+        it.distance(location) < 5.0
+    }
 
     private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
 
@@ -330,7 +334,7 @@ object HoppityEggLocator {
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
                 if (i == target) {
-                    IslandGraphs.pathFind(location)
+                    IslandGraphs.pathFind(location, "Hoppity Test", condition = { true })
                     return
                 }
             }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -37,6 +38,10 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
     public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
+    @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
+    public ExperimentationTableConfig experimentationTable = new ExperimentationTableConfig();
 
     @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
@@ -78,6 +83,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
     @Accordion
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
+
+    @Expose
+    @ConfigOption(name = "Focus Mode", desc="")
+    @Accordion
+    public FocusModeConfig focusMode = new FocusModeConfig();
 
     @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
@@ -128,6 +138,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
+
+    @Expose
+    @ConfigOption(name = "Attribute Overlay", desc = "")
+    @Accordion
+    public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -227,6 +242,12 @@ public class InventoryConfig {
     public boolean itemStars = false;
 
     @Expose
+    @ConfigOption(name = "Ultimate Enchant Star", desc = "Show a star on Enchanted Books with an Ultimate Enchant.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ultimateEnchantStar = false;
+
+    @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
@@ -287,4 +308,23 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hexAsColorInLore = true;
+
+    @Expose
+    @ConfigOption(name = "Essence Shop Helper", desc = "Show extra information about remaining upgrades in essence shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean essenceShopHelper = true;
+  
+    @Expose
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean snakeGameKeybinds = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightActiveBeaconEffect = true;
+
 }

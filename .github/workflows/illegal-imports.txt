@@ -5,7 +5,8 @@
 
 at/hannibal2/skyhanni/ scala.
 at/hannibal2/skyhanni/ jline.
-at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Constants
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.SlotClickEvent
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
+at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Constants
+at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Utils
 at/hannibal2/skyhanni/ java.util.function.Supplier

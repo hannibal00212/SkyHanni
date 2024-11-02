@@ -93,7 +93,7 @@ object MagicalPowerDisplay {
             else -> if (internalName.isAbicase()) endMP += (contactAmount ?: 0) / 2
         }
 
-        event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
+        event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}$endMP"
     }
 
     @SubscribeEvent

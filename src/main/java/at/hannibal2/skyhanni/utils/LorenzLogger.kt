@@ -43,6 +43,7 @@ class LorenzLogger(filePath: String) {
         return initLogger
     }
 
+    @Suppress("PrintStackTrace")
     private fun initLogger(): Logger {
         val logger = Logger.getLogger("Lorenz-Logger-" + System.nanoTime())
         try {
