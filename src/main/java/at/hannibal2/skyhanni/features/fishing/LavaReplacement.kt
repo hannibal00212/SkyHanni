@@ -58,7 +58,6 @@ object LavaReplacement {
 
         fun inIsland() = island.isInIsland()
     }
-    
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(65, "fishing.lavaReplacement.onlyInCrimsonIsle", "fishing.lavaReplacement.everywhere") { element ->
