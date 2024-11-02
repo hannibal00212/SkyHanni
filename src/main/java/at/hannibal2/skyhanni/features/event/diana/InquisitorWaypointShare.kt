@@ -73,8 +73,8 @@ object InquisitorWaypointShare {
      * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
      */
     @Suppress("MaxLineLength")
-    private val sboPattern by patternGroup.pattern(
-        "party.sbo",
+    private val volcaddonsPattern by patternGroup.pattern(
+        "party.volc",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) \\| Minos Inquisitor spawned at (?<area>.*)!",
     )
 
@@ -267,7 +267,7 @@ object InquisitorWaypointShare {
         if (partyOnlyCoordsPattern.isDetected(message)) {
             event.cancel()
         }
-        if (sboPattern.isDetected(message)) {
+        if (volcaddonsPattern.isDetected(message)) {
             event.cancel()
         }
         diedPattern.matchMatcher(message) {
