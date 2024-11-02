@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -231,7 +231,7 @@ object GraphEditor {
 
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
-        this.draw3DLine_nea(
+        this.draw3DLineNea(
             edge.node1.position.add(0.5, 0.5, 0.5),
             edge.node2.position.add(0.5, 0.5, 0.5),
             when {
@@ -260,7 +260,8 @@ object GraphEditor {
         }
     }
 
-    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.",
+    private fun chatAtDisable() = ChatUtils.clickableChat(
+        "Graph Editor is now inactive. §lClick to activate.",
         GraphEditor::commandIn
     )
 
@@ -530,14 +531,27 @@ object GraphEditor {
     private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
+        val nodes = nodes.mapIndexed { index, node ->
+            GraphNode(
+                index,
+                node.position,
+                node.name,
+                node.tags.map {
+                    it.internalName
+                }
+            )
+        }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
-                val otherNode = if (node == edge.node1) edge.node2 else edge.node1
+                val otherNode =
+                    if (node == edge.node1) edge.node2
+                    else edge.node1
+                // TODO: Fix this to not use a bang bang
+                @Suppress("MapGetWithNotNullAssertionOperator")
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
-        nodes.forEachIndexed { index, it -> it.neighbours = neighbours[index].toMap() }
+        nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
         return Graph(nodes)
     }
 
@@ -553,9 +567,11 @@ object GraphEditor {
                 )
             },
         )
-        val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()
+        val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
         edges.addAll(
             graph.map { node ->
+                // TODO: Fix this to not use bang bangs
+                @Suppress("MapGetWithNotNullAssertionOperator")
                 node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
             }.flatten().distinct(),
         )

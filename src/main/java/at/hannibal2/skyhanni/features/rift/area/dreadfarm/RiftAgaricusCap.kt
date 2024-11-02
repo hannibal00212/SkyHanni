@@ -63,7 +63,7 @@ object RiftAgaricusCap {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val location = location?.add(y = 0.6) ?: return
+        val location = location?.up(0.6) ?: return
 
         if (startTime.isFarFuture()) {
             event.drawDynamicText(location, "§cClick!", 1.5)

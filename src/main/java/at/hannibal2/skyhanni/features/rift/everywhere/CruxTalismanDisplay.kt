@@ -23,6 +23,7 @@ object CruxTalismanDisplay {
 
     private val config get() = RiftAPI.config.cruxTalisman
 
+    @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(
         "rift.everywhere.crux.progress",
         ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"

@@ -168,16 +168,19 @@ object JacobContestTimeNeeded {
                 showLine = line
             }
         }
-        map[crop] = Renderable.hoverTips(showLine, buildList {
-            add("§7Time Needed for §9${crop.cropName} Medals§7:")
-            addAll(brackets)
-            add("")
-            val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-            add("§7Latest FF: §e${(latestFF).addSeparators()}")
-            val bps = crop.getBps()?.roundTo(1) ?: 0
-            add("§7${addBpsTitle()}§e${bps.addSeparators()}")
-            addAll(lowBPSWarning)
-        })
+        map[crop] = Renderable.hoverTips(
+            showLine,
+            buildList {
+                add("§7Time Needed for §9${crop.cropName} Medals§7:")
+                addAll(brackets)
+                add("")
+                val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
+                add("§7Latest FF: §e${(latestFF).addSeparators()}")
+                val bps = crop.getBps()?.roundTo(1) ?: 0
+                add("§7${addBpsTitle()}§e${bps.addSeparators()}")
+                addAll(lowBPSWarning)
+            }
+        )
     }
 
     private fun addBpsTitle() = if (config.jacobContestCustomBps) "Custom Blocks/Second: " else "Your Blocks/Second: "

@@ -158,6 +158,22 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun bank() {
+        send("bank")
+    }
+
+    fun pickupStash() {
+        send("pickupstash")
+    }
+
+    fun viewStash(type: String) {
+        send("viewstash $type")
+    }
+
+    fun locraw() {
+        send("locraw")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function

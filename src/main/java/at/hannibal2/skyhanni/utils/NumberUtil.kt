@@ -241,7 +241,9 @@ object NumberUtil {
         return@run null
     }
 
-    private fun String.formatDoubleOrNull(): Double? {
+    fun String.formatIntOrNull(): Int? = formatDoubleOrNull()?.toInt()
+
+    fun String.formatDoubleOrNull(): Double? {
         var text = lowercase().replace(",", "")
 
         val multiplier = if (text.endsWith("k")) {

@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-@Cancelable
 class BlockClickEvent(clickType: ClickType, val position: LorenzVec, itemInHand: ItemStack?) :
     WorldClickEvent(itemInHand, clickType) {
 

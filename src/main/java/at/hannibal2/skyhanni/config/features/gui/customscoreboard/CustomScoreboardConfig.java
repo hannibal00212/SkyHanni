@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -28,17 +29,14 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Appearance",
-        desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
+        desc = "Drag text to change the appearance of the advanced scoreboard."
     )
-    @ConfigEditorDraggableList()
-    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
+    @ConfigEditorDraggableList
+    public Property<List<ScoreboardConfigElement>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardConfigElement.defaultOptions));
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable reset = () -> {
-        scoreboardEntries.clear();
-        scoreboardEntries.addAll(ScoreboardElement.defaultOption);
-    };
+    public Runnable reset = CustomScoreboard::resetAppearance;
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
@@ -56,7 +54,11 @@ public class CustomScoreboardConfig {
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
     @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Give a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigOption(
+        name = "Unknown Lines warning",
+        desc = "Give a chat warning when unknown lines are found in the scoreboard." +
+            "\n§cReporting these in the Discord Server are very important, so we can know what lines are missing."
+    )
     @ConfigEditorBoolean
     public boolean unknownLinesWarning = true;
 

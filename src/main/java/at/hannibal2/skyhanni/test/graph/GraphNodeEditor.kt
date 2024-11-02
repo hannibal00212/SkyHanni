@@ -152,9 +152,16 @@ object GraphNodeEditor {
         )
     }
 
-    private fun checkIsland(tag: GraphNodeTag): Boolean = tag.onlyIsland?.let {
-        it == LorenzUtils.skyBlockIsland
-    } ?: true
+    private fun checkIsland(tag: GraphNodeTag): Boolean {
+        val islandMatches = tag.onlyIsland?.let {
+            it == LorenzUtils.skyBlockIsland
+        } ?: true
+        val skyblockMatches = tag.onlySkyblock?.let {
+            it == LorenzUtils.inSkyBlock
+        } ?: true
+
+        return islandMatches && skyblockMatches
+    }
 
     private fun createTagName(
         name: String,
@@ -179,7 +186,9 @@ object GraphNodeEditor {
     )
 
     private fun drawNodeNames(): List<Searchable> = buildList {
-        for ((node, distance: Double) in GraphEditor.nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
+        for ((node, distance: Double) in GraphEditor.nodes.map {
+            it to it.position.distanceSqToPlayer()
+        }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
             }

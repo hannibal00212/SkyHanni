@@ -64,7 +64,10 @@ object ComputerTimeOffset {
             e, "Failed to get NTP offset",
             "server" to ntpServer,
         )
-        else e.printStackTrace()
+        else {
+            @Suppress("PrintStackTrace")
+            e.printStackTrace()
+        }
         null
     }
 

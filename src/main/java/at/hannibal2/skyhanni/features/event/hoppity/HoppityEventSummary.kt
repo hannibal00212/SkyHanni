@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
@@ -46,6 +47,11 @@ object HoppityEventSummary {
         if (event.duplicate) rarityMap.dupes++
         else rarityMap.uniques++
         if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
     }
 
     @SubscribeEvent
@@ -98,8 +104,8 @@ object HoppityEventSummary {
 
         if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
             sendStatsMessage(stats, year)
-            (ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
-                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization."))
+            ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
+                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
         }
     }
 
@@ -131,6 +137,10 @@ object HoppityEventSummary {
         )
     }
 
+    private fun HoppityEventStats.getMilestoneCount(): Int =
+        (mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
+            (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
+
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats, year ->
@@ -155,8 +165,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
-                ((stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
-                    (stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)).takeIf { it > 0 }?.let {
+                stats.getMilestoneCount().takeIf { it > 0 }?.let {
                     sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
                 }
             }
@@ -202,7 +211,8 @@ object HoppityEventSummary {
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
-        val availableYearsFormat = "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
+        val availableYearsFormat =
+            "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {

@@ -58,21 +58,22 @@ object CosmeticFollowingLine {
         val last2 = locations.keys.toList().takeLast(2)
 
         locations.keys.zipWithNext { a, b ->
-            val locationSpot = locations[b]!!
-            if (firstPerson && !locationSpot.onGround && b in last7) {
-                // Do not render the line in the face, keep more distance while the line is in the air
-                return
+            locations[b]?.let {
+                if (firstPerson && !it.onGround && b in last7) {
+                    // Do not render the line in the face, keep more distance while the line is in the air
+                    return
+                }
+                if (b in last2 && it.time.passedSince() < 400.milliseconds) {
+                    // Do not render the line directly next to the player, prevent laggy design
+                    return
+                }
+                event.draw3DLine(a, b, color, it.getWidth(), !config.behindBlocks)
             }
-            if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
-                // Do not render the line directly next to the player, prevent laggy design
-                return
-            }
-            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
     }
 
     private fun updateClose(event: LorenzRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 0.3)
+        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
             val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
@@ -86,8 +87,9 @@ object CosmeticFollowingLine {
 
 
         latestLocations.keys.zipWithNext { a, b ->
-            val locationSpot = latestLocations[b]!!
-            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
+            latestLocations[b]?.let {
+                event.draw3DLine(a, b, color, it.getWidth(), !config.behindBlocks)
+            }
         }
     }
 
@@ -113,7 +115,7 @@ object CosmeticFollowingLine {
         }
 
         if (event.isMod(2)) {
-            val playerLocation = LocationUtils.playerLocation().add(y = 0.3)
+            val playerLocation = LocationUtils.playerLocation().up(0.3)
 
             locations.keys.lastOrNull()?.let {
                 if (it.distance(playerLocation) < 0.1) return

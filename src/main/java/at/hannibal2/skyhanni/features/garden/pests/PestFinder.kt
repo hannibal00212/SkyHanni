@@ -118,12 +118,15 @@ object PestFinder {
         }
     }
 
+    private fun heldItemDisabled() = config.onlyWithVacuum && !PestAPI.hasVacuumInHand()
+    private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+
     // priority to low so that this happens after other renderPlot calls.
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+        if (heldItemDisabled() && timePassedDisabled()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -157,8 +160,8 @@ object PestFinder {
         val isInaccurate = plot.isPestCountInaccurate
         val location = playerLocation.copy(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-        val text = "§e" + (if (isInaccurate) "?" else
-            pests
+        val text = "§e" + (
+            if (isInaccurate) "?" else pests
             ) + " §c$pestsName §7in §b$plotName"
         event.drawDynamicText(
             location, text, 1.5,

@@ -144,8 +144,11 @@ object LimboTimeTracker {
 
     fun printStats(onlyPlaytime: Boolean = false) {
         val timeInLimbo: Int = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds.toInt() else 0
-        val playtime: Int = if (inLimbo) (storage?.playtime
-            ?: 0) + limboJoinTime.passedSince().inWholeSeconds.toInt() else storage?.playtime ?: 0
+        val playtime: Int = if (inLimbo) (
+            storage?.playtime ?: 0
+            ) + limboJoinTime.passedSince().inWholeSeconds.toInt()
+        else storage?.playtime ?: 0
+
         if (onlyPlaytime) {
             ChatUtils.chat("§aYou have ${playtime / 3600} hours and ${playtime % 3600 / 60} minutes playtime!", false)
         } else {
