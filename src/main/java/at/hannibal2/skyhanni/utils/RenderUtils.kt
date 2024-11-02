@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -33,7 +34,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
@@ -694,7 +694,7 @@ object RenderUtils {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
-                item.addEnchantment(Enchantment.protection, 0)
+                item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
             }
             add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
