@@ -38,19 +38,20 @@ jobs:
                     else
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
-            -   name: Add label if changelog verification fails
+
+            -   name: Add label if detekt fails
                 if: failure()
                 uses: actions-ecosystem/action-add-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Detekt'
-
-            -   name: Remove label if changelog verification passes
+            -   name: Remove label if detekt passes
                 if: success()
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Detekt'
+
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
