@@ -772,4 +772,17 @@ public class ProfileSpecificStorage {
         @Expose
         public boolean summarized = false;
     }
+
+    @Expose
+    public SkyblockXP skyblockXP = new SkyblockXP();
+
+    public static class SkyblockXP {
+        @Expose
+        @Nullable
+        public Integer xp = null;
+
+        @Expose
+        @Nullable
+        public Integer level = null;
+    }
 }
