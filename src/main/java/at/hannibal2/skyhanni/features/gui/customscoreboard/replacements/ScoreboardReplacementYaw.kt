@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.replacements
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import net.minecraft.client.Minecraft
 
-object ScoreboardReplacementYaw : ScoreboardReplacements() {
+object ScoreboardReplacementYaw : ScoreboardReplacement() {
     override val trigger = "%yaw%"
     override val name = "Direction"
     override fun replacement(): String = normalizeYaw(Minecraft.getMinecraft().thePlayer.rotationYaw).round(2).toString()
