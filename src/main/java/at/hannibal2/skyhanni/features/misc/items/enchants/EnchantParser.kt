@@ -43,6 +43,8 @@ object EnchantParser {
     /**
      * REGEX-TEST: §9Champion VI §81.2M
      * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
      */
