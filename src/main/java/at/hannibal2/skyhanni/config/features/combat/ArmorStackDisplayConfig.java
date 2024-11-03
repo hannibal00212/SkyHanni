@@ -24,7 +24,7 @@ public class ArmorStackDisplayConfig {
     @ConfigOption(name = "Show Armor Stack", desc = "Display the current number of stacks for armors, such as Crimson, Terror, Aurora, etc.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean armorStackDisplay = true;
+    public boolean showArmorStackCount = true;
 
     @Expose
     @ConfigOption(name = "Show Armor Stack Type", desc = "Display the type of armor stack, such as 'Dominus', 'Hydra Strike', etc.")

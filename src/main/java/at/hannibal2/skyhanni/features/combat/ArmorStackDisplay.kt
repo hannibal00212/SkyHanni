@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,12 +13,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ArmorStackDisplay {
@@ -55,7 +58,7 @@ object ArmorStackDisplay {
             updateStack(group("stack").toInt(), group("symbol"))
         } ?: resetStack()
 
-        if (config.armorStackDisplay) event.changeActionBar(event.actionBar.replace(Regex("$stackPattern"), "").trim())
+        if (config.showArmorStackCount) event.changeActionBar(event.actionBar.replace(stackPattern, ""))
     }
 
     @SubscribeEvent
@@ -73,9 +76,8 @@ object ArmorStackDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (isEnabled()) {
-            config.position.renderStrings(display, posLabel = "Armor Stack Display")
-        }
+        if (!isEnabled()) return
+        config.position.renderStrings(display, posLabel = "Armor Stack Display")
     }
 
     @SubscribeEvent
@@ -104,7 +106,7 @@ object ArmorStackDisplay {
         return if (config.showInSingleLine) {
             listOf(
                 buildString {
-                    if (config.armorStackDisplay) {
+                    if (config.showArmorStackCount) {
                         append("§6")
                         if (config.armorStackType) append("$stackType: ")
                         append("§l$stackCount$stackSymbol ")
@@ -117,7 +119,7 @@ object ArmorStackDisplay {
             )
         } else {
             buildList {
-                if (config.armorStackDisplay) {
+                if (config.showArmorStackCount) {
                     add(
                         buildString {
                             append("§6")
@@ -140,17 +142,16 @@ object ArmorStackDisplay {
                 armorStackTierBonus.firstMatcher(it) {
                     stackType = group("type")
                     group("amount")
-                }
-                    ?.toInt()
+                }?.toInt()
             }
         } ?: 0
 
         val stackDecayTime = when (armorPieceCount) {
-            2 -> 5000
-            3 -> 8000
-            4 -> 11000
+            2 -> 5
+            3 -> 8
+            4 -> 11
             else -> 0
-        }.milliseconds
+        }.seconds
         stackDecayTimeCurrent = SimpleTimeMark.now() + stackDecayTime
     }
 
@@ -163,6 +164,11 @@ object ArmorStackDisplay {
         if (stackCount != newStackCount && config.armorStackDecayTimer) resetDecayTime()
         stackCount = newStackCount
         stackSymbol = newStackSymbol
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65, "combat.stackDisplayConfig", "combat.armorStackDisplay")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

@@ -73,6 +73,8 @@ object RegexUtils {
     fun Pattern.firstMatches(list: List<String>): String? = list.firstOrNull { matches(it) }
     fun Pattern.allMatches(list: List<String>): List<String> = list.filter { matches(it) }
 
+    fun String.replace(pattern: Pattern, replacement: String): String = pattern.matcher(this).replaceAll(replacement)
+
     /**
      * Get the group, otherwise, return null
      * @param groupName The group name in the pattern
