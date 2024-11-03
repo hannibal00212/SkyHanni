@@ -21,13 +21,13 @@ object SkyBlockXPAPI {
     var xp: Int?
         get() = storage?.xp
         set(value) {
-            storage?.xp = value
+            storage?.let { it.xp = value }
         }
 
     var level: Int?
         get() = storage?.level
         set(value) {
-            storage?.level = value
+            storage?.let { it.level = value }
         }
 
     private val group = RepoPattern.group("skyblockxpapi.inventory")
