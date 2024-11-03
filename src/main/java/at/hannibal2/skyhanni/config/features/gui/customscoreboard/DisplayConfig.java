@@ -140,6 +140,16 @@ public class DisplayConfig {
     public boolean skyblockTimeExactMinutes = true;
 
     @Expose
+    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
+    @ConfigEditorBoolean
+    public boolean dateInLobbyCode = true;
+
+    @Expose
+    @ConfigOption(name = "Use Day-First Date Format", desc = "If enabled, the date will be shown in day-first format (dd/MM/yyyy). Otherwise, it will be shown in month-first format (MM/dd/yyyy).")
+    @ConfigEditorBoolean
+    public boolean useDayFirstDateFormat = false;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
@@ -153,11 +163,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
     @ConfigEditorBoolean
     public boolean showProfileName = false;
-
-    @Expose
-    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
-    @ConfigEditorBoolean
-    public boolean dateInLobbyCode = true;
 
     @Expose
     @ConfigOption(
