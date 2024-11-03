@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.data.DateFormat;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -145,9 +146,9 @@ public class DisplayConfig {
     public boolean dateInLobbyCode = true;
 
     @Expose
-    @ConfigOption(name = "Use Day-First Date Format", desc = "If enabled, the date will be shown in day-first format (dd/MM/yyyy). Otherwise, it will be shown in month-first format (MM/dd/yyyy).")
-    @ConfigEditorBoolean
-    public boolean useDayFirstDateFormat = false;
+    @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
+    @ConfigEditorDropdown
+    public DateFormat dateFormat = DateFormat.US_SLASH_MMDDYYYY;
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
