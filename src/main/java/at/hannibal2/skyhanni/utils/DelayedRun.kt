@@ -44,7 +44,7 @@ object DelayedRun {
         if (mc.isCallingFromMinecraftThread) {
             it.run()
         } else {
-            Minecraft.getMinecraft().addScheduledTask(it)
+            mc.addScheduledTask(it)
         }
     }
 }

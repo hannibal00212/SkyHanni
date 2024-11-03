@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.events.LorenzEvent
@@ -86,7 +87,7 @@ object ConfigUtils {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
         // TODO create utils function "crashIfInDevEnv"
-        if (LorenzEvent.isInGuardedEventHandler) {
+        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
             throw Error("can not jump to editor $name")
         }
         ErrorManager.logErrorStateWithData(
