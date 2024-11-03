@@ -48,7 +48,7 @@ object EnchantParser {
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§7§l|§d§l|§9|§7)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
     // Above regex tests apply to this pattern also
     val enchantmentPattern by patternGroup.pattern(
