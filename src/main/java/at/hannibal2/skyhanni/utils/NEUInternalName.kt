@@ -16,6 +16,9 @@ class NEUInternalName private constructor(private val internalName: String) {
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
         val WISP_POTION = "WISP_POTION".toInternalName()
 
+        @Deprecated("Name changed", ReplaceWith("this.toInternalName()"))
+        fun String.asInternalName() = toInternalName()
+
         fun String.toInternalName(): NEUInternalName = uppercase().replace(" ", "_").let {
             internalNameMap.getOrPut(it) { NEUInternalName(it) }
         }
