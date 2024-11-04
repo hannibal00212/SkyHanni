@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,8 +27,7 @@ object ChocolateFactoryShortcut {
         ItemUtils.createSkull(
             displayName = "§6Open Chocolate Factory",
             uuid = "d7ac85e6-bd40-359e-a2c5-86082959309e",
-            value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvO" +
-                "WE4MTUzOThlN2RhODliMWJjMDhmNjQ2Y2FmYzhlN2I4MTNkYTBiZTBlZWMwY2NlNmQzZWZmNTIwNzgwMTAyNiJ9fX0=",
+            value = SkullTextureHolder.getTexture("CHOC_FAC_SHORTCUT"),
             "§8(From SkyHanni)",
             "",
             "§7Click here to run",

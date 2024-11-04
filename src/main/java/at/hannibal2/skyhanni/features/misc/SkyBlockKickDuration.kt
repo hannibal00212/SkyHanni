@@ -31,10 +31,12 @@ object SkyBlockKickDuration {
     /**
      * REGEX-TEST: §cYou were kicked while joining that server!
      * REGEX-TEST: §cA kick occurred in your connection, so you were put in the SkyBlock lobby!
+     * REGEX-TEST: §cAn exception occurred in your connection, so you were put in the SkyBlock Lobby!
      */
+    @Suppress("MaxLineLength")
     private val kickPattern by patternGroup.pattern(
         "kicked",
-        "§c(?:You were kicked while joining that server!|A kick occurred in your connection, so you were put in the SkyBlock lobby!)",
+        "§c(?:You were kicked while joining that server!|An? (?:kick|exception) occurred in your connection, so you were put in the SkyBlock [lL]obby!)",
     )
 
     /**
