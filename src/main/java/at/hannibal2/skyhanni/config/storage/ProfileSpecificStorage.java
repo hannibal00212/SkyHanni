@@ -55,6 +55,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -523,10 +524,10 @@ public class ProfileSpecificStorage {
 
     public static class CakeData {
         @Expose
-        public List<Integer> ownedCakes = new ArrayList<>();
+        public Set<Integer> ownedCakes = new HashSet<>();
 
         @Expose
-        public List<Integer> neededCakes = new ArrayList<>();
+        public Set<Integer> neededCakes = new HashSet<>();
 
         @Override
         public int hashCode() {

@@ -75,7 +75,7 @@ public class CakeTrackerConfig {
         desc = "The color that should be used to highlight unobtained cakes in the auction house."
     )
     @ConfigEditorColour
-    public Property<String> unobtainedAuctionHighlightColor = Property.of(LorenzColor.RED.toConfigColor());
+    public String unobtainedAuctionHighlightColor = LorenzColor.RED.toConfigColor();
 
     @Expose
     @ConfigOption(
@@ -83,7 +83,7 @@ public class CakeTrackerConfig {
         desc = "The color that should be used to highlight obtained cakes in the auction house."
     )
     @ConfigEditorColour
-    public Property<String> obtainedAuctionHighlightColor = Property.of(LorenzColor.GREEN.toConfigColor());
+    public String obtainedAuctionHighlightColor = LorenzColor.GREEN.toConfigColor();
 
     @Expose
     @ConfigOption(
