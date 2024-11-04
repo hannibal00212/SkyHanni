@@ -374,6 +374,8 @@ object CakeTracker {
             DisplayOrder.NEWEST_FIRST -> cakeList.sortedDescending()
         }
 
+        // Combine consecutive years into ranges
+        // + 3 is to account for the header and selector boxes
         val maxDisplayRows = config.maxDisplayRows.get() + 3
         var start = sortedCakes.first()
         var end = start
