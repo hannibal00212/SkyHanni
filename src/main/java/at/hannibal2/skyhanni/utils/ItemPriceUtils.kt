@@ -6,15 +6,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object ItemPriceUtils {
 
-    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
-    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".toInternalName() }
+    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".asInternalName() }
+    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".asInternalName() }
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,

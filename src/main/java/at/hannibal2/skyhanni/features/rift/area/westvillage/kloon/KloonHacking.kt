@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -41,7 +41,7 @@ object KloonHacking {
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
-    private val RETRO_ENCABULATING_VISOR by lazy { "RETRO_ENCABULATING_VISOR".toInternalName() }
+    private val RETRO_ENCABULATING_VISOR by lazy { "RETRO_ENCABULATING_VISOR".asInternalName() }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {

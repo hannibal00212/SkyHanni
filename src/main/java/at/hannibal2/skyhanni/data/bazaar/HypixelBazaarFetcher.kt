@@ -82,7 +82,7 @@ object HypixelBazaarFetcher {
     }
 
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
-        val internalName = NEUItems.transHypixelNameToInternalName(key)
+        val internalName = NEUItems.transHypixelNameasInternalName(key)
         val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
         val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 

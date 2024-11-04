@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -31,7 +31,7 @@ object FocusMode {
         if (event.toolTip.isEmpty()) return
         if (config.hideMenuItems) {
             event.itemStack.getInternalNameOrNull().let {
-                if (it == null || it == "SKYBLOCK_MENU".toInternalName()) return
+                if (it == null || it == "SKYBLOCK_MENU".asInternalName()) return
             }
             val inBazaar = BazaarApi.inBazaarInventory && event.slot.isTopInventory()
             if (inBazaar) return

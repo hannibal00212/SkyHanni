@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -106,10 +105,10 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".toInternalName() }
-    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
-    private val VOLTA by lazy { "VOLTA".toInternalName() }
-    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
+    private val COMPOST by lazy { "COMPOST".asInternalName() }
+    private val BIOFUEL by lazy { "BIOFUEL".asInternalName() }
+    private val VOLTA by lazy { "VOLTA".asInternalName() }
+    private val OIL_BARREL by lazy { "OIL_BARREL".asInternalName() }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

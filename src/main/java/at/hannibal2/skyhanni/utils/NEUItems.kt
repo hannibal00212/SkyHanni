@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
@@ -134,7 +133,7 @@ object NEUItems {
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
-    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
+    fun transHypixelNameasInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
@@ -261,7 +260,7 @@ object NEUItems {
         val result = allNeuRepoItems().filter {
             Item.getByNameOrId(it.value["itemid"].asString) == item
         }.keys.map {
-            it.toInternalName()
+            it.asInternalName()
         }
         itemIdCache[item] = result
         return result

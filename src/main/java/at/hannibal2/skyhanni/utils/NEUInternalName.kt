@@ -8,18 +8,15 @@ class NEUInternalName private constructor(private val internalName: String) {
 
         private val internalNameMap = mutableMapOf<String, NEUInternalName>()
 
-        val NONE = "NONE".toInternalName()
-        val MISSING_ITEM = "MISSING_ITEM".toInternalName()
+        val NONE = "NONE".asInternalName()
+        val MISSING_ITEM = "MISSING_ITEM".asInternalName()
 
-        val JASPER_CRYSTAL = "JASPER_CRYSTAL".toInternalName()
-        val RUBY_CRYSTAL = "RUBY_CRYSTAL".toInternalName()
-        val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
-        val WISP_POTION = "WISP_POTION".toInternalName()
+        val JASPER_CRYSTAL = "JASPER_CRYSTAL".asInternalName()
+        val RUBY_CRYSTAL = "RUBY_CRYSTAL".asInternalName()
+        val SKYBLOCK_COIN = "SKYBLOCK_COIN".asInternalName()
+        val WISP_POTION = "WISP_POTION".asInternalName()
 
-        @Deprecated("Name changed", ReplaceWith("this.toInternalName()"))
-        fun String.asInternalName() = toInternalName()
-
-        fun String.toInternalName(): NEUInternalName = uppercase().replace(" ", "_").let {
+        fun String.asInternalName(): NEUInternalName = uppercase().replace(" ", "_").let {
             internalNameMap.getOrPut(it) { NEUInternalName(it) }
         }
 
@@ -29,7 +26,7 @@ class NEUInternalName private constructor(private val internalName: String) {
             ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet")) ?: getCoins(itemName)
         }
 
-        fun fromItemNameOrInternalName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
+        fun fromItemNameOrInternalName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: itemName.asInternalName()
 
         private fun getCoins(itemName: String): NEUInternalName? = when {
             isCoins(itemName) -> SKYBLOCK_COIN
@@ -66,7 +63,7 @@ class NEUInternalName private constructor(private val internalName: String) {
     fun endsWith(other: String) = internalName.endsWith(other)
 
     fun replace(oldValue: String, newValue: String): NEUInternalName =
-        internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
+        internalName.replace(oldValue, newValue, ignoreCase = true).asInternalName()
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
 }

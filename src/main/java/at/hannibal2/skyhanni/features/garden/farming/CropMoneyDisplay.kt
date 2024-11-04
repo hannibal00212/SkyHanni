@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -61,9 +60,9 @@ object CropMoneyDisplay {
     private val cropNames = mutableMapOf<NEUInternalName, CropType>()
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
-    private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
-    private val SEEDS by lazy { "SEEDS".toInternalName() }
-    private val ENCHANTED_SEEDS by lazy { "ENCHANTED_SEEDS".toInternalName() }
+    private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".asInternalName().getItemStack() }
+    private val SEEDS by lazy { "SEEDS".asInternalName() }
+    private val ENCHANTED_SEEDS by lazy { "ENCHANTED_SEEDS".asInternalName() }
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

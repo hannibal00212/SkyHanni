@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -101,7 +101,7 @@ object FarmingFortuneDisplay {
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
 
-    private val ZORROS_CAPE by lazy { "ZORROS_CAPE".toInternalName() }
+    private val ZORROS_CAPE by lazy { "ZORROS_CAPE".asInternalName() }
 
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
