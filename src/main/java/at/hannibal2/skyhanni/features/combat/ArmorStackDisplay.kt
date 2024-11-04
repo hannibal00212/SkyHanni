@@ -103,36 +103,24 @@ object ArmorStackDisplay {
             else -> "§b"
         }
 
-        return if (config.showInSingleLine) {
-            listOf(
-                buildString {
-                    if (config.showArmorStackCount) {
-                        append("§6")
-                        if (config.armorStackType) append("$stackType: ")
-                        append("§l$stackCount$stackSymbol ")
-                    }
-
-                    if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
-                        append("$colorCode($decayTimeString)")
-                    }
-                }
-            )
-        } else {
-            buildList {
-                if (config.showArmorStackCount) {
-                    add(
-                        buildString {
-                            append("§6")
-                            if (config.armorStackType) append("$stackType: ")
-                            append("§l$stackCount$stackSymbol ")
-                        }
-                    )
-                }
-
-                if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
-                    add("$colorCode$decayTimeString")
-                }
+        val armorStackString = buildString {
+            if (config.showArmorStackCount) {
+                append("§6")
+                if (config.armorStackType) append("$stackType: ")
+                append("§l$stackCount$stackSymbol ")
             }
+        }
+
+        val timeString = if (config.armorStackDecayTimer && (!config.maxStackOnly || isMaxStack)) {
+            "$colorCode($decayTimeString)"
+        } else {
+            null
+        }
+
+        return if (config.showInSingleLine) {
+            listOf(armorStackString + timeString.orEmpty())
+        } else {
+            listOfNotNull(armorStackString, timeString)
         }
     }
 
