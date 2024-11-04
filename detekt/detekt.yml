@@ -12,6 +12,11 @@ FormattingRules:
     CustomCommentSpacing:
         active: true
 
+UseRepoRules:
+    active: true
+    SkullTexturesUseRepo:
+        active: true
+
 ImportRules:
     active: true
     CustomImportOrdering:

@@ -13,8 +13,8 @@ object ScoreboardElementLobbyCode : ScoreboardElement() {
 
     override fun getDisplay() = buildString {
         if (CustomScoreboard.displayConfig.dateInLobbyCode) append("§7${LocalDate.now().format(formatter)} ")
-        append(HypixelData.serverId?.let { "§8$it" })
-        append(DungeonAPI.getRoomID()?.let { " §8$it" })
+        HypixelData.serverId?.let { append("§8$it") }
+        DungeonAPI.roomId?.let { append(" §8$it") }
     }
 
     override val configLine = "§710/23/2024 §8mega77CK"
