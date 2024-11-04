@@ -527,11 +527,15 @@ public class ProfileSpecificStorage {
         public Set<Integer> ownedCakes = new HashSet<>();
 
         @Expose
-        public Set<Integer> neededCakes = new HashSet<>();
+        public Set<Integer> missingCakes = new HashSet<>();
 
         @Override
         public int hashCode() {
-            return ownedCakes.hashCode() + neededCakes.hashCode();
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ownedCakes.hashCode();
+            result = prime * result + missingCakes.hashCode();
+            return result;
         }
     }
 

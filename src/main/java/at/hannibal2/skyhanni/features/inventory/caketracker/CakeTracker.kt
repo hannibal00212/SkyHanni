@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -155,7 +156,6 @@ object CakeTracker {
     fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inCakeInventory) checkInventoryCakes()
-
         if (!inAuctionHouse) return
 
         (event.gui.inventorySlots as ContainerChest).getAllItems().forEach { (slot, _) ->
@@ -171,7 +171,6 @@ object CakeTracker {
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
         inAuctionHouse = checkAuctionCakes(event)
-        slotHighlightCache = mapOf()
     }
 
     private fun reRenderDisplay() {
@@ -200,12 +199,11 @@ object CakeTracker {
         searchingForCakes = auctionCakeSearchPattern.matches(event.inventoryName)
         slotHighlightCache = event.inventoryItems.filter {
             cakeNamePattern.matches(it.value.displayName)
-        }.map {
-            val year = cakeNamePattern.matchGroup(it.value.displayName, "year")?.toInt() ?: -1
+        }.mapValues { (_, item) ->
+            val year = cakeNamePattern.matchGroup(item.displayName, "year")?.toInt() ?: -1
             val owned = storage?.ownedCakes?.contains(year) ?: false
-            val color = if (owned) obtainedHighlightColor else unobtainedHighlightColor
-            it.key to color
-        }.toMap().filter { it.key != -1 }
+            if (owned) obtainedHighlightColor else unobtainedHighlightColor
+        }
         return true
     }
 
@@ -249,9 +247,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.neededCakes = (1..currentYear).filter { year ->
-            year !in storage.ownedCakes
-        }.toSet()
+        storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
     }
 
     private data class CakeRange(var start: Int, var end: Int = 0) {
@@ -349,7 +345,7 @@ object CakeTracker {
         add(
             Renderable.hoverTips(
                 "§c§lNew §f§lYear §c§lCake §f§lTracker",
-                tips = listOf("§aHave§7: §a${data.ownedCakes.size}§7, §cMissing§7: §c${data.neededCakes.size}"),
+                tips = listOf("§aHave§7: §a${data.ownedCakes.size}§7, §cMissing§7: §c${data.missingCakes.size}"),
             ),
         )
         add(buildDisplayTypeToggle())
@@ -357,8 +353,8 @@ object CakeTracker {
 
         val cakeList = when (config.displayType) {
             DisplayType.OWNED_CAKES -> data.ownedCakes
-            DisplayType.MISSING_CAKES -> data.neededCakes
-            null -> data.neededCakes
+            DisplayType.MISSING_CAKES -> data.missingCakes
+            null -> data.missingCakes
         }
 
         if (cakeList.isEmpty()) {
@@ -378,14 +374,12 @@ object CakeTracker {
             DisplayOrder.NEWEST_FIRST -> cakeList.sortedDescending()
         }
 
-        // Combine consecutive years into ranges
-        // + 3 is to account for the header and selector boxes
         val maxDisplayRows = config.maxDisplayRows.get() + 3
         var start = sortedCakes.first()
         var end = start
         var hiddenRows = 0
 
-        for (year in sortedCakes) {
+        for (year in sortedCakes.drop(1)) { // Skip the first item to prevent duplicate addition
             if ((orderType == DisplayOrder.OLDEST_FIRST && year == end + 1) ||
                 (orderType == DisplayOrder.NEWEST_FIRST && year == end - 1)
             ) {
@@ -395,8 +389,9 @@ object CakeTracker {
                     val range = if (start != end) CakeRange(start, end) else CakeRange(start)
                     add(range.getRenderable(displayType))
                 } else {
-                    end = year
                     hiddenRows++
+                    start = year
+                    end = start
                     continue
                 }
                 start = year
@@ -404,7 +399,6 @@ object CakeTracker {
             }
         }
 
-        // Add the last range
         if (this.size < maxDisplayRows) {
             val lastRange = if (start != end) CakeRange(start, end) else CakeRange(start)
             add(lastRange.getRenderable(displayType))
@@ -412,7 +406,12 @@ object CakeTracker {
             hiddenRows++
         }
 
-        // Add a line to indicate that there are more rows hidden
-        if (hiddenRows > 0) add(Renderable.string("§7§o($hiddenRows hidden rows)"))
+        if (hiddenRows > 0) add(
+            Renderable.clickAndHover(
+                "§7§o($hiddenRows hidden rows)",
+                tips = listOf("§eClick to configure # of displayed rows"),
+                onClick = { config::maxDisplayRows.jumpToEditor() }
+            )
+        )
     }
 }
