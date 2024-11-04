@@ -295,9 +295,9 @@
     <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var backupTrapperID: Int = 17</ID>
     <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var trapperID: Int = 56</ID>
     <ID>VarCouldBeVal:TrophyFishDisplay.kt$TrophyFishDisplay$private var recentlyDroppedTrophies = TimeLimitedCache&lt;NEUInternalName, TrophyRarity&gt;(5.seconds)</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var fillerID = "STAINED_GLASS_PANE".asInternalName()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var limboID = "ENDER_PEARL".asInternalName()</ID>
+    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var fillerID = "STAINED_GLASS_PANE".toInternalName()</ID>
+    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var limboID = "ENDER_PEARL".toInternalName()</ID>
     <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillOverflowLuck = mutableMapOf&lt;SkillType, Int&gt;()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillsID = "DIAMOND_SWORD".asInternalName()</ID>
+    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillsID = "DIAMOND_SWORD".toInternalName()</ID>
   </CurrentIssues>
 </SmellBaseline>

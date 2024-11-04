@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -59,7 +59,7 @@ object DraconicSacrificeTracker {
         }
 
     private val altarArea = AxisAlignedBB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
-    private val ESSENCE_DRAGON = "ESSENCE_DRAGON".asInternalName()
+    private val ESSENCE_DRAGON = "ESSENCE_DRAGON".toInternalName()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {

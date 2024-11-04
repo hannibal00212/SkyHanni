@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -96,7 +96,7 @@ object FishingProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
-    private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
+    private val MAGMA_FISH by lazy { "MAGMA_FISH".toInternalName() }
 
     private const val NAME_ALL: CategoryName = "All"
     private var currentCategory: CategoryName = NAME_ALL

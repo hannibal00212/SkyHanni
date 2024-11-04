@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RiftHorsezookaHider {
 
-    private val HORSEZOOKA by lazy { "HORSEZOOKA".asInternalName() }
+    private val HORSEZOOKA by lazy { "HORSEZOOKA".toInternalName() }
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {

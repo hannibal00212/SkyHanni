@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -244,9 +244,9 @@ object TrophyFishDisplay {
                 return internalName
             }
         }
-        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".asInternalName()
-        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".asInternalName()
-        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".asInternalName()
+        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".toInternalName()
+        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".toInternalName()
+        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".toInternalName()
 
         return null
     }

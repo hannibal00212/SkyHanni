@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -36,7 +36,7 @@ object DeepCavernsGuide {
     private var showStartIcon = false
 
     private val startIcon by lazy {
-        val neuItem = "MAP".asInternalName().getItemStack()
+        val neuItem = "MAP".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
             "§bDeep Caverns Guide",
