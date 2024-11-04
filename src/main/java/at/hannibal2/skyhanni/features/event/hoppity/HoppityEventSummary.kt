@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
@@ -60,6 +59,7 @@ object HoppityEventSummary {
     )
 
     private const val LINE_HEADER = "    "
+    private val SEPARATOR = "§d§l${"▬".repeat(64)}"
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
@@ -68,15 +68,9 @@ object HoppityEventSummary {
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
     private var lastKnownInInvState = false
-    private var lastAddedCfMillis: SimpleTimeMark = farPast()
-    private var lastSentCfUpdateMessage: SimpleTimeMark = farPast()
-    private var lastToggleMark: SimpleTimeMark = farPast()
-
-    private fun SimpleTimeMark.isUninitialized(): Boolean =
-        this.toMillis() == 0L || this.toMillis() == Long.MAX_VALUE
-
-    private fun SimpleTimeMark.takeIfInitialized(): SimpleTimeMark? =
-        if (this.isUninitialized()) null else this
+    private var lastAddedCfMillis: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastSentCfUpdateMessage: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun isEggLocatorOverridden(): Boolean =
         liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId.equals("EGGLOCATOR")
@@ -158,7 +152,7 @@ object HoppityEventSummary {
 
         val stats = getYearStats(statYear).first
         // Calculate a 'hash' of the stats to determine if they have changed
-        val statsHash = stats?.hashCode() ?: 0
+        val statsHash = stats.hashCode()
         if (statsHash != lastKnownStatHash) {
             lastKnownStatHash = statsHash
             displayCardRenderables = buildDisplayRenderables(stats, statYear)
@@ -242,7 +236,7 @@ object HoppityEventSummary {
 
         // If it's been more than {config} since the last update, send a message
         val stats = getYearStats().first ?: return
-        val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: farPast()
+        val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: SimpleTimeMark.farPast()
         if (lastLbUpdate.passedSince() >= updateCfConfig.reminderInterval.minutes) {
             lastSentCfUpdateMessage = SimpleTimeMark.now()
             ChatUtils.chat(
@@ -482,18 +476,18 @@ object HoppityEventSummary {
     }
 
     private fun getSecondaryLbLine(initial: LeaderboardPosition, final: LeaderboardPosition): String {
-        val iPo = initial.position
-        val fPo = final.position
-        val dPo = fPo - iPo
-        val iPe = initial.percentile
-        val fPe = final.percentile
-        val dPe = fPe - iPe
-        val preambleFormat = if (iPo > fPo) "§a+" else "§c"
+        val initPosition = initial.position
+        val finalPosition = final.position
+        val diffPosition = finalPosition - initPosition
+        val initialPercentile = initial.percentile
+        val finalPercentile = final.percentile
+        val diffPercentile = finalPercentile - initialPercentile
+        val preambleFormat = if (initPosition > finalPosition) "§a+" else "§c"
 
         return buildString {
-            append(" §7($preambleFormat${(-1 * dPo).addSeparators()} ${StringUtils.pluralize(dPo, "spot")}§7)")
-            if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
-            else append(" §7Top §a$iPe%")
+            append(" §7($preambleFormat${(-1 * diffPosition).addSeparators()} ${StringUtils.pluralize(diffPosition, "spot")}§7)")
+            if (diffPercentile != 0.0) append(" §7Top §a$initialPercentile% §c-> §7Top §a$finalPercentile%")
+            else append(" §7Top §a$initialPercentile%")
         }
     }
 
@@ -521,33 +515,34 @@ object HoppityEventSummary {
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {
         if (eventYear == null) return
-        val summaryBuilder: StringBuilder = StringBuilder()
-        summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
 
-        // Header
-        summaryBuilder.appendLine("${" ".repeat(26)}§d§lHoppity's Hunt #${getHoppityEventNumber(eventYear)} Stats")
-        summaryBuilder.appendLine()
+        val statsString = buildString {
+            getStatsStrings(stats, eventYear).forEach {
+                if (it.headed) appendHeadedLine(it.string)
+                else appendLine(it.string)
+            }
 
-        // Various stats from config
-        val statsBuilder: StringBuilder = StringBuilder()
-        getStatsStrings(stats, eventYear).forEach {
-            if (it.headed) statsBuilder.appendHeadedLine(it.string)
-            else statsBuilder.appendLine(it.string)
+            // If no stats are found, display a message
+            if (toString().replace("\n", "").isEmpty()) {
+                appendHeadedLine("§c§lNothing to show!")
+                appendHeadedLine("§c§oGo find some eggs!")
+            }
         }
 
-        // If no stats are found, display a message
-        if (statsBuilder.toString().replace("\n", "").isEmpty()) {
-            statsBuilder.appendHeadedLine("§c§lNothing to show!")
-            statsBuilder.appendHeadedLine("§c§oGo find some eggs!")
+        val summary = buildString {
+            appendLine(SEPARATOR)
+
+            // Header
+            appendLine("${" ".repeat(26)}§d§lHoppity's Hunt #${getHoppityEventNumber(eventYear)} Stats")
+            appendLine()
+
+            // Append stats
+            append(statsString)
+
+            append(SEPARATOR)
         }
 
-        // Append stats
-        summaryBuilder.append(statsBuilder)
-
-        // Footer
-        summaryBuilder.append("§d§l${"▬".repeat(64)}")
-
-        ChatUtils.chat(summaryBuilder.toString(), prefix = false)
+        ChatUtils.chat(summary, prefix = false)
     }
 
     private fun HoppityEventStats.getEggsFoundFormat(year: Int): String? =
