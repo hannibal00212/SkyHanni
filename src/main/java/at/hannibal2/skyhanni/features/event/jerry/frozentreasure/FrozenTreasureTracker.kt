@@ -154,7 +154,7 @@ object FrozenTreasureTracker {
         addSearchString("")
     }
 
-    fun formatNumber(amount: Number): String {
+    private fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
         if (amount is Long) return amount.shortFormat()
         return "$amount"

@@ -66,9 +66,9 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
-    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
+    @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")
     @ConfigEditorBoolean
-    public boolean hideCoinsDifference = false;
+    public boolean showNumberDifference = false;
 
     @Expose
     @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
