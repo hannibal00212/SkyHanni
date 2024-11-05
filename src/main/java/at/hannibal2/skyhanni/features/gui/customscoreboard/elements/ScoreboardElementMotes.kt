@@ -17,7 +17,7 @@ object ScoreboardElementMotes : ScoreboardElement(), CustomScoreboardNumberTrack
     override fun getDisplay(): String? {
         val motes = getMotes()
         checkDifference(motes.toLong())
-        val line = formatStringNum(motes) + (ScoreboardElementCopper.temporaryChangeDisplay ?: "")
+        val line = formatStringNum(motes) + temporaryChangeDisplay.orEmpty()
 
         return when {
             informationFilteringConfig.hideEmptyLines && line == "0" -> null

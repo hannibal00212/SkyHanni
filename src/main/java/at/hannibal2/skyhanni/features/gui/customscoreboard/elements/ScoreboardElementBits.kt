@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
@@ -21,7 +20,7 @@ object ScoreboardElementBits : ScoreboardElement(), CustomScoreboardNumberTracki
         val bits = BitsAPI.bits.toLong()
         val bitsToClaim = BitsAPI.bitsAvailable
         checkDifference(bits)
-        val line = getBitsLine() + (temporaryChangeDisplay ?: "")
+        val line = getBitsLine() + temporaryChangeDisplay.orEmpty()
 
         return when {
             informationFilteringConfig.hideEmptyLines && bits == 0L && (bitsToClaim == -1 || bitsToClaim == 0) -> null

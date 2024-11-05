@@ -17,7 +17,7 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
     override fun getDisplay(): String? {
         val soulflow = getSoulflow()
         checkDifference(soulflow.toLong())
-        val line = formatStringNum(soulflow) + (temporaryChangeDisplay ?: "")
+        val line = formatStringNum(soulflow) + temporaryChangeDisplay.orEmpty()
 
         return when {
             informationFilteringConfig.hideEmptyLines && line == "0" -> null

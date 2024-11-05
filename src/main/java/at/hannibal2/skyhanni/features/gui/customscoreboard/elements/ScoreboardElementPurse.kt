@@ -17,7 +17,7 @@ object ScoreboardElementPurse : ScoreboardElement(), CustomScoreboardNumberTrack
     override fun getDisplay(): String? {
         val currentPurse = PurseAPI.currentPurse.toLong()
         checkDifference(currentPurse)
-        val purse = formatNumber(currentPurse) + (temporaryChangeDisplay ?: "")
+        val purse = formatNumber(currentPurse) + temporaryChangeDisplay.orEmpty()
 
         return when {
             informationFilteringConfig.hideEmptyLines && purse == "0" -> null
