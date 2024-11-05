@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -29,10 +30,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.init.Items
+import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -48,7 +49,7 @@ object HoppityAPI {
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    private var lastDoradoFire: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var processedSlots = mutableListOf<Int>()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -104,14 +105,25 @@ object HoppityAPI {
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
 
+    private fun addProcessedSlot(slot: Slot) {
+        processedSlots.add(slot.slotNumber)
+        DelayedRun.runDelayed(5.seconds) { // Assume we caught it on the first 'frame', so we can remove it after 5 seconds.
+            processedSlots.remove(slot.slotNumber)
+        }
+    }
+
+    private fun shouldProcessSlot(slot: Slot) =
+        // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
+        slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
+            // Don't process the same slot twice.
+            !processedSlots.contains(slot.slotNumber) &&
+            // All strays are skulls with a display name, and lore.
+            slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        InventoryUtils.getItemsInOpenChest().filter {
-            it.stack.hasDisplayName() &&
-                it.stack.getMinecraftId().toString() == "minecraft:skull" &&
-                it.stack.getLore().isNotEmpty()
-        }.forEach {
+        InventoryUtils.getItemsInOpenChest().filter { shouldProcessSlot(it) }.forEach {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
                 when (groupOrNull("name") ?: return@matchMatcher) {
@@ -128,8 +140,7 @@ object HoppityAPI {
             ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(it.stack.getLore())) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
-                val escaped = ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(it.stack.getLore())
-                if (escaped || lastDoradoFire.passedSince() <= 10.seconds) return@matchMatcher
+                if (ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(it.stack.getLore())) return@matchMatcher
 
                 // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
                 // §6§lGolden Rabbit §d§lCAUGHT!
@@ -139,8 +150,8 @@ object HoppityAPI {
                 lastMeal = STRAY
                 duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 attemptFireRabbitFound()
-                lastDoradoFire = SimpleTimeMark.now()
             }
+            addProcessedSlot(it)
         }
     }
 
