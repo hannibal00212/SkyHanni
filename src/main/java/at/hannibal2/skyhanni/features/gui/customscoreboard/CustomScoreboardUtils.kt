@@ -48,8 +48,6 @@ object CustomScoreboardUtils {
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
-    internal fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
-
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
     } ?: "0"

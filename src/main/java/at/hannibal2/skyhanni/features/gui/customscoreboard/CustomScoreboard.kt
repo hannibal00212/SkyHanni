@@ -2,7 +2,6 @@
  * TODO LIST
  *  - Bank API (actually maybe not, I like the current design)
  *  - countdown events like fishing festival + fiesta when its not on tablist
- *  - improve hide coin difference to also work with bits, motes, etc
  *  - color options in the purse etc lines
  *  - choose the amount of decimal places in shorten nums
  *  - heavily optimize elements and events by only updating them when absolutely needed

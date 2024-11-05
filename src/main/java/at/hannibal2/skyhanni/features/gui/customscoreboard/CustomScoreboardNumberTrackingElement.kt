@@ -1,33 +1,33 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 interface CustomScoreboardNumberTrackingElement {
-    var previousValue: Long
+    var previousAmount: Long
+    var temporaryChangeDisplay: String?
     val numberColor: String
-    var lastUpdateTime: SimpleTimeMark
 
-    fun calculateAndFormatDifference(currentValue: Long): String {
-        val difference = currentValue - previousValue
-        if (!CustomScoreboard.displayConfig.showNumberDifference) return ""
-
-        if (lastUpdateTime.passedSince() > 5.seconds) return ""
-
-        return when {
-            difference > 0 -> " §7(+$numberColor${formatNumber(difference)}§7)"
-            difference < 0 -> " §7($numberColor${formatNumber(difference)}§7)"
-            else -> ""
+    fun checkDifference(currentAmount: Long) {
+        if (currentAmount != previousAmount) {
+            val changeAmount = currentAmount - previousAmount
+            showTemporaryChange(changeAmount)
+            previousAmount = currentAmount
         }
     }
 
-    fun updatePreviousValue(currentValue: Long) {
-        if (lastUpdateTime.passedSince() < 5.seconds) return
+    private fun showTemporaryChange(changeAmount: Long, durationMillis: Long = 5000) {
+        temporaryChangeDisplay = if (changeAmount > 0) {
+            " §7($numberColor+${formatNumber(changeAmount)}§7)$numberColor"
+        } else {
+            " §7($numberColor${formatNumber(changeAmount)}§7)$numberColor"
+        }
 
-        if (currentValue != previousValue) {
-            lastUpdateTime = SimpleTimeMark.now()
-            previousValue = currentValue
+        SkyHanniMod.coroutineScope.launch {
+            delay(durationMillis)
+            temporaryChangeDisplay = null
         }
     }
 }
