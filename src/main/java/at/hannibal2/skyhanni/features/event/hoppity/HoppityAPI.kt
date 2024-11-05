@@ -48,7 +48,7 @@ object HoppityAPI {
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    private var processedSlots = mutableListOf<Int>()
+    private val processedSlots = mutableListOf<Int>()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
