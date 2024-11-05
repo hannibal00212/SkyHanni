@@ -102,6 +102,7 @@ object CustomScoreboardConfigFix {
         listOf("alignTitle", "alignFooter").forEach { key ->
             event.move(63, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
         }
+        event.move(65, "$DISPLAY_PREFIX.hideCoinsDifference", "$DISPLAY_PREFIX.showNumberDifference")
     }
 
     private fun replaceElements(element: JsonElement, oldElements: List<String>, newElement: String): JsonArray {
