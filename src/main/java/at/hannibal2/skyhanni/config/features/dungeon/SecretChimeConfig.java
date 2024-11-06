@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.dungeon.DungeonSecretChime;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -16,6 +17,26 @@ public class SecretChimeConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(name = "Mute Sounds", desc = "Disables chest and lever sounds.")
+    @Accordion
+    public MuteSecretSoundConfig muteSecretSound = new MuteSecretSoundConfig();
+
+    public static class MuteSecretSoundConfig {
+
+        @Expose
+        @ConfigOption(name = "Mute Chest Sound", desc = "Disables chest opening sound.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean muteChestSound = false;
+
+        @Expose
+        @ConfigOption(name = "Mute Lever Sound", desc = "Disables lever activation sound.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean muteLeverSound = false;
+    }
 
     @Expose
     @ConfigOption(name = "Secret Chime Sound", desc = "The sound played for the secret chime.")
