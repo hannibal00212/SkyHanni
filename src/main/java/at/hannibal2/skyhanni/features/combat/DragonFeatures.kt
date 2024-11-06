@@ -278,12 +278,12 @@ object DragonFeatures {
     @SubscribeEvent
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
         if (!(enableDisplay())) return
-        val index = event.scoreboard.indexOfFirst { scoreDragon.matches(it) }
+        val index = event.full.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
         if (egg) {
             dragonSpawned = true
         }
-        scoreDamage.matchMatcher(event.scoreboard[index + 1]) {
+        scoreDamage.matchMatcher(event.full[index + 1]) {
             currentDamage = this.group("Damage").replace(",", "").toDouble()
         }
 
