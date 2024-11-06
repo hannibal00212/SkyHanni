@@ -100,6 +100,10 @@ object HypixelCommands {
         send("wiki $text")
     }
 
+    fun openBackpack(position: Int) {
+        send("bp $position")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
