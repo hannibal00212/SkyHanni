@@ -7,8 +7,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -26,9 +25,9 @@ object BingoBoopParty {
     fun onChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
 
-        val msg = event.message.trimWhiteSpaceAndResets()
+        val msg = event.messageComponent.textComponent.formattedText.removeResets()
         boopPattern.matchMatcher(msg) {
-            val username = msg.getPlayerNameFromChatMessage() ?: return
+            val username = event.author
             ChatUtils.clickableChat("Click to invite $username to the party", onClick = {
                 HypixelCommands.partyInvite(username)
             })
