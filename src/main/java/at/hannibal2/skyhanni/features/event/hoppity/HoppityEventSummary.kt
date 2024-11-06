@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -24,6 +25,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -61,6 +64,7 @@ object HoppityEventSummary {
     private const val LINE_HEADER = "    "
     private val SEPARATOR = "§d§l${"▬".repeat(64)}"
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val statDisplayList get() = config.eventSummary.statDisplayList.get()
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
@@ -170,6 +174,13 @@ object HoppityEventSummary {
     }
 
     @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.eventSummary.statDisplayList.afterChange {
+            lastKnownStatHash = 0
+        }
+    }
+
+    @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         checkLbUpdateWarning()
@@ -219,7 +230,7 @@ object HoppityEventSummary {
         if (!LorenzUtils.inSkyBlock || !HoppityAPI.isHoppityEvent() || !updateCfConfig.enabled) return
 
         // Only run if the user has leaderboard stats enabled
-        if (!config.eventSummary.statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
+        if (!statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
 
         // If we're only showing the live display during the last {X} hours of the hunt,
         // check if we're in that time frame
@@ -496,7 +507,7 @@ object HoppityEventSummary {
         val statList = mutableListOf<StatString>()
 
         // Various stats from config
-        config.eventSummary.statDisplayList.forEach {
+        statDisplayList.forEach {
             summaryOperationList[it]?.invoke(statList, stats, eventYear)
         }
 

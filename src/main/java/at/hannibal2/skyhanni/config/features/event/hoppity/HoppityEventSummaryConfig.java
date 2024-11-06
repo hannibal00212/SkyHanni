@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class HoppityEventSummaryConfig {
         desc = "Drag text to change what displays in the summary card."
     )
     @ConfigEditorDraggableList
-    public List<HoppityStat> statDisplayList = new ArrayList<>(Arrays.asList(
+    public Property<List<HoppityStat>> statDisplayList = Property.of(new ArrayList<>(Arrays.asList(
         HoppityStat.MEAL_EGGS_FOUND,
         HoppityStat.HOPPITY_RABBITS_BOUGHT,
         HoppityStat.SIDE_DISH_EGGS,
@@ -55,7 +56,7 @@ public class HoppityEventSummaryConfig {
         HoppityStat.TIME_IN_CF,
         HoppityStat.RABBIT_THE_FISH_FINDS,
         HoppityStat.LEADERBOARD_CHANGE
-    ));
+    )));
 
     public enum HoppityStat {
         MEAL_EGGS_FOUND("§7You found §b45§7/§a47 §6Chocolate Meal Eggs§7."),
