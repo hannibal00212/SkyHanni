@@ -174,10 +174,11 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        registerCommand("shtrack", "Track any quantity", ShTrack.arguments) { ShTrack.ContextObject() }
-        registerCommand(
+        event.registerComplex("shtrack", "Track any quantity",CommandCategory.USERS_ACTIVE, ShTrack.arguments) { ShTrack.ContextObject() }
+        event.registerComplex(
             "shtrackitem",
             "Track any item",
+            CommandCategory.USERS_ACTIVE,
             ShTrack.arguments,
             ShTrack.DocumentationExcludes.itemTrack,
         ) {
@@ -844,20 +845,7 @@ object Commands {
         }
     }
 
-    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> registerCommand(
-        rawName: String,
-        description: String,
-        specifiers: Collection<A>,
-        excludedSpecifiersFromDescription: Set<A> = emptySet(),
-        context: () -> O,
-    ) {
-        val command = ComplexCommand(rawName, specifiers, context)
-        registerCommand(rawName, command.constructHelp(description, excludedSpecifiersFromDescription)) {
-            advancedHandleCommand(it, specifiers, context())
-        }
-    }
-
-    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> advancedHandleCommand(
+    fun <O : CommandContextAwareObject, A : CommandArgument<O>> advancedHandleCommand(
         args: Array<String>,
         specifiers: Collection<A>,
         context: O,
