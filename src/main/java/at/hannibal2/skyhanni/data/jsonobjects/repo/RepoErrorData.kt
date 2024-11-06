@@ -14,6 +14,6 @@ data class RepoErrorData(
     @Expose @SerializedName("custom_message") var customMessage: String?,
     @Expose @SerializedName("affected_versions") var affectedVersions: List<String> = listOf(),
 ) {
-    val messageExact get() = rawMessageExact ?: emptyList()
-    val messageStartsWith get() = rawMessageStartsWith ?: emptyList()
+    val messageExact get() = rawMessageExact.orEmpty()
+    val messageStartsWith get() = rawMessageStartsWith.orEmpty()
 }

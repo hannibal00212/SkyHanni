@@ -78,9 +78,14 @@ object ItemDisplayOverlayFeatures {
         "harvest",
         "§7§7You may harvest §6(?<amount>.).*",
     )
+
+    /**
+     * REGEX-TEST: Dungeon VII Potion
+     * REGEX-TEST: Dungeon VII Potion x1
+     */
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion",
+        "Dungeon (?<level>.*) Potion(?: x1)?",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
@@ -149,7 +154,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getNewYearCake()?.toString() ?: ""
+            val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"
         }
 
@@ -298,8 +303,10 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) &&
-            lore.any {
+        if (BESTIARY_LEVEL.isSelected() && (
+                chestName.contains("Bestiary ➜") ||
+                    chestName.contains("Fishing ➜")
+                ) && lore.any {
                 it.contains("Deaths: ")
             }
         ) {

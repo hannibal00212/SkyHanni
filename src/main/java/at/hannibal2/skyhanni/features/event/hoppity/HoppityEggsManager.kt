@@ -259,6 +259,8 @@ object HoppityEggsManager {
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
         event.move(50, "event.hoppityEggs.showDuringContest", "event.hoppityEggs.showWhileBusy")
+        event.move(62, "event.hoppityEggs.uniquesWarpMenu", "event.hoppityEggs.warpMenu.enabled")
+        event.move(62, "event.hoppityEggs.uniquesWarpMenuHideMax", "event.hoppityEggs.warpMenu.hideWhenMaxed")
     }
 
     fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&

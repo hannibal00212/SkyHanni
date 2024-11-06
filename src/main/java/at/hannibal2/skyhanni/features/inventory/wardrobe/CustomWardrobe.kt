@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -240,13 +241,13 @@ object CustomWardrobe {
         try {
             // Get tooltip from minecraft and other mods
             // TODO add support for advanced tooltip (F3+H)
-            val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+            val toolTips = stack.getTooltipCompat(false)
 
             // Modify tooltip via SkyHanni Events
             val mcSlotId = slot.inventorySlots[armorIndex]
             // if the slot is null, we don't fire LorenzToolTipEvent at all.
             val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-            LorenzToolTipEvent(mcSlot, stack, toolTips).postWithoutCatch()
+            LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
 
             return toolTips
         } catch (e: Exception) {
@@ -255,7 +256,7 @@ object CustomWardrobe {
                 "Failed to get tooltip for armor piece in CustomWardrobe",
                 "Armor" to stack,
                 "Slot" to slot,
-                "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                "Lore" to stack.getTooltipCompat(false),
             )
             return null
         }

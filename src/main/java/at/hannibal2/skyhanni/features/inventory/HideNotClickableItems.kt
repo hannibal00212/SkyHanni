@@ -277,6 +277,7 @@ object HideNotClickableItems {
         return true
     }
 
+    @Suppress("UnusedParameter")
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
         if (!ComposterOverlay.inInventory) return false
 
@@ -563,7 +564,8 @@ object HideNotClickableItems {
         val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
-            chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
+            chestName == "Co-op Auction House" || chestName == "Auction House" ||
+                chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
 

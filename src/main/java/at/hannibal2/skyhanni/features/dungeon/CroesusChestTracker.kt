@@ -269,7 +269,7 @@ object CroesusChestTracker {
     fun resetChest() = croesusChests?.let {
         it.clear()
         it.addAll(generateMaxChest())
-        ChatUtils.chat("Kismet State was cleared!")
+        ChatUtils.chat("Kismet State was Reset!")
     }
 
     @JvmStatic

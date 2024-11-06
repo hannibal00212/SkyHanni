@@ -110,7 +110,8 @@ open class Enchant : Comparable<Enchant> {
         private var nbtNum: String? = null
 
         @Expose
-        private var statLabel: String? = null
+        @Suppress("UnusedPrivateProperty")
+        private val statLabel: String? = null
 
         @Expose
         private var stackLevel: TreeSet<Int>? = null

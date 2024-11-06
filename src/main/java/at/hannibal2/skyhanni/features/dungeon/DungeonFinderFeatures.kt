@@ -124,8 +124,6 @@ object DungeonFinderFeatures {
         "§7View and select a dungeon class.",
     )
 
-    private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
-
     //  Variables used
     private var selectedClass = ""
     private var floorStackSize = mapOf<Int, String>()
@@ -217,6 +215,8 @@ object DungeonFinderFeatures {
         val map = mutableMapOf<Int, LorenzColor>()
         if (!partyFinderTitlePattern.matches(event.inventoryName)) return map
         inInventory = true
+        // TODO: Refactor this to not have so many continue statements
+        @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             if (!checkIfPartyPattern.matches(stack.displayName)) continue

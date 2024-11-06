@@ -79,6 +79,8 @@ object RegexUtils {
      */
     fun Matcher.groupOrNull(groupName: String): String? = runCatching { group(groupName) }.getOrNull()
 
+    fun Matcher.groupOrEmpty(groupName: String): String = groupOrNull(groupName).orEmpty()
+
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
     fun Pattern.indexOfFirstMatch(list: List<String>): Int? {

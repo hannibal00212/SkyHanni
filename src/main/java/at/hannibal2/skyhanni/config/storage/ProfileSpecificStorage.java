@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
+import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
@@ -202,6 +203,10 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
+
+        @Expose
+        // shop name -> (item name, tier)
+        public Map<String, Map<String, Integer>> carnivalShopProgress = new HashMap<>();
     }
 
     @Expose
@@ -723,6 +728,9 @@ public class ProfileSpecificStorage {
         @Nullable
         public Integer currentSlot = null;
     }
+
+    @Expose
+    public DraconicSacrificeTracker.Data draconicSacrificeTracker = new DraconicSacrificeTracker.Data();
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;

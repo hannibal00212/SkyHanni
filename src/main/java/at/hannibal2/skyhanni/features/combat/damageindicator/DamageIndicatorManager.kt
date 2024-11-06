@@ -91,7 +91,7 @@ object DamageIndicatorManager {
         return damagePattern.matcher(name).matches()
     }
 
-    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(type: BossType) = data.entries.any { it.value.bossType == type }
 
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 

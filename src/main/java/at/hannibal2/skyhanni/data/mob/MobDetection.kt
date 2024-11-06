@@ -355,11 +355,12 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-                {
-                    shouldClear.set(true)
-                    allEntitiesViaPacketId.clear()
-                }
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
+                shouldClear.set(true)
+                allEntitiesViaPacketId.clear()
+            }
         }
     }
 

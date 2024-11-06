@@ -42,11 +42,11 @@ object LocationUtils {
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
-    fun LorenzVec.canBeSeen(radius: Double = 150.0, offset: Double? = null): Boolean {
+    fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
         val noBlocks = canSee(a, b, offset)
-        val notTooFar = a.distance(b) < radius
+        val notTooFar = a.distance(b) < viewDistance.toDouble()
         val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
         return noBlocks && notTooFar && inFov
     }

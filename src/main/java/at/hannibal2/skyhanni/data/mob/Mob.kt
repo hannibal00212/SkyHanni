@@ -8,17 +8,18 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import java.util.UUID
@@ -111,9 +112,9 @@ class Mob(
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
-    fun canBeSeen() = baseEntity.canBeSeen()
+    fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
@@ -132,9 +133,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
             }
         }
     }
@@ -151,6 +152,9 @@ class Mob(
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
+    val health: Float get() = baseEntity.health
+    val maxHealth: Int get() = baseEntity.baseMaxHealth
+
     init {
         removeExtraEntitiesFromChecking()
         relativeBoundingBox =
@@ -158,7 +162,7 @@ class Mob(
 
         owner = (
             ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+                summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
     }
@@ -228,6 +232,8 @@ class Mob(
         internalHighlight()
     }
 
+    val centerCords get() = boundingBox.getCenter()
+
     override fun hashCode() = id.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
@@ -238,4 +244,8 @@ class Mob(
 
         return id == other.id
     }
+
+    // TODO add max distance
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }
