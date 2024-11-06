@@ -113,8 +113,12 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
+        //#if MC<1.16
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        //#else
+        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {

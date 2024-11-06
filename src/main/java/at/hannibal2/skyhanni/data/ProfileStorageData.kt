@@ -91,7 +91,7 @@ object ProfileStorageData {
             if (it.multipleProfiles && !hypixelDataLoaded) return
         }
 
-        if (noTabListTime.passedSince() < 5.seconds) return
+        if (noTabListTime.passedSince() < 2.seconds) return
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {
@@ -102,11 +102,13 @@ object ProfileStorageData {
                     HypixelCommands.widget()
                 },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
         } else {
             ChatUtils.chat(
                 "§cExtra Information from Tab list not found! " +
                     "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
+                replaceSameMessage = true,
             )
         }
     }

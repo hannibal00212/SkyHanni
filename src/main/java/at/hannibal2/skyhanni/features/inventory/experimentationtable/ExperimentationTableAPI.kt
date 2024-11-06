@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -43,11 +44,7 @@ object ExperimentationTableAPI {
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
-    // TODO: Add to repo
-    private const val EXPERIMENTATION_TABLE_SKULL =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
-            "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
-
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**

@@ -37,7 +37,7 @@ public class RepositoryConfig {
         public String user = "hannibal002";
 
         @Expose
-        @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-Repo")
+        @ConfigOption(name = "Repository Name", desc = "The Repository Name, default: SkyHanni-REPO")
         @ConfigEditorText
         public String name = "SkyHanni-REPO";
 
