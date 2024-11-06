@@ -124,6 +124,7 @@ object HoppityAPI {
         slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
             // Don't process the same slot twice.
             !processedSlots.contains(slot.slotNumber) &&
+            slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
 
@@ -165,6 +166,7 @@ object HoppityAPI {
     private fun shouldProcessMiscSlot(slot: Slot) =
         // Don't process the same slot twice.
         !processedSlots.contains(slot.slotNumber) &&
+            slot.stack != null && slot.stack.item != null &&
             // All misc items are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
 
