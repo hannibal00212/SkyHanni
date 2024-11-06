@@ -276,7 +276,8 @@ object CarryTracker {
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " + "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
+                                "still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),

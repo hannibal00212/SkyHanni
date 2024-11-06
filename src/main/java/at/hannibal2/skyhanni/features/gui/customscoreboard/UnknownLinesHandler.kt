@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +20,17 @@ import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+
+internal var allUnknownLines = listOf<UnknownLine>()
+internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
+
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
+
+internal class UnknownLine(val line: String) {
+    val firstFound = SimpleTimeMark.now()
+    var lastFound = SimpleTimeMark.now()
+    var lastWarned = SimpleTimeMark.farPast()
+}
 
 object UnknownLinesHandler {
 
@@ -85,7 +98,7 @@ object UnknownLinesHandler {
         SbPattern.reformingPattern,
         SbPattern.bossHealthPattern,
         SbPattern.bossHealthBarPattern,
-        SbPattern.broodmotherPattern,
+        SpidersDenAPI.broodmotherPattern,
         SbPattern.bossHPPattern,
         SbPattern.bossDamagePattern,
         SbPattern.slayerQuestPattern,
@@ -114,7 +127,7 @@ object UnknownLinesHandler {
         SbPattern.wtfAreThoseLinesPattern,
         SbPattern.timeLeftPattern,
         SbPattern.darkAuctionCurrentItemPattern,
-        SbPattern.coldPattern,
+        MiningAPI.coldPattern,
         SbPattern.riftHotdogTitlePattern,
         SbPattern.riftHotdogEatenPattern,
         SbPattern.mineshaftNotStartedPattern,
@@ -148,7 +161,6 @@ object UnknownLinesHandler {
             patternsToExclude.addAll(remoteOnlyPatterns)
             remoteOnlyPatternsAdded = true
         }
-
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
         }
@@ -244,9 +256,10 @@ object UnknownLinesHandler {
     }
 
     private fun warn(line: String, reason: String) {
+        if (!CustomScoreboard.config.unknownLinesWarning) return
         ErrorManager.logErrorWithData(
-            // line inclucded in chat message to not cache a previous message
-            CustomScoreboardUtils.UndetectedScoreboardLines(line),
+            // line included in chat message to not cache a previous message
+            Exception(line),
             "CustomScoreboard detected a unknown line: '$line'",
             "Unknown Line" to line,
             "reason" to reason,

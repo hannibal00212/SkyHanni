@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,7 +11,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -31,7 +29,6 @@ object GuardianReminder {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private var lastInventoryOpen = SimpleTimeMark.farPast()
-    private var lastWarn = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -44,10 +41,7 @@ object GuardianReminder {
     }
 
     private fun warn() {
-        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
-
-        if (lastWarn.passedSince() < 5.seconds) return
-        lastWarn = SimpleTimeMark.now()
+        if (ExperimentationTableAPI.hasGuardianPet()) return
 
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
@@ -62,6 +56,7 @@ object GuardianReminder {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
+        if (ExperimentationTableAPI.hasGuardianPet()) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         sendTitle(gui.width, gui.height)

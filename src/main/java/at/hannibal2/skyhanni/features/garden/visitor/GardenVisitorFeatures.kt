@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
@@ -176,6 +177,8 @@ object GardenVisitorFeatures {
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
 
+            if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
+
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
                 newVisitors.add(visitorName)
@@ -252,7 +255,7 @@ object GardenVisitorFeatures {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
-            ?.ingredients ?: emptySet()
+            ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
@@ -336,7 +339,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackUpdate(event: SackDataUpdateEvent) {
         update()
     }
@@ -582,7 +585,9 @@ object GardenVisitorFeatures {
                 }
             }
 
-            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) && entity is EntityLivingBase) {
+            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) &&
+                entity is EntityLivingBase
+            ) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(

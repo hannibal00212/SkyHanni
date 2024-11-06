@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -36,7 +36,7 @@ object PetNametag {
             val lvl = group("lvl").formatInt()
             val rarity = group("rarity")
             val pet = group("pet")
-            val skin = groupOrNull("skin") ?: ""
+            val skin = groupOrEmpty("skin")
 
             val hideLevel = config.hidePetLevel
             val hideMaxLevel = config.hideMaxPetLevel && (lvl == 100 || lvl == 200)

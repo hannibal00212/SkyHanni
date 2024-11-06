@@ -57,7 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenNextJacobContest {
 
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
@@ -565,7 +565,10 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                ChatUtils.chat(
+                    "This year's contests aren't available to fetch automatically yet, " +
+                        "please load them from your calendar or wait 10 minutes."
+                )
                 ChatUtils.clickableChat(
                     "Click here to open your calendar!",
                     onClick = { HypixelCommands.calendar() },

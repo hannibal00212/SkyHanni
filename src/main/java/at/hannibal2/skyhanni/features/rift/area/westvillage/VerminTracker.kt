@@ -106,7 +106,7 @@ object VerminTracker {
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
             .firstOrNull { it.getInternalName() == TURBOMAX_VACUUM }
-            ?.getLore() ?: emptyList()
+            ?.getLore().orEmpty()
 
         val binCounts = countVermin(bin, verminBinPattern)
         VerminType.entries.forEach { setVermin(it, binCounts[it] ?: 0) }

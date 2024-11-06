@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -9,8 +8,6 @@ import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
 abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
-
-    private val config get() = SkyHanniMod.feature.misc.tracker
 
     abstract fun resetItems()
 

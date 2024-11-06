@@ -72,7 +72,10 @@ object ShowMotesNpcSellPrice {
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
-            event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes §7($size x §d${(baseMotes / size).addSeparators()} Motes§7)")
+            event.toolTip.add(
+                "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
+                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)"
+            )
         } else {
             event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes")
         }

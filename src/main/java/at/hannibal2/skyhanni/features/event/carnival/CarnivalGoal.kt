@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,7 +24,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
-private val repoGroup = RepoPattern.group("carnvial.goals")
+private val patternGroup = RepoPattern.group("event.carnival.goals")
 
 enum class CarnivalGoal(
     private val type: GoalType,
@@ -124,8 +126,8 @@ enum class CarnivalGoal(
 
     private val patternKeyName = name.lowercase().replace("_", ".")
 
-    private val lorePattern by repoGroup.pattern("lore.$patternKeyName", loreLine)
-    private val chatPattern by repoGroup.pattern("chat.$patternKeyName", chatLine)
+    private val lorePattern by patternGroup.pattern("lore.$patternKeyName", loreLine)
+    private val chatPattern by patternGroup.pattern("chat.$patternKeyName", chatLine)
 
     private var isReached: Boolean
         get() {
@@ -159,9 +161,9 @@ enum class CarnivalGoal(
         private val config get() = SkyHanniMod.feature.event.carnival
         private val storage get() = ProfileStorageData.profileSpecific?.carnival
 
-        private val inventoryPattern by repoGroup.pattern("inventory", "Carnival Goals")
+        private val inventoryPattern by patternGroup.pattern("inventory", "Carnival Goals")
 
-        private val completePattern by repoGroup.pattern("complete", "§a§lCOMPLETE")
+        private val completePattern by patternGroup.pattern("complete", "§a§lCOMPLETE")
 
         private var dirty = true
 
@@ -192,6 +194,7 @@ enum class CarnivalGoal(
         }
 
         private var display = emptyList<Renderable>()
+        private var inCarnival = false
 
         @SubscribeEvent
         fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -205,8 +208,13 @@ enum class CarnivalGoal(
             config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }
 
+        @HandleEvent
+        fun onAreaChange(event: GraphAreaChangeEvent) {
+            inCarnival = event.area == "Carnival"
+        }
+
         fun isEnabled() =
-            LorenzUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && LorenzUtils.skyBlockArea == "Carnival"
+            LorenzUtils.inSkyBlock && config.showGoals && Perk.CHIVALROUS_CARNIVAL.isActive && inCarnival
 
         private enum class GoalType(val item: Item, display: String) {
             FRUIT_DIGGING(Item.getItemFromBlock(Blocks.sand), "§6Fruit Digging"),
@@ -232,5 +240,4 @@ enum class CarnivalGoal(
             val getGoals get() = CarnivalGoal.entries.filter { it.type == this }
         }
     }
-
 }

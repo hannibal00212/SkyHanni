@@ -159,13 +159,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.postAndCatch()
         }
         return isVisible
     }
@@ -353,11 +355,12 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-                {
-                    shouldClear.set(true)
-                    allEntitiesViaPacketId.clear()
-                }
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
+                shouldClear.set(true)
+                allEntitiesViaPacketId.clear()
+            }
         }
     }
 

@@ -360,12 +360,9 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun isEnabled() = (
-        config.display && (
-            OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
-            ) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
-        )
+    private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
+    private fun outsideEnabled() = OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
+    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenAPI.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
 

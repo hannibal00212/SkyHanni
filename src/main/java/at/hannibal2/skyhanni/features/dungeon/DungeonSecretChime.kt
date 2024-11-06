@@ -24,8 +24,7 @@ object DungeonSecretChime {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        val isWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
-        if (isWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonAPI.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         when (event.blockType) {
             ClickedBlockType.CHEST,

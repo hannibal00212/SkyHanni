@@ -119,8 +119,8 @@ object Translator {
         sourceLanguage: String = "auto",
     ): Array<String>? {
         // TODO add &dj=1 to use named json
-        val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=" +
-            URLEncoder.encode(message, "UTF-8")
+        val encode = URLEncoder.encode(message, "UTF-8")
+        val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 
         var messageToSend = ""
         val fullResponse = getJSONResponse(url).asJsonArray

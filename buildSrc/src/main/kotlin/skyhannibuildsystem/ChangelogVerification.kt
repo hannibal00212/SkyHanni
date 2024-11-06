@@ -25,7 +25,7 @@ abstract class ChangelogVerification : DefaultTask() {
     val prBodyLines get() = prBody.lines()
 
     private val prLink = "ignored"
-    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md"
+    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md?plain=1"
 
     @TaskAction
     fun scanChangelog() {
@@ -45,6 +45,7 @@ abstract class ChangelogVerification : DefaultTask() {
 
             // Export errors so that they can be listed in the PR comment
             val errorFile = File(outputDirectory.get().asFile, "changelog_errors.txt")
+            println("saved error file to: ${errorFile.path}")
 
             errorFile.appendText("I have detected some issues with your pull request:\n\n")
 

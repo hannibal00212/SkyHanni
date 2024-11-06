@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -149,7 +149,7 @@ object TunnelsMaps {
 
     /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
+        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) }.orEmpty()
     }
 
     private var clickTranslate = mapOf<Int, String>()
@@ -367,7 +367,7 @@ object TunnelsMaps {
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
         Renderable.string(
-            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + (
+            (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
                 ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
@@ -502,8 +502,8 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
-    fun onLorenzWarp(event: LorenzWarpEvent) {
+    @HandleEvent
+    fun onWarp(event: SkyHanniWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {
             DelayedRun.runNextTick {
