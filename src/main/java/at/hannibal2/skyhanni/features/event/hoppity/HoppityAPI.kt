@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
@@ -48,6 +50,7 @@ object HoppityAPI {
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    private var inMiscProcessInventory = false
     private val processedSlots = mutableListOf<Int>()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
@@ -112,6 +115,16 @@ object HoppityAPI {
         "§eClick to claim!",
     )
 
+    /**
+     * REGEX-TEST: Chocolate Factory
+     * REGEX-TEST: Chocolate Shop Milestones
+     * REGEX-TEST: Chocolate Factory Milestones
+     */
+    private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "inventory.misc",
+        "(?:§.)*Chocolate (?:Shop |Factory ?)(?:Milestones)?",
+    )
+
     private fun addProcessedSlot(slot: Slot) {
         processedSlots.add(slot.slotNumber)
         DelayedRun.runDelayed(5.seconds) { // Assume we caught it on the first 'frame', so we can remove it after 5 seconds.
@@ -163,6 +176,16 @@ object HoppityAPI {
         }
     }
 
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        inMiscProcessInventory = miscProcessInvPattern.matches(event.inventoryName)
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inMiscProcessInventory = false
+    }
+
     private fun shouldProcessMiscSlot(slot: Slot) =
         // Don't process the same slot twice.
         !processedSlots.contains(slot.slotNumber) &&
@@ -172,6 +195,7 @@ object HoppityAPI {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!inMiscProcessInventory) return
         val slot = event.slot ?: return
         val index = slot.slotIndex.takeIf { it != -999 } ?: return
         if (!shouldProcessMiscSlot(slot)) return
