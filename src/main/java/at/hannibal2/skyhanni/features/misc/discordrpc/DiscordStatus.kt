@@ -321,7 +321,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             } else {
                 val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
                 val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
-                val time = DungeonAPI.getTime()
+                val time = DungeonAPI.time
                 "$floor Kills: $amountKills ($time)"
             }
         }

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -44,6 +44,12 @@ object TheGreatSpook {
     private var displayGreatSpookEnd: Renderable? = null
 
     private var timeUntilNextMob = SimpleTimeMark.farPast()
+
+    private val publicSpeakingSolutions = CircularList(
+        "I looove SkyHanni!",
+        "Do you know SkyHanni? A cool mod for SkyBlock!",
+        "Today is a good day to kill Spooky monsters.",
+    )
 
     private val patternGroup = RepoPattern.group("event.greatspook")
 
@@ -91,7 +97,7 @@ object TheGreatSpook {
         }
         displayMobCooldown = Renderable.string(mobCooldownString)
 
-        if (config.primalFearNotification && mobCooldown.isInFuture()) {
+        if (config.primalFearNotification && mobCooldown.isInPast()) {
             SoundUtils.playPlingSound()
         }
 
@@ -168,9 +174,9 @@ object TheGreatSpook {
             return
         }
         ChatUtils.clickToActionOrDisable(
-            "The answer is §b$answer§e.",
+            "The answer is: §b$answer§e.",
             config.primalFearSolver::math,
-            actionName = "Send the answer",
+            actionName = "send the answer",
             action = {
                 HypixelCommands.allChat(answer.toString())
             },
@@ -178,13 +184,15 @@ object TheGreatSpook {
     }
 
     private fun publicSpeakingSolver() {
+        val solution = publicSpeakingSolutions.next()
         ChatUtils.clickToActionOrDisable(
-            "Solving Public Speak puzzle for you.",
+            "Solving Public Speaking puzzle for you.",
             config.primalFearSolver::publicSpeaking,
-            actionName = "send a random string.",
+            actionName = "send a random string",
             action = {
-                HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
+                HypixelCommands.allChat(solution)
             },
+            oneTimeClick = true
         )
     }
 
