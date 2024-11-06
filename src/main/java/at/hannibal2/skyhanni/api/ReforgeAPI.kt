@@ -201,7 +201,7 @@ object ReforgeAPI {
         return Reforge(
             name = it.reforgeName,
             type = LorenzUtils.enumValueOf<ReforgeType>(type.first),
-            stats = it.reforgeStats ?: emptyMap(),
+            stats = it.reforgeStats.orEmpty(),
             reforgeStone = it.internalName,
             specialItems = type.second.takeIf { it.isNotEmpty() },
             extraProperty = it.reforgeAbility,

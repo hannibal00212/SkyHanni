@@ -18,6 +18,7 @@ val forgeEvent = "SubscribeEvent"
 val handleEvent = "HandleEvent"
 val skyHanniModule = "SkyHanniModule"
 
+val skyhanniPath = "at.hannibal2.skyhanni"
 val patternGroup = "at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup"
 val pattern = "java.util.regex.Pattern"
 
@@ -36,12 +37,17 @@ fun isRepoPattern(property: KtProperty): Boolean {
     return false
 }
 
+fun isFromSkyhanni(declaration: KtNamedDeclaration): Boolean {
+    return declaration.fqName?.asString()?.startsWith(skyhanniPath) ?: false
+}
+
 class ModuleInspectionKotlin : AbstractKotlinInspection() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
 
         val visitor = object : KtVisitorVoid() {
 
             override fun visitClass(klass: KtClass) {
+                if (!isFromSkyhanni(klass)) return
                 val hasAnnotation = klass.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
 
                 if (hasAnnotation) {
@@ -54,6 +60,7 @@ class ModuleInspectionKotlin : AbstractKotlinInspection() {
             }
 
             override fun visitObjectDeclaration(declaration: KtObjectDeclaration) {
+                if (!isFromSkyhanni(declaration)) return
                 val hasAnnotation = declaration.annotationEntries.any { it.shortName?.asString() == skyHanniModule }
                 if (hasAnnotation) return
 

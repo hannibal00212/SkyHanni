@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,6 +22,7 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
     @SubscribeEvent
@@ -45,24 +45,30 @@ object ChocolateFactoryTimeTowerManager {
 
         if (ChocolateFactoryAPI.inChocolateFactory) return
 
-        val nextCharge = profileStorage.nextTimeTower
+        if (timeTowerFullTimeMark().isInPast()) {
+            profileStorage.currentTimeTowerUses = maxCharges()
+        } else {
+            var nextCharge = profileStorage.nextTimeTower
+            while (nextCharge.isInPast() && !nextCharge.isFarPast()) {
+                profileStorage.currentTimeTowerUses++
+                nextCharge += ChocolateFactoryAPI.timeTowerChargeDuration()
+                profileStorage.nextTimeTower = nextCharge
+                warnAboutNewCharge = true
+            }
+        }
 
-        if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
-            profileStorage.currentTimeTowerUses++
-
-            val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
-            profileStorage.nextTimeTower = nextTimeTower
-
+        if (currentCharges() > 0 && currentCharges() < maxCharges()) {
             if (!config.timeTowerWarning || timeTowerActive()) return
+            if (!warnAboutNewCharge) return
             ChatUtils.clickableChat(
-                "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
+                "Your Time Tower has an available charge §7(${timeTowerCharges()})§e. " +
                     "Click here to use one.",
                 onClick = { HypixelCommands.chocolateFactory() },
                 HOVER_TEXT,
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
-            return
+            warnAboutNewCharge = false
         }
         checkTimeTowerWarning(false)
     }

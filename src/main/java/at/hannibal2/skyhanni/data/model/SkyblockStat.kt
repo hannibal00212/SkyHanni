@@ -18,12 +18,13 @@ import java.util.EnumMap
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
+@Suppress("MaxLineLength")
 enum class SkyblockStat(
     val icon: String,
     @Language("RegExp") tabListPatternS: String,
     @Language("RegExp") menuPatternS: String,
 ) {
-    DAMAGE("§c❁", "", ""),  // Weapon only
+    DAMAGE("§c❁", "", ""), // Weapon only
     HEALTH("§c❤", " Health: §r§c❤(?<value>.*)", " §c❤ Health §f(?<value>.*)"), // TODO get from action bar
     DEFENSE("§a❈", " Defense: §r§a❈(?<value>.*)", " §a❈ Defense §f(?<value>.*)"), // TODO get from action bar
     STRENGTH("§c❁", " Strength: §r§c❁(?<value>.*)", " §c❁ Strength §f(?<value>.*)"),
@@ -62,7 +63,7 @@ enum class SkyblockStat(
     FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>.*)", " §6☘ Foraging Fortune §f(?<value>.*)"),
     FARMING_FORTUNE("§6☘", " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>.*)", " (?:§7§m|§6)☘ Farming Fortune (?:§f)?(?<value>.*)"),
     MINING_FORTUNE("§6☘", " Mining Fortune: §r§6☘(?<value>.*)", " §6☘ Mining Fortune §f(?<value>.*)"),
-    FEAR("§a☠", "", ""), // Skyblock does not like fear. It only shows during Great Spook, therefore no Data.
+    FEAR("§5☠", " Fear: §r§5☠(?<value>.*)", " §5☠ Fear §f(?<value>.*)"),
     COLD_RESISTANCE("§b❄", " Cold Resistance: §r§b❄(?<value>.*)", ""),
     WHEAT_FORTUNE("§7☘", "", " §7(?:§m)☘ Wheat Fortune (?<value>.*)"),
     CARROT_FORTUNE("§7☘", "", " §7(?:§m)☘ Carrot Fortune (?<value>.*)"),
@@ -86,8 +87,8 @@ enum class SkyblockStat(
     UNKNOWN("§c?", "", "")
     ;
 
-    var lastKnownValue: Double
-        get() = ProfileStorageData.profileSpecific?.stats?.get(this) ?: 0.0
+    var lastKnownValue: Double?
+        get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
@@ -100,7 +101,7 @@ enum class SkyblockStat(
 
     val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = icon + lastKnownValue.roundToInt()
+    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
@@ -137,7 +138,7 @@ enum class SkyblockStat(
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
             if (event.inventoryName != "SkyBlock Menu") return
             val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getLore() ?: return
-            DelayedRun.runNextTick {  // Delayed to not impact opening time
+            DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }
             }
         }
@@ -148,7 +149,7 @@ enum class SkyblockStat(
             if (event.inventoryName != "Your Equipment and Stats") return
             val list = statsMenuRelevantSlotIndexes.mapNotNull { event.inventoryItems[it]?.getLore() }.flatten()
             if (list.isEmpty()) return
-            DelayedRun.runNextTick {  // Delayed to not impact opening time
+            DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
             }
         }

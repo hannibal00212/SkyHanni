@@ -51,6 +51,8 @@ object AuctionHouseOpenPriceWebsite {
     private fun createDisplayItem() = ItemUtils.createItemStack(
         "PAPER".asInternalName().getItemStack().item,
         "§bPrice History",
+        "§8(From SkyHanni)",
+        "",
         "§7Click here to open",
         "§7the price history",
         "§7of §e$searchTerm",

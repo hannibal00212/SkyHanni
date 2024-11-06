@@ -58,16 +58,17 @@ object CosmeticFollowingLine {
         val last2 = locations.keys.toList().takeLast(2)
 
         locations.keys.zipWithNext { a, b ->
-            val locationSpot = locations[b]!!
-            if (firstPerson && !locationSpot.onGround && b in last7) {
-                // Do not render the line in the face, keep more distance while the line is in the air
-                return
+            locations[b]?.let {
+                if (firstPerson && !it.onGround && b in last7) {
+                    // Do not render the line in the face, keep more distance while the line is in the air
+                    return
+                }
+                if (b in last2 && it.time.passedSince() < 400.milliseconds) {
+                    // Do not render the line directly next to the player, prevent laggy design
+                    return
+                }
+                event.draw3DLine(a, b, color, it.getWidth(), !config.behindBlocks)
             }
-            if (b in last2 && locationSpot.time.passedSince() < 400.milliseconds) {
-                // Do not render the line directly next to the player, prevent laggy design
-                return
-            }
-            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }
     }
 
@@ -86,8 +87,9 @@ object CosmeticFollowingLine {
 
 
         latestLocations.keys.zipWithNext { a, b ->
-            val locationSpot = latestLocations[b]!!
-            event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
+            latestLocations[b]?.let {
+                event.draw3DLine(a, b, color, it.getWidth(), !config.behindBlocks)
+            }
         }
     }
 

@@ -104,11 +104,6 @@ object MobData {
     }
 
     @SubscribeEvent
-    fun onMobFirstSeen(event: MobEvent.FirstSeen) {
-        notSeenMobs.remove(event.mob)
-    }
-
-    @SubscribeEvent
     fun onSkyblockMobSpawnEvent(event: MobEvent.Spawn.SkyblockMob) {
         skyblockMobs.add(event.mob)
     }

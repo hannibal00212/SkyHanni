@@ -55,6 +55,7 @@ object PlayerTabComplete {
                 parent("kick", "demote", "promote", "transfer") { add(partyMembersEntry) }
                 literal("chat", "disband", "kickoffline", "leave", "list", "mute", "poll", "private", "settings", "warp")
             }
+            add(getExcluding(PlayerCategory.PARTY))
         }
 
         parent("w", "msg", "tell", "boop") { add(getExcluding()) }
@@ -99,7 +100,9 @@ object PlayerTabComplete {
 
     private fun lazyEntry(getter: () -> List<String>) = LazySuggestionEntry { addAll(getter()) }
 
-    fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf { it.isNotEmpty() }?.distinct()
+    fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf {
+        it.isNotEmpty()
+    }?.distinct()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

@@ -189,12 +189,18 @@ object GardenAPI {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
     }
 
-    fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory ||
-        FFGuideGUI.isInGui() || ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||
-        ChocolateFactoryAPI.chocolateFactoryPaused || HoppityCollectionStats.inInventory
+    fun hideExtraGuis() = ComposterOverlay.inInventory ||
+        AnitaMedalProfit.inInventory ||
+        SkyMartCopperPrice.inInventory ||
+        FarmingContestAPI.inInventory ||
+        VisitorAPI.inInventory ||
+        FFGuideGUI.isInGui() ||
+        ChocolateShopPrice.inInventory ||
+        ChocolateFactoryAPI.inChocolateFactory ||
+        ChocolateFactoryAPI.chocolateFactoryPaused ||
+        HoppityCollectionStats.inInventory
 
-    fun clearCropSpeed() {
+    fun resetCropSpeed() {
         storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()

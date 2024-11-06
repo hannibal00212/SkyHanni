@@ -175,9 +175,8 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                {
-                    HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL")
-                }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") },
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(
@@ -252,6 +251,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern
             )
+            @Suppress("MaxLineLength")
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",

@@ -29,9 +29,8 @@ object GardenPlotMenuHighlighting {
             val list = mutableListOf<PlotStatusType>()
             val plot = GardenPlotAPI.plots.find { it.inventorySlot == slot.slotIndex } ?: continue
 
-            val (pestsEnabled, spraysEnabled, locksEnabled, currentEnabled, pastesEnabled) = PlotStatusType.entries.map {
-                it in config.deskPlotStatusTypes
-            }
+            val (pestsEnabled, spraysEnabled, locksEnabled, currentEnabled, pastesEnabled) =
+                PlotStatusType.entries.map { it in config.deskPlotStatusTypes }
 
             if (plot.pests >= 1 && pestsEnabled) list.add(PlotStatusType.PESTS)
             if (plot.currentSpray != null && spraysEnabled) list.add(PlotStatusType.SPRAYS)

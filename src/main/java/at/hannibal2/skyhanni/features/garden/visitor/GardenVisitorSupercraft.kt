@@ -35,6 +35,8 @@ object GardenVisitorSupercraft {
         ItemUtils.createItemStack(
             neuItem.item,
             "§bSuper Craft",
+            "§8(From SkyHanni)",
+            "",
             "§7You have the items to craft",
             "§7Click me to open the super crafter!",
         )

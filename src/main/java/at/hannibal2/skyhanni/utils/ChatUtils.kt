@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -45,8 +44,11 @@ object ChatUtils {
      *
      * @see DEBUG_PREFIX
      */
-    fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+    fun debug(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }
@@ -59,8 +61,11 @@ object ChatUtils {
      *
      * @see USER_ERROR_PREFIX
      */
-    fun userError(message: String) {
-        internalChat(USER_ERROR_PREFIX + message)
+    fun userError(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        internalChat(USER_ERROR_PREFIX + message, replaceSameMessage)
     }
 
     /**
@@ -68,22 +73,39 @@ object ChatUtils {
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun chat(
+        message: String,
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
+    ) {
+
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
         } else {
-            internalChat(message)
+            internalChat(message, replaceSameMessage)
         }
     }
 
-    private fun internalChat(message: String): Boolean {
-        return chat(ChatComponentText(message))
+    private fun internalChat(
+        message: String,
+        replaceSameMessage: Boolean,
+    ): Boolean {
+        val text = ChatComponentText(message)
+
+        return if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+            chat(text, false)
+        } else {
+            chat(text)
+        }
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -99,7 +121,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
@@ -129,9 +151,9 @@ object ChatUtils {
 
         val rawText = msgPrefix + message
         val text = Text.text(rawText) {
-                this.onClick(expireAt, oneTimeClick, onClick)
-                this.hover = hover.asComponent()
-            }
+            this.onClick(expireAt, oneTimeClick, onClick)
+            this.hover = hover.asComponent()
+        }
         if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(rawText))
         } else {
@@ -172,7 +194,7 @@ object ChatUtils {
                 if (command != null) {
                     this.command = command
                 }
-            }
+            },
         )
     }
 
@@ -200,7 +222,7 @@ object ChatUtils {
             Text.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
-            }
+            },
         )
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -254,8 +276,9 @@ object ChatUtils {
         sendMessageToServer("/$command")
     }
 
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
+        it.isNotEmpty()
+    }?.get(0) == commandWithSlash
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
@@ -269,7 +292,7 @@ object ChatUtils {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
-            "§eClick to find setting in the config!"
+            "§eClick to find setting in the config!",
         )
     }
 
@@ -280,8 +303,13 @@ object ChatUtils {
         return this
     }
 
-
-    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+    fun clickToActionOrDisable(
+        message: String,
+        option: KMutableProperty0<*>,
+        actionName: String,
+        action: () -> Unit,
+        oneTimeClick: Boolean = false,
+    ) {
         clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
@@ -291,8 +319,8 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n" +
-                "§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
     }

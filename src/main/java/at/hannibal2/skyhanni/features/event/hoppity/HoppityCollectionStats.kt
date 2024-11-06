@@ -223,7 +223,7 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else ItemStack(Items.dye, 8)
+            ) else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
             newItemStack.setStackDisplayName(stack.displayName)
@@ -520,9 +520,9 @@ object HoppityCollectionStats {
     }
 
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun clearSavedRabbits() {
+    fun resetSavedRabbits() {
         loggedRabbits.clear()
-        ChatUtils.chat("Cleared saved rabbit data.")
+        ChatUtils.chat("Reset saved rabbit data.")
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)

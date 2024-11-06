@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -105,7 +106,10 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".asInternalName() }
+    private val COMPOST by lazy { "COMPOST".toInternalName() }
+    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
+    private val VOLTA by lazy { "VOLTA".toInternalName() }
+    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -386,7 +390,7 @@ object ComposterOverlay {
         bigList: MutableList<List<Any>>,
         factors: Map<NEUInternalName, Double>,
         missing: Double,
-        testOffset_: Int = 0,
+        testOffsetRec: Int = 0,
         onClick: (NEUInternalName) -> Unit,
     ): NEUInternalName {
         val map = mutableMapOf<NEUInternalName, Double>()
@@ -394,11 +398,11 @@ object ComposterOverlay {
             map[internalName] = factor / getPrice(internalName)
         }
 
-        val testOffset = if (testOffset_ > map.size) {
+        val testOffset = if (testOffsetRec > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
-        } else testOffset_
+        } else testOffsetRec
 
         val first: NEUInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
         if (testOffset != 0) {
@@ -481,7 +485,7 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")
+            !LorenzUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -496,8 +500,7 @@ object ComposterOverlay {
             HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
-            val isDwarvenMineable =
-                internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
+            val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
@@ -535,7 +538,7 @@ object ComposterOverlay {
 
     private fun getPrice(internalName: NEUInternalName): Double {
         val price = internalName.getPrice(config.priceSource)
-        if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
+        if (internalName == BIOFUEL && price > 20_000) return 20_000.0
 
         return price
     }

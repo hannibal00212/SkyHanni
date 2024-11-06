@@ -266,11 +266,10 @@ object SackDisplay {
         var totalPrice = 0L
         val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
-            val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table[
                 buildList {
                     addString(" §7- ")
-                    addItemStack(internalName)
+                    addItemStack(gem.internalName)
                     add(
                         Renderable.optionalLink(
                             name,
@@ -280,10 +279,10 @@ object SackDisplay {
                             highlightsOnHoverSlots = listOf(gem.slot)
                         ) { !NEUItems.neuHasFocus() }
                     )
-                    addAlignedNumber(rough.addSeparators())
-                    addAlignedNumber("§a${flawed.addSeparators()}")
-                    addAlignedNumber("§9${fine.addSeparators()}")
-                    val price = roughprice + flawedprice + fineprice
+                    addAlignedNumber(gem.rough.addSeparators())
+                    addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                    addAlignedNumber("§9${gem.fine.addSeparators()}")
+                    val price = gem.priceSum
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
                 }

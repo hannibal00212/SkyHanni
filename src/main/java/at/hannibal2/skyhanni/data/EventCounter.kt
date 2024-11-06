@@ -15,7 +15,7 @@ object EventCounter {
 
     private val config get() = SkyHanniMod.feature.dev.debug
 
-    private var map = mutableMapOf<String, Int>()
+    private val map = mutableMapOf<String, Int>()
     private var lastUpdate = SimpleTimeMark.farPast()
 
     private var enabled = false

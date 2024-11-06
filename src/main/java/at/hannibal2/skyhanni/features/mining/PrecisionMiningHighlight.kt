@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -31,7 +31,8 @@ object PrecisionMiningHighlight {
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
-            !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown) return
+            !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown
+        ) return
 
         val mouseOverObject = Minecraft.getMinecraft().objectMouseOver
         if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
@@ -52,7 +53,7 @@ object PrecisionMiningHighlight {
     fun onRender(event: LorenzRenderWorldEvent) {
         val particleBoundingBox = lastParticle ?: return
 
-        event.drawFilledBoundingBox_nea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
+        event.drawFilledBoundingBoxNea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
     }
 
     @SubscribeEvent
