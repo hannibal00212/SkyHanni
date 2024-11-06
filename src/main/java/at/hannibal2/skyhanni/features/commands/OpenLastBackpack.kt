@@ -16,12 +16,14 @@ object OpenLastBackpack {
         if (event.senderIsSkyhanni()) return
 
         if (!event.message.startsWith("/backpack", ignoreCase = true) &&
-            !event.message.startsWith("/bp", ignoreCase = true)) {
+            !event.message.startsWith("/bp", ignoreCase = true)
+        ) {
             return
         }
 
         if (event.message.startsWith("/backpack -", ignoreCase = true) ||
-            event.message.startsWith("/bp -", ignoreCase = true)) {
+            event.message.startsWith("/bp -", ignoreCase = true)
+        ) {
             event.isCanceled = true
             if (lastBackpack == -1) {
                 ChatUtils.chat("There is no previous backpack to reopen!")
