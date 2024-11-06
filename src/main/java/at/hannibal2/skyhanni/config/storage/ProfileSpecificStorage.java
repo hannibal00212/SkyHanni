@@ -49,7 +49,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
+import at.hannibal2.skyhanni.utils.StaticDurations;
 import com.google.gson.annotations.Expose;
+import kotlin.time.Duration;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,6 +66,10 @@ public class ProfileSpecificStorage {
 
     private static SimpleTimeMark SimpleTimeMarkFarPast() {
         return GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
+    }
+
+    private static Duration DurationZero() {
+        return GenericWrapper.getDuration(StaticDurations.getZero()).getIt();
     }
 
     @Expose
@@ -778,9 +784,8 @@ public class ProfileSpecificStorage {
         @Expose
         public long strayChocolateGained = 0;
 
-        // Todo: Convert to Duration
         @Expose
-        public long millisInCf = 0;
+        public Duration millisInCf = DurationZero();
 
         @Expose
         public int rabbitTheFishFinds = 0;

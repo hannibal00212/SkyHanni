@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
 
-    private val locatorItem = "EGGLOCATOR".asInternalName()
+    val locatorItem = "EGGLOCATOR".asInternalName()
 
     private var lastParticlePosition: LorenzVec? = null
     private var lastParticlePositionForever: LorenzVec? = null

@@ -49,6 +49,7 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityEventSummary {
@@ -76,7 +77,7 @@ object HoppityEventSummary {
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private fun isEggLocatorOverridden(): Boolean =
-        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId.equals("EGGLOCATOR")
+        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
 
     private fun liveDisplayEnabled(): Boolean {
         val storage = storage ?: return false
@@ -88,6 +89,8 @@ object HoppityEventSummary {
     }
 
     private data class StatString(val string: String, val headed: Boolean = true)
+    private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) =
+        this.add(StatString(string, headed))
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -325,10 +328,13 @@ object HoppityEventSummary {
     }
 
     private fun checkAddCfTime() {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) {
+            lastAddedCfMillis = SimpleTimeMark.farPast()
+            return
+        }
         val stats = getYearStats().first ?: return
         lastAddedCfMillis.takeIfInitialized()?.let {
-            stats.millisInCf += (SimpleTimeMark.now().toMillis() - it.toMillis())
+            stats.millisInCf += it.passedSince()
         }
         lastAddedCfMillis = SimpleTimeMark.now()
     }
@@ -391,69 +397,69 @@ object HoppityEventSummary {
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
-            put(HoppityStat.MEAL_EGGS_FOUND) { sl, stats, year ->
+            put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
                 stats.getEggsFoundFormat(year).takeIf { it != null }?.let {
-                    sl.add(StatString(it))
+                    statList.addStr(it)
                 }
             }
 
-            put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { sl, stats, _ ->
+            put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
                 stats.mealsFound[HoppityEggType.BOUGHT]?.let {
-                    sl.add(StatString("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7."))
+                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
+                    statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
                 }
             }
 
-            put(HoppityStat.SIDE_DISH_EGGS) { sl, stats, _ ->
+            put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
                 stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
-                    sl.add(
-                        StatString(
-                            "§7You found §b$it §6§lSide Dish ${StringUtils.pluralize(it, "Egg")} " +
-                                "§r§7in the §6Chocolate Factory§7.",
-                        ),
-                    )
+                    val eggFormat = StringUtils.pluralize(it, "Egg")
+                    statList.addStr("§7You found §b$it §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
                 }
             }
 
-            put(HoppityStat.MILESTONE_RABBITS) { sl, stats, _ ->
+            put(HoppityStat.MILESTONE_RABBITS) { statList, stats, _ ->
                 stats.getMilestoneCount().takeIf { it > 0 }?.let {
-                    sl.add(StatString("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7."))
+                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
+                    statList.addStr("§7You claimed §b$it §6§lMilestone $rabbitFormat§7.")
                 }
             }
 
-            put(HoppityStat.NEW_RABBITS) { sl, stats, _ ->
+            put(HoppityStat.NEW_RABBITS) { statList, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
-                    sl.add(StatString(it))
+                    statList.addStr(it)
                 }
             }
 
-            put(HoppityStat.DUPLICATE_RABBITS) { sl, stats, _ ->
+            put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
-                    sl.add(StatString(it))
+                    statList.addStr(it)
                 }
-                sl.addExtraChocFormatLine(stats.dupeChocolateGained)
+                statList.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
-            put(HoppityStat.STRAY_RABBITS) { sl, stats, _ ->
+            put(HoppityStat.STRAY_RABBITS) { statList, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
-                    sl.add(StatString(it))
+                    statList.addStr(it)
                 }
-                sl.addExtraChocFormatLine(stats.strayChocolateGained)
+                statList.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
-            put(HoppityStat.TIME_IN_CF) { sl, stats, _ ->
-                val cfTimeFormat = stats.millisInCf.milliseconds.format(maxUnits = 2)
-                sl.add(StatString("§7You spent §b$cfTimeFormat §7in the §6Chocolate Factory§7."))
+            put(HoppityStat.TIME_IN_CF) { statList, stats, _ ->
+                stats.millisInCf.takeIf { it > 0.seconds }?.let {
+                    val cfTimeFormat = it.format(maxUnits = 2)
+                    statList.addStr("§7You spent §b$cfTimeFormat §7in the §6Chocolate Factory§7.")
+                }
             }
 
-            put(HoppityStat.RABBIT_THE_FISH_FINDS) { sl, stats, _ ->
+            put(HoppityStat.RABBIT_THE_FISH_FINDS) { statList, stats, _ ->
                 stats.rabbitTheFishFinds.takeIf { it > 0 }?.let {
                     val timesFormat = StringUtils.pluralize(it, "time")
                     val eggsFormat = StringUtils.pluralize(it, "Egg")
-                    sl.add(StatString("§7You found §cRabbit the Fish §7in Meal $eggsFormat §b$it §7$timesFormat."))
+                    statList.addStr("§7You found §cRabbit the Fish §7in Meal $eggsFormat §b$it §7$timesFormat.")
                 }
             }
 
-            put(HoppityStat.LEADERBOARD_CHANGE) { sl, stats, _ ->
+            put(HoppityStat.LEADERBOARD_CHANGE) { statList, stats, _ ->
                 val initial = stats.initialLeaderboardPosition
                 val final = stats.finalLeaderboardPosition
                 if (
@@ -462,7 +468,7 @@ object HoppityEventSummary {
                     initial.position == final.position
                 ) return@put
                 getFullLeaderboardMessage(initial, final).forEach {
-                    sl.add(StatString(it))
+                    statList.addStr(it)
                 }
             }
 
