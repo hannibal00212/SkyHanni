@@ -148,7 +148,9 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        val change = event.sackChanges.firstOrNull { it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0 } ?: return
+        val change = event.sackChanges.firstOrNull {
+            it.internalName == EnderNode.MITE_GEL.internalName && it.delta > 0
+        } ?: return
 
         tracker.modify { storage ->
             storage.lootCount.addOrPut(EnderNode.MITE_GEL, change.delta)
@@ -268,7 +270,11 @@ object EnderNodeTracker {
         addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
-    private fun calculateEnderArmor(storage: Data) = storage.lootCount.filter { isEnderArmor(it.key) }.map { it.value }.sum()
+    private fun calculateEnderArmor(storage: Data) = storage.lootCount.filter {
+        isEnderArmor(it.key)
+    }.map {
+        it.value
+    }.sum()
 
     private fun formatDisplay(map: List<Searchable>): List<Searchable> {
         if (!ProfileStorageData.loaded) return emptyList()

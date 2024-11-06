@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
@@ -37,6 +38,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
+import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
@@ -101,6 +103,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public long currentChocolate = 0;
+
+        @Expose
+        public long maxChocolate = 0;
 
         @Expose
         public long chocolateThisPrestige = 0;
@@ -198,7 +203,14 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
+
+        @Expose
+        // shop name -> (item name, tier)
+        public Map<String, Map<String, Integer>> carnivalShopProgress = new HashMap<>();
     }
+
+    @Expose
+    public Map<SkyblockStat,Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
 
     @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
@@ -716,6 +728,9 @@ public class ProfileSpecificStorage {
         @Nullable
         public Integer currentSlot = null;
     }
+
+    @Expose
+    public DraconicSacrificeTracker.Data draconicSacrificeTracker = new DraconicSacrificeTracker.Data();
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;

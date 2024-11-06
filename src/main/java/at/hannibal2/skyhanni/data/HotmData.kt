@@ -447,6 +447,7 @@ enum class HotmData(
             "perk.enable",
             "§a§lENABLED|(§.)*SELECTED",
         )
+        @Suppress("UnusedPrivateProperty")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
@@ -530,7 +531,7 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
-            (0..CORE_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
+            for (level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
                 val map = mutableMapOf<HotmReward, Double>()
                 if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
                 if (level >= 2) map.addOrPut(HotmReward.ABILITY_LEVEL, 1.0)
@@ -679,7 +680,7 @@ enum class HotmData(
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            ScoreboardPattern.powderPattern.firstMatcher(event.scoreboard) {
+            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()

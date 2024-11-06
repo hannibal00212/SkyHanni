@@ -77,7 +77,7 @@ object HotmAPI {
 
         /** Use when new powder gets collected*/
         fun gain(difference: Long) {
-            ChatUtils.debug("Gained §a${difference.addSeparators()} §e$displayName Powder")
+            ChatUtils.debug("Gained §a${difference.addSeparators()} $color$displayName Powder")
             addTotal(difference)
             addCurrent(difference)
             PowderGainEvent(this, difference).post()

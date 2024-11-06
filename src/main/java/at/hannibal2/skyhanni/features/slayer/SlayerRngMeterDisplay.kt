@@ -217,7 +217,8 @@ object SlayerRngMeterDisplay {
 
         if (SlayerAPI.latestSlayerCategory.let {
                 it.endsWith(" I") || it.endsWith(" II")
-            }) {
+            }
+        ) {
             return ""
         }
         val latestSlayerCategory = SlayerAPI.latestSlayerCategory

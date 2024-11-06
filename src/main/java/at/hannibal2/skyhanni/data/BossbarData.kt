@@ -12,7 +12,7 @@ object BossbarData {
     private var bossbar: String? = null
     private var previousServerBossbar = ""
 
-    fun getBossbar() = bossbar ?: ""
+    fun getBossbar() = bossbar.orEmpty()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

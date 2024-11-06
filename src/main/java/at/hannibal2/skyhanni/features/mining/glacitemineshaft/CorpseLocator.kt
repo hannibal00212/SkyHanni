@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -48,7 +49,7 @@ object CorpseLocator {
                 entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
             }
             .forEach { entity ->
-                val helmetName = entity.getCurrentArmor(3)?.getInternalName() ?: return
+                val helmetName = entity.getStandHelmet()?.getInternalName() ?: return
                 val corpseType = MineshaftWaypointType.getByHelmetOrNull(helmetName) ?: return
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
@@ -59,7 +60,7 @@ object CorpseLocator {
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
-                            location = entity.getLorenzVec().add(y = 1),
+                            location = entity.getLorenzVec().up(),
                             isCorpse = true,
                         ),
                     )

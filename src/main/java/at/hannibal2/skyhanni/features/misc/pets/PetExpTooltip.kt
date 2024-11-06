@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -80,7 +81,7 @@ object PetExpTooltip {
         index = toolTip.indexOfFirst { it.contains("Progress to Level") }
         if (index != -1) {
 
-            val offset = if (isNeuExtendedExpEnabled) 4 else 3
+            val offset = if (PlatformUtils.isNeuLoaded() && isNeuExtendedExpEnabled) 4 else 3
             return index + offset
         }
 

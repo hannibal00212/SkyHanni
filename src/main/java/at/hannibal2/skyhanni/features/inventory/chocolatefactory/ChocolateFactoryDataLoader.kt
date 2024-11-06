@@ -51,6 +51,14 @@ object ChocolateFactoryDataLoader {
         "chocolate.thisprestige",
         "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)",
     )
+
+    /**
+     * REGEX-TEST: §7Max Chocolate: §660B
+     */
+    private val maxChocolatePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "chocolate.max",
+        "§7Max Chocolate: §6(?<max>.*)",
+    )
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.forprestige",
         "§7§cRequires (?<amount>\\w+) Chocolate this.*",
@@ -229,6 +237,9 @@ object ChocolateFactoryDataLoader {
         for (line in item.getLore()) {
             chocolateThisPrestigePattern.matchMatcher(line) {
                 profileStorage.chocolateThisPrestige = group("amount").formatLong()
+            }
+            maxChocolatePattern.matchMatcher(line) {
+                profileStorage.maxChocolate = group("max").formatLong()
             }
             chocolateForPrestigePattern.matchMatcher(line) {
                 ChocolateFactoryAPI.chocolateForPrestige = group("amount").formatLong()

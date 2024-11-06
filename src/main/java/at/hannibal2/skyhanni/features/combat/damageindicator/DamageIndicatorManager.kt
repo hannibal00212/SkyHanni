@@ -91,7 +91,7 @@ object DamageIndicatorManager {
         return damagePattern.matcher(name).matches()
     }
 
-    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(type: BossType) = data.entries.any { it.value.bossType == type }
 
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
@@ -367,8 +367,8 @@ object DamageIndicatorManager {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
+            data[entity.uniqueID]?.let {
+                val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 

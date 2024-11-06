@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
@@ -226,6 +227,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
+    @SearchTag("Elizabeth Community Center")
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
 

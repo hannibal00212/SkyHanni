@@ -24,23 +24,23 @@ object ItemClickData {
             packet is C08PacketPlayerBlockPlacement -> {
                 if (packet.placedBlockDirection != 255) {
                     val position = packet.position.toLorenzVec()
-                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).postAndCatch()
+                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).post()
                 } else {
-                    ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).postAndCatch()
+                    ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
                 }
             }
 
             packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
                 val position = packet.position.toLorenzVec()
                 val blockClickCancelled =
-                    BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).postAndCatch()
+                    BlockClickEvent(ClickType.LEFT_CLICK, position, InventoryUtils.getItemInHand()).post()
                 ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).also {
-                    it.isCanceled = blockClickCancelled
-                }.postAndCatch()
+                    if (blockClickCancelled) it.cancel()
+                }.post()
             }
 
             packet is C0APacketAnimation -> {
-                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).postAndCatch()
+                ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
             }
 
             packet is C02PacketUseEntity -> {
@@ -51,7 +51,7 @@ object ItemClickData {
                     else -> return
                 }
                 val clickedEntity = packet.getEntityFromWorld(Minecraft.getMinecraft().theWorld) ?: return
-                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
+                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post()
             }
 
             else -> {

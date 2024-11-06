@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -26,11 +27,8 @@ object VerminHighlighter {
 
     private val checkedEntities = TimeLimitedSet<Int>(1.minutes)
 
-    // TODO repo
-    private const val FLY_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTMwYWMxZjljNjQ5Yzk5Y2Q2MGU0YmZhNTMzNmNjMTg1MGYyNzNlYWI5ZjViMGI3OTQwZDRkNGQ3ZGM4MjVkYyJ9fX0="
-    private const val SPIDER_TEXTURE =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY1MDU1NjEzMTkxNywKICAicHJvZmlsZUlkIiA6ICI0ODI5MmJkMjI1OTc0YzUwOTZiMTZhNjEyOGFmMzY3NSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLVVJPVE9ZVEIyOCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84ZmRmNjJkNGUwM2NhNTk0YzhjZDIxZGQxNzUzMjdmMWNmNzdjNGJjMDU3YTA5NTk2MDNkODNhNjhiYTI3MDA4IgogICAgfQogIH0KfQ=="
+    private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
+    private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -56,7 +54,7 @@ object VerminHighlighter {
     }
 
     private fun isVermin(entity: EntityLivingBase): Boolean = when (entity) {
-        is EntityArmorStand -> entity.hasSkullTexture(FLY_TEXTURE) || entity.hasSkullTexture(SPIDER_TEXTURE)
+        is EntityArmorStand -> entity.hasSkullTexture(VERMIN_FLY_TEXTURE) || entity.hasSkullTexture(VERMIN_SPIDER_TEXTURE)
         is EntitySilverfish -> entity.baseMaxHealth == 8
 
         else -> false

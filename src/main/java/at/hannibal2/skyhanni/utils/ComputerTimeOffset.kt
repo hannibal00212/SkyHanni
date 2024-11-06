@@ -64,7 +64,10 @@ object ComputerTimeOffset {
             e, "Failed to get NTP offset",
             "server" to ntpServer,
         )
-        else e.printStackTrace()
+        else {
+            @Suppress("PrintStackTrace")
+            e.printStackTrace()
+        }
         null
     }
 
@@ -112,11 +115,16 @@ object ComputerTimeOffset {
     @SubscribeEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Time Offset")
-        val relevant = offsetMillis?.absoluteValue?.let { it < 100.milliseconds } ?: true
+        val offset = offsetMillis ?: run {
+            event.addIrrelevant("not calculated yet")
+            return
+        }
+
+        val relevant = offset.absoluteValue > 500.milliseconds
         if (relevant) {
-            event.addData(offsetMillis.toString())
+            event.addData(offset.toString())
         } else {
-            event.addIrrelevant(offsetMillis.toString())
+            event.addIrrelevant(offset.toString())
         }
     }
 }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -20,7 +21,6 @@ import java.util.NavigableSet
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
@@ -144,34 +144,6 @@ object StringUtils {
 
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
-    inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
-        matcher(text).let { if (it.matches()) consumer(it) else null }
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatcher(text, consumer)"))
-    inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
-        matcher(text).let { if (it.find()) consumer(it) else null }
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
-    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        toList().matchFirst(pattern, consumer)
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
-        for (line in this) {
-            pattern.matcher(line).let { if (it.matches()) return consumer(it) }
-        }
-        return null
-    }
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchAll(pattern, consumer)"))
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? {
-        for (line in this) {
-            pattern.matcher(line).let { if (it.find()) consumer(it) }
-        }
-        return null
-    }
-
     private fun String.internalCleanPlayerName(): String {
         val split = trim().split(" ")
         return if (split.size > 1) {
@@ -190,16 +162,6 @@ object StringUtils {
         } else {
             internalCleanPlayerName()
         }
-    }
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchMatchers(text, consumer)"))
-    inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
-        for (pattern in iterator()) {
-            pattern.matchMatcher<T>(text) {
-                return consumer()
-            }
-        }
-        return null
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
@@ -369,18 +331,6 @@ object StringUtils {
 
     fun String.convertToFormatted(): String = this.replace("&&", "§")
 
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matches(string)"))
-    fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches(list)"))
-    fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { this.matches(it) } ?: false
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.anyMatches(list)"))
-    fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.find(string)"))
-    fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
-
     fun String.allLettersFirstUppercase() = split("_").joinToString(" ") { it.firstLetterUppercase() }
 
     fun String?.equalsIgnoreColor(string: String?) = this?.let { it.removeColor() == string?.removeColor() } ?: false
@@ -476,7 +426,7 @@ object StringUtils {
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
         val clickEvent = message.chatStyle.chatClickEvent
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
                 return
             }
             foundCommands.add(message)
@@ -559,6 +509,7 @@ object StringUtils {
 
     fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
+    @Deprecated("This function strips internal formatting changes like the color of the pluses of the MVP+ rank")
     fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
         formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
 
@@ -575,5 +526,10 @@ object StringUtils {
         } catch (e: IllegalArgumentException) {
             false
         }
+    }
+
+    fun optionalAn(string: String): String {
+        if (string.isEmpty()) return ""
+        return if (string[0] in "aeiou") "an" else "a"
     }
 }

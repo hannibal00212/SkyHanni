@@ -239,4 +239,8 @@ object ChocolateFactoryAPI {
             it.rabbit.removeColor() == rabbitName.removeColor()
         }
     }
+
+    fun isMax(): Boolean = profileStorage?.let {
+        it.maxChocolate == it.currentChocolate
+    } ?: false
 }

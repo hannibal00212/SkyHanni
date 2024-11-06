@@ -82,7 +82,7 @@ object IslandExceptions {
             baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
-        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name ?: "") ->
+        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
 
         else -> null
@@ -257,7 +257,7 @@ object IslandExceptions {
             .firstOrNull {
                 it != null &&
                     it.distanceTo(baseEntity) < 4.0 &&
-                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL
+                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL_TEXTURE
             }?.let {
                 MobData.MobResult.found(Mob(baseEntity, mobType = Mob.Type.BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is EntityZombie) MobData.MobResult.notYetFound else null

@@ -11,10 +11,6 @@ import java.security.PrivilegedAction;
 
 public class TweakerUtils {
 
-    public static boolean isOnWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("win");
-    }
-
     public static void openUrl(String url) {
         try {
             Desktop.getDesktop().browse(new URI(url));

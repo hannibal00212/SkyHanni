@@ -84,7 +84,7 @@ object HoppityEggsCompactChat {
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
             STRAY -> "§aStray Rabbit"
-            else -> "${lastChatMeal?.coloredName ?: ""} Egg"
+            else -> "${lastChatMeal?.coloredName.orEmpty()} Egg"
         }
 
         val rarityConfig = HoppityEggsManager.config.rarityInCompact
@@ -97,12 +97,13 @@ object HoppityEggsCompactChat {
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
                 (HoppityCollectionStats.getRabbitCount(this.lastName)).takeIf { it > 0 }?.let {
                     " §7(§b#$it§7)"
-                } ?: ""
+                }.orEmpty()
             } else ""
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}" +
+                "$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7($lastProfit§7)"
@@ -161,7 +162,7 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            if (group("rabbitname").equals(lastName)) {
+            if (group("rabbitname") == lastName) {
                 lastChatMeal = BOUGHT
                 compactChat(event)
             }

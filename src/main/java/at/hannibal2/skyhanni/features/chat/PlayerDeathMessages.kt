@@ -35,7 +35,8 @@ object PlayerDeathMessages {
         if (MarkedPlayerManager.config.highlightInChat &&
             !DungeonAPI.inDungeon() &&
             !LorenzUtils.inKuudraFight &&
-            MarkedPlayerManager.isMarkedPlayer(name)) {
+            MarkedPlayerManager.isMarkedPlayer(name)
+        ) {
             val reason = event.reason
             val color = MarkedPlayerManager.config.chatColor.getChatColor()
             ChatUtils.chat(" §c☠ $color$name §7$reason", false)

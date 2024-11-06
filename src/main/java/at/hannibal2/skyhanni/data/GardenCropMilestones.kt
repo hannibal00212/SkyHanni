@@ -51,7 +51,7 @@ object GardenCropMilestones {
                 crop.setCounter(amount)
             }
         }
-        CropMilestoneUpdateEvent().postAndCatch()
+        CropMilestoneUpdateEvent.post()
         GardenCropMilestonesCommunityFix.openInventory(event.inventoryItems)
     }
 

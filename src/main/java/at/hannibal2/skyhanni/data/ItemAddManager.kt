@@ -89,7 +89,7 @@ object ItemAddManager {
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
-    private var superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
+    private val superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

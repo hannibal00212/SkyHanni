@@ -63,7 +63,7 @@ object CollectionAPI {
                 val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
                 collectionValue[internalName] = counter
             }
-            CollectionUpdateEvent().postAndCatch()
+            CollectionUpdateEvent.post()
         }
 
         if (inventoryName.endsWith(" Collections")) {
@@ -86,7 +86,7 @@ object CollectionAPI {
                     collectionValue[internalName] = counter
                 }
             }
-            CollectionUpdateEvent().postAndCatch()
+            CollectionUpdateEvent.post()
         }
     }
 

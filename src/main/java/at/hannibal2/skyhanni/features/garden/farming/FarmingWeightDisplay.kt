@@ -123,12 +123,6 @@ object FarmingWeightDisplay {
     private var nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
 
-    private val recalculate by lazy {
-        ({
-            resetData()
-        })
-    }
-
     private val eliteWeightApiGson by lazy {
         BaseGsonBuilder.gson()
             .registerTypeAdapter(CropType::class.java, SkyHanniTypeAdapters.CROP_TYPE.nullSafe())
@@ -141,22 +135,22 @@ object FarmingWeightDisplay {
             Renderable.clickAndHover(
                 "§cFarming Weight error: Cannot load",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§cdata from Elite Farmers!",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§eRejoin the garden or",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
             Renderable.clickAndHover(
                 "§eclick here to fix it.",
                 listOf("§eClick here to reload the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             ),
         )
     }
@@ -268,7 +262,7 @@ object FarmingWeightDisplay {
         val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
             "§cWaiting for leaderboard update...",
             listOf("§eClick here to load new data right now!"),
-            onClick = recalculate,
+            onClick = ::resetData,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
         var nextName =
@@ -304,7 +298,7 @@ object FarmingWeightDisplay {
             return Renderable.clickAndHover(
                 "§cRejoin the garden to show ETA!",
                 listOf("Click here to calculate the data right now!"),
-                onClick = recalculate,
+                onClick = ::resetData,
             )
         }
 
@@ -366,8 +360,9 @@ object FarmingWeightDisplay {
         )
     }
 
-    private fun isEnabled() = ((OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock) ||
-        (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))) && config.display
+    private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
+    private fun outsideEnabled() = OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
+    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenAPI.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
 
