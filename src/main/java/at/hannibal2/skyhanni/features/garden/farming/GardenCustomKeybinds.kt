@@ -29,14 +29,14 @@ object GardenCustomKeybinds {
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
 
     init {
-        map[mcSettings.keyBindAttack] = { config.attack }
-        map[mcSettings.keyBindUseItem] = { config.useItem }
-        map[mcSettings.keyBindLeft] = { config.left }
-        map[mcSettings.keyBindRight] = { config.right }
-        map[mcSettings.keyBindForward] = { config.forward }
-        map[mcSettings.keyBindBack] = { config.back }
-        map[mcSettings.keyBindJump] = { config.jump }
-        map[mcSettings.keyBindSneak] = { config.sneak }
+        map[mcSettings.keyBindAttack] = config::attack
+        map[mcSettings.keyBindUseItem] = config::useItem
+        map[mcSettings.keyBindLeft] = config::left
+        map[mcSettings.keyBindRight] = config::right
+        map[mcSettings.keyBindForward] = config::forward
+        map[mcSettings.keyBindBack] = config::back
+        map[mcSettings.keyBindJump] = config::jump
+        map[mcSettings.keyBindSneak] = config::sneak
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
@@ -87,8 +87,10 @@ object GardenCustomKeybinds {
         if (keyCode == 0) return
         val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
         ci.cancel()
-        keyBinding as AccessorKeyBinding
-        keyBinding.pressTime_skyhanni++
+        if (keyBinding.isKeyDown) {
+            (keyBinding as AccessorKeyBinding).pressTime_skyhanni++
+            KeyBinding.setKeyBindState(keyCode, true)
+        }
     }
 
     @SubscribeEvent
