@@ -1,20 +1,83 @@
 
-net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
-net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
-net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
-net.minecraft.util.math.Rotations net.minecraft.util.Rotations
-net.minecraft.network.play.server.SPacketParticles net.minecraft.network.play.server.S2APacketParticles
+net.minecraft.client.renderer.BufferBuilder net.minecraft.client.renderer.WorldRenderer
+net.minecraft.client.renderer.RenderItem net.minecraft.client.renderer.entity.RenderItem
 
+net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resources.model.IBakedModel
+
+net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
+
+net.minecraft.entity.player.EntityPlayer getHeldItemMainhand() getHeldItem()
+
+# Workaround for it not letting stackSize be mapped to count.
+temp.net.minecraft.item.ItemStack net.minecraft.item.ItemStack
+temp.net.minecraft.item.ItemStack count stackSize
+net.minecraft.item.ItemStack temp.net.minecraft.item.ItemStack
+
+net.minecraft.network.play.client.CPacketAnimation net.minecraft.network.play.client.C0APacketAnimation
+net.minecraft.network.play.client.CPacketChatMessage net.minecraft.network.play.client.C01PacketChatMessage
+net.minecraft.network.play.client.CPacketClickWindow net.minecraft.network.play.client.C0EPacketClickWindow
+net.minecraft.network.play.client.CPacketHeldItemChange net.minecraft.network.play.client.C09PacketHeldItemChange
+net.minecraft.network.play.client.CPacketPlayer net.minecraft.network.play.client.C03PacketPlayer
+net.minecraft.network.play.client.CPacketPlayerDigging net.minecraft.network.play.client.C07PacketPlayerDigging
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+net.minecraft.network.play.client.CPacketUseEntity net.minecraft.network.play.client.C02PacketUseEntity
+
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock getDirection() getPlacedBlockDirection()
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock getPos() getPosition()
+
+net.minecraft.network.play.server.SPacketAnimation net.minecraft.network.play.server.S0BPacketAnimation
+net.minecraft.network.play.server.SPacketBlockChange net.minecraft.network.play.server.S23PacketBlockChange
+net.minecraft.network.play.server.SPacketChat net.minecraft.network.play.server.S02PacketChat
+net.minecraft.network.play.server.SPacketCloseWindow net.minecraft.network.play.server.S2EPacketCloseWindow
+net.minecraft.network.play.server.SPacketCollectItem net.minecraft.network.play.server.S0DPacketCollectItem
+net.minecraft.network.play.server.SPacketDestroyEntities net.minecraft.network.play.server.S13PacketDestroyEntities
+net.minecraft.network.play.server.SPacketEffect net.minecraft.network.play.server.S28PacketEffect
+net.minecraft.network.play.server.SPacketEntity net.minecraft.network.play.server.S14PacketEntity
+net.minecraft.network.play.server.SPacketEntityAttach net.minecraft.network.play.server.S1BPacketEntityAttach
+net.minecraft.network.play.server.SPacketEntityEffect net.minecraft.network.play.server.S1DPacketEntityEffect
+net.minecraft.network.play.server.SPacketEntityEquipment net.minecraft.network.play.server.S04PacketEntityEquipment
+net.minecraft.network.play.server.SPacketEntityHeadLook net.minecraft.network.play.server.S19PacketEntityHeadLook
+net.minecraft.network.play.server.SPacketEntityMetadata net.minecraft.network.play.server.S1CPacketEntityMetadata
+net.minecraft.network.play.server.SPacketEntityProperties net.minecraft.network.play.server.S20PacketEntityProperties
+net.minecraft.network.play.server.SPacketEntityStatus net.minecraft.network.play.server.S19PacketEntityStatus
+net.minecraft.network.play.server.SPacketEntityTeleport net.minecraft.network.play.server.S18PacketEntityTeleport
+net.minecraft.network.play.server.SPacketEntityVelocity net.minecraft.network.play.server.S12PacketEntityVelocity
+net.minecraft.network.play.server.SPacketJoinGame net.minecraft.network.play.server.S01PacketJoinGame
+net.minecraft.network.play.server.SPacketMultiBlockChange net.minecraft.network.play.server.S22PacketMultiBlockChange
+net.minecraft.network.play.server.SPacketOpenWindow net.minecraft.network.play.server.S2DPacketOpenWindow
+net.minecraft.network.play.server.SPacketParticles net.minecraft.network.play.server.S2APacketParticles
+net.minecraft.network.play.server.SPacketPlayerListHeaderFooter net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
+net.minecraft.network.play.server.SPacketPlayerListItem net.minecraft.network.play.server.S38PacketPlayerListItem
+net.minecraft.network.play.server.SPacketSetSlot net.minecraft.network.play.server.S2FPacketSetSlot
+net.minecraft.network.play.server.SPacketSoundEffect net.minecraft.network.play.server.S29PacketSoundEffect
+net.minecraft.network.play.server.SPacketSpawnMob net.minecraft.network.play.server.S0FPacketSpawnMob
+net.minecraft.network.play.server.SPacketSpawnObject net.minecraft.network.play.server.S0EPacketSpawnObject
+net.minecraft.network.play.server.SPacketSpawnPlayer net.minecraft.network.play.server.S0CPacketSpawnPlayer
+net.minecraft.network.play.server.SPacketTeams net.minecraft.network.play.server.S3EPacketTeams
+net.minecraft.network.play.server.SPacketTitle net.minecraft.network.play.server.S45PacketTitle
+net.minecraft.network.play.server.SPacketUpdateScore net.minecraft.network.play.server.S3CPacketUpdateScore
+net.minecraft.network.play.server.SPacketWorldBorder net.minecraft.network.play.server.S44PacketWorldBorder
+
+net.minecraft.util.SoundCategory net.minecraft.client.audio.SoundCategory
+
+net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
+net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
+net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
+net.minecraft.util.math.RayTraceResult net.minecraft.util.MovingObjectPosition
+net.minecraft.util.math.RayTraceResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
+net.minecraft.util.math.Rotations net.minecraft.util.Rotations
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+
+net.minecraft.util.text.ITextComponent net.minecraft.util.IChatComponent
+net.minecraft.util.text.Style net.minecraft.util.ChatStyle
 net.minecraft.util.text.TextComponentString net.minecraft.util.ChatComponentText
 net.minecraft.util.text.TextComponentTranslation net.minecraft.util.ChatComponentTranslation
-net.minecraft.util.text.Style net.minecraft.util.ChatStyle
-net.minecraft.util.text.Style getHoverEvent() getChatHoverEvent()
-net.minecraft.util.text.Style getClickEvent() getChatClickEvent()
 net.minecraft.util.text.TextFormatting net.minecraft.util.EnumChatFormatting
-net.minecraft.util.text.ITextComponent net.minecraft.util.IChatComponent
-net.minecraft.util.text.event.HoverEvent net.minecraft.event.HoverEvent
-net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
 
+net.minecraft.util.text.Style getClickEvent() getChatClickEvent()
+net.minecraft.util.text.Style getHoverEvent() getChatHoverEvent()
+
+net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
+net.minecraft.util.text.event.HoverEvent net.minecraft.event.HoverEvent
 

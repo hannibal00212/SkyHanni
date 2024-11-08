@@ -223,7 +223,7 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else ItemStack(Items.dye, 8)
+            ) else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
             newItemStack.setStackDisplayName(stack.displayName)

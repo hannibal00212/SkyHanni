@@ -126,6 +126,15 @@ object ChocolateFactoryStrayTracker {
         "(?:§.)*already have captured him before.*",
     )
 
+    /**
+     * REGEX-TEST: §7but he escaped and left behind
+     * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
+     */
+    val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.doradoescape",
+        "(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!)"
+    )
+
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
         drawDisplay(it)
     }
