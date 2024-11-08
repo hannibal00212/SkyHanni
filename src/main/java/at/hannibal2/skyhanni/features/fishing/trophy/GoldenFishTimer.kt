@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -93,10 +94,7 @@ object GoldenFishTimer {
         handle()
     }
 
-    // TODO: Move to repo
-    @Suppress("MaxLineLength")
-    private const val GOLDEN_FISH_SKULL_TEXTURE =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzgzMTA2MDE5OCwKICAicHJvZmlsZUlkIiA6ICJiN2ZkYmU2N2NkMDA0NjgzYjlmYTllM2UxNzczODI1NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJDVUNGTDE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzEyMGNmM2MwYTQwZmM2N2UwZTVmZTBjNDZiMGFlNDA5YWM3MTAzMGE3NjU2ZGExN2IxMWVkMDAxNjQ1ODg4ZmUiCiAgICB9CiAgfQp9"
+    private val GOLDEN_FISH_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("GOLDEN_FISH") }
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
@@ -272,7 +270,6 @@ object GoldenFishTimer {
         if (!isActive()) return
         if (isGoldenFishActive()) return
         val entity = event.entity as? EntityArmorStand ?: return
-        entity.inventory.forEach { it?.getSkullTexture()?.let { texture -> println(texture) } }
 
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }

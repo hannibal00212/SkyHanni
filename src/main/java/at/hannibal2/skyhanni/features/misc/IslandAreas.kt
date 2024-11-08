@@ -53,7 +53,7 @@ object IslandAreas {
         display = null
         targetNode = null
         hasMoved = true
-        updateArea("no_area")
+        updateArea("no_area", onlyInternal = true)
     }
 
     fun nodeMoved() {
@@ -87,21 +87,15 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!IslandGraphs.existsForThisIsland) return
-
-        if (event.isMod(2) && hasMoved) {
-            hasMoved = false
-            updatePosition()
-        }
+        if (isEnabled() || !(event.isMod(2) && hasMoved)) return
+        hasMoved = false
+        updatePosition()
     }
 
     @SubscribeEvent
     fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+        if (isEnabled() && event.entity == Minecraft.getMinecraft().thePlayer) {
+            hasMoved = true
         }
     }
 
@@ -162,10 +156,11 @@ object IslandAreas {
             val distance = difference.roundTo(0).toInt()
             val text = "$coloredName§7: §e$distance$suffix"
 
+            val isConfigVisible = node.getAreaTag(useConfig = true) != null
             if (!foundCurrentArea) {
                 foundCurrentArea = true
 
-                val inAnArea = name != "no_area"
+                val inAnArea = name != "no_area" && isConfigVisible
                 if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
                         addSearchString("§eCurrent area: $coloredName")
@@ -173,13 +168,14 @@ object IslandAreas {
                         addSearchString("§7Not in an area.")
                     }
                 }
-                updateArea(name)
+                updateArea(name, onlyInternal = !isConfigVisible)
 
                 addSearchString("§eAreas nearby:")
                 continue
             }
 
             if (name == "no_area") continue
+            if (!isConfigVisible) continue
             foundAreas++
 
             add(
@@ -221,11 +217,11 @@ object IslandAreas {
         }
     }
 
-    private fun updateArea(name: String) {
+    private fun updateArea(name: String, onlyInternal: Boolean) {
         if (name != currentAreaName) {
             val oldArea = currentAreaName
             currentAreaName = name
-            GraphAreaChangeEvent(name, oldArea).post()
+            GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
 
@@ -233,6 +229,8 @@ object IslandAreas {
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
         val inAnArea = name != "no_area"
+        // when this is a small area and small areas are disabled via config
+        if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
             LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
         }
@@ -240,14 +238,15 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
             if (name == currentAreaName) continue
             if (name == "no_area") continue
             val position = node.position
-            val color = node.getAreaTag()?.color?.getChatColor().orEmpty()
+            val areaTag = node.getAreaTag(useConfig = true) ?: continue
+            val color = areaTag.color.getChatColor()
             if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
         }
@@ -269,8 +268,8 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(useConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {
@@ -291,5 +290,5 @@ object IslandAreas {
         hasMoved = true
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }
