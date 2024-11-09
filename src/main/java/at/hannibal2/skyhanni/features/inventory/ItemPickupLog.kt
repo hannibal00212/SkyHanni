@@ -100,6 +100,7 @@ object ItemPickupLog {
         "MAXOR_ENERGY_CRYSTAL",
         "ELLE_SUPPLIES",
         "ELLE_FUEL_CELL",
+        "LEAVE_GAME_BUTTON",
     )
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
 
