@@ -112,9 +112,10 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
+    // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
-        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+        return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
 
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =

@@ -17,11 +17,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
 @SkyHanniModule
+// TODO change to use skyhanni tracker
 object TrevorTracker {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     private val patternGroup = RepoPattern.group("misc.trevor")
+
+    // TODO regex tests
     private val selfKillMobPattern by patternGroup.pattern(
         "selfkill",
         "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a."
