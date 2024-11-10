@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -35,6 +38,11 @@ object ChocolateFactoryScreenFlash {
             when (config.rabbitWarning.flashScreenType) {
                 FlashScreenTypeEntry.SPECIAL -> isSpecial(it)
 
+                FlashScreenTypeEntry.LEGENDARY_P -> isRarityOrHigher(it, LorenzRarity.LEGENDARY)
+                FlashScreenTypeEntry.EPIC_P -> isRarityOrHigher(it, LorenzRarity.EPIC)
+                FlashScreenTypeEntry.RARE_P -> isRarityOrHigher(it, LorenzRarity.RARE)
+                FlashScreenTypeEntry.UNCOMMON_P -> isRarityOrHigher(it, LorenzRarity.UNCOMMON)
+
                 FlashScreenTypeEntry.ALL -> {
                     clickMeRabbitPattern.matches(it.stack.name) || isSpecial(it)
                 }
@@ -49,6 +57,14 @@ object ChocolateFactoryScreenFlash {
         if (event.eggType != HoppityEggType.STRAY) return
         flashScreen = false
     }
+
+    private fun isRarityOrHigher(slot: Slot, rarity: LorenzRarity) =
+        slot.stack?.getSkullOwner()?.let { slotSkullId ->
+            HoppityTextureHandler.getRarityBySkullId(slotSkullId)?.let { slotRarity ->
+                slotRarity.ordinal >= rarity.ordinal
+            } ?: false
+        } ?: false
+
 
     private fun isSpecial(slot: Slot) =
         clickMeGoldenRabbitPattern.matches(slot.stack.name) || slot.stack.getSkullTexture() in specialRabbitTextures
