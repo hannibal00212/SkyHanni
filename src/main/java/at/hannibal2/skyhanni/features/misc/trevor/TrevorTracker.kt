@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 
-@SkyHanniModule
 // TODO change to use skyhanni tracker
+@SkyHanniModule
 object TrevorTracker {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
@@ -27,11 +27,11 @@ object TrevorTracker {
     // TODO regex tests
     private val selfKillMobPattern by patternGroup.pattern(
         "selfkill",
-        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a."
+        "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.",
     )
     private val killMobPattern by patternGroup.pattern(
         "kill",
-        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a."
+        "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.",
     )
 
     private var display = emptyList<List<Any>>()
