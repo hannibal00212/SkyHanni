@@ -442,11 +442,9 @@ object ChocolateFactoryDataLoader {
 
         if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
             if (shouldWarnAboutStray(item)) {
-                SoundUtils.playBeepSound()
-            }
-
-            if (warningConfig.specialRabbitWarning && (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures)) {
-                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+                if(isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures) {
+                    SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+                } else SoundUtils.playBeepSound()
             }
 
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex

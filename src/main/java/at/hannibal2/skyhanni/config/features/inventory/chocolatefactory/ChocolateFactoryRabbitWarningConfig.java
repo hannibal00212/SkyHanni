@@ -20,11 +20,6 @@ public class ChocolateFactoryRabbitWarningConfig {
     public StrayTypeEntry rabbitWarningType = StrayTypeEntry.ALL;
 
     @Expose
-    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits)")
-    @ConfigEditorBoolean
-    public boolean specialRabbitWarning = true;
-
-    @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +
         "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
         "§eThen write §bskyhanni:yourfilename\n" +
