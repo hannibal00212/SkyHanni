@@ -1,7 +1,9 @@
 name: "Assign relevant labels"
 on:
     pull_request_target:
-        types: [ opened, edited ]
+        types: [ opened, edited, reopened, synchronize, closed ]
+    milestone:
+        types: [ created, closed, deleted, edited ]
 jobs:
     assign-label:
         if: github.event.pull_request.state == 'open' && github.event.pull_request.milestone
