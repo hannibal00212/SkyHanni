@@ -400,10 +400,7 @@ object HypixelData {
     private fun sendLocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                HypixelCommands.locraw()
-            }
+            HypixelCommands.locraw()
         }
     }
 
