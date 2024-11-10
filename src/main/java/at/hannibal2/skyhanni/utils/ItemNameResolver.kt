@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
@@ -51,20 +51,20 @@ object ItemNameResolver {
                     }
                 } ${split.joinToString("_").allLettersFirstUppercase()}"
                 ItemResolutionQuery.findInternalNameByDisplayName(gemstoneQuery, true)?.let {
-                    return itemNameCache.getOrPut(lowercase) { it.asInternalName() }
+                    return itemNameCache.getOrPut(lowercase) { it.toInternalName() }
                 }
             }
         }
 
         val internalName = when (itemName) {
-            "SUPERBOOM TNT" -> "SUPERBOOM_TNT".asInternalName()
+            "SUPERBOOM TNT" -> "SUPERBOOM_TNT".toInternalName()
             else -> {
                 ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
 
                     // This fixes a NEU bug with §9Hay Bale (cosmetic item)
                     // TODO remove workaround when this is fixed in neu
                     val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
-                    rawInternalName.asInternalName()
+                    rawInternalName.toInternalName()
                 } ?: return null
             }
         }
@@ -119,10 +119,10 @@ object ItemNameResolver {
     fun fixEnchantmentName(originalName: String): NEUInternalName {
         duplexPattern.matchMatcher(originalName) {
             val tier = group("tier")
-            return "ULTIMATE_REITERATE;$tier".asInternalName()
+            return "ULTIMATE_REITERATE;$tier".toInternalName()
         }
         // TODO USE SH-REPO
-        return originalName.asInternalName()
+        return originalName.toInternalName()
     }
 
     private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {

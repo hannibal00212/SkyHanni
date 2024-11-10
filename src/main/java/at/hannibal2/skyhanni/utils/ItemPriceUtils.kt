@@ -53,6 +53,7 @@ object ItemPriceUtils {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
     }
 
+    // TODO neuneu
     private fun NEUInternalName.getLowestBinOrNull(): Double? {
         val result = NEUItems.manager.auctionManager.getLowestBin(asString())
         if (result == -1L) return null
@@ -94,7 +95,7 @@ object ItemPriceUtils {
         println("defaultPrice: $defaultPrice")
 
         println(" #")
-        for (source in ItemPriceSource.values()) {
+        for (source in ItemPriceSource.entries) {
             val price = internalName.getPrice(source)
             println("${source.displayName} price: ${price.addSeparators()}")
         }

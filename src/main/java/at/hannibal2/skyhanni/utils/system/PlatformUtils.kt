@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.system
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.ModContainer
@@ -24,9 +25,32 @@ object PlatformUtils {
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
 
-    var validNeuInstalled = false
+    private var validNeuInstalled = false
 
     fun isNeuLoaded() = validNeuInstalled
+
+    @JvmStatic
+    fun checkIfNeuIsLoaded() {
+        try {
+            Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
+        } catch (e: Throwable) {
+            EnoughUpdatesManager.downloadRepo()
+            return
+        }
+
+        try {
+            val clazz = Class.forName("io.github.moulberry.notenoughupdates.util.ItemResolutionQuery")
+
+            for (field in clazz.methods) {
+                if (field.name == "findInternalNameByDisplayName") {
+                    validNeuInstalled = true
+                    return
+                }
+            }
+        } catch (_: Throwable) {
+        }
+        EnoughUpdatesManager.downloadRepo()
+    }
 
 }
 

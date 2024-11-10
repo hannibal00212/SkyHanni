@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -48,7 +49,7 @@ class SkyHanniMod {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+        PlatformUtils.checkIfNeuIsLoaded()
 
         HotswapSupport.load()
 
@@ -75,6 +76,7 @@ class SkyHanniMod {
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
+            EnoughUpdatesManager.reloadRepo()
             repo.loadRepoInformation()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()

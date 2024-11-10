@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -24,7 +26,6 @@ import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -104,13 +105,13 @@ object NEUItems {
         return map
     }
 
-    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
+    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
@@ -147,7 +148,7 @@ object NEUItems {
     fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<PrimitiveRecipe> = emptyList()): Double? =
         getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
-    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
+    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
@@ -252,7 +253,7 @@ object NEUItems {
         }
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+    fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.itemMap
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
         itemIdCache[item]?.let {
