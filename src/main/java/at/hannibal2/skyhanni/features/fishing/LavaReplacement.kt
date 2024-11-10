@@ -39,7 +39,7 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        if (isActive) Minecraft.getMinecraft().renderGlobal.loadRenderers()
+        Minecraft.getMinecraft().renderGlobal.loadRenderers()
     }
 
     private fun shouldReplace(): Boolean {
@@ -58,6 +58,7 @@ object LavaReplacement {
 
         fun inIsland() = island.isInIsland()
     }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(65, "fishing.lavaReplacement.onlyInCrimsonIsle", "fishing.lavaReplacement.everywhere") { element ->

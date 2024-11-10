@@ -22,7 +22,6 @@ public class LavaReplacementConfig {
     @Expose
     @ConfigOption(name = "Replace Everywhere", desc = "Replace the lava texture In All Islands regardless of List Below.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public Property<Boolean> everywhere = Property.of(true);
 
     @Expose
