@@ -87,9 +87,11 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (isEnabled() || !(event.isMod(2) && hasMoved)) return
-        hasMoved = false
-        updatePosition()
+        if (!isEnabled()) return
+        if (event.isMod(2) && hasMoved) {
+            updatePosition()
+            hasMoved = false
+        }
     }
 
     @SubscribeEvent
@@ -287,7 +289,7 @@ object IslandAreas {
             allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
-        hasMoved = true
+        updatePosition()
     }
 
     fun isEnabled() = IslandGraphs.currentIslandGraph != null
