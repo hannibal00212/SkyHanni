@@ -168,7 +168,7 @@ object ItemPriceUtils {
     }
 
     private fun refreshLowestBins() {
-        // TODO neuneu use gzipped one
-        lowestBins = APIUtils.getJSONResponse("https://moulberry.codes/lowestbin.json")
+        lowestBins = APIUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
+        println("total lowest bins found: ${lowestBins.entrySet().size}")
     }
 }

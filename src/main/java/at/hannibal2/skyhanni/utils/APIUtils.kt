@@ -17,6 +17,7 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.message.BasicHeader
 import org.apache.http.util.EntityUtils
 import java.security.KeyStore
+import java.util.zip.GZIPInputStream
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
@@ -72,20 +73,26 @@ object APIUtils {
      * make suspend
      * use withContext(Dispatchers.IO) { APIUtils.getJSONResponse(url) }.asJsonObject
      */
-    fun getJSONResponse(urlString: String, silentError: Boolean = false) =
-        getJSONResponseAsElement(urlString, silentError) as JsonObject
+    fun getJSONResponse(urlString: String, silentError: Boolean = false, gunzip: Boolean = false) =
+        getJSONResponseAsElement(urlString, silentError, gunzip = gunzip) as JsonObject
 
     fun getJSONResponseAsElement(
         urlString: String,
         silentError: Boolean = false,
         apiName: String = "Hypixel API",
+        gunzip: Boolean = false,
     ): JsonElement {
         val client = builder.build()
         try {
             client.execute(HttpGet(urlString)).use { response ->
                 val entity = response.entity
                 if (entity != null) {
-                    val retSrc = EntityUtils.toString(entity)
+                    val inputStream = if (gunzip) {
+                        GZIPInputStream(entity.content)
+                    } else {
+                        entity.content
+                    }
+                    val retSrc = inputStream.bufferedReader().use { it.readText() }
                     try {
                         return parser.parse(retSrc)
                     } catch (e: JsonSyntaxException) {

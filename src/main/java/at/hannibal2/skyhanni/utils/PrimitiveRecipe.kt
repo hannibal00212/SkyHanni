@@ -4,13 +4,6 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RecipeType.CRAFTING
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.recipes.EssenceUpgrades
-import io.github.moulberry.notenoughupdates.recipes.ForgeRecipe
-import io.github.moulberry.notenoughupdates.recipes.ItemShopRecipe
-import io.github.moulberry.notenoughupdates.recipes.KatRecipe
-import io.github.moulberry.notenoughupdates.recipes.MobLootRecipe
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
-import io.github.moulberry.notenoughupdates.recipes.VillagerTradeRecipe
 
 data class PrimitiveRecipe(
     val ingredients: Set<PrimitiveIngredient>,

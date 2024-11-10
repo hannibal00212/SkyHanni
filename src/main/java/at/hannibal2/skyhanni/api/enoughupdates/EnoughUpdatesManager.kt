@@ -36,6 +36,7 @@ import java.io.InputStreamReader
 import java.util.TreeMap
 import kotlin.math.floor
 
+// Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
 

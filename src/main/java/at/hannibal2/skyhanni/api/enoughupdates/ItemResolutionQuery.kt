@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Matcher
 
+// Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
     private var compound: NBTTagCompound? = null
