@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryScreenFlash.isRarityOrHigher
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryScreenFlash.isSpecial
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -14,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -437,7 +441,7 @@ object ChocolateFactoryDataLoader {
         val warningConfig = config.rabbitWarning
 
         if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
-            if (config.rabbitWarning.rabbitWarning) {
+            if (shouldWarnAboutStray(item)) {
                 SoundUtils.playBeepSound()
             }
 
@@ -447,6 +451,22 @@ object ChocolateFactoryDataLoader {
 
             ChocolateFactoryAPI.clickRabbitSlot = slotIndex
         }
+    }
+
+    private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningType) {
+        StrayTypeEntry.SPECIAL -> isSpecial(item)
+
+        StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)
+        StrayTypeEntry.EPIC_P -> isRarityOrHigher(item, LorenzRarity.EPIC)
+        StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
+        StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
+
+        StrayTypeEntry.ALL -> {
+            clickMeRabbitPattern.matches(item.name) || isSpecial(item)
+        }
+
+        StrayTypeEntry.NONE -> false
+        else -> false
     }
 
     private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
