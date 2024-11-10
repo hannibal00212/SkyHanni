@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils;
 import at.hannibal2.skyhanni.data.DateFormat;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
