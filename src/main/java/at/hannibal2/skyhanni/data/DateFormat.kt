@@ -17,7 +17,7 @@ enum class DateFormat(pattern: String) {
     DAY_MONTH_YEAR("dd MMMM yyyy"),
     DAY_MONTH_YEAR_SHORT("dd MMM yyyy");
 
-    val formatter = DateTimeFormatter.ofPattern(pattern)
+    private val formatter = DateTimeFormatter.ofPattern(pattern)
 
     override fun toString() = LocalDate.now().format(formatter)
 }
