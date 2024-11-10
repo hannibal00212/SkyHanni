@@ -124,25 +124,6 @@ data class PrimitiveRecipe(
             val recipe = PrimitiveRecipe(ingredients, setOf(outputItem), recipeType)
             EnoughUpdatesManager.registerRecipe(recipe)
         }
-
-        private fun fromNeuRecipe(neuRecipe: NeuRecipe): PrimitiveRecipe {
-            val ingredients = neuRecipe.ingredients.map { PrimitiveIngredient.fromNeuIngredient(it) }.toSet()
-            val outputs = neuRecipe.outputs.map { PrimitiveIngredient.fromNeuIngredient(it) }.toSet()
-
-            val recipeType = when (neuRecipe::class.java) {
-                ForgeRecipe::class.java -> RecipeType.FORGE
-                VillagerTradeRecipe::class.java -> RecipeType.TRADE
-                EssenceUpgrades::class.java -> RecipeType.ESSENCE
-                MobLootRecipe::class.java -> RecipeType.MOB_DROP
-                ItemShopRecipe::class.java -> RecipeType.NPC_SHOP
-                KatRecipe::class.java -> RecipeType.KAT_UPGRADE
-                else -> CRAFTING
-            }
-
-            return PrimitiveRecipe(ingredients, outputs, recipeType)
-        }
-
-        fun convertMultiple(neuRecipes: Collection<NeuRecipe>) = neuRecipes.map { fromNeuRecipe(it) }
     }
 
     fun isCraftingRecipe() = this.recipeType == CRAFTING

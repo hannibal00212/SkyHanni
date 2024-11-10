@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -142,7 +141,7 @@ object MinionCraftHelper {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
-                for (ingredient in recipe.getCachedIngredients()) {
+                for (ingredient in recipe.ingredients) {
                     val ingredientInternalName = ingredient.internalName
                     if (ingredientInternalName == internalName) return true
 
@@ -177,7 +176,7 @@ object MinionCraftHelper {
                 for (recipe in NEUItems.getRecipes(internalName)) {
                     if (!recipe.isCraftingRecipe()) continue
 
-                    for (ingredient in recipe.getCachedIngredients()) {
+                    for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalName
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)

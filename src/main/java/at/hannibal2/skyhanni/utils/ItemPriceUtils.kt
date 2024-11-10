@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -10,7 +13,14 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import kotlinx.coroutines.launch
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object ItemPriceUtils {
 
     private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
@@ -53,12 +63,18 @@ object ItemPriceUtils {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
     }
 
-    // TODO neuneu
     private fun NEUInternalName.getLowestBinOrNull(): Double? {
-        val result = NEUItems.manager.auctionManager.getLowestBin(asString())
+        val result = if (PlatformUtils.isNeuLoaded()) {
+            getNeuLowestBin(this)
+        } else {
+            getShLowestBin(this)
+        }
         if (result == -1L) return null
         return result.toDouble()
     }
+
+    private fun getNeuLowestBin(internalName: NEUInternalName) =
+        NotEnoughUpdates.INSTANCE.manager.auctionManager.getLowestBin(internalName.asString())
 
     // We can not use NEU craft cost, since we want to respect the price source choice
     // NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost
@@ -85,7 +101,6 @@ object ItemPriceUtils {
             ChatUtils.userError("Hold an item in hand or do /shdebugprice <item name/id>")
             return
         }
-
 
         val defaultPrice = internalName.getPrice().addSeparators()
         ChatUtils.chat("${internalName.itemName}§f: §6$defaultPrice")
@@ -128,5 +143,32 @@ object ItemPriceUtils {
             }
 
         }
+    }
+
+    private var lastLowestBinRefresh = SimpleTimeMark.farPast()
+    private var lowestBins = JsonObject()
+
+    private fun getShLowestBin(internalName: NEUInternalName): Long {
+        if (lowestBins.has(internalName.asString())) {
+            return lowestBins[internalName.asString()].asLong
+        }
+
+        return -1L
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (PlatformUtils.isNeuLoaded()) return
+        if (lastLowestBinRefresh.passedSince() < 2.minutes) return
+        lastLowestBinRefresh = SimpleTimeMark.now()
+
+        SkyHanniMod.coroutineScope.launch {
+            refreshLowestBins()
+        }
+    }
+
+    private fun refreshLowestBins() {
+        // TODO neuneu use gzipped one
+        lowestBins = APIUtils.getJSONResponse("https://moulberry.codes/lowestbin.json")
     }
 }

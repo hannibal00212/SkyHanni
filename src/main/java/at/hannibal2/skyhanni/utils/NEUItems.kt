@@ -21,9 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.client.Minecraft
@@ -35,6 +33,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
@@ -46,11 +45,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRa
 
 @SkyHanniModule
 object NEUItems {
-
-    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
-    private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
-    private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
@@ -80,7 +75,7 @@ object NEUItems {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            var name = manager.createItem(rawInternalName).displayName.lowercase()
+            var name = getItemStackOrNull(rawInternalName)?.displayName?.lowercase() ?: continue
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
@@ -136,7 +131,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
+        ItemResolutionQuery.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
@@ -152,7 +147,7 @@ object NEUItems {
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
+    fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -166,7 +161,22 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
 
-    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
+    private val hardcodedVanillaItems = listOf(
+        "WOOD_AXE", "WOOD_HOE", "WOOD_PICKAXE", "WOOD_SPADE", "WOOD_SWORD",
+        "GOLD_AXE", "GOLD_HOE", "GOLD_PICKAXE", "GOLD_SPADE", "GOLD_SWORD",
+    )
+
+    fun NEUInternalName.isVanillaItem(): Boolean {
+        val asString = this.asString()
+        if (hardcodedVanillaItems.contains(asString)) return true
+
+        val vanillaName = asString.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
+        if (allNeuRepoItems().containsKey(vanillaName)) {
+            val json = allNeuRepoItems()[vanillaName]
+            if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
+        }
+        return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
+    }
 
     fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
         if (prefix.isEmpty()) return this
@@ -253,7 +263,7 @@ object NEUItems {
         }
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.itemMap
+    fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
         itemIdCache[item]?.let {
@@ -282,7 +292,7 @@ object NEUItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
+            for (ingredient in recipe.ingredients.toPrimitiveItemStacks()) {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
@@ -325,13 +335,7 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> {
-        return recipesCache.getOrPut(internalName) {
-            PrimitiveRecipe.convertMultiple(manager.getRecipesFor(internalName.asString())).toSet()
-        }
-    }
-
-    fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
         if (!PlatformUtils.isNeuLoaded()) return false
@@ -347,7 +351,7 @@ object NEUItems {
 
     // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
-        val jsonObject = manager.getJsonForItem(item)
+        val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
         }
@@ -359,6 +363,6 @@ object NEUItems {
     fun loadNBTData(encoded: String): ItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
-        return manager.jsonToStack(jsonObject, false)
+        return EnoughUpdatesManager.jsonToStack(jsonObject, false)
     }
 }

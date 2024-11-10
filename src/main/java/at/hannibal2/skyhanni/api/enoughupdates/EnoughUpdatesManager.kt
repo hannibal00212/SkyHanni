@@ -11,12 +11,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -40,15 +42,18 @@ object EnoughUpdatesManager {
     val configLocation = File("config/notenoughupdates")
     val repoLocation = File(configLocation, "repo")
 
-    val itemMap = TreeMap<String, JsonObject>()
+    private val itemMap = TreeMap<String, JsonObject>()
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
     private val recipes = mutableSetOf<PrimitiveRecipe>()
+    private val recipesMap = mutableMapOf<NEUInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: JsonObject? = null
 
     val titleWordMap = TreeMap<String, MutableMap<String, MutableList<Int>>>()
+
+    fun getItemInformation() = itemMap
 
     fun downloadRepo() {
         EnoughUpdatesRepo.downloadRepo()
@@ -59,6 +64,8 @@ object EnoughUpdatesManager {
         displayNameCache.clear()
         itemMap.clear()
         titleWordMap.clear()
+        recipes.clear()
+        recipesMap.clear()
 
         val tempItemMap = TreeMap<String, JsonObject>()
         SkyHanniMod.coroutineScope.launch {
@@ -70,6 +77,8 @@ object EnoughUpdatesManager {
             NeuRepositoryReloadEvent().postAndCatch()
         }
     }
+
+    fun getRecipesFor(internalName: NEUInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
         val itemDir = File(repoLocation, "items")
@@ -120,10 +129,42 @@ object EnoughUpdatesManager {
 
     fun registerRecipe(recipe: PrimitiveRecipe) {
         recipes.add(recipe)
+        for (internalName in recipe.outputs) {
+            val recipeSet = recipesMap.getOrPut(internalName.internalName) { mutableSetOf() }
+            recipeSet.add(recipe)
+        }
     }
 
     fun getItemById(id: String): JsonObject? {
         return itemMap[id]
+    }
+
+    fun stackToJson(stack: ItemStack): JsonObject {
+        val tag = stack.tagCompound ?: NBTTagCompound()
+
+        val lore = mutableListOf<String>()
+        if (tag.hasKey("display", 10)) {
+            val display = tag.getCompoundTag("display")
+            if (display.hasKey("Lore", 9)) {
+                val loreList = display.getTagList("Lore", 8)
+                for (i in 0 until loreList.tagCount()) {
+                    lore.add(loreList.getStringTagAt(i))
+                }
+            }
+        }
+
+        val json = JsonObject()
+        json.addProperty("itemid", stack.item.registryName.toString())
+        json.addProperty("displayname", stack.displayName)
+        json.addProperty("nbttag", tag.toString())
+        json.addProperty("damage", stack.itemDamage)
+
+        val jsonLore = JsonArray()
+        for (line in lore) {
+            jsonLore.add(JsonPrimitive(line))
+        }
+        json.add("lore", jsonLore)
+        return json
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {

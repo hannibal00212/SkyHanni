@@ -33,6 +33,16 @@ class ItemResolutionQuery {
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
+        private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
+
+        fun transformHypixelBazaarToNEUItemId(hypixelId: String): String {
+            val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
+            if (matcher.matches()) {
+                return matcher.group(1) + ";" + matcher.group(2)
+            }
+            return hypixelId.replace(":", "-")
+        }
+
         fun findInternalNameByDisplayName(displayName: String, mayBeMangled: Boolean): String? {
             return filterInternalNameCandidates(
                 findInternalNameCandidatesForDisplayName(displayName),

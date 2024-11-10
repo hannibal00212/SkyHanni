@@ -191,6 +191,7 @@ object ItemUtils {
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
         val nbt = tagCompound ?: return null
+
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
