@@ -119,10 +119,13 @@ object HoppityAPI {
      * REGEX-TEST: Chocolate Factory
      * REGEX-TEST: Chocolate Shop Milestones
      * REGEX-TEST: Chocolate Factory Milestones
+     * REGEX-TEST: Chocolate Breakfast Egg
+     * REGEX-TEST: Chocolate Lunch Egg
+     * REGEX-TEST: Chocolate Dinner Egg
      */
     private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.misc",
-        "(?:§.)*Chocolate (?:Shop |Factory ?)(?:Milestones)?",
+        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
     )
 
     private fun addProcessedSlot(slot: Slot) {
