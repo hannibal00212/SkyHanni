@@ -345,13 +345,15 @@ object HoppityEventSummary {
         val currentSeason = SkyblockSeason.currentSeason
         val isSpring = currentSeason == SkyblockSeason.SPRING
 
-        getUnsummarizedYearStats().forEach { (year, stats) ->
-            if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
-                sendStatsMessage(stats, year)
-                storage?.let {
-                    it.hoppityEventStats[year]?.summarized = true
-                } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
-            }
+        for ((year, stats) in getUnsummarizedYearStats()) {
+            val isFutureYear = year >= currentYear
+            val isCurrentYearButNotSpring = year == currentYear && !isSpring
+            if (isFutureYear && !(isCurrentYearButNotSpring && config.eventSummary.enabled)) continue
+
+            sendStatsMessage(stats, year)
+            storage?.let {
+                it.hoppityEventStats[year]?.summarized = true
+            } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
         }
     }
 
