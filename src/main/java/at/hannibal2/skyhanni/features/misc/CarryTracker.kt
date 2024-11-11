@@ -128,8 +128,7 @@ object CarryTracker {
         }
     }
 
-    @Suppress("ReturnCount")
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
             ChatUtils.userError(
                 "Usage:\n" +
@@ -305,8 +304,7 @@ object CarryTracker {
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
-                                "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),
