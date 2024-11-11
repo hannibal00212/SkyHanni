@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -112,7 +114,7 @@ class Mob(
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
@@ -150,6 +152,9 @@ class Mob(
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
+    val health: Float get() = baseEntity.health
+    val maxHealth: Int get() = baseEntity.baseMaxHealth
+
     init {
         removeExtraEntitiesFromChecking()
         relativeBoundingBox =
@@ -157,7 +162,7 @@ class Mob(
 
         owner = (
             ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+                summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
     }

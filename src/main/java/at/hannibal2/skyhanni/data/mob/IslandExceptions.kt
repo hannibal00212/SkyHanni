@@ -257,7 +257,7 @@ object IslandExceptions {
             .firstOrNull {
                 it != null &&
                     it.distanceTo(baseEntity) < 4.0 &&
-                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL
+                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL_TEXTURE
             }?.let {
                 MobData.MobResult.found(Mob(baseEntity, mobType = Mob.Type.BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is EntityZombie) MobData.MobResult.notYetFound else null

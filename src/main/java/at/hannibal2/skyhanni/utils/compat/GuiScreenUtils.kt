@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import org.lwjgl.input.Mouse
+//#if MC < 1.16
+import net.minecraft.client.gui.ScaledResolution
+//#endif
 
 object GuiScreenUtils {
 
