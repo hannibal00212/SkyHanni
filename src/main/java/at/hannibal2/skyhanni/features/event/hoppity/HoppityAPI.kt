@@ -148,8 +148,10 @@ object HoppityAPI {
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         InventoryUtils.getItemsInOpenChest().filter { shouldProcessStraySlot(it) }.forEach {
+            var processed = false
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
+                processed = true
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
@@ -174,8 +176,9 @@ object HoppityAPI {
                 lastMeal = STRAY
                 duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 attemptFireRabbitFound()
+                processed = true
             }
-            addProcessedSlot(it)
+            if (processed) addProcessedSlot(it)
         }
     }
 
