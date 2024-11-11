@@ -128,6 +128,7 @@ object CarryTracker {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
             ChatUtils.userError(
