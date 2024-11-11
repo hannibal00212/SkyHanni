@@ -106,7 +106,7 @@ object HoppityEventSummary {
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
         if (!HoppityAPI.isHoppityEvent()) return
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
 
         stats.mealsFound.addOrPut(event.eggType, 1)
         val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
@@ -144,7 +144,7 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!HoppityAPI.isHoppityEvent()) return
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
 
         if (rabbitTheFishPattern.matches(event.message)) {
             stats.rabbitTheFishFinds++
@@ -156,9 +156,9 @@ object HoppityEventSummary {
         if (!liveDisplayEnabled()) return
         val storage = storage ?: return
         val statYear = storage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
-            ?: SkyBlockTime.now().year
+            ?: getCurrentSBYear()
 
-        val stats = getYearStats(statYear).first
+        val stats = getYearStats(statYear)
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
         if (statsHash != lastKnownStatHash) {
@@ -250,7 +250,7 @@ object HoppityEventSummary {
         }
 
         // If it's been more than {config} since the last update, send a message
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
         val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: SimpleTimeMark.farPast()
         if (lastLbUpdate.passedSince() >= updateCfConfig.reminderInterval.minutes) {
             lastSentCfUpdateMessage = SimpleTimeMark.now()
@@ -320,21 +320,17 @@ object HoppityEventSummary {
         )
     }
 
-    private fun getYearStats(year: Int? = null): Pair<HoppityEventStats?, Int> {
-        val queryYear = year ?: SkyBlockTime.now().year
-        val yearStorage = storage?.hoppityEventStats?.getOrPut(
-            (year ?: SkyBlockTime.now().year),
-            ::HoppityEventStats,
-        )
-        return Pair(yearStorage, queryYear)
-    }
+    private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
+        storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
+
+    private fun getCurrentSBYear() = SkyBlockTime.now().year
 
     private fun checkAddCfTime() {
         if (!ChocolateFactoryAPI.inChocolateFactory) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
             return
         }
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
         lastAddedCfMillis.takeIfInitialized()?.let {
             stats.millisInCf += it.passedSince()
         }
@@ -342,10 +338,12 @@ object HoppityEventSummary {
     }
 
     private fun checkEnded() {
-        val (stats, year) = getYearStats()
+        val year = getCurrentSBYear()
+        val stats = getYearStats()
         if (stats == null || stats.summarized) return
 
-        val currentYear = SkyBlockTime.now().year
+        val currentYear = getCurrentSBYear()
+        // TODO year and currentYear are the same. logical errors below?
         val currentSeason = SkyblockSeason.currentSeason
         val isSpring = currentSeason == SkyblockSeason.SPRING
 
@@ -362,7 +360,7 @@ object HoppityEventSummary {
 
     fun updateCfPosition(position: Int?, percentile: Double?) {
         if (!HoppityAPI.isHoppityEvent() || position == null || percentile == null) return
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
         val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
         stats.finalLeaderboardPosition = snapshot
@@ -371,7 +369,7 @@ object HoppityEventSummary {
 
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
         if (!HoppityAPI.isHoppityEvent()) return
-        val stats = getYearStats().first ?: return
+        val stats = getYearStats() ?: return
         val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
         rarityMap.strays++
         stats.strayChocolateGained += chocGained
@@ -406,10 +404,9 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
-                stats.mealsFound[HoppityEggType.BOUGHT]?.let {
-                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
-                    statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
-                }
+                val found = stats.mealsFound[HoppityEggType.BOUGHT] ?: 0
+                val rabbitFormat = StringUtils.pluralize(found, "Rabbit")
+                statList.addStr("§7You bought §b$found §f$rabbitFormat §7from §aHoppity§7.")
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
