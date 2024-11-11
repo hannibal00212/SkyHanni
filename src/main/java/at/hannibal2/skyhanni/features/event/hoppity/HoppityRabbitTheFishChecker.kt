@@ -61,10 +61,11 @@ object HoppityRabbitTheFishChecker {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName()
+            it.value.hasDisplayName() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key
@@ -94,5 +95,5 @@ object HoppityRabbitTheFishChecker {
         return shouldContinue
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingFish
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingRabbitTheFish
 }
