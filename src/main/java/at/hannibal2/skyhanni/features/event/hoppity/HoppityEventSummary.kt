@@ -320,6 +320,9 @@ object HoppityEventSummary {
         )
     }
 
+    private fun getUnsummarizedYearStats(): MutableMap<Int, HoppityEventStats> =
+        storage?.hoppityEventStats?.filterValues { !it.summarized }?.toMutableMap() ?: mutableMapOf()
+
     private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
         storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
 
@@ -338,20 +341,17 @@ object HoppityEventSummary {
     }
 
     private fun checkEnded() {
-        val year = getCurrentSBYear()
-        val stats = getYearStats()
-        if (stats == null || stats.summarized) return
-
         val currentYear = getCurrentSBYear()
-        // TODO year and currentYear are the same. logical errors below?
         val currentSeason = SkyblockSeason.currentSeason
         val isSpring = currentSeason == SkyblockSeason.SPRING
 
-        if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
-            sendStatsMessage(stats, year)
-            storage?.let {
-                it.hoppityEventStats[year]?.summarized = true
-            } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
+        getUnsummarizedYearStats().forEach { (year, stats) ->
+            if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
+                sendStatsMessage(stats, year)
+                storage?.let {
+                    it.hoppityEventStats[year]?.summarized = true
+                } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
+            }
         }
     }
 
@@ -404,9 +404,10 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
-                val found = stats.mealsFound[HoppityEggType.BOUGHT] ?: 0
-                val rabbitFormat = StringUtils.pluralize(found, "Rabbit")
-                statList.addStr("§7You bought §b$found §f$rabbitFormat §7from §aHoppity§7.")
+                stats.mealsFound[HoppityEggType.BOUGHT]?.let {
+                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
+                    statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
+                }
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
