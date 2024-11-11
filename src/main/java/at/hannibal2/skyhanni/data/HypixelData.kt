@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -400,10 +399,7 @@ object HypixelData {
     private fun sendLocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                HypixelCommands.locraw()
-            }
+            HypixelCommands.locraw()
         }
     }
 

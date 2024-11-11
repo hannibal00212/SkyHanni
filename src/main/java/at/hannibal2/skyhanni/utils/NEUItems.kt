@@ -112,6 +112,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
+    // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
         return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
@@ -210,11 +211,7 @@ object NEUItems {
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
         try {
-            // TODO remove workaround once rendering goblin raid textures doesnt cause errors
-//             if (item.name != "Goblin" || Minecraft.getMinecraft().thePlayer.isSneaking) {
-            if (item.name != "Goblin") {
-                Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-            }
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         } catch (e: Exception) {
             if (lastWarn.passedSince() > 1.seconds) {
                 lastWarn = SimpleTimeMark.now()
