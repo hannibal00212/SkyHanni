@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import java.util.regex.Matcher
 import kotlin.time.Duration
 
 enum class HoppityEggType(
@@ -52,7 +55,15 @@ enum class HoppityEggType(
 
         fun allFound() = resettingEntries.forEach { it.markClaimed() }
 
-        fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
+        private fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
+
+        internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
+            HoppityEggType.getMealByName(group("meal")) ?: run {
+                ErrorManager.skyHanniError(
+                    "Unknown meal: ${group("meal")}",
+                    "message" to event.message,
+                )
+            }
 
         fun checkClaimed() {
             val currentSbTime = SkyBlockTime.now()
