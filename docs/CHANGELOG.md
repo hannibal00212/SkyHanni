@@ -76,6 +76,7 @@
 + Reordered commands in categories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2642)
 + Renamed some commands for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2642)
 + Added Spirit Sceptre message to block annoying messages. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2863)
++ Added `/boo` support for tab completion. - Empa (https://github.com/hannibal002/SkyHanni/pull/2885)****
 
 #### Combat Improvements
 
@@ -113,10 +114,12 @@
 + Added the date to the Custom Scoreboard Lobby code. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2802)
 + Added an option to display the profile type instead of the name in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2810)
 + Improved performance when checking the Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/2765)
++ Added a dropdown menu to select the Lobby Code date format. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2890)
 
 #### Dungeon Improvements
 
 + Improved various Dungeon-related features. - Empa (https://github.com/hannibal002/SkyHanni/pull/2108)
++ Added support for Kuudra and Dungeons in Island-Specific Lava Replacement. - Fazfoxy, Empa (https://github.com/hannibal002/SkyHanni/pull/2794)
 
 #### Garden Improvements
 
@@ -162,6 +165,7 @@
 + Fixed "Dungeon Potion level as stack size" not working in shop menus. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2825)
 + Fixed being unable to use the "Close" button when "Change all clicks to shift clicks in brewing stands" is enabled. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2824)
 + Fixed a rare error message when using Experimentation Table features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2833)
++ Fixed an error in the Personal Compactor Overlay. - Empa (https://github.com/hannibal002/SkyHanni/pull/2888)
 
 #### Combat Fixes
 
@@ -179,6 +183,8 @@
 + Fixed some Custom Scoreboard errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2779)
 + Fixed party leader not displaying correctly in the Custom Scoreboard. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2783)
 + Fixed the Broodmother line in the Custom Scoreboard having a leading space. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2810)
++ Fixed the Custom Scoreboard not displaying Dojo lines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2901)
++ Fixed scoreboard flickering when using Apec and Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2892)
 
 #### Hoppity Fixes
 
@@ -213,6 +219,9 @@
 
 + Fixed a crash when attempting to edit the Flowstate Helper config. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2740)
 + Fixed not detecting mining most "pure ores". - Empa (https://github.com/hannibal002/SkyHanni/pull/2827)
++ Fixed Deep Caverns Guide not activating when the Lift menu is locked. - Luna (https://github.com/hannibal002/SkyHanni/pull/2887)
++ Fixed Deep Caverns Guide activating even after unlocking the Obsidian Sanctuary. - Luna (https://github.com/hannibal002/SkyHanni/pull/2887)
++ Fixed Mining Event display glitching with Goblin Raid. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2894)
 
 #### Chocolate Factory Fixes
 
@@ -232,6 +241,7 @@
 + Fixed the "found by" line in bingo showing up accidentally. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2874)
 + Fixed lobby basket waypoints. - martimavocado & Erymanthus (https://github.com/hannibal002/SkyHanni/pull/2660)
 + Fixed Great Spook chat solution sending random characters in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2878)
++ Fixed the Rabbit the Fish highlighter sometimes causing softlocks. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2896)
 
 #### Rift Fixes
 
@@ -262,6 +272,9 @@
 + Fixed white names in Enable Chat Formatting. - !nea (https://github.com/hannibal002/SkyHanni/pull/2871)
 + Fixed Overflow Level/XP calculation being incorrect. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2808)
     +  Hypixel now shows the correct amount of overflow XP when max level is reached.
++ Fixed item data not loading. - nopo (https://github.com/hannibal002/SkyHanni/pull/2903)
++ Fixed the Island Area list not updating. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2904)
++ Fixed "You are sending commands too fast" error when swapping lobbies. - nopo (https://github.com/hannibal002/SkyHanni/pull/2906)
 
 ### Technical Details
 
@@ -325,6 +338,12 @@
 + Handles the number of Champion stacks. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2865)
 + Added CircularList. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2878)
     +  A CircularList allows continuous retrieval of elements in order, looping back to the start when the end is reached.
++ Added a property to skip Detekt. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2881)
++ Started using some of the preprocessed compatibility methods. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2882)
++ Added more preprocessed mappings and made most of the compatibility files work for 1.16. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2883)
++ Unusable enchantments are no longer treated as lore lines by the enchant parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2889)
++ Enchantment-exclusive regex now allows any combination of prefixed colour codes. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2891)
++ Added a `DateFormat` enum that contains various date formats. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2890)
 
 ## Version 0.27
 
