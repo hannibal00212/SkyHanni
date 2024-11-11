@@ -195,7 +195,7 @@ object HoppityAPI {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            if (group("rabbitname").equals(lastName)) {
+            if (group("rabbitname") == lastName) {
                 lastMeal = HoppityEggType.BOUGHT
                 EggFoundEvent(HoppityEggType.BOUGHT).post()
                 attemptFireRabbitFound()

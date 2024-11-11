@@ -648,6 +648,7 @@ public class ProfileSpecificStorage {
         @Expose
         public int selfKillingAnimals;
 
+        // TODO change to sh tracker
         @Expose
         public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities = new HashMap<>();
     }
