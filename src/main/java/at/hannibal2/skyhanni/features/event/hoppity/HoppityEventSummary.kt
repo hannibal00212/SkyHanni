@@ -526,6 +526,12 @@ object HoppityEventSummary {
             }
         }
 
+        // If no stats are found, or the stats are only newlines, display a message
+        if (statList.all { it.string.isBlank() } || statList.isEmpty()) {
+            statList.add(StatString("§c§lNothing to show!"))
+            statList.add(StatString("§c§oFind some eggs in the future!"))
+        }
+
         return statList
     }
 
@@ -536,12 +542,6 @@ object HoppityEventSummary {
             getStatsStrings(stats, eventYear).forEach {
                 if (it.headed) appendHeadedLine(it.string)
                 else appendLine(it.string)
-            }
-
-            // If no stats are found, display a message
-            if (toString().replace("\n", "").isEmpty()) {
-                appendHeadedLine("§c§lNothing to show!")
-                appendHeadedLine("§c§oGo find some eggs!")
             }
         }
 
