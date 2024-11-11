@@ -59,6 +59,7 @@ class SkyHanniMod {
         loadModule(CrimsonIsleReputationHelper(this))
 
         SkyHanniEvents.init(modules)
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         CommandRegistrationEvent.post()
 
@@ -76,7 +77,6 @@ class SkyHanniMod {
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
-            EnoughUpdatesManager.reloadRepo()
             repo.loadRepoInformation()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()

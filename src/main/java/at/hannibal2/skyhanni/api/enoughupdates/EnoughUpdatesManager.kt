@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
 
@@ -57,7 +58,9 @@ object EnoughUpdatesManager {
     fun getItemInformation() = itemMap
 
     fun downloadRepo() {
-        EnoughUpdatesRepo.downloadRepo()
+        SkyHanniMod.coroutineScope.launch {
+            EnoughUpdatesRepo.downloadRepo()
+        }
     }
 
     fun reloadRepo() {
@@ -76,6 +79,7 @@ object EnoughUpdatesManager {
                 itemMap.putAll(tempItemMap)
             }
             NeuRepositoryReloadEvent().postAndCatch()
+            ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
         }
     }
 
@@ -87,7 +91,7 @@ object EnoughUpdatesManager {
         for (file in itemDir.listFiles() ?: return) {
             if (file.extension != "json") continue
             try {
-                InputStreamReader(FileInputStream(file)).use { reader ->
+                InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8).use { reader ->
                     val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
                     tempItemMap[file.nameWithoutExtension] = parseItem(file.nameWithoutExtension, json) ?: continue
                 }
@@ -370,21 +374,16 @@ object EnoughUpdatesManager {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
             event.register("neureloadrepo") {
+                aliases = listOf("shreloadneurepo")
                 description = "Reloads the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback {
-                    reloadRepo()
-                    ChatUtils.chat("Reloaded NEU repo")
-                }
+                callback { reloadRepo() }
             }
             event.register("neuresetrepo") {
+                aliases = listOf("shresetneurepo")
                 description = "Redownload the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
-                callback {
-                    downloadRepo()
-                    reloadRepo()
-                    ChatUtils.chat("Updated NEU repo")
-                }
+                callback { downloadRepo() }
             }
         }
     }

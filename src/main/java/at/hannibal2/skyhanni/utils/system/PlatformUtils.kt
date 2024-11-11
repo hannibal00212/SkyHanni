@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.system
 
-import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import net.minecraft.launchwrapper.Launch
@@ -37,7 +36,6 @@ object PlatformUtils {
         try {
             Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
         } catch (e: Throwable) {
-            EnoughUpdatesManager.downloadRepo()
             return
         }
 
@@ -62,8 +60,6 @@ object PlatformUtils {
             "§cPlease update NotEnoughUpdates to version 2.4.0",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
-
-        EnoughUpdatesManager.downloadRepo()
     }
 
 }
