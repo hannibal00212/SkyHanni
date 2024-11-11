@@ -320,8 +320,8 @@ object HoppityEventSummary {
         )
     }
 
-    private fun getUnsummarizedYearStats(): MutableMap<Int, HoppityEventStats> =
-        storage?.hoppityEventStats?.filterValues { !it.summarized }?.toMutableMap() ?: mutableMapOf()
+    private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
+        storage?.hoppityEventStats?.filterValues { !it.summarized } ?: emptyMap()
 
     private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
         storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
