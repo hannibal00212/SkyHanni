@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -289,11 +288,6 @@ object Commands {
             description = "Teleports you to the nearest infested plot"
             category = CommandCategory.USERS_ACTIVE
             callback { PestFinder.teleportNearestInfestedPlot() }
-        }
-        event.register("shhoppitystats") {
-            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
-            category = CommandCategory.USERS_ACTIVE
-            callback { HoppityEventSummary.sendStatsMessage(it) }
         }
         event.register("shcolors") {
             description = "Prints a list of all Minecraft color & formatting codes in chat."

@@ -122,11 +122,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§7Obtained by finding the §aStray Rabbit
+     * REGEX-TEST: §7§7Obtained by finding a §6Golden Stray
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
-        "§7§7Obtained by finding the §aStray Rabbit",
+        "(?:§.)+Obtained by finding a §6Golden Stray",
     )
 
     /**

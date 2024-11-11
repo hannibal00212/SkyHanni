@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
@@ -22,6 +23,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -44,9 +47,15 @@ object DeepCavernsGuide {
             "",
             "§7Manually enable the ",
             "§7guide to the bottom",
-            "§7of the Deep Caverns."
+            "§7of the Deep Caverns.",
         )
     }
+
+    private val patternGroup = RepoPattern.group("features.mining.deepcavernsguide")
+    private val notUnlockedPattern by patternGroup.pattern(
+        "notunlocked",
+        "§e\\[NPC] §bLift Operator§f: §rVenture down into the Lapis Quarry to unlock my Lift Menu!",
+    )
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
@@ -65,7 +74,7 @@ object DeepCavernsGuide {
             depth = false,
             onEndReach = {
                 show = false
-            }
+            },
         )
         updateConfig()
     }
@@ -86,6 +95,15 @@ object DeepCavernsGuide {
     }
 
     @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
+        if (notUnlockedPattern.matches(event.message)) {
+            start()
+        }
+    }
+
+    @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         showStartIcon = false
         if (!isEnabled()) return
@@ -93,20 +111,15 @@ object DeepCavernsGuide {
         if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
         showStartIcon = true
 
-        event.inventoryItems[30]?.let {
+        event.inventoryItems[31]?.let {
             if (it.displayName != "§aObsidian Sanctuary") {
-                if (!show) {
-                    start()
-                    ChatUtils.chat(
-                        "Automatically enabling Deep Caverns Guide, " +
-                            "helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
-                    )
-                }
+                start()
             }
         }
     }
 
     private fun start() {
+        if (show) return
         show = true
         parkourHelper?.reset()
         if (parkourHelper == null) {
@@ -116,9 +129,12 @@ object DeepCavernsGuide {
                     SkyHanniMod.repo.updateRepo()
                 },
                 "§eClick to update the repo!",
-                prefixColor = "§c"
+                prefixColor = "§c",
             )
         }
+        ChatUtils.chat(
+            "Automatically enabling Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
+        )
     }
 
     @SubscribeEvent
