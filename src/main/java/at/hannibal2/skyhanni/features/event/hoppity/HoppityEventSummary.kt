@@ -91,6 +91,8 @@ object HoppityEventSummary {
     private data class StatString(val string: String, val headed: Boolean = true)
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) =
         this.add(StatString(string, headed))
+    private fun MutableList<StatString>.addEmptyLine() =
+        this.add(StatString("", false))
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -472,11 +474,10 @@ object HoppityEventSummary {
                 }
             }
 
-            val emptyStatString = StatString("", false)
-            put(HoppityStat.EMPTY_1) { sl, _, _ -> sl.add(emptyStatString) }
-            put(HoppityStat.EMPTY_2) { sl, _, _ -> sl.add(emptyStatString) }
-            put(HoppityStat.EMPTY_3) { sl, _, _ -> sl.add(emptyStatString) }
-            put(HoppityStat.EMPTY_4) { sl, _, _ -> sl.add(emptyStatString) }
+            put(HoppityStat.EMPTY_1) { sl, _, _ -> sl.addEmptyLine() }
+            put(HoppityStat.EMPTY_2) { sl, _, _ -> sl.addEmptyLine() }
+            put(HoppityStat.EMPTY_3) { sl, _, _ -> sl.addEmptyLine() }
+            put(HoppityStat.EMPTY_4) { sl, _, _ -> sl.addEmptyLine() }
         }
     }
 
@@ -528,8 +529,10 @@ object HoppityEventSummary {
 
         // If no stats are found, or the stats are only newlines, display a message
         if (statList.all { it.string.isBlank() } || statList.isEmpty()) {
-            statList.add(StatString("§c§lNothing to show!"))
-            statList.add(StatString("§c§oFind some eggs in the future!"))
+            statList.clear()
+            statList.addEmptyLine()
+            statList.addStr("§c§lNothing to show!")
+            statList.addStr("§c§oFind some eggs in the future!")
         }
 
         return statList
