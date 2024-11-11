@@ -128,7 +128,6 @@ object CarryTracker {
         }
     }
 
-    @Suppress("ReturnCount")
     private fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
             ChatUtils.userError(
@@ -157,13 +156,22 @@ object CarryTracker {
             return
         }
 
-        val customerName = args[0]
+        onAddCarryCommand(args)
+    }
 
+    private fun onAddCarryCommand(args: Array<String>) {
+        val customerName = args[0]
         val rawType = args[1]
         val carryType = getCarryType(rawType) ?: return
-
         val amountRequested = args[2].formatIntOrUserError() ?: return
+        addCarry(carryType, amountRequested, customerName)
+    }
 
+    private fun addCarry(
+        carryType: CarryType,
+        amountRequested: Int,
+        customerName: String,
+    ) {
         val newCarry = Carry(carryType, amountRequested)
 
         for (customer in customers) {
@@ -212,18 +220,56 @@ object CarryTracker {
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
-    private fun getCustomer(customerName: String): Customer {
-        for (customer in customers) {
-            if (customer.name.equals(customerName, ignoreCase = true)) {
-                return customer
-            }
-        }
-        val customer = Customer(customerName)
-        customers.add(customer)
-        return customer
-    }
+    private fun getCustomer(customerName: String): Customer =
+        customers.firstOrNull { it.name.equals(customerName, ignoreCase = true) } ?: Customer(customerName).also { customers.add(it) }
 
     private fun CarryType.sameType(other: CarryType): Boolean = name == other.name && tier == other.tier
+
+    private fun createDisplay(
+        carry: Carry,
+        customer: Customer,
+        carries: MutableList<Carry>,
+    ): Renderable {
+        val requested = carry.requested
+        val done = carry.done
+        val missing = requested - done
+
+        val color = if (done > requested) "§c" else if (done == requested) "§a" else "§e"
+        val cost = formatCost(carry.type.pricePer?.let { it * requested })
+        val text = "$color$done§8/$color$requested $cost"
+        return Renderable.clickAndHover(
+            Renderable.string("  ${carry.type} $text"),
+            tips = buildList {
+                add("§b${customer.name}' ${carry.type} §cCarry")
+                add("")
+                add("§7Requested: §e$requested")
+                add("§7Done: §e$done")
+                add("§7Missing: §e$missing")
+                add("")
+                if (cost != "") {
+                    add("§7Total cost: §e$cost")
+                    add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
+                } else {
+                    add("§cNo price set for this carry!")
+                    add("§7Set a price with §e/shcarry <type> <price>")
+                }
+                add("")
+                add("§7Run §e/shcarry remove ${customer.name} §7to remove the whole customer!")
+                add("§eClick to send current progress in the party chat!")
+                add("§eControl-click to remove this carry!")
+            },
+            onClick = {
+                if (KeyboardManager.isModifierKeyDown()) {
+                    carries.remove(carry)
+                    update()
+                } else {
+                    HypixelCommands.partyChat(
+                        "${customer.name} ${carry.type.toString().removeColor()} carry: $done/$requested",
+                    )
+                }
+            },
+        )
+    }
 
     private fun update() {
         val list = mutableListOf<Renderable>()
@@ -238,47 +284,7 @@ object CarryTracker {
 
             val carries = customer.carries
             for (carry in carries) {
-                val requested = carry.requested
-                val done = carry.done
-                val missing = requested - done
-
-                val color = if (done > requested) "§c" else if (done == requested) "§a" else "§e"
-                val cost = formatCost(carry.type.pricePer?.let { it * requested })
-                val text = "$color$done§8/$color$requested $cost"
-                list.add(
-                    Renderable.clickAndHover(
-                        Renderable.string("  ${carry.type} $text"),
-                        tips = buildList {
-                            add("§b${customer.name}' ${carry.type} §cCarry")
-                            add("")
-                            add("§7Requested: §e$requested")
-                            add("§7Done: §e$done")
-                            add("§7Missing: §e$missing")
-                            add("")
-                            if (cost != "") {
-                                add("§7Total cost: §e$cost")
-                                add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
-                            } else {
-                                add("§cNo price set for this carry!")
-                                add("§7Set a price with §e/shcarry <type> <price>")
-                            }
-                            add("")
-                            add("§7Run §e/shcarry remove ${customer.name} §7to remove the whole customer!")
-                            add("§eClick to send current progress in the party chat!")
-                            add("§eControl-click to remove this carry!")
-                        },
-                        onClick = {
-                            if (KeyboardManager.isModifierKeyDown()) {
-                                carries.remove(carry)
-                                update()
-                            } else {
-                                HypixelCommands.partyChat(
-                                    "${customer.name} ${carry.type.toString().removeColor()} carry: $done/$requested",
-                                )
-                            }
-                        },
-                    ),
-                )
+                list.add(createDisplay(carry, customer, carries))
             }
         }
         display = list
@@ -288,39 +294,35 @@ object CarryTracker {
         val customerName = customer.name
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
-        if (totalCostFormat != "") {
-            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
-            val missingFormat = formatCost(totalCost - customer.alreadyPaid)
-            list.add(
-                Renderable.clickAndHover(
-                    Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
-                    tips = listOf(
-                        "§7Carries for §b$customerName",
-                        "",
-                        "§7Total cost: $totalCostFormat",
-                        "§7Already paid: $paidFormat",
-                        "§7Still missing: $missingFormat",
-                        "",
-                        "§eClick to send missing coins in party chat!",
-                    ),
-                    onClick = {
-                        HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
-                        )
-                    },
-                ),
-            )
-
-        } else {
-            list.addString("§b$customerName$totalCostFormat")
+        if (totalCostFormat == "") {
+            list.addString("§b$customerName")
+            return
         }
+
+        val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
+        val missingFormat = formatCost(totalCost - customer.alreadyPaid)
+        Renderable.clickAndHover(
+            Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+            tips = listOf(
+                "§7Carries for §b$customerName",
+                "",
+                "§7Total cost: $totalCostFormat",
+                "§7Already paid: $paidFormat",
+                "§7Still missing: $missingFormat",
+                "",
+                "§eClick to send missing coins in party chat!",
+            ),
+            onClick = {
+                HypixelCommands.partyChat(
+                    "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
+                )
+            },
+        ).also { list.add(it) }
     }
 
-    private fun Carry.getCost(): Double? {
-        return type.pricePer?.let {
-            requested * it
-        }?.takeIf { it != 0.0 }
-    }
+    private fun Carry.getCost(): Double? = type.pricePer?.let {
+        requested * it
+    }?.takeIf { it != 0.0 }
 
     private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.shortFormat()}"
 
