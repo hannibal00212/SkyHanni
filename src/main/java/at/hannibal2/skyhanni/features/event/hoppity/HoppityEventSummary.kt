@@ -341,14 +341,15 @@ object HoppityEventSummary {
     }
 
     private fun checkEnded() {
+        if (!config.eventSummary.enabled) return
         val currentYear = getCurrentSBYear()
         val currentSeason = SkyblockSeason.currentSeason
         val isSpring = currentSeason == SkyblockSeason.SPRING
 
         for ((year, stats) in getUnsummarizedYearStats()) {
-            val isFutureYear = year >= currentYear
-            val isCurrentYearButNotSpring = year == currentYear && !isSpring
-            if (isFutureYear && !(isCurrentYearButNotSpring && config.eventSummary.enabled)) continue
+            val isPastYear = year < currentYear
+            val isPastSpring = (year == currentYear && !isSpring)
+            if (!isPastYear && !isPastSpring) continue
 
             sendStatsMessage(stats, year)
             storage?.let {
