@@ -176,7 +176,6 @@ object HoppityAPI {
                 lastMeal = STRAY
                 duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 attemptFireRabbitFound()
-                processed = true
             }
             if (processed) addProcessedSlot(it)
         }
