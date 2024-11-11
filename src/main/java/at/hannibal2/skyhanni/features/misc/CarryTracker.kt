@@ -156,22 +156,12 @@ object CarryTracker {
             return
         }
 
-        onAddCarryCommand(args)
+        addCarry(args[0], args[1], args[2])
     }
 
-    private fun onAddCarryCommand(args: Array<String>) {
-        val customerName = args[0]
-        val rawType = args[1]
+    private fun addCarry(customerName: String, rawType: String, amount: String) {
         val carryType = getCarryType(rawType) ?: return
-        val amountRequested = args[2].formatIntOrUserError() ?: return
-        addCarry(carryType, amountRequested, customerName)
-    }
-
-    private fun addCarry(
-        carryType: CarryType,
-        amountRequested: Int,
-        customerName: String,
-    ) {
+        val amountRequested = amount.formatIntOrUserError() ?: return
         val newCarry = Carry(carryType, amountRequested)
 
         for (customer in customers) {
@@ -198,8 +188,7 @@ object CarryTracker {
             return
         }
 
-        val customer = getCustomer(customerName)
-        customer.carries.add(newCarry)
+        getCustomer(customerName).carries.add(newCarry)
         update()
         ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
     }
@@ -239,7 +228,7 @@ object CarryTracker {
         val text = "$color$done§8/$color$requested $cost"
         return Renderable.clickAndHover(
             Renderable.string("  ${carry.type} $text"),
-            tips = buildList {
+            tips = buildList<String> {
                 add("§b${customer.name}' ${carry.type} §cCarry")
                 add("")
                 add("§7Requested: §e$requested")
