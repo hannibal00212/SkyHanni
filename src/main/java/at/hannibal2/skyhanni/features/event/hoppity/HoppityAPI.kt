@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -136,12 +137,14 @@ object HoppityAPI {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        inMiscProcessInventory = false
         if (lastHoppityCallAccept == null) return
         DelayedRun.runDelayed(1.seconds) {
             lastHoppityCallAccept = null
         }
     }
 
+    /**
      * REGEX-TEST: §eClick to claim!
      */
     private val claimableMilestonePattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -218,11 +221,6 @@ object HoppityAPI {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inMiscProcessInventory = miscProcessInvPattern.matches(event.inventoryName)
-    }
-
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inMiscProcessInventory = false
     }
 
     private fun shouldProcessMiscSlot(slot: Slot) =
