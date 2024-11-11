@@ -321,7 +321,7 @@ object HoppityEventSummary {
     }
 
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
-        storage?.hoppityEventStats?.filterValues { !it.summarized } ?: emptyMap()
+        storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
     private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
         storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
