@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class CakeTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Track which Cakes you have/need. §cWill not fully work with NEU Storage Overlay.")
+    @ConfigOption(name = "Enabled", desc = "Tracks which Cakes you have/need. §cWill not fully work with NEU Storage Overlay enabled.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -42,7 +42,7 @@ public class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Missing Color",
-        desc = "The color that should be used to highlight unobtained cakes in the auction house."
+        desc = "The color that should be used to highlight unobtained cakes in the Auction House."
     )
     @ConfigEditorColour
     public String unobtainedAuctionHighlightColor = LorenzColor.RED.toConfigColor();
@@ -50,7 +50,7 @@ public class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Owned Color",
-        desc = "The color that should be used to highlight obtained cakes in the auction house."
+        desc = "The color that should be used to highlight obtained cakes in the Auction House."
     )
     @ConfigEditorColour
     public String obtainedAuctionHighlightColor = LorenzColor.GREEN.toConfigColor();
