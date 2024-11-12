@@ -71,7 +71,7 @@ object AttributeAPI {
 
         companion object {
 
-            fun getByInternalNameOrNull(internalName: String) = entries.find { it.internalName == internalName }
+            fun getByInternalNameOrNull(internalName: String) = entries.find { it.internalName.equals(internalName, true) }
 
             fun getByInternalName(internalName: String) = getByInternalNameOrNull(internalName) ?: UNKNOWN
         }
@@ -93,13 +93,16 @@ object AttributeAPI {
         }
     }
 
-    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? =
-        getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
-            AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
-        }?.toPair()
+    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? {
+        val attributes = getAttributes() ?: return null
+        if (attributes.isEmpty()) return null
+        return attributes.mapNotNull { (name, level) ->
+            AttributeType.getByInternalNameOrNull(name)?.let { Attribute(it, level) }
+        }.toPair()
+    }
 
     /**
-     * Assumes it's already not a good roll
+     * Assumes it's already not a Good Roll
      */
     fun AttributeType.isPartialRoll(internalName: NEUInternalName): Boolean {
         val rolls = goodRolls.find { it.regex.matches(internalName.asString()) } ?: return false
@@ -123,9 +126,6 @@ object AttributeAPI {
     }
 
     fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean =
-        goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
-            val attributes = first.type to second.type
-            goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }
-        } ?: false
+        getRollType(internalName) == RollType.GOOD_ROLL
 
 }
