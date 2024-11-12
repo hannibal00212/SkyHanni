@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
@@ -242,7 +243,9 @@ object PlayerNameFormatter {
         if (author.getText().contains("ADMIN")) return author
         if (config.ignoreYouTube && author.getText().contains("YOUTUBE")) return author
         val (rank, name) = author.splitPlayerNameAndExtras()
-        val coloredName = createColoredName(name, levelColor, name.getText().removeColor())
+        val rankColor =
+            if (rank != null && rank.sampleAtStart() === name.sampleAtStart()) FontRenderer.getFormatFromString(rank.getText()) else ""
+        val coloredName = createColoredName(name, levelColor, name.getText().removeColor(), rankColor)
         return if (config.playerRankHider || rank == null) coloredName else rank + coloredName
     }
 
@@ -250,9 +253,10 @@ object PlayerNameFormatter {
         name: ComponentSpan,
         levelColor: String?,
         removeColor: String,
+        rankColor: String,
     ): ComponentSpan = when {
         MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
-            ChatComponentText(MarkedPlayerManager.replaceInChat(removeColor))
+            ChatComponentText(MarkedPlayerManager.replaceInChat(rankColor + removeColor))
                 .setChatStyle(name.sampleStyleAtStart()).intoSpan()
 
         levelColor != null && config.useLevelColorForName ->
@@ -266,7 +270,11 @@ object PlayerNameFormatter {
                 .style { color = EnumChatFormatting.AQUA }
                 .intoSpan()
 
-        else -> name
+        else ->
+            if (rankColor.isEmpty()) name
+            else ChatComponentText(rankColor + removeColor)
+                .setChatStyle(name.sampleStyleAtStart())
+                .intoSpan()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
