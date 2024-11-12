@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -14,10 +15,20 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class CakeTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Tracks which Cakes you have/need. §cWill not fully work with NEU Storage Overlay enabled.")
+    @ConfigOption(name = "Enabled", desc = "Tracks which Cakes you have/need.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Note",
+        desc = "§cNote7:" +
+            "\nThis feature is not compatible with the NEU Storage Overlay." +
+            "\nBackpacks/Ender Chest will not be scanned correctly with it enabled."
+    )
+    @ConfigEditorInfoText
+    public boolean incompatibleNote = false;
 
     @Expose
     @ConfigLink(owner = CakeTrackerConfig.class, field = "enabled")
@@ -38,6 +49,11 @@ public class CakeTrackerConfig {
         OLDEST_FIRST,
         NEWEST_FIRST,
     }
+
+    @Expose
+    @ConfigOption(name = "Price on Hover", desc = "Show the prices of cakes when hovering over them in the tracker.")
+    @ConfigEditorBoolean
+    public boolean priceOnHover = true;
 
     @Expose
     @ConfigOption(

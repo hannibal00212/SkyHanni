@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,8 +23,11 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,11 +36,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 private typealias DisplayOrder = CakeTrackerDisplayOrderType
 private typealias DisplayType = CakeTrackerDisplayType
@@ -48,13 +55,13 @@ object CakeTracker {
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
 
     private var currentYear = 0
-    private var inCakeBag = false
     private var inCakeInventory = false
     private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
     private var inAuctionHouse = false
     private var slotHighlightCache = mapOf<Int, Color>()
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
+    private var cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
 
     private var cakeRenderables = listOf<Renderable>()
     private var lastKnownCakeDataHash = 0
@@ -74,21 +81,23 @@ object CakeTracker {
     )
 
     /**
-     * REGEX-TEST: Ender Chest (2/9)
-     * REGEX-TEST: Jumbo Backpack (Slot #6)
-     * REGEX-TEST: New Year Cake Bag
+     * REGEX-TEST: §eYou purchased §r§f§r§f§r§cNew Year Cake (Year 143) §r§efor §r§62,000,000 coins§r§e!
      */
-    private val cakeContainerPattern by patternGroup.pattern(
-        "cake.container",
-        "Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag",
+    private val cakePurchasedPattern by patternGroup.pattern(
+        "cake.purchased",
+        "§eYou purchased (?:§.)*New Year Cake \\(Year (?<year>[\\d,]+)\\) (?:§.)*for (?:§.)+(?<coins>[\\d,]+) coins(?:§.)+!",
     )
 
     /**
+     * REGEX-TEST: Ender Chest (2/9)
+     * REGEX-TEST: Jumbo Backpack (Slot #6)
      * REGEX-TEST: New Year Cake Bag
+     * REGEX-TEST: Large Chest
+     * REGEX-TEST: Chest
      */
-    private val cakeBagPattern by patternGroup.pattern(
-        "cake.bag",
-        "New Year Cake Bag",
+    private val cakeContainerPattern by patternGroup.pattern(
+        "cake.container",
+        "Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag|(Large )?Chest",
     )
 
     /**
@@ -138,6 +147,15 @@ object CakeTracker {
     }
 
     @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        cakePurchasedPattern.matchMatcher(event.message) {
+            val year = group("year").formatInt()
+            addCake(year)
+        }
+    }
+
+    @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.maxDisplayRows) {
             lastKnownCakeDataHash = 0
@@ -147,7 +165,7 @@ object CakeTracker {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (inCakeBag || (inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes))) {
+        if (inCakeInventory || (inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes))) {
             reRenderDisplay()
         }
     }
@@ -158,7 +176,7 @@ object CakeTracker {
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
 
-        (event.gui.inventorySlots as ContainerChest).getAllItems().forEach { (slot, _) ->
+        (event.gui.inventorySlots as ContainerChest).getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.slotIndex]?.let { color ->
                 slot highlight color
             }
@@ -182,7 +200,6 @@ object CakeTracker {
 
     private fun checkCakeContainer(event: InventoryFullyOpenedEvent) {
         if (!cakeContainerPattern.matches(event.inventoryName)) return
-        if (cakeBagPattern.matches(event.inventoryName)) inCakeBag = true
         knownCakesInCurrentInventory = event.inventoryItems.values.mapNotNull { item ->
             cakeNamePattern.matchMatcher(item.displayName) {
                 val year = group("year").formatInt()
@@ -209,7 +226,6 @@ object CakeTracker {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inCakeBag = false
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
         inAuctionHouse = false
@@ -250,20 +266,56 @@ object CakeTracker {
         storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
     }
 
+    private fun getCakePrice(year: Int): Double {
+        return cakePriceCache.getOrPut(year) {
+            val cakeItem = "NEW_YEAR_CAKE+$year".toInternalName()
+            cakeItem.getPrice()
+        }
+    }
+
+    private fun getCakePriceString(year: Int): String {
+        return getCakePrice(year).takeIf { it > 0}?.let {
+            "§6${it.addSeparators()}"
+        } ?: "§7Unknown (no auctions)"
+    }
+
     private data class CakeRange(var start: Int, var end: Int = 0) {
+        val isSingular = (start == end || end == 0)
+
         fun getRenderable(displayType: DisplayType): Renderable {
-            val colorCode =
-                if (displayType == DisplayType.OWNED_CAKES) "§a"
-                else "§c"
-            val stringRenderable =
-                Renderable.string(
-                    if (end != 0) "§fYears $colorCode$start§f-$colorCode$end"
-                    else "§fYear $colorCode$start",
-                )
+            val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§a" else "§c"
+            val baseRenderable = getHoverable(colorCode)
             return if (displayType == DisplayType.MISSING_CAKES) Renderable.link(
-                stringRenderable,
+                baseRenderable,
                 { HypixelCommands.auctionSearch("New Year Cake (Year $start)") },
-            ) else stringRenderable
+            ) else baseRenderable
+        }
+
+        fun getHoverable(colorCode: String): Renderable {
+            val displayString =
+                if (isSingular) "§fYear $colorCode$start"
+                else "§fYears $colorCode$start§f-$colorCode$end"
+
+            return if (!config.priceOnHover) Renderable.string(displayString)
+            else Renderable.hoverTips(displayString, getPriceHoverTooltip(colorCode))
+        }
+
+        fun getPriceHoverTooltip(colorCode: String): List<String> {
+            return if (isSingular) {
+                listOf("${colorCode}Year $start§7: ${getCakePriceString(start)}")
+            } else buildList {
+                val largerNumber = if (start > end) start else end
+                val smallerNumber = if (start < end) start else end
+                val numericalRange = smallerNumber..largerNumber
+                val rangeLength = abs(end - start) + 1
+
+                numericalRange.take(5).forEach { year ->
+                    add("${colorCode}Year $year§7: ${getCakePriceString(year)}")
+                }
+                if (rangeLength >= 5) add("§7§o... and ${rangeLength - 5} more")
+                add("")
+                add("§aTotal§7: §6${numericalRange.sumOf(::getCakePrice).addSeparators()}")
+            }
         }
     }
 
@@ -274,24 +326,20 @@ object CakeTracker {
 
     private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
         buildList {
-            val ownedString =
-                if (config.displayType == DisplayType.OWNED_CAKES) "§7§l[§r §a§nOwned§r §7§l]"
-                else "§aOwned"
-            val missingString =
-                if (config.displayType == DisplayType.MISSING_CAKES) "§7§l[§r §c§nMissing§r §7§l]"
-                else "§cMissing"
+            val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
+            val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
 
             add(
                 Renderable.optionalLink(
-                    ownedString,
+                    "${ownedColor}[Owned]",
                     { setDisplayType(DisplayType.OWNED_CAKES) },
                     condition = { config.displayType != DisplayType.OWNED_CAKES },
                 ),
             )
-            add(Renderable.string(" §7§l- §r"))
+            add(Renderable.string(" "))
             add(
                 Renderable.optionalLink(
-                    missingString,
+                    "${missingColor}[Missing]",
                     { setDisplayType(DisplayType.MISSING_CAKES) },
                     condition = { config.displayType != DisplayType.MISSING_CAKES },
                 ),
@@ -306,24 +354,20 @@ object CakeTracker {
 
     private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
         buildList {
-            val newestString =
-                if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§7§l[§r §a§nNewest First§r §7§l]"
-                else "§aNewest First"
-            val oldestString =
-                if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§7§l[§r §c§nOldest First§r §7§l]"
-                else "§cOldest First"
+            val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
+            val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
 
             add(
                 Renderable.optionalLink(
-                    newestString,
+                    "${newestColor}[Newest First]",
                     { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
                     condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
                 ),
             )
-            add(Renderable.string(" §7§l- §r"))
+            add(Renderable.string(" "))
             add(
                 Renderable.optionalLink(
-                    oldestString,
+                    "${oldestColor}[Oldest First]",
                     { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
                     condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
                 ),
@@ -341,13 +385,27 @@ object CakeTracker {
         addAll(cakeRenderables)
     }
 
-    private fun buildCakeRenderables(data: CakeData) = buildList {
+    private fun getHeaderTips(data: CakeData) = buildList {
+        val unknownOwned = data.ownedCakes.count { getCakePrice(it) == 0.0 }
+        val unknownMissing = data.missingCakes.count { getCakePrice(it) == 0.0 }
+
+        add("§aHave§7: §a${data.ownedCakes.size}")
         add(
-            Renderable.hoverTips(
-                "§c§lNew §f§lYear §c§lCake §f§lTracker",
-                tips = listOf("§aHave§7: §a${data.ownedCakes.size}§7, §cMissing§7: §c${data.missingCakes.size}"),
-            ),
+            "§6Total value§7: §6${data.ownedCakes.sumOf(::getCakePrice).addSeparators()}"
         )
+        if (unknownOwned > 0) add("  §7§o* $unknownOwned unknown prices")
+        add("")
+        add("§cMissing§7: §c${data.missingCakes.size}")
+        add(
+            "§6Total cost§7: §6${data.missingCakes.sumOf(::getCakePrice).addSeparators()}"
+        )
+        if (unknownMissing > 0) add("  §7§o* $unknownMissing unknown prices")
+        add("")
+        add("§bPercent owned§7: §a${"%.2f".format(data.ownedCakes.size * 100.0 / currentYear)}%")
+    }
+
+    private fun buildCakeRenderables(data: CakeData) = buildList {
+        add(Renderable.hoverTips("§c§lNew §f§lYear §c§lCake §f§lTracker", getHeaderTips(data)))
         add(buildDisplayTypeToggle())
         add(buildOrderTypeToggle())
 
