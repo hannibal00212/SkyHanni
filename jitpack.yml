@@ -1,3 +1,4 @@
 jdk:
-  - openjdk17
-
+  - openjdk21
+install:
+  - ./gradlew publishToMavenLocal

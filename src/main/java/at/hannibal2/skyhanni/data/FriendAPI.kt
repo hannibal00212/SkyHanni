@@ -153,7 +153,8 @@ object FriendAPI {
     }
 
     private fun readName(chatStyle: ChatStyle): String? {
-        for (component in chatStyle.chatHoverEvent.value.siblings) {
+        val hoverEventSiblings = chatStyle.chatHoverEvent?.value?.siblings ?: return null
+        for (component in hoverEventSiblings) {
             val rawName = component.unformattedText
             rawNamePattern.matchMatcher(rawName) {
                 return group("name").cleanPlayerName()

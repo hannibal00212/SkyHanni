@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -63,11 +62,9 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -151,10 +148,6 @@ object Commands {
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
-        }
-        event.register("shcarry") {
-            description = "Keep track of carries you do."
-            callback { CarryTracker.onCommand(it) }
         }
         event.register("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
@@ -285,22 +278,12 @@ object Commands {
             category = CommandCategory.USERS_ACTIVE
             callback { PestFinder.teleportNearestInfestedPlot() }
         }
-        event.register("shhoppitystats") {
-            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
-            category = CommandCategory.USERS_ACTIVE
-            callback { HoppityEventSummary.sendStatsMessage(it) }
-        }
         event.register("shcolors") {
             description = "Prints a list of all Minecraft color & formatting codes in chat."
             category = CommandCategory.USERS_ACTIVE
             @Suppress("AvoidBritishSpelling")
             aliases = listOf("shcolor", "shcolours", "shcolour")
             callback { ColorFormattingHelper.printColorCodeList() }
-        }
-        event.register("shtps") {
-            description = "Informs in chat about the server ticks per second (TPS)."
-            category = CommandCategory.USERS_ACTIVE
-            callback { TpsCounter.tpsCommand() }
         }
     }
 

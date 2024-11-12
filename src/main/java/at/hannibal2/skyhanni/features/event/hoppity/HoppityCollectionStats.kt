@@ -122,11 +122,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§7Obtained by finding the §aStray Rabbit
+     * REGEX-TEST: §7§7Obtained by finding a §6Golden Stray
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
-        "§7§7Obtained by finding the §aStray Rabbit",
+        "(?:§.)+Obtained by finding a §6Golden Stray",
     )
 
     /**
@@ -223,7 +223,7 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else ItemStack(Items.dye, 8)
+            ) else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
             newItemStack.setStackDisplayName(stack.displayName)

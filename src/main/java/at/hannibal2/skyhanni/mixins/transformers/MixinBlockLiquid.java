@@ -20,7 +20,7 @@ public abstract class MixinBlockLiquid {
         ordinal = 0
     )
     TextureAtlasSprite[] replaceRenderedFluid(TextureAtlasSprite[] value) {
-        if (LavaReplacement.replaceLava()) {
+        if (LavaReplacement.isActive()) {
             return this.atlasSpritesWater;
         }
         return value;
