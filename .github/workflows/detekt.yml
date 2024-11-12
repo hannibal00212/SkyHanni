@@ -39,14 +39,31 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
 
+            -   name: Check if this is the latest workflow run
+                id: check_latest
+                run: |
+                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                        | jq -r '.head.sha')
+                    
+                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
+                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
+                    
+                    # Compare the SHAs and set a result variable
+                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
+                        echo "is_latest=true" >> $GITHUB_ENV
+                    else
+                        echo "is_latest=false" >> $GITHUB_ENV
+                    fi
+
             -   name: Add label if detekt fails
-                if: failure()
+                if: ${{ failure() && env.is_latest == 'true' && steps.check_sarif.outputs.exists == 'true' }}
                 uses: actions-ecosystem/action-add-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Detekt'
             -   name: Remove label if detekt passes
-                if: success()
+                if: ${{ success() && env.is_latest == 'true' }}
                 uses: actions-ecosystem/action-remove-labels@v1
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
