@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 enum class CropAccessory(
     val internalName: NEUInternalName?,
@@ -12,17 +12,17 @@ enum class CropAccessory(
 
     NONE(null, emptySet(), 0.0, null),
     CROPIE(
-        "CROPIE_TALISMAN".asInternalName(),
+        "CROPIE_TALISMAN".toInternalName(),
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT),
         10.0,
         Pair("CROPIE", 256)
     ),
     SQUASH(
-        "SQUASH_RING".asInternalName(),
+        "SQUASH_RING".toInternalName(),
         setOf(CropType.WHEAT, CropType.POTATO, CropType.CARROT, CropType.COCOA_BEANS, CropType.MELON, CropType.PUMPKIN),
         20.0, Pair("SQUASH", 128)
     ),
-    FERMENTO("FERMENTO_ARTIFACT".asInternalName(), CropType.entries.toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
+    FERMENTO("FERMENTO_ARTIFACT".toInternalName(), CropType.entries.toSet(), 30.0, Pair("CONDENSED_FERMENTO", 8)),
     ;
 
     fun getFortune(cropType: CropType): Double {

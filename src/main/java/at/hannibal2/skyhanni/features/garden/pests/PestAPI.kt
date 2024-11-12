@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -57,11 +57,11 @@ object PestAPI {
 
     // TODO move into repo
     val vacuumVariants = listOf(
-        "SKYMART_VACUUM".asInternalName(),
-        "SKYMART_TURBO_VACUUM".asInternalName(),
-        "SKYMART_HYPER_VACUUM".asInternalName(),
-        "INFINI_VACUUM".asInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+        "SKYMART_VACUUM".toInternalName(),
+        "SKYMART_TURBO_VACUUM".toInternalName(),
+        "SKYMART_HYPER_VACUUM".toInternalName(),
+        "INFINI_VACUUM".toInternalName(),
+        "INFINI_VACUUM_HOOVERIUS".toInternalName(),
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants

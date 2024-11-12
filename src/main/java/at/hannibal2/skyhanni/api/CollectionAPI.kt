@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -44,7 +44,7 @@ object CollectionAPI {
 
     // TODO repo
     private val incorrectCollectionNames = mapOf(
-        "Mushroom" to "RED_MUSHROOM".asInternalName(),
+        "Mushroom" to "RED_MUSHROOM".toInternalName(),
     )
 
     @SubscribeEvent
