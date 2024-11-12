@@ -20,6 +20,8 @@ import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object SkyHanniTypeAdapters {
 
@@ -52,6 +54,16 @@ object SkyHanniTypeAdapters {
 
         override fun read(reader: JsonReader): SimpleTimeMark {
             return reader.nextString().toLong().asTimeMark()
+        }
+    }
+
+    val DURATION: TypeAdapter<Duration> = object : TypeAdapter<Duration>() {
+        override fun write(out: JsonWriter, value: Duration) {
+            out.value(value.inWholeMilliseconds)
+        }
+
+        override fun read(reader: JsonReader): Duration {
+            return reader.nextString().toLong().milliseconds
         }
     }
 

@@ -2,22 +2,24 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -29,10 +31,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import net.minecraft.init.Items
+import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -48,7 +51,8 @@ object HoppityAPI {
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    private var lastDoradoFire: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var inMiscProcessInventory = false
+    private val processedSlots = mutableListOf<Int>()
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -64,6 +68,12 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun millisToEventEnd(): Long =
+        if (isHoppityEvent()) {
+            val now = SkyBlockTime.now()
+            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 3)
+            eventEnd.toMillis() - now.toMillis()
+        } else 0
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
@@ -104,16 +114,51 @@ object HoppityAPI {
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
 
+    /**
+     * REGEX-TEST: §eClick to claim!
+     */
+    private val claimableMilestonePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "milestone.claimable",
+        "§eClick to claim!",
+    )
+
+    /**
+     * REGEX-TEST: Chocolate Factory
+     * REGEX-TEST: Chocolate Shop Milestones
+     * REGEX-TEST: Chocolate Factory Milestones
+     * REGEX-TEST: Chocolate Breakfast Egg
+     * REGEX-TEST: Chocolate Lunch Egg
+     * REGEX-TEST: Chocolate Dinner Egg
+     */
+    private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "inventory.misc",
+        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
+    )
+
+    private fun addProcessedSlot(slot: Slot) {
+        processedSlots.add(slot.slotNumber)
+        DelayedRun.runDelayed(5.seconds) { // Assume we caught it on the first 'frame', so we can remove it after 5 seconds.
+            processedSlots.remove(slot.slotNumber)
+        }
+    }
+
+    private fun shouldProcessStraySlot(slot: Slot) =
+        // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
+        slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
+            // Don't process the same slot twice.
+            !processedSlots.contains(slot.slotNumber) &&
+            slot.stack != null && slot.stack.item != null &&
+            // All strays are skulls with a display name, and lore.
+            slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        InventoryUtils.getItemsInOpenChest().filter {
-            it.stack.hasDisplayName() &&
-                it.stack.getMinecraftId().toString() == "minecraft:skull" &&
-                it.stack.getLore().isNotEmpty()
-        }.forEach {
+        InventoryUtils.getItemsInOpenChest().filter { shouldProcessStraySlot(it) }.forEach {
+            var processed = false
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
+                processed = true
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
@@ -128,8 +173,7 @@ object HoppityAPI {
             ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(it.stack.getLore())) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
-                val escaped = ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(it.stack.getLore())
-                if (escaped || lastDoradoFire.passedSince() <= 10.seconds) return@matchMatcher
+                if (ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(it.stack.getLore())) return@matchMatcher
 
                 // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
                 // §6§lGolden Rabbit §d§lCAUGHT!
@@ -139,17 +183,37 @@ object HoppityAPI {
                 lastMeal = STRAY
                 duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 attemptFireRabbitFound()
-                lastDoradoFire = SimpleTimeMark.now()
             }
+            if (processed) addProcessedSlot(it)
         }
     }
 
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        inMiscProcessInventory = miscProcessInvPattern.matches(event.inventoryName)
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inMiscProcessInventory = false
+    }
+
+    private fun shouldProcessMiscSlot(slot: Slot) =
+        // Don't process the same slot twice.
+        !processedSlots.contains(slot.slotNumber) &&
+            slot.stack != null && slot.stack.item != null &&
+            // All misc items are skulls with a display name, and lore.
+            slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val index = event.slot?.slotIndex?.takeIf { it != -999 } ?: return
+        if (!inMiscProcessInventory) return
+        val slot = event.slot ?: return
+        val index = slot.slotIndex.takeIf { it != -999 } ?: return
+        if (!shouldProcessMiscSlot(slot)) return
 
         val clickedStack = InventoryUtils.getItemsInOpenChest()
-            .find { it.slotNumber == event.slot.slotNumber && it.hasStack }
+            .find { it.slotNumber == slot.slotNumber && it.hasStack }
             ?.stack ?: return
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
 
@@ -158,19 +222,19 @@ object HoppityAPI {
             lastMeal = SIDE_DISH
             attemptFireRabbitFound()
         }
+
         milestoneNamePattern.matchMatcher(nameText) {
-            clickedStack.getLore().let {
-                if (!it.any { line -> line == "§eClick to claim!" }) return
-                allTimeLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
-                    lastMeal = CHOCOLATE_FACTORY_MILESTONE
-                    attemptFireRabbitFound()
-                }
-                shopLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
-                    lastMeal = CHOCOLATE_SHOP_MILESTONE
-                    attemptFireRabbitFound()
-                }
+            val lore = clickedStack.getLore()
+            if (!claimableMilestonePattern.anyMatches(lore)) return
+            allTimeLorePattern.firstMatcher(lore) {
+                EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
+                lastMeal = CHOCOLATE_FACTORY_MILESTONE
+                attemptFireRabbitFound()
+            }
+            shopLorePattern.firstMatcher(lore) {
+                EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
+                lastMeal = CHOCOLATE_SHOP_MILESTONE
+                attemptFireRabbitFound()
             }
         }
     }
@@ -179,7 +243,7 @@ object HoppityAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        eggFoundPattern.matchMatcher(event.message) {
+        HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
             val note = groupOrNull("note")?.removeColor()
@@ -188,7 +252,7 @@ object HoppityAPI {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            if (group("rabbitname").equals(lastName)) {
+            if (group("rabbitname") == lastName) {
                 lastMeal = HoppityEggType.BOUGHT
                 EggFoundEvent(HoppityEggType.BOUGHT).post()
                 attemptFireRabbitFound()

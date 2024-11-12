@@ -231,6 +231,7 @@ object ElectionAPI {
 
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
+                Perk.resetPerks()
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
                 currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
             }

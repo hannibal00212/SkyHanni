@@ -66,8 +66,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
 // TODO cut class into smaller pieces
+@SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
 

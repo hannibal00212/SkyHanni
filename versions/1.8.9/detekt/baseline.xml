@@ -136,8 +136,6 @@
     <ID>TooManyFunctions:Renderable.kt$Renderable$Companion</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
-    <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$Basket.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
-    <ID>UnsafeCallOnNullableType:BasketWaypoints.kt$BasketWaypoints$notFoundBaskets.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:ChatHoverEvent.kt$ChatHoverEvent$component.chatStyle.chatHoverEvent!!</ID>
     <ID>UnsafeCallOnNullableType:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$upgradeCost!!</ID>
@@ -156,7 +154,6 @@
     <ID>UnsafeCallOnNullableType:DefaultConfigOptionGui.kt$DefaultConfigOptionGui$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:DicerRngDropTracker.kt$DicerRngDropTracker$event.toolItem!!</ID>
     <ID>UnsafeCallOnNullableType:DiscordStatus.kt$ownerRegex.find(colorlessLine)!!</ID>
-    <ID>UnsafeCallOnNullableType:DungeonAPI.kt$DungeonAPI$dungeonFloor!!</ID>
     <ID>UnsafeCallOnNullableType:EasterEggWaypoints.kt$EasterEggWaypoints$EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:EasterEggWaypoints.kt$EasterEggWaypoints$notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:EntityMovementData.kt$EntityMovementData$entityLocation[entity]!!</ID>
