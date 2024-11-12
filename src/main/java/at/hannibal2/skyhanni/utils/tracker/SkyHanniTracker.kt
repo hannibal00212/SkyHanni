@@ -37,7 +37,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
-    private var lastRunSearchEnabled = config.trackerSearchEnabled.get()
+    private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
     private val textInput = TextInput()
 
@@ -85,8 +85,8 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        val thisRunSearchEnabled = config.trackerSearchEnabled.get()
-        if (dirty || TrackerManager.dirty || (thisRunSearchEnabled != lastRunSearchEnabled)) {
+        val searchEnabled = config.trackerSearchEnabled.get()
+        if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
@@ -95,7 +95,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             }.orEmpty()
             dirty = false
         }
-        lastRunSearchEnabled = config.trackerSearchEnabled.get()
+        wasSearchEnabled = searchEnabled
 
         position.renderRenderables(display, posLabel = name)
     }
