@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -38,7 +38,6 @@ object AnitaMedalProfit {
         GOLD("§6Gold medal", 8),
         SILVER("§fSilver medal", 2),
         BRONZE("§cBronze medal", 1),
-        ;
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
@@ -77,7 +76,7 @@ object AnitaMedalProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item) ?: return
+        val itemName = getItemName(item)
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
@@ -129,7 +128,7 @@ object AnitaMedalProfit {
     }
 
     private fun getFullCost(requiredItems: MutableList<String>): Double {
-        val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
+        val jacobTicketPrice = "JACOBS_TICKET".toInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)

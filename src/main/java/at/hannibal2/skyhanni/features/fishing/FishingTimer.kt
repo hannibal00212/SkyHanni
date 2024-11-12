@@ -65,7 +65,7 @@ object FishingTimer {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        updateLocation()
+        rightLocation = updateLocation()
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
             playSound()
         }
@@ -170,8 +170,10 @@ object FishingTimer {
         display = createDisplay()
     }
 
-    private fun updateLocation() {
-        rightLocation = when (LorenzUtils.skyBlockIsland) {
+    private fun updateLocation(): Boolean {
+        if (config.showAnywhere) return true
+
+        return when (LorenzUtils.skyBlockIsland) {
             IslandType.CRYSTAL_HOLLOWS -> config.crystalHollows.get()
             IslandType.CRIMSON_ISLE -> config.crimsonIsle.get()
             IslandType.WINTER -> config.winterIsland.get()

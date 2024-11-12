@@ -68,7 +68,8 @@ object HoppityNpc {
                     IslandGraphs.pathFind(
                         LorenzVec(6.4, 70.0, 7.4),
                         "§aHoppity's Shop",
-                        condition = { config.hoppityShopReminder })
+                        condition = { config.hoppityShopReminder }
+                    )
                 }
             },
         )

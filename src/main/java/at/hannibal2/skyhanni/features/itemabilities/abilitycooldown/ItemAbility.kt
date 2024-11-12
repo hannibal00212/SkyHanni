@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
@@ -52,6 +52,8 @@ enum class ItemAbility(
     ROYAL_PIGEON(5),
     WAND_OF_STRENGTH(10),
     TACTICAL_INSERTION(20),
+    TOTEM_OF_CORRUPTION(20),
+    ENRAGER(20),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 5, "Ender Bow"),
@@ -81,9 +83,9 @@ enum class ItemAbility(
     ) {
         newVariant = true
         alternateInternalNames.forEach {
-            internalNames.add(it.asInternalName())
+            internalNames.add(it.toInternalName())
         }
-        internalNames.add(name.asInternalName())
+        internalNames.add(name.toInternalName())
     }
 
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {

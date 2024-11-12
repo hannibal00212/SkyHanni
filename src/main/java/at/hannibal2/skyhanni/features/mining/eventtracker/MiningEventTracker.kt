@@ -200,7 +200,8 @@ object MiningEventTracker {
                 canRequestAt = SimpleTimeMark.now() + 20.minutes
                 if (LorenzUtils.debug) {
                     ErrorManager.logErrorWithData(
-                        e, "Receiving mining event data was unsuccessful",
+                        e,
+                        "Failed to load Mining Event data!",
                     )
                 }
                 return@launch
@@ -208,11 +209,19 @@ object MiningEventTracker {
             val miningEventData = ConfigManager.gson.fromJson(data, MiningEventDataReceive::class.java)
 
             if (!miningEventData.success) {
-                ErrorManager.logErrorWithData(
-                    Exception("PostFailure"), "Receiving mining event data was unsuccessful",
-                    "cause" to miningEventData.cause,
-                    "recievedData" to data
-                )
+                if (data.toString() == "{}") {
+                    ChatUtils.chat(
+                        "§cFailed loading Mining Event data!\n" +
+                            "Please wait until the server problem fixes itself! There is nothing else to do at the moment."
+                    )
+                } else {
+                    ErrorManager.logErrorWithData(
+                        Exception("miningEventData.success = false"),
+                        "Failed to load Mining Event data!",
+                        "cause" to miningEventData.cause,
+                        "recievedData" to data
+                    )
+                }
                 return@launch
             }
             apiErrorCount = 0

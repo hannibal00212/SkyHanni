@@ -65,6 +65,7 @@ class TextInput {
             activeInstance = null
         }
 
+        @Suppress("UnusedParameter")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
@@ -92,7 +93,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox ?: ""
+            get() = activeInstance?.textBox.orEmpty()
             set(value) {
                 activeInstance?.textBox = value
             }
@@ -130,7 +131,7 @@ class TextInput {
                 }
                 return
             }
-            if (Keyboard.KEY_DELETE.isKeyClicked()) { // Does not work for some reason
+            if (Keyboard.KEY_BACK.isKeyClicked()) {
                 if (carriage != null) {
                     textBox.removeRange(carriage, carriage + 1)
                 } else {

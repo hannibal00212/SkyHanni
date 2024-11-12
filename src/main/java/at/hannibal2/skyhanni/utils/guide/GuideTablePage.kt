@@ -27,7 +27,8 @@ abstract class GuideTablePage(
                         yPadding = ySpace
                     ),
                     Renderable.horizontalContainer(footer, footerSpacing, horizontalAlign = HorizontalAlignment.CENTER)
-                ), spacing = ySpace
+                ),
+                spacing = ySpace
             )
     }
 }

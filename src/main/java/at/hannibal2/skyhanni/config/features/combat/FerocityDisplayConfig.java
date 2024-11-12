@@ -13,7 +13,7 @@ public class FerocityDisplayConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show ferocity stat as single GUI element.\n" +
-        "§eRequires tab list widget enabled and ferocity selected to work."
+        "§eRequires tab list widget enabled and ferocity selected to update live."
     )
     @ConfigEditorBoolean
     @FeatureToggle

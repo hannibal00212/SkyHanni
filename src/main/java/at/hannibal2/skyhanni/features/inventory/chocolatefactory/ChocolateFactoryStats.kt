@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -49,9 +50,11 @@ object ChocolateFactoryStats {
 
         val position = ChocolateFactoryAPI.leaderboardPosition
         val positionText = position?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" } ?: ""
-        val leaderboard = "#$positionText $percentile"
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile
+        val percentileText = percentile?.let { "§7Top §a$it%" }.orEmpty()
+        val leaderboard = "#$positionText $percentileText"
         ChocolatePositionChange.update(position, leaderboard)
+        HoppityEventSummary.updateCfPosition(position, percentile)
 
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
@@ -76,7 +79,10 @@ object ChocolateFactoryStats {
         val map = buildMap<ChocolateFactoryStat, String> {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
-            put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
+            val maxSuffix = if (ChocolateFactoryAPI.isMax()) {
+                " §cMax!"
+            } else ""
+            put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}$maxSuffix")
             put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
             put(ChocolateFactoryStat.ALL_TIME, "§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
 
@@ -132,7 +138,7 @@ object ChocolateFactoryStats {
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n") ?: listOf() }
+        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
 
         display = listOf(
             Renderable.clickAndHover(

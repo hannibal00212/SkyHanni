@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
@@ -260,7 +261,16 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
+                isGuiScreen &&
+                    isGuiPositionEditor &&
+                    inMenu &&
+                    isNotInSignAndOnSlot &&
+                    isConfigScreen &&
+                    !isInNeuPv &&
+                    !isInSkytilsPv &&
+                    !neuFocus &&
+                    !isInSkytilsSettings &&
+                    !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -370,7 +380,7 @@ interface Renderable {
                 horizontalAlign = horizontalAlign,
                 verticalAlign = verticalAlign,
             ),
-            item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            item.getTooltipCompat(false),
             stack = item,
         )
 
@@ -564,7 +574,7 @@ interface Renderable {
                     for ((index, renderable) in row.withIndex()) {
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
+                        renderable.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
@@ -614,7 +624,12 @@ interface Renderable {
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
-            val searchWidth get() = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(searchPrefix + textInput.editTextWithAlwaysCarriage()) * scale).toInt() + 1
+            val searchWidth: Int
+                get() {
+                    val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+                    val string = searchPrefix + textInput.editTextWithAlwaysCarriage()
+                    return (fontRenderer.getStringWidth(string) * scale).toInt() + 1
+                }
 
             init {
                 textInput.registerToEvent(key) {
@@ -1139,8 +1154,11 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: yOffsets.size) - 1
+                @Suppress("SpacingAroundCurly")
+                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                        ?: yOffsets.size
+                    ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1
@@ -1355,7 +1373,7 @@ interface Renderable {
             height: Int = 100,
             entityScale: Int = 30,
             padding: Int = 5,
-            color: Int? = null,
+            color: Color? = null,
             colorCondition: () -> Boolean = { true },
         ) = object : Renderable {
             override val width = width + 2 * padding

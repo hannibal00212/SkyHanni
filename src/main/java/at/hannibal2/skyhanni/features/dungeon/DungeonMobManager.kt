@@ -83,7 +83,7 @@ object DungeonMobManager {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
-            felOnTheGround.filter { it.canBeSeen() }.forEach {
+            felOnTheGround.filter { it.canBeSeen(30) }.forEach {
                 event.draw3DLine(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
                     event.exactPlayerEyeLocation(),

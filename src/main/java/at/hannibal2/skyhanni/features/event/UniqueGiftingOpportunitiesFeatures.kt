@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -38,11 +38,11 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
     private val giftedPattern by patternGroup.pattern(
         "gifted",
-        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!"
+        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!",
     )
     private val giftNamePattern by patternGroup.pattern(
         "giftname",
-        "(?:WHITE|RED|GREEN)_GIFT\$"
+        "(?:WHITE|RED|GREEN)_GIFT\$",
     )
 
     private var holdingGift = false
@@ -57,6 +57,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private fun isEnabled() = holdingGift
 
+    @Suppress("UnusedPrivateProperty")
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
     private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 
@@ -89,7 +90,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
             RenderLivingEntityHelper.setEntityColor(
                 entity,
-                LorenzColor.DARK_GREEN.toColor().withAlpha(127)
+                LorenzColor.DARK_GREEN.toColor().addAlpha(127),
             ) { isEnabled() && !hasGiftedPlayer(entity) }
         }
     }

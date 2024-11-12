@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -31,9 +34,25 @@ object KingTalismanHelper {
     private val config get() = SkyHanniMod.feature.mining.kingTalisman
     private val storage get() = ProfileStorageData.profileSpecific?.mining
 
-    private val kingPattern by RepoPattern.pattern(
-        "mining.kingtalisman.king",
+    private val patternGroup = RepoPattern.group("mining.kingtalisman")
+
+    /**
+     * REGEX-TEST: §6§lKing Brammor
+     * REGEX-TEST: §6§lKing Emkam
+     * REGEX-TEST: §6§lKing Kevin
+     * REGEX-TEST: §6§lKing Redros
+     */
+    private val kingPattern by patternGroup.pattern(
+        "king",
         "§6§lKing (?<name>.*)"
+    )
+
+    /**
+     * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
+     */
+    private val talismanPattern by patternGroup.pattern(
+        "talisman",
+        "§7You have received a §r§fKing Talisman§r§7!"
     )
 
     private var currentOffset: Int? = null
@@ -66,7 +85,8 @@ object KingTalismanHelper {
     private var farDisplay = ""
     private var display = emptyList<String>()
 
-    private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Royal Palace" &&
+    private fun isNearby() = IslandType.DWARVEN_MINES.isInIsland() &&
+        LorenzUtils.skyBlockArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
     @SubscribeEvent
@@ -86,7 +106,7 @@ object KingTalismanHelper {
             return
         }
 
-        update(kingsTalkedTo)
+        update()
         display = if (nearby) allKingsDisplay else Collections.singletonList(farDisplay)
     }
 
@@ -103,7 +123,8 @@ object KingTalismanHelper {
         skyblockYear = SkyBlockTime.now().year
     }
 
-    fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock &&
+    fun isEnabled() = config.enabled &&
+        LorenzUtils.inSkyBlock &&
         (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
 
     @SubscribeEvent
@@ -118,12 +139,13 @@ object KingTalismanHelper {
         val kingsTalkedTo = storage.kingsTalkedTo
         if (currentKing !in kingsTalkedTo) {
             kingsTalkedTo.add(currentKing)
-            update(kingsTalkedTo)
+            update()
             display = allKingsDisplay
         }
     }
 
-    private fun update(kingsTalkedTo: MutableList<String>) {
+    private fun update() {
+        val kingsTalkedTo = storage?.kingsTalkedTo ?: return
         if (kingsTalkedTo.size == kingCircles.size) {
             allKingsDisplay = Collections.singletonList("§eAll Kings found.")
             farDisplay = ""
@@ -197,5 +219,16 @@ object KingTalismanHelper {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        if (!MiningAPI.inDwarvenMines) return
+
+        if (talismanPattern.matches(event.message)) {
+            storage?.kingsTalkedTo = kingCircles.toMutableList()
+            update()
+        }
     }
 }

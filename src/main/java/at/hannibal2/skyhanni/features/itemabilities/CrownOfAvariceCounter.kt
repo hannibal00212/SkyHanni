@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -21,7 +21,7 @@ object CrownOfAvariceCounter {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.crownOfAvarice
 
-    private val internalName = "CROWN_OF_AVARICE".asInternalName()
+    private val internalName = "CROWN_OF_AVARICE".toInternalName()
 
     private var render: Renderable? = null
 
@@ -40,7 +40,7 @@ object CrownOfAvariceCounter {
         if (!config.enable) return null
         val item = InventoryUtils.getHelmet()
         if (item?.getInternalNameOrNull() != internalName) return null
-        val count = item.extraAttributes.getLong("collected_coins");
+        val count = item.extraAttributes.getLong("collected_coins")
         return Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(internalName.getItemStack()),

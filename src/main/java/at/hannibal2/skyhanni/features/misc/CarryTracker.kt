@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CarryTrackerJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -32,10 +33,10 @@ import kotlin.time.Duration.Companion.seconds
  * save on restart
  * support for Dungeon, Kuudra, crimson minibosses
  * average spawn time per slayer customer
- * change customer name color if offline, onlilne, on your island
+ * change customer name color if offline, online, on your island
  * show time since last boss died next to slayer customer name
  * highlight slayer bosses for slayer customers
- * automatically mark customers with /shmarkplaayers
+ * automatically mark customers with /shmarkplayers
  * show a line behind them
  */
 
@@ -119,12 +120,39 @@ object CarryTracker {
         config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
     }
 
-    fun onCommand(args: Array<String>) {
+    @HandleEvent
+    fun onCommandRegister(event: CommandRegistrationEvent) {
+        event.register("shcarry") {
+            description = "Keep track of carries you do."
+            callback { onCommand(it) }
+        }
+    }
+
+    @Suppress("ReturnCount")
+    private fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
-            ChatUtils.userError("Usage:\n§c/shcarry <customer name> <type> <amount requested>\n§c/shcarry <type> <price per>")
+            ChatUtils.userError(
+                "Usage:\n" +
+                    "§c/shcarry <customer name> <type> <amount requested>\n" +
+                    "§c/shcarry <type> <price per>\n" +
+                    "§c/shcarry remove <costumer name>",
+            )
             return
         }
         if (args.size == 2) {
+            if (args[0] == "remove") {
+                val customerName = args[1]
+                for (customer in customers) {
+                    if (customer.name.equals(customerName, ignoreCase = true)) {
+                        customers.remove(customer)
+                        update()
+                        ChatUtils.chat("Removed customer: §b$customerName")
+                        return
+                    }
+                }
+                ChatUtils.userError("Customer not found: §b$customerName")
+                return
+            }
             setPrice(args[0], args[1])
             return
         }
@@ -235,6 +263,7 @@ object CarryTracker {
                                 add("§7Set a price with §e/shcarry <type> <price>")
                             }
                             add("")
+                            add("§7Run §e/shcarry remove ${customer.name} §7to remove the whole customer!")
                             add("§eClick to send current progress in the party chat!")
                             add("§eControl-click to remove this carry!")
                         },
@@ -260,7 +289,7 @@ object CarryTracker {
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
-	            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
+            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
@@ -276,7 +305,7 @@ object CarryTracker {
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " + "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),

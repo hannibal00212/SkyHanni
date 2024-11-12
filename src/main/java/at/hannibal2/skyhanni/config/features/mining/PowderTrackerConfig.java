@@ -24,7 +24,6 @@ import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.P
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GOLD_ESSENCE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.HARD_STONE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.JADE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.MITHRIL_POWDER;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ROBOTRON;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.RUBY;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
@@ -56,7 +55,6 @@ public class PowderTrackerConfig {
     public Property<List<PowderDisplayEntry>> textFormat = Property.of(new ArrayList<>(Arrays.asList(
         TOTAL_CHESTS,
         DOUBLE_POWDER,
-        MITHRIL_POWDER,
         GEMSTONE_POWDER,
         SPACER_1,
         DIAMOND_ESSENCE,
@@ -78,7 +76,6 @@ public class PowderTrackerConfig {
     public enum PowderDisplayEntry implements HasLegacyId {
         TOTAL_CHESTS("§d852 Total chests Picked §7(950/h)", 2),
         DOUBLE_POWDER("§bx2 Powder: §aActive!", 3),
-        MITHRIL_POWDER("§b250,420 §aMithril Powder §7(350,000/h)", 4),
         GEMSTONE_POWDER("§b250,420 §dGemstone Powder §7(350,000/h)", 5),
         SPACER_1("", 6),
         DIAMOND_ESSENCE("§b129 §bDiamond Essence §7(600/h)", 7),

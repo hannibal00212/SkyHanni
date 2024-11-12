@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -50,7 +49,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
@@ -70,7 +69,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
         val itemDisplayName =
-            item.itemName.replace("§a✔ ", "").replace("§c✖ ", "")
+            item.displayName.replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 
@@ -79,7 +78,7 @@ object WikiManager {
 
     fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
         if (wikithis && !LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§cYou must be in SkyBlock to do this!")
+            ChatUtils.userError("You must be in SkyBlock to do this!")
             return
         }
 
@@ -88,7 +87,7 @@ object WikiManager {
 
         if (wikithis) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, false, useFandom = useFandom)
@@ -102,8 +101,10 @@ object WikiManager {
     }
 
     fun sendWikiMessage(
-        search: String = "", displaySearch: String = search,
-        autoOpen: Boolean = config.autoOpenWiki, useFandom: Boolean = config.useFandom
+        search: String = "",
+        displaySearch: String = search,
+        autoOpen: Boolean = config.autoOpenWiki,
+        useFandom: Boolean = config.useFandom,
     ) {
         val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
         val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX

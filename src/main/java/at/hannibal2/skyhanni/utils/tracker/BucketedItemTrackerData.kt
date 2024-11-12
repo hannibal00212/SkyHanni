@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -9,8 +8,6 @@ import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
 abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
-
-    private val config get() = SkyHanniMod.feature.misc.tracker
 
     abstract fun resetItems()
 
@@ -59,10 +56,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
                 (type as? Class<E>)?.enumConstants
             } ?: ErrorManager.skyHanniError(
-                "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-                "selectedBucket" to selectedBucket,
-                "dataClass" to this.javaClass.superclass.name,
-            )
+            "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+            "selectedBucket" to selectedBucket,
+            "dataClass" to this.javaClass.superclass.name,
+        )
     }
 
     @Expose
@@ -71,8 +68,12 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
     private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    private fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
-    fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let { getBucket(it) } ?: flattenBuckets()
+    private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
+        it.value.isNotEmpty()
+    }.keys.toMutableList()
+    fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let {
+        getBucket(it)
+    } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket() {
         // Move to the next ordinal, or wrap to null if at the last value

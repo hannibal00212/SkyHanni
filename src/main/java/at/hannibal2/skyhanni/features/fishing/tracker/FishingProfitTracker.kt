@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -83,7 +83,7 @@ object FishingProfitTracker {
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {
             // TODO find better way to tell if the item is a trophy
-            val neuInternalNames = itemCategories["Trophy Fish"]!!
+            val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
             return if (internalName in neuInternalNames) {
                 SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingAPI.getFilletPerTrophy(internalName)
@@ -96,7 +96,7 @@ object FishingProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
-    private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
+    private val MAGMA_FISH by lazy { "MAGMA_FISH".toInternalName() }
 
     private const val NAME_ALL: CategoryName = "All"
     private var currentCategory: CategoryName = NAME_ALL
@@ -163,8 +163,7 @@ object FishingProfitTracker {
         val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
-            val items = itemCategories[currentCategory]!!
-            { it in items }
+            { it in (itemCategories[currentCategory].orEmpty()) }
         }
         return filter
     }

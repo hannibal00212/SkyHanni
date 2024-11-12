@@ -3,14 +3,29 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import moe.nea.shot.ShotParser
+import moe.nea.shot.Shots
+import net.fabricmc.loom.api.processor.MinecraftJarProcessor
+import net.fabricmc.loom.api.processor.ProcessorContext
+import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.DownloadBackupRepo
+import java.io.Serializable
+import java.nio.file.Path
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+import kotlin.io.path.moveTo
+import kotlin.io.path.outputStream
 
 plugins {
     idea
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
@@ -93,6 +108,12 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.branch = "main"
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -100,7 +121,22 @@ tasks.runClient {
         },
     )
 }
-val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
+file("shots.txt")
+    .takeIf(File::exists)
+    ?.readText()
+    ?.lines()
+    ?.let(ShotParser()::parse)
+    ?.let(::Shots)
+    ?.let {
+        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+    }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -135,6 +171,12 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else if (target == ProjectTarget.BRIDGE116FABRIC) {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+    } else if (target == ProjectTarget.MODERN) {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -142,15 +184,16 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // August 27, 2024, 4:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.3
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.3:all") {
+    // October 3, 2024, 11:43 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -203,6 +246,7 @@ kotlin {
 
 // Tasks:
 tasks.processResources {
+    from(includeBackupRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
@@ -231,6 +275,25 @@ if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
+
+fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+    if (buildPathsFile.exists()) {
+        sourceSet.get().apply {
+            val buildPaths = buildPathsFile.readText().lineSequence()
+                .map { it.substringBefore("#").trim() }
+                .filter { it.isNotBlank() }
+                .toSet()
+            kotlin.include(buildPaths)
+            java.include(buildPaths)
+        }
+    }
+}
+includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
+includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
 if (target.parent == ProjectTarget.MAIN) {
@@ -313,7 +376,8 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
 
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
+    vars.put("FORGE", if (target.isForge) 1 else 0)
+    vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
@@ -348,28 +412,50 @@ publishing.publications {
     }
 }
 
-// Detekt: TODO: Uncomment this when we're ready to enforce
-// detekt {
-//     buildUponDefaultConfig = true // preconfigure defaults
-//     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-//     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
-//     source.setFrom(project.sourceSets.named("main").map { it.allSource })
-// }
-//
-// tasks.withType<Detekt>().configureEach {
-//     reports {
-//         html.required.set(true) // observe findings in your browser with structure and code snippets
-//         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
-//         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
-//         md.required.set(true) // simple Markdown format
-//     }
-// }
-//
-// tasks.withType<Detekt>().configureEach {
-//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-//     outputs.cacheIf { false } // Custom rules won't work if cached
-// }
-// tasks.withType<DetektCreateBaselineTask>().configureEach {
-//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-//     outputs.cacheIf { false } // Custom rules won't work if cached
-// }
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+}
+
+tasks.withType<Detekt>().configureEach {
+    onlyIf {
+        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
+    }
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        md.required.set(true) // simple Markdown format
+    }
+}
+
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}
+
+abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
+    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
+    Serializable {
+
+    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
+
+    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
+        val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
+        ZipFile(source.toFile()).use { input ->
+            ZipOutputStream(dest.outputStream()).use { output ->
+                shots.processZipFile(input, output)
+            }
+        }
+        dest.moveTo(source, overwrite = true)
+    }
+
+    override fun getName(): String = "Shots"
+
+    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
+}

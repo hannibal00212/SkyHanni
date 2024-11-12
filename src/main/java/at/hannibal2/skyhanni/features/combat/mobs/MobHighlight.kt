@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -15,8 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -41,9 +40,8 @@ object MobHighlight {
         if (config.corruptedMobHighlight && event.health == baseMaxHealth * 3) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
-            )
-            { config.corruptedMobHighlight }
+                LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
+            ) { config.corruptedMobHighlight }
         }
     }
 
@@ -56,17 +54,15 @@ object MobHighlight {
         if (config.arachneKeeperHighlight && (maxHealth == 3_000 || maxHealth == 12_000) && entity is EntityCaveSpider) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_BLUE.toColor().withAlpha(127)
-            )
-            { config.arachneKeeperHighlight }
+                LorenzColor.DARK_BLUE.toColor().addAlpha(127),
+            ) { config.arachneKeeperHighlight }
         }
 
         if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
-            )
-            { config.corleoneHighlighter }
+                LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
+            ) { config.corleoneHighlighter }
         }
 
         if (entity is EntityEnderman) {
@@ -77,20 +73,18 @@ object MobHighlight {
                 if (isZealot || isBruiser) {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
-                        LorenzColor.DARK_AQUA.toColor().withAlpha(127)
-                    )
-                    { config.zealotBruiserHighlighter }
+                        LorenzColor.DARK_AQUA.toColor().addAlpha(127),
+                    ) { config.zealotBruiserHighlighter }
                 }
             }
 
             if (config.chestZealotHighlighter) {
-                val isHoldingChest = (entity as? EntityEnderman)?.getBlockInHand()?.block == Blocks.ender_chest
+                val isHoldingChest = entity.getBlockInHand()?.block == Blocks.ender_chest
                 if ((isZealot || isBruiser) && isHoldingChest) {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
-                        LorenzColor.GREEN.toColor().withAlpha(127)
-                    )
-                    { config.chestZealotHighlighter }
+                        LorenzColor.GREEN.toColor().addAlpha(127),
+                    ) { config.chestZealotHighlighter }
                 }
             }
 
@@ -98,9 +92,8 @@ object MobHighlight {
             if (config.specialZealotHighlighter && maxHealth.ignoreDerpy() == 2_000) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
-                    LorenzColor.DARK_RED.toColor().withAlpha(50)
-                )
-                { config.specialZealotHighlighter }
+                    LorenzColor.DARK_RED.toColor().addAlpha(50),
+                ) { config.specialZealotHighlighter }
             }
         }
 
@@ -121,12 +114,11 @@ object MobHighlight {
 
         if (arachne.distanceToPlayer() > 10) return
 
-        event.draw3DLine(
-            event.exactPlayerEyeLocation(),
-            arachne.getLorenzVec().add(y = 1),
+        event.drawLineToEye(
+            arachne.getLorenzVec().up(),
             LorenzColor.RED.toColor(),
             config.lineToArachneWidth,
-            true
+            true,
         )
     }
 
@@ -153,12 +145,16 @@ object MobHighlight {
     }
 
     private fun markArachneMinis(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            entity,
+            LorenzColor.GOLD.toColor().addAlpha(50),
+        ) { config.arachneBossHighlighter }
     }
 
     private fun markArachne(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            entity,
+            LorenzColor.RED.toColor().addAlpha(50),
+        ) { config.arachneBossHighlighter }
     }
 }

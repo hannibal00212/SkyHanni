@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
 import at.hannibal2.skyhanni.data.ClickType
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 object FireVeilWandParticles {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
-    private val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
+    private val item by lazy { "FIRE_VEIL_WAND".toInternalName() }
 
     private var lastClick = SimpleTimeMark.farPast()
 
@@ -39,9 +40,8 @@ object FireVeilWandParticles {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val internalName = event.itemInHand?.getInternalName()
 

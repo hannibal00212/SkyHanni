@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -152,8 +152,8 @@ object MinionXp {
             MinionFeatures.minionInventoryOpen -> {
                 addXpInfoToTooltip(event)
                 if (collectItem == event.itemStack.item) {
-                    collectItemXpList.forEachIndexed { i, it ->
-                        event.toolTip.add(i + 1, it)
+                    collectItemXpList.forEachIndexed { i, item ->
+                        event.toolTip.add(i + 1, item)
                     }
                 }
             }
@@ -187,7 +187,7 @@ object MinionXp {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
-            xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
+            xpType.value.mapNotNull { it.key.toInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()
     }
 }

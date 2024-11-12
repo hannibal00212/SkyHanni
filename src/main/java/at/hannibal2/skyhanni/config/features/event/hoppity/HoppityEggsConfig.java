@@ -20,9 +20,14 @@ public class HoppityEggsConfig {
     public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
 
     @Expose
-    @ConfigOption(name = "Event Summary", desc = "")
+    @ConfigOption(name = "Hoppity Hunt Stats Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
+
+    @Expose
+    @ConfigOption(name = "Warp Menu", desc = "")
+    @Accordion
+    public HoppityWarpMenuConfig warpMenu = new HoppityWarpMenuConfig();
 
     @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
@@ -211,4 +216,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Prevent Missing Rabbit the Fish", desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventMissingRabbitTheFish = true;
 }

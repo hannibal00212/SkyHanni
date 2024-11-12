@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -122,11 +122,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§7Obtained by finding the §aStray Rabbit
+     * REGEX-TEST: §7§7Obtained by finding a §6Golden Stray
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
-        "§7§7Obtained by finding the §aStray Rabbit",
+        "(?:§.)+Obtained by finding a §6Golden Stray",
     )
 
     /**
@@ -213,7 +213,7 @@ object HoppityCollectionStats {
             val newItemStack = if (config.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
                 when (rarity) {
-                    LorenzRarity.COMMON -> 7  // Light gray dye
+                    LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
                     LorenzRarity.RARE -> 4 // Lapis lazuli
                     LorenzRarity.EPIC -> 5 // Purple dye
@@ -223,7 +223,7 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else ItemStack(Items.dye, 8)
+            ) else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
             newItemStack.setStackDisplayName(stack.displayName)
@@ -505,7 +505,11 @@ object HoppityCollectionStats {
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
 
-            if (!found) continue
+            if (!found) {
+                // if the config has wrong data, remove it
+                loggedRabbits.remove(itemName)
+                continue
+            }
 
             val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
@@ -516,9 +520,9 @@ object HoppityCollectionStats {
     }
 
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun clearSavedRabbits() {
+    fun resetSavedRabbits() {
         loggedRabbits.clear()
-        ChatUtils.chat("Cleared saved rabbit data.")
+        ChatUtils.chat("Reset saved rabbit data.")
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
@@ -527,14 +531,14 @@ object HoppityCollectionStats {
         val displayName: String,
         val item: NEUInternalName,
     ) {
-        COMMON("§fCommon", "STAINED_GLASS".asInternalName()),
-        UNCOMMON("§aUncommon", "STAINED_GLASS-5".asInternalName()),
-        RARE("§9Rare", "STAINED_GLASS-11".asInternalName()),
-        EPIC("§5Epic", "STAINED_GLASS-10".asInternalName()),
-        LEGENDARY("§6Legendary", "STAINED_GLASS-1".asInternalName()),
-        MYTHIC("§dMythic", "STAINED_GLASS-6".asInternalName()),
-        DIVINE("§bDivine", "STAINED_GLASS-3".asInternalName()),
-        TOTAL("§cTotal", "STAINED_GLASS-14".asInternalName()),
+        COMMON("§fCommon", "STAINED_GLASS".toInternalName()),
+        UNCOMMON("§aUncommon", "STAINED_GLASS-5".toInternalName()),
+        RARE("§9Rare", "STAINED_GLASS-11".toInternalName()),
+        EPIC("§5Epic", "STAINED_GLASS-10".toInternalName()),
+        LEGENDARY("§6Legendary", "STAINED_GLASS-1".toInternalName()),
+        MYTHIC("§dMythic", "STAINED_GLASS-6".toInternalName()),
+        DIVINE("§bDivine", "STAINED_GLASS-3".toInternalName()),
+        TOTAL("§cTotal", "STAINED_GLASS-14".toInternalName()),
         ;
 
         companion object {

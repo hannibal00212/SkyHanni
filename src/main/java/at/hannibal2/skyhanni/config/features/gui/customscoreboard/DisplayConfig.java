@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.data.DateFormat;
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -50,7 +52,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
-
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.\n" +
@@ -140,13 +141,36 @@ public class DisplayConfig {
     public boolean skyblockTimeExactMinutes = true;
 
     @Expose
+    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
+    @ConfigEditorBoolean
+    public boolean dateInLobbyCode = true;
+
+    @Expose
+    @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
+    @ConfigEditorDropdown
+    public DateFormat dateFormat = DateFormat.US_SLASH_MMDDYYYY;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "Cache Scoreboard on Island Switch",
-        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigOption(name = "Text Alignment", desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
+
+    @Expose
+    @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
+    @ConfigEditorBoolean
+    public boolean showProfileName = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\n" +
+            "Removes the shaking when loading data."
+    )
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
 }

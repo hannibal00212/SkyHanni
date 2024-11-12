@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -23,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -54,12 +55,14 @@ object ItemAbilityCooldown {
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
-    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
-    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
-    private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
-    private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
-    private val SOS_FLARE = "SOS_FLARE".asInternalName()
+    private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
+    private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".toInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
+    private val SOS_FLARE = "SOS_FLARE".toInternalName()
+    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
 
     @SubscribeEvent
@@ -90,8 +93,8 @@ object ItemAbilityCooldown {
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName(),
+                            "SHADOW_FURY".toInternalName(),
+                            "STARRED_SHADOW_FURY".toInternalName(),
                         )
                     ) return
 
@@ -191,20 +194,30 @@ object ItemAbilityCooldown {
             event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
             }
+            // Totem of Corruption
+            event.soundName == "random.wood_click" && event.pitch == 0.84126985f && event.volume == 0.5f -> {
+                if (TOTEM_OF_CORRUPTION in recentItemsInHand) {
+                    ItemAbility.TOTEM_OF_CORRUPTION.sound()
+                }
+            }
+            // Enrager
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2.0f -> {
+                ItemAbility.ENRAGER.sound()
+            }
+
             // Blaze Slayer Flares
             event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
-                val recent = InventoryUtils.recentItemsInHand.values
-                if (WARNING_FLARE in recent || ALERT_FLARE in recent) {
+                if (WARNING_FLARE in recentItemsInHand || ALERT_FLARE in recentItemsInHand) {
                     ItemAbility.ALERT_FLARE.sound()
                 }
-                if (SOS_FLARE in recent) {
+                if (SOS_FLARE in recentItemsInHand) {
                     ItemAbility.SOS_FLARE.sound()
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (AshfangFreezeCooldown.isCurrentlyFrozen()) return
         handleItemClick(event.itemInHand)

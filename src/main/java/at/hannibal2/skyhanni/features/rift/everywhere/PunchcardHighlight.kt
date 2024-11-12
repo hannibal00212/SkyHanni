@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -15,14 +16,14 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -74,7 +75,7 @@ object PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
     private var playerQueue = mutableListOf<String>()
 
-    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
+    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".toInternalName().getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
     @SubscribeEvent
@@ -119,7 +120,7 @@ object PunchcardHighlight {
     private fun checkPunchcard() {
         if (!RiftAPI.inRift()) return
 
-        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".asInternalName())
+        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".toInternalName())
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
             warningCooldown = SimpleTimeMark.now()
             ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")
@@ -148,14 +149,14 @@ object PunchcardHighlight {
             255 -> 1
             else -> 255 - color.alpha
         }
-        RenderLivingEntityHelper.setEntityColor(entity, color.withAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
+        RenderLivingEntityHelper.setEntityColor(entity, color.addAlpha(alpha)) { IslandType.THE_RIFT.isInIsland() }
     }
 
     private fun removePlayerColor(entity: EntityLivingBase) {
         RenderLivingEntityHelper.removeEntityColor(entity)
     }
 
-    fun clearList() {
+    fun onResetCommand() {
         playerList.clear()
         playerQueue.clear()
         if (config.reverse.get()) {
@@ -169,9 +170,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPunch(event: EntityClickEvent) {
-        if (!RiftAPI.inRift()) return
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNPC()) return
