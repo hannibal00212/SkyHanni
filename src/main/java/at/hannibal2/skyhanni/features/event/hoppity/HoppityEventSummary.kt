@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryCo
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -75,6 +76,9 @@ object HoppityEventSummary {
     private var lastAddedCfMillis: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSentCfUpdateMessage: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastSnapshotServer: String? = null
+    private var statYear: Int = getCurrentSBYear()
 
     private fun isEggLocatorOverridden(): Boolean =
         liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
@@ -155,8 +159,6 @@ object HoppityEventSummary {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
         val storage = storage ?: return
-        val statYear = storage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
-            ?: getCurrentSBYear()
 
         val stats = getYearStats(statYear)
         // Calculate a 'hash' of the stats to determine if they have changed
@@ -238,18 +240,18 @@ object HoppityEventSummary {
 
         // If we're only showing the live display during the last {X} hours of the hunt,
         // check if we're in that time frame
-        if (updateCfConfig.showForLastXHours > 0) {
-            val eventEnd = SimpleTimeMark.now() + HoppityAPI.millisToEventEnd().milliseconds
-            if (eventEnd.timeUntil() >= updateCfConfig.showForLastXHours.hours) return
-        }
+        val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
-        // If it's been less than {config} minutes since the last message, don't send another
+        // Initialize the current event end mark if it hasn't been set yet
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = HoppityAPI.getEventEndMark() ?: return
+        if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
+
+        // If it's been less than {config} minutes since the last warning message, don't send another
         lastSentCfUpdateMessage.takeIfInitialized()?.let {
-            val configFrequency = updateCfConfig.reminderInterval
-            if (it.passedSince() < configFrequency.minutes) return
+            if (it.passedSince() < updateCfConfig.reminderInterval.minutes) return
         }
 
-        // If it's been more than {config} since the last update, send a message
+        // If it's been more than {config} since the last leaderboard update, send a message
         val stats = getYearStats() ?: return
         val lastLbUpdate = stats.lastLbUpdate.takeIfInitialized() ?: SimpleTimeMark.farPast()
         if (lastLbUpdate.passedSince() >= updateCfConfig.reminderInterval.minutes) {
@@ -308,18 +310,19 @@ object HoppityEventSummary {
             predecessorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
-                    onClick = { storage.hoppityStatLiveDisplayYear = it },
+                    onClick = { statYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
-                    onClick = { storage.hoppityStatLiveDisplayYear = it },
+                    onClick = { statYear = it },
                 )
             },
         )
     }
 
+    @Suppress("SpellCheckingInspection")
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
         storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
@@ -361,8 +364,15 @@ object HoppityEventSummary {
     // First event was year 346 -> #1, 20th event was year 365, etc.
     private fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
+    private fun inSameServer(): Boolean {
+        val serverId = HypixelData.serverId ?: return false
+        val lastServer = lastSnapshotServer
+        lastSnapshotServer = serverId
+        return serverId == lastServer
+    }
+
     fun updateCfPosition(position: Int?, percentile: Double?) {
-        if (!HoppityAPI.isHoppityEvent() || position == null || percentile == null) return
+        if (!HoppityAPI.isHoppityEvent() || inSameServer() || position == null || percentile == null) return
         val stats = getYearStats() ?: return
         val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot

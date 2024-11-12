@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -68,12 +70,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun millisToEventEnd(): Long =
-        if (isHoppityEvent()) {
-            val now = SkyBlockTime.now()
-            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 3)
-            eventEnd.toMillis() - now.toMillis()
-        } else 0
+    fun getEventEndMark(): SimpleTimeMark? =
+        if (isHoppityEvent()) SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).toMillis().asTimeMark()
+        else null
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
