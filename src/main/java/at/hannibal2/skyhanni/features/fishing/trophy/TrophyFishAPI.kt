@@ -8,7 +8,7 @@ object TrophyFishAPI {
     fun hoverInfo(internalName: String): String? {
         val trophyFishes = TrophyFishManager.fish ?: return null
         val info = TrophyFishManager.getInfo(internalName) ?: return null
-        val counts = trophyFishes[internalName] ?: emptyMap()
+        val counts = trophyFishes[internalName].orEmpty()
         val bestFishObtained = counts.keys.maxOrNull() ?: TrophyRarity.BRONZE
         val rateString = if (info.rate != null) "§8[§7${info.rate}%§8]" else ""
         return """

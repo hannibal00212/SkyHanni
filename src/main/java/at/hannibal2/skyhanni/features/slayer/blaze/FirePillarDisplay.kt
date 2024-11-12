@@ -40,7 +40,7 @@ object FirePillarDisplay {
 
         display = seconds?.let {
             "§cFire Pillar: §b${seconds}s"
-        } ?: ""
+        }.orEmpty()
     }
 
     @SubscribeEvent

@@ -20,7 +20,7 @@ import org.lwjgl.input.Keyboard
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
 
-    //<editor-fold desc="Patterns">
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Chocolate Breakfast Egg
      * REGEX-TEST: Chocolate Lunch Egg
@@ -46,7 +46,7 @@ object HoppityRabbitTheFishChecker {
         "inventory.mealegg.continue",
         "(?:§.)*Click to open Chocolate Factory!",
     )
-    //</editor-fold>
+    // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null
@@ -55,17 +55,17 @@ object HoppityRabbitTheFishChecker {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        rabbitTheFishIndex?.let {
-            InventoryUtils.getItemsInOpenChest()[it] highlight LorenzColor.RED
-        }
+        val index = rabbitTheFishIndex ?: return
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName()
+            it.value.hasDisplayName() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key
@@ -80,7 +80,7 @@ object HoppityRabbitTheFishChecker {
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.cancel()
             SoundUtils.playErrorSound()
-        } else if (rabbitTheFishIndex == event.slot.slotNumber) {
+        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
@@ -95,5 +95,5 @@ object HoppityRabbitTheFishChecker {
         return shouldContinue
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingFish
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingRabbitTheFish
 }

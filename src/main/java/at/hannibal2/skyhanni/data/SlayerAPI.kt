@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerAPI {
 
-    private var nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
+    private val nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
     var isInCorrectArea = false
@@ -108,14 +108,14 @@ object SlayerAPI {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest") ?: ""
+        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest").orEmpty()
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
             SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
         }
 
-        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""
+        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
         if (latestSlayerProgress != slayerProgress) {
             SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
             latestSlayerProgress = slayerProgress

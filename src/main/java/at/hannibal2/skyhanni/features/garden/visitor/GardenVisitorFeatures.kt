@@ -46,7 +46,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -110,7 +110,7 @@ object GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
-    private val greenThumb = "GREEN_THUMB;1".asInternalName()
+    private val greenThumb = "GREEN_THUMB;1".toInternalName()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -176,6 +176,8 @@ object GardenVisitorFeatures {
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
+
+            if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
 
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
@@ -253,7 +255,7 @@ object GardenVisitorFeatures {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
-            ?.ingredients ?: emptySet()
+            ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()

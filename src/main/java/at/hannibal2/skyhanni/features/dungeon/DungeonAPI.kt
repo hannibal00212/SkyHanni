@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
@@ -15,8 +14,9 @@ import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
@@ -29,13 +29,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -53,20 +53,28 @@ object DungeonAPI {
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
     var dungeonFloor: String? = null
+        private set
     var started = false
+        private set
     var completed = false
+        private set
     var inBossRoom = false
+        private set
     var playerClass: DungeonClass? = null
-    var playerClassLevel = -1
+        private set
+    var playerClassLevel: Int = -1
+        private set
     var isUniqueClass = false
+        private set
+    var time: String = ""
+        private set
+    var roomId: String? = null
+        private set
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
-    // TODO: Move to repo
-    @Suppress("MaxLineLength")
-    private const val WITHER_ESSENCE_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
+    private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -87,7 +95,7 @@ object DungeonAPI {
     )
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
-        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
+        "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
@@ -129,7 +137,7 @@ object DungeonAPI {
     }
 
     private fun checkBossName(bossName: String): Boolean {
-        val correctBoss = when (dungeonFloor!!) {
+        val correctBoss = when (dungeonFloor) {
             "E" -> "The Watcher"
             "F1", "M1" -> "Bonzo"
             "F2", "M2" -> "Scarf"
@@ -145,18 +153,13 @@ object DungeonAPI {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
-        "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
-    } ?: ""
-
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
         return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
-    fun getRoomID(): String? = ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
-        group("roomId")
-    }
+    private const val WATER_ROOM_ID = "-60,-60"
+    val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
 
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
@@ -173,25 +176,38 @@ object DungeonAPI {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (dungeonFloor == null) {
-            ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
-                val floor = group("floor")
-                dungeonFloor = floor
-                DungeonEnterEvent(floor).postAndCatch()
-            }
+    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
+        floorPattern.firstMatcher(event.added) {
+            val floor = group("floor")
+            if (dungeonFloor == floor) return
+            dungeonFloor = floor
+            DungeonEnterEvent(floor).postAndCatch()
+            return
         }
-        if (dungeonFloor != null && playerClass == null) {
-            val playerTeam = TabListData.getTabList().firstOrNull {
-                it.contains(LorenzUtils.getPlayerName())
-            }?.removeColor() ?: ""
+        if (!inDungeon()) return
+        dungeonRoomPattern.firstMatcher(event.added) {
+            roomId = group("roomId")
+            return
+        }
+        timePattern.firstMatcher(event.added) {
+            time = "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+            return
+        }
+    }
 
-            for (dungeonClass in DungeonClass.entries) {
-                if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
-                    val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
-                    playerClass = dungeonClass
-                    playerClassLevel = level
-                }
+    @SubscribeEvent
+    fun onTablistChange(event: TabListUpdateEvent) {
+        if (!inDungeon()) return
+        if (dungeonFloor == null || playerClass != null) return
+
+        val playerTeam = event.tabList.find { it.contains(LorenzUtils.getPlayerName()) }?.removeColor() ?: return
+        for (dungeonClass in DungeonClass.entries) {
+            if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
+                val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
+                playerClass = dungeonClass
+                playerClassLevel = level
+                return
             }
         }
     }
@@ -224,6 +240,8 @@ object DungeonAPI {
         playerClass = null
         playerClassLevel = -1
         completed = false
+        time = ""
+        roomId = null
         DungeonBlessings.reset()
     }
 
@@ -327,7 +345,8 @@ object DungeonAPI {
         event.addData {
             add("dungeonFloor: $dungeonFloor")
             add("started: $started")
-            add("getRoomID: ${getRoomID()}")
+            add("getRoomID: $roomId")
+            add("time: $time")
             add("inBossRoom: $inBossRoom")
             add("")
             add("playerClass: $playerClass")
@@ -373,7 +392,7 @@ object DungeonAPI {
             Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
             Blocks.lever -> ClickedBlockType.LEVER
             Blocks.skull -> {
-                val blockTexture = BlockUtils.getTextureFromSkull(position.toBlockPos())
+                val blockTexture = BlockUtils.getTextureFromSkull(position)
                 if (blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE
                 } else {

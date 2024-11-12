@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -74,7 +74,7 @@ object HideNotClickableItems {
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
 
-    private val netherWart by lazy { "NETHER_STALK".asInternalName() }
+    private val netherWart by lazy { "NETHER_STALK".toInternalName() }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -232,7 +232,7 @@ object HideNotClickableItems {
 
         // TODO add more special named fossils (hypixel why)
         val list = listOf(
-            "HELIX".asInternalName(),
+            "HELIX".toInternalName(),
         )
 
         if (internalName in list) {
@@ -277,6 +277,7 @@ object HideNotClickableItems {
         return true
     }
 
+    @Suppress("UnusedParameter")
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
         if (!ComposterOverlay.inInventory) return false
 

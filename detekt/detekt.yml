@@ -3,13 +3,21 @@ config:
     validation: true
 
 GrammarRules:
-    active: true
-    AvoidBritishSpelling: # custom rule to prefer american spellings over british ones
+    AvoidBritishSpelling:
         active: true
 
 FormattingRules:
-    active: true
     CustomCommentSpacing:
+        active: true
+    CustomAnnotationSpacing:
+        active: true
+
+UseRepoRules:
+    SkullTexturesUseRepo:
+        active: true
+
+ImportRules:
+    CustomImportOrdering:
         active: true
 
 
@@ -72,6 +80,10 @@ formatting:
     SpacingBetweenDeclarationsWithAnnotations: # nah
         active: false
     SpacingBetweenDeclarationsWithComments: # also nah
+        active: false
+    ImportOrdering: # handled by custom rule
+        active: false
+    AnnotationSpacing: # handled by custom rule
         active: false
 
 complexity:

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPatter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -28,8 +28,8 @@ object ItemAddManager {
         COMMAND,
     }
 
-    private val ARCHFIEND_DICE = "ARCHFIEND_DICE".asInternalName()
-    private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".asInternalName()
+    private val ARCHFIEND_DICE = "ARCHFIEND_DICE".toInternalName()
+    private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
 
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
@@ -89,7 +89,7 @@ object ItemAddManager {
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
-    private var superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
+    private val superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -155,7 +155,7 @@ object SackDisplay {
                             )
                         )
                         // TODO add cache
-                        addItemStack("MAGMA_FISH".asInternalName())
+                        addItemStack("MAGMA_FISH".toInternalName())
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
@@ -266,11 +266,10 @@ object SackDisplay {
         var totalPrice = 0L
         val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
-            val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
             table[
                 buildList {
                     addString(" §7- ")
-                    addItemStack(internalName)
+                    addItemStack(gem.internalName)
                     add(
                         Renderable.optionalLink(
                             name,
@@ -280,10 +279,10 @@ object SackDisplay {
                             highlightsOnHoverSlots = listOf(gem.slot)
                         ) { !NEUItems.neuHasFocus() }
                     )
-                    addAlignedNumber(rough.addSeparators())
-                    addAlignedNumber("§a${flawed.addSeparators()}")
-                    addAlignedNumber("§9${fine.addSeparators()}")
-                    val price = roughprice + flawedprice + fineprice
+                    addAlignedNumber(gem.rough.addSeparators())
+                    addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                    addAlignedNumber("§9${gem.fine.addSeparators()}")
+                    val price = gem.priceSum
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
                 }

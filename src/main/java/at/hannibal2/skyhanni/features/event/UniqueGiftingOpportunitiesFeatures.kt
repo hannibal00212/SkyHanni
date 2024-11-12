@@ -57,6 +57,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private fun isEnabled() = holdingGift
 
+    @Suppress("UnusedPrivateProperty")
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
     private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 

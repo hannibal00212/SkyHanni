@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -23,10 +23,11 @@ object StashCompact {
     /**
      * REGEX-TEST: §f                 §7You have §3226 §7materials stashed away!
      * REGEX-TEST: §f                 §7You have §31,000 §7items stashed away!
+     * REGEX-TEST: §f                     §7You have §a2 §7items stashed away!
      */
     private val materialCountPattern by patternGroup.pattern(
         "material.count",
-        "§f *§7You have §3(?<count>[\\d,]+) (?:§.)+(?<type>item|material)s? stashed away!.*",
+        "§f *§7You have §.(?<count>[\\d,]+) (?:§.)+(?<type>item|material)s? stashed away!.*",
     )
 
     /**
@@ -42,10 +43,11 @@ object StashCompact {
 
     /**
      * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
+     * REGEX-TEST: §f                §6§l>>> §6§lCLICK HERE§e to pick them up! §6§l<<<
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
-        "§f *§3§l>>> §3§lCLICK HERE§b to pick (?:them|it) up! §3§l<<<.*",
+        "§f *§.§l>>> §.§lCLICK HERE§. to pick (?:them|it) up! §.§l<<<.*",
     )
 
     /**
@@ -61,61 +63,62 @@ object StashCompact {
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
 
-    private var lastMaterialCount = 0
-    private var lastDifferingMaterialsCount = 0
-    private var lastType = ""
+    private var currentMessage: StashMessage? = null
+    private var lastMessage: StashMessage? = null
 
-    private var lastSentMaterialCount = 0
-    private var lastSentType = ""
+    data class StashMessage(val materialCount: Int, val type: String) {
+        var differingMaterialsCount: Int? = null
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        genericAddedToStashPattern.matchMatcher(event.message) {
-            event.blockedReason = "stash_compact"
-        }
-
+        // TODO make a system for detecting message "groups" (multiple consecutive messages)
         materialCountPattern.matchMatcher(event.message) {
-            groupOrNull("count")?.formatIntOrNull()?.let { count ->
-                lastMaterialCount = count
-            }
+            currentMessage = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            groupOrNull("count")?.formatIntOrNull()?.let { count ->
-                lastDifferingMaterialsCount = count
-            }
-            groupOrNull("type")?.let { type ->
-                lastType = type
-            }
+            currentMessage?.differingMaterialsCount = group("count").formatInt()
             event.blockedReason = "stash_compact"
         }
 
         if (pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
-            if (lastMaterialCount <= config.hideLowWarningsThreshold) return
-            if (config.hideDuplicateCounts && lastMaterialCount == lastSentMaterialCount && lastType == lastSentType) return
+            val current = currentMessage ?: return
+            if (current.materialCount <= config.hideLowWarningsThreshold) return
+            if (config.hideDuplicateCounts && current == lastMessage) return
 
-            sendCompactedStashMessage()
+            current.sendCompactedStashMessage()
+        }
+
+        if (!config.hideAddedMessages) return
+        genericAddedToStashPattern.matchMatcher(event.message) {
+            event.blockedReason = "stash_compact"
         }
     }
 
-    private fun sendCompactedStashMessage() {
-        val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
-        val typeFormat = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
+    private fun StashMessage.sendCompactedStashMessage() {
+        val typeNameFormat = StringUtils.pluralize(materialCount, type)
+        val (mainColor, accentColor) = if (type == "item") "§e" to "§6" else "§b" to "§3"
+        val typeStringExtra = differingMaterialsCount?.let {
+            ", ${mainColor}totalling $accentColor$it ${StringUtils.pluralize(it, "type")}$mainColor"
+        }.orEmpty()
+        val action = if (config.useViewStash) "view" else "pickup"
+
         ChatUtils.clickableChat(
-            "§eYou have §6${lastMaterialCount} §e$typeNameFormat in stash§6, " +
-                "§etotalling §6$lastDifferingMaterialsCount $typeFormat§6. " +
-                "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §estash§6.",
+            "${mainColor}You have $accentColor${materialCount.shortFormat()} $mainColor$typeNameFormat in stash$typeStringExtra. " +
+                "${mainColor}Click to $accentColor$action ${mainColor}your stash!",
             onClick = {
-                if (config.useViewStash) HypixelCommands.viewStash(lastType)
+                if (config.useViewStash) HypixelCommands.viewStash(type)
                 else HypixelCommands.pickupStash()
             },
+            hover = "§eClick to $action your $type stash!",
         )
-        lastSentMaterialCount = lastMaterialCount
-        lastSentType = lastType
+        currentMessage = null
+        lastMessage = this
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

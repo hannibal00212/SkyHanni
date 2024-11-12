@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -59,6 +58,13 @@ class RepoManager(private val configLocation: File) {
         fun getRepoLocation(): String {
             return "${config.location.user}/${config.location.name}/${config.location.branch}"
         }
+
+        private const val DEFAULT_USER = "hannibal002"
+        private const val DEFAULT_NAME = "SkyHanni-REPO"
+        private const val DEFAULT_BRANCH = "main"
+
+        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
+            user == DEFAULT_USER && name == DEFAULT_NAME && branch == DEFAULT_BRANCH
     }
 
     fun loadRepoInformation() {
@@ -239,7 +245,7 @@ class RepoManager(private val configLocation: File) {
                         ).asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
-                text.add("§7Backup Repo Value: §c${usingBackupRepo}".asComponent())
+                text.add("§7Backup Repo Value: §c$usingBackupRepo".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
                 text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
 
@@ -311,27 +317,19 @@ class RepoManager(private val configLocation: File) {
         ).use { writer -> writer.write(gson.toJson(json)) }
     }
 
-    @SubscribeEvent
-    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
-    }
-
     fun resetRepositoryLocation(manual: Boolean = false) {
-        val defaultUser = "hannibal002"
-        val defaultName = "SkyHanni-Repo"
-        val defaultBranch = "main"
 
         with(config.location) {
-            if (user == defaultUser && name == defaultName && branch == defaultBranch) {
+            if (hasDefaultSettings()) {
                 if (manual) {
                     ChatUtils.chat("Repo settings are already on default!")
                 }
                 return
             }
 
-            user = defaultUser
-            name = defaultName
-            branch = defaultBranch
+            user = DEFAULT_USER
+            name = DEFAULT_NAME
+            branch = DEFAULT_BRANCH
             if (manual) {
                 ChatUtils.clickableChat(
                     "Reset Repo settings to default. " +
@@ -346,7 +344,7 @@ class RepoManager(private val configLocation: File) {
     }
 
     private fun checkRepoLocation() {
-        if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
+        if (config.location.run { user.isEmpty() || name.isEmpty() || branch.isEmpty() }) {
             ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }

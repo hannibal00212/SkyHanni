@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -139,7 +139,7 @@ object SackAPI {
                     if (gemstoneMap.containsKey(name.removeColor())) {
                         val internalName = "${rarity.uppercase()}_${
                             name.uppercase().split(" ")[0].removeColor()
-                        }_GEM".asInternalName()
+                        }_GEM".toInternalName()
 
                         gem.slot = slot
 
@@ -207,7 +207,7 @@ object SackAPI {
                         val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
                         val filletValue = filletPerTrophy * stored
                         item.magmaFish = filletValue
-                        "MAGMA_FISH".asInternalName().sackPrice(filletValue)
+                        "MAGMA_FISH".toInternalName().sackPrice(filletValue)
                     } else {
                         internalName.sackPrice(stored).coerceAtLeast(0)
                     }
@@ -233,12 +233,12 @@ object SackAPI {
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
-        } ?: ""
+        }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
-        } ?: ""
+        }.orEmpty()
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
@@ -345,7 +345,10 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    ) : AbstractSackItem()
+    ) : AbstractSackItem() {
+        val priceSum: Long
+            get() = roughPrice + flawedPrice + finePrice
+    }
 
     data class SackRune(
         var stack: ItemStack? = null,
@@ -375,7 +378,7 @@ object SackAPI {
     fun testSackAPI(args: Array<String>) {
         if (args.size == 1) {
             if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
             } else {
                 ChatUtils.userError("That item isn't a valid sack item.")
             }
@@ -395,18 +398,18 @@ data class SackItem(
 
 // TODO repo
 private val gemstoneMap = mapOf(
-    "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
-    "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
-    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".asInternalName(),
-    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".asInternalName(),
-    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".asInternalName(),
-    "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
-    "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
-    "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
-    "Onyx Gemstones" to "ROUGH_ONYX_GEM".asInternalName(),
-    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".asInternalName(),
-    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".asInternalName(),
-    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".asInternalName(),
+    "Jade Gemstones" to "ROUGH_JADE_GEM".toInternalName(),
+    "Amber Gemstones" to "ROUGH_AMBER_GEM".toInternalName(),
+    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".toInternalName(),
+    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".toInternalName(),
+    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".toInternalName(),
+    "Jasper Gemstones" to "ROUGH_JASPER_GEM".toInternalName(),
+    "Ruby Gemstones" to "ROUGH_RUBY_GEM".toInternalName(),
+    "Opal Gemstones" to "ROUGH_OPAL_GEM".toInternalName(),
+    "Onyx Gemstones" to "ROUGH_ONYX_GEM".toInternalName(),
+    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".toInternalName(),
+    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".toInternalName(),
+    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".toInternalName(),
 )
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks

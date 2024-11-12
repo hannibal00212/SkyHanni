@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,24 +11,16 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import com.google.gson.stream.JsonWriter
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
@@ -46,6 +35,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
@@ -60,41 +50,6 @@ object NEUItems {
     private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
     private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
-
-    private val hypixelApiGson by lazy {
-        BaseGsonBuilder.gson()
-            .registerTypeAdapter(
-                HypixelApiTrophyFish::class.java,
-                object : TypeAdapter<HypixelApiTrophyFish>() {
-                    @Suppress("EmptyFunctionBlock")
-                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
-
-                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                        val trophyFish = mutableMapOf<String, Int>()
-                        var totalCaught = 0
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            val key = reader.nextName()
-                            if (key == "total_caught") {
-                                totalCaught = reader.nextInt()
-                                continue
-                            }
-                            if (reader.peek() == JsonToken.NUMBER) {
-                                val valueAsString = reader.nextString()
-                                if (valueAsString.isInt()) {
-                                    trophyFish[key] = valueAsString.toInt()
-                                    continue
-                                }
-                            }
-                            reader.skipValue()
-                        }
-                        reader.endObject()
-                        return HypixelApiTrophyFish(totalCaught, trophyFish)
-                    }
-                }.nullSafe(),
-            )
-            .create()
-    }
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -119,21 +74,6 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    @SubscribeEvent
-    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
-        val apiData = event.data ?: return
-        try {
-            val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error reading hypixel player api data",
-                "data" to apiData,
-            )
-        }
-    }
-
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
@@ -144,7 +84,7 @@ object NEUItems {
             // because builder blocks can have the same display name as normal items.
             if (rawInternalName.startsWith("BUILDER_")) continue
 
-            val internalName = rawInternalName.asInternalName()
+            val internalName = rawInternalName.toInternalName()
 
             // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
@@ -169,11 +109,12 @@ object NEUItems {
         .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.toInternalName()
 
+    // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
-        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+        return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
 
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
@@ -194,7 +135,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
@@ -210,7 +151,7 @@ object NEUItems {
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
+    fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -230,7 +171,7 @@ object NEUItems {
         if (prefix.isEmpty()) return this
         val string = asString()
         if (!string.startsWith(prefix)) return this
-        return string.substring(prefix.length).asInternalName()
+        return string.substring(prefix.length).toInternalName()
     }
 
     const val itemFontSize = 2.0 / 3.0
@@ -271,17 +212,22 @@ object NEUItems {
         try {
             Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         } catch (e: Exception) {
-            println(" ")
-            println("item: $item")
-            println("name: ${item.name}")
-            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
-            println(" ")
-            e.printStackTrace()
+            if (lastWarn.passedSince() > 1.seconds) {
+                lastWarn = SimpleTimeMark.now()
+                println(" ")
+                println("item: $item")
+                println("name: ${item.name}")
+                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+                println(" ")
+                ChatUtils.debug("rendering an item has failed.")
+            }
         }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
     }
+
+    private var lastWarn = SimpleTimeMark.farPast()
 
     private object AdjustStandardItemLighting {
 
@@ -308,9 +254,11 @@ object NEUItems {
         itemIdCache[item]?.let {
             return it
         }
-        val result = allNeuRepoItems()
-            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
-            .keys.map { it.asInternalName() }
+        val result = allNeuRepoItems().filter {
+            Item.getByNameOrId(it.value["itemid"].asString) == item
+        }.keys.map {
+            it.toInternalName()
+        }
         itemIdCache[item] = result
         return result
     }
@@ -333,22 +281,22 @@ object NEUItems {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
-                    internalItemId = "CACTUS".asInternalName()
+                if (internalName == "ENCHANTED_CACTUS_GREEN".toInternalName() && internalItemId == "INK_SACK-2".toInternalName()) {
+                    internalItemId = "CACTUS".toInternalName()
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
+                if (internalName == "ENCHANTED_COOKIE".toInternalName() && internalItemId == "WHEAT".toInternalName()) {
                     continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".toInternalName() && internalItemId == "GOLDEN_CARROT".toInternalName()) {
                     continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
+                if (internalName == "LEATHER".toInternalName() && internalItemId == "RABBIT_HIDE".toInternalName()) {
                     continue
                 }
 
@@ -381,6 +329,7 @@ object NEUItems {
     fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
+        if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
         // TODO add RecipeSearchOverlay via RecalculatingValue and reflection

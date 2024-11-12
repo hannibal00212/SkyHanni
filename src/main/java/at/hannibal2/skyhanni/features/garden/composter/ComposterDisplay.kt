@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -35,7 +35,7 @@ object ComposterDisplay {
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
-    private val bucket by lazy { "BUCKET".asInternalName().getItemStack() }
+    private val bucket by lazy { "BUCKET".toInternalName().getItemStack() }
     private var tabListData by ComposterAPI::tabListData
 
     enum class DataType(rawPattern: String, val icon: String) {
@@ -44,12 +44,12 @@ object ComposterDisplay {
         TIME_LEFT(" Time Left: §r(.*)", "WATCH"),
         STORED_COMPOST(" Stored Compost: §r(.*)", "COMPOST");
 
-        val displayItem by lazy { icon.asInternalName().getItemStack() }
+        val displayItem by lazy { icon.toInternalName().getItemStack() }
 
         val pattern by lazy { rawPattern.toPattern() }
 
         fun addToList(map: Map<DataType, String>): List<Any> {
-            return map[this]?.let { listOf(displayItem, it) } ?: emptyList()
+            return map[this]?.let { listOf(displayItem, it) }.orEmpty()
         }
     }
 

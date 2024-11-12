@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig.GhostDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -11,11 +12,11 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option.KILLS
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.bestiaryData
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -81,7 +81,7 @@ object GhostCounter {
         "skillxp",
         "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)",
     )
-    
+
     @Suppress("MaxLineLength")
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",
@@ -121,9 +121,9 @@ object GhostCounter {
     private var currentSkill = ""
     private var currentSkillLevel = -1
     private const val CONFIG_VALUE_VERSION = 1
-    private val SORROW = "SORROW".asInternalName()
-    private val PLASMA = "PLASMA".asInternalName()
-    private val VOLTA = "VOLTA".asInternalName()
+    private val SORROW = "SORROW".toInternalName()
+    private val PLASMA = "PLASMA".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -284,8 +284,10 @@ object GhostCounter {
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
                 moneyMade += (count.toLong() * value.toLong())
-                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= " +
-                    "§6${(value.toLong() * count.toLong()).addSeparators()}")
+                add(
+                    "$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= " +
+                        "§6${(value.toLong() * count.toLong()).addSeparators()}"
+                )
             }
             add("§bTotal: §6${moneyMade.addSeparators()}")
             add("§eClick to copy to clipboard!")
@@ -345,9 +347,9 @@ object GhostCounter {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        inMist = IslandAreas.currentAreaName == "The Mist"
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inMist = event.area == "The Mist"
     }
 
     @SubscribeEvent

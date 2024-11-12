@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -116,18 +116,20 @@ object MinionCraftHelper {
         val allMinions = tierOneMinions.toMutableList()
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
-        for (item in mainInventory) {
-            val name = item?.name?.removeColor() ?: continue
-            if (item.hasEnchantments()) continue
+        for (item in mainInventory.filterNotNull()) {
+            val name = item.name.removeColor()
             val rawId = item.getInternalName()
-            if (!isMinionName(name)) {
-                if (!allIngredients.contains(rawId)) continue
-                if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
-                val old = otherItems.getOrDefault(itemId, 0)
-                otherItems[itemId] = old + item.stackSize * multiplier
-            }
+            if (
+                item.hasEnchantments() ||
+                !isMinionName(name) ||
+                !allIngredients.contains(rawId) ||
+                !isAllowed(allMinions, rawId)
+            ) continue
+
+            val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
+            val old = otherItems.getOrDefault(itemId, 0)
+            otherItems[itemId] = old + item.stackSize * multiplier
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -146,7 +148,8 @@ object MinionCraftHelper {
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
                     if (primitiveStack.internalName == ingredientPrimitive.internalName &&
-                        primitiveStack.amount < ingredientPrimitive.amount) return true
+                        primitiveStack.amount < ingredientPrimitive.amount
+                    ) return true
                 }
             }
         }
@@ -159,13 +162,13 @@ object MinionCraftHelper {
         allIngredients.clear()
 
         for (internalId in NEUItems.allNeuRepoItems().keys) {
-            val internalName = internalId.asInternalName()
+            val internalName = internalId.toInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
-                if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
-                    internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
-                    internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
-                    internalName == "INFERNO_GENERATOR_1".asInternalName() ||
-                    internalName == "VAMPIRE_GENERATOR_1".asInternalName()
+                if (internalName == "REVENANT_GENERATOR_1".toInternalName() ||
+                    internalName == "TARANTULA_GENERATOR_1".toInternalName() ||
+                    internalName == "VOIDLING_GENERATOR_1".toInternalName() ||
+                    internalName == "INFERNO_GENERATOR_1".toInternalName() ||
+                    internalName == "VAMPIRE_GENERATOR_1".toInternalName()
                 ) continue
                 tierOneMinions.add(internalName)
             }
