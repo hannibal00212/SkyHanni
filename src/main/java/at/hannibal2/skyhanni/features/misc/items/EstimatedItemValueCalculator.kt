@@ -230,7 +230,7 @@ object EstimatedItemValueCalculator {
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
-        list.add("  §7Stone $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
+        list.add("  §7Stone: $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
         list.add("  §7Apply cost: (§6" + applyCost.shortFormat() + "§7)")
         return reforgeStonePrice + applyCost
     }
