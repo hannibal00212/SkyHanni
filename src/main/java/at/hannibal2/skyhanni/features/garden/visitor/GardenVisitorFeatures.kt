@@ -594,7 +594,8 @@ object GardenVisitorFeatures {
                         entity,
                         color,
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
-                } else if (color == null || !GardenAPI.inGarden()) {
+                }
+                if (color == null || !GardenAPI.inGarden()) {
                     // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
                     RenderLivingEntityHelper.removeEntityColor(entity)
                 }
