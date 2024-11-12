@@ -134,7 +134,7 @@ object NEUItems {
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
-    fun transHypixelNametoInternalName(hypixelId: String): NEUInternalName =
+    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))

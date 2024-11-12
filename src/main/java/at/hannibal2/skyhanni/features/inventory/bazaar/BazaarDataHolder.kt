@@ -28,7 +28,7 @@ class BazaarDataHolder {
 
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
             for (item in itemsData.items) {
-                val neuItemId = NEUItems.transHypixelNametoInternalName(item.id ?: continue)
+                val neuItemId = NEUItems.transHypixelNameToInternalName(item.id ?: continue)
                 item.npcPrice?.let { list[neuItemId] = it }
                 item.motesPrice?.let { motesPrice[neuItemId] = it }
             }
