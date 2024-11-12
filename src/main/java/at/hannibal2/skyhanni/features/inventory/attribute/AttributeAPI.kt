@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AttributeGoodRollsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.AttributeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsIgnoreOrder
 import at.hannibal2.skyhanni.utils.CollectionUtils.toPair
@@ -11,6 +12,14 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+
+enum class RollType {
+    GOOD_ROLL,
+    PARTIAL_ROLL,
+    BAD_ROLL,
+}
+
+data class Attribute(val type: AttributeType, val level: Int)
 
 @SkyHanniModule
 object AttributeAPI {
@@ -68,8 +77,6 @@ object AttributeAPI {
         }
     }
 
-    data class Attribute(val type: AttributeType, val level: Int)
-
     private data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
     @SubscribeEvent
@@ -90,6 +97,30 @@ object AttributeAPI {
         getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
             AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
         }?.toPair()
+
+    /**
+     * Assumes it's already not a good roll
+     */
+    fun AttributeType.isPartialRoll(internalName: NEUInternalName): Boolean {
+        val rolls = goodRolls.find { it.regex.matches(internalName.asString()) } ?: return false
+        return rolls.attributes.any { it.first == this || it.second == this }
+    }
+
+    fun Pair<Attribute, Attribute>.getRollType(internalName: NEUInternalName): RollType {
+        val rolls = goodRolls.find { it.regex.matches(internalName.asString()) } ?: return RollType.BAD_ROLL
+        val firstType = first.type
+        val secondType = second.type
+        val pair = firstType to secondType
+        var partialRoll = false
+        for (combination in rolls.attributes) {
+            if (pair.equalsIgnoreOrder(combination)) return RollType.GOOD_ROLL
+            val (attr1, attr2) = combination
+            if (attr1 == firstType || attr1 == secondType || attr2 == firstType || attr2 == secondType) {
+                partialRoll = true
+            }
+        }
+        return if (partialRoll) RollType.PARTIAL_ROLL else RollType.BAD_ROLL
+    }
 
     fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean =
         goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->

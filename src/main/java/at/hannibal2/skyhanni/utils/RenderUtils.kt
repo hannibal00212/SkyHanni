@@ -1693,6 +1693,7 @@ object RenderUtils {
         )
     }
 
+    @Suppress("UnusedReceiverParameter")
     fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawSlotText(
         xPos: Int,
         yPos: Int,
@@ -1702,6 +1703,7 @@ object RenderUtils {
         RenderUtils.drawSlotText(xPos, yPos, text, scale)
     }
 
+    @Suppress("UnusedReceiverParameter")
     fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
         xPos: Int,
         yPos: Int,
