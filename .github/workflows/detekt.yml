@@ -19,6 +19,7 @@ jobs:
             pull-requests: write
         outputs:
             sarif_exists: ${{ steps.check_sarif.outputs.exists }}
+            is_latest: ${{ env.is_latest }}
         steps:
             -   name: Checkout PR code
                 uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
         name: Comment detekt failures on PR
         runs-on: ubuntu-latest
         needs: detekt
-        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() }}
+        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() && needs.detekt.outputs.is_latest == 'true' }}
         permissions:
             pull-requests: write
         steps:
@@ -109,24 +110,8 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
                     node .github/scripts/process_detekt_output.js
-            -   name: Check if this is the latest workflow run
-                id: check_latest
-                run: |
-                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
-                        | jq -r '.head.sha')
-                  
-                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
-                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
-                  
-                    # Compare the SHAs and set a result variable
-                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
-                        echo "is_latest=true" >> $GITHUB_ENV
-                    else
-                        echo "is_latest=false" >> $GITHUB_ENV
-                    fi
+
             -   name: Add comment to PR
-                if: env.is_latest == 'true'
                 uses: actions/github-script@v6
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
