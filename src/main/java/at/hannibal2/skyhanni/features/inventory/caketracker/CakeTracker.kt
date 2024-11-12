@@ -61,7 +61,7 @@ object CakeTracker {
     private var slotHighlightCache = mapOf<Int, Color>()
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
-    private var cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
+    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
 
     private var cakeRenderables = listOf<Renderable>()
     private var lastKnownCakeDataHash = 0
@@ -274,7 +274,7 @@ object CakeTracker {
     }
 
     private fun getCakePriceString(year: Int): String {
-        return getCakePrice(year).takeIf { it > 0}?.let {
+        return getCakePrice(year).takeIf { it > 0 }?.let {
             "§6${it.addSeparators()}"
         } ?: "§7Unknown (no auctions)"
     }
@@ -331,7 +331,7 @@ object CakeTracker {
 
             add(
                 Renderable.optionalLink(
-                    "${ownedColor}[Owned]",
+                    "$ownedColor[Owned]",
                     { setDisplayType(DisplayType.OWNED_CAKES) },
                     condition = { config.displayType != DisplayType.OWNED_CAKES },
                 ),
@@ -339,7 +339,7 @@ object CakeTracker {
             add(Renderable.string(" "))
             add(
                 Renderable.optionalLink(
-                    "${missingColor}[Missing]",
+                    "$missingColor[Missing]",
                     { setDisplayType(DisplayType.MISSING_CAKES) },
                     condition = { config.displayType != DisplayType.MISSING_CAKES },
                 ),
@@ -359,7 +359,7 @@ object CakeTracker {
 
             add(
                 Renderable.optionalLink(
-                    "${newestColor}[Newest First]",
+                    "$newestColor[Newest First]",
                     { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
                     condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
                 ),
@@ -367,7 +367,7 @@ object CakeTracker {
             add(Renderable.string(" "))
             add(
                 Renderable.optionalLink(
-                    "${oldestColor}[Oldest First]",
+                    "$oldestColor[Oldest First]",
                     { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
                     condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
                 ),
