@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -20,7 +20,7 @@ object BitsPerCookieVisual {
 
     private val config get() = SkyHanniMod.feature.misc.bits
 
-    private val boosterCookie = "BOOSTER_COOKIE".asInternalName()
+    private val boosterCookie = "BOOSTER_COOKIE".toInternalName()
 
     private val patternGroup = RepoPattern.group("cookie.bits")
 

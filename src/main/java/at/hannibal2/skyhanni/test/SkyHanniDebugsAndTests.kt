@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
@@ -328,18 +328,15 @@ object SkyHanniDebugsAndTests {
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
         val z = (location.z + 0.001).roundTo(1)
-        if (args.size == 1) {
-            if (args[0].equals("json", false)) {
-                OSUtils.copyToClipboard("\"$x:$y:$z\"")
-                return
-            }
-            if (args[0].equals("pathfind", false)) {
-                OSUtils.copyToClipboard("`/shtestwaaypoint $x $y $z pathfind`")
-                return
-            }
-        }
+        val (clipboard, format) = formatLocation(x, y, z, args.getOrNull(0))
+        OSUtils.copyToClipboard(clipboard)
+        ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
+    }
 
-        OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
+    private fun formatLocation(x: Double, y: Double, z: Double, parameter: String?): Pair<String, String> = when (parameter) {
+        "json" -> "$x:$y:$z" to "json"
+        "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
+        else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
     }
 
     fun debugVersion() {
@@ -389,7 +386,7 @@ object SkyHanniDebugsAndTests {
                 return@buildList
             }
 
-            input.asInternalName().getItemStackOrNull()?.let { item ->
+            input.toInternalName().getItemStackOrNull()?.let { item ->
                 val itemName = item.itemName
                 val internalName = item.getInternalName()
                 add("§einternal name: §7${internalName.asString()}")

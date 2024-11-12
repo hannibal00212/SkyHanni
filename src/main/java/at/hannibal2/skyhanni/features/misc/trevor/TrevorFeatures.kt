@@ -174,9 +174,11 @@ object TrevorFeatures {
 
         clickOptionPattern.findMatcher(event.message) {
             for (sibling in event.chatComponent.siblings) {
-                if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
+                val clickEvent = sibling.chatStyle.chatClickEvent ?: continue
+
+                if (clickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
-                    lastChatPrompt = sibling.chatStyle.chatClickEvent.value.substringAfter(" ")
+                    lastChatPrompt = clickEvent.value.substringAfter(" ")
                 }
             }
         }

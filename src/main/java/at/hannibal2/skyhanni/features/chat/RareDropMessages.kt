@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -16,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
@@ -121,7 +122,7 @@ object RareDropMessages {
     @SubscribeEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (event.amount != 1) return
+        if (event.amount != 1 || event.source != ItemAddManager.Source.ITEM_ADD) return
         if (!config.enchantedBook) return
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
@@ -136,7 +137,7 @@ object RareDropMessages {
         if (anyRecent) {
             var message = "§r§6§lRARE DROP! ${internalName.itemName}"
             userLuck?.takeIf { it != 0f }?.let { luck ->
-                var luckString = luck.round(2).toString()
+                var luckString = luck.roundTo(2).toString()
                 if (luck > 0) luckString = "+$luckString"
                 message += " §a($luckString ✴ SkyHanni User Luck"
             }

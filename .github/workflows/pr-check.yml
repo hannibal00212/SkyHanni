@@ -12,6 +12,9 @@ jobs:
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
 
@@ -39,8 +42,26 @@ jobs:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     labels: 'Wrong Title/Changelog'
 
-            -   name: Add comment to PR if changelog verification fails
+            -   name: Check if this is the latest workflow run
                 if: failure()
+                id: check_latest
+                run: |
+                    PR_LATEST_SHA=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
+                        | jq -r '.head.sha')
+
+                    echo "Latest commit SHA from PR: $PR_LATEST_SHA"
+                    echo "Current workflow SHA: ${{ github.event.pull_request.head.sha }}"
+
+                    # Compare the SHAs and set a result variable
+                    if [[ "${PR_LATEST_SHA}" == "${{ github.event.pull_request.head.sha }}" ]]; then
+                        echo "is_latest=true" >> $GITHUB_ENV
+                    else
+                        echo "is_latest=false" >> $GITHUB_ENV
+                    fi
+
+            -   name: Add comment to PR if changelog verification fails
+                if: ${{ failure() && env.is_latest == 'true' }}
                 uses: actions/github-script@v6
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -50,8 +71,8 @@ jobs:
                         const commentBody = `${test}`
                         
                         github.rest.issues.createComment({
-                          issue_number: context.issue.number,
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          body: commentBody
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
                         })
