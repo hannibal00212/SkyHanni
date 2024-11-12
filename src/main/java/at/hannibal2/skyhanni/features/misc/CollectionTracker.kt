@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -168,8 +168,8 @@ object CollectionTracker {
     }
 
     private fun countCurrentlyInInventory(): Int {
-        val cactus = "CACTUS".asInternalName()
-        val cactusGreen = "INK_SACK-2".asInternalName()
+        val cactus = "CACTUS".toInternalName()
+        val cactusGreen = "INK_SACK-2".toInternalName()
         return InventoryUtils.countItemsInLowerInventory {
             if (internalName == cactus && it.getInternalName() == cactusGreen) {
                 return@countItemsInLowerInventory true

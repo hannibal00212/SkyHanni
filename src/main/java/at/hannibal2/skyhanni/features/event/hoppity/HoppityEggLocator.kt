@@ -39,7 +39,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
-
     val locatorItem = "EGGLOCATOR".toInternalName()
 
     private var lastParticlePosition: LorenzVec? = null

@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -56,13 +56,13 @@ object ItemAbilityCooldown {
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
-    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
-    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
-    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
-    private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
-    private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
-    private val SOS_FLARE = "SOS_FLARE".asInternalName()
-    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".asInternalName()
+    private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".toInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
+    private val SOS_FLARE = "SOS_FLARE".toInternalName()
+    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
 
     @SubscribeEvent
@@ -93,8 +93,8 @@ object ItemAbilityCooldown {
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName(),
+                            "SHADOW_FURY".toInternalName(),
+                            "STARRED_SHADOW_FURY".toInternalName(),
                         )
                     ) return
 

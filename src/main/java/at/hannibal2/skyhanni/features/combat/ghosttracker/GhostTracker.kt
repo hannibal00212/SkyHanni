@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -150,7 +150,7 @@ object GhostTracker {
         "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
     )
 
-    private val SORROW = "SORROW".asInternalName()
+    private val SORROW = "SORROW".toInternalName()
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lGhost Profit Tracker")
