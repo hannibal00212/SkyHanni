@@ -57,7 +57,7 @@ object PlatformUtils {
             "§cif you choose to still use NotEnoughUpdates, which is recommended,",
             "§cwe require you to use a newer version of NotEnoughUpdates to ensure",
             "§ccompatibility with some of our features.",
-            "§cPlease update NotEnoughUpdates to version 2.4.0",
+            "§cPlease update NotEnoughUpdates",
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
     }
