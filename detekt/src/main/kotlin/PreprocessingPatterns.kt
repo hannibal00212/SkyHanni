@@ -13,7 +13,7 @@ enum class PreprocessingPattern(val text: String) {
 
     companion object {
         fun String.containsPreprocessingPattern(): Boolean {
-            return entries.any { this.contains(it.text) }
+            return entries.any { this.startsWith(it.text) }
         }
     }
 }
