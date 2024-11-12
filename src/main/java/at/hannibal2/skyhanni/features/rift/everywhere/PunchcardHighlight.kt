@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -75,7 +75,7 @@ object PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
     private var playerQueue = mutableListOf<String>()
 
-    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
+    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".toInternalName().getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
     @SubscribeEvent
@@ -120,7 +120,7 @@ object PunchcardHighlight {
     private fun checkPunchcard() {
         if (!RiftAPI.inRift()) return
 
-        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".asInternalName())
+        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".toInternalName())
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
             warningCooldown = SimpleTimeMark.now()
             ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")

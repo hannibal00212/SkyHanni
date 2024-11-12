@@ -162,6 +162,12 @@ object TimeUtils {
     val Float.minutes get() = toDouble().minutes
 }
 
+object StaticDurations {
+    @JvmStatic
+    @JvmName("getZero")
+    fun getZero() = Duration.ZERO
+}
+
 private const val FACTOR_SECONDS = 1000L
 private const val FACTOR_MINUTES = FACTOR_SECONDS * 60
 private const val FACTOR_HOURS = FACTOR_MINUTES * 60

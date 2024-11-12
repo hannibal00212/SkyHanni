@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -23,9 +23,9 @@ object RiftAPI {
     // internal name -> motes
     var motesPrice = emptyMap<NEUInternalName, Double>()
 
-    val farmingTool by lazy { "FARMING_WAND".asInternalName() }
+    val farmingTool by lazy { "FARMING_WAND".toInternalName() }
 
-    private val blowgun by lazy { "BERBERIS_BLOWGUN".asInternalName() }
+    private val blowgun by lazy { "BERBERIS_BLOWGUN".toInternalName() }
 
     val ItemStack?.isBlowgun: Boolean
         get() = this?.getInternalName() == blowgun

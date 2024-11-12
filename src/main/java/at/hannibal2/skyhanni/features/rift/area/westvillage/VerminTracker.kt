@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -51,7 +51,7 @@ object VerminTracker {
     )
 
     private var hasVacuum = false
-    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".asInternalName()
+    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
 
     private val config get() = RiftAPI.config.area.westVillage.verminTracker
 

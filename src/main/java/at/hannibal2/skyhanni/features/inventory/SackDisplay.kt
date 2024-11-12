@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -155,7 +155,7 @@ object SackDisplay {
                             )
                         )
                         // TODO add cache
-                        addItemStack("MAGMA_FISH".asInternalName())
+                        addItemStack("MAGMA_FISH".toInternalName())
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
