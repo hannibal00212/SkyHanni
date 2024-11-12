@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -63,7 +63,7 @@ object AnitaExtraFarmingFortune {
 
         // TODO: maybe only show the price when playing classic
 //        if (!LorenzUtils.noTradeMode) {
-        val price = jacobTickets * "JACOBS_TICKET".asInternalName().getPrice()
+        val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()
         event.toolTip.add(index, "  §7Price: §6${price.shortFormat()} coins")
 //        }
         event.toolTip.add(index, "§aJacob Tickets §8x${jacobTickets.addSeparators()}")

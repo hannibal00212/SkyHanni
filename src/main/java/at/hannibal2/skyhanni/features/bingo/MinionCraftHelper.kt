@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -161,13 +161,13 @@ object MinionCraftHelper {
         allIngredients.clear()
 
         for (internalId in NEUItems.allNeuRepoItems().keys) {
-            val internalName = internalId.asInternalName()
+            val internalName = internalId.toInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
-                if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
-                    internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
-                    internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
-                    internalName == "INFERNO_GENERATOR_1".asInternalName() ||
-                    internalName == "VAMPIRE_GENERATOR_1".asInternalName()
+                if (internalName == "REVENANT_GENERATOR_1".toInternalName() ||
+                    internalName == "TARANTULA_GENERATOR_1".toInternalName() ||
+                    internalName == "VOIDLING_GENERATOR_1".toInternalName() ||
+                    internalName == "INFERNO_GENERATOR_1".toInternalName() ||
+                    internalName == "VAMPIRE_GENERATOR_1".toInternalName()
                 ) continue
                 tierOneMinions.add(internalName)
             }
