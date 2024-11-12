@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -37,19 +37,19 @@ object UserLuckBreakdown {
     private val config get() = SkyHanniMod.feature.misc
 
     private lateinit var mainLuckItem: ItemStack
-    private val mainLuckID = "ENDER_PEARL".asInternalName()
+    private val mainLuckID = "ENDER_PEARL".toInternalName()
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
-    private var fillerID = "STAINED_GLASS_PANE".asInternalName()
+    private var fillerID = "STAINED_GLASS_PANE".toInternalName()
     private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
-    private var limboID = "ENDER_PEARL".asInternalName()
+    private var limboID = "ENDER_PEARL".toInternalName()
     private const val LIMBO_NAME = "§a✴ Limbo Personal Best"
 
     private lateinit var skillsItem: ItemStack
-    private var skillsID = "DIAMOND_SWORD".asInternalName()
+    private var skillsID = "DIAMOND_SWORD".toInternalName()
     private const val SKILLS_NAME = "§a✴ Category: Skills"
 
     private var showAllStats = true

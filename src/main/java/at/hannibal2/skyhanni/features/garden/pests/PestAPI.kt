@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -57,11 +57,11 @@ object PestAPI {
 
     // TODO move into repo
     val vacuumVariants = listOf(
-        "SKYMART_VACUUM".asInternalName(),
-        "SKYMART_TURBO_VACUUM".asInternalName(),
-        "SKYMART_HYPER_VACUUM".asInternalName(),
-        "INFINI_VACUUM".asInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+        "SKYMART_VACUUM".toInternalName(),
+        "SKYMART_TURBO_VACUUM".toInternalName(),
+        "SKYMART_HYPER_VACUUM".toInternalName(),
+        "INFINI_VACUUM".toInternalName(),
+        "INFINI_VACUUM_HOOVERIUS".toInternalName(),
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
@@ -130,24 +130,31 @@ object PestAPI {
     private fun fixPests(loop: Int = 2) {
         DelayedRun.runDelayed(2.seconds) {
             val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
-            val inaccurateAmount = getPlotsWithInaccuratePests().size
-            if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
-                for (plot in getPlotsWithInaccuratePests()) {
-                    plot.pests = 1
+            val inaccurate = getPlotsWithInaccuratePests()
+            val inaccurateAmount = inaccurate.size
+            when {
+                // if we can assume all inaccurate plots have 1 pest each
+                scoreboardPests == accurateAmount + inaccurateAmount -> {
+                    for (plot in inaccurate) {
+                        plot.pests = 1
+                        plot.isPestCountInaccurate = false
+                    }
+                }
+                // if we can assume all the inaccurate pests are in the only inaccurate plot
+                inaccurateAmount == 1 -> {
+                    val plot = inaccurate.first()
+                    plot.pests = scoreboardPests - accurateAmount
                     plot.isPestCountInaccurate = false
                 }
-            } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
-                val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return@runDelayed
-                plot.pests = scoreboardPests - accurateAmount
-                plot.isPestCountInaccurate = false
-            } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
-                getInfestedPlots().forEach {
-                    it.pests = 0
-                    it.isPestCountInaccurate = true
+                // when logic fails and we reach impossible pest counts
+                accurateAmount + inaccurateAmount > scoreboardPests -> {
+                    getInfestedPlots().forEach {
+                        it.pests = 0
+                        it.isPestCountInaccurate = true
+                    }
+                    if (loop > 0) fixPests(loop - 1)
+                    else sendPestError()
                 }
-                if (loop > 0) {
-                    fixPests(loop - 1)
-                } else sendPestError()
             }
         }
     }
@@ -223,7 +230,7 @@ object PestAPI {
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
-        checkScoreboardLines(event.scoreboard)
+        checkScoreboardLines(event.added)
     }
 
     @SubscribeEvent
@@ -265,7 +272,7 @@ object PestAPI {
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
 
-    private fun getPlotsWithInaccuratePests() = GardenPlotAPI.plots.filter { it.pests == 0 && it.isPestCountInaccurate }
+    private fun getPlotsWithInaccuratePests() = GardenPlotAPI.plots.filter { it.isPestCountInaccurate }
 
     fun getInfestedPlots() = GardenPlotAPI.plots.filter { it.pests > 0 || it.isPestCountInaccurate }
 

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,8 +32,8 @@ object MagicalPowerDisplay {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
 
-    private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
-    private val riftPrism = "RIFT_PRISM".asInternalName()
+    private val hegemonyArtifact = "HEGEMONY_ARTIFACT".toInternalName()
+    private val riftPrism = "RIFT_PRISM".toInternalName()
 
     /**
      * REGEX-TEST: Accessory Bag
