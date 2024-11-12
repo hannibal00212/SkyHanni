@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -80,7 +80,7 @@ object ItemPickupLog {
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
 
-    private val coinIcon = "COIN_TALISMAN".asInternalName()
+    private val coinIcon = "COIN_TALISMAN".toInternalName()
     private val bitsIcon = "BITS_TALISMAN".asInternalName()
 
     private const val COIN_HASH = 0
