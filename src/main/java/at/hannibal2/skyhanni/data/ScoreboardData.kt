@@ -122,15 +122,16 @@ object ScoreboardData {
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
         if (semiFormatted != sidebarLines) {
-            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
             sidebarLines = semiFormatted
+            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
         }
 
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardUpdateEvent(new).postAndCatch()
+            val old = sidebarLinesFormatted
             sidebarLinesFormatted = new
+            ScoreboardUpdateEvent(new, old).postAndCatch()
         }
     }
 

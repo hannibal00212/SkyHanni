@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -33,10 +34,8 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -112,7 +111,7 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
-    private var lastLocRaw = SimpleTimeMark.farPast()
+    var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
 
     var hypixelLive = false
@@ -358,7 +357,7 @@ object HypixelData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
-            checkNEULocraw()
+            sendLocraw()
         }
 
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
@@ -401,18 +400,10 @@ object HypixelData {
         HypixelLocationAPI.checkSkyblock(skyBlock)
     }
 
-    // Modified from NEU.
-    // NEU does not send locraw when not in SkyBlock.
-    // So, as requested by Hannibal, use locraw from
-    // NEU and have NEU send it.
-    // Remove this when NEU dependency is removed
-    private fun checkNEULocraw() {
+    private fun sendLocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-            }
+            HypixelCommands.locraw()
         }
     }
 

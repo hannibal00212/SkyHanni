@@ -89,7 +89,7 @@ object LorenzUtils {
             return result
         }
 
-    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+    val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     private var previousApril = false
 

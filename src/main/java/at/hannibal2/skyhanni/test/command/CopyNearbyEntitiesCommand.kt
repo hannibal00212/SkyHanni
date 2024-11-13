@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -69,8 +70,8 @@ object CopyNearbyEntitiesCommand {
                 resultList.add("-  rotationYaw: $rotationYaw")
                 resultList.add("-  rotationPitch: $rotationPitch")
 
-                val riddenByEntity = entity.riddenByEntity
-                resultList.add("riddenByEntity: $riddenByEntity")
+                val firstPassenger = entity.getFirstPassenger()
+                resultList.add("firstPassenger: $firstPassenger")
                 val ridingEntity = entity.ridingEntity
                 resultList.add("ridingEntity: $ridingEntity")
 
@@ -140,6 +141,7 @@ object CopyNearbyEntitiesCommand {
                         val itemDamage = stack.itemDamage
                         val stackSize = stack.stackSize
                         val maxStackSize = stack.maxStackSize
+                        val skullTexture = stack.getSkullTexture()
                         resultList.add("-  name: '$stackName'")
                         resultList.add("-  stackDisplayName: '$stackDisplayName'")
                         resultList.add("-  cleanName: '$cleanName'")
@@ -147,6 +149,7 @@ object CopyNearbyEntitiesCommand {
                         resultList.add("-  itemDamage: '$itemDamage'")
                         resultList.add("-  stackSize: '$stackSize'")
                         resultList.add("-  maxStackSize: '$maxStackSize'")
+                        skullTexture?.let { resultList.add("-  skullTexture: '$it'") }
                     }
 
                     is EntityOtherPlayerMP -> {
