@@ -56,7 +56,7 @@ object HypixelLocationAPI {
     private var sentIslandEvent = false
     private var internalIsland = IslandType.NONE
 
-    @HandleEvent(priority = Int.MIN_VALUE)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onHypixelJoin(event: HypixelAPIJoinEvent) {
         logger.log(event.toString())
         logger.log("Connected to Hypixel")
@@ -64,7 +64,7 @@ object HypixelLocationAPI {
         inHypixel = true
     }
 
-    @HandleEvent(priority = Int.MIN_VALUE)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onServerChange(event: HypixelAPIServerChangeEvent) {
         logger.log(event.toString())
         inHypixel = true
