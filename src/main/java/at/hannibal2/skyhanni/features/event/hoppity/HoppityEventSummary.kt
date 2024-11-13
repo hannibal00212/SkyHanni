@@ -218,6 +218,7 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
+        event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
     }
 
     @SubscribeEvent
