@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -61,8 +62,7 @@ object BlazeSlayerDaggerHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        val player = Minecraft.getMinecraft().thePlayer
-        val dagger = getDaggerFromStack(player.inventory.mainInventory[player.inventory.currentItem])
+        val dagger = getDaggerFromStack(InventoryUtils.getItemInHand())
         if (dagger != null) {
             setDaggerText(dagger)
             return
@@ -151,8 +151,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun readFromInventory(dagger: Dagger): HellionShield? {
-        val player = Minecraft.getMinecraft().thePlayer
-        for (stack in player.inventory.mainInventory) {
+        for (stack in InventoryUtils.getItemsInOwnInventory()) {
             val otherDagger = getDaggerFromStack(stack) ?: continue
             if (dagger != otherDagger) continue
             for (line in stack.getLore()) {

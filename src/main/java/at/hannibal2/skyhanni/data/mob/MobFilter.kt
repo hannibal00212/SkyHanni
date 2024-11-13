@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -339,10 +341,10 @@ object MobFilter {
         if (baseEntity !is EntityZombie) return null
         when {
             illegalEntitiesPattern.matches(armorStand.name) -> return MobResult.illegal
-            baseEntity.getFirstPassenger() is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
-                ?.getSkullTexture() == RAT_SKULL_TEXTURE -> return MobResult.illegal // Rat Morph
+            baseEntity.getFirstPassenger() is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)
+                ?.wearingSkullTexture(RAT_SKULL_TEXTURE) ?: false -> return MobResult.illegal // Rat Morph
         }
-        when (armorStand.inventory?.get(4)?.getSkullTexture()) {
+        when (armorStand.getStandHelmet()?.getSkullTexture()) {
             HELLWISP_TENTACLE_SKULL_TEXTURE -> return MobResult.illegal // Hellwisp Tentacle
             RIFT_EYE_SKULL1_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
             RIFT_EYE_SKULL2_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))

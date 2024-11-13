@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -38,7 +38,7 @@ object ExperimentationTableAPI {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
         val entity = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
         } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
