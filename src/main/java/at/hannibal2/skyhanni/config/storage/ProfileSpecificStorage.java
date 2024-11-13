@@ -751,7 +751,7 @@ public class ProfileSpecificStorage {
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     @Expose
-    public Boolean hoppityStatLiveDisplayToggled = false;
+    public Boolean hoppityStatLiveDisplayToggledOff = false;
 
     public static class HoppityEventStats {
         @Expose

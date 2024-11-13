@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
@@ -20,7 +21,9 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -62,6 +65,16 @@ object HoppityEventSummary {
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
     )
 
+    /**
+     * REGEX-TEST: Hoppity's Collection
+     * REGEX-TEST: Chocolate Factory Milestones
+     * REGEX-TEST: Chocolate Shop Milestones
+     */
+    private val miscCfInventoryPatterns by ChocolateFactoryAPI.patternGroup.pattern(
+        "cf.inventory",
+        "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones",
+    )
+
     private const val LINE_HEADER = "    "
     private val SEPARATOR = "§d§l${"▬".repeat(64)}"
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
@@ -80,16 +93,45 @@ object HoppityEventSummary {
     private var lastSnapshotServer: String? = null
     private var statYear: Int = getCurrentSBYear()
 
-    private fun isEggLocatorOverridden(): Boolean =
-        liveDisplayConfig.showHoldingEgglocator && InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
+    private fun inMatchingInventory(): Boolean {
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+            ?: return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.NO_INVENTORY)
+
+        if (currentScreen is GuiInventory)
+            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.OWN_INVENTORY)
+
+        // Get the inventory name and check if it matches any of the specific inventories
+        val inventoryName = InventoryUtils.openInventoryName()
+
+        if (
+            ChocolateFactoryAPI.inChocolateFactory ||
+            menuNamePattern.matches(inventoryName) ||
+            miscCfInventoryPatterns.matches(inventoryName)
+        ) return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY)
+
+        if (inventoryName == "Hoppity")
+            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.HOPPITY)
+
+        if (mealEggInventoryPattern.matches(inventoryName))
+            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.MEAL_EGGS)
+
+        return false
+    }
 
     private fun liveDisplayEnabled(): Boolean {
         val storage = storage ?: return false
+        val isToggledOff = storage.hoppityStatLiveDisplayToggledOff
         val isEnabled = liveDisplayConfig.enabled
         val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
-        val isToggledOff = storage.hoppityStatLiveDisplayToggled
+        val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
+        val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
 
-        return LorenzUtils.inSkyBlock && isEnabled && (isEggLocatorOverridden() || (!isToggledOff && isEventEnabled))
+        return LorenzUtils.inSkyBlock &&
+            !isToggledOff &&
+            isEnabled &&
+            isEventEnabled &&
+            isEggLocatorEnabled &&
+            isInventoryEnabled
     }
 
     private data class StatString(val string: String, val headed: Boolean = true)
@@ -141,7 +183,7 @@ object HoppityEventSummary {
         if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryAPI.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
-        storage.hoppityStatLiveDisplayToggled = !storage.hoppityStatLiveDisplayToggled
+        storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
         lastToggleMark = SimpleTimeMark.now()
     }
 
@@ -158,7 +200,6 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
-        val storage = storage ?: return
 
         val stats = getYearStats(statYear)
         // Calculate a 'hash' of the stats to determine if they have changed
@@ -322,7 +363,6 @@ object HoppityEventSummary {
         )
     }
 
-    @Suppress("SpellCheckingInspection")
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
         storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
