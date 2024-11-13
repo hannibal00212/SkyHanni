@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 
 private val repoGroup by RepoPattern.exclusiveGroup("tab.widget.enum")
 
@@ -381,9 +384,15 @@ enum class TabWidget(
             entries.forEach { it.pattern }
         }
 
+        private val FORCE_UPDATE_DELAY = 2.seconds
+
         @SubscribeEvent
         fun onSecond(event: SecondPassedEvent) {
             if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
+            val noTablistTime = ProfileStorageData.noTabListTime
+            if (noTablistTime.isFarPast()) return
+            if (noTablistTime.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
             update(TabListData.getTabList())
