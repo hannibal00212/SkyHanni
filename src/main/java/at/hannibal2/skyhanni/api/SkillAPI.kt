@@ -149,59 +149,57 @@ object SkillAPI {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        val inventoryName = event.inventoryName
+        if (event.inventoryName != "Your Skills") return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
-            if (inventoryName == "Your Skills" &&
-                lore.any { it.contains("Click to view!") || it.contains("Not unlocked!") }
-            ) {
-                val cleanName = stack.cleanName()
-                val split = cleanName.split(" ")
-                val skillName = split.first()
-                val skill = SkillType.getByNameOrNull(skillName) ?: continue
-                val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
-                val skillInfo = storage?.getOrPut(skill) { SkillInfo() }
+            if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue
+            val cleanName = stack.cleanName()
+            val split = cleanName.split(" ")
+            val skillName = split.first()
+            val skill = SkillType.getByNameOrNull(skillName) ?: continue
+            val skillLevel = if (split.size > 1) split.last().romanToDecimalIfNecessary() else 0
+            val skillInfo = storage?.getOrPut(skill, ::SkillInfo) ?: continue
 
-                for ((lineIndex, line) in lore.withIndex()) {
-                    val cleanLine = line.removeColor()
-                    if (!cleanLine.startsWith("                    ")) continue
-                    val previousLine = stack.getLore()[lineIndex - 1]
-                    val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
-                    if (previousLine == "§7§8Max Skill level reached!") {
-                        val totalXp = progress.formatLong()
-                        val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(
-                            totalXp,
-                            defaultSkillCap[skill.lowercaseName] ?: 60,
-                        )
+            lore@ for ((index, line) in lore.withIndex()) {
+                val cleanLine = line.removeColor()
+                if (!cleanLine.startsWith("                    ")) continue@lore
+                val previousLine = stack.getLore().getOrNull(index - 1) ?: continue@lore
+                val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
+                if (previousLine == "§7§8Max Skill level reached!") {
+                    val totalXp = progress.formatLong()
+                    val cap = defaultSkillCap[skill.lowercaseName] ?: 60
+                    val maxXp = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+                    val currentXp = totalXp - maxXp
+                    val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) =
+                        calculateSkillLevel(totalXp, cap)
 
-                        skillInfo?.apply {
-                            this.overflowLevel = overflowLevel
-                            this.overflowCurrentXp = overflowCurrent
-                            this.overflowCurrentXpMax = overflowNeeded
-                            this.overflowTotalXp = overflowTotal
+                    skillInfo.apply {
+                        this.overflowLevel = overflowLevel
+                        this.overflowCurrentXp = overflowCurrent
+                        this.overflowCurrentXpMax = overflowNeeded
+                        this.overflowTotalXp = overflowTotal
 
-                            this.totalXp = totalXp
-                            this.level = skillLevel
-                            this.currentXp = totalXp
-                            this.currentXpMax = 0L
-                        }
-                    } else {
-                        val splitProgress = progress.split("/")
-                        val currentXp = splitProgress.first().formatLong()
-                        val neededXp = splitProgress.last().formatLong()
-                        val levelXp = calculateLevelXp(skillLevel - 1).toLong()
+                        this.totalXp = totalXp
+                        this.level = skillLevel
+                        this.currentXp = currentXp
+                        this.currentXpMax = 0L
+                    }
+                } else {
+                    val splitProgress = progress.split("/")
+                    val currentXp = splitProgress.first().formatLong()
+                    val neededXp = splitProgress.last().formatLong()
+                    val levelXp = calculateLevelXp(skillLevel - 1).toLong()
 
-                        skillInfo?.apply {
-                            this.currentXp = currentXp
-                            this.level = skillLevel
-                            this.currentXpMax = neededXp
-                            this.totalXp = levelXp + currentXp
+                    skillInfo.apply {
+                        this.currentXp = currentXp
+                        this.level = skillLevel
+                        this.currentXpMax = neededXp
+                        this.totalXp = levelXp + currentXp
 
-                            this.overflowCurrentXp = currentXp
-                            this.overflowLevel = skillLevel
-                            this.overflowCurrentXpMax = neededXp
-                            this.overflowTotalXp = levelXp + currentXp
-                        }
+                        this.overflowCurrentXp = currentXp
+                        this.overflowLevel = skillLevel
+                        this.overflowCurrentXpMax = neededXp
+                        this.overflowTotalXp = levelXp + currentXp
                     }
                 }
             }
@@ -261,8 +259,10 @@ object SkillAPI {
             else -> 0
         }
 
+        val totalXp = currentXp + add
+
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
-            calculateSkillLevel(currentXp + add, cap)
+            calculateSkillLevel(totalXp, cap)
 
         if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
             SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
@@ -271,7 +271,7 @@ object SkillAPI {
             this.level = level
             this.currentXp = currentXp
             this.currentXpMax = maxXp
-            this.totalXp = currentXp
+            this.totalXp = totalXp
 
             this.overflowLevel = levelOverflow
             this.overflowCurrentXp = currentOverflow
@@ -493,9 +493,7 @@ object SkillAPI {
             2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
                 SkillType.entries.map { it.displayName },
-            )
-            else
-                listOf()
+            ) else listOf()
 
             else -> listOf()
         }
