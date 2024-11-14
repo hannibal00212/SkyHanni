@@ -223,7 +223,7 @@ object BitsAPI {
             }
 
             val lore = cookieStack.getLore()
-            bitsAvailableMenuPattern.firstMatcher<Unit>(lore) {
+            bitsAvailableMenuPattern.firstMatcher(lore) {
                 val amount = group("toClaim").formatInt()
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
@@ -235,11 +235,11 @@ object BitsAPI {
                     }
                 }
             }
-            cookieDurationPattern.firstMatcher<Unit>(lore) {
+            cookieDurationPattern.firstMatcher(lore) {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            noCookieActiveSBMenuPattern.firstMatcher<Unit>(lore) {
+            noCookieActiveSBMenuPattern.firstMatcher(lore) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }

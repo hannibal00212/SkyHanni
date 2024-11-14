@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -51,7 +50,7 @@ object ComposterInventoryNumbers {
 
         // Organic Matter or Fuel
         if (slotNumber == 46 || slotNumber == 52) {
-            stack.getLore().matchFirst(valuePattern) {
+            valuePattern.firstMatcher(stack.getLore()) {
                 val having = group("having").removeColor().formatInt()
                 val havingFormat = having.shortFormat()
                 val total = group("total").removeColor()

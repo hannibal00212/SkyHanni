@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -139,7 +138,7 @@ object FarmingContestAPI {
 
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
-                val amount = lore.matchFirst(bracket.bracketPattern) {
+                val amount = bracket.bracketPattern.firstMatcher(lore) {
                     group("amount").formatInt()
                 } ?: continue
                 put(bracket, amount)

@@ -54,7 +54,7 @@ object AuctionsHighlighter {
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
-                buyItNowPattern.firstMatcher<Unit>(lore) {
+                buyItNowPattern.firstMatcher(lore) {
                     val coins = group("coins").formatLong()
                     val totalPrice = EstimatedItemValueCalculator.getTotalPrice(stack)
                     if (coins > totalPrice) {

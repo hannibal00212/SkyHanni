@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -46,7 +45,7 @@ object MaxPurseItems {
         for (item in Minecraft.getMinecraft().thePlayer.openContainer.inventory) {
             val name = item?.displayName ?: continue
             createOrderPattern.matchMatcher(name) {
-                item.getLore().matchFirst(orderPattern) {
+                orderPattern.firstMatcher(item.getLore()) {
                     // +0.1 because I expect people to use the gold nugget option
                     buyOrderPrice = group("coins").formatDouble() + 0.1
                     // If we get to this point, we have the instant price because instant is earlier in the list of items

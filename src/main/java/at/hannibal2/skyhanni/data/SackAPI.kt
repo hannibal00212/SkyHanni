@@ -134,7 +134,7 @@ object SackAPI {
 
             if (isGemstoneSack) {
                 val gem = SackGemstone()
-                gemstonePattern.matchAll<Unit>(lore) {
+                gemstonePattern.matchAll(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE

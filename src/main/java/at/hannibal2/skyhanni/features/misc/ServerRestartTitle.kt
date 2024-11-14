@@ -31,7 +31,7 @@ object ServerRestartTitle {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.serverRestartTitle) return
 
-        restartingPattern.firstMatcher<Unit>(ScoreboardData.sidebarLinesFormatted) {
+        restartingPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val minutes = group("minutes").toInt().minutes
             val seconds = group("seconds").toInt().seconds
             val totalTime = minutes + seconds
