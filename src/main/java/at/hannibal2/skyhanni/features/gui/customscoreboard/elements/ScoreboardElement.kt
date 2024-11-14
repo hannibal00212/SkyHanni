@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine
+import java.util.regex.Pattern
 
 abstract class ScoreboardElement {
     /**
@@ -19,6 +20,8 @@ abstract class ScoreboardElement {
     abstract val configLine: String
 
     open fun showIsland(): Boolean = true
+
+    open val elementPatterns = emptyList<Pattern>()
 
     // TODO: Add Hover and Clickable Feedback to Lines
     //  Suggestion: https://discord.com/channels/997079228510117908/1226508204762992733

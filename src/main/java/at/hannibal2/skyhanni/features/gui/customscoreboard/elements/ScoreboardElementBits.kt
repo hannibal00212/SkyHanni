@@ -25,6 +25,8 @@ object ScoreboardElementBits : ScoreboardElement() {
 
     override val configLine = "Bits: §b59,264"
 
+    override val elementPatterns = listOf(BitsAPI.bitsScoreboardPattern)
+
     override fun showIsland() = !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }
 

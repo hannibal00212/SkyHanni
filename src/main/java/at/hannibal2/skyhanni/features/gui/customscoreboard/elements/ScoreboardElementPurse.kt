@@ -26,5 +26,7 @@ object ScoreboardElementPurse : ScoreboardElement() {
 
     override val configLine = "Purse: §652,763,737"
 
+    override val elementPatterns = listOf(PurseAPI.coinsPattern)
+
     override fun showIsland() = !RiftAPI.inRift()
 }

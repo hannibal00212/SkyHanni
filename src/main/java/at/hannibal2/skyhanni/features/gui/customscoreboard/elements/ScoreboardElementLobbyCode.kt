@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.DateFormat
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
 // internal
 // update on island change and every second while in dungeons
@@ -15,4 +16,6 @@ object ScoreboardElementLobbyCode : ScoreboardElement() {
     }
 
     override val configLine = "§7${DateFormat.US_SLASH_MMDDYYYY} §8mega77CK"
+
+    override val elementPatterns = listOf(ScoreboardPattern.lobbyCodePattern)
 }

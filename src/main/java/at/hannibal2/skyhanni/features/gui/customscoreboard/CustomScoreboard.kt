@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,6 +52,8 @@ object CustomScoreboard {
     private var currentIslandEntries = listOf<ScoreboardElement>()
     var currentIslandEvents = listOf<ScoreboardEvent>()
         private set
+
+    var activePatterns = listOf<Pattern>()
 
     private const val GUI_NAME = "Custom Scoreboard"
 
@@ -205,6 +208,8 @@ object CustomScoreboard {
     private fun updateIslandEntries() {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
+
+        activePatterns = ScoreboardConfigElement.entries.filter { it.element.showIsland() }.flatMap { it.element.elementPatterns }.distinct()
     }
 
     @SubscribeEvent
@@ -223,6 +228,8 @@ object CustomScoreboard {
                             "${entry.element.getLines().map { it.display }}",
                     )
                 }
+                add("Active Patterns:")
+                activePatterns.forEach { add("   $it") }
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
                     set.forEach { add("   ${it.line}") }
