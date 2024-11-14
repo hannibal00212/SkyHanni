@@ -340,7 +340,6 @@ object HoppityAPI {
             groupOrNull("other")?.let {
                 hoppityDataSet.lastProfit = it
                 attemptFireRabbitFound(event)
-                return
             }
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
@@ -352,11 +351,11 @@ object HoppityAPI {
     }
 
     fun attemptFireRabbitFound(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
-        if (event != null) HoppityEggsCompactChat.processChatEvent(event, hoppityDataSet)
         lastDuplicateAmount?.let {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true
         }
+        if (event != null) HoppityEggsCompactChat.processChatEvent(event, hoppityDataSet)
         if (lastChatMessage.isNotEmpty()) hoppityDataSet.hoppityMessages.add(lastChatMessage)
 
         // Theoretically impossible, but a failsafe.
