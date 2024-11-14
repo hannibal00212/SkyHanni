@@ -54,6 +54,7 @@ object CustomScoreboard {
         private set
 
     var activePatterns = listOf<Pattern>()
+        private set
 
     private const val GUI_NAME = "Custom Scoreboard"
 
