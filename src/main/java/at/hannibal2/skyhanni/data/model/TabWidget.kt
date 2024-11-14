@@ -389,9 +389,6 @@ enum class TabWidget(
         fun onSecond(event: SecondPassedEvent) {
             if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
-            val noTablistTime = ProfileStorageData.noTabListTime
-            if (noTablistTime.isFarPast()) return
-            if (noTablistTime.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
             update(TabListData.getTabList())

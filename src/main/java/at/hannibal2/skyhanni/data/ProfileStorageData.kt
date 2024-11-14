@@ -29,8 +29,7 @@ object ProfileStorageData {
     var playerSpecific: PlayerSpecificStorage? = null
     var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
-    var noTabListTime = SimpleTimeMark.farPast()
-        private set
+    private var noTabListTime = SimpleTimeMark.farPast()
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
