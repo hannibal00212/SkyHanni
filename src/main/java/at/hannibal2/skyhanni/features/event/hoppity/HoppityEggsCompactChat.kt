@@ -86,12 +86,12 @@ object HoppityEggsCompactChat {
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$hoppityDataSet.lastRarity " else ""}" +
-                "$hoppityDataSet.lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "${hoppityDataSet.lastRarity} " else ""}" +
+                "${hoppityDataSet.lastName}$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$hoppityDataSet.lastRarity " else ""}" +
-                "$hoppityDataSet.lastName §7($hoppityDataSet.lastProfit§7)"
+                "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
         }
     }
 

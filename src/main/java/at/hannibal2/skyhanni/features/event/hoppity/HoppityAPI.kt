@@ -159,8 +159,6 @@ object HoppityAPI {
     private val processedSlots = mutableListOf<Int>()
     private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
     private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
-    private val hitmanClaimAllActive =
-        hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName())
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
@@ -308,7 +306,7 @@ object HoppityAPI {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             hoppityDataSet.lastMeal = HITMAN.takeIf {
-                hoppityDataSet.lastMeal == it || (hitmanClaimAllActive && hitmanClaimable-- >= 0)
+                hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName()) && hitmanClaimable-- >= 0
             } ?: getEggType(event)
 
             hoppityDataSet.lastMeal?.let { meal ->
