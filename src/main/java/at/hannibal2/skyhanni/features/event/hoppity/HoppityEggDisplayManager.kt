@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.MEAL_ORDER
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -83,9 +81,7 @@ object HoppityEggDisplayManager {
             HoppityEggType.resettingEntries.let { entries ->
                 if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
-            }.map {
-                "§7 - ${it.formattedName} ${it.timeUntil().format()}"
-            }.onEach { add(it) }
+            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
 
             if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
