@@ -13,6 +13,8 @@ object ScoreboardEventFlightDuration : ScoreboardEvent() {
 
     override val configLine = "Flight Duration: §a10m 0s"
 
+    override val elementPatterns = listOf(ScoreboardPattern.flightDurationPattern)
+
     override fun showIsland() = inAnyIsland(
         IslandType.PRIVATE_ISLAND,
         IslandType.PRIVATE_ISLAND_GUEST,

@@ -10,4 +10,6 @@ object ScoreboardEventNewYear : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.newYearPattern.firstMatches(getSbLines())
 
     override val configLine = "§dNew Year Event!§f 24:25"
+
+    override val elementPatterns = listOf(ScoreboardPattern.newYearPattern)
 }

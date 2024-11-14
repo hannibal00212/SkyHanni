@@ -13,5 +13,7 @@ object ScoreboardEventRedstone : ScoreboardEvent() {
 
     override val configLine = "§e§l⚡ §cRedstone: §e§b7%"
 
+    override val elementPatterns = listOf(ScoreboardPattern.redstonePattern)
+
     override fun showIsland() = IslandType.PRIVATE_ISLAND.isInIsland()
 }

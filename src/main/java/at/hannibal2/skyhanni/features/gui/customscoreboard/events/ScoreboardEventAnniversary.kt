@@ -10,4 +10,6 @@ object ScoreboardEventAnniversary : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.anniversaryPattern.firstMatches(getSbLines())
 
     override val configLine = "§d5th Anniversary§f 167:59:54"
+
+    override val elementPatterns = listOf(ScoreboardPattern.anniversaryPattern)
 }

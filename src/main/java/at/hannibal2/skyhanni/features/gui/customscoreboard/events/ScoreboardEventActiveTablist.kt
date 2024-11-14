@@ -26,6 +26,8 @@ object ScoreboardEventActiveTablist : ScoreboardEvent() {
     override fun showWhen() = TabWidget.EVENT.isActive
 
     override val configLine = "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
+
+    override val elementPatterns = listOf(ScoreboardPattern.travelingZooPattern)
 }
 
 // click: open /calendar

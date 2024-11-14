@@ -9,7 +9,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventKuudra : ScoreboardEvent() {
 
-    private val patterns = listOf(
+    override fun getDisplay() = elementPatterns.allMatches(getSbLines())
+
+    override val configLine = "§7(All Kuudra Lines)"
+
+    override val elementPatterns = listOf(
         ScoreboardPattern.autoClosingPattern,
         ScoreboardPattern.startingInPattern,
         ScoreboardPattern.timeElapsedPattern,
@@ -18,10 +22,6 @@ object ScoreboardEventKuudra : ScoreboardEvent() {
         ScoreboardPattern.tokensPattern,
         ScoreboardPattern.submergesPattern,
     )
-
-    override fun getDisplay() = patterns.allMatches(getSbLines())
-
-    override val configLine = "§7(All Kuudra Lines)"
 
     override fun showIsland() = KuudraAPI.inKuudra()
 }

@@ -10,4 +10,6 @@ object ScoreboardEventEssence : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.essencePattern.firstMatches(getSbLines())
 
     override val configLine = "Dragon Essence: §d1,285"
+
+    override val elementPatterns = listOf(ScoreboardPattern.essencePattern)
 }

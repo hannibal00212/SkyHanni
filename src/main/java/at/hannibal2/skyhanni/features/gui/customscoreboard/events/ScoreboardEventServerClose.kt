@@ -11,4 +11,6 @@ object ScoreboardEventServerClose : ScoreboardEvent() {
         ServerRestartTitle.restartingGreedyPattern.firstMatches(getSbLines())?.split("§8")?.getOrNull(0)
 
     override val configLine = "§cServer closing soon!"
+
+    override val elementPatterns = listOf(ServerRestartTitle.restartingGreedyPattern)
 }

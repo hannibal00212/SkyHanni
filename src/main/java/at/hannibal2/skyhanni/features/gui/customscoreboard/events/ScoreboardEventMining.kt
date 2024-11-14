@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import java.util.regex.Pattern
 
 // scoreboard
 // scoreboard update event
@@ -69,6 +70,22 @@ object ScoreboardEventMining : ScoreboardEvent() {
     }
 
     override val configLine = "§7(All Mining Event Lines)"
+
+    override val elementPatterns = listOf(
+        ScoreboardPattern.windCompassPattern,
+        ScoreboardPattern.windCompassArrowPattern,
+        ScoreboardPattern.nearbyPlayersPattern,
+        ScoreboardPattern.miningEventPattern,
+        ScoreboardPattern.miningEventZonePattern,
+        ScoreboardPattern.mithrilRemainingPattern,
+        ScoreboardPattern.mithrilYourMithrilPattern,
+        ScoreboardPattern.raffleTicketsPattern,
+        ScoreboardPattern.rafflePoolPattern,
+        ScoreboardPattern.yourGoblinKillsPattern,
+        ScoreboardPattern.remainingGoblinPattern,
+        ScoreboardPattern.fortunateFreezingBonusPattern,
+        ScoreboardPattern.fossilDustPattern,
+    )
 
     override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
 }

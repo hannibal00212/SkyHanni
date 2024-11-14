@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventQueue : ScoreboardEvent() {
 
-    private val patterns = listOf(
+    override fun getDisplay() = elementPatterns.allMatches(getSbLines())
+
+    override val configLine = "Queued: Glacite Mineshafts\nPosition: §b#45 §fSince: §a00:00"
+
+    override val elementPatterns = listOf(
         ScoreboardPattern.queuePattern,
         ScoreboardPattern.queueTierPattern,
         ScoreboardPattern.queuePositionPattern,
     )
-
-    override fun getDisplay() = patterns.allMatches(getSbLines())
-
-    override val configLine = "Queued: Glacite Mineshafts\nPosition: §b#45 §fSince: §a00:00"
 }

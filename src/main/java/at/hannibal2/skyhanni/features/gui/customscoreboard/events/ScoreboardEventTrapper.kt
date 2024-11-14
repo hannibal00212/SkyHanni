@@ -21,5 +21,10 @@ object ScoreboardEventTrapper : ScoreboardEvent() {
 
     override val configLine = "Pelts: §5711\nTracker Mob Location:\n§bMushroom Gorge"
 
+    override val elementPatterns = listOf(
+        ScoreboardPattern.peltsPattern,
+        ScoreboardPattern.mobLocationPattern,
+    )
+
     override fun showIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 }

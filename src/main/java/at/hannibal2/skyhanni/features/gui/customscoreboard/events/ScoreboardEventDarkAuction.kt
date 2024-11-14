@@ -23,5 +23,11 @@ object ScoreboardEventDarkAuction : ScoreboardEvent() {
 
     override val configLine = "Time Left: §b11\nCurrent Item:\n §5Travel Scroll to Sirius"
 
+    override val elementPatterns = listOf(
+        ScoreboardPattern.startingInPattern,
+        ScoreboardPattern.timeLeftPattern,
+        ScoreboardPattern.darkAuctionCurrentItemPattern,
+    )
+
     override fun showIsland() = IslandType.DARK_AUCTION.isInIsland()
 }

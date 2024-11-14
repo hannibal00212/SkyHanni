@@ -21,5 +21,7 @@ object ScoreboardEventJacobContest : ScoreboardEvent() {
     }
 
     override val configLine: String = "§eJacob's Contest\n§e○ §fCarrot §a18m17s\n Collected §e8,264"
+
+    override val elementPatterns = listOf(ScoreboardPattern.jacobsContestPattern)
 }
 
