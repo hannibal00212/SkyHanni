@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
@@ -235,7 +236,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".toInternalName()) {
-            lore.matchFirst(harvestPattern) {
+            harvestPattern.firstMatcher<Nothing>(lore) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"

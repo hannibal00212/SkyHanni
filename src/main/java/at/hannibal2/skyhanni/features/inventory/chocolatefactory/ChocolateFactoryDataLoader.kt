@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -258,7 +259,7 @@ object ChocolateFactoryDataLoader {
     private fun processProductionItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        item.getLore().matchFirst(chocolateMultiplierPattern) {
+        chocolateMultiplierPattern.firstMatcher(item.getLore()) {
             val currentMultiplier = group("amount").formatDouble()
             profileStorage.chocolateMultiplier = currentMultiplier
 

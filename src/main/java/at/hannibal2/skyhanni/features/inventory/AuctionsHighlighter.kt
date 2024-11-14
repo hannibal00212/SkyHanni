@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
@@ -54,7 +54,7 @@ object AuctionsHighlighter {
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
-                lore.matchFirst(buyItNowPattern) {
+                buyItNowPattern.firstMatcher<Unit>(lore) {
                     val coins = group("coins").formatLong()
                     val totalPrice = EstimatedItemValueCalculator.getTotalPrice(stack)
                     if (coins > totalPrice) {

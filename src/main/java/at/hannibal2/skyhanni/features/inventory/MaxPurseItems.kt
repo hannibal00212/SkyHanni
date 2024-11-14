@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -23,19 +24,19 @@ object MaxPurseItems {
     private val patternGroup = RepoPattern.group("inventory.maxpurse")
     private val orderPattern by patternGroup.pattern(
         "order",
-        ".*§6(?<coins>[\\d.,]+) coins §7each.*"
+        ".*§6(?<coins>[\\d.,]+) coins §7each.*",
     )
     private val instantPattern by patternGroup.pattern(
         "instant",
-        ".*Price per unit: §6(?<coins>[\\d.,]+) coins.*"
+        ".*Price per unit: §6(?<coins>[\\d.,]+) coins.*",
     )
     private val createOrderPattern by patternGroup.pattern(
         "createorder",
-        "§aCreate Buy Order"
+        "§aCreate Buy Order",
     )
     private val createInstantPattern by patternGroup.pattern(
         "createinstant",
-        "§aBuy Instantly"
+        "§aBuy Instantly",
     )
 
     private var buyOrderPrice: Double? = null
@@ -54,7 +55,7 @@ object MaxPurseItems {
                 }
             }
             createInstantPattern.matchMatcher(name) {
-                item.getLore().matchFirst(instantPattern) {
+                instantPattern.firstMatcher(item.getLore()) {
                     instantBuyPrice = group("coins").formatDouble()
                 }
             }
@@ -87,9 +88,9 @@ object MaxPurseItems {
             listOf(
                 "§7Max items with purse",
                 "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",
-                "§7Instant buy: §e${buyInstant.addSeparators()}x"
+                "§7Instant buy: §e${buyInstant.addSeparators()}x",
             ),
-            posLabel = "Max Items With Purse"
+            posLabel = "Max Items With Purse",
         )
     }
 

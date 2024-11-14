@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -31,15 +32,15 @@ object FarmingContestAPI {
     private val patternGroup = RepoPattern.group("garden.farming.contest")
     private val timePattern by patternGroup.pattern(
         "time",
-        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
+        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)",
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§8(?<crop>.*) Contest"
+        "§8(?<crop>.*) Contest",
     )
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
-        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*",
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
@@ -48,7 +49,7 @@ object FarmingContestAPI {
         get() = internalContest && LorenzUtils.skyBlockIsland.isAnyOf(
             IslandType.GARDEN,
             IslandType.HUB,
-            IslandType.THE_FARMING_ISLANDS
+            IslandType.THE_FARMING_ISLANDS,
         )
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
@@ -132,7 +133,7 @@ object FarmingContestAPI {
     private fun createContest(time: Long, item: ItemStack): FarmingContest {
         val lore = item.getLore()
 
-        val crop = lore.matchFirst(cropPattern) {
+        val crop = cropPattern.firstMatcher(lore) {
             CropType.getByName(group("crop"))
         } ?: error("Crop not found in lore!")
 

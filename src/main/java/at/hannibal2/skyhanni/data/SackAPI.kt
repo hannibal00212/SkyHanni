@@ -24,8 +24,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -49,11 +49,13 @@ object SackAPI {
         "sack",
         "^(.* Sack|Enchanted .* Sack)\$",
     )
+
     @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
@@ -132,7 +134,7 @@ object SackAPI {
 
             if (isGemstoneSack) {
                 val gem = SackGemstone()
-                lore.matchAll(gemstonePattern) {
+                gemstonePattern.matchAll<Unit>(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
@@ -193,7 +195,7 @@ object SackAPI {
                 }
             } else {
                 // normal sack
-                lore.matchFirst(numPattern) {
+                numPattern.firstMatcher(lore) {
                     val item = SackOtherItem()
                     val stored = group("stored").formatInt()
                     val internalName = stack.getInternalName()

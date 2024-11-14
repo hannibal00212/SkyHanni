@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -19,11 +20,11 @@ object ComposterInventoryNumbers {
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
     private val valuePattern by patternGroup.pattern(
         "value",
-        ".* §e(?<having>.*)§6/(?<total>.*)"
+        ".* §e(?<having>.*)§6/(?<total>.*)",
     )
     private val amountPattern by patternGroup.pattern(
         "amount",
-        "§7§7Compost Available: §a(?<amount>.*)"
+        "§7§7Compost Available: §a(?<amount>.*)",
     )
 
     @SubscribeEvent
@@ -39,7 +40,7 @@ object ComposterInventoryNumbers {
 
         // Composts Available
         if (slotNumber == 13) {
-            stack.getLore().matchFirst(amountPattern) {
+            amountPattern.firstMatcher(stack.getLore()) {
                 val total = group("amount").formatInt()
                 event.offsetY = -2
                 event.offsetX = -20

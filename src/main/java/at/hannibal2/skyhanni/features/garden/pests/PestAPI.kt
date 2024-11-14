@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -71,7 +71,7 @@ object PestAPI {
     private val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
+        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
     )
 
     /**
@@ -80,7 +80,7 @@ object PestAPI {
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.nopests",
-        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$"
+        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
     )
 
     /**
@@ -88,7 +88,7 @@ object PestAPI {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)"
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -96,11 +96,11 @@ object PestAPI {
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.nopests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$"
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
+        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!",
     )
 
     /**
@@ -108,7 +108,7 @@ object PestAPI {
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
-        "\\sPlots: (?<plots>.*)"
+        "\\sPlots: (?<plots>.*)",
     )
 
     /**
@@ -117,11 +117,11 @@ object PestAPI {
      */
     val pestDeathChatPattern by patternGroup.pattern(
         "chat.pestdeath",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
+        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!",
     )
     private val noPestsChatPattern by patternGroup.pattern(
         "chat.nopests",
-        "§cThere are not any Pests on your Garden right now! Keep farming!"
+        "§cThere are not any Pests on your Garden right now! Keep farming!",
     )
 
     var gardenJoinTime = SimpleTimeMark.farPast()
@@ -196,7 +196,7 @@ object PestAPI {
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            item.getLore().matchFirst(pestInventoryPattern) {
+            pestInventoryPattern.firstMatcher(item.getLore()) {
                 plot.pests = group("amount").toInt()
             }
         }
@@ -312,7 +312,7 @@ object PestAPI {
             "scoreboardPests" to scoreboardPests,
             "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
             noStackTrace = true,
-            betaOnly = true
+            betaOnly = true,
         )
     }
 

@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -118,7 +118,7 @@ object CaptureFarmingGear {
             currentCrop.farmingItem.setItem(itemStack)
         }
 
-        TabListData.getTabList().matchFirst(strengthPattern) {
+        strengthPattern.firstMatcher(TabListData.getTabList()) {
             GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
         }
     }
@@ -216,7 +216,7 @@ object CaptureFarmingGear {
             if (item.displayName.contains("Extra Farming Fortune")) {
                 level = 0
 
-                item.getLore().matchFirst(anitaMenuPattern) {
+                anitaMenuPattern.firstMatcher(item.getLore()) {
                     level = group("level").toInt() / 4
                 }
             }

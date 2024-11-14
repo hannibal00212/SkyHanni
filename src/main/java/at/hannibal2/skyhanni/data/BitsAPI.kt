@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -223,7 +223,7 @@ object BitsAPI {
             }
 
             val lore = cookieStack.getLore()
-            lore.matchFirst(bitsAvailableMenuPattern) {
+            bitsAvailableMenuPattern.firstMatcher<Unit>(lore) {
                 val amount = group("toClaim").formatInt()
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
@@ -235,11 +235,11 @@ object BitsAPI {
                     }
                 }
             }
-            lore.matchFirst(cookieDurationPattern) {
+            cookieDurationPattern.firstMatcher<Unit>(lore) {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            lore.matchFirst(noCookieActiveSBMenuPattern) {
+            noCookieActiveSBMenuPattern.firstMatcher<Unit>(lore) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }
