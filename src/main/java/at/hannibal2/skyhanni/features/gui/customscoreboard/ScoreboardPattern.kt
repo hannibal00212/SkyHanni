@@ -426,12 +426,12 @@ object ScoreboardPattern {
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
-    @Suppress("MaxLineLength")
     /**
      * REGEX-TEST: §eProtect Elle §7(§a98%§7)
      * REGEX-TEST: §fFish 1 Flyfish §c✖
      * REGEX-TEST: §fFish 1 Skeleton Fish §c✖
      */
+    @Suppress("MaxLineLength")
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
         "§eProtect Elle §7\\(§.\\d+%§7\\)|\\s*§.\\(§.\\w+§.\\/§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]",
