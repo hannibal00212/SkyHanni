@@ -44,8 +44,12 @@ object HoppityEggsCompactChat {
         if (hoppityDataSet.lastMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
             DelayedRun.runDelayed(5.milliseconds) {
                 createWaypointShareCompactMessage(HoppityEggsManager.getAndDisposeWaypointOnclick())
+                hoppityDataSet.reset()
             }
-        } else ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityDataSet.hoppityMessages, prefix = false)
+        } else {
+            ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityDataSet.hoppityMessages, prefix = false)
+            hoppityDataSet.reset()
+        }
     }
 
     private fun createCompactMessage(): String {
@@ -54,7 +58,7 @@ object HoppityEggsCompactChat {
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
 
-        val compactMessage = if (hoppityDataSet.duplicate) {
+         return if (hoppityDataSet.duplicate) {
             val format = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = hoppityDataSet.lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
@@ -75,9 +79,6 @@ object HoppityEggsCompactChat {
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$hoppityDataSet.lastRarity " else ""}" +
                 "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
         }
-
-        hoppityDataSet.reset()
-        return compactMessage
     }
 
     private fun createWaypointShareCompactMessage(onClick: () -> Unit) {

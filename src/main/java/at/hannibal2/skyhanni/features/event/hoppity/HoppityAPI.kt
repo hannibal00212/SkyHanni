@@ -44,6 +44,8 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -144,14 +146,12 @@ object HoppityAPI {
         var lastDuplicateAmount: Long? = null
     ) {
         fun reset() {
-            hoppityMessages.clear()
-            duplicate = false
-            lastRarity = ""
-            lastName = ""
-            lastNameCache = ""
-            lastProfit = ""
-            lastMeal = null
-            lastDuplicateAmount = null
+            val default = HoppityStateDataSet()
+            this::class.memberProperties
+                .filterIsInstance<KMutableProperty1<HoppityStateDataSet, Any?>>()
+                .forEach { prop ->
+                    prop.set(this, prop.get(default))
+                }
         }
     }
 
@@ -214,7 +214,6 @@ object HoppityAPI {
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
                         hoppityDataSet.lastName = "§9Fish the Rabbit"
-                        hoppityDataSet.lastMeal = STRAY
                         hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         EggFoundEvent(STRAY, it.slotNumber).post()
                     }
@@ -230,7 +229,6 @@ object HoppityAPI {
                 // §6§lGolden Rabbit §d§lCAUGHT!
                 // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
                 hoppityDataSet.lastName = "§6El Dorado"
-                hoppityDataSet.lastMeal = STRAY
                 hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, it.slotNumber).post()
             }
@@ -340,6 +338,7 @@ object HoppityAPI {
             groupOrNull("other")?.let {
                 hoppityDataSet.lastProfit = it
                 attemptFireRabbitFound(event)
+                return
             }
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
