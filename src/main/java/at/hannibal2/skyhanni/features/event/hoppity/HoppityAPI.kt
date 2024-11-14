@@ -130,17 +130,32 @@ object HoppityAPI {
     )
     // </editor-fold>
 
-    private var messageCount = 0
-    private var duplicate = false
-    private var lastRarity = ""
-    private var lastName = ""
-    private var lastNameCache = ""
-    private var newRabbit = false
-    private var lastMeal: HoppityEggType? = null
-    private var lastDuplicateAmount: Long? = null
+    data class HoppityStateDataSet(
+        var hoppityMessages: MutableList<String> = mutableListOf(),
+        var duplicate: Boolean = false,
+        var lastRarity: String = "",
+        var lastName: String = "",
+        var lastNameCache: String = "",
+        var lastProfit: String = "",
+        var lastMeal: HoppityEggType? = null,
+        var lastDuplicateAmount: Long? = null
+    ) {
+        fun reset() {
+            hoppityMessages.clear()
+            duplicate = false
+            lastRarity = ""
+            lastName = ""
+            lastNameCache = ""
+            lastProfit = ""
+            lastMeal = null
+            lastDuplicateAmount = null
+        }
+    }
 
+    private var lastChatMessage = ""
     private var hitmanClaimable: Int = 0
-
+    private var hoppityDataSet = HoppityStateDataSet()
+    
     private val processedSlots = mutableListOf<Int>()
     private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
     private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
@@ -149,17 +164,7 @@ object HoppityAPI {
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
-    private fun resetRabbitData() {
-        this.messageCount = 0
-        this.duplicate = false
-        this.newRabbit = false
-        this.lastRarity = ""
-        this.lastName = ""
-        this.lastMeal = null
-        this.lastDuplicateAmount = null
-    }
-
-    fun getLastRabbit(): String = this.lastNameCache
+    fun getLastRabbit(): String = hoppityDataSet.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun millisToEventEnd(): Long =
         if (isHoppityEvent()) {
@@ -209,9 +214,9 @@ object HoppityAPI {
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
-                        lastName = "§9Fish the Rabbit"
-                        lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
+                        hoppityDataSet.lastName = "§9Fish the Rabbit"
+                        hoppityDataSet.lastMeal = STRAY
+                        hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     else -> return@matchMatcher
@@ -226,9 +231,9 @@ object HoppityAPI {
                 // §6§lGolden Rabbit §d§lCAUGHT!
                 // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
                 EggFoundEvent(STRAY, it.slotNumber).post()
-                lastName = "§6El Dorado"
-                lastMeal = STRAY
-                duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
+                hoppityDataSet.lastName = "§6El Dorado"
+                hoppityDataSet.lastMeal = STRAY
+                hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 attemptFireRabbitFound()
             }
             if (processed) addProcessedSlot(it)
@@ -260,13 +265,13 @@ object HoppityAPI {
 
         sideDishNamePattern.matchMatcher(nameText) {
             EggFoundEvent(SIDE_DISH, index).post()
-            lastMeal = SIDE_DISH
+            hoppityDataSet.lastMeal = SIDE_DISH
             attemptFireRabbitFound()
         }
 
         hitmanEggPattern.matchMatcher(nameText) {
             EggFoundEvent(HITMAN, index).post()
-            lastMeal = HITMAN
+            hoppityDataSet.lastMeal = HITMAN
             attemptFireRabbitFound()
         }
 
@@ -275,12 +280,12 @@ object HoppityAPI {
             if (!claimableMilestonePattern.anyMatches(lore)) return
             allTimeLorePattern.firstMatcher(lore) {
                 EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
-                lastMeal = CHOCOLATE_FACTORY_MILESTONE
+                hoppityDataSet.lastMeal = CHOCOLATE_FACTORY_MILESTONE
                 attemptFireRabbitFound()
             }
             shopLorePattern.firstMatcher(lore) {
                 EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
-                lastMeal = CHOCOLATE_SHOP_MILESTONE
+                hoppityDataSet.lastMeal = CHOCOLATE_SHOP_MILESTONE
                 attemptFireRabbitFound()
             }
         }
@@ -299,57 +304,68 @@ object HoppityAPI {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        lastChatMessage = event.message
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
-            resetRabbitData()
-            lastMeal = HITMAN.takeIf { lastMeal == it || (hitmanClaimAllActive && hitmanClaimable-- >= 0) }
-                ?: getEggType(event)
+            hoppityDataSet.reset()
+            hoppityDataSet.lastMeal = HITMAN.takeIf {
+                hoppityDataSet.lastMeal == it || (hitmanClaimAllActive && hitmanClaimable-- >= 0)
+            } ?: getEggType(event)
 
-            lastMeal?.let {
+            hoppityDataSet.lastMeal?.let { meal ->
                 EggFoundEvent(
-                    it,
+                    meal,
                     note = groupOrNull("note")?.removeColor().takeIf { // Only set note if it's a meal egg
-                        lastMeal in resettingEntries
+                        meal in resettingEntries
                     }
                 ).post()
             }
 
-            attemptFireRabbitFound()
+            attemptFireRabbitFound(event)
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            if (group("rabbitname") == lastName) {
-                lastMeal = HoppityEggType.BOUGHT
+            if (group("rabbitname") == hoppityDataSet.lastName) {
+                hoppityDataSet.lastMeal = HoppityEggType.BOUGHT
                 EggFoundEvent(HoppityEggType.BOUGHT).post()
-                attemptFireRabbitFound()
+                attemptFireRabbitFound(event)
             }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
-            lastName = group("name")
-            lastNameCache = lastName
-            lastRarity = group("rarity")
-            attemptFireRabbitFound()
+            hoppityDataSet.lastName = group("name")
+            hoppityDataSet.lastNameCache = hoppityDataSet.lastName
+            hoppityDataSet.lastRarity = group("rarity")
+            attemptFireRabbitFound(event)
         }
 
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
-            newRabbit = true
             groupOrNull("other")?.let {
-                attemptFireRabbitFound()
+                hoppityDataSet.lastProfit = it
+                attemptFireRabbitFound(event)
                 return
             }
-            attemptFireRabbitFound()
+            val chocolate = groupOrNull("chocolate")
+            val perSecond = group("perSecond")
+            hoppityDataSet.lastProfit = chocolate?.let {
+                "§6+$it §7and §6+${perSecond}x c/s!"
+            } ?: "§6+${perSecond}x c/s!"
+            attemptFireRabbitFound(event)
         }
     }
 
-    fun attemptFireRabbitFound(lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+        if (event != null) HoppityEggsCompactChat.processChatEvent(event, hoppityDataSet)
         lastDuplicateAmount?.let {
-            this.lastDuplicateAmount = it
-            this.duplicate = true
+            hoppityDataSet.lastDuplicateAmount = it
+            hoppityDataSet.duplicate = true
         }
-        messageCount++
-        val lastChatMeal = lastMeal ?: return
-        if (messageCount != 3) return
-        RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
-        resetRabbitData()
+        if (lastChatMessage.isNotEmpty()) hoppityDataSet.hoppityMessages.add(lastChatMessage)
+
+        // Theoretically impossible, but a failsafe.
+        if (hoppityDataSet.lastMeal == null) return
+
+        if (hoppityDataSet.hoppityMessages.size != 3) return
+        RabbitFoundEvent(hoppityDataSet).post()
+        hoppityDataSet.reset()
     }
 }

@@ -25,8 +25,8 @@ enum class HoppityEggType(
     SIDE_DISH("Side Dish", "§6§l", -1),
     HITMAN("Hitman", "§c", -1),
     BOUGHT("Bought", "§a", -1),
-    CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6", -1),
-    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1),
+    CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6§l", -1),
+    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6§l", -1),
     STRAY("Stray Rabbit", "§a", -1)
     ;
 
