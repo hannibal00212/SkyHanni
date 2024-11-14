@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -44,65 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityAPI {
 
-    private var messageCount = 0
-    private var duplicate = false
-    private var lastRarity = ""
-    private var lastName = ""
-    private var lastNameCache = ""
-    private var newRabbit = false
-    private var lastMeal: HoppityEggType? = null
-    private var lastDuplicateAmount: Long? = null
-
-    private var persistHitman = false
-    private var hitmanClaimable: Int = 0
-    private var hitmanClaimAllActive = false
-
-    private val processedSlots = mutableListOf<Int>()
-    private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
-    private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
-
-    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
-
-    private fun resetRabbitData() {
-        this.messageCount = 0
-        this.duplicate = false
-        this.newRabbit = false
-        this.lastRarity = ""
-        this.lastName = ""
-        this.lastMeal = null
-        this.lastDuplicateAmount = null
-    }
-
-    private fun shouldResetHitmanPersist() =
-        hitmanClaimable == 0 && !hitmanClaimAllActive
-    private fun setHitmanPersist(bool: Boolean) {
-        persistHitman = bool
-        HoppityEggsCompactChat.persistHitman = bool
-    }
-
-    fun getLastRabbit(): String = this.lastNameCache
-    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun millisToEventEnd(): Long =
-        if (isHoppityEvent()) {
-            val now = SkyBlockTime.now()
-            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 3)
-            eventEnd.toMillis() - now.toMillis()
-        } else 0
-    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
-        it.chatColorCode == rabbit.substring(0, 2)
-    }
-    fun SkyBlockTime.isAlternateDay(): Boolean {
-        if (!isHoppityEvent()) return false
-        // Spring 1st (first day of event) is a normal day.
-        // Spring 2nd is an alternate day, Spring 3rd is a normal day, etc.
-        // So Month 3, day 1 is used as the baseline.
-
-        // Because months are all 31 days, it flip-flops every month.
-        // If the month is 1 or 3, alternate days are on even days.
-        // If the month is 2, alternate days are on odd days.
-        return (month % 2 == 1) == (day % 2 == 0)
-    }
-
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
      * REGEX-TEST: §915th Chocolate Milestone
@@ -172,9 +116,9 @@ object HoppityAPI {
     /**
      * REGEX-TEST: §aClaim All
      */
-    private val hitmanClaimAllPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hitman.claimall",
-        "§aClaim All",
+    private val hitmanClaimAllInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.inventory.claimall",
+        "Claim All",
     )
 
     /**
@@ -184,6 +128,59 @@ object HoppityAPI {
         "hitman.inventory",
         "(?:§.)*Rabbit Hitman",
     )
+    // </editor-fold>
+
+    private var messageCount = 0
+    private var duplicate = false
+    private var lastRarity = ""
+    private var lastName = ""
+    private var lastNameCache = ""
+    private var newRabbit = false
+    private var lastMeal: HoppityEggType? = null
+    private var lastDuplicateAmount: Long? = null
+
+    private var hitmanClaimable: Int = 0
+
+    private val processedSlots = mutableListOf<Int>()
+    private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
+    private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
+    private val hitmanClaimAllActive =
+        hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName())
+
+    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+
+    private fun resetRabbitData() {
+        this.messageCount = 0
+        this.duplicate = false
+        this.newRabbit = false
+        this.lastRarity = ""
+        this.lastName = ""
+        this.lastMeal = null
+        this.lastDuplicateAmount = null
+    }
+
+    fun getLastRabbit(): String = this.lastNameCache
+    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun millisToEventEnd(): Long =
+        if (isHoppityEvent()) {
+            val now = SkyBlockTime.now()
+            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 3)
+            eventEnd.toMillis() - now.toMillis()
+        } else 0
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
+    fun SkyBlockTime.isAlternateDay(): Boolean {
+        if (!isHoppityEvent()) return false
+        // Spring 1st (first day of event) is a normal day.
+        // Spring 2nd is an alternate day, Spring 3rd is a normal day, etc.
+        // So Month 3, day 1 is used as the baseline.
+
+        // Because months are all 31 days, it flip-flops every month.
+        // If the month is 1 or 3, alternate days are on even days.
+        // If the month is 2, alternate days are on odd days.
+        return (month % 2 == 1) == (day % 2 == 0)
+    }
 
     private fun addProcessedSlot(slot: Slot) {
         processedSlots.add(slot.slotNumber)
@@ -268,15 +265,9 @@ object HoppityAPI {
         }
 
         hitmanEggPattern.matchMatcher(nameText) {
-            EggFoundEvent(HoppityEggType.HITMAN, index).post()
-            lastMeal = HoppityEggType.HITMAN
-            setHitmanPersist(true)
-            HoppityEggsCompactChat.persistHitman = true
-        }
-
-        hitmanClaimAllPattern.matchMatcher(nameText) {
-            hitmanClaimAllActive = true
-            setHitmanPersist(true)
+            EggFoundEvent(HITMAN, index).post()
+            lastMeal = HITMAN
+            attemptFireRabbitFound()
         }
 
         milestoneNamePattern.matchMatcher(nameText) {
@@ -310,20 +301,18 @@ object HoppityAPI {
 
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
-            lastMeal = getEggType(event)
-            if (persistHitman) {
-                lastMeal = HoppityEggType.HITMAN
-                if (hitmanClaimAllActive) {
-                    hitmanClaimable--
-                    if (hitmanClaimable == 0) {
-                        setHitmanPersist(false)
-                        hitmanClaimAllActive = false
+            lastMeal = HITMAN.takeIf { lastMeal == it || (hitmanClaimAllActive && hitmanClaimable-- >= 0) }
+                ?: getEggType(event)
+
+            lastMeal?.let {
+                EggFoundEvent(
+                    it,
+                    note = groupOrNull("note")?.removeColor().takeIf { // Only set note if it's a meal egg
+                        lastMeal in resettingEntries
                     }
-                } else setHitmanPersist(false)
-            } else {
-                val note = groupOrNull("note")?.removeColor()
-                lastMeal?.let { EggFoundEvent(it, note = note).post() }
+                ).post()
             }
+
             attemptFireRabbitFound()
         }
 

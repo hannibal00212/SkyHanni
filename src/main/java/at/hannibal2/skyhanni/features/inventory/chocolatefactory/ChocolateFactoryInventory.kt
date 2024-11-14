@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -99,6 +100,9 @@ object ChocolateFactoryInventory {
 
         // this would break ChocolateFactoryKeybinds otherwise
         if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) return
+
+        // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
+        if (KeyboardManager.isShiftKeyDown() && slotNumber in ChocolateFactoryAPI.rabbitSlots.keys) return
 
         event.makePickblock()
     }

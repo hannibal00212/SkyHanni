@@ -40,7 +40,6 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    var persistHitman = false
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
@@ -156,7 +155,7 @@ object HoppityEggsCompactChat {
         if (!LorenzUtils.inSkyBlock) return
         eggFoundPattern.matchMatcher(event.message) {
             resetCompactData()
-            lastChatMeal = if (persistHitman) HITMAN else getEggType(event)
+            lastChatMeal = HITMAN.takeIf { lastChatMeal == it } ?: getEggType(event)
             compactChat(event)
         }
 
