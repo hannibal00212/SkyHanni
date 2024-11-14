@@ -25,10 +25,13 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Breakfast Egg
      * REGEX-TEST: Chocolate Lunch Egg
      * REGEX-TEST: Chocolate Dinner Egg
+     * REGEX-TEST: Chocolate Brunch Egg
+     * REGEX-TEST: Chocolate Déjeuner Egg
+     * REGEX-TEST: Chocolate Supper Egg
      */
     private val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.name",
-        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner) Egg.*",
+        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
 
     /**

@@ -45,7 +45,6 @@ object WarpMenuUniques {
             "The Barn" -> IslandType.THE_FARMING_ISLANDS
             else -> IslandType.getByNameOrNull(name) ?: return
         }
-        if (island == IslandType.DUNGEON_HUB) return
 
         if (HoppityEggLocations.apiEggLocations[island]?.size == null) return
         val maxEggs = 15

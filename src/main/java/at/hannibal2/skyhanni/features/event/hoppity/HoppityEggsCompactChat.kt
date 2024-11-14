@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
@@ -39,6 +40,7 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
+    var persistHitman = false
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
@@ -84,6 +86,7 @@ object HoppityEggsCompactChat {
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
             STRAY -> "§aStray Rabbit"
+            HITMAN -> "§cHitman Rabbit"
             else -> "${lastChatMeal?.coloredName.orEmpty()} Egg"
         }
 
@@ -153,7 +156,7 @@ object HoppityEggsCompactChat {
         if (!LorenzUtils.inSkyBlock) return
         eggFoundPattern.matchMatcher(event.message) {
             resetCompactData()
-            lastChatMeal = getEggType(event)
+            lastChatMeal = if (persistHitman) HITMAN else getEggType(event)
             compactChat(event)
         }
 

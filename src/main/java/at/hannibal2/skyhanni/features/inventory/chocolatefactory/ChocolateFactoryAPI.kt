@@ -73,18 +73,19 @@ object ChocolateFactoryAPI {
     var barnIndex = 34
     var infoIndex = 13
     var productionInfoIndex = 45
-    var prestigeIndex = 28
+    var prestigeIndex = 27
     var milestoneIndex = 53
-    var leaderboardIndex = 51
+    var leaderboardIndex = 52
     var handCookieIndex = 38
     var timeTowerIndex = 39
     var shrineIndex = 41
     var coachRabbitIndex = 42
-    var maxRabbits = 395
+    var rabbitHitmanIndex = 51
+    var maxRabbits = 503
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
-    private var maxPrestige = 5
+    private var maxPrestige = 6
 
     var inChocolateFactory = false
     var chocolateFactoryPaused = false
@@ -143,6 +144,7 @@ object ChocolateFactoryAPI {
         timeTowerIndex = data.timeTowerIndex
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
+        rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
         chocolateMilestones = data.chocolateMilestones

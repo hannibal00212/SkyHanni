@@ -112,7 +112,6 @@ object ChocolateFactoryStats {
                         "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
                 },
             )
-            put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
