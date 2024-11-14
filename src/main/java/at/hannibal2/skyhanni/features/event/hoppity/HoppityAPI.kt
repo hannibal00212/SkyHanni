@@ -154,8 +154,8 @@ object HoppityAPI {
 
     private var lastChatMessage = ""
     private var hitmanClaimable: Int = 0
-    private var hoppityDataSet = HoppityStateDataSet()
-    
+
+    private val hoppityDataSet = HoppityStateDataSet()
     private val processedSlots = mutableListOf<Int>()
     private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
     private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
