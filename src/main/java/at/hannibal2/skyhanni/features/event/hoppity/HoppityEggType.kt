@@ -33,8 +33,7 @@ enum class HoppityEggType(
     fun timeUntil(): Duration {
         if (resetsAt == -1) return Duration.INFINITE
         val now = SkyBlockTime.now()
-        val isAltDayNow = now.isAlternateDay()
-        val isEggDayToday = altDay == isAltDayNow
+        val isEggDayToday = altDay == now.isAlternateDay()
 
         val daysToAdd = when {
             isEggDayToday && now.hour < resetsAt -> 0
@@ -42,9 +41,7 @@ enum class HoppityEggType(
             else -> 1
         }
 
-        val nextEggDay = now.addUnits(days = daysToAdd)
-        val nextEggTime = nextEggDay.copy(hour = resetsAt, minute = 0, second = 0)
-        return nextEggTime.asTimeMark().timeUntil()
+        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
     }
 
     fun markClaimed() {

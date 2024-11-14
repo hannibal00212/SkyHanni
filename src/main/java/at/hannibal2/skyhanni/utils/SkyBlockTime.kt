@@ -20,45 +20,6 @@ data class SkyBlockTime(
     val monthName get() = monthName(month)
     val dayName get() = "$day${daySuffix(day)}"
 
-    fun addUnits(
-        seconds: Int = 0,
-        minutes: Int = 0,
-        hours: Int = 0,
-        days: Int = 0,
-        months: Int = 0,
-        years: Int = 0
-    ): SkyBlockTime {
-        var newSecond = second + seconds
-        var newMinute = minute + minutes
-        var newHour = hour + hours
-        var newDay = day + days
-        var newMonth = month + months
-        var newYear = year + years
-
-        while (newSecond >= 60) {
-            newSecond -= 60
-            newMinute++
-        }
-        while (newMinute >= 60) {
-            newMinute -= 60
-            newHour++
-        }
-        while (newHour >= 24) {
-            newHour -= 24
-            newDay++
-        }
-        while (newDay > 31) {
-            newDay -= 31
-            newMonth++
-        }
-        while (newMonth > 12) {
-            newMonth -= 12
-            newYear++
-        }
-
-        return SkyBlockTime(newYear, newMonth, newDay, newHour, newMinute, newSecond)
-    }
-
     fun toInstant(): Instant? = Instant.ofEpochMilli(toMillis())
 
     fun toMillis(): Long =
