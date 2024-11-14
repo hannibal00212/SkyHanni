@@ -37,7 +37,6 @@ object HoppityEggsCompactChat {
     private fun compactChat(event: LorenzChatEvent) {
         if (!HoppityEggsManager.config.compactChat) return
         event.blockedReason = "compact_hoppity"
-        hoppityDataSet.hoppityMessages.add(event.message)
         if (hoppityDataSet.hoppityMessages.size == 3) sendCompact()
     }
 
@@ -45,12 +44,8 @@ object HoppityEggsCompactChat {
         if (hoppityDataSet.lastMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
             DelayedRun.runDelayed(5.milliseconds) {
                 createWaypointShareCompactMessage(HoppityEggsManager.getAndDisposeWaypointOnclick())
-                hoppityDataSet.reset()
             }
-        } else {
-            ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityDataSet.hoppityMessages, prefix = false)
-            hoppityDataSet.reset()
-        }
+        } else ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityDataSet.hoppityMessages, prefix = false)
     }
 
     private fun createCompactMessage(): String {
@@ -59,7 +54,7 @@ object HoppityEggsCompactChat {
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
 
-        return if (hoppityDataSet.duplicate) {
+        val compactMessage = if (hoppityDataSet.duplicate) {
             val format = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = hoppityDataSet.lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
@@ -80,12 +75,14 @@ object HoppityEggsCompactChat {
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$hoppityDataSet.lastRarity " else ""}" +
                 "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
         }
+
+        hoppityDataSet.reset()
+        return compactMessage
     }
 
     private fun createWaypointShareCompactMessage(onClick: () -> Unit) {
         val hover = hoppityDataSet.hoppityMessages.joinToString("\n") +
             " \n§eClick here to share the location of this chocolate egg with the server!"
-        hoppityDataSet.hoppityMessages.clear()
         ChatUtils.clickableChat(
             createCompactMessage(),
             hover = hover,
