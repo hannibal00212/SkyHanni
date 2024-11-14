@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.MEAL_ORDER
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -75,22 +78,25 @@ object HoppityEggDisplayManager {
         if (!config.showClaimedEggs) return emptyList()
         if (ReminderUtils.isBusy() && !config.showWhileBusy) return emptyList()
 
-        val displayList =
-            HoppityEggType.resettingEntries.sortedBy {
-                it.timeUntil()
+        val displayList: List<String> = buildList {
+            add("§bUnclaimed Eggs:")
+            HoppityEggType.resettingEntries.let { entries ->
+                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
+                else entries
             }.map {
                 "§7 - ${it.formattedName} ${it.timeUntil().format()}"
-            }.toMutableList()
-        displayList.add(0, "§bUnclaimed Eggs:")
+            }.onEach { add(it) }
 
-        if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
+            if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
                 val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
                 val collectedFormat = formatEggsCollected(collectedEggs)
-                displayList.add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
+                add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
         }
+
         if (displayList.size == 1) return emptyList()
 
         val container = Renderable.verticalContainer(displayList.map(Renderable::string))
