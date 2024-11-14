@@ -426,6 +426,7 @@ object ScoreboardPattern {
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
+    @Suppress("MaxLineLength")
     /**
      * REGEX-TEST: §eProtect Elle §7(§a98%§7)
      * REGEX-TEST: §fFish 1 Flyfish §c✖
