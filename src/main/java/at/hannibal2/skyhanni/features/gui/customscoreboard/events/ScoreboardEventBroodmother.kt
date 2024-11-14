@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import java.util.regex.Pattern
 
 // scoreboard
 // widget update event

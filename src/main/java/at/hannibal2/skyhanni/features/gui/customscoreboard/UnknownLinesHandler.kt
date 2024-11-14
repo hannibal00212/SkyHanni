@@ -38,7 +38,7 @@ object UnknownLinesHandler {
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
-        var patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
+        val patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
 
         if (::remoteOnlyPatterns.isInitialized) {
             patternsToExclude.addAll(remoteOnlyPatterns)

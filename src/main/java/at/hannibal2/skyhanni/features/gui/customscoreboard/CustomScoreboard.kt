@@ -210,7 +210,13 @@ object CustomScoreboard {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
 
-        activePatterns = ScoreboardConfigElement.entries.filter { it.element.showIsland() }.flatMap { it.element.elementPatterns }.distinct()
+        activePatterns = ScoreboardConfigElement.entries
+            un.filter {
+                it.element.showIsland()
+            }
+            .flatMap {
+                it.element.elementPatterns
+            }.distinct()
     }
 
     @SubscribeEvent
