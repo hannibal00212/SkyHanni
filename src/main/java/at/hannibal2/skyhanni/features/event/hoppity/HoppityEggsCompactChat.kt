@@ -1,19 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,11 +23,11 @@ object HoppityEggsCompactChat {
     private var hoppityDataSet = HoppityStateDataSet()
 
     fun processChatEvent(
-        event: LorenzChatEvent,
+        event: LorenzChatEvent?,
         dataSet: HoppityStateDataSet
     ) {
         hoppityDataSet = dataSet.copy()
-        compactChat(event)
+        if (event != null) compactChat(event)
     }
 
     private val config get() = ChocolateFactoryAPI.config
@@ -103,29 +94,5 @@ object HoppityEggsCompactChat {
             oneTimeClick = true,
             prefix = false,
         )
-    }
-
-    @HandleEvent(priority = HIGHEST)
-    fun onEggFound(event: EggFoundEvent) {
-        if (!HoppityEggsManager.config.compactChat) return
-        hoppityDataSet.lastMeal = event.type
-
-        val message = when (event.type) {
-            SIDE_DISH ->
-                "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
-            CHOCOLATE_FACTORY_MILESTONE ->
-                "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!"
-            CHOCOLATE_SHOP_MILESTONE ->
-                "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
-            STRAY ->
-                "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!"
-
-            // Each of these have their own from-Hypixel chats, so we don't need to add a message here
-            in resettingEntries, HITMAN, BOUGHT -> return
-            else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
-        }
-
-        hoppityDataSet.hoppityMessages.add(message)
-        if (hoppityDataSet.hoppityMessages.size == 3) sendCompact()
     }
 }
