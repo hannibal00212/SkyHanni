@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -58,8 +57,7 @@ object ChocolateFactoryBarnManager {
                 }
             }
             ChocolateAmount.addToAll(amount)
-            HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
-            HoppityAPI.attemptFireRabbitFound(lastDuplicateAmount = amount)
+            HoppityAPI.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
 
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
                 (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit())).takeIf { it > 0 }?.let {

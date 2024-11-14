@@ -43,12 +43,8 @@ object HoppityEggsCompactChat {
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val rarityConfig get() = HoppityEggsManager.config.rarityInCompact
 
-    fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
+    private fun compactChat(event: LorenzChatEvent) {
         if (!HoppityEggsManager.config.compactChat) return
-        lastDuplicateAmount?.let {
-            hoppityDataSet.lastDuplicateAmount = it
-            hoppityDataSet.duplicate = true
-        }
         event.blockedReason = "compact_hoppity"
         hoppityDataSet.hoppityMessages.add(event.message)
         if (hoppityDataSet.hoppityMessages.size == 3) sendCompact()
