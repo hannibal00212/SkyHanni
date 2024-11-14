@@ -58,7 +58,7 @@ object HoppityEggsCompactChat {
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
 
-         return if (hoppityDataSet.duplicate) {
+        return if (hoppityDataSet.duplicate) {
             val format = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = hoppityDataSet.lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
