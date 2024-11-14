@@ -219,17 +219,17 @@ object FishingTimer {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Barn Fishing Timer")
         event.addIrrelevant {
-            "lastSeaCreatureFished: $lastSeaCreatureFished"
-            "lastNameFished: $lastNameFished"
-            "babyMagmaSlugsToFind: $babyMagmaSlugsToFind"
-            "lastMagmaSlugLocation: $lastMagmaSlugLocation"
-            "lastMagmaSlugTime: $lastMagmaSlugTime"
-            "recentBabyMagmaSlugs: $recentBabyMagmaSlugs"
-            "mobsToFind: $mobsToFind"
-            "recentMobs: $recentMobs"
-            "currentCap: $currentCap"
-            "mobDespawnTime: $mobDespawnTime"
-            "startTime: $startTime"
+            add("lastSeaCreatureFished: $lastSeaCreatureFished")
+            add("lastNameFished: $lastNameFished")
+            add("babyMagmaSlugsToFind: $babyMagmaSlugsToFind")
+            add("lastMagmaSlugLocation: $lastMagmaSlugLocation")
+            add("lastMagmaSlugTime: $lastMagmaSlugTime")
+            add("recentBabyMagmaSlugs: $recentBabyMagmaSlugs")
+            add("mobsToFind: $mobsToFind")
+            add("recentMobs: $recentMobs")
+            add("currentCap: $currentCap")
+            add("mobDespawnTime: $mobDespawnTime")
+            add("startTime: $startTime")
         }
     }
 
