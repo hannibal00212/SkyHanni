@@ -227,22 +227,28 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                ScoreboardConfigElement.entries.forEach { entry ->
-                    add(
-                        "   ${entry.name.firstLetterUppercase()} - " +
-                            "island: ${entry.element.showIsland()} - " +
-                            "show: ${entry.element.showWhen()} - " +
-                            "${entry.element.getLines().map { it.display }}",
-                    )
-                }
+                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }))
+
+                add("Custom Scoreboard Events:")
+                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }))
+
                 add("Active Patterns:")
                 activePatterns.forEach { add("   $it") }
+
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
                     set.forEach { add("   ${it.line}") }
                 }
             }
         }
+    }
+
+    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>) = entries.map { (name, element) ->
+        val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
+        "   ${name.firstLetterUppercase()} - " +
+            "island: ${element.showIsland()} - " +
+            "show: ${element.showWhen()} - " +
+            lines
     }
 
     @JvmStatic

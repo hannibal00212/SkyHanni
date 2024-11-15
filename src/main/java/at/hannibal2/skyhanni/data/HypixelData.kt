@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -51,6 +51,7 @@ object HypixelData {
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
     )
+
     @Suppress("UnusedPrivateProperty")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
@@ -169,7 +170,7 @@ object HypixelData {
             return
         }
 
-        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
@@ -243,7 +244,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
+        scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt()
         }
 
@@ -415,7 +416,7 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
             profileName = group("profile").lowercase()
             ProfileJoinEvent(profileName).postAndCatch()
         }

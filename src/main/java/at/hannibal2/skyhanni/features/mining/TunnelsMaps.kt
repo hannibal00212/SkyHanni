@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -167,7 +167,7 @@ object TunnelsMaps {
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            val type = lore.matchFirst(collectorCommissionPattern) {
+            val type = collectorCommissionPattern.firstMatcher(lore) {
                 group("what")
             } ?: return@mapNotNull null
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
