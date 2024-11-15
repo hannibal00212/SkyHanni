@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -93,7 +93,7 @@ object ChocolateShopPrice {
             val lore = item.getLore()
 
             if (slot == MILESTONE_INDEX) {
-                lore.matchFirst(chocolateSpentPattern) {
+                chocolateSpentPattern.firstMatcher(lore) {
                     chocolateSpent = group("amount").formatLong()
                 }
             }

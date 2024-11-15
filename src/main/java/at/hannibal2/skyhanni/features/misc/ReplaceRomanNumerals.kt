@@ -49,7 +49,7 @@ object ReplaceRomanNumerals {
         lore.replaceAll { it.transformLine() }
 
         val chatComponentText = ChatComponentText(lore.joinToString("\n"))
-        val hoverEvent = HoverEvent(event.component.chatStyle.chatHoverEvent.action, chatComponentText)
+        val hoverEvent = HoverEvent(event.component.chatStyle.chatHoverEvent?.action, chatComponentText)
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }

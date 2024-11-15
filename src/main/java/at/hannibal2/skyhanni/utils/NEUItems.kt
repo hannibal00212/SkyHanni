@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -85,7 +84,7 @@ object NEUItems {
             // because builder blocks can have the same display name as normal items.
             if (rawInternalName.startsWith("BUILDER_")) continue
 
-            val internalName = rawInternalName.asInternalName()
+            val internalName = rawInternalName.toInternalName()
 
             // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
@@ -110,7 +109,7 @@ object NEUItems {
         .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.toInternalName()
 
     // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
@@ -136,7 +135,7 @@ object NEUItems {
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
+        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
@@ -152,7 +151,7 @@ object NEUItems {
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
+    fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -172,7 +171,7 @@ object NEUItems {
         if (prefix.isEmpty()) return this
         val string = asString()
         if (!string.startsWith(prefix)) return this
-        return string.substring(prefix.length).asInternalName()
+        return string.substring(prefix.length).toInternalName()
     }
 
     const val itemFontSize = 2.0 / 3.0
@@ -282,22 +281,22 @@ object NEUItems {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
-                    internalItemId = "CACTUS".asInternalName()
+                if (internalName == "ENCHANTED_CACTUS_GREEN".toInternalName() && internalItemId == "INK_SACK-2".toInternalName()) {
+                    internalItemId = "CACTUS".toInternalName()
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
+                if (internalName == "ENCHANTED_COOKIE".toInternalName() && internalItemId == "WHEAT".toInternalName()) {
                     continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".toInternalName() && internalItemId == "GOLDEN_CARROT".toInternalName()) {
                     continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
+                if (internalName == "LEATHER".toInternalName() && internalItemId == "RABBIT_HIDE".toInternalName()) {
                     continue
                 }
 
