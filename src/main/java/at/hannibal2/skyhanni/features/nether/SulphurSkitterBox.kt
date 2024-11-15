@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
@@ -77,7 +77,7 @@ object SulphurSkitterBox {
     }
 
     private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
-        val color = config.boxColor.toChromaColor()
+        val color = config.boxColor.toSpecialColor()
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
                 RenderUtils.drawFilledBoundingBoxNea(

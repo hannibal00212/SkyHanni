@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -95,7 +95,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.CENTERED,
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
-            -> {
+                -> {
                 val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
@@ -111,7 +111,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = barConfig.barStartColor.toChromaColor(),
+                startColor = barConfig.barStartColor.toSpecialColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get(),
             )
@@ -121,8 +121,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = barConfig.barStartColor.toChromaColor(),
-                endColor = barConfig.barStartColor.toChromaColor(),
+                startColor = barConfig.barStartColor.toSpecialColor(),
+                endColor = barConfig.barStartColor.toSpecialColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get(),

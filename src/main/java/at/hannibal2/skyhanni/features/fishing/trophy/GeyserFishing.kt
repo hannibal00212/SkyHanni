@@ -7,13 +7,13 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -62,7 +62,7 @@ object GeyserFishing {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
 
-        val color = config.boxColor.toChromaColor()
+        val color = config.boxColor.toSpecialColor()
         event.drawFilledBoundingBoxNea(geyserBox, color)
     }
 
