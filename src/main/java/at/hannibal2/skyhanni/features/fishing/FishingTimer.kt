@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -86,9 +88,11 @@ object FishingTimer {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        if (babyMagmaSlugsToFind != 0 && mob.name == "Baby Magma Slug") {
+        if (mob.name == "Baby Magma Slug") {
             recentBabyMagmaSlugs += mob
-            handleBabySlugs()
+            DelayedRun.runNextTick {
+                handleBabySlugs()
+            }
             return
         }
         if (mob.name !in SeaCreatureManager.allFishingMobs) return
@@ -99,6 +103,7 @@ object FishingTimer {
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
+        recentBabyMagmaSlugs -= event.mob
         if (mob in mobDespawnTime) {
             mobDespawnTime.remove(mob)
             if (mob.name == "Magma Slug") {
@@ -168,7 +173,7 @@ object FishingTimer {
 
     private fun updateInfo() {
         currentCount = mobDespawnTime.size
-        startTime = mobDespawnTime.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
+        startTime = mobDespawnTime.values.maxByOrNull { it.passedSince() } ?: SimpleTimeMark.farPast()
         display = createDisplay()
     }
 
@@ -183,6 +188,15 @@ object FishingTimer {
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
             else -> false
         }
+    }
+
+    @SubscribeEvent
+    fun onSecond(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        if (babyMagmaSlugsToFind == 0) return
+        if (lastMagmaSlugTime.passedSince() < 3.seconds) return
+        babyMagmaSlugsToFind = 0
+        lastMagmaSlugLocation = null
     }
 
     @SubscribeEvent
