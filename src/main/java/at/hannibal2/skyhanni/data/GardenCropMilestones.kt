@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,7 +33,7 @@ object GardenCropMilestones {
     private val config get() = GardenAPI.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
-        itemStack.getLore().matchFirst(cropPattern) {
+        cropPattern.firstMatcher(itemStack.getLore()) {
             val name = group("name")
             return CropType.getByNameOrNull(name)
         }
@@ -46,7 +46,7 @@ object GardenCropMilestones {
 
         for ((_, stack) in event.inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
-            stack.getLore().matchFirst(totalPattern) {
+            totalPattern.firstMatcher(stack.getLore()) {
                 val amount = group("name").formatLong()
                 crop.setCounter(amount)
             }

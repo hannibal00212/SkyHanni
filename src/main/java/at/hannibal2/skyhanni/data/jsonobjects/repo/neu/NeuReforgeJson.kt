@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -53,7 +53,7 @@ data class NeuReforgeJson(
                 is Map<*, *> -> {
                     val type = "SPECIAL_ITEMS"
                     val map = any as? Map<String, List<String>> ?: return type to emptyList()
-                    val internalNames = map["internalName"]?.map { it.asInternalName() }.orEmpty()
+                    val internalNames = map["internalName"]?.map { it.toInternalName() }.orEmpty()
                     val itemType = map["itemid"]?.map {
                         NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
                     }?.flatten().orEmpty()

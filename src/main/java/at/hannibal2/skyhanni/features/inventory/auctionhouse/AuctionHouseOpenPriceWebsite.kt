@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -49,7 +49,7 @@ object AuctionHouseOpenPriceWebsite {
     }
 
     private fun createDisplayItem() = ItemUtils.createItemStack(
-        "PAPER".asInternalName().getItemStack().item,
+        "PAPER".toInternalName().getItemStack().item,
         "§bPrice History",
         "§8(From SkyHanni)",
         "",
