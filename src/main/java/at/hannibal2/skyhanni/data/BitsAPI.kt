@@ -96,7 +96,7 @@ object BitsAPI {
     )
 
     /**
-     * REGEX-TEST:  §7Duration: §a140d 8h 35m 36s
+     * REGEX-TEST:  §7Duraaaaation: §a140d 8h 35m 36s
      */
     private val cookieDurationPattern by bitsGuiGroup.pattern(
         "cookieduration",
