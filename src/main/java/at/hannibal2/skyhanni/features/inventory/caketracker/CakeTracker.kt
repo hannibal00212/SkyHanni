@@ -165,7 +165,9 @@ object CakeTracker {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (inCakeInventory || (inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes))) {
+        val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
+        val inAuctionWithCakes = inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes)
+        if (inInvWithCakes || inAuctionWithCakes) {
             reRenderDisplay()
         }
     }
