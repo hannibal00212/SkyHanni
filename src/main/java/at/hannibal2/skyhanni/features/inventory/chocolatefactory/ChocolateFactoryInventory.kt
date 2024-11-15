@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -38,11 +38,9 @@ object ChocolateFactoryInventory {
             if (config.showAllBestUpgrades && slotIndex in ChocolateFactoryAPI.allBestPossibleUpgrades.keys) {
                 val current = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex }
                 val upgrades = ChocolateFactoryAPI.allBestPossibleUpgrades[slotIndex] ?: continue
-                if (upgrades.isEmpty()) continue
+                if (upgrades.isEmpty() || current?.isMaxed == true) continue
 
                 val upgrade = upgrades.last()
-
-                if (current?.isMaxed == true) continue
 
                 val dif = upgrade.level - (current?.level ?: 0) + 1
 

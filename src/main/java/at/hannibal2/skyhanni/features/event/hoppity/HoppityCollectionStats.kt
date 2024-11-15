@@ -520,9 +520,11 @@ object HoppityCollectionStats {
     }
 
     fun getDivineRabbitCount(): Int {
-        return loggedRabbits.filter { HoppityCollectionData.getRarity(it.key) == RabbitCollectionRarity.DIVINE && it.value > 0}.size
+        return loggedRabbits.filter {
+            HoppityCollectionData.getRarity(it.key) == RabbitCollectionRarity.DIVINE && it.value > 0
+        }.size
     }
-    
+
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
     fun resetSavedRabbits() {
         loggedRabbits.clear()

@@ -222,7 +222,7 @@ object ChocolateFactoryDataLoader {
 
         ChocolateFactoryAPI.factoryUpgrades = list
 
-        //testCases()
+        // testCases()
     }
 
     private fun processChocolateItem(item: ItemStack) {
@@ -459,8 +459,8 @@ object ChocolateFactoryDataLoader {
         if (!isCurrentHigher) {
             // remove all upgrades that have been done
             for (current in currentUpgrades) {
-                while ((ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.level
-                        ?: current.level) < current.level
+                while ((ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.level ?: current.level)
+                    < current.level
                 ) {
                     ChocolateFactoryAPI.totalUpgradeCost -=
                         ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.price ?: 0L
