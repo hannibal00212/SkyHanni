@@ -52,12 +52,6 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
         val parent = delegate.parent as? KtProperty ?: return
         val variableName = parent.name ?: "unknownPattern"
 
-        val parentPrevSibling1 = delegate.parent.prevSibling
-        println("lines for $variableName")
-        println("parentPrevSibling1: ${parentPrevSibling1.javaClass.simpleName}, ${parentPrevSibling1.text}")
-        val parentPrevSibling2 = parentPrevSibling1?.prevSibling
-        println("parentPrevSibling2: ${parentPrevSibling2?.javaClass?.simpleName}, ${parentPrevSibling2?.text}")
-
         val (regexTests, failingRegexTests) = findRegexTestInKDoc(parent)
 
         if (regexTests.isEmpty()) {
