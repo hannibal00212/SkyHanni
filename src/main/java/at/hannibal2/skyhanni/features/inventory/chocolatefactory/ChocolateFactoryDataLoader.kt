@@ -221,8 +221,6 @@ object ChocolateFactoryDataLoader {
         if (config.showAllBestUpgrades) findAllBestUpgrades(list)
 
         ChocolateFactoryAPI.factoryUpgrades = list
-
-        // testCases()
     }
 
     private fun processChocolateItem(item: ItemStack) {
@@ -632,28 +630,6 @@ object ChocolateFactoryDataLoader {
 
         val affordAbleUpgrade = notMaxed.filter { it.canAfford() }.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         ChocolateFactoryAPI.bestAffordableSlot = affordAbleUpgrade?.getValidUpgradeIndex() ?: -1
-    }
-
-    private fun testCases() {
-        val upgrades = ArrayList<ChocolateFactoryUpgrade>()
-        profileStorage?.currentChocolate = 20000L
-        var index = 2
-        upgrades.add(ChocolateFactoryUpgrade(29, 20, getUpgradeCost(29, 20), 1.44, 680.0, isRabbit = true, isPrestige = false))
-        upgrades.add(ChocolateFactoryUpgrade(30, 1, getUpgradeCost(30, 1), 2.87, 1429.0, isRabbit = true, isPrestige = false))
-        upgrades.add(ChocolateFactoryUpgrade(31, 1, getUpgradeCost(31, 1), 4.32, 2143.0, isRabbit = true, isPrestige = false))
-        upgrades.add(ChocolateFactoryUpgrade(32, 1, getUpgradeCost(32, 1), 5.74, 2857.5, isRabbit = true, isPrestige = false))
-        upgrades.add(ChocolateFactoryUpgrade(33, 1, getUpgradeCost(23, 1), 7.2, 3572.2, isRabbit = true, isPrestige = false))
-
-        updateEffectiveCost(upgrades, 0, 0.0)
-        findAllBestUpgrades(upgrades)
-
-        for (i in 0..5) {
-            upgrades[index] = getNextUpgrade(upgrades[index])
-            updateEffectiveCost(upgrades, index + 1, 0.0)
-            findAllBestUpgrades(upgrades)
-        }
-
-        ChocolateFactoryAPI.allBestPossibleUpgrades = emptyMap()
     }
 }
 
