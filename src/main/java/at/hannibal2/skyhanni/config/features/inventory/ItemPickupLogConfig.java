@@ -37,12 +37,22 @@ public class ItemPickupLogConfig {
     @Expose
     @ConfigOption(name = "Sacks", desc = "Show items added and removed from sacks.")
     @ConfigEditorBoolean
-    public boolean sack = false;
+    public boolean sack = true;
 
     @Expose
     @ConfigOption(name = "Coins", desc = "Show coins added and removed from purse.")
     @ConfigEditorBoolean
-    public boolean coins = false;
+    public boolean coins = true;
+
+    @Expose
+    @ConfigOption(name = "Bits", desc = "Show bits added and removed from balance.")
+    @ConfigEditorBoolean
+    public boolean bits = true;
+
+    @Expose
+    @ConfigOption(name = "Armour", desc = "Include armour in the pickup log.")
+    @ConfigEditorBoolean
+    public boolean armour = false;
 
     @Expose
     @ConfigOption(
