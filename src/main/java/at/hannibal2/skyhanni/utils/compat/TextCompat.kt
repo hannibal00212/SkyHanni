@@ -19,11 +19,12 @@ fun IChatComponent.getDirectlyContainedText() =
 //$$        (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 
-fun IChatComponent.getFormattedTextCompat() =
+fun IChatComponent?.getFormattedTextCompat(): String =
 //#if MC < 1.16
-    this.formattedText
+    this?.formattedText.orEmpty()
 //#else
 //$$run {
+//$$    this ?: return@run ""
 //$$    val sb = StringBuilder()
 //$$    for (component in iterator()) {
 //$$        sb.append(component.style.color?.toChatFormatting()?.toString() ?: "§r")
@@ -51,3 +52,5 @@ fun IChatComponent.getFormattedTextCompat() =
 //$$    return this.styled { it.withColor(formatting) }
 //$$}
 //#endif
+
+fun String.getFormattedTextCompat() = this

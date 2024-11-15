@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -26,7 +26,7 @@ object BlobbercystsHighlight {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        val color = Color.RED.withAlpha(80)
+        val color = Color.RED.addAlpha(80)
         for (player in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
             if (player.name == BLOBBER_NAME) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(player, color) { isEnabled() }

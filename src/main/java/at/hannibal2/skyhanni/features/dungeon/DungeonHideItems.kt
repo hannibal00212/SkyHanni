@@ -9,11 +9,12 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -38,10 +39,7 @@ object DungeonHideItems {
     private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
     private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
 
-    private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
-        val itemStack = entity.inventory[4]
-        return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
-    }
+    private fun isSkeletonSkull(entity: EntityArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
@@ -183,7 +181,7 @@ object DungeonHideItems {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.GOLD.toColor().withAlpha(60)
+                LorenzColor.GOLD.toColor().addAlpha(60),
             ) { shouldColorMovingSkull(entity) }
         }
     }

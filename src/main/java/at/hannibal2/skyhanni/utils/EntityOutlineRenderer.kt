@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.OpenGlHelper
@@ -301,7 +302,7 @@ object EntityOutlineRenderer {
                 vector.x,
                 vector.y,
                 vector.z
-            ) || entity.riddenByEntity === mc.thePlayer
+            ) || entity.getFirstPassenger() === mc.thePlayer
             )
     // Only render if renderManager would render and the world is loaded at the entity
 

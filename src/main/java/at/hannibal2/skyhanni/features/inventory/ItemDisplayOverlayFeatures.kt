@@ -41,12 +41,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
@@ -127,11 +127,11 @@ object ItemDisplayOverlayFeatures {
 
         if (MASTER_STAR_TIER.isSelected()) {
             when (internalName) {
-                "FIRST_MASTER_STAR".asInternalName() -> return "1"
-                "SECOND_MASTER_STAR".asInternalName() -> return "2"
-                "THIRD_MASTER_STAR".asInternalName() -> return "3"
-                "FOURTH_MASTER_STAR".asInternalName() -> return "4"
-                "FIFTH_MASTER_STAR".asInternalName() -> return "5"
+                "FIRST_MASTER_STAR".toInternalName() -> return "1"
+                "SECOND_MASTER_STAR".toInternalName() -> return "2"
+                "THIRD_MASTER_STAR".toInternalName() -> return "3"
+                "FOURTH_MASTER_STAR".toInternalName() -> return "4"
+                "FIFTH_MASTER_STAR".toInternalName() -> return "5"
             }
         }
 
@@ -153,7 +153,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
+        if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".toInternalName()) {
             val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"
         }
@@ -182,11 +182,11 @@ object ItemDisplayOverlayFeatures {
 
         if (KUUDRA_KEY.isSelected() && itemName.contains("Kuudra Key")) {
             return when (internalName) {
-                "KUUDRA_TIER_KEY".asInternalName() -> "§a1"
-                "KUUDRA_HOT_TIER_KEY".asInternalName() -> "§22"
-                "KUUDRA_BURNING_TIER_KEY".asInternalName() -> "§e3"
-                "KUUDRA_FIERY_TIER_KEY".asInternalName() -> "§64"
-                "KUUDRA_INFERNAL_TIER_KEY".asInternalName() -> "§c5"
+                "KUUDRA_TIER_KEY".toInternalName() -> "§a1"
+                "KUUDRA_HOT_TIER_KEY".toInternalName() -> "§22"
+                "KUUDRA_BURNING_TIER_KEY".toInternalName() -> "§e3"
+                "KUUDRA_FIERY_TIER_KEY".toInternalName() -> "§64"
+                "KUUDRA_INFERNAL_TIER_KEY".toInternalName() -> "§c5"
                 else -> "§4?"
             }
         }
@@ -220,13 +220,13 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".asInternalName()) {
+        if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".toInternalName()) {
             item.getRanchersSpeed()?.let {
                 val isUsingBlackCat = PetAPI.isCurrentPet("Black Cat")
                 val helmet = InventoryUtils.getHelmet()?.getInternalName()
                 val hand = InventoryUtils.getItemInHand()?.getInternalName()
-                val racingHelmet = "RACING_HELMET".asInternalName()
-                val cactusKnife = "CACTUS_KNIFE".asInternalName()
+                val racingHelmet = "RACING_HELMET".toInternalName()
+                val cactusKnife = "CACTUS_KNIFE".toInternalName()
                 val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenAPI.inGarden() && hand == cactusKnife)
                 val effectiveSpeedCap = if (is500) 500 else 400
                 val text = if (it > 999) "1k" else "$it"
@@ -234,8 +234,8 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".asInternalName()) {
-            lore.matchFirst(harvestPattern) {
+        if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".toInternalName()) {
+            harvestPattern.firstMatcher(lore) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"
@@ -257,7 +257,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
-            lore.matchFirst(gardenVacuumPattern) {
+            gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
@@ -272,12 +272,12 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".asInternalName()) {
+        if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".toInternalName()) {
             val seconds = item.getBottleOfJyrreSeconds() ?: 0
             return "§a${(seconds / 3600)}"
         }
 
-        if (DARK_CACAO_TRUFFLE.isSelected() && internalName == "DARK_CACAO_TRUFFLE".asInternalName()) {
+        if (DARK_CACAO_TRUFFLE.isSelected() && internalName == "DARK_CACAO_TRUFFLE".toInternalName()) {
             val seconds = item.getSecondsHeld() ?: 0
             return "§a${(seconds / 3600)}"
         }
@@ -291,14 +291,14 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
-            lore.matchFirst(bingoGoalRankPattern) {
+            bingoGoalRankPattern.firstMatcher(lore) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${rank.shortFormat()}"
             }
         }
 
         if (SKYBLOCK_LEVEL.isSelected() && chestName == "SkyBlock Menu" && itemName == "SkyBlock Leveling") {
-            lore.matchFirst(skyblockLevelPattern) {
+            skyblockLevelPattern.firstMatcher(lore) {
                 return group("level")
             }
         }
@@ -310,7 +310,7 @@ object ItemDisplayOverlayFeatures {
                 it.contains("Deaths: ")
             }
         ) {
-            lore.matchFirst(bestiaryStackPattern) {
+            bestiaryStackPattern.firstMatcher(lore) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {

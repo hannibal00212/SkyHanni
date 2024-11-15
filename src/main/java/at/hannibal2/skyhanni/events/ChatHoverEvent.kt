@@ -13,5 +13,5 @@ import net.minecraft.util.ChatComponentText
  * chat component, but rather makes a new one just before rendering.
  */
 class ChatHoverEvent(val component: ChatComponentText) : LorenzEvent() {
-    fun getHoverEvent(): HoverEvent = component.chatStyle.chatHoverEvent
+    fun getHoverEvent(): HoverEvent = component.chatStyle.chatHoverEvent!!
 }

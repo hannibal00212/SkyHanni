@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -338,7 +339,7 @@ object MobFilter {
         if (baseEntity !is EntityZombie) return null
         when {
             illegalEntitiesPattern.matches(armorStand.name) -> return MobResult.illegal
-            baseEntity.riddenByEntity is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
+            baseEntity.getFirstPassenger() is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
                 ?.getSkullTexture() == RAT_SKULL_TEXTURE -> return MobResult.illegal // Rat Morph
         }
         when (armorStand.inventory?.get(4)?.getSkullTexture()) {
