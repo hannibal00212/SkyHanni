@@ -230,7 +230,10 @@ object CustomScoreboard {
 
     private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>) = entries.map { (name, element) ->
         val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
-        "   ${name.firstLetterUppercase()} - island: ${element.showIsland()} - show: ${element.showWhen()} - $lines"
+        "   ${name.firstLetterUppercase()} - " +
+            "island: ${element.showIsland()} - " +
+            "show: ${element.showWhen()} - " +
+            lines
     }
 
     @JvmStatic
