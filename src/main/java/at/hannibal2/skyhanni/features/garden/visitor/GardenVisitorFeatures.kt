@@ -46,7 +46,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
@@ -110,7 +110,7 @@ object GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
-    private val greenThumb = "GREEN_THUMB;1".asInternalName()
+    private val greenThumb = "GREEN_THUMB;1".toInternalName()
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -589,14 +589,16 @@ object GardenVisitorFeatures {
                 entity is EntityLivingBase
             ) {
                 val color = visitor.status.color
-                if (color != -1) {
+                if (color != null) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color,
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
-                // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
-                if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
+                if (color == null || !GardenAPI.inGarden()) {
+                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                    RenderLivingEntityHelper.removeEntityColor(entity)
+                }
             }
         }
     }

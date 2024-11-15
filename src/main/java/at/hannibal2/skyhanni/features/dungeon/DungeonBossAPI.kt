@@ -37,7 +37,7 @@ object DungeonBossAPI {
     private val patternGroup = RepoPattern.group("dungeon.boss.message")
 
     /**
-     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\? Sadan\?!
+     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me? Sadan?!
      */
     private val terracottaStartPattern by patternGroup.pattern(
         "f6.terracotta",

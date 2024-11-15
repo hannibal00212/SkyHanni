@@ -141,6 +141,7 @@ object CopyNearbyEntitiesCommand {
                         val itemDamage = stack.itemDamage
                         val stackSize = stack.stackSize
                         val maxStackSize = stack.maxStackSize
+                        val skullTexture = stack.getSkullTexture()
                         resultList.add("-  name: '$stackName'")
                         resultList.add("-  stackDisplayName: '$stackDisplayName'")
                         resultList.add("-  cleanName: '$cleanName'")
@@ -148,6 +149,7 @@ object CopyNearbyEntitiesCommand {
                         resultList.add("-  itemDamage: '$itemDamage'")
                         resultList.add("-  stackSize: '$stackSize'")
                         resultList.add("-  maxStackSize: '$maxStackSize'")
+                        skullTexture?.let { resultList.add("-  skullTexture: '$it'") }
                     }
 
                     is EntityOtherPlayerMP -> {

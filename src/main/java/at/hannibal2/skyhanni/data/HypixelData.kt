@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,6 +51,7 @@ object HypixelData {
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
     )
+
     @Suppress("UnusedPrivateProperty")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
@@ -170,7 +170,7 @@ object HypixelData {
             return
         }
 
-        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
@@ -244,7 +244,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
+        scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt()
         }
 
@@ -400,10 +400,7 @@ object HypixelData {
     private fun sendLocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                HypixelCommands.locraw()
-            }
+            HypixelCommands.locraw()
         }
     }
 
@@ -419,7 +416,7 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
             profileName = group("profile").lowercase()
             ProfileJoinEvent(profileName).postAndCatch()
         }

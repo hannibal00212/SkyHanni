@@ -120,7 +120,7 @@ object HarpFeatures {
         val minecraft = Minecraft.getMinecraft()
         val width = GuiScreenUtils.scaledWindowWidth
         val height = GuiScreenUtils.scaledWindowHeight
-        minecraft.currentScreen.setWorldAndResolution(minecraft, width, height)
+        minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
     }
 
     @SubscribeEvent

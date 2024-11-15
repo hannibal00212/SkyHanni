@@ -127,7 +127,7 @@ object IslandGraphs {
 
     /**
      * REGEX-TEST: Dwarven Base Camp
-     * REGEX-TEST: Forge
+     * REGEX-FAIL: Forge
      * REGEX-TEST: Fossil Research Center
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(

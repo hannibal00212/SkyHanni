@@ -12,6 +12,9 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
 
+/**
+ * This rule enforces correct import ordering, while ignoring preprocessed comments and imports that are in a preprocessed block.
+ */
 class CustomImportOrdering(config: Config) : Rule(config) {
     override val issue = Issue(
         "CustomImportOrdering",
@@ -87,9 +90,6 @@ class CustomImportOrdering(config: Config) : Rule(config) {
     }
 
     override fun visitImportList(importList: KtImportList) {
-
-        val testEntity = Entity.from(importList)
-
         val rawText = importList.text.trim()
         if (rawText.isBlank()) {
             return
@@ -101,7 +101,7 @@ class CustomImportOrdering(config: Config) : Rule(config) {
             report(
                 CodeSmell(
                     issue,
-                    testEntity,
+                    Entity.from(importList),
                     "Imports must be ordered in lexicographic order without any empty lines in-between " +
                         "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
                         "pre-processed imports.",

@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -166,7 +166,7 @@ object ChocolateFactoryDataLoader {
                 ChatUtils.clickableChat(
                     "Could not determine your current statistics to get next upgrade. Open CF to fix this!",
                     onClick = { HypixelCommands.chocolateFactory() },
-                    "§eClick to run /cf!"
+                    "§eClick to run /cf!",
                 )
             }
         }
@@ -258,7 +258,7 @@ object ChocolateFactoryDataLoader {
     private fun processProductionItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        item.getLore().matchFirst(chocolateMultiplierPattern) {
+        chocolateMultiplierPattern.firstMatcher(item.getLore()) {
             val currentMultiplier = group("amount").formatDouble()
             profileStorage.chocolateMultiplier = currentMultiplier
 
@@ -287,7 +287,7 @@ object ChocolateFactoryDataLoader {
     private fun processBarnItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        item.getLore().matchFirst(barnAmountPattern) {
+        barnAmountPattern.firstMatcher(item.getLore()) {
             profileStorage.currentRabbits = group("rabbits").formatInt()
             profileStorage.maxRabbits = group("max").formatInt()
             ChocolateFactoryBarnManager.trySendBarnFullMessage(inventory = true)
