@@ -109,8 +109,9 @@ object SkillAPI {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {
-            val matcher = listOf(skillPattern, skillPercentPattern, skillMultiplierPattern).firstOrNull { it.matcher(component).matches() }
-                ?.matcher(component)
+            val matcher = listOf(skillPattern, skillPercentPattern, skillMultiplierPattern).firstOrNull {
+                it.matcher(component).matches()
+            }?.matcher(component)
 
             if (matcher?.matches() == true) {
                 val skillName = matcher.group("skillName")
