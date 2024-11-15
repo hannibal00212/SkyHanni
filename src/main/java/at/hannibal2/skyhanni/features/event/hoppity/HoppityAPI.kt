@@ -35,6 +35,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -166,12 +168,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = hoppityDataSet.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun millisToEventEnd(): Long =
-        if (isHoppityEvent()) {
-            val now = SkyBlockTime.now()
-            val eventEnd = SkyBlockTime.fromSbYearAndMonth(now.year, 4)
-            eventEnd.toMillis() - now.toMillis()
-        } else 0
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
+        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
+    } else null
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
@@ -217,6 +216,7 @@ object HoppityAPI {
                         hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         EggFoundEvent(STRAY, it.slotNumber).post()
                     }
+
                     else -> return@matchMatcher
                 }
             }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -57,10 +57,10 @@ object LogBookStats {
             var timesVisited = 0L
             var timesAccepted = 0L
             val lore = item.getLore()
-            lore.matchFirst(visitedPattern) {
+            visitedPattern.firstMatcher(lore) {
                 timesVisited += group("timesVisited").formatLong()
             }
-            lore.matchFirst(acceptedPattern) {
+            acceptedPattern.firstMatcher(lore) {
                 timesAccepted += group("timesAccepted").formatLong()
             }
 
@@ -112,7 +112,7 @@ object LogBookStats {
         }
         for (item in event.inventoryItems.values) {
             if (item.displayName != "§aNext Page") continue
-            item.getLore().matchFirst(pagePattern) {
+            pagePattern.firstMatcher(item.getLore()) {
                 currentPage = group("page").toInt() - 1
             }
         }

@@ -46,7 +46,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
@@ -235,7 +235,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".toInternalName()) {
-            lore.matchFirst(harvestPattern) {
+            harvestPattern.firstMatcher(lore) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"
@@ -257,7 +257,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
-            lore.matchFirst(gardenVacuumPattern) {
+            gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
@@ -291,14 +291,14 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
-            lore.matchFirst(bingoGoalRankPattern) {
+            bingoGoalRankPattern.firstMatcher(lore) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${rank.shortFormat()}"
             }
         }
 
         if (SKYBLOCK_LEVEL.isSelected() && chestName == "SkyBlock Menu" && itemName == "SkyBlock Leveling") {
-            lore.matchFirst(skyblockLevelPattern) {
+            skyblockLevelPattern.firstMatcher(lore) {
                 return group("level")
             }
         }
@@ -310,7 +310,7 @@ object ItemDisplayOverlayFeatures {
                 it.contains("Deaths: ")
             }
         ) {
-            lore.matchFirst(bestiaryStackPattern) {
+            bestiaryStackPattern.firstMatcher(lore) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {

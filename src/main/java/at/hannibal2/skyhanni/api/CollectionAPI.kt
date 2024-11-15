@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,7 +54,7 @@ object CollectionAPI {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
             val stack = event.inventoryItems[4] ?: return
-            stack.getLore().matchFirst(singleCounterPattern) {
+            singleCounterPattern.firstMatcher(stack.getLore()) {
                 val counter = group("amount").formatLong()
                 val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                 val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
@@ -78,7 +78,7 @@ object CollectionAPI {
                 }
 
                 val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
-                lore.matchFirst(counterPattern) {
+                counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
                 }

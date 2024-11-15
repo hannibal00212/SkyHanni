@@ -110,7 +110,7 @@ format like "- #821" to illustrate the dependency.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
       After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
-     `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
+     `baseline.xml` replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
   - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -145,6 +145,7 @@ format like "- #821" to illustrate the dependency.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
