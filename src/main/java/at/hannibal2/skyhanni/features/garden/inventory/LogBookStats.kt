@@ -113,7 +113,7 @@ object LogBookStats {
         for (item in event.inventoryItems.values) {
             if (item.displayName != "§aNext Page") continue
             pagePattern.firstMatcher(item.getLore()) {
-                this@LogBookStats.currentPage = group("page").toInt() - 1
+                currentPage = group("page").toInt() - 1
             }
         }
     }
