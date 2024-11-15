@@ -24,7 +24,7 @@ public class OptimalSpeedConfig {
     @Expose
     @ConfigOption(name = "Only Warn With Rancher's", desc = "Only send a warning when wearing Rancher's Boots.")
     @ConfigEditorBoolean
-    public boolean onlyWarnRanchers = true;
+    public boolean onlyWarnRanchers = false;
 
     @Expose
     @ConfigOption(name = "Rancher Boots", desc = "Set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
