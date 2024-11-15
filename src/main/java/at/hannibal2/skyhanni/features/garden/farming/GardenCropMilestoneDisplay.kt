@@ -107,6 +107,8 @@ object GardenCropMilestoneDisplay {
         update()
     }
 
+
+    //TODO this doesn't seem to live update the collection amount
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
@@ -120,6 +122,7 @@ object GardenCropMilestoneDisplay {
                 val old = cultivatingData[crop]!!
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
+                EliteFarmingCollectionDisplay.addCrop(crop, addedCounter)
                 update()
                 crop.setCounter(crop.getCounter() + addedCounter)
             }

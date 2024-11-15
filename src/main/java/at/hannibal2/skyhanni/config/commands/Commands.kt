@@ -47,11 +47,13 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
+import at.hannibal2.skyhanni.features.garden.farming.EliteFarmingCollectionDisplay
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.pests.ElitePestKillsDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
@@ -75,6 +77,7 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
+import at.hannibal2.skyhanni.features.skillprogress.EliteSkillRankDisplay
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
@@ -383,6 +386,21 @@ object Commands {
         }
 
         // non trackers
+        event.register("shrefreshfc") {
+            description = "Refresh the Farming Collection Display"
+            category = CommandCategory.USERS_RESET
+            callback { EliteFarmingCollectionDisplay.refresh() }
+        }
+        event.register("shrefreshsl") {
+            description = "Refresh the Skill Leaderboard Display"
+            category = CommandCategory.USERS_RESET
+            callback { EliteSkillRankDisplay.reset() }
+        }
+        event.register("shrefreshpl") {
+            description = "Refresh the Pest Kills Leaderboard Display"
+            category = CommandCategory.USERS_RESET
+            callback { ElitePestKillsDisplay.reset() }
+        }
         event.register("shresetghostcounter") {
             description = "Resets the ghost counter"
             category = CommandCategory.USERS_RESET

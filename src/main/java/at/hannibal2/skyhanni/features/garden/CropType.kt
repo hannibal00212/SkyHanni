@@ -22,6 +22,10 @@ enum class CropType(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
         { ItemStack(Items.wheat) }, "wheat", FarmingItems.WHEAT
     ),
+    SEEDS(
+        "Seeds", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
+        { ItemStack(Items.wheat_seeds) }, "seeds", FarmingItems.SEEDS,
+    ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
         { ItemStack(Items.carrot) }, "carrot", FarmingItems.CARROT, replenish = true

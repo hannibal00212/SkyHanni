@@ -11,7 +11,7 @@ object CopyActionBarCommand {
 
         val status = if (noFormattingCodes) "without" else "with"
 
-        var actionBar = ActionBarData.getActionBar()
+        var actionBar = ActionBarData.actionBar
         if (noFormattingCodes) actionBar = actionBar.removeColor()
 
         OSUtils.copyToClipboard(actionBar)

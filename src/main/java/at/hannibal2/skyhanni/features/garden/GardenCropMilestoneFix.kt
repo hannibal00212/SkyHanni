@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -60,19 +60,6 @@ object GardenCropMilestoneFix {
             val crops = GardenCropMilestones.getCropsForTier(tier, crop)
             changedValue(crop, crops, "level up chat message", 0)
         }
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
-            val amount = group("amount").toInt()
-            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
-            val rawName = primitiveStack.internalName.itemNameWithoutColor
-            val cropType = CropType.getByNameOrNull(rawName) ?: return
-
-            cropType.setCounter(
-                cropType.getCounter() + (amount * primitiveStack.amount)
-            )
-            GardenCropMilestoneDisplay.update()
-        }
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -81,10 +68,22 @@ object GardenCropMilestoneFix {
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + primitiveStack.amount
+                cropType.getCounter() + primitiveStack.amount,
             )
             GardenCropMilestoneDisplay.update()
         }
+    }
+
+    @SubscribeEvent
+    fun onPestKill(event: PestKillEvent) {
+        val primitiveStack = NEUItems.getPrimitiveMultiplier(event.item)
+        val rawName = primitiveStack.internalName.itemNameWithoutColor
+        val cropType = CropType.getByNameOrNull(rawName) ?: return
+
+        cropType.setCounter(
+            cropType.getCounter() + (event.amount * primitiveStack.amount),
+        )
+        GardenCropMilestoneDisplay.update()
     }
 
     @SubscribeEvent

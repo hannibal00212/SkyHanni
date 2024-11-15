@@ -14,6 +14,7 @@ enum class FarmingItems(
     private val ffCalculation: (ItemStack?) -> Map<FFTypes, Double> = { emptyMap() },
 ) {
     WHEAT(ItemCategory.HOE),
+    SEEDS(ItemCategory.HOE),
     CARROT(ItemCategory.HOE),
     POTATO(ItemCategory.HOE),
     NETHER_WART(ItemCategory.HOE),

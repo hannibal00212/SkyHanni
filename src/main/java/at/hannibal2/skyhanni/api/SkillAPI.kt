@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.ActionBarBeforeUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -104,7 +104,7 @@ object SkillAPI {
     }
 
     @SubscribeEvent
-    fun onActionBarUpdate(event: ActionBarUpdateEvent) {
+    fun onActionBarUpdate(event: ActionBarBeforeUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
         for (component in components) {

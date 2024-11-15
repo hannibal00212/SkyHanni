@@ -8,3 +8,4 @@ class ActionBarUpdateEvent(var actionBar: String, var chatComponent: IChatCompon
         chatComponent = ChatComponentText(newText)
     }
 }
+class ActionBarBeforeUpdateEvent(val actionBar: String, val chatComponent: IChatComponent) : LorenzEvent()

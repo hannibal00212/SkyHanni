@@ -18,6 +18,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class GardenConfig {
     @Expose
+    @ConfigOption(name = "Elite Bot Farming Collection", desc = "")
+    @Accordion
+    public EliteFarmingCollectionConfig eliteFarmingCollection = new EliteFarmingCollectionConfig();
+
+    @Expose
+    @ConfigOption(name = "Elite Bot Pest Kills", desc = "")
+    @Accordion
+    public ElitePestKillsDisplayConfig elitePestKillsDisplayConfig = new ElitePestKillsDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "SkyMart", desc = "")
     @Accordion
     public SkyMartConfig skyMart = new SkyMartConfig();

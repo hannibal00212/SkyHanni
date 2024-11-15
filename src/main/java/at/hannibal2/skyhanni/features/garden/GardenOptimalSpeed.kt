@@ -143,7 +143,7 @@ object GardenOptimalSpeed {
 
     private fun CropType.getConfig(): Property<Float> = with(configCustomSpeed) {
         when (this@getConfig) {
-            CropType.WHEAT -> wheat
+            CropType.WHEAT, CropType.SEEDS -> wheat
             CropType.CARROT -> carrot
             CropType.POTATO -> potato
             CropType.NETHER_WART -> netherWart

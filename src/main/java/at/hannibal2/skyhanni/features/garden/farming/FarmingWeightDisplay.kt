@@ -589,6 +589,7 @@ object FarmingWeightDisplay {
     private val backupCropWeights by lazy {
         mapOf(
             CropType.WHEAT to 100_000.0,
+            CropType.SEEDS to 0.0,
             CropType.CARROT to 302_061.86,
             CropType.POTATO to 300_000.0,
             CropType.SUGAR_CANE to 200_000.0,

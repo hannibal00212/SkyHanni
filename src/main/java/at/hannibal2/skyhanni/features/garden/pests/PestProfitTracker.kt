@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -106,6 +107,15 @@ object PestProfitTracker {
             tryAddItem(internalName, 1, command = false)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
+    }
+
+    @SubscribeEvent
+    fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
+
+        tracker.addItem(event.item, event.amount, false)
+        addKill()
+        if (config.hideChat) event.blockedReason = "pest_drop"
     }
 
     private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
