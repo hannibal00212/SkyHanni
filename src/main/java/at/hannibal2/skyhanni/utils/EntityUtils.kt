@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getNameAsString
 import at.hannibal2.skyhanni.utils.compat.getWholeInventory
@@ -34,7 +35,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object EntityUtils {
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
@@ -53,6 +54,7 @@ object EntityUtils {
         return list
     }
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
@@ -60,7 +62,7 @@ object EntityUtils {
         it.getNameAsString().contains(contains)
     }
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -69,7 +71,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -176,7 +178,7 @@ object EntityUtils {
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.entityWorld?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
 
     @SubscribeEvent
     fun onEntityRenderPre(

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -42,7 +42,7 @@ object LimboPlaytime {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
-    private val itemID = "ENDER_PEARL".asInternalName()
+    private val itemID = "ENDER_PEARL".toInternalName()
     private const val ITEM_NAME = "§aLimbo"
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()

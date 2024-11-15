@@ -51,8 +51,8 @@ object StashCompact {
     )
 
     /**
-     * REGEX-TEST: §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here to pick them up!
-     * REGEX-TEST: §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here to pick them up!
+     * REGEX-TEST: §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here §eto pick them up!
+     * REGEX-TEST: §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here §eto pick them up!
      */
     @Suppress("MaxLineLength")
     private val genericAddedToStashPattern by patternGroup.pattern(

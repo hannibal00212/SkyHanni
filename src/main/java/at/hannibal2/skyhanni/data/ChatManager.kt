@@ -27,6 +27,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
@@ -131,6 +132,9 @@ object ChatManager {
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
+                event.isCanceled = true
+            }
             return
         }
         val key = IdentityCharacteristics(original)

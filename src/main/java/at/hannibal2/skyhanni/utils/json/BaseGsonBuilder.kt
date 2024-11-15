@@ -7,12 +7,14 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.time.Duration
 
 object BaseGsonBuilder {
     fun gson(): GsonBuilder = GsonBuilder().setPrettyPrinting()
@@ -32,6 +34,7 @@ object BaseGsonBuilder {
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),
         )
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
+        .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
         .enableComplexMapKeySerialization()
 

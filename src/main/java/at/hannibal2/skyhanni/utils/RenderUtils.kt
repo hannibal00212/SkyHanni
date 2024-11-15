@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -33,7 +34,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
@@ -194,7 +194,8 @@ object RenderUtils {
             Triple(xTranslate, yTranslate, zTranslate)
         }
 
-    fun getViewerPos(partialTicks: Float) = exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
+    fun getViewerPos(partialTicks: Float) =
+        Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
 
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AxisAlignedBB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -352,9 +353,9 @@ object RenderUtils {
         seeThroughBlocks: Boolean = false,
         color: Color? = null,
     ) {
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.pushMatrix()
-        val viewer = Minecraft.getMinecraft().renderViewEntity
         val renderManager = Minecraft.getMinecraft().renderManager
         var x = location.x - renderManager.viewerPosX
         var y = location.y - renderManager.viewerPosY - viewer.eyeHeight
@@ -694,7 +695,7 @@ object RenderUtils {
         try {
             if (highlight) {
                 // Hack to add enchant glint, like Hypixel does it
-                item.addEnchantment(Enchantment.protection, 0)
+                item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
             }
             add(Renderable.itemStack(item, scale))
         } catch (e: NullPointerException) {
@@ -993,15 +994,16 @@ object RenderUtils {
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+
         val x = location.x
         val y = location.y
         val z = location.z
 
-        val render = Minecraft.getMinecraft().renderViewEntity
-        val renderOffsetX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val renderOffsetY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val renderOffsetZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
         val eyeHeight = thePlayer.eyeHeight
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
@@ -1098,6 +1100,12 @@ object RenderUtils {
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
+    }
+
+    fun LorenzRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
+        if (entity.isDead) return entity.entityBoundingBox
+        val offset = exactLocation(entity) - entity.getLorenzVec()
+        return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
     }
 
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
@@ -1611,13 +1619,13 @@ object RenderUtils {
         lineWidth: Int,
         depth: Boolean,
     ) {
+        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
         GlStateManager.disableCull()
 
-        val render = Minecraft.getMinecraft().renderViewEntity
         val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks
-        val realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks
-        val realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks
+        val realX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
+        val realY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
+        val realZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
         GlStateManager.pushMatrix()
         GlStateManager.translate(-realX, -realY, -realZ)
         GlStateManager.disableTexture2D()

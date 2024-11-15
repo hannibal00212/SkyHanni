@@ -43,4 +43,3 @@ class SkullTexturesUseRepo(config: Config) : Rule(config) {
         super.visitStringTemplateExpression(expression)
     }
 }
-

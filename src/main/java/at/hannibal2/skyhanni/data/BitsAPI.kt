@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -66,10 +66,10 @@ object BitsAPI {
     // Chat patterns
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
+    @Suppress("MaxLineLength")
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "rankup.bits",
-        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your " +
-            "§epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
+        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
     )
 
     private val fameRankUpPattern by bitsChatGroup.pattern(
@@ -223,7 +223,7 @@ object BitsAPI {
             }
 
             val lore = cookieStack.getLore()
-            lore.matchFirst(bitsAvailableMenuPattern) {
+            bitsAvailableMenuPattern.firstMatcher(lore) {
                 val amount = group("toClaim").formatInt()
                 if (bitsAvailable != amount) {
                     bitsAvailable = amount
@@ -235,11 +235,11 @@ object BitsAPI {
                     }
                 }
             }
-            lore.matchFirst(cookieDurationPattern) {
+            cookieDurationPattern.firstMatcher(lore) {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            lore.matchFirst(noCookieActiveSBMenuPattern) {
+            noCookieActiveSBMenuPattern.firstMatcher(lore) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }

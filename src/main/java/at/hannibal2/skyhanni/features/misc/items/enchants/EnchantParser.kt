@@ -41,17 +41,22 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
     /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
      * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
      * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "(?:(?:§7§l|§d§l|§9)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:,\\d{3})*))+\$",
+        "^(?:(?:§.)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
     // Above regex tests apply to this pattern also
+    @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
+        "(§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}([,.]\\d{1,3})*[kKmMbB]?)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
@@ -280,7 +285,7 @@ object EnchantParser {
                 } catch (e: NumberFormatException) {
                     matcher.group("levelNumeral").romanToDecimal()
                 }
-                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,]+\$".toRegex())) {
+                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,.kKmMbB]+\$".toRegex())) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
@@ -404,7 +409,7 @@ object EnchantParser {
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = ChatComponentText(text)
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent.action, chatComponentText)
+        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }

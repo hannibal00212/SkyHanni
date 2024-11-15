@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackAPI
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 object HypixelCommands {
     fun skyblock() {
@@ -61,7 +61,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackAPI.getFromSack(itemName.asInternalName(), amount)
+        GetFromSackAPI.getFromSack(itemName.toInternalName(), amount)
     }
 
     fun widget() {
@@ -170,9 +170,13 @@ object HypixelCommands {
         send("viewstash $type")
     }
 
+    fun locraw() {
+        send("locraw")
+    }
+
     private fun send(command: String) {
-        @Suppress("DEPRECATION")
         // TODO rename function
+        @Suppress("DEPRECATION")
         ChatUtils.sendCommandToServer(command)
     }
 }

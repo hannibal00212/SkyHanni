@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -43,7 +43,7 @@ object EnigmaSoulWaypoints {
     private var adding = true
 
     private val item by lazy {
-        val neuItem = "SKYBLOCK_ENIGMA_SOUL".asInternalName().getItemStack()
+        val neuItem = "SKYBLOCK_ENIGMA_SOUL".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
