@@ -2,10 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.BitsAPI.bits
-import at.hannibal2.skyhanni.data.BitsAPI.bitsAvailable
-import at.hannibal2.skyhanni.data.BitsAPI.cookieBuffTime
-import at.hannibal2.skyhanni.data.BitsAPI.sendBitsAvailableGainedEvent
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -13,13 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -29,7 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
