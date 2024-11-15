@@ -423,13 +423,8 @@
     <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "gemstone", " §[0-9a-f](?&lt;gemrarity&gt;[A-z]*): §[0-9a-f](?&lt;stored&gt;\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?", )</ID>
     <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "number", "(?:(?:§[0-9a-f](?&lt;level&gt;I{1,3})§7:)?|(?:§7Stored:)?) (?&lt;color&gt;§[0-9a-f])(?&lt;stored&gt;[0-9.,kKmMbB]+)§7/(?&lt;total&gt;\\d+(?:[0-9.,]+)?[kKmMbB]?)", )</ID>
     <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "sack", "^(.* Sack|Enchanted .* Sack)\$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "bossdamage", "Your Damage: §c[\\d,.]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "bosshp", "(?:Protector|Dragon) HP: §a[\\d,.]* §c❤", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "killmagmasbar", "(?:(?:§.)*▎+)+.*", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "magmaboss", "§7Boss: §[c6e]\\d+%", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "magmabosshealthbar", "§.[\\w,.]+§f/§a10M§c❤", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "magmareforming", "§cThe boss is (?:re)?forming!", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "floor3guardians", "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "teammates", "(?:§.)*(?&lt;classAbbv&gt;\\[\\w]) (?:§.)*(?&lt;username&gt;\\w{2,16}) ((?:§.)*(?&lt;classLevel&gt;\\[Lvl?(?&lt;level&gt;[\\w,.]+)?]?)|(?:§.)*(?&lt;health&gt;[\\w,.]+)(?:§.)*.?)", )</ID>
@@ -441,25 +436,8 @@
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventstart", "(?:§.)*Event Start: §.[\\d:]+$", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventtotaldmg", "(?:§.)*Your Total Damage: §.[\\d+,.]+.*$", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventwave", "(?:§.)*Wave \\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "cleanup", "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "locked", "\\s*§cLocked", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "moblocation", "(?:§.)*Tracker Mob Location:", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "pasting", "\\s*§f(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "pelts", "(?:§.)*Pelts: (?:§.)*[\\d,]+.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by farmingSb.pattern( "plot", "\\s*§aPlot §7-.*", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by kuudraSb.pattern( "tokens", "(?:§.)*Tokens: §.[\\w,]+", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by kuudraSb.pattern( "wave", "(?:§.)*Wave: (?:§.)*\\d+(?:§.)*(?: §.- §.\\d+:\\d+)?", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "copper", "(?:§.)*Copper: (?:§.)*(?&lt;copper&gt;[\\d,]+).*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "date", "\\s*(?:(?:Late|Early) )?(?:Spring|Summer|Autumn|Winter) \\d+(?:st|nd|rd|th)?.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "footer", "§e(?:www|alpha).hypixel.net", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "heat", "Heat: (?&lt;heat&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "lobbycode", "\\s*§.(?:\\d{2}/?){3} §8(?&lt;code&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "location", "\\s*(?&lt;location&gt;(?:§7⏣|§5ф) .*)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "motes", "(?:§.)*Motes: (?:§.)*(?&lt;motes&gt;[\\d,]+).*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "northstars", "North Stars: §d(?&lt;northstars&gt;[\\w,]+).*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "profiletype", "\\s*(?:§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "waitingforvote", "§7Waiting for|§7your vote\\.\\.\\.", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by mainSb.pattern( "yearvotes", "§6Year \\d+ Votes", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "fortunatefreezing.bonus", "Event Bonus: §6\\+\\d+☘", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "fossildust", "Fossil Dust: §f[\\d.,]+.*", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mineshaft.notstarted", "(?:§.)*Not started.*", )</ID>
@@ -468,32 +446,14 @@
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mithrilremaining", "Remaining: §a(?:\\d+ Tasty Mithril|FULL)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mithrilyourmithril", "Your Tasty Mithril: §c\\d+.*", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "nearbyplayers", "Nearby Players: §.(?:\\d+|N/A)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "rafflepool", "Pool: §6\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "raffleuseless", "Find tickets on the|ground and bring them|to the raffle box", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "windcompassarrow", "\\s*(?:§.|[⋖⋗≈])+\\s*(?:§.|[⋖⋗≈])*\\s*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "yourgoblin", "Your kills: §c\\d+ ☠(?: §a\\(\\+\\d+\\))?", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "dojochallenge", "(?:§.)*Challenge: (?:§.)*(?&lt;challenge&gt;.+)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "dojodifficulty", "(?:§.)*Difficulty: (?:§.)*(?&lt;difficulty&gt;.+)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "dojopoints", "(?:§.)*Points: (?:§.)*[\\w.]+.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "essence", "\\s*.*Essence: §.(?&lt;essence&gt;-?\\d+(?::?,\\d{3})*(?:\\.\\d+)?)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "flightduration", "^\\s*Flight Duration: §a(:?\\d{1,3})*$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "objective", "(?:§.)*(?:Objective|Quest).*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "queued", "Queued:.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "queueposition", "Position: (?:§.)*#\\d+ (?:§.)*Since: .*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "redstone", "\\s*(?:§.)*⚡ §cRedstone: (?:§.)*\\d+%", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "visiting", "\\s*§a✌ §7\\(§.\\d+(?:§.)?/\\d+(?:§.)?\\)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "wtfarethoselines", "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "autoclosing", "(?:§.)*Auto-closing in: §c(?:\\d+:)?\\d+", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "instanceshutdown", "(?:§.)*Instance Shutdown In: (?:§.)*(?&lt;time&gt;(?:\\w+[ydhms] ?)+)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "startingin", "(?:§.)*Starting in: §.(?:\\d+:)?\\d+", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "timeelapsed", "(?:§.)*Time Elapsed: (?:§.)*(?&lt;time&gt;(\\w+[ydhms] ?)+)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "timeleft", "(?:§.)*Time Left: (?:§.)*[\\w:,.\\s]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "aveikx", "Time spent sitting|with Ävaeìkx: .*", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "clues", "Clues: §.\\d+/\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "dimension", "\\s*§fRift Dimension", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "hayeaten", "Hay Eaten: §.[\\d,.]+/[\\d,.]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "hotdogeaten", "Eaten: §.\\d+/\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by tablistGroup.pattern( "eventtime", "\\s+Ends In: §r§e(?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by tablistGroup.pattern( "eventtimestarts", "\\s+Starts In: §r§e(?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:ServerRestartTitle.kt$ServerRestartTitle$by patternGroup.pattern( "greedy", "§cServer closing.*" )</ID>
     <ID>RepoPatternRegexTest:ServerRestartTitle.kt$ServerRestartTitle$by patternGroup.pattern( "time", "§cServer closing: (?&lt;minutes&gt;\\d+):(?&lt;seconds&gt;\\d+) ?§8.*" )</ID>
