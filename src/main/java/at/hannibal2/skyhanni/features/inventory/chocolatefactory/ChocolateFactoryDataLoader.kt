@@ -588,8 +588,8 @@ object ChocolateFactoryDataLoader {
                     if (upgrades[i].slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 0.01 else 0.0,
             )
 
-            val extra: Double = (afterChocPerSec - beforeChocPerSec).round(2)
-            val effectiveCost: Double? = upgrades[i].price?.div(extra)?.round(2)
+            val extra: Double = (afterChocPerSec - beforeChocPerSec).roundTo(2)
+            val effectiveCost: Double? = upgrades[i].price?.div(extra)?.roundTo(2)
             upgrades[i] = upgrades[i].copy(extraPerSecond = extra, effectiveCost = effectiveCost)
         }
     }
