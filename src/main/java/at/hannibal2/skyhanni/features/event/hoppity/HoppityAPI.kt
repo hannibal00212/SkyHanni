@@ -70,9 +70,11 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun getEventEndMark(): SimpleTimeMark? =
-        if (isHoppityEvent()) SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).toMillis().asTimeMark()
-        else null
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
+        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
+    } else null
+
+
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
@@ -166,6 +168,7 @@ object HoppityAPI {
                         duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
+
                     else -> return@matchMatcher
                 }
             }

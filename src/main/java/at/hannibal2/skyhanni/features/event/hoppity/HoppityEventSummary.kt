@@ -94,26 +94,27 @@ object HoppityEventSummary {
     private var statYear: Int = getCurrentSBYear()
 
     private fun inMatchingInventory(): Boolean {
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-            ?: return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.NO_INVENTORY)
+        val setting = liveDisplayConfig.specificInventories
+        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
-        if (currentScreen is GuiInventory)
-            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.OWN_INVENTORY)
+        if (currentScreen is GuiInventory) {
+            return HoppityLiveDisplayInventoryType.OWN_INVENTORY in setting
+        }
 
         // Get the inventory name and check if it matches any of the specific inventories
         val inventoryName = InventoryUtils.openInventoryName()
 
-        if (
+        val inChocolateFactory =
             ChocolateFactoryAPI.inChocolateFactory ||
-            menuNamePattern.matches(inventoryName) ||
-            miscCfInventoryPatterns.matches(inventoryName)
-        ) return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY)
+                menuNamePattern.matches(inventoryName) ||
+                miscCfInventoryPatterns.matches(inventoryName)
+        if (inChocolateFactory) return HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY in setting
 
-        if (inventoryName == "Hoppity")
-            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.HOPPITY)
+        if (inventoryName == "Hoppity") return HoppityLiveDisplayInventoryType.HOPPITY in setting
 
-        if (mealEggInventoryPattern.matches(inventoryName))
-            return liveDisplayConfig.specificInventories.contains(HoppityLiveDisplayInventoryType.MEAL_EGGS)
+        if (mealEggInventoryPattern.matches(inventoryName)) {
+            return HoppityLiveDisplayInventoryType.MEAL_EGGS in setting
+        }
 
         return false
     }
@@ -135,10 +136,9 @@ object HoppityEventSummary {
     }
 
     private data class StatString(val string: String, val headed: Boolean = true)
-    private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) =
-        this.add(StatString(string, headed))
-    private fun MutableList<StatString>.addEmptyLine() =
-        this.add(StatString("", false))
+
+    private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
+    private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -244,8 +244,7 @@ object HoppityEventSummary {
     }
 
     private fun isInInventory(): Boolean =
-        Minecraft.getMinecraft().currentScreen is GuiInventory ||
-            Minecraft.getMinecraft().currentScreen is GuiChest
+        Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
 
     private fun reCheckInventoryState() {
         if (isInInventory() != lastKnownInInvState) {
@@ -635,7 +634,6 @@ object HoppityEventSummary {
             val spawnedMealsEggs = previousEggs + currentEggs
             "§7You found §b$it§7/§a$spawnedMealsEggs §6Chocolate Meal ${StringUtils.pluralize(it, "Egg")}§7."
         }
-
 
     private fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
         val rabbitsSum = rarityMap.values.sum()
