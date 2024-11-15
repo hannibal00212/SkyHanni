@@ -584,7 +584,9 @@ object HoppityEventSummary {
             statList.clear()
             statList.addEmptyLine()
             statList.addStr("§c§lNothing to show!")
-            statList.addStr("§c§oFind some eggs in the future!")
+            val isCurrentEvent = HoppityAPI.isHoppityEvent() && eventYear == getCurrentSBYear()
+            val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
+            statList.addStr("§c§oFind some eggs $timeFormat!")
         }
 
         return statList
