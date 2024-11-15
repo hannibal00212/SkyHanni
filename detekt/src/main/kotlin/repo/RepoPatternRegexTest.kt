@@ -59,7 +59,7 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
                 CodeSmell(
                     issue,
                     Entity.from(delegate),
-                    "Repo pattern '$variableName' must have a regex test.",
+                    "Repo pattern `$variableName` must have a regex test.",
                 ),
             )
             return
@@ -72,7 +72,7 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
                 CodeSmell(
                     issue,
                     Entity.from(delegate),
-                    "Repo pattern '$variableName' has an invalid regex: '$rawPattern'.",
+                    "Repo pattern `$variableName` has an invalid regex: `$rawPattern`.",
                 ),
             )
             return
@@ -84,7 +84,7 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
                     CodeSmell(
                         issue,
                         Entity.from(delegate),
-                        "Repo pattern '$variableName' failed regex test: '$test' pattern: '$rawPattern'.",
+                        "Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`.",
                     ),
                 )
             }
@@ -96,7 +96,7 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
                     CodeSmell(
                         issue,
                         Entity.from(delegate),
-                        "Repo pattern '$variableName' passed regex test: '$test' pattern: '$rawPattern' even though it was set to fail.",
+                        "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` even though it was set to fail.",
                     ),
                 )
             }
