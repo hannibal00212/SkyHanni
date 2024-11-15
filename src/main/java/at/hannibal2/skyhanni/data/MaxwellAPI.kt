@@ -299,7 +299,7 @@ object MaxwellAPI {
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo
     @SubscribeEvent
