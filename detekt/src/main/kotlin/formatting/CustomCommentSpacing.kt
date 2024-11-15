@@ -10,6 +10,9 @@ import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 
+/**
+ * This rule enforces the default spacing rules for comments but ignores preprocessed comments.
+ */
 class CustomCommentSpacing(config: Config) : Rule(config) {
     override val issue = Issue(
         "CustomCommentSpacing",
@@ -18,15 +21,8 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
         Debt.FIVE_MINS
     )
 
-
     override fun visitComment(comment: PsiComment) {
         if (comment.text.containsPreprocessingPattern()) return
-
-        /**
-         * REGEX-TEST: // Test comment
-         * REGEX-TEST: /* Test comment */
-         */
-        val commentRegex = Regex("""^(?:\/{2}|\/\*)(?:\s.*|$)""", RegexOption.DOT_MATCHES_ALL)
         if (!commentRegex.matches(comment.text)) {
             report(
                 CodeSmell(
@@ -39,5 +35,13 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
 
         // Fallback to super (ostensibly a no-check)
         super.visitComment(comment)
+    }
+
+    companion object {
+        /**
+         * REGEX-TEST: // Test comment
+         * REGEX-TEST: /* Test comment */
+         */
+        val commentRegex = Regex("""^(?:\/{2}|\/\*)(?:\s.*|$)""", RegexOption.DOT_MATCHES_ALL)
     }
 }

@@ -20,7 +20,7 @@ public class HoppityEggsConfig {
     public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
 
     @Expose
-    @ConfigOption(name = "Event Summary", desc = "")
+    @ConfigOption(name = "Hoppity Hunt Stats Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
 
@@ -218,8 +218,8 @@ public class HoppityEggsConfig {
     public boolean petWarning = false;
 
     @Expose
-    @ConfigOption(name = "Prevent Missing Fish the Rabbit", desc = "Prevent closing a Meal Egg's inventory if Fish the Rabbit is present.")
+    @ConfigOption(name = "Prevent Missing Rabbit the Fish", desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean preventMissingFish = true;
+    public boolean preventMissingRabbitTheFish = true;
 }
