@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -185,7 +185,7 @@ object GetFromSackAPI {
         val replacedString = itemString.replace("_", " ")
 
         val item = when {
-            SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            SackAPI.sackListInternalNames.contains(itemString) -> itemString.toInternalName()
             SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",

@@ -10,14 +10,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object DianaAPI {
 
-    private val spade by lazy { "ANCESTRAL_SPADE".asInternalName() }
+    private val spade by lazy { "ANCESTRAL_SPADE".toInternalName() }
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId == spade
 

@@ -12,6 +12,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
+import io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule(neuRequired = true)
