@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,7 +26,7 @@ object StatsTuning {
 
     private val statPointsPattern by RepoPattern.pattern(
         "inventory.statstuning.points",
-        "§7Stat has: §e(?<amount>\\d+) points?"
+        "§7Stat has: §e(?<amount>\\d+) points?",
     )
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ object StatsTuning {
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
         if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(
                 stack,
-                event
+                event,
             )
         ) return
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
@@ -90,7 +90,7 @@ object StatsTuning {
     }
 
     private fun points(stack: ItemStack, event: RenderInventoryItemTipEvent) {
-        stack.getLore().matchFirst(statPointsPattern) {
+        statPointsPattern.firstMatcher(stack.getLore()) {
             val points = group("amount")
             event.stackTip = points
         }

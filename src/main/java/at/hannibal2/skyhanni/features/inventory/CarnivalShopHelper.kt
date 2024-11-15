@@ -44,8 +44,8 @@ object CarnivalShopHelper {
     private var shopSpecificInfoItemStack: ItemStack? = null
 
     /**
-     * REGEX-TEST: Your Tokens: §a1,234,567
-     * REGEX-TEST: Your Tokens: §a0
+     * REGEX-TEST: §7Your Tokens: §a1,234,567
+     * REGEX-TEST: §7Your Tokens: §a0
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",
