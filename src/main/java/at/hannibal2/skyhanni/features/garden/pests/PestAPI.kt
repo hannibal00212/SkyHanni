@@ -119,7 +119,7 @@ object PestAPI {
         "chat.pestdeath",
         "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
     )
-    private val noPestsChatPattern by patternGroup.pattern(
+    val noPestsChatPattern by patternGroup.pattern(
         "chat.nopests",
         "§cThere are not any Pests on your Garden right now! Keep farming!"
     )
