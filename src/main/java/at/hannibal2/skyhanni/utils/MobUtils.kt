@@ -80,6 +80,8 @@ object MobUtils {
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
-    val EntityLivingBase.mob get() = MobData.entityToMob[this]
+    val EntityLivingBase.mob: Mob? get() = MobData.entityToMob[this]
+
+    val Entity.mob: Mob? get() = (this as? EntityLivingBase)?.mob
 
 }

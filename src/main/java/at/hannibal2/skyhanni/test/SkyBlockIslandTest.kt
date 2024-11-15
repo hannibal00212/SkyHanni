@@ -34,7 +34,7 @@ object SkyBlockIslandTest {
     }
 
     private fun find(search: String): IslandType? {
-        for (type in IslandType.values()) {
+        for (type in IslandType.entries) {
             if (type.name.equals(search, ignoreCase = true)) return type
             if (type.displayName.equals(search, ignoreCase = true)) return type
         }

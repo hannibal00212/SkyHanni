@@ -16,7 +16,9 @@ import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,7 +38,7 @@ object PlayerChatManager {
      */
     private val globalPattern by patternGroup.pattern(
         "global",
-        "(?:\\[(?<level>\\d+)] )?(?<author>.+?)(?<chatColor>§f|§7|): (?<message>.*)"
+        "^(?:\\[(?<level>\\d+)] )?(?<author>(?:[^ ] )?(?:(?:§.)?\\[[^\\]]+\\] )?[^ ]+?)(?<chatColor>§f|§7|): (?<message>.*)\$",
     )
 
     /**
@@ -69,8 +71,8 @@ object PlayerChatManager {
     /**
      * REGEX-TEST: To nea89o: lol
      * REGEX-TEST: From nea89o: hiii
-     * REGEX-TEST: From stash: Pufferfish
-     * REGEX-TEST: From stash: Wheat
+     * REGEX-FAIL: From stash: Pufferfish
+     * REGEX-FAIL: From stash: Wheat
      * REGEX-TEST: To [MVP+] Eisengolem: Boop!
      * REGEX-TEST: From [MVP+] Eisengolem: Boop!
      * REGEX-TEST: To [MVP+] Eisengolem: danke
@@ -97,7 +99,7 @@ object PlayerChatManager {
 
     /**
      * REGEX-TEST: ♫ §c[Buddy ツ] §b[MVP§d+§b] lrg89
-     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
+     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
@@ -106,7 +108,7 @@ object PlayerChatManager {
 
     /**
      * REGEX-TEST: ♫ §a[✌] §f[Gamer] §b[MVP§d+§b] lrg89
-     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
+     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
      * REGEX-TEST: ♫ §a[✌] §c[Buddy ツ] §b[MVP§d+§b] lrg89
      */
     private val privateIslandGuestPattern by patternGroup.pattern(
@@ -169,6 +171,11 @@ object PlayerChatManager {
 
     private fun ComponentMatcher.isGlobalChat(event: LorenzChatEvent): Boolean {
         var author = groupOrThrow("author")
+        val chatColor = groupOrThrow("chatColor")
+        if (chatColor.length == 0 && !author.getText().removeColor().endsWith(LorenzUtils.getPlayerName())) {
+            // The last format string is always present, unless this is the players own message
+            return false
+        }
         val message = groupOrThrow("message").removePrefix("§f")
         if (author.getText().contains("[NPC]")) {
             NpcChatEvent(author, message, event.chatComponent).postChat(event)
@@ -196,7 +203,7 @@ object PlayerChatManager {
             levelComponent = group("level"),
             privateIslandRank = privateIslandRank,
             privateIslandGuest = privateIslandGuest,
-            chatColor = groupOrThrow("chatColor").getText(),
+            chatColor = chatColor.getText(),
             authorComponent = author,
             messageComponent = message,
             chatComponent = event.chatComponent,

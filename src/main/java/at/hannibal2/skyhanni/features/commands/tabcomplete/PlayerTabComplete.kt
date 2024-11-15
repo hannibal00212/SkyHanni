@@ -58,7 +58,7 @@ object PlayerTabComplete {
             add(getExcluding(PlayerCategory.PARTY))
         }
 
-        parent("w", "msg", "tell", "boop") { add(getExcluding()) }
+        parent("w", "msg", "tell", "boop", "boo") { add(getExcluding()) }
 
         parent("visit") {
             add(getExcluding())

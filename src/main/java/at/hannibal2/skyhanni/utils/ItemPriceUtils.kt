@@ -5,12 +5,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object ItemPriceUtils {
+
+    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
+    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".toInternalName() }
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
@@ -37,11 +40,11 @@ object ItemPriceUtils {
                 return it
             }
 
-            if (equals("JACK_O_LANTERN")) {
-                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
+            if (this == JACK_O_LANTERN) {
+                return "PUMPKIN".toInternalName().getPrice(priceSource) + 1
             }
         }
-        if (equals("GOLDEN_CARROT")) {
+        if (this == GOLDEN_CARROT) {
             // 6.8 for some players
             return 7.0 // NPC price
         }
@@ -115,7 +118,7 @@ object ItemPriceUtils {
         return if (name.isEmpty()) {
             InventoryUtils.getItemInHand()?.getInternalName()
         } else {
-            val internalName = name.asInternalName()
+            val internalName = name.toInternalName()
             if (internalName.getItemStackOrNull() != null) {
                 internalName
             } else {
