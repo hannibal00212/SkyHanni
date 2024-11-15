@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
