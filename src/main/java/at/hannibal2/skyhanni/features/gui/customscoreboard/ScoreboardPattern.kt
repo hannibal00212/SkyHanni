@@ -419,8 +419,8 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST §a▎▎▎▎▎§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
-     * REGEX-TEST §a§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
+     * REGEX-TEST: §a▎▎▎▎▎§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
+     * REGEX-TEST: §a§7▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎
      */
     val killMagmasDamagedSoakedBarPattern by combatSb.pattern(
         "killmagmasbar",
@@ -428,7 +428,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST §cThe boss is reforming!
+     * REGEX-TEST: §cThe boss is reforming!
      */
     val reformingPattern by combatSb.pattern(
         "magmareforming",
@@ -657,7 +657,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST:Eaten: §c2/50
+     * REGEX-TEST: Eaten: §c2/50
      */
     val riftHotdogEatenPattern by riftSb.pattern(
         "hotdogeaten",
