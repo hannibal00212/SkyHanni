@@ -1373,7 +1373,7 @@ interface Renderable {
             height: Int = 100,
             entityScale: Int = 30,
             padding: Int = 5,
-            color: Int? = null,
+            color: Color? = null,
             colorCondition: () -> Boolean = { true },
         ) = object : Renderable {
             override val width = width + 2 * padding

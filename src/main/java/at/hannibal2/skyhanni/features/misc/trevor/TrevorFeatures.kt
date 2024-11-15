@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -218,7 +218,7 @@ object TrevorFeatures {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
-        // TODO work wioth trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
+        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
         for (line in TabListData.getTabList()) {
             val formattedLine = line.removeColor().drop(1)
             if (formattedLine.startsWith("Time Left: ")) {
@@ -345,7 +345,7 @@ object TrevorFeatures {
         ACTIVE(LorenzColor.DARK_RED),
         ;
 
-        val color = baseColor.toColor().withAlpha(75)
+        val color = baseColor.toColor().addAlpha(75)
         val colorCode = baseColor.getChatColor()
     }
 

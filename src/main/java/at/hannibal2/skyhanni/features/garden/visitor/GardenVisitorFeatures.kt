@@ -589,14 +589,16 @@ object GardenVisitorFeatures {
                 entity is EntityLivingBase
             ) {
                 val color = visitor.status.color
-                if (color != -1) {
+                if (color != null) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color,
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
-                // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
-                if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
+                if (color == null || !GardenAPI.inGarden()) {
+                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                    RenderLivingEntityHelper.removeEntityColor(entity)
+                }
             }
         }
     }
