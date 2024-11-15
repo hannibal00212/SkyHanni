@@ -392,15 +392,11 @@ object CakeTracker {
         val unknownMissing = data.missingCakes.count { getCakePrice(it) == 0.0 }
 
         add("§aHave§7: §a${data.ownedCakes.size}")
-        add(
-            "§6Total value§7: §6${data.ownedCakes.sumOf(::getCakePrice).addSeparators()}"
-        )
+        add("§6Total value§7: §6${data.ownedCakes.sumOf(::getCakePrice).addSeparators()}")
         if (unknownOwned > 0) add("  §7§o* $unknownOwned unknown prices")
         add("")
         add("§cMissing§7: §c${data.missingCakes.size}")
-        add(
-            "§6Total cost§7: §6${data.missingCakes.sumOf(::getCakePrice).addSeparators()}"
-        )
+        add("§6Total cost§7: §6${data.missingCakes.sumOf(::getCakePrice).addSeparators()}")
         if (unknownMissing > 0) add("  §7§o* $unknownMissing unknown prices")
         add("")
         add("§bPercent owned§7: §a${"%.2f".format(data.ownedCakes.size * 100.0 / currentYear)}%")
@@ -427,7 +423,7 @@ object CakeTracker {
     private fun MutableList<Renderable>.addCakeRanges(
         cakeList: Set<Int>,
         orderType: DisplayOrder,
-        displayType: DisplayType
+        displayType: DisplayType,
     ) {
         val sortedCakes = when (orderType) {
             DisplayOrder.OLDEST_FIRST -> cakeList.sorted()
@@ -472,8 +468,8 @@ object CakeTracker {
             Renderable.clickAndHover(
                 "§7§o($hiddenRows hidden rows)",
                 tips = listOf("§eClick to configure # of displayed rows"),
-                onClick = { config::maxDisplayRows.jumpToEditor() }
-            )
+                onClick = { config::maxDisplayRows.jumpToEditor() },
+            ),
         )
     }
 }
