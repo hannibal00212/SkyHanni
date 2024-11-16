@@ -975,6 +975,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            showScrollableTipsInList: Boolean = false
         ) = object : Renderable {
             override val width = list.maxOf { it.width }
             override val height = height
@@ -1001,6 +1002,16 @@ interface Renderable {
                 var renderY = 0
                 var virtualY = 0
                 var found = false
+
+                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+                // there are more items above
+                if (showScrollableTipsInList && scroll.asInt() > 0) {
+                    val tip = string("§7§oMore items above (scroll)")
+                    tip.renderXAligned(posX, posY, width)
+                    GlStateManager.translate(0f, tip.height.toFloat(), 0f)
+                    renderY += tip.height
+                }
+
                 for (renderable in list) {
                     if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
                         renderable.renderXAligned(posX, posY + renderY, width)
@@ -1016,6 +1027,16 @@ interface Renderable {
                     }
                     virtualY += renderable.height
                 }
+
+                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+                // there are more items below
+                if (showScrollableTipsInList && virtualY > end) {
+                    val tip = string("§7§oMore items below (scroll)")
+                    tip.renderXAligned(posX, posY + height - tip.height, width)
+                    GlStateManager.translate(0f, tip.height.toFloat(), 0f)
+                    renderY += tip.height
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }

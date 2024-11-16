@@ -73,9 +73,9 @@ public class CakeTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Maximum Rows",
-        desc = "The maximum number of rows to display in the tracker, before a cutoff is imposed."
+        name = "Max Height",
+        desc = "Maximum height of the tracker."
     )
-    @ConfigEditorSlider(minValue = 5, maxValue = 40, minStep = 1)
-    public Property<Integer> maxDisplayRows = Property.of(20);
+    @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 10)
+    public Property<Integer> maxHeight = Property.of(250);
 }

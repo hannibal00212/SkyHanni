@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -53,6 +52,7 @@ object CakeTracker {
 
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
+    private val maxTrackerHeight get() = config.maxHeight.get()
 
     private var currentYear = 0
     private var inCakeInventory = false
@@ -157,7 +157,7 @@ object CakeTracker {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.maxDisplayRows) {
+        ConditionalUtils.onToggle(config.maxHeight) {
             lastKnownCakeDataHash = 0
         }
     }
@@ -286,25 +286,31 @@ object CakeTracker {
 
         fun getRenderable(displayType: DisplayType): Renderable {
             val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§a" else "§c"
-            val baseRenderable = getHoverable(colorCode)
-            return if (displayType == DisplayType.MISSING_CAKES) Renderable.link(
+            val baseRenderable = getHoverable(displayType, colorCode)
+            return if (displayType == DisplayType.MISSING_CAKES && config.priceOnHover) Renderable.link(
                 baseRenderable,
                 { HypixelCommands.auctionSearch("New Year Cake (Year $start)") },
             ) else baseRenderable
         }
 
-        fun getHoverable(colorCode: String): Renderable {
+        fun getHoverable(displayType: DisplayType, colorCode: String): Renderable {
             val displayString =
                 if (isSingular) "§fYear $colorCode$start"
                 else "§fYears $colorCode$start§f-$colorCode$end"
 
             return if (!config.priceOnHover) Renderable.string(displayString)
-            else Renderable.hoverTips(displayString, getPriceHoverTooltip(colorCode))
+            else Renderable.hoverTips(
+                displayString,
+                getPriceHoverTooltip(displayType, colorCode)
+            )
         }
 
-        fun getPriceHoverTooltip(colorCode: String): List<String> {
+        fun getPriceHoverTooltip(displayType: DisplayType, colorCode: String): List<String> {
             return if (isSingular) {
-                listOf("${colorCode}Year $start§7: ${getCakePriceString(start)}")
+                listOf(
+                    "${colorCode}Year $start§7: ${getCakePriceString(start)}",
+                    "§eClick to search auction house",
+                )
             } else buildList {
                 val largerNumber = if (start > end) start else end
                 val smallerNumber = if (start < end) start else end
@@ -317,6 +323,9 @@ object CakeTracker {
                 if (rangeLength >= 5) add("§7§o... and ${rangeLength - 5} more")
                 add("")
                 add("§aTotal§7: §6${numericalRange.sumOf(::getCakePrice).addSeparators()}")
+                if (displayType == DisplayType.MISSING_CAKES) {
+                    add("§eClick to search auction house")
+                }
             }
         }
     }
@@ -417,59 +426,46 @@ object CakeTracker {
             val colorCode = if (config.displayType == DisplayType.OWNED_CAKES) "§c" else "§a"
             val verbiage = if (config.displayType == DisplayType.OWNED_CAKES) "missing" else "owned"
             add(Renderable.string("$colorCode§lAll cakes $verbiage!"))
-        } else addCakeRanges(cakeList, config.displayOrderType, config.displayType)
+        } else add(
+            Renderable.scrollList(
+                getCakeRanges(cakeList, config.displayOrderType, config.displayType),
+                height = maxTrackerHeight,
+                velocity = 20.0,
+                showScrollableTipsInList = true
+            )
+        )
     }
 
-    private fun MutableList<Renderable>.addCakeRanges(
+    private fun getCakeRanges(
         cakeList: Set<Int>,
         orderType: DisplayOrder,
         displayType: DisplayType,
-    ) {
+    ): List<Renderable> = buildList {
         val sortedCakes = when (orderType) {
             DisplayOrder.OLDEST_FIRST -> cakeList.sorted()
             DisplayOrder.NEWEST_FIRST -> cakeList.sortedDescending()
         }
 
-        // Combine consecutive years into ranges
-        // + 3 is to account for the header and selector boxes
-        val maxDisplayRows = config.maxDisplayRows.get() + 3
         var start = sortedCakes.first()
         var end = start
-        var hiddenRows = 0
 
         for (year in sortedCakes.drop(1)) { // Skip the first item to prevent duplicate addition
-            if ((orderType == DisplayOrder.OLDEST_FIRST && year == end + 1) ||
-                (orderType == DisplayOrder.NEWEST_FIRST && year == end - 1)
-            ) {
-                end = year
-            } else {
-                if (this.size < maxDisplayRows) {
-                    val range = if (start != end) CakeRange(start, end) else CakeRange(start)
-                    add(range.getRenderable(displayType))
-                } else {
-                    hiddenRows++
-                    start = year
-                    end = start
-                    continue
-                }
+            val oldestFirstAtEnd = orderType == DisplayOrder.OLDEST_FIRST && year == end + 1
+            val newestFirstAtEnd = orderType == DisplayOrder.NEWEST_FIRST && year == end - 1
+
+            if (oldestFirstAtEnd || newestFirstAtEnd) end = year
+            else {
+                val range = if (start != end) CakeRange(start, end) else CakeRange(start)
+                add(range.getRenderable(displayType))
                 start = year
                 end = start
             }
         }
 
-        if (this.size < maxDisplayRows) {
-            val lastRange = if (start != end) CakeRange(start, end) else CakeRange(start)
-            add(lastRange.getRenderable(displayType))
-        } else {
-            hiddenRows++
-        }
+        val lastRange =
+            if (start != end) CakeRange(start, end)
+            else CakeRange(start)
 
-        if (hiddenRows > 0) add(
-            Renderable.clickAndHover(
-                "§7§o($hiddenRows hidden rows)",
-                tips = listOf("§eClick to configure # of displayed rows"),
-                onClick = { config::maxDisplayRows.jumpToEditor() },
-            ),
-        )
+        add(lastRange.getRenderable(displayType))
     }
 }
