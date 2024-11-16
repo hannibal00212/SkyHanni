@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -25,15 +25,15 @@ object CurrentPetDisplay {
     private val patternGroup = RepoPattern.group("misc.currentpet")
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
-        "§7§7Selected pet: (?<pet>.*)"
+        "§7§7Selected pet: (?<pet>.*)",
     )
     private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
-        "§aYou summoned your §r(?<pet>.*)§r§a!"
+        "§aYou summoned your §r(?<pet>.*)§r§a!",
     )
     private val chatDespawnPattern by patternGroup.pattern(
         "chat.despawn",
-        "§aYou despawned your §r.*§r§a!"
+        "§aYou despawned your §r.*§r§a!",
     )
 
     /**
@@ -42,7 +42,7 @@ object CurrentPetDisplay {
      */
     private val chatPetRulePattern by patternGroup.pattern(
         "chat.rule",
-        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)§e! §a§lVIEW RULE"
+        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)§e! §a§lVIEW RULE",
     )
 
     @SubscribeEvent
@@ -74,7 +74,7 @@ object CurrentPetDisplay {
         if (!PetAPI.isPetMenu(event.inventoryName)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
-        lore.matchFirst(inventorySelectedPetPattern) {
+        inventorySelectedPetPattern.firstMatcher(lore) {
             val newPet = group("pet")
             PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
         }

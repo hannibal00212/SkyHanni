@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -272,7 +272,7 @@ object MaxwellAPI {
 
     private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
         val item = inventoryItems[48] ?: return
-        item.getLore().matchFirst(thaumaturgyMagicalPowerPattern) {
+        thaumaturgyMagicalPowerPattern.firstMatcher(item.getLore()) {
             magicalPower = group("mp").formatInt()
         }
     }
@@ -324,7 +324,7 @@ object MaxwellAPI {
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo
     @SubscribeEvent

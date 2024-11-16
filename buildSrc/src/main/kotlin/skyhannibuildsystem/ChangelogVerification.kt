@@ -29,7 +29,7 @@ abstract class ChangelogVerification : DefaultTask() {
 
     @TaskAction
     fun scanChangelog() {
-        if (prBodyLines.contains("exclude_from_changelog")) {
+        if (prBodyLines.let { it.contains("exclude_from_changelog") || it.contains("ignore_from_changelog") }) {
             println("PR is excluded from changelog verification")
             return
         }
