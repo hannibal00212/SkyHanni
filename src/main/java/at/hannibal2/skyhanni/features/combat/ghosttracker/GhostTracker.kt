@@ -368,15 +368,15 @@ object GhostTracker {
             return newData
         }
 
-        event.move(66, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
-        event.move(66, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
-        event.move(66, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
-        event.move(66, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
-        event.move(66, "#profile.ghostCounter.totalMF", "#profile.ghostStorage.ghostTracker.totalMagicFind")
+        event.move(67, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
+        event.move(67, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
+        event.move(67, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
+        event.move(67, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
+        event.move(67, "#profile.ghostCounter.totalMF", "#profile.ghostStorage.ghostTracker.totalMagicFind")
 
-        event.move(66, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW", ::migrateItem)
-        event.move(66, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA", ::migrateItem)
-        event.move(66, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA", ::migrateItem)
-        event.move(66, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS", ::migrateItem)
+        event.move(67, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW", ::migrateItem)
+        event.move(67, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA", ::migrateItem)
+        event.move(67, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA", ::migrateItem)
+        event.move(67, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS", ::migrateItem)
     }
 }
