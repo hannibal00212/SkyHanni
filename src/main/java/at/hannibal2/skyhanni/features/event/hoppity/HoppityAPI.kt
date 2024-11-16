@@ -133,7 +133,7 @@ object HoppityAPI {
      */
     private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.misc",
-        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
+        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) ?)(?:Milestones|Egg)?",
     )
 
     private fun addProcessedSlot(slot: Slot) {
