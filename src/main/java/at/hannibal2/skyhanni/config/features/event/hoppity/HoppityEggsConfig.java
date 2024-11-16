@@ -30,6 +30,11 @@ public class HoppityEggsConfig {
     public HoppityWarpMenuConfig warpMenu = new HoppityWarpMenuConfig();
 
     @Expose
+    @ConfigOption(name = "Stray Timer", desc = "")
+    @Accordion
+    public HoppityStrayTimerConfig strayTimer = new HoppityStrayTimerConfig();
+
+    @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
     @ConfigEditorBoolean
     @FeatureToggle
