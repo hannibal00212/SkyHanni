@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getNextUnlockedRabbitWorker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getNextUpgrade
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getUpgradeCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
