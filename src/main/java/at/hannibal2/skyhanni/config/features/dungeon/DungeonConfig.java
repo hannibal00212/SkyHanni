@@ -9,6 +9,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class DungeonConfig {
+    @Expose
+    @ConfigOption(name = "M7", desc = "")
+    @Accordion
+    public M7Config m7config = new M7Config();
 
     @Expose
     @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")

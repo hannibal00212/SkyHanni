@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.DungeonM7Phase5Start
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -96,6 +97,10 @@ object DungeonAPI {
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
         "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
+    )
+    private val phase5Start by patternGroup.pattern(
+        "m7.p5start",
+        "§4\\[BOSS] Necron§r§c: §r§cAll this, for nothing\\.\\.\\."
     )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
@@ -251,6 +256,9 @@ object DungeonAPI {
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
             DungeonStartEvent(floor).postAndCatch()
+        }
+        if (phase5Start.matches(event.message)) {
+            DungeonM7Phase5Start().postAndCatch()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {
             isUniqueClass = true
