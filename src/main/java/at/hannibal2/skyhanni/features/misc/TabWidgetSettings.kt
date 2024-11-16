@@ -17,29 +17,44 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
+
+    /**
+     * REGEX-TEST: Widgets on Private Island
+     * REGEX-TEST: Widgets in Crystal Hollows
+     */
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "(Widgets in.*|Widgets on.*)"
+        "(Widgets in.*|Widgets on.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Currently: §aALWAYS ENABLED
+     * REGEX-TEST: §7Currently: §cDISABLED
+     */
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
-        "§7Currently:.*"
+        "§7Currently:.*",
     )
+
+    /**
+     * REGEX-TEST: §eClick to disable!
+     * REGEX-TEST: §eClick to edit!
+     */
     private val subPageWidgetPattern by patternGroup.pattern(
         "sub",
-        "§eClick to .*"
+        "§eClick to .*",
     )
     private val shownSettingPattern by patternGroup.pattern(
         "show",
-        "Shown .* Setting.*|.*Widget Settings"
+        "Shown .* Setting.*|.*Widget Settings",
     )
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
-        ".*(disable!)"
+        ".*(disable!)",
     )
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",
-        ".*ENABLED"
+        ".*ENABLED",
     )
 
     var inInventory = false

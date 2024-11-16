@@ -47,6 +47,11 @@ object HypixelData {
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
     )
+
+    /**
+     * REGEX-TEST: §ewww.hypixel.net
+     * REGEX-TEST: §ealpha.hypixel.net
+     */
     private val serverNameScoreboardPattern by patternGroup.pattern(
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
@@ -56,6 +61,11 @@ object HypixelData {
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
     )
+
+    /**
+     * REGEX-TEST: §711/15/24 §8m19CJ
+     * REGEX-TEST: §711/15/24 §8m1F
+     */
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
         "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
@@ -64,14 +74,26 @@ object HypixelData {
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+",
     )
+
+    /**
+     * REGEX-TEST:          §r§a§lPlayers §r§f(5)
+     */
     private val playerAmountPattern by patternGroup.pattern(
         "playeramount",
         "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
     )
+
+    /**
+     * REGEX-TEST:           §r§b§lCoop §r§f(4)
+     */
     private val playerAmountCoopPattern by patternGroup.pattern(
         "playeramount.coop",
         "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
     )
+
+    /**
+     * REGEX-TEST:           §r§5§lGuests §r§f(0)
+     */
     private val playerAmountGuestingPattern by patternGroup.pattern(
         "playeramount.guesting",
         "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",

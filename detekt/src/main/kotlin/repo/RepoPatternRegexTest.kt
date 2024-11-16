@@ -45,7 +45,7 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
                 is KtEscapeStringTemplateEntry -> entry.unescapedValue
                 else -> "" // Skip any other types of entries
             }
-        }.removeSurrounding("\"")
+        }.removeSurrounding("\"").replace("\n", "")
 
         if (!rawPattern.needsRegexTest()) return
 

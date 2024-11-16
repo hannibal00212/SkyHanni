@@ -58,6 +58,9 @@ object BitsAPI {
     private val bitsDataGroup = RepoPattern.group("data.bits")
 
     // Scoreboard patterns
+    /**
+     * REGEX-TEST: Bits: §b140,965
+     */
     val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
         "^Bits: §b(?<amount>[\\d,.]+).*$",
@@ -77,6 +80,11 @@ object BitsAPI {
         "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)",
     )
 
+    /**
+     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e! §dYummy!
+     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e!
+     * REGEX-TEST: §eYou consumed a §6Booster Cookie§e! §dDivine!
+     */
     private val boosterCookieAte by bitsChatGroup.pattern(
         "boostercookieate",
         "§eYou consumed a §6Booster Cookie§e!.*",

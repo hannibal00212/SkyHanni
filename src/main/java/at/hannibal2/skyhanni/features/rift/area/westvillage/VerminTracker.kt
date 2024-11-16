@@ -29,22 +29,44 @@ import java.util.regex.Pattern
 object VerminTracker {
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aSilverfish§r§e!
+     */
     private val silverfishPattern by patternGroup.pattern(
         "silverfish",
         ".*§eYou vacuumed a §.*Silverfish.*"
     )
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aSpider§r§e!
+     */
     private val spiderPattern by patternGroup.pattern(
         "spider",
         ".*§eYou vacuumed a §.*Spider.*"
     )
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aFly§r§e!
+     */
     private val flyPattern by patternGroup.pattern(
         "fly",
         ".*§eYou vacuumed a §.*Fly.*"
     )
+
+    /**
+     * REGEX-TEST: §fVermin Bin: §a27 Silverfishes
+     * REGEX-TEST: §fVermin Bin: §a19 Flies
+     */
     private val verminBinPattern by patternGroup.pattern(
         "binline",
         "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)"
     )
+
+    /**
+     * REGEX-TEST: §fVacuum Bag: §72 Silverfishes
+     * REGEX-TEST: §fVacuum Bag: §70 Spiders
+     */
     private val verminBagPattern by patternGroup.pattern(
         "bagline",
         "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)"

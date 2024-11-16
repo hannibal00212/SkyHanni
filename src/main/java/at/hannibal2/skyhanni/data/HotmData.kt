@@ -179,9 +179,6 @@ enum class HotmData(
         { level -> mapOf(HotmReward.MINING_SPEED to level * 40.0) },
     ),
 
-
-
-
     SUBTERRANEAN_FISHER(
         "Subterranean Fisher",
         40,
@@ -192,7 +189,6 @@ enum class HotmData(
                 HotmReward.SEA_CREATURE_CHANCE to 1 + (level * 0.1),
             )
         },
-
     ),
 
 
@@ -443,10 +439,15 @@ enum class HotmData(
             "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|",
         )
 
+        /**
+         * REGEX-TEST: §a§lSELECTED
+         * REGEX-TEST: §a§lENABLED
+         */
         private val enabledPattern by patternGroup.pattern(
             "perk.enable",
             "§a§lENABLED|(§.)*SELECTED",
         )
+
         @Suppress("UnusedPrivateProperty")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
@@ -454,6 +455,9 @@ enum class HotmData(
         ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 
+        /**
+         * REGEX-TEST: §7Cost
+         */
         val perkCostPattern by patternGroup.pattern(
             "perk.cost",
             "(?:§.)*§7Cost",
@@ -461,7 +465,7 @@ enum class HotmData(
 
         private val resetChatPattern by patternGroup.pattern(
             "reset.chat",
-            "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset.",
+            "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset\\.",
         )
 
         private val heartItemPattern by patternGroup.pattern(
@@ -473,11 +477,17 @@ enum class HotmData(
             "§cReset Heart of the Mountain",
         )
 
+        /**
+         * REGEX-TEST: §7Token of the Mountain: §515
+         */
         private val heartTokensPattern by patternGroup.pattern(
             "inventory.heart.token",
             "§7Token of the Mountain: §5(?<token>\\d+)",
         )
 
+        /**
+         * REGEX-TEST:   §8- §54 Token of the Mountain
+         */
         private val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
             "\\s+§8- §5(?<token>\\d+) Token of the Mountain",
@@ -499,7 +509,7 @@ enum class HotmData(
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)"
+            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
         )
 
         var inInventory = false
