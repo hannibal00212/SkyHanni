@@ -38,10 +38,11 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Déjeuner Egg §r§dwithin the wither cage§r§d!
      */
     val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!",
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>[\\wé]+) Egg §r§d(?<note>.*)§r§d!",
     )
 
     /**

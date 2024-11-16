@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.detektrules.userepo
+package at.hannibal2.skyhanni.detektrules.repo
 
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config

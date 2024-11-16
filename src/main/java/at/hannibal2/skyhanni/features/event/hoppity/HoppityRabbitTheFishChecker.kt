@@ -28,7 +28,7 @@ object HoppityRabbitTheFishChecker {
      */
     val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.name",
-        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner) Egg.*",
+        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
 
     /**
