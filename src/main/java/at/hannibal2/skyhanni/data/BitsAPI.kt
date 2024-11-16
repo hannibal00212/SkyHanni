@@ -70,12 +70,18 @@ object BitsAPI {
     // Chat patterns
     private val bitsChatGroup = bitsDataGroup.group("chat")
 
+    /**
+     * REGEX-TEST: §eYou gained §317,664 Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!
+     */
     @Suppress("MaxLineLength")
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "rankup.bits",
         "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
     )
 
+    /**
+     * REGEX-TEST: §6  §6§lFAME RANK UP §eStatesperson
+     */
     private val fameRankUpPattern by bitsChatGroup.pattern(
         "rankup.rank",
         "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)",
@@ -104,7 +110,7 @@ object BitsAPI {
      */
     private val bitsPurseMenuPattern by bitsGuiGroup.pattern(
         "bitsmenu",
-        "^§7Bits Purse: §b(?<amount>[\\d,.]+)"
+        "^§7Bits Purse: §b(?<amount>[\\d,.]+)",
     )
 
     private val fameRankSbMenuPattern by bitsGuiGroup.pattern(

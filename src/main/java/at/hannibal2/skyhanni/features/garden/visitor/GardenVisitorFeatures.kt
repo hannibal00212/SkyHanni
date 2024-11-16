@@ -85,20 +85,32 @@ object GardenVisitorFeatures {
 
     /**
      * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
-     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
      */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
         ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
+
+    /**
+     * REGEX-TEST:  §8+§c20 Copper
+     */
     private val copperPattern by patternGroup.pattern(
         "copper",
         " §8\\+§c(?<amount>.*) Copper",
     )
+
+    /**
+     * REGEX-TEST:  §8+§215 §7Garden Experience
+     */
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",
         " §8\\+§2(?<amount>.*) §7Garden Experience",
     )
+
+    /**
+     * REGEX-TEST: §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm. Bring me your fanciest crop.
+     * REGEX-TEST: §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium. But it's too dark to see in there, even for me! Can you spare any glowing pumpkins?
+     */
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
         "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",

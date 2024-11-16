@@ -125,6 +125,6 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
     }
 
     companion object {
-        val regexConstructs = Regex("""(?<!\\)[.*+(){}\[\]|?]""")
+        val regexConstructs = Regex("""(?<!\\)[.*+(){}\[|?]""")
     }
 }
