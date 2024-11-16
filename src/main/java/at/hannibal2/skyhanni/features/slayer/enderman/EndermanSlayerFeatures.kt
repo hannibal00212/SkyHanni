@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -70,7 +70,7 @@ object EndermanSlayerFeatures {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
-                        beaconConfig.beaconColor.toChromaColor().withAlpha(1),
+                        beaconConfig.beaconColor.toChromaColor().addAlpha(1),
                     ) {
                         beaconConfig.highlightBeacon
                     }
@@ -89,7 +89,7 @@ object EndermanSlayerFeatures {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
-                    LorenzColor.GOLD.toColor().withAlpha(1),
+                    LorenzColor.GOLD.toColor().addAlpha(1),
                 ) { config.highlightNukekebi }
                 logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
@@ -139,7 +139,7 @@ object EndermanSlayerFeatures {
                     skullLocation.up(),
                     LorenzColor.GOLD.toColor(),
                     3,
-                    true
+                    true,
                 )
             }
         }

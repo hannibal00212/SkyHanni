@@ -12,8 +12,10 @@ FormattingRules:
     CustomAnnotationSpacing:
         active: true
 
-UseRepoRules:
+RepoRules:
     SkullTexturesUseRepo:
+        active: true
+    RepoPatternRegexTest:
         active: true
 
 ImportRules:

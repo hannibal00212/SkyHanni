@@ -236,6 +236,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Options to highlight good rolls in different colors, show only certain attributes, etc.
 + Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
     +  Assists with maxing upgrades.
++ Added New Year Cake Tracker. - Daveed. (https://github.com/hannibal002/SkyHanni/pull/2237)
+    +  Highlights unowned cakes in AH.
+    +  Displays a list of missing cake years.
 
 </details>
 <details open><summary>

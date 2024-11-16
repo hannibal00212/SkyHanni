@@ -53,10 +53,10 @@ object EnchantParser {
         "^(?:(?:§.)+([A-Za-z][A-Za-z '-]+) (?:[IVXLCDM]+|[0-9]+)(?:[§r]?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
     // Above regex tests apply to this pattern also
+    @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)" +
-            "(?<stacking>(§r)?§9, |\$| §8\\d{1,3}([,.]\\d{1,3})*[kKmMbB]?)",
+        "(§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}([,.]\\d{1,3})*[kKmMbB]?)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",

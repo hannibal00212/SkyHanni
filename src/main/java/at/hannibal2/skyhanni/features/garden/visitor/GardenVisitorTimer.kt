@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -83,7 +83,7 @@ object GardenVisitorTimer {
         var millis = visitorInterval
         var queueFull = false
 
-        TabListData.getTabList().matchFirst(timePattern) {
+        timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
                 display = Renderable.string("§cVisitors not unlocked!")
