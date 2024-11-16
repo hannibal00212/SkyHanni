@@ -57,6 +57,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -528,6 +529,26 @@ public class ProfileSpecificStorage {
 
     }
 
+    public static class CakeData {
+        @Expose
+        public Set<Integer> ownedCakes = new HashSet<>();
+
+        @Expose
+        public Set<Integer> missingCakes = new HashSet<>();
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ownedCakes.hashCode();
+            result = prime * result + missingCakes.hashCode();
+            return result;
+        }
+    }
+
+    @Expose
+    public CakeData cakeData = new CakeData();
+
     @Expose
     public PowderTracker.Data powderTracker = new PowderTracker.Data();
 
@@ -751,10 +772,7 @@ public class ProfileSpecificStorage {
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     @Expose
-    public Boolean hoppityStatLiveDisplayToggled = false;
-
-    @Expose
-    public Integer hoppityStatLiveDisplayYear = -1;
+    public Boolean hoppityStatLiveDisplayToggledOff = false;
 
     public static class HoppityEventStats {
         @Expose

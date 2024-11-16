@@ -1,20 +1,25 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 
 private val repoGroup by RepoPattern.exclusiveGroup("tab.widget.enum")
 
@@ -371,8 +376,22 @@ enum class TabWidget(
         /** Patterns that where loaded from a future version*/
         private var extraPatterns: List<Pattern> = emptyList()
 
+        private var sentSinceWorldChange = false
+
         init {
             entries.forEach { it.pattern }
+        }
+
+        private val FORCE_UPDATE_DELAY = 2.seconds
+
+        @SubscribeEvent
+        fun onSecond(event: SecondPassedEvent) {
+            if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
+            if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
+            sentSinceWorldChange = true
+            @Suppress("DEPRECATION")
+            update(TabListData.getTabList())
+            ChatUtils.debug("Forcefully Updated Widgets")
         }
 
         @SubscribeEvent(priority = EventPriority.HIGH)
@@ -384,8 +403,11 @@ enum class TabWidget(
                 }
                 return
             }
+            update(event.tabList)
+        }
 
-            val tabList = filterTabList(event.tabList)
+        private fun update(newTablist: List<String>) {
+            val tabList = filterTabList(newTablist)
 
             separatorIndexes.clear()
 
@@ -407,6 +429,11 @@ enum class TabWidget(
             separatorIndexes.forEach {
                 it.second?.gotChecked = false
             }
+        }
+
+        @SubscribeEvent
+        fun onWorldChange(event: LorenzWorldChangeEvent) {
+            sentSinceWorldChange = false
         }
 
         @SubscribeEvent(priority = EventPriority.LOW)
