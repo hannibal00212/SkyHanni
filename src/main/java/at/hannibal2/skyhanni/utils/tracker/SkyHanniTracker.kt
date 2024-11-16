@@ -104,9 +104,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
             add(buildDisplayModeView())
-        }
-        if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
-            add(buildSessionResetButton())
+            if (getDisplayMode() == DisplayMode.SESSION) {
+                add(buildSessionResetButton())
+            }
         }
     }
 
