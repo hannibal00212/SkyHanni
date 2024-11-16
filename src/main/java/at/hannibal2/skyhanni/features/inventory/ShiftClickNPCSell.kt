@@ -24,7 +24,7 @@ object ShiftClickNPCSell {
      */
     private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",
-        "§7them to this Shop!|§eClick to buyback!"
+        "§7them to this Shop!|§eClick to buyback!",
     )
 
     var inInventory = false

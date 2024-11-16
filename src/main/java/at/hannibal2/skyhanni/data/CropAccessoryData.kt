@@ -22,7 +22,7 @@ object CropAccessoryData {
      */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "data.accessory.bagname.new",
-        "Accessory Bag.*"
+        "Accessory Bag.*",
     )
 
     private var accessoryInBag = CropAccessory.NONE

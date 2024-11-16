@@ -35,7 +35,7 @@ object VerminTracker {
      */
     private val silverfishPattern by patternGroup.pattern(
         "silverfish",
-        ".*§eYou vacuumed a §.*Silverfish.*"
+        ".*§eYou vacuumed a §.*Silverfish.*",
     )
 
     /**
@@ -43,7 +43,7 @@ object VerminTracker {
      */
     private val spiderPattern by patternGroup.pattern(
         "spider",
-        ".*§eYou vacuumed a §.*Spider.*"
+        ".*§eYou vacuumed a §.*Spider.*",
     )
 
     /**
@@ -51,7 +51,7 @@ object VerminTracker {
      */
     private val flyPattern by patternGroup.pattern(
         "fly",
-        ".*§eYou vacuumed a §.*Fly.*"
+        ".*§eYou vacuumed a §.*Fly.*",
     )
 
     /**
@@ -60,7 +60,7 @@ object VerminTracker {
      */
     private val verminBinPattern by patternGroup.pattern(
         "binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
 
     /**
@@ -69,7 +69,7 @@ object VerminTracker {
      */
     private val verminBagPattern by patternGroup.pattern(
         "bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
 
     private var hasVacuum = false
@@ -143,7 +143,7 @@ object VerminTracker {
         val verminCounts = mutableMapOf(
             VerminType.SILVERFISH to 0,
             VerminType.SPIDER to 0,
-            VerminType.FLY to 0
+            VerminType.FLY to 0,
         )
         for (line in lore) {
             pattern.matchMatcher(line) {
