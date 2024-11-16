@@ -21,22 +21,14 @@ typealias RarityType = HoppityEggsConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var hoppityDataSet = HoppityStateDataSet()
-
-    fun processChatEvent(
-        event: LorenzChatEvent?,
-        dataSet: HoppityStateDataSet
-    ) {
-        hoppityDataSet = dataSet.copy()
-        if (event != null) compactChat(event)
-    }
-
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val rarityConfig get() = HoppityEggsManager.config.rarityInCompact
 
-    private fun compactChat(event: LorenzChatEvent) {
+    fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
         if (!HoppityEggsManager.config.compactChat) return
-        event.blockedReason = "compact_hoppity"
+        hoppityDataSet = dataSet.copy()
+        event?.let { it.blockedReason = "compact_hoppity" }
         if (hoppityDataSet.hoppityMessages.size == 3) sendCompact()
     }
 

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.HITMAN
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryBarnManager
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
@@ -142,7 +143,6 @@ object HoppityAPI {
         var duplicate: Boolean = false,
         var lastRarity: String = "",
         var lastName: String = "",
-        var lastNameCache: String = "",
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
         var lastDuplicateAmount: Long? = null
@@ -166,7 +166,6 @@ object HoppityAPI {
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
-    fun getLastRabbit(): String = hoppityDataSet.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
         SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
@@ -329,7 +328,7 @@ object HoppityAPI {
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.lastName = group("name")
-            hoppityDataSet.lastNameCache = hoppityDataSet.lastName
+            ChocolateFactoryBarnManager.processDataSet(hoppityDataSet)
             hoppityDataSet.lastRarity = group("rarity")
             attemptFireRabbitFound(event)
         }
@@ -355,7 +354,7 @@ object HoppityAPI {
             hoppityDataSet.duplicate = true
         }
         if (event != null) hoppityDataSet.hoppityMessages.add(event.message)
-        HoppityEggsCompactChat.processChatEvent(event, hoppityDataSet)
+        HoppityEggsCompactChat.compactChat(event, hoppityDataSet)
 
         // Theoretically impossible, but a failsafe.
         if (hoppityDataSet.lastMeal == null) return

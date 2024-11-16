@@ -35,6 +35,11 @@ object ChocolateFactoryBarnManager {
 
     var barnFull = false
     private var sentBarnFullWarning = false
+    private var lastRabbit = ""
+
+    fun processDataSet(dataSet: HoppityAPI.HoppityStateDataSet) {
+        lastRabbit = dataSet.lastName
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -60,7 +65,7 @@ object ChocolateFactoryBarnManager {
             HoppityAPI.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
 
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
-                (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit())).takeIf { it > 0 }?.let {
+                (HoppityCollectionStats.getRabbitCount(lastRabbit)).takeIf { it > 0 }?.let {
                     event.chatComponent = ChatComponentText(
                         event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"),
                     )
