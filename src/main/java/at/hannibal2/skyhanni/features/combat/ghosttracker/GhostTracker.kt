@@ -115,7 +115,7 @@ object GhostTracker {
     private val patternGroup = RepoPattern.group("combat.ghosttracker")
 
     /**
-     * REGEX-TEST: §5§l+20 Kill Combo §r§8§r§3+15☯ Combat Wisdom
+     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b✯ Magic Find§r§b)
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
