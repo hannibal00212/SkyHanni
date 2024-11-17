@@ -121,9 +121,6 @@ object NEUItems {
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
