@@ -306,10 +306,12 @@ object HoppityAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
+            val alreadyHitman = hoppityDataSet.lastMeal == HITMAN
             hoppityDataSet.reset()
-            hoppityDataSet.lastMeal = HITMAN.takeIf {
-                hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName()) && hitmanClaimable-- >= 0
-            } ?: getEggType(event)
+            val multiHitmanActive = hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName()) && hitmanClaimable > 0
+            hoppityDataSet.lastMeal =
+                if (alreadyHitman || multiHitmanActive) HITMAN
+                else getEggType(event)
 
             hoppityDataSet.lastMeal?.let { meal ->
                 EggFoundEvent(
