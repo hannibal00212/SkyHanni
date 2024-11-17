@@ -440,7 +440,7 @@
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$lastParticlePoint2!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$lastParticlePoint2?.distance(particlePoint!!)!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint!!</ID>
-    <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint?.subtract(lastParticlePoint2!!)!!</ID>
+    <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint?.let { it - lastParticlePoint2!! }!!</ID>
     <ID>UnsafeCallOnNullableType:SummoningSoulsName.kt$SummoningSoulsName$mobsName.getOrNull(nearestMob)!!</ID>
     <ID>UnsafeCallOnNullableType:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:TiaRelayWaypoints.kt$TiaRelayWaypoints$waypointName!!</ID>
