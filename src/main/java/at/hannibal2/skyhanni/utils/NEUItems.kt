@@ -37,7 +37,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
 
 @SkyHanniModule
 object NEUItems {
@@ -117,13 +116,6 @@ object NEUItems {
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
-
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getPrice(
-        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<PrimitiveRecipe> = emptyList(),
-    ): Double = getPriceNew(priceSource, pastRecipes)
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()

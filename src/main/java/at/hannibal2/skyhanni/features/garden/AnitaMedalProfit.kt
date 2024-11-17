@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -114,8 +114,8 @@ object AnitaMedalProfit {
                 profit,
                 internalName,
                 hover,
-                highlightsOnHoverSlots = listOf(slot)
-            )
+                highlightsOnHoverSlots = listOf(slot),
+            ),
         )
     }
 
@@ -178,7 +178,7 @@ object AnitaMedalProfit {
             config.medalProfitPos.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "Anita Medal Profit"
+                posLabel = "Anita Medal Profit",
             )
         }
     }
