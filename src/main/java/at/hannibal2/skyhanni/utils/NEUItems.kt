@@ -38,7 +38,6 @@ import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull as getPriceOrNullNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRawCraftCostOrNullNew
 
@@ -120,13 +119,6 @@ object NEUItems {
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
-
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getPrice(
-        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<PrimitiveRecipe> = emptyList(),
-    ): Double = getPriceNew(priceSource, pastRecipes)
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
