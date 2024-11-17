@@ -29,6 +29,11 @@ object InGameDateDisplay {
         "date",
         ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*",
     )
+
+    /**
+     * REGEX-TEST: 8:30am ☀
+     * REGEX-TEST: 11:40pm ☽
+     */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",
         "([☀☽࿇])",

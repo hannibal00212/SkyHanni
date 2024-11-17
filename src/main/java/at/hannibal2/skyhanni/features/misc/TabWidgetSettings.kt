@@ -44,14 +44,26 @@ object TabWidgetSettings {
         "sub",
         "§eClick to .*",
     )
+
+    /**
+     * REGEX-TEST: Profile Widget Settings
+     */
     private val shownSettingPattern by patternGroup.pattern(
         "show",
         "Shown .* Setting.*|.*Widget Settings",
     )
+
+    /**
+     * REGEX-TEST: §eClick to disable!
+     */
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
         ".*(disable!)",
     )
+
+    /**
+     * REGEX-TEST: §7Currently: §aENABLED
+     */
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",
         ".*ENABLED",

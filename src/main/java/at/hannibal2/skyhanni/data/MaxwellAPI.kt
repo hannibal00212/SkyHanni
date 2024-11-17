@@ -142,10 +142,18 @@ object MaxwellAPI {
         "gui.noselectedpower",
         "(?:§.)*Visit Maxwell in the Hub to learn",
     )
+
+    /**
+     * REGEX-TEST: §aAccessory Bag
+     */
     private val accessoryBagStack by patternGroup.pattern(
         "stack.accessorybag",
         "§.Accessory Bag",
     )
+
+    /**
+     * REGEX-TEST: §7§c§cRequires §aRedstone Collection II§c.
+     */
     private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",

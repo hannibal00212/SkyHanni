@@ -100,6 +100,9 @@ object BitsAPI {
     // GUI patterns
     private val bitsGuiGroup = bitsDataGroup.group("gui")
 
+    /**
+     * REGEX-TEST: §7Bits Available: §b19,176
+     */
     private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
         "§7Bits Available: §b(?<toClaim>[\\d,]+)(§3.+)?",
@@ -113,6 +116,9 @@ object BitsAPI {
         "^§7Bits Purse: §b(?<amount>[\\d,.]+)",
     )
 
+    /**
+     * REGEX-TEST: §7Your rank: §eAttaché
+     */
     private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)",
@@ -131,11 +137,18 @@ object BitsAPI {
         " §7Status: §cNot active!",
     )
 
+    /**
+     * REGEX-TEST: §7§cYou do not currently have a
+     * REGEX-TEST: §cBooster Cookie active!
+     */
     private val noCookieActiveCookieMenuPattern by bitsGuiGroup.pattern(
         "cookiemenucookieactive",
         "(§7§cYou do not currently have a|§cBooster Cookie active!)",
     )
 
+    /**
+     * REGEX-TEST: §7Fame Rank: §eAttaché
+     */
     private val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
         "communityshopfamerank",
         "§7Fame Rank: §e(?<rank>.*)",
@@ -156,11 +169,19 @@ object BitsAPI {
         "§bBits",
     )
 
+    /**
+     * REGEX-TEST: Community Shop
+     * REGEX-TEST: Booster Cookie
+     */
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
         "famerankmenuname",
         "^(Community Shop|Booster Cookie)$",
     )
 
+    /**
+     * REGEX-TEST: §aCommunity Shop
+     * REGEX-TEST: §eFame Rank
+     */
     private val fameRankGuiStackPattern by bitsGuiGroup.pattern(
         "famerankmenustack",
         "^(§aCommunity Shop|§eFame Rank)$",

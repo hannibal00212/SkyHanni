@@ -59,10 +59,19 @@ object BestiaryData {
         "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
     )
 
+    /**
+     * REGEX-TEST: 9/10
+     * REGEX-TEST: 6/6
+     */
     private val progressPattern by patternGroup.pattern(
         "progress",
         "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
     )
+
+    /**
+     * REGEX-TEST: (1/2) Bestiary ➜ The Catacombs
+     * REGEX-TEST: Bestiary ➜ Dwarven Mines
+     */
     private val titlePattern by patternGroup.pattern(
         "title",
         "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"

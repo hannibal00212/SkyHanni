@@ -73,6 +73,9 @@ object HoppityEggsManager {
         "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))",
     )
 
+    /**
+     * REGEX-TEST: §7§lDUPLICATE RABBIT! §6+6,759,912 Chocolate
+     */
     val duplicateRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.duplicate",
         "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate",
@@ -82,13 +85,23 @@ object HoppityEggsManager {
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!",
     )
+
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Lunch Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Déjeune Egg §r§dhas appeared!
+     */
     private val eggSpawnedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.spawned",
-        "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>\\w+) Egg §r§dhas appeared!",
+        "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>[\\wé]+) Egg §r§dhas appeared!",
     )
+
+    /**
+     * REGEX-TEST: §cYou have already collected this Chocolate Breakfast Egg§r§c! Try again when it respawns!
+     * REGEX-TEST: §cYou have already collected this Chocolate Déjeune Egg§r§c! Try again when it respawns!
+     */
     private val eggAlreadyCollectedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.alreadycollected",
-        "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!",
+        "§cYou have already collected this Chocolate (?<meal>[\\wé]+) Egg§r§c! Try again when it respawns!",
     )
     private val hoppityEventNotOn by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.notevent",

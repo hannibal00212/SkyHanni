@@ -448,10 +448,14 @@ enum class HotmData(
             "§a§lENABLED|(§.)*SELECTED",
         )
 
+        /**
+         * REGEX-TEST: §eClick to select!
+         * REGEX-TEST: §c§lDISABLED
+         */
         @Suppress("UnusedPrivateProperty")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
-            "§c§lDISABLED|§7§eClick to select!",
+            "§c§lDISABLED|§eClick to select!",
         ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 

@@ -45,17 +45,31 @@ object SackAPI {
     var inSackInventory = false
 
     private val patternGroup = RepoPattern.group("data.sacks")
+
+    /**
+     * REGEX-TEST: Fishing Sack
+     * REGEX-TEST: Enchanted Agronomy Sack
+     */
     private val sackPattern by patternGroup.pattern(
         "sack",
         "^(.* Sack|Enchanted .* Sack)\$",
     )
 
+    /**
+     * REGEX-TEST: §7Stored: §e28,183§7/60.5k
+     * REGEX-TEST: §7Stored: §80§7/60.5k
+     */
     @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
 
+    /**
+     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
+     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
+     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
+     */
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
