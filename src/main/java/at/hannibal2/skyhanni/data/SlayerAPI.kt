@@ -137,32 +137,32 @@ object SlayerAPI {
     fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
         "Graveyard",
         "Coal Mine",
-            -> SlayerType.REVENANT
+        -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
         "Arachne's Sanctuary",
         "Burning Desert",
-            -> SlayerType.TARANTULA
+        -> SlayerType.TARANTULA
 
         "Ruins",
         "Howling Cave",
-            -> SlayerType.SVEN
+        -> SlayerType.SVEN
 
         "The End",
         "Dragon's Nest",
         "Void Sepulture",
         "Zealot Bruiser Hideout",
-            -> SlayerType.VOID
+        -> SlayerType.VOID
 
         "Stronghold",
         "The Wasteland",
         "Smoldering Tomb",
-            -> SlayerType.INFERNO
+        -> SlayerType.INFERNO
 
         "Stillgore Château",
         "Oubliette",
-            -> SlayerType.VAMPIRE
+        -> SlayerType.VAMPIRE
 
         else -> null
     }
