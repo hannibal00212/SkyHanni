@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -137,32 +137,32 @@ object SlayerAPI {
     fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
         "Graveyard",
         "Coal Mine",
-        -> SlayerType.REVENANT
+            -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
         "Arachne's Sanctuary",
         "Burning Desert",
-        -> SlayerType.TARANTULA
+            -> SlayerType.TARANTULA
 
         "Ruins",
         "Howling Cave",
-        -> SlayerType.SVEN
+            -> SlayerType.SVEN
 
         "The End",
         "Dragon's Nest",
         "Void Sepulture",
         "Zealot Bruiser Hideout",
-        -> SlayerType.VOID
+            -> SlayerType.VOID
 
         "Stronghold",
         "The Wasteland",
         "Smoldering Tomb",
-        -> SlayerType.INFERNO
+            -> SlayerType.INFERNO
 
         "Stillgore Château",
         "Oubliette",
-        -> SlayerType.VAMPIRE
+            -> SlayerType.VAMPIRE
 
         else -> null
     }

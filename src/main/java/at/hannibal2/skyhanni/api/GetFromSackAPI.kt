@@ -84,12 +84,6 @@ object GetFromSackAPI {
 
     private var lastItemStack: PrimitiveItemStack? = null
 
-    @Deprecated("", ReplaceWith("SackAPI.sackListInternalNames"))
-    val sackListInternalNames get() = SackAPI.sackListInternalNames
-
-    @Deprecated("", ReplaceWith("SackAPI.sackListNames"))
-    val sackListNames get() = SackAPI.sackListNames
-
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
 
     private fun addToInventory(items: List<PrimitiveItemStack>, slotId: Int) = inventoryMap.put(slotId, items)

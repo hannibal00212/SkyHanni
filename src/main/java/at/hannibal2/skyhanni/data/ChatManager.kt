@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
@@ -128,7 +129,7 @@ object ChatManager {
         //#endif
 
         val original = event.message
-        val message = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val message = original.formattedText.stripHypixelMessage()
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
