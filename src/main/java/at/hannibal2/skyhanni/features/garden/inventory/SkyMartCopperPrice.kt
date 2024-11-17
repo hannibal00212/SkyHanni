@@ -28,6 +28,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyMartCopperPrice {
 
+    /**
+     * REGEX-TEST: §c250 Copper
+     */
     private val copperPattern by RepoPattern.pattern(
         "garden.inventory.skymart.copper",
         "§c(?<amount>.*) Copper"

@@ -37,12 +37,15 @@ object ChocolateShopPrice {
     private var display = emptyList<Renderable>()
     private var products = emptyList<Product>()
 
-    // TODO regex pattern
-
     val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.title",
         "Chocolate Shop",
     )
+
+    /**
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
+     */
     private val itemBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
