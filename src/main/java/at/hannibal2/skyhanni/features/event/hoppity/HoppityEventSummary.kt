@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
@@ -72,7 +73,7 @@ object HoppityEventSummary {
      */
     private val miscCfInventoryPatterns by ChocolateFactoryAPI.patternGroup.pattern(
         "cf.inventory",
-        "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones",
+        "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
 
     private const val LINE_HEADER = "    "
@@ -445,11 +446,26 @@ object HoppityEventSummary {
         (mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
 
+    private fun HoppityEventStats.getMealEggCount(): Int =
+        mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt()
+
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
-                stats.getEggsFoundFormat(year).takeIf { it != null }?.let {
-                    statList.addStr(it)
+                stats.getMealEggCount().takeIf { it > 0 }?.let {
+                    val spawnedMealEggs = getSpawnedEggCount(year)
+                    val eggFormat = StringUtils.pluralize(it, "Egg")
+                    statList.addStr("§7You found §b$it§7/§a$spawnedMealEggs §6Chocolate Meal $eggFormat§7.")
+                }
+            }
+
+            put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
+                stats.mealsFound[HoppityEggType.HITMAN]?.let {
+                    val spawnedMealEggs = getSpawnedEggCount(year)
+                    val missedMealEggs = spawnedMealEggs - stats.getMealEggCount()
+                    val eggFormat = StringUtils.pluralize(it, "Egg")
+                    val divisorFormat = "§b$it§7/§a$missedMealEggs"
+                    statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
                 }
             }
 
@@ -614,23 +630,21 @@ object HoppityEventSummary {
         ChatUtils.chat(summary, prefix = false)
     }
 
-    private fun HoppityEventStats.getEggsFoundFormat(year: Int): String? =
-        mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt().takeIf { it > 0 }?.let {
-            val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
-            val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
-            // Calculate total eggs from complete days and incomplete day periods
-            val previousEggs = if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3
-            val currentEggs = when {
-                pastEvent -> 0
-                // Add eggs for the current day based on time of day
-                milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
-                milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
-                milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
-                else -> 0
-            }
-            val spawnedMealsEggs = previousEggs + currentEggs
-            "§7You found §b$it§7/§a$spawnedMealsEggs §6Chocolate Meal ${StringUtils.pluralize(it, "Egg")}§7."
+    private fun getSpawnedEggCount(year: Int): Int {
+        val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
+        val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
+        // Calculate total eggs from complete days and incomplete day periods
+        val previousEggs = if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3
+        val currentEggs = when {
+            pastEvent -> 0
+            // Add eggs for the current day based on time of day
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
+            else -> 0
         }
+        return previousEggs + currentEggs
+    }
 
     private fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
         val rabbitsSum = rarityMap.values.sum()
