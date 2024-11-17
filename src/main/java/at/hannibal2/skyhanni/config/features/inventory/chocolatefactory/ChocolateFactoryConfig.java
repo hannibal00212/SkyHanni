@@ -207,6 +207,15 @@ public class ChocolateFactoryConfig {
     public boolean showLocationRequirementsRabbitsInHoppityStats = false;
 
     @Expose
+    @ConfigOption(
+        name = "Show Missing Resident Rabbits",
+        desc = "Show the islands that you have the most missing resident rabbits om."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showResidentSummaryInHoppityStats = false;
+
+    @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "")
     @Accordion
     public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();

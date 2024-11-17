@@ -191,6 +191,9 @@ public class ProfileSpecificStorage {
         public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
+        public Map<IslandType, Map<String, @Nullable Boolean>> residentRabbits = new HashMap<>();
+
+        @Expose
         public Integer hoppityShopYearOpened = null;
 
         @Expose

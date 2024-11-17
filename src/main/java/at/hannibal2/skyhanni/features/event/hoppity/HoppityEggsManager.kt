@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -120,13 +119,6 @@ object HoppityEggsManager {
         event.type.markClaimed()
         lastMeal = event.type
         lastNote = event.note
-    }
-
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onRabbitFound(event: RabbitFoundEvent) {
-        DelayedRun.runDelayed(1.seconds) {
-            HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
-        }
     }
 
     @SubscribeEvent
