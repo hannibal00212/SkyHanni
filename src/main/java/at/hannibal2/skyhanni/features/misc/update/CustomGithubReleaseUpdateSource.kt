@@ -6,6 +6,9 @@ import moe.nea.libautoupdate.GithubReleaseUpdateData
 import moe.nea.libautoupdate.GithubReleaseUpdateSource
 import moe.nea.libautoupdate.UpdateData
 
+/**
+ * This class is a custom implementation of the [GithubReleaseUpdateSource] that filters assets based on the mod's version.
+ */
 class CustomGithubReleaseUpdateSource(owner: String, repository: String) : GithubReleaseUpdateSource(owner, repository) {
 
     override fun findAsset(release: GithubRelease?): UpdateData? {
