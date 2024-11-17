@@ -18,17 +18,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object ChocolateFactoryHitmanSlots {
 
-    // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: §cOn cooldown: 8h 38m 6s
-     * REGEX-TEST: §cOn cooldown: 19m 57s
-     * REGEX-TEST: §cOn cooldown: 3s
-     */
-    private val cooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hitman.cooldown",
-        "§cOn cooldown: (?<cooldown>[\\d hms]*)"
-    )
-
     /**
      * REGEX-TEST: §cEgg Slot
      */
@@ -36,14 +25,13 @@ object ChocolateFactoryHitmanSlots {
         "hitman.slotoncooldown",
         "§cEgg Slot"
     )
-    // </editor-fold>
 
     private val config get() = ChocolateFactoryAPI.config
     private val hitmanRabbits = mutableListOf<HitmanRabbit>()
 
     private var cooldownSlotIndices = emptySet<Int>()
 
-    data class HitmanRabbit (
+    data class HitmanRabbit(
         val rabbitName: String,
         val claimedAt: SimpleTimeMark,
         var expiresAt: SimpleTimeMark? = null,
