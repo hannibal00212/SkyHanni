@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.util.IdentityHashMap
 import kotlin.time.Duration.Companion.milliseconds
@@ -41,6 +39,8 @@ object GardenCustomKeybinds {
 
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
+    private fun Int.keybind(): KeyBinding? = (mcSettings.keyBindBack as AccessorKeyBinding).hash_skyhanni.lookup(this)
+
     private fun isActive(): Boolean {
         if (!isEnabled()) return false
         if (GardenAPI.toolInHand == null) return false
@@ -63,7 +63,7 @@ object GardenCustomKeybinds {
             if (lastDuplicateKeybindsWarnTime.passedSince() > 30.seconds) {
                 ChatUtils.chatAndOpenConfig(
                     "Duplicate Custom Keybinds aren't allowed!",
-                    GardenAPI.config::keyBind
+                    GardenAPI.config::keyBind,
                 )
                 lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
             }
@@ -76,20 +76,24 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
-        val keyCode = override()
-        cir.returnValue = keyCode.isKeyHeld()
+        val keycode = map[keyBinding] ?: return
+        val newKeybind = keycode().keybind() ?: return
+        val accessor = newKeybind as AccessorKeyBinding
+        cir.returnValue = accessor.pressed_skyhanni
     }
 
     @JvmStatic
-    fun onTick(keyCode: Int, ci: CallbackInfo) {
+    fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        if (keyCode == 0) return
-        val keyBinding = map.entries.firstOrNull { it.value() == keyCode }?.key ?: return
-        ci.cancel()
-        if (keyBinding.isKeyDown) {
-            (keyBinding as AccessorKeyBinding).pressTime_skyhanni++
-            KeyBinding.setKeyBindState(keyCode, true)
+        val override = map[keyBinding] ?: return
+        val keyCode = override()
+        val newKeybind = keyCode.keybind() ?: return
+        val accessor = newKeybind as AccessorKeyBinding
+        if (accessor.pressTime_skyhanni == 0) {
+            cir.returnValue = false
+        } else {
+            --accessor.pressTime_skyhanni
+            cir.returnValue = true
         }
     }
 
