@@ -256,4 +256,13 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "strayRabbitTracker")
     public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "Hitman Slot Rabbit",
+        desc = "Show the last rabbit found in hitman slots that are on cooldown."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hitmanSlotInfo = true;
 }
