@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,7 +56,7 @@ object ChocolateFactoryStrayTimer {
     private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(
         listOf(
             "§eStray Timer",
-            "§b${String.format("%.2f", timer.inPartialSeconds)}s"
+            "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
         ).map { Renderable.string(it) }
     )
 }

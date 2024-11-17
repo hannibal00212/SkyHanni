@@ -46,7 +46,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.Locale
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -434,15 +433,15 @@ object HoppityCollectionStats {
 
         val tips: List<String> = buildList {
             addAll(
-                    residentRabbitData.map { (island, residents) ->
-                        val foundResidents = residents.values.count { it == true }
-                        val totalResidents = residents.size
-                        val indeterminateResidents = residents.values.count { it == null }
-                        val islandName = island.displayName
-                        val color = if (foundResidents == totalResidents) "§a" else "§c"
-                        val foundFormat =
-                            if (indeterminateResidents > 0) "???"
-                            else foundResidents.toString()
+                residentRabbitData.map { (island, residents) ->
+                    val foundResidents = residents.values.count { it == true }
+                    val totalResidents = residents.size
+                    val indeterminateResidents = residents.values.count { it == null }
+                    val islandName = island.displayName
+                    val color = if (foundResidents == totalResidents) "§a" else "§c"
+                    val foundFormat =
+                        if (indeterminateResidents > 0) "???"
+                        else foundResidents.toString()
                     "$islandName: $color$foundFormat§7/§a$totalResidents"
                 }
             )
