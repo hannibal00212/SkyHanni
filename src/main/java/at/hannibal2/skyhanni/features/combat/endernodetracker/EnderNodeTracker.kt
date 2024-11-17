@@ -225,7 +225,7 @@ object EnderNodeTracker {
         EnderNode.END_BOOTS,
         EnderNode.ENDER_NECKLACE,
         EnderNode.ENDER_GAUNTLET,
-            -> true
+        -> true
 
         else -> false
     }
