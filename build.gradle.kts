@@ -312,6 +312,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveAppendix.set(target.minecraftVersion.versionName)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -384,6 +385,7 @@ preprocess {
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

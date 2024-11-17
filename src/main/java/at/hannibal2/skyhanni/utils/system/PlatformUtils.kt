@@ -10,6 +10,8 @@ import net.minecraftforge.fml.common.ModContainer
  */
 object PlatformUtils {
 
+    const val MC_VERSION = "@MC_VERSION@"
+
     private val modPackages: Map<String, ModContainer> by lazy {
         Loader.instance().modList.flatMap { mod -> mod.ownedPackages.map { it to mod } }.toMap()
     }
