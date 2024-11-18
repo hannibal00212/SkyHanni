@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -58,6 +58,11 @@ object HoppityCollectionStats {
         "page.current",
         "(?:\\((?<page>\\d+)/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
     )
+
+    /**
+     * REGEX-TEST: §7Duplicates Found: §a9
+     * REGEX-TEST: §7Duplicates Found: §a0
+     */
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)",
@@ -72,6 +77,9 @@ object HoppityCollectionStats {
         "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)",
     )
 
+    /**
+     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     */
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
@@ -122,11 +130,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §7§7Obtained by finding the §aStray Rabbit
+     * REGEX-TEST: §7§7Obtained by finding a §6Golden Stray
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
-        "§7§7Obtained by finding the §aStray Rabbit",
+        "(?:§.)+Obtained by finding a §6Golden Stray",
     )
 
     /**
@@ -531,14 +539,14 @@ object HoppityCollectionStats {
         val displayName: String,
         val item: NEUInternalName,
     ) {
-        COMMON("§fCommon", "STAINED_GLASS".asInternalName()),
-        UNCOMMON("§aUncommon", "STAINED_GLASS-5".asInternalName()),
-        RARE("§9Rare", "STAINED_GLASS-11".asInternalName()),
-        EPIC("§5Epic", "STAINED_GLASS-10".asInternalName()),
-        LEGENDARY("§6Legendary", "STAINED_GLASS-1".asInternalName()),
-        MYTHIC("§dMythic", "STAINED_GLASS-6".asInternalName()),
-        DIVINE("§bDivine", "STAINED_GLASS-3".asInternalName()),
-        TOTAL("§cTotal", "STAINED_GLASS-14".asInternalName()),
+        COMMON("§fCommon", "STAINED_GLASS".toInternalName()),
+        UNCOMMON("§aUncommon", "STAINED_GLASS-5".toInternalName()),
+        RARE("§9Rare", "STAINED_GLASS-11".toInternalName()),
+        EPIC("§5Epic", "STAINED_GLASS-10".toInternalName()),
+        LEGENDARY("§6Legendary", "STAINED_GLASS-1".toInternalName()),
+        MYTHIC("§dMythic", "STAINED_GLASS-6".toInternalName()),
+        DIVINE("§bDivine", "STAINED_GLASS-3".toInternalName()),
+        TOTAL("§cTotal", "STAINED_GLASS-14".toInternalName()),
         ;
 
         companion object {

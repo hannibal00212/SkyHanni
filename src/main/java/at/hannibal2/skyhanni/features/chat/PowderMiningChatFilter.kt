@@ -104,22 +104,22 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:    §r§a§r§aGreen Goblin Egg
-     * REGEX-TEST:    §r§9Goblin Egg
-     * REGEX-TEST:    §r§dDiamond Essence
-     * REGEX-TEST:    §r§dGold Essence
-     * REGEX-TEST:    §r§dGold Essence §r§8x3
-     * REGEX-TEST:    §r§dGemstone Powder §r§8x537
-     * REGEX-TEST:    §r§dDiamond Essence §r§8x2
-     * REGEX-TEST:    §r§2Mithril Powder §r§8x153
-     * REGEX-TEST:    §r§5Treasurite
-     * REGEX-TEST:    §r§f⸕ Rough Amber Gemstone §r§8x24
-     * REGEX-TEST:    §r§f❤ Rough Ruby Gemstone §r§8x24
-     * REGEX-TEST:    §r§f❈ Rough Amethyst Gemstone §r§8x24
-     * REGEX-TEST:    §r§9§r§eYellow Goblin Egg
-     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone
-     * REGEX-TEST:    §r§aWishing Compass §r§8x3
-     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone §r§8x2
+     * REGEX-TEST:     §r§a§r§aGreen Goblin Egg
+     * REGEX-TEST:     §r§9Goblin Egg
+     * REGEX-TEST:     §r§dDiamond Essence
+     * REGEX-TEST:     §r§dGold Essence
+     * REGEX-TEST:     §r§dGold Essence §r§8x3
+     * REGEX-TEST:     §r§dGemstone Powder §r§8x537
+     * REGEX-TEST:     §r§dDiamond Essence §r§8x2
+     * REGEX-TEST:     §r§2Mithril Powder §r§8x153
+     * REGEX-TEST:     §r§5Treasurite
+     * REGEX-TEST:     §r§f⸕ Rough Amber Gemstone §r§8x24
+     * REGEX-TEST:     §r§f❤ Rough Ruby Gemstone §r§8x24
+     * REGEX-TEST:     §r§f❈ Rough Amethyst Gemstone §r§8x24
+     * REGEX-TEST:     §r§9§r§eYellow Goblin Egg
+     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone
+     * REGEX-TEST:     §r§aWishing Compass §r§8x3
+     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone §r§8x2
      */
     val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
@@ -256,7 +256,7 @@ object PowderMiningChatFilter {
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa9][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
     @Suppress("CyclomaticComplexMethod")

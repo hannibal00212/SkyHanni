@@ -17,7 +17,7 @@ class AvoidBritishSpelling(config: Config) : Rule(config) {
     override val issue = Issue(
         "AvoidBritishSpelling",
         Severity.Style,
-        "Avoid using the word british spelling over american spelling.",
+        "Avoid using the british spelling over the american spelling.",
         Debt.FIVE_MINS,
     )
 
