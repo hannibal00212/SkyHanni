@@ -8,12 +8,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(KeyBinding.class)
 public interface AccessorKeyBinding {
 
-    @Accessor("pressTime")
-    int getPressTime_skyhanni();
-
-    @Accessor("pressTime")
-    void setPressTime_skyhanni(int pressTime);
-
     @Accessor("pressed")
     boolean getPressed_skyhanni();
 
