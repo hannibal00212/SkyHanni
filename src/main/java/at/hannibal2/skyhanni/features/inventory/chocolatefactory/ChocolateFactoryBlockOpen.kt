@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +36,25 @@ object ChocolateFactoryBlockOpen {
         "/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
+    /**
+     * REGEX-TEST: §6Chocolate Factory
+     * REGEX-TEST: §6Open Chocolate Factory
+     */
+    private val openCfItemPattern by RepoPattern.pattern(
+        "inventory.chocolatefactory.openitem",
+        "§6(?:Open )?Chocolate Factory",
+    )
+
     private var commandSentTimer = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        val slotDisplayName = event.slot?.stack?.displayName ?: return
+        if (!openCfItemPattern.matches(slotDisplayName)) return
+
+        if (tryBlock() != TryBlockResult.SUCCESS) event.cancel()
+    }
 
     @SubscribeEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
@@ -43,18 +62,30 @@ object ChocolateFactoryBlockOpen {
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
 
+        if (tryBlock() != TryBlockResult.SUCCESS) {
+            commandSentTimer = SimpleTimeMark.now()
+            event.cancel()
+        }
+    }
+
+    private enum class TryBlockResult {
+        SUCCESS,
+        FAIL_NO_RABBIT,
+        FAIL_NO_BOOSTER_COOKIE,
+    }
+
+    private fun tryBlock(): TryBlockResult {
         if (config.mythicRabbitRequirement && !MythicRabbitPetWarning.correctPet()) {
-            event.cancelOpen()
             ChatUtils.clickToActionOrDisable(
                 "§cBlocked opening the Chocolate Factory without a §dMythic Rabbit Pet §cequipped!",
                 config::mythicRabbitRequirement,
                 actionName = "open pets menu",
                 action = { HypixelCommands.pet() },
             )
+            return TryBlockResult.FAIL_NO_RABBIT
         } else if (config.boosterCookieRequirement) {
             profileStorage?.boosterCookieExpiryTime?.let {
-                if (it.timeUntil() > 0.seconds) return
-                event.cancelOpen()
+                if (it.timeUntil() > 0.seconds) return TryBlockResult.SUCCESS
                 ChatUtils.clickToActionOrDisable(
                     "§cBlocked opening the Chocolate Factory without a §dBooster Cookie §cactive!",
                     config::boosterCookieRequirement,
@@ -66,12 +97,9 @@ object ChocolateFactoryBlockOpen {
                         }
                     },
                 )
+                return TryBlockResult.FAIL_NO_BOOSTER_COOKIE
             }
         }
-    }
-
-    private fun MessageSendToServerEvent.cancelOpen() {
-        commandSentTimer = SimpleTimeMark.now()
-        this.cancel()
+        return TryBlockResult.SUCCESS
     }
 }
