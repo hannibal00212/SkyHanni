@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -122,8 +123,11 @@ object MiningEventDisplay {
         }
     }
 
-    private fun shouldDisplay() =
-        LorenzUtils.inSkyBlock && config.enabled && !(!config.outsideMining && !MiningEventTracker.isMiningIsland())
+    private fun shouldDisplay(): Boolean {
+        val isOnValidMiningLocation = LorenzUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
+
+        return (isOnValidMiningLocation || OutsideSbFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
+    }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
