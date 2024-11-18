@@ -69,7 +69,7 @@ object UserLuckBreakdown {
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
     private val invalidItemSlots = (0..53).filter { it !in validItemSlots }
 
-    private var skillOverflowLuck = mutableMapOf<SkillType, Int>()
+    private val skillOverflowLuck = mutableMapOf<SkillType, Int>()
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
