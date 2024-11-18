@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -85,9 +87,11 @@ object FishingTimer {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        if (babyMagmaSlugsToFind != 0 && mob.name == "Baby Magma Slug") {
+        if (mob.name == "Baby Magma Slug") {
             recentBabyMagmaSlugs += mob
-            handleBabySlugs()
+            DelayedRun.runNextTick {
+                handleBabySlugs()
+            }
             return
         }
         if (mob.name !in SeaCreatureManager.allFishingMobs) return
@@ -97,10 +101,10 @@ object FishingTimer {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        if (!isEnabled()) return
         val mob = event.mob
+        recentBabyMagmaSlugs -= event.mob
         if (mob in mobDespawnTime) {
-            mobDespawnTime -= mob
+            mobDespawnTime.remove(mob)
             if (mob.name == "Magma Slug") {
                 lastMagmaSlugLocation = mob.baseEntity.getLorenzVec()
                 babyMagmaSlugsToFind += 3
@@ -127,7 +131,8 @@ object FishingTimer {
         val name = lastNameFished ?: return
         val mobs = recentMobs.toSet().filter { it.name == name && it !in mobDespawnTime }
             .sortedBy { it.baseEntity.distanceToPlayer() }
-            .take(mobsToFind).ifEmpty { return }
+            .take(mobsToFind)
+        if (mobs.isEmpty()) return
         mobsToFind -= mobs.size
         mobs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
         if (mobsToFind == 0) {
@@ -143,7 +148,8 @@ object FishingTimer {
         val location = lastMagmaSlugLocation ?: return
         val slugs = recentBabyMagmaSlugs.filter { it !in mobDespawnTime }
             .sortedBy { it.baseEntity.distanceTo(location) }
-            .take(babyMagmaSlugsToFind).ifEmpty { return }
+            .take(babyMagmaSlugsToFind)
+        if (slugs.isEmpty()) return
         babyMagmaSlugsToFind -= slugs.size
         slugs.forEach { mobDespawnTime[it] = SimpleTimeMark.now() }
         if (babyMagmaSlugsToFind == 0) {
@@ -166,7 +172,7 @@ object FishingTimer {
 
     private fun updateInfo() {
         currentCount = mobDespawnTime.size
-        startTime = mobDespawnTime.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
+        startTime = mobDespawnTime.values.maxByOrNull { it.passedSince() } ?: SimpleTimeMark.farPast()
         display = createDisplay()
     }
 
@@ -181,6 +187,15 @@ object FishingTimer {
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
             else -> false
         }
+    }
+
+    @SubscribeEvent
+    fun onSecond(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        if (babyMagmaSlugsToFind == 0) return
+        if (lastMagmaSlugTime.passedSince() < 3.seconds) return
+        babyMagmaSlugsToFind = 0
+        lastMagmaSlugLocation = null
     }
 
     @SubscribeEvent
@@ -211,6 +226,24 @@ object FishingTimer {
         val countColor = if (config.fishingCapAlert && currentCount >= currentCap) "§c" else "§e"
         val name = StringUtils.pluralize(currentCount, "sea creature")
         return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
+    }
+
+    @SubscribeEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Barn Fishing Timer")
+        event.addIrrelevant {
+            add("lastSeaCreatureFished: $lastSeaCreatureFished")
+            add("lastNameFished: $lastNameFished")
+            add("babyMagmaSlugsToFind: $babyMagmaSlugsToFind")
+            add("lastMagmaSlugLocation: $lastMagmaSlugLocation")
+            add("lastMagmaSlugTime: $lastMagmaSlugTime")
+            add("recentBabyMagmaSlugs: $recentBabyMagmaSlugs")
+            add("mobsToFind: $mobsToFind")
+            add("recentMobs: $recentMobs")
+            add("currentCap: $currentCap")
+            add("mobDespawnTime: $mobDespawnTime")
+            add("startTime: $startTime")
+        }
     }
 
     @SubscribeEvent

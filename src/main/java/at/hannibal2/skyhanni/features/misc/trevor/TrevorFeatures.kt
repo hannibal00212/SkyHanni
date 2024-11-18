@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -50,14 +50,26 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
+
+    /**
+     * REGEX-TEST: [NPC] Trevor: You can find your TRACKABLE animal near the §eDesert Mountain.
+     */
     private val trapperPattern by patternGroup.pattern(
         "trapper",
-        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).",
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)\\.",
     )
+
+    /**
+     * REGEX-TEST: The target is around 40 blocks above, at a 45 degrees angle!
+     */
     private val talbotPatternAbove by patternGroup.pattern(
         "above",
         "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!",
     )
+
+    /**
+     * REGEX-TEST: The target is around 15 blocks below, at a 30 degrees angle!
+     */
     private val talbotPatternBelow by patternGroup.pattern(
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!",
@@ -66,6 +78,10 @@ object TrevorFeatures {
         "at",
         "You are at the exact height!",
     )
+
+    /**
+     * REGEX-TEST: Location: Mushroom Gorge
+     */
     private val locationPattern by patternGroup.pattern(
         "zone",
         "Location: (?<zone>.*)",
@@ -76,7 +92,7 @@ object TrevorFeatures {
     )
     private val startDialoguePattern by patternGroup.pattern(
         "start.dialogue",
-        "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.",
+        "\\[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task\\.",
     )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
@@ -218,7 +234,7 @@ object TrevorFeatures {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
-        // TODO work wioth trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
+        // TODO work with trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
         for (line in TabListData.getTabList()) {
             val formattedLine = line.removeColor().drop(1)
             if (formattedLine.startsWith("Time Left: ")) {
@@ -345,7 +361,7 @@ object TrevorFeatures {
         ACTIVE(LorenzColor.DARK_RED),
         ;
 
-        val color = baseColor.toColor().withAlpha(75)
+        val color = baseColor.toColor().addAlpha(75)
         val colorCode = baseColor.getChatColor()
     }
 

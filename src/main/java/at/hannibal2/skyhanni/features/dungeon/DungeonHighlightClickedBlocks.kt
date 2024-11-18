@@ -29,7 +29,7 @@ object DungeonHighlightClickedBlocks {
     private val patternGroup = RepoPattern.group("dungeons.highlightclickedblock")
     private val leverPattern by patternGroup.pattern(
         "lever",
-        "§cYou hear the sound of something opening...",
+        "§cYou hear the sound of something opening\\.\\.\\.",
     )
     private val lockedPattern by patternGroup.pattern(
         "locked",

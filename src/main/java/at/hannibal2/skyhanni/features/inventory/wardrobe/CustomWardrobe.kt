@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -276,7 +275,7 @@ object CustomWardrobe {
 
         val playerColor = if (!slot.isInCurrentPage()) {
             scale *= 0.9
-            Color.GRAY.withAlpha(100)
+            Color.GRAY.addAlpha(100)
         } else null
 
         return Renderable.fakePlayer(

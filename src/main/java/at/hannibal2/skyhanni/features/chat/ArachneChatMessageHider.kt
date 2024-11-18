@@ -17,6 +17,10 @@ object ArachneChatMessageHider {
     private var hideArachneDeadMessage = false
 
     private val patternGroup = RepoPattern.group("chat.arachne")
+
+    /**
+     * REGEX-TEST: §4☄ §r§7littlegremlins §r§eplaced an §r§9Arachne's Calling§r§e! Something is awakening! §r§e(§r§a4§r§e/§r§a4§r§e)
+     */
     val arachneCallingPattern by patternGroup.pattern(
         "calling",
         "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*"
