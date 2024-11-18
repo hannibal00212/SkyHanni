@@ -57,7 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityCollectionStats {
-    private val collectionConfig get() =  ChocolateFactoryAPI.config.hoppityCollectionStats
+    private val collectionConfig get() = ChocolateFactoryAPI.config.hoppityCollectionStats
     private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
 
     // <editor-fold desc="Patterns">
