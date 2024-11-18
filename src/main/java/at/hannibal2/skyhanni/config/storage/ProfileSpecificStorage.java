@@ -193,6 +193,23 @@ public class ProfileSpecificStorage {
         @Expose
         public Map<IslandType, Map<String, @Nullable Boolean>> residentRabbits = new HashMap<>();
 
+        public static class HotspotRabbitStorage {
+            @Expose
+            @Nullable
+            public Integer skyblockYear;
+
+            @Expose
+            public Map<IslandType, Map<String, @Nullable Boolean>> hotspotRabbits;
+
+            public HotspotRabbitStorage(@Nullable Integer year) {
+                this.skyblockYear = year;
+                this.hotspotRabbits = new HashMap<>();
+            }
+        }
+
+        @Expose
+        public HotspotRabbitStorage hotspotRabbitStorage = new HotspotRabbitStorage(null);
+
         @Expose
         public Integer hoppityShopYearOpened = null;
 
