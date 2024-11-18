@@ -97,7 +97,7 @@ object DungeonAPI {
     /**
      * REGEX-TEST: §711/15/24 §8m4F 830,-420
      */
-    private val dungeonRoomPattern by patternGroup.pattern(
+    val dungeonRoomPattern by patternGroup.pattern(
         "room",
         "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
