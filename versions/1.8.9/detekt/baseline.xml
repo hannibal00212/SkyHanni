@@ -453,70 +453,13 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
-    <ID>UseOrEmpty:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$event.originalOre?.let { "$it " } ?: ""</ID>
-    <ID>VarCouldBeVal:AdvancedPlayerList.kt$AdvancedPlayerList$private var randomOrderCache = TimeLimitedCache&lt;String, Int&gt;(20.minutes)</ID>
-    <ID>VarCouldBeVal:BestiaryData.kt$BestiaryData$private var indexes = listOf( 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43 )</ID>
-    <ID>VarCouldBeVal:BucketedItemTrackerData.kt$BucketedItemTrackerData$@Expose private var bucketedItems: MutableMap&lt;E, MutableMap&lt;NEUInternalName, TrackedItem&gt;&gt; = HashMap()</ID>
-    <ID>VarCouldBeVal:CarnivalZombieShootout.kt$CarnivalZombieShootout$private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())</ID>
-    <ID>VarCouldBeVal:ChocolateFactoryStrayTracker.kt$ChocolateFactoryStrayTracker$private var claimedStraysSlots = mutableListOf&lt;Int&gt;()</ID>
-    <ID>VarCouldBeVal:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$private var bestiaryDescription = mutableListOf&lt;String&gt;()</ID>
-    <ID>VarCouldBeVal:CraftRoomHolographicMob.kt$CraftRoomHolographicMob$private var entityToHolographicEntity = mapOf( EntityZombie::class.java to HolographicEntities.zombie, EntitySlime::class.java to HolographicEntities.slime, EntityCaveSpider::class.java to HolographicEntities.caveSpider, )</ID>
-    <ID>VarCouldBeVal:CustomWardrobe.kt$CustomWardrobe$private var guiName = "Custom Wardrobe"</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var goodLevel = 0</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var maxLevel = 0</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var nbtNum: String? = null</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var stackLevel: TreeSet&lt;Int&gt;? = null</ID>
-    <ID>VarCouldBeVal:ErrorManager.kt$ErrorManager$private var cache = TimeLimitedSet&lt;Pair&lt;String, Int&gt;&gt;(10.minutes)</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var nameColor = if (!useless) "§9" else "§7"</ID>
-    <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var currentBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
-    <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var lastBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
-    <ID>VarCouldBeVal:FarmingWeightDisplay.kt$FarmingWeightDisplay$private var nextPlayers = mutableListOf&lt;UpcomingLeaderboardPlayer&gt;()</ID>
-    <ID>VarCouldBeVal:FlareDisplay.kt$FlareDisplay$private var flares = mutableListOf&lt;Flare&gt;()</ID>
-    <ID>VarCouldBeVal:FontRendererHook.kt$FontRendererHook$private var CHROMA_COLOR: Int = -0x1</ID>
-    <ID>VarCouldBeVal:FontRendererHook.kt$FontRendererHook$private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB</ID>
-    <ID>VarCouldBeVal:GardenPlotIcon.kt$GardenPlotIcon$private var cachedStack = mutableMapOf&lt;Int, ItemStack&gt;()</ID>
-    <ID>VarCouldBeVal:GardenPlotIcon.kt$GardenPlotIcon$private var originalStack = mutableMapOf&lt;Int, ItemStack&gt;()</ID>
-    <ID>VarCouldBeVal:GardenPlotMenuHighlighting.kt$GardenPlotMenuHighlighting$private var highlightedPlots = mutableMapOf&lt;GardenPlotAPI.Plot, PlotStatusType&gt;()</ID>
-    <ID>VarCouldBeVal:GardenVisitorColorNames.kt$GardenVisitorColorNames$private var visitorColors = mutableMapOf&lt;String, String&gt;() // name -&gt; color code</ID>
-    <ID>VarCouldBeVal:GhostData.kt$GhostData$private var session = mutableMapOf( Option.KILLS to 0.0, Option.SORROWCOUNT to 0.0, Option.VOLTACOUNT to 0.0, Option.PLASMACOUNT to 0.0, Option.GHOSTLYBOOTS to 0.0, Option.BAGOFCASH to 0.0, Option.TOTALDROPS to 0.0, Option.SCAVENGERCOINS to 0.0, Option.MAXKILLCOMBO to 0.0, Option.SKILLXPGAINED to 0.0 )</ID>
-    <ID>VarCouldBeVal:GraphEditor.kt$GraphEditor$var vector = LocationUtils.calculatePlayerFacingDirection()</ID>
-    <ID>VarCouldBeVal:HoppityCollectionStats.kt$HoppityCollectionStats$private var highlightMap = mutableMapOf&lt;String, LorenzColor&gt;()</ID>
     <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;LorenzVec&gt;&gt; get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value }</ID>
-    <ID>VarCouldBeVal:HoppityNpc.kt$HoppityNpc$private var slotsToHighlight = mutableSetOf&lt;Int&gt;()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemList = mutableMapOf&lt;Int, Pair&lt;ItemStack, Int&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemsAddedToInventory = mutableMapOf&lt;Int, PickupEntry&gt;()</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemsRemovedFromInventory = mutableMapOf&lt;Int, PickupEntry&gt;()</ID>
-    <ID>VarCouldBeVal:LocationUtils.kt$LocationUtils$var yaw = LocationUtils.calculatePlayerYaw() + 180</ID>
-    <ID>VarCouldBeVal:LorenzLogger.kt$LorenzLogger.Companion$private var LOG_DIRECTORY = File("config/skyhanni/logs")</ID>
-    <ID>VarCouldBeVal:MobDetection.kt$MobDetection$private var shouldClear: AtomicBoolean = AtomicBoolean(false)</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var floor2summonsDiedOnce = mutableListOf&lt;EntityOtherPlayerMP&gt;()</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var floor6GiantsSeparateDelay = mutableMapOf&lt;UUID, Pair&lt;Long, BossType&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var guardians = mutableListOf&lt;EntityGuardian&gt;()</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NEUInternalName&gt;&gt;</ID>
-    <ID>VarCouldBeVal:PowerStoneGuideFeatures.kt$PowerStoneGuideFeatures$private var missing = mutableMapOf&lt;Int, NEUInternalName&gt;()</ID>
-    <ID>VarCouldBeVal:PunchcardHighlight.kt$PunchcardHighlight$private var playerQueue = mutableListOf&lt;String&gt;()</ID>
-    <ID>VarCouldBeVal:QuiverWarning.kt$QuiverWarning$private var arrowsInInstance = mutableSetOf&lt;ArrowType&gt;()</ID>
-    <ID>VarCouldBeVal:ReforgeHelper.kt$ReforgeHelper$private var waitForChat = AtomicBoolean(false)</ID>
-    <ID>VarCouldBeVal:ReminderManager.kt$ReminderManager$private var listPage = 1</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing the exclusive owner of a regex key */ private var exclusivity: MutableMap&lt;String, RepoPatternKeyOwner&gt; = mutableMapOf()</ID>
-    <ID>VarCouldBeVal:SeaCreatureFeatures.kt$SeaCreatureFeatures$private var entityIds = TimeLimitedSet&lt;Int&gt;(6.minutes)</ID>
-    <ID>VarCouldBeVal:SeaCreatureFeatures.kt$SeaCreatureFeatures$private var rareSeaCreatures = TimeLimitedSet&lt;Mob&gt;(6.minutes)</ID>
-    <ID>VarCouldBeVal:ShowFishingItemName.kt$ShowFishingItemName$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(750.milliseconds)</ID>
-    <ID>VarCouldBeVal:SkyblockGuideHighlightFeature.kt$SkyblockGuideHighlightFeature.Companion$private var missing = mutableSetOf&lt;Int&gt;()</ID>
-    <ID>VarCouldBeVal:SlayerItemsOnGround.kt$SlayerItemsOnGround$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(2.seconds)</ID>
-    <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var dingSlope = mutableListOf&lt;Float&gt;()</ID>
-    <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var locations = mutableListOf&lt;LorenzVec&gt;()</ID>
-    <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var resultDisplay = mutableMapOf&lt;Int, Int&gt;()</ID>
-    <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var sounds = mutableMapOf&lt;Int, Sound&gt;()</ID>
-    <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var backupTrapperID: Int = 17</ID>
     <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var trapperID: Int = 56</ID>
-    <ID>VarCouldBeVal:TrophyFishDisplay.kt$TrophyFishDisplay$private var recentlyDroppedTrophies = TimeLimitedCache&lt;NEUInternalName, TrophyRarity&gt;(5.seconds)</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var fillerID = "STAINED_GLASS_PANE".toInternalName()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var limboID = "ENDER_PEARL".toInternalName()</ID>
     <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillOverflowLuck = mutableMapOf&lt;SkillType, Int&gt;()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillsID = "DIAMOND_SWORD".toInternalName()</ID>
   </CurrentIssues>
 </SmellBaseline>

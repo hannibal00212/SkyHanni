@@ -41,15 +41,15 @@ object UserLuckBreakdown {
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
-    private var fillerID = "STAINED_GLASS_PANE".toInternalName()
+    private val fillerID = "STAINED_GLASS_PANE".toInternalName()
     private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
-    private var limboID = "ENDER_PEARL".toInternalName()
+    private val limboID = "ENDER_PEARL".toInternalName()
     private const val LIMBO_NAME = "§a✴ Limbo Personal Best"
 
     private lateinit var skillsItem: ItemStack
-    private var skillsID = "DIAMOND_SWORD".toInternalName()
+    private val skillsID = "DIAMOND_SWORD".toInternalName()
     private const val SKILLS_NAME = "§a✴ Category: Skills"
 
     private var showAllStats = true

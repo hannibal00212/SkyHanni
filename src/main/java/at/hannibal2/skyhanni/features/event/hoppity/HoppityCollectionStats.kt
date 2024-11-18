@@ -302,7 +302,7 @@ object HoppityCollectionStats {
         }
     }
 
-    private var highlightMap = mutableMapOf<String, LorenzColor>()
+    private val highlightMap = mutableMapOf<String, LorenzColor>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

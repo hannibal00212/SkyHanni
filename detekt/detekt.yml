@@ -1,3 +1,4 @@
+# VarCouldBeVal triggers on lateinit and var set() methods
 
 config:
     validation: true

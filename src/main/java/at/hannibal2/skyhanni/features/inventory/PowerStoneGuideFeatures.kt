@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object PowerStoneGuideFeatures {
 
-    private var missing = mutableMapOf<Int, NEUInternalName>()
+    private val missing = mutableMapOf<Int, NEUInternalName>()
     private var inInventory = false
 
     @SubscribeEvent

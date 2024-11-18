@@ -21,9 +21,9 @@ object FontRendererHook {
     private const val CHROMA_FORMAT_INDEX = 22
     private const val WHITE_FORMAT_INDEX = 15
 
-    private var CHROMA_COLOR: Int = -0x1
+    private const val CHROMA_COLOR: Int = -0x1
     private val DRAW_CHROMA = ChromaFontRenderer(CHROMA_COLOR)
-    private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
+    private const val CHROMA_COLOR_SHADOW: Int = -0xAAAAAB
     private val DRAW_CHROMA_SHADOW = ChromaFontRenderer(CHROMA_COLOR_SHADOW)
 
     private var currentDrawState: ChromaFontRenderer? = null

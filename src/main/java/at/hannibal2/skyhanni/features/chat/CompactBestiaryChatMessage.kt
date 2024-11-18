@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object CompactBestiaryChatMessage {
 
     private var inBestiary = false
-    private var bestiaryDescription = mutableListOf<String>()
+    private val bestiaryDescription = mutableListOf<String>()
     private var acceptMoreDescription = true
     var command = ""
     private var blockedLines = 0

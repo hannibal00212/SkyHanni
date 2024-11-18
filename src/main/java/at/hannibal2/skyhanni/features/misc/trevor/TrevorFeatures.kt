@@ -112,7 +112,7 @@ object TrevorFeatures {
     private var currentStatus = TrapperStatus.READY
     private var currentLabel = "§2Ready"
     private var trapperID: Int = 56
-    private var backupTrapperID: Int = 17
+    private const val BACKUP_TRAPPER_ID: Int = 17
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
@@ -270,7 +270,7 @@ object TrevorFeatures {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
-        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
+        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
                 config.trapperTalkCooldown

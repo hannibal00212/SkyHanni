@@ -95,7 +95,7 @@ object ReforgeHelper {
 
     private const val EXIT_BUTTON = 40
 
-    private var waitForChat = AtomicBoolean(false)
+    private val waitForChat = AtomicBoolean(false)
 
     /** Gatekeeps instant double switches of the state */
     private var waitDelay = false

@@ -32,8 +32,8 @@ object SeaCreatureFeatures {
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
     private var lastRareCatch = SimpleTimeMark.farPast()
-    private var rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
-    private var entityIds = TimeLimitedSet<Int>(6.minutes)
+    private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
+    private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
     @SubscribeEvent
