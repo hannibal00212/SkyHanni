@@ -22,7 +22,7 @@ object ErrorManager {
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()
-    private var cache = TimeLimitedSet<Pair<String, Int>>(10.minutes)
+    private val cache = TimeLimitedSet<Pair<String, Int>>(10.minutes)
     private var repoErrors: List<RepoErrorData> = emptyList()
 
     private val breakAfter = listOf(

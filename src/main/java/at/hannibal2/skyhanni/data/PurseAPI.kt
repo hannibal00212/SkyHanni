@@ -17,10 +17,19 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     * REGEX-TEST: Purse: §6423,085,776 §e(+5)
+     */
     val coinsPattern by patternGroup.pattern(
         "coins",
         "(?:§.)*(?:Piggy|Purse): §6(?<coins>[\\d,.]+)(?: ?(?:§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     */
     val piggyPattern by patternGroup.pattern(
         "piggy",
         "Piggy: (?<coins>.*)",

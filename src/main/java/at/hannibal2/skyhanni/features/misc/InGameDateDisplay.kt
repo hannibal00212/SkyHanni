@@ -20,13 +20,23 @@ object InGameDateDisplay {
     private val config get() = SkyHanniMod.feature.gui.inGameDate
 
     private val patternGroup = RepoPattern.group("misc.ingametime")
+
+    /**
+     * REGEX-TEST: Spring 26th
+     * REGEX-TEST: Early Winter 1st
+     */
     private val monthAndDatePattern by patternGroup.pattern(
         "date",
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*"
+        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*",
     )
+
+    /**
+     * REGEX-TEST: 8:30am ☀
+     * REGEX-TEST: 11:40pm ☽
+     */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",
-        "([☀☽࿇])"
+        "([☀☽࿇])",
     )
 
     private var display = ""

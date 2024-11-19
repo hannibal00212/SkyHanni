@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
@@ -17,11 +16,9 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -38,7 +35,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,9 +49,6 @@ object LorenzUtils {
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
-
-    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
-    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
      * Consider using [IslandType.isInIsland] instead
@@ -95,18 +88,6 @@ object LorenzUtils {
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
-
-    // TODO move to string utils
-    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
-    fun stripVanillaMessage(originalMessage: String): String {
-        return originalMessage.stripHypixelMessage()
-    }
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
-    fun Double.round(decimals: Int) = this.roundTo(decimals)
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
-    fun Float.round(decimals: Int) = this.roundTo(decimals)
 
     // TODO replace all calls with regex
     @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
@@ -345,22 +326,8 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    /**
-     * Get the group, otherwise, return null
-     * @param groupName The group name in the pattern
-     */
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
-    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
-    fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
-
-    // TODO move into Mining API
-    @Deprecated("", ReplaceWith("MiningAPI.inAdvancedMiningIsland()", "at.hannibal2.skyhanni.data.MiningAPI"))
-    fun inAdvancedMiningIsland() = MiningAPI.inAdvancedMiningIsland()
-
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
-        IslandType.DEEP_CAVERNS.isInIsland() || inAdvancedMiningIsland()
+        IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 

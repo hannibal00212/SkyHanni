@@ -19,34 +19,53 @@ import java.util.UUID
 @SkyHanniModule
 object FriendAPI {
     private val patternGroup = RepoPattern.group("data.friends")
+
+    /**
+     * REGEX-TEST: §r§eYou removed §r§b[MVP§r§d+§r§b] Throwpo§r§e from your friends list!§r§9§m
+     */
     private val removedFriendPattern by patternGroup.pattern(
         "remove",
-        ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*"
-    )
-    private val addedFriendPattern by patternGroup.pattern(
-        "add",
-        "§aYou are now friends with (?<name>.*)"
-    )
-    private val noBestFriendPattern by patternGroup.pattern(
-        "removebest",
-        ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*"
-    )
-    private val bestFriendPattern by patternGroup.pattern(
-        "addbest",
-        ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*"
+        ".*\n§r§eYou removed §r(?<name>.*)§e from your friends list!§r§9§m\n.*",
     )
 
     /**
-     * REGEX-TEST:
-     * §eClick here to view §bAaronL_Jackson§e's profile
+     * REGEX-TEST: §aYou are now friends with §r§b[MVP§r§d+§r§b] Throwpo
+     */
+    private val addedFriendPattern by patternGroup.pattern(
+        "add",
+        "§aYou are now friends with (?<name>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§e is no longer a best friend!§r§9§m
+     */
+    private val noBestFriendPattern by patternGroup.pattern(
+        "removebest",
+        ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*",
+    )
+
+    /**
+     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§a is now a best friend!§r§9§m
+     */
+    private val bestFriendPattern by patternGroup.pattern(
+        "addbest",
+        ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*",
+    )
+
+    /**
+     * REGEX-TEST: §eClick here to view §bThrowpo§e's profile
      */
     private val rawNamePattern by patternGroup.pattern(
         "rawname",
-        "\\n§eClick here to view §.(?<name>.*)§e's profile"
+        "\n§eClick here to view §.(?<name>.*)§e's profile",
     )
+
+    /**
+     * REGEX-TEST: /viewprofile 503450fc-72c2-4e87-8243-94e264977437
+     */
     private val readFriendListPattern by patternGroup.pattern(
         "readfriends",
-        "/viewprofile (?<uuid>.*)"
+        "/viewprofile (?<uuid>.*)",
     )
 
     private val tempFriends = mutableListOf<Friend>()
