@@ -169,7 +169,9 @@ class TextInput {
                     } else {
                         textBox.dropLast(1)
                     }
-                } else {textBox}
+                } else {
+                    textBox
+                }
 
                 else -> if (carriage != null) {
                     this.carriage = carriage + 1
