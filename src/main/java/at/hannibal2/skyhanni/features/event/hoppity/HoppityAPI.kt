@@ -269,7 +269,7 @@ object HoppityAPI {
             else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
         }?.let { hoppityDataSet.hoppityMessages.add(it) }
 
-        if (hoppityDataSet.hoppityMessages.size == 3) attemptFireRabbitFound(event.chatEvent)
+        attemptFireRabbitFound(event.chatEvent)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
