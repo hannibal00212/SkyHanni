@@ -18,10 +18,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropUpgrades {
 
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
+
+    /**
+     * REGEX-TEST: §7Current Tier: §e7§7/§a9
+     */
     private val tierPattern by patternGroup.pattern(
         "tier",
         "§7Current Tier: §.(?<level>\\d)§7/§a9",
     )
+
+    /**
+     * REGEX-TEST:   §r§6§lCROP UPGRADE §eNether Wart§7 #7
+     */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",
         "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",

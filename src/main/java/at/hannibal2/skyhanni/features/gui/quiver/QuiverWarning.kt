@@ -30,7 +30,7 @@ object QuiverWarning {
     private val config get() = SkyHanniMod.feature.combat.quiverConfig
 
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
-    private var arrowsInInstance = mutableSetOf<ArrowType>()
+    private val arrowsInInstance = mutableSetOf<ArrowType>()
 
     @SubscribeEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {

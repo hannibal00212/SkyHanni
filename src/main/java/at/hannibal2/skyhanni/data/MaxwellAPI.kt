@@ -61,18 +61,34 @@ object MaxwellAPI {
     private var powers = mutableListOf<String>()
 
     private val patternGroup = RepoPattern.group("data.maxwell")
+
+    /**
+     * REGEX-TEST: §eYou selected the §aSighted §epower for your §aAccessory Bag§e!
+     */
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
         "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!",
     )
+
+    /**
+     * REGEX-TEST: §eYour selected power was set to §r§aSighted§r§e!
+     */
     private val chatPowerUnlockedPattern by patternGroup.pattern(
         "chat.power.unlocked",
         "§eYour selected power was set to (?:§r)*§a(?<power>.*)(?:§r)*§e!",
     )
+
+    /**
+     * REGEX-TEST: §7Selected Power: §aSighted
+     */
     private val inventoryPowerPattern by patternGroup.pattern(
         "inventory.power",
         "§7Selected Power: §a(?<power>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Magical Power: §6419
+     */
     private val inventoryMPPattern by patternGroup.pattern(
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)",
@@ -89,6 +105,10 @@ object MaxwellAPI {
         "gui.thaumaturgy.data",
         "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)",
     )
+
+    /**
+     * REGEX-TEST: §7Total: §6419 Magical Power
+     */
     private val thaumaturgyMagicalPowerPattern by patternGroup.pattern(
         "gui.thaumaturgy.magicalpower",
         "§7Total: §6(?<mp>[\\d.,]+) Magical Power",
@@ -97,6 +117,11 @@ object MaxwellAPI {
         "gui.thaumaturgy.statstuning",
         "Stats Tuning",
     )
+
+    /**
+     * REGEX-TEST: §7You have: §b1,347 §7+ §b6 ✎
+     * REGEX-TEST: §7You have: §a812 §7+ §a3 ❈
+     */
     private val statsTuningDataPattern by patternGroup.pattern(
         "thaumaturgy.statstuning",
         "§7You have: .+ §7\\+ §(?<color>.)(?<amount>[^ ]+) (?<icon>.)",
@@ -117,10 +142,18 @@ object MaxwellAPI {
         "gui.noselectedpower",
         "(?:§.)*Visit Maxwell in the Hub to learn",
     )
+
+    /**
+     * REGEX-TEST: §aAccessory Bag
+     */
     private val accessoryBagStack by patternGroup.pattern(
         "stack.accessorybag",
         "§.Accessory Bag",
     )
+
+    /**
+     * REGEX-TEST: §7§c§cRequires §aRedstone Collection II§c.
+     */
     private val redstoneCollectionRequirementPattern by patternGroup.pattern(
         "collection.redstone.requirement",
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
@@ -299,7 +332,7 @@ object MaxwellAPI {
 
     fun getPowerByNameOrNull(name: String) = powers.find { it == name }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo
     @SubscribeEvent

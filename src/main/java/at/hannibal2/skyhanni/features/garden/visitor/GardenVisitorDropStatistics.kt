@@ -44,33 +44,61 @@ object GardenVisitorDropStatistics {
     var lastAccept = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
+
+    /**
+     * REGEX-TEST: OFFER ACCEPTED with Duke (UNCOMMON)
+     */
     private val acceptPattern by patternGroup.pattern(
         "accept",
-        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]"
+        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]",
     )
+
+    /**
+     * REGEX-TEST: +20 Copper
+     */
     private val copperPattern by patternGroup.pattern(
         "copper",
-        "[+](?<amount>.*) Copper"
+        "[+](?<amount>.*) Copper",
     )
+
+    /**
+     * REGEX-TEST: +20 Garden Experience
+     */
     private val gardenExpPattern by patternGroup.pattern(
         "gardenexp",
-        "[+](?<amount>.*) Garden Experience"
+        "[+](?<amount>.*) Garden Experience",
     )
+
+    /**
+     * REGEX-TEST: +18.2k Farming XP
+     */
     private val farmingExpPattern by patternGroup.pattern(
         "farmingexp",
-        "[+](?<amount>.*) Farming XP"
+        "[+](?<amount>.*) Farming XP",
     )
+
+    /**
+     * REGEX-TEST: +12 Bits
+     */
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        "[+](?<amount>.*) Bits"
+        "[+](?<amount>.*) Bits",
     )
+
+    /**
+     * REGEX-TEST: +968 Mithril Powder
+     */
     private val mithrilPowderPattern by patternGroup.pattern(
         "powder.mithril",
-        "[+](?<amount>.*) Mithril Powder"
+        "[+](?<amount>.*) Mithril Powder",
     )
+
+    /**
+     * REGEX-TEST: +754 Gemstone Powder
+     */
     private val gemstonePowderPattern by patternGroup.pattern(
         "powder.gemstone",
-        "[+](?<amount>.*) Gemstone Powder"
+        "[+](?<amount>.*) Gemstone Powder",
     )
 
     private var rewardsCount = mapOf<VisitorReward, Int>()
@@ -172,13 +200,13 @@ object GardenVisitorDropStatistics {
                     "§9${visitorRarities[1].addSeparators()}§f-" +
                     "§6${visitorRarities[2].addSeparators()}§f-" +
                     "§d${visitorRarities[3].addSeparators()}§f-" +
-                    "§c${visitorRarities[4].addSeparators()}"
+                    "§c${visitorRarities[4].addSeparators()}",
             )
         } else {
             addAsSingletonList("§c?")
             ErrorManager.logErrorWithData(
                 RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
-                "Error rendering visitor drop statistics"
+                "Error rendering visitor drop statistics",
             )
         }
         addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))

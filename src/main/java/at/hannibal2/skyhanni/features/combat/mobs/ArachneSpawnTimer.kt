@@ -30,10 +30,18 @@ object ArachneSpawnTimer {
     private val config get() = SkyHanniMod.feature.combat.mobs
 
     private val patternGroup = RepoPattern.group("combat.mobs.spawntime.arachne")
+
+    /**
+     * REGEX-TEST: ☄ littlegremlins placed an arachne's calling! something is awakening! (4/4)
+     */
     private val arachneFragmentPattern by patternGroup.pattern(
         "fragment",
         "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$"
     )
+
+    /**
+     * REGEX-TEST: ☄ littlegremlins placed an arachne crystal! something is awakening!
+     */
     private val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
         "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$"

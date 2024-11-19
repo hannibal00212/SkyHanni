@@ -139,16 +139,6 @@ object Translator {
         return arrayOf(messageToSend, language)
     }
 
-    @Deprecated("Use toNativeLanguage() instead", ReplaceWith("Translator.toNativeLanguage(args)"))
-    fun toEnglish(args: Array<String>) {
-        toNativeLanguage(args)
-    }
-
-    @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
-    fun fromEnglish(args: Array<String>) {
-        fromNativeLanguage(args)
-    }
-
     fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 

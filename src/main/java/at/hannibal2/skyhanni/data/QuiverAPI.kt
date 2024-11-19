@@ -71,27 +71,35 @@ object QuiverAPI {
     private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
-        "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!"
+        "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!",
     )
+
+    /**
+     * REGEX-TEST: §aYou filled your quiver with §f1,253 §aextra arrows!
+     */
     private val fillUpPattern by chatGroup.pattern(
         "fillup",
-        "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!"
+        "§aYou filled your quiver with §f(?<flintAmount>.*) §aextra arrows!",
     )
     private val clearedPattern by chatGroup.pattern(
         "cleared",
-        "§aCleared your quiver!|§c§lYour quiver is now completely empty!"
+        "§aCleared your quiver!|§c§lYour quiver is now completely empty!",
     )
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
-        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!"
+        "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!",
     )
     private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
-        "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
+        "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!",
     )
 
     // Bows that don't use the players arrows, checked using the SkyBlock ID
+    /**
+     * REGEX-TEST: BOSS_SPIRIT_BOW
+     * REGEX-TEST: CRYPT_BOW
+     */
     private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
 
@@ -100,7 +108,7 @@ object QuiverAPI {
      */
     private val quiverInventoryPattern by group.pattern(
         "quiver.inventory",
-        "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)"
+        "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)",
     )
 
     @SubscribeEvent
