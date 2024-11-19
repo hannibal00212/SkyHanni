@@ -252,7 +252,7 @@ object HoppityAPI {
     fun onEggFound(event: EggFoundEvent) {
         hoppityDataSet.lastMeal = event.type
 
-        val message: String? = when (event.type) {
+        when (event.type) {
             SIDE_DISH ->
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
             CHOCOLATE_FACTORY_MILESTONE ->
@@ -263,12 +263,12 @@ object HoppityAPI {
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!"
 
             // Each of these have their own from-Hypixel chats, so we don't need to add a message here
+            // as it will be handled in the attemptFireRabbitFound method, from the chat event.
             in resettingEntries, HITMAN, BOUGHT -> null
             else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
-        }
+        }?.let { hoppityDataSet.hoppityMessages.add(it) }
 
-        message?.let { hoppityDataSet.hoppityMessages.add(it) }
-        if (hoppityDataSet.hoppityMessages.size == 3) attemptFireRabbitFound(event.chatEvent)
+        attemptFireRabbitFound(event.chatEvent)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
