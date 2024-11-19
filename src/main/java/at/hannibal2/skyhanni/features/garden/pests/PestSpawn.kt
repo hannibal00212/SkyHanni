@@ -26,35 +26,20 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aPlot §7- §b4§7!
+     * REGEX-TEST: §6§lGROSS! §7A §2Pest §7has appeared in §aPlot §7- §b4§7!
      */
     private val onePestPattern by patternGroup.pattern(
         "one",
-        "§6§l.*! §7A §6Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!"
+        "§6§l.*! §7A §2Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!"
     )
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §6Pest §7has appeared in §aThe Barn§7!
-     */
-    private val onePestBarnPattern by patternGroup.pattern(
-        "onebarn",
-        "§6§l.*! §7A §6Pest §7has appeared in §a(?<plot>The Barn)§7!"
-    )
-
-    /**
-     * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aPlot §7- §b2§7!
+     * REGEX-TEST: §6§lEWW! §22 Pests §7have spawned in §aPlot §7- §b2§7!
+     * REGEX-TEST: §6§lYUCK! §23 Pests §7have spawned in §aPlot §7- §bR1§7!
      */
     private val multiplePestsSpawn by patternGroup.pattern(
         "multiple",
-        "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
-    )
-
-    /**
-     * REGEX-TEST: §6§lEWW! §62 Pests §7have spawned in §aThe Barn§7!
-     */
-    private val multiplePestsBarnSpawn by patternGroup.pattern(
-        "multiplebarn",
-        "§6§l.*! §6(?<amount>\\d) Pests §7have spawned in §a(?<plot>The Barn)§7!"
+        "§6§l.*! §2(?<amount>\\d) Pests §7have spawned in §aPlot §7- §b(?<plot>.*)§7!"
     )
 
     /**
@@ -80,20 +65,7 @@ object PestSpawn {
             pestSpawn(1, plotNames, false)
             blocked = true
         }
-        onePestBarnPattern.matchMatcher(message) {
-            val plotName = group("plot")
-            plotNames.add(plotName)
-            pestSpawn(1, plotNames, false)
-            blocked = true
-        }
         multiplePestsSpawn.matchMatcher(message) {
-            val plotName = group("plot")
-            plotNames.add(plotName)
-            val amount = group("amount").toInt()
-            pestSpawn(amount, plotNames, false)
-            blocked = true
-        }
-        multiplePestsBarnSpawn.matchMatcher(message) {
             val plotName = group("plot")
             plotNames.add(plotName)
             val amount = group("amount").toInt()
