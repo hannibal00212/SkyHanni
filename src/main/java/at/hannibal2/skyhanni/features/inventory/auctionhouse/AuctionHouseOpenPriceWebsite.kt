@@ -18,6 +18,7 @@ import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,7 +44,7 @@ object AuctionHouseOpenPriceWebsite {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         ahSearchPattern.matchMatcher(event.inventoryName) {
-            searchTerm = group("searchTerm").removeSuffix("\"").replace(" ", "%20")
+            searchTerm = URLEncoder.encode(group("searchTerm").removeSuffix("\""), "UTF-8")
             displayItem = createDisplayItem()
         }
     }
