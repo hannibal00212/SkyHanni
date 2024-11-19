@@ -10,6 +10,9 @@ import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 
+/**
+ * This rule enforces the default spacing rules for comments but ignores preprocessed comments.
+ */
 class CustomCommentSpacing(config: Config) : Rule(config) {
     override val issue = Issue(
         "CustomCommentSpacing",
@@ -17,7 +20,6 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
         "Enforces custom spacing rules for comments.",
         Debt.FIVE_MINS
     )
-
 
     override fun visitComment(comment: PsiComment) {
         if (comment.text.containsPreprocessingPattern()) return

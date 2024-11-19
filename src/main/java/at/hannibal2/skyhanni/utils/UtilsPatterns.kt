@@ -10,14 +10,14 @@ object UtilsPatterns {
     private val patternGroup = RepoPattern.group("utils")
 
     /** Examples:
-     §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
-     §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-     §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
-     §6§lSHINY LEGENDARY DUNGEON BOOTS
-     §6§lLEGENDARY DUNGEON BOOTS
-     §5§lEPIC BOOTS
-     §f§lCOMMON
-     **/
+     * §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
+     * §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+     * §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
+     * §6§lSHINY LEGENDARY DUNGEON BOOTS
+     * §6§lLEGENDARY DUNGEON BOOTS
+     * §5§lEPIC BOOTS
+     * §f§lCOMMON
+     */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
         "^(?:§.){2,3}(?:.§. (?:§.){2})?(?:SHINY )?(?<rarity>" +
@@ -71,6 +71,10 @@ object UtilsPatterns {
         "item.amount.behind",
         "(?<name>(?:§.)*(?:[^§] ?)+)(?:§8x(?<amount>[\\d,]+))?",
     )
+
+    /**
+     * REGEX-TEST: §7Cost
+     */
     val costLinePattern by patternGroup.pattern(
         "item.cost.line",
         "(?:§5§o)?§7Cost.*",
@@ -100,11 +104,20 @@ object UtilsPatterns {
         ".*Sack",
     )
 
+    /**
+     * REGEX-TEST: Late Winter
+     * REGEX-TEST: Early Spring
+     * REGEX-TEST: Summer
+     */
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
         "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)",
     )
 
+    /**
+     * REGEX-TEST: §l§r§e§lProfile: §r§aApple §r§7♲
+     * REGEX-TEST: §l§r§e§lProfile: §r§aNot Allowed To Quit Skyblock Ever Again
+     */
     val tabListProfilePattern by patternGroup.pattern(
         "tablist.profile",
         "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",

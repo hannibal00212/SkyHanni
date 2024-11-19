@@ -15,17 +15,17 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -45,15 +45,31 @@ object SackAPI {
     var inSackInventory = false
 
     private val patternGroup = RepoPattern.group("data.sacks")
+
+    /**
+     * REGEX-TEST: Fishing Sack
+     * REGEX-TEST: Enchanted Agronomy Sack
+     */
     private val sackPattern by patternGroup.pattern(
         "sack",
         "^(.* Sack|Enchanted .* Sack)\$",
     )
+
+    /**
+     * REGEX-TEST: §7Stored: §e28,183§7/60.5k
+     * REGEX-TEST: §7Stored: §80§7/60.5k
+     */
     @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+
+    /**
+     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
+     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
+     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
+     */
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
@@ -132,14 +148,14 @@ object SackAPI {
 
             if (isGemstoneSack) {
                 val gem = SackGemstone()
-                lore.matchAll(gemstonePattern) {
+                gemstonePattern.matchAll(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
                     if (gemstoneMap.containsKey(name.removeColor())) {
                         val internalName = "${rarity.uppercase()}_${
                             name.uppercase().split(" ")[0].removeColor()
-                        }_GEM".asInternalName()
+                        }_GEM".toInternalName()
 
                         gem.slot = slot
 
@@ -193,7 +209,7 @@ object SackAPI {
                 }
             } else {
                 // normal sack
-                lore.matchFirst(numPattern) {
+                numPattern.firstMatcher(lore) {
                     val item = SackOtherItem()
                     val stored = group("stored").formatInt()
                     val internalName = stack.getInternalName()
@@ -207,7 +223,7 @@ object SackAPI {
                         val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
                         val filletValue = filletPerTrophy * stored
                         item.magmaFish = filletValue
-                        "MAGMA_FISH".asInternalName().sackPrice(filletValue)
+                        "MAGMA_FISH".toInternalName().sackPrice(filletValue)
                     } else {
                         internalName.sackPrice(stored).coerceAtLeast(0)
                     }
@@ -378,7 +394,7 @@ object SackAPI {
     fun testSackAPI(args: Array<String>) {
         if (args.size == 1) {
             if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
             } else {
                 ChatUtils.userError("That item isn't a valid sack item.")
             }
@@ -398,18 +414,18 @@ data class SackItem(
 
 // TODO repo
 private val gemstoneMap = mapOf(
-    "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
-    "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
-    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".asInternalName(),
-    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".asInternalName(),
-    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".asInternalName(),
-    "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
-    "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
-    "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
-    "Onyx Gemstones" to "ROUGH_ONYX_GEM".asInternalName(),
-    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".asInternalName(),
-    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".asInternalName(),
-    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".asInternalName(),
+    "Jade Gemstones" to "ROUGH_JADE_GEM".toInternalName(),
+    "Amber Gemstones" to "ROUGH_AMBER_GEM".toInternalName(),
+    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".toInternalName(),
+    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".toInternalName(),
+    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".toInternalName(),
+    "Jasper Gemstones" to "ROUGH_JASPER_GEM".toInternalName(),
+    "Ruby Gemstones" to "ROUGH_RUBY_GEM".toInternalName(),
+    "Opal Gemstones" to "ROUGH_OPAL_GEM".toInternalName(),
+    "Onyx Gemstones" to "ROUGH_ONYX_GEM".toInternalName(),
+    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".toInternalName(),
+    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".toInternalName(),
+    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".toInternalName(),
 )
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks

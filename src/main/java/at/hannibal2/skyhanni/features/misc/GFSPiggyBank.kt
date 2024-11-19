@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object GFSPiggyBank {
 
-    private val ENCHANTED_PORK by lazy { "ENCHANTED_PORK".asInternalName().makePrimitiveStack(8) }
+    private val ENCHANTED_PORK by lazy { "ENCHANTED_PORK".toInternalName().makePrimitiveStack(8) }
 
     private val group = RepoPattern.group("misc.piggybank")
 

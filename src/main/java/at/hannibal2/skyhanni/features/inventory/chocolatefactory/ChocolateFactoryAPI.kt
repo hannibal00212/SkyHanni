@@ -39,10 +39,19 @@ object ChocolateFactoryAPI {
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
+
+    /**
+     * REGEX-TEST: 46,559,892,200 Chocolate
+     */
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
         "(?<amount>[\\d,]+) Chocolate",
     )
+
+    /**
+     * REGEX-TEST: Hoppity
+     * REGEX-TEST: Chocolate Factory Milestones
+     */
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "Hoppity|Chocolate Factory Milestones",
