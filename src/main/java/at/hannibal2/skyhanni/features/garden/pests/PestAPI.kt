@@ -114,7 +114,7 @@ object PestAPI {
     /**
      * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
      * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
-     * §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
+     * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
      */
     val pestDeathChatPattern by patternGroup.pattern(
         "chat.pestdeath",
