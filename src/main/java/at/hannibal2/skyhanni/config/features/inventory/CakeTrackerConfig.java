@@ -23,9 +23,8 @@ public class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Note",
-        desc = "§cNote7:" +
-            "\nThis feature is not compatible with the NEU Storage Overlay." +
-            "\nBackpacks/Ender Chest will not be scanned correctly with it enabled."
+        desc = "This feature is not compatible with the NEU Storage Overlay." +
+            "Backpacks/Ender Chest will not be scanned correctly with it enabled."
     )
     @ConfigEditorInfoText
     public boolean incompatibleNote = false;
