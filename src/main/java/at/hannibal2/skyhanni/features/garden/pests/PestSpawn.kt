@@ -43,11 +43,11 @@ object PestSpawn {
     )
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7While you were offline, §6Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
+     * REGEX-TEST: §6§lGROSS! §7While you were offline, §2Pests §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
      */
     private val offlinePestsSpawn by patternGroup.pattern(
         "offline",
-        "§6§l.*! §7While you were offline, §6Pests §7spawned in §aPlots (?<plots>.*)!"
+        "§6§l.*! §7While you were offline, §2Pests §7spawned in §aPlots (?<plots>.*)!"
     )
     private var plotNames = mutableListOf<String>()
 
