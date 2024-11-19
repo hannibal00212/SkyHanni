@@ -119,7 +119,8 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+            UnknownLinesHandler.handleUnknownLines()
     }
 
     @SubscribeEvent
