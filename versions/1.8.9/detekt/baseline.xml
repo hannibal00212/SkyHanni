@@ -81,13 +81,8 @@
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
     <ID>RepoPatternRegexTest:AdvancedPlayerList.kt$AdvancedPlayerList$by RepoPattern.pattern( "misc.compacttablist.advanced.level", ".*\\[(?&lt;level&gt;.*)] §r(?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:AnitaExtraFarmingFortune.kt$AnitaExtraFarmingFortune$by RepoPattern.pattern( "garden.inventory.anita.extrafortune.realamount", "§5§o§aJacob's Ticket §8x(?&lt;realAmount&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "calling", "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*" )</ID>
     <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "crystal", "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!" )</ID>
     <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "spawn", "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)" )</ID>
-    <ID>RepoPatternRegexTest:ArachneSpawnTimer.kt$ArachneSpawnTimer$by patternGroup.pattern( "crystal", "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$" )</ID>
-    <ID>RepoPatternRegexTest:ArachneSpawnTimer.kt$ArachneSpawnTimer$by patternGroup.pattern( "fragment", "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$" )</ID>
-    <ID>RepoPatternRegexTest:ArmorDropTracker.kt$ArmorDropTracker$by RepoPattern.pattern( "garden.armordrops.armor", "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)" )</ID>
     <ID>RepoPatternRegexTest:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "allowedinventories", "Auctions Browser|Manage Auctions|Auctions: \".*\"?", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "price", "§7(?:Buy it now|Starting bid|Top bid): §6(?&lt;coins&gt;[0-9,]+) coins", )</ID>
@@ -103,8 +98,6 @@
     <ID>RepoPatternRegexTest:BazaarOrderHelper.kt$BazaarOrderHelper$by patternGroup.pattern( "price", "§7Price per unit: §6(?&lt;number&gt;.*) coins", )</ID>
     <ID>RepoPatternRegexTest:BeaconPower.kt$BeaconPower$by group.pattern( "stat", "§7Current Stat: (?&lt;stat&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:BeaconPower.kt$BeaconPower$by group.pattern( "time", "§7Power Remaining: §e(?&lt;time&gt;.+)", )</ID>
-    <ID>RepoPatternRegexTest:BestiaryData.kt$BestiaryData$by patternGroup.pattern( "progress", "(?&lt;current&gt;[0-9kKmMbB,.]+)/(?&lt;needed&gt;[0-9kKmMbB,.]+\$)" )</ID>
-    <ID>RepoPatternRegexTest:BestiaryData.kt$BestiaryData$by patternGroup.pattern( "title", "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$" )</ID>
     <ID>RepoPatternRegexTest:BingoAPI.kt$BingoAPI$by RepoPattern.pattern( "bingo.detection.scoreboard", " §.Ⓑ §.Bingo" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "goalcomplete", "§6§lBINGO GOAL COMPLETE! §r§e(?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "hiddengoal", ".*§7§eThe next hint will unlock in (?&lt;time&gt;.*)" )</ID>
@@ -117,73 +110,30 @@
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.obtain", "Obtain a (?&lt;name&gt;\\w+) Crystal in the Crystal Hollows\\." )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.obtained", " *§r§e(?&lt;crystalName&gt;Topaz|Sapphire|Jade|Amethyst|Amber) Crystal" )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "skill", "Obtain level (?&lt;level&gt;.*) in the (?&lt;skill&gt;.*) Skill." )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsChatGroup.pattern( "boostercookieate", "§eYou consumed a §6Booster Cookie§e!.*", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsChatGroup.pattern( "rankup.bits", "§eYou gained §3(?&lt;amount&gt;.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsChatGroup.pattern( "rankup.rank", "[§\\w\\s]+FAME RANK UP (?:§.)+(?&lt;rank&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsDataGroup.pattern( "scoreboard", "^Bits: §b(?&lt;amount&gt;[\\d,.]+).*$", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "availablemenu", "§7Bits Available: §b(?&lt;toClaim&gt;[\\d,]+)(§3.+)?", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "communityshopfamerank", "§7Fame Rank: §e(?&lt;rank&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "cookiemenucookieactive", "(§7§cYou do not currently have a|§cBooster Cookie active!)", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "famerankmenuname", "^(Community Shop|Booster Cookie)$", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "famerankmenustack", "^(§aCommunity Shop|§eFame Rank)$", )</ID>
-    <ID>RepoPatternRegexTest:BitsAPI.kt$BitsAPI$by bitsGuiGroup.pattern( "sbmenufamerank", "§7Your rank: §e(?&lt;rank&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:BitsPerCookieVisual.kt$BitsPerCookieVisual$by patternGroup.pattern("wrong", "§[de]Booster Cookie")</ID>
     <ID>RepoPatternRegexTest:BlazeSlayerDaggerHelper.kt$BlazeSlayerDaggerHelper$by RepoPattern.pattern( "slayer.blaze.dagger.attunement", "§cStrike using the §r(.+) §r§cattunement on your dagger!" )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "anitabuff", "You tiered up the Extra Farming Drops upgrade to [+](?&lt;level&gt;.*)%!", )</ID>
-    <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "anitamenu", "§7You have: §6\\+(?&lt;level&gt;.*)☘ Farming Fortune", )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "bestiary", ".*§6+(?&lt;fortune&gt;.*)☘ Farming Fortune.*", )</ID>
-    <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "cake", "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!", )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "farminglevel", "SKILL LEVEL UP Farming .*➜(?&lt;level&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "fortuneupgrade", "You claimed the Garden Farming Fortune (?&lt;level&gt;.*) upgrade!", )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "lotusupgrade", "Lotus (?&lt;piece&gt;.*) upgraded to [+].*☘!", )</ID>
     <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "petlevelup", "Your (?&lt;pet&gt;.*) leveled up to level .*!", )</ID>
-    <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "strength", " Strength: §r§c❁(?&lt;strength&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "uniquevisitors.tier", "§7Progress to Tier (?&lt;nextTier&gt;\\w+):.*", )</ID>
-    <ID>RepoPatternRegexTest:CaptureFarmingGear.kt$CaptureFarmingGear$by patternGroup.pattern( "uniquevisitors.tierprogress", ".* §e(?&lt;having&gt;.*)§6/(?&lt;total&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:CarryTracker.kt$CarryTracker$by patternGroup.pattern( "trade.coins.gained", " §r§a§l\\+ §r§6(?&lt;coins&gt;.*) coins", )</ID>
     <ID>RepoPatternRegexTest:CarryTracker.kt$CarryTracker$by patternGroup.pattern( "trade.completed", "§6Trade completed with (?&lt;name&gt;.*)§r§6!", )</ID>
     <ID>RepoPatternRegexTest:ChatFilter.kt$ChatFilter$by RepoPattern.pattern( "chat.firesale", "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*", )</ID>
     <ID>RepoPatternRegexTest:ChatFilter.kt$ChatFilter$by RepoPattern.pattern( "chat.skymall.perk", "§eNew buff§r§r§r:(.*)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryAPI.kt$ChocolateFactoryAPI$by patternGroup.pattern( "chocolate.amount", "(?&lt;amount&gt;[\\d,]+) Chocolate", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryAPI.kt$ChocolateFactoryAPI$by patternGroup.pattern( "inventory.name", "Hoppity|Chocolate Factory Milestones", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "barn.amount", "§7Your Barn: §.(?&lt;rabbits&gt;\\d+)§7/§.(?&lt;max&gt;\\d+) Rabbits", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "chocolate.alltime", "§7All-time Chocolate: §6(?&lt;amount&gt;[\\d,]+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "chocolate.forprestige", "§7§cRequires (?&lt;amount&gt;\\w+) Chocolate this.*", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "chocolate.multiplier", "§7Total Multiplier: §6(?&lt;amount&gt;[\\d.]+)x", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "chocolate.persecond", "§6(?&lt;amount&gt;[\\d.,]+) §8per second", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "chocolate.thisprestige", "§7Chocolate this Prestige: §6(?&lt;amount&gt;[\\d,]+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "leaderboard.percentile", "§7§8You are in the top §.(?&lt;percent&gt;[\\d.]+)%§8 of players!", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "other.upgrade", "Rabbit Shrine|Coach Jackrabbit", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "prestige.level", "§6Chocolate Factory (?&lt;prestige&gt;[IVX]+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "rabbit.amount", "Rabbit \\S+ - \\[(?&lt;amount&gt;\\d+)].*", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "rabbit.unemployed", "Rabbit \\w+ - Unemployed", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "timetower.amount", "§7Charges: §.(?&lt;uses&gt;\\d+)§7/§a(?&lt;max&gt;\\d+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "timetower.recharge", "§7Next Charge: §a(?&lt;duration&gt;\\w+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "timetower.status", "§7Status: §.§l(?&lt;status&gt;INACTIVE|ACTIVE)(?: §f)?(?&lt;acitveTime&gt;\\w*)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryDataLoader.kt$ChocolateFactoryDataLoader$by ChocolateFactoryAPI.patternGroup.pattern( "upgradetier", ".*\\s(?&lt;tier&gt;[IVXLC]+)", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateFactoryInventory.kt$ChocolateFactoryInventory$by ChocolateFactoryAPI.patternGroup.pattern( "unclaimedrewards", "§7§aYou have \\d+ unclaimed rewards?!", )</ID>
-    <ID>RepoPatternRegexTest:ChocolateShopPrice.kt$ChocolateShopPrice$by ChocolateFactoryAPI.patternGroup.pattern( "shop.bought", "§aYou bought §r§.(?&lt;item&gt;[\\w ]+)§r(?:§8 x(?&lt;amount&gt;\\d+)§r)?§a!", )</ID>
     <ID>RepoPatternRegexTest:CityProjectFeatures.kt$CityProjectFeatures$by patternGroup.pattern( "completed", "§aProject is (?:being built|released)!", )</ID>
     <ID>RepoPatternRegexTest:CityProjectFeatures.kt$CityProjectFeatures$by patternGroup.pattern( "contribute", "§7Contribute again: §e(?&lt;time&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:CollectionAPI.kt$CollectionAPI$by patternGroup.pattern( "counter", ".* §e(?&lt;amount&gt;.*)§6/.*" )</ID>
-    <ID>RepoPatternRegexTest:CollectionAPI.kt$CollectionAPI$by patternGroup.pattern( "singlecounter", "§7Total Collected: §e(?&lt;amount&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:CollectionAPI.kt$CollectionAPI$by patternGroup.pattern( "tierzero", "§7Progress to .* I: .*" )</ID>
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "border", "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" )</ID>
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "health", " {3}§r§7§8\\+§a.* §c❤ Health" )</ID>
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "strength", " {3}§r§7§8\\+§a. §c❁ Strength" )</ID>
-    <ID>RepoPatternRegexTest:ComposterInventoryNumbers.kt$ComposterInventoryNumbers$by patternGroup.pattern( "amount", "§7§7Compost Available: §a(?&lt;amount&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ComposterInventoryNumbers.kt$ComposterInventoryNumbers$by patternGroup.pattern( "value", ".* §e(?&lt;having&gt;.*)§6/(?&lt;total&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:CrashOnDeath.kt$CrashOnDeath$by RepoPattern.pattern( "ownplayer.death.chat", "§c ☠ §r§7You (?&lt;reason&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:CrimsonIsleReputationHelper.kt$CrimsonIsleReputationHelper$by RepoPattern.pattern( "crimson.reputation.tablist", " §r§[cdea].*", )</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?&lt;floor&gt;[IV]+)")</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.master", ".*Master.*")</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")</ID>
-    <ID>RepoPatternRegexTest:CropAccessoryData.kt$CropAccessoryData$by RepoPattern.pattern( "data.accessory.bagname.new", "Accessory Bag.*" )</ID>
-    <ID>RepoPatternRegexTest:CruxTalismanDisplay.kt$CruxTalismanDisplay$by RepoPattern.pattern( "rift.everywhere.crux.progress", ".*(?&lt;tier&gt;§[0-9a-z][IV1-4-]+)\\s+(?&lt;name&gt;§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?&lt;progress&gt;§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*" )</ID>
     <ID>RepoPatternRegexTest:CurrentPetDisplay.kt$CurrentPetDisplay$by patternGroup.pattern( "chat.despawn", "§aYou despawned your §r.*§r§a!", )</ID>
     <ID>RepoPatternRegexTest:CurrentPetDisplay.kt$CurrentPetDisplay$by patternGroup.pattern( "chat.spawn", "§aYou summoned your §r(?&lt;pet&gt;.*)§r§a!", )</ID>
     <ID>RepoPatternRegexTest:CurrentPetDisplay.kt$CurrentPetDisplay$by patternGroup.pattern( "inventory.selected", "§7§7Selected pet: (?&lt;pet&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:DeepCavernsGuide.kt$DeepCavernsGuide$by patternGroup.pattern( "notunlocked", "§e\\[NPC] §bLift Operator§f: §rVenture down into the Lapis Quarry to unlock my Lift Menu!", )</ID>
     <ID>RepoPatternRegexTest:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "burrow.dug", "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*", )</ID>
     <ID>RepoPatternRegexTest:DianaProfitTracker.kt$DianaProfitTracker$by patternGroup.pattern( "coins", "§6§lWow! §r§eYou dug out §r§6(?&lt;coins&gt;.*) coins§r§e!", )</ID>
     <ID>RepoPatternRegexTest:DicerRngDropTracker.kt$DicerRngDropTracker$by melonPatternGroup.pattern( "crazyrare", "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!", )</ID>
@@ -196,38 +146,19 @@
     <ID>RepoPatternRegexTest:DicerRngDropTracker.kt$DicerRngDropTracker$by pumpkinPatternGroup.pattern( "uncommon", "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!", )</ID>
     <ID>RepoPatternRegexTest:DojoRankDisplay.kt$DojoRankDisplay$by patternGroup.pattern( "name", "(?&lt;color&gt;§\\w)Test of (?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:DojoRankDisplay.kt$DojoRankDisplay$by patternGroup.pattern( "rank", "(?:§\\w)+Your Rank: (?&lt;rank&gt;§\\w.) §8\\((?&lt;score&gt;\\d+)\\)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonAPI.kt$DungeonAPI$by patternGroup.pattern( "blessings", "§r§r§fBlessing of (?&lt;type&gt;\\w+) (?&lt;amount&gt;\\w+)§r", )</ID>
-    <ID>RepoPatternRegexTest:DungeonAPI.kt$DungeonAPI$by patternGroup.pattern( "noblessings", "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r", )</ID>
-    <ID>RepoPatternRegexTest:DungeonAPI.kt$DungeonAPI$by patternGroup.pattern( "room", "§7\\d+/\\d+/\\d+ §\\w+ (?&lt;roomId&gt;[\\w,-]+)", )</ID>
     <ID>RepoPatternRegexTest:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.normal", "(?:§c§lPUZZLE FAIL!|§4) §.§.(?&lt;name&gt;\\S*) .*" )</ID>
     <ID>RepoPatternRegexTest:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.quiz", "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?&lt;name&gt;\\S*) (?:§.)*chose the wrong .*" )</ID>
-    <ID>RepoPatternRegexTest:DungeonCopilot.kt$DungeonCopilot$by patternGroup.pattern( "countdown", "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute." )</ID>
-    <ID>RepoPatternRegexTest:DungeonCopilot.kt$DungeonCopilot$by patternGroup.pattern( "wither.door", "(.*) opened a §r§8§lWITHER §r§adoor!" )</ID>
+    <ID>RepoPatternRegexTest:DungeonCopilot.kt$DungeonCopilot$by patternGroup.pattern( "countdown", "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "carry", "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "catacombs.gate", "(Catacombs Gate)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "check.if.party", ".*('s Party)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "class.level", " §.(?&lt;playerName&gt;.*)§f: §e(?&lt;className&gt;.*)§b \\(§e(?&lt;level&gt;.*)§b\\)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "detect.dungeon.class", "§7View and select a dungeon class.", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "entrance", "(.*Entrance)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "floor", "(Floor .*)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "floor.any", "(Any)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "floor.dungeon", "(Dungeon: .*)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "floor.number", ".* (?&lt;floorNum&gt;[IV\\d]+)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "floor.pattern", "(Floor: .*)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "get.dungeon.class", ".* (?&lt;class&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "ineligible", "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "member", ".*§.(?&lt;playerName&gt;.*)§f: §e(?&lt;className&gt;.*)§b \\(§e(?&lt;level&gt;.*)§b\\)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "nonpug", "(?i).*(PERM|VC|DISCORD).*", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "note", "§7§7Note: §f(?&lt;note&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "party.finder.title", "(Party Finder)", )</ID>
     <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "price", "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*", )</ID>
-    <ID>RepoPatternRegexTest:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "select.floor", "(Select Floor)", )</ID>
-    <ID>RepoPatternRegexTest:DungeonHighlightClickedBlocks.kt$DungeonHighlightClickedBlocks$by patternGroup.pattern( "lever", "§cYou hear the sound of something opening...", )</ID>
-    <ID>RepoPatternRegexTest:DungeonMilestonesDisplay.kt$DungeonMilestonesDisplay$by RepoPattern.pattern( "dungeon.milestone", "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*" )</ID>
-    <ID>RepoPatternRegexTest:DungeonsRaceGuide.kt$DungeonsRaceGuide$by RepoPattern.pattern( "dungeon.race.active", "§.§.(?&lt;race&gt;[\\w ]+) RACE §.[\\d:.]+" )</ID>
     <ID>RepoPatternRegexTest:EnchantParser.kt$EnchantParser$by patternGroup.pattern( "enchants.new", "(§7§l|§d§l|§9|§7)(?&lt;enchant&gt;[A-Za-z][A-Za-z '-]+) (?&lt;levelNumeral&gt;[IVXLCDM]+|[0-9]+)(?&lt;stacking&gt;(§r)?§9, |\$| §8\\d{1,3}([,.]\\d{1,3})*[kKmMbB]?)", )</ID>
     <ID>RepoPatternRegexTest:EnchantParser.kt$EnchantParser$by patternGroup.pattern( "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*", )</ID>
-    <ID>RepoPatternRegexTest:EntityMovementData.kt$EntityMovementData$by RepoPattern.pattern( "data.entity.warping", "§7(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\.", )</ID>
     <ID>RepoPatternRegexTest:FarmingContestAPI.kt$FarmingContestAPI$by patternGroup.pattern( "crop", "§8(?&lt;crop&gt;.*) Contest", )</ID>
     <ID>RepoPatternRegexTest:FarmingContestAPI.kt$FarmingContestAPI$by patternGroup.pattern( "sidebarcrop", "\\s*(?:§e○|§6☘) §f(?&lt;crop&gt;.*) §a.*", )</ID>
     <ID>RepoPatternRegexTest:FarmingContestAPI.kt$FarmingContestAPI$by patternGroup.pattern( "time", "§a(?&lt;month&gt;.*) (?&lt;day&gt;.*)(?:rd|st|nd|th), Year (?&lt;year&gt;.*)", )</ID>
@@ -238,23 +169,8 @@
     <ID>RepoPatternRegexTest:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.cropspecific", " (?&lt;crop&gt;Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTest:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.universal", " Farming Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTest:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tooltip.new", "^§7Farming Fortune: §a\\+(?&lt;display&gt;[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?&lt;reforge&gt;\\d+)\\))?(?: §d\\(\\+(?&lt;gemstone&gt;\\d+)\\))?\$", )</ID>
-    <ID>RepoPatternRegexTest:FishingAPI.kt$FishingAPI$by RepoPattern.pattern( "fishing.trophyfishing.armor", "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)", )</ID>
     <ID>RepoPatternRegexTest:FishingProfitTracker.kt$FishingProfitTracker$by RepoPattern.pattern( "fishing.tracker.chat.coins", ".* CATCH! §r§bYou found §r§6(?&lt;coins&gt;.*) Coins§r§b\\.", )</ID>
-    <ID>RepoPatternRegexTest:FossilSolverDisplay.kt$FossilSolverDisplay$by patternGroup.pattern( "chargesremaining", "Chisel Charges Remaining: (?&lt;charges&gt;\\d+)", )</ID>
-    <ID>RepoPatternRegexTest:FossilSolverDisplay.kt$FossilSolverDisplay$by patternGroup.pattern( "fossilprogress", "Fossil Excavation Progress: (?&lt;progress&gt;[\\d.]+%)", )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "add", "§aYou are now friends with (?&lt;name&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "addbest", ".*\n(?&lt;name&gt;.*)§a is now a best friend!§r§9§m\n.*" )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "rawname", "\\n§eClick here to view §.(?&lt;name&gt;.*)§e's profile" )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "readfriends", "/viewprofile (?&lt;uuid&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "remove", ".*\n§r§eYou removed §r(?&lt;name&gt;.*)§e from your friends list!§r§9§m\n.*" )</ID>
-    <ID>RepoPatternRegexTest:FriendAPI.kt$FriendAPI$by patternGroup.pattern( "removebest", ".*\n§r(?&lt;name&gt;.*)§e is no longer a best friend!§r§9§m\n.*" )</ID>
     <ID>RepoPatternRegexTest:GardenCropMilestoneFix.kt$GardenCropMilestoneFix$by patternGroup.pattern( "levelup", " {2}§r§b§lGARDEN MILESTONE §3(?&lt;crop&gt;.*) §8.*➜§3(?&lt;tier&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:GardenCropMilestones.kt$GardenCropMilestones$by patternGroup.pattern( "crop", "§7Harvest §f(?&lt;name&gt;.*) §7on .*", )</ID>
-    <ID>RepoPatternRegexTest:GardenCropMilestones.kt$GardenCropMilestones$by patternGroup.pattern( "total", "§7Total: §a(?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:GardenCropMilestonesCommunityFix.kt$GardenCropMilestonesCommunityFix$by RepoPattern.pattern( "data.garden.milestonefix.amount", ".*§e(?&lt;having&gt;.*)§6/§e(?&lt;max&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:GardenCropUpgrades.kt$GardenCropUpgrades$by patternGroup.pattern( "chatupgrade", "\\s+§r§6§lCROP UPGRADE §e(?&lt;crop&gt;[\\w ]+)§7 #(?&lt;tier&gt;\\d)", )</ID>
-    <ID>RepoPatternRegexTest:GardenCropUpgrades.kt$GardenCropUpgrades$by patternGroup.pattern( "tier", "§7Current Tier: §.(?&lt;level&gt;\\d)§7/§a9", )</ID>
-    <ID>RepoPatternRegexTest:GardenInventoryNumbers.kt$GardenInventoryNumbers$by RepoPattern.pattern( "garden.inventory.numbers.upgradetier", "§7Current Tier: §[ea](?&lt;tier&gt;.*)§7/§a.*", )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "chat.increase", " {4}§r§8\\+§r§2(?&lt;exp&gt;.*) §r§7Garden Experience" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.levelprogress", "§7Progress to Level (?&lt;currentLevel&gt;[^:]*).*" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.name", "Garden (?:Desk|Level (?&lt;currentLevel&gt;.*))" )</ID>
@@ -263,22 +179,6 @@
     <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "crop", "§(e○|6☘) §7(?&lt;crop&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:GardenPlotAPI.kt$GardenPlotAPI$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorCompactChat.kt$GardenVisitorCompactChat$by patternGroup.pattern( "disregardrewardname", "^(Copper|Farming XP|Farming Experience|Garden Experience|Bits)\$" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorCompactChat.kt$GardenVisitorCompactChat$by patternGroup.pattern( "rewardstext", "^ {2}§a§lREWARDS" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "accept", "OFFER ACCEPTED with (?&lt;visitor&gt;.*) [(](?&lt;rarity&gt;.*)[)]" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "bits", "[+](?&lt;amount&gt;.*) Bits" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "copper", "[+](?&lt;amount&gt;.*) Copper" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "farmingexp", "[+](?&lt;amount&gt;.*) Farming XP" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "gardenexp", "[+](?&lt;amount&gt;.*) Garden Experience" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "powder.gemstone", "[+](?&lt;amount&gt;.*) Gemstone Powder" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorDropStatistics.kt$GardenVisitorDropStatistics$by patternGroup.pattern( "powder.mithril", "[+](?&lt;amount&gt;.*) Mithril Powder" )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorFeatures.kt$GardenVisitorFeatures$by patternGroup.pattern( "copper", " §8\\+§c(?&lt;amount&gt;.*) Copper", )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorFeatures.kt$GardenVisitorFeatures$by patternGroup.pattern( "gardenexperience", " §8\\+§2(?&lt;amount&gt;.*) §7Garden Experience", )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorFeatures.kt$GardenVisitorFeatures$by patternGroup.pattern( "visitorchat", "§e\\[NPC] (?&lt;color&gt;§.)?(?&lt;name&gt;.*)§f: §r.*", )</ID>
-    <ID>RepoPatternRegexTest:GardenVisitorTimer.kt$GardenVisitorTimer$by RepoPattern.pattern( "garden.visitor.timer.time.new", " Next Visitor: §r(?&lt;info&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:GardenWarpCommands.kt$GardenWarpCommands$by RepoPattern.pattern( "garden.warpcommand.tpplot", "/tp (?&lt;plot&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GetFromSackAPI.kt$GetFromSackAPI$by patternGroup.pattern( "from", "§aMoved §r§e(?&lt;amount&gt;\\d+) (?&lt;item&gt;.+)§r§a from your Sacks to your inventory.", )</ID>
-    <ID>RepoPatternRegexTest:GetFromSackAPI.kt$GetFromSackAPI$by patternGroup.pattern( "missing", "§cYou have no (?&lt;item&gt;.+) in your Sacks!", )</ID>
     <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "bestiary", ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?&lt;previousLevel&gt;\\d+)➜(?:§\\d|§\\w)(?&lt;nextLevel&gt;\\d+).*", )</ID>
     <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "combatsection", ".*[+](?&lt;gained&gt;[0-9,.]+) (?&lt;skillName&gt;[A-Za-z]+) \\((?&lt;progress&gt;(?&lt;current&gt;[0-9.,]+)/(?&lt;total&gt;[0-9.,]+)|(?&lt;percent&gt;[0-9.]+)%)\\).*", )</ID>
     <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "ghostxp", "(?&lt;current&gt;\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?&lt;total&gt;\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)", )</ID>
@@ -286,40 +186,12 @@
     <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "skilllevel", ".*§e§lSkills: §r§a(?&lt;skillName&gt;.*) (?&lt;skillLevel&gt;\\d+).*", )</ID>
     <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "skillxp", "[+](?&lt;gained&gt;[0-9,.]+) \\((?&lt;current&gt;[0-9,.]+)(?:/(?&lt;total&gt;[0-9,.]+))?\\)", )</ID>
     <ID>RepoPatternRegexTest:GlacitePowderFeatures.kt$GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GoldenGoblinHighlight.kt$GoldenGoblinHighlight$by RepoPattern.pattern("mining.mob.golden.goblin", "Golden Goblin|Diamond Goblin")</ID>
-    <ID>RepoPatternRegexTest:HarpFeatures.kt$HarpFeatures$by patternGroup.pattern( "inventory", "Harp.*", )</ID>
-    <ID>RepoPatternRegexTest:HarpFeatures.kt$HarpFeatures$by patternGroup.pattern( "menu", "Melody.*", )</ID>
-    <ID>RepoPatternRegexTest:HideNotClickableItems.kt$HideNotClickableItems$by RepoPattern.pattern( "inventory.hidenotclickable.seeds", "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3", )</ID>
-    <ID>RepoPatternRegexTest:HighlightBonzoMasks.kt$HighlightBonzoMasks$by patternGroup.pattern( "bonzo", "Your .*Bonzo's Mask saved your life!" )</ID>
     <ID>RepoPatternRegexTest:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
-    <ID>RepoPatternRegexTest:HoppityCollectionStats.kt$HoppityCollectionStats$by patternGroup.pattern( "duplicates.found", "§7Duplicates Found: §a(?&lt;duplicates&gt;[\\d,]+)", )</ID>
-    <ID>RepoPatternRegexTest:HoppityCollectionStats.kt$HoppityCollectionStats$by patternGroup.pattern( "rabbits.found", "§.§l§m[ §a-z]+§r §.(?&lt;current&gt;[0-9]+)§./§.(?&lt;total&gt;[0-9]+)", )</ID>
-    <ID>RepoPatternRegexTest:HoppityEggsManager.kt$HoppityEggsManager$by ChocolateFactoryAPI.patternGroup.pattern( "egg.alreadycollected", "§cYou have already collected this Chocolate (?&lt;meal&gt;\\w+) Egg§r§c! Try again when it respawns!", )</ID>
-    <ID>RepoPatternRegexTest:HoppityEggsManager.kt$HoppityEggsManager$by ChocolateFactoryAPI.patternGroup.pattern( "egg.spawned", "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?&lt;meal&gt;\\w+) Egg §r§dhas appeared!", )</ID>
-    <ID>RepoPatternRegexTest:HoppityEggsManager.kt$HoppityEggsManager$by ChocolateFactoryAPI.patternGroup.pattern( "rabbit.duplicate", "§7§lDUPLICATE RABBIT! §6\\+(?&lt;amount&gt;[\\d,]+) Chocolate", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "inventory.heart.token", "§7Token of the Mountain: §5(?&lt;token&gt;\\d+)", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "inventory.reset.token", "\\s+§8- §5(?&lt;token&gt;\\d+) Token of the Mountain", )</ID>
     <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.cost", "(?:§.)*§7Cost", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.disabled", "§c§lDISABLED|§7§eClick to select!", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.enable", "§a§lENABLED|(§.)*SELECTED", )</ID>
     <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "perk.notunlocked", "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|", )</ID>
-    <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "reset.chat", "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset.", )</ID>
     <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "skymall", "(?:§eNew buff§r§r§r: §r§f|§8 ■ §7)(?&lt;perk&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "islandname", "(?:§.)*(Area|Dungeon): (?:§.)*(?&lt;island&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "lobbytype", "(?&lt;lobbyType&gt;.*lobby)\\d+", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "playeramount", "^\\s*(?:§.)+Players (?:§.)+\\((?&lt;amount&gt;\\d+)\\)\\s*$", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "playeramount.coop", "^\\s*(?:§.)*Coop (?:§.)*\\((?&lt;amount&gt;\\d+)\\)\\s*$", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "playeramount.guesting", "^\\s*(?:§.)*Guests (?:§.)*\\((?&lt;amount&gt;\\d+)\\)\\s*$", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "scoreboard.title", "SK[YI]BLOCK(?: CO-OP| GUEST)?", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "scoreboard.visiting.amount", "\\s+§.✌ §.\\(§.(?&lt;currentamount&gt;\\d+)§./(?&lt;maxamount&gt;\\d+)\\)", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "serverid.scoreboard", "§7\\d+/\\d+/\\d+ §8(?&lt;servertype&gt;[mM])(?&lt;serverid&gt;\\S+).*", )</ID>
     <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "servername.connection", "(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "servername.scoreboard", "§e(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
-    <ID>RepoPatternRegexTest:HypixelData.kt$HypixelData$by patternGroup.pattern( "solo.profile.amount", "^\\s*(?:§.)*Island\\s*$", )</ID>
-    <ID>RepoPatternRegexTest:InGameDateDisplay.kt$InGameDateDisplay$by patternGroup.pattern( "date", ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*" )</ID>
-    <ID>RepoPatternRegexTest:InGameDateDisplay.kt$InGameDateDisplay$by patternGroup.pattern( "symbols", "([☀☽࿇])" )</ID>
-    <ID>RepoPatternRegexTest:InfernoMinionFeatures.kt$InfernoMinionFeatures$by RepoPattern.pattern( "minion.infernominiontitle", "Inferno Minion .*" )</ID>
     <ID>RepoPatternRegexTest:InquisitorWaypointShare.kt$InquisitorWaypointShare$by patternGroup.pattern( "died", "(?&lt;party&gt;§9Party §8&gt; )?(?&lt;playerName&gt;.*)§f: §rInquisitor dead!", )</ID>
     <ID>RepoPatternRegexTest:ItemAbilityCooldown.kt$ItemAbilityCooldown$by patternGroup.pattern( "alignedother", "§eYou aligned §r§a.* §r§eother player(s)?!", )</ID>
     <ID>RepoPatternRegexTest:ItemAbilityCooldown.kt$ItemAbilityCooldown$by patternGroup.pattern( "buffedyourself", "§aYou buffed yourself for §r§c\\+\\d+❁ Strength", )</ID>
@@ -327,7 +199,6 @@
     <ID>RepoPatternRegexTest:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "bestiarystack", "§7Progress to Tier (?&lt;tier&gt;[\\dIVXC]+): §b[\\d.]+%", )</ID>
     <ID>RepoPatternRegexTest:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "bingogoalrank", "(§.)*You were the (§.)*(?&lt;rank&gt;[\\w]+)(?&lt;ordinal&gt;(st|nd|rd|th)) (§.)*to", )</ID>
     <ID>RepoPatternRegexTest:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "harvest", "§7§7You may harvest §6(?&lt;amount&gt;.).*", )</ID>
-    <ID>RepoPatternRegexTest:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "masterskull.id", "MASTER_SKULL_TIER_(?&lt;tier&gt;\\d)", )</ID>
     <ID>RepoPatternRegexTest:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "vacuum", "§7Vacuum Bag: §6(?&lt;amount&gt;\\d*) Pests?", )</ID>
     <ID>RepoPatternRegexTest:ItemPickupLog.kt$ItemPickupLog$by patternGroup.pattern( "shoppattern", "^(?&lt;itemName&gt;.+?)(?: x\\d+)?\$", )</ID>
     <ID>RepoPatternRegexTest:JacobFarmingContestsInventory.kt$JacobFarmingContestsInventory$by RepoPattern.pattern( "garden.jacob.contests.inventory.medal", "§7§7You placed in the (?&lt;medal&gt;.*) §7bracket!" )</ID>
@@ -336,26 +207,10 @@
     <ID>RepoPatternRegexTest:KuudraAPI.kt$KuudraAPI$by patternGroup.pattern( "scoreboard.tier", " §7⏣ §cKuudra's Hollow §8\\(T(?&lt;tier&gt;.*)\\)" )</ID>
     <ID>RepoPatternRegexTest:LimboPlaytime.kt$LimboPlaytime$by patternGroup.pattern( "hours", "§5§o§b([\\d.,]+) hours.+\$" )</ID>
     <ID>RepoPatternRegexTest:LimboPlaytime.kt$LimboPlaytime$by patternGroup.pattern( "minutes", "§5§o§a([\\d.,]+) minutes.+\$" )</ID>
-    <ID>RepoPatternRegexTest:LogBookStats.kt$LogBookStats$by groupPattern.pattern( "accepted", "§7Offers Accepted: §a(?&lt;timesAccepted&gt;[0-9,.]+)" )</ID>
-    <ID>RepoPatternRegexTest:LogBookStats.kt$LogBookStats$by groupPattern.pattern( "page.current", "§ePage (?&lt;page&gt;\\d)" )</ID>
-    <ID>RepoPatternRegexTest:LogBookStats.kt$LogBookStats$by groupPattern.pattern( "visited", "§7Times Visited: §a(?&lt;timesVisited&gt;[0-9,.]+)" )</ID>
     <ID>RepoPatternRegexTest:MaxPurseItems.kt$MaxPurseItems$by patternGroup.pattern( "instant", ".*Price per unit: §6(?&lt;coins&gt;[\\d.,]+) coins.*", )</ID>
     <ID>RepoPatternRegexTest:MaxPurseItems.kt$MaxPurseItems$by patternGroup.pattern( "order", ".*§6(?&lt;coins&gt;[\\d.,]+) coins §7each.*", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "chat.power", "§eYou selected the §a(?&lt;power&gt;.*) §e(power )?for your §aAccessory Bag§e!", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "chat.power.unlocked", "§eYour selected power was set to (?:§r)*§a(?&lt;power&gt;.*)(?:§r)*§e!", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "collection.redstone.requirement", "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.", )</ID>
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.noselectedpower", "(?:§.)*Visit Maxwell in the Hub to learn", )</ID>
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.thaumaturgy.data", "§(?&lt;color&gt;.)\\+(?&lt;amount&gt;[^ ]+)(?&lt;icon&gt;.) (?&lt;name&gt;.+)", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.thaumaturgy.magicalpower", "§7Total: §6(?&lt;mp&gt;[\\d.,]+) Magical Power", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "inventory.magicalpower", "§7Magical Power: §6(?&lt;mp&gt;[\\d,]+)", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "inventory.power", "§7Selected Power: §a(?&lt;power&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "stack.accessorybag", "§.Accessory Bag", )</ID>
-    <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "thaumaturgy.statstuning", "§7You have: .+ §7\\+ §(?&lt;color&gt;.)(?&lt;amount&gt;[^ ]+) (?&lt;icon&gt;.)", )</ID>
-    <ID>RepoPatternRegexTest:MiningAPI.kt$MiningAPI$by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")</ID>
-    <ID>RepoPatternRegexTest:MiningEventTracker.kt$MiningEventTracker$by patternGroup.pattern( "bossbar.active", "§e§lEVENT (?&lt;event&gt;.+) §e§lACTIVE IN (?&lt;area&gt;.+) §e§lfor §a§l(?&lt;time&gt;\\S+)§r" )</ID>
-    <ID>RepoPatternRegexTest:MiningEventTracker.kt$MiningEventTracker$by patternGroup.pattern( "bossbar.passive", "§e§lPASSIVE EVENT (?&lt;event&gt;.+) §e§lRUNNING FOR §a§l(?&lt;time&gt;\\S+)§r" )</ID>
-    <ID>RepoPatternRegexTest:MiningEventTracker.kt$MiningEventTracker$by patternGroup.pattern( "ended", "(?:§.)*\\s+(?:§.)+§l(?&lt;event&gt;.+) ENDED!" )</ID>
-    <ID>RepoPatternRegexTest:MiningEventTracker.kt$MiningEventTracker$by patternGroup.pattern( "started", "(?:§.)*\\s+(?:§.)+§l(?&lt;event&gt;.+) STARTED!" )</ID>
     <ID>RepoPatternRegexTest:MinionCraftHelper.kt$MinionCraftHelper$by RepoPattern.pattern( "bingo.minion.name", "(?&lt;name&gt;.*) Minion (?&lt;number&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.coin", "§aYou received §r§6(.*) coins§r§a!" )</ID>
     <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.upgrade", "§aYou have upgraded your Minion to Tier (?&lt;tier&gt;.*)" )</ID>
@@ -370,7 +225,6 @@
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern("filter.slayer", "^. (?&lt;name&gt;.*) (?&lt;tier&gt;[IV]+) \\d+.*")</ID>
-    <ID>RepoPatternRegexTest:MobUtils.kt$MobUtils$by RepoPattern.pattern("armorstand.default", "Armou?r Stand")</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "gaiaconstruct", ".* §r§eYou dug out a §r§2Gaia Construct§r§e!", )</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoschampion", ".* §r§eYou dug out a §r§2Minos Champion§r§e!", )</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoshunter", ".* §r§eYou dug out a §r§2Minos Hunter§r§e!", )</ID>
@@ -380,84 +234,24 @@
     <ID>RepoPatternRegexTest:NPCVisitorFix.kt$NPCVisitorFix$by RepoPattern.pattern( "garden.barn.skin.change", "§aChanging Barn skin to §r.*" )</ID>
     <ID>RepoPatternRegexTest:NewYearCakeReminder.kt$NewYearCakeReminder$by RepoPattern.pattern( "event.winter.newyearcake.reminder.sidebar", "§dNew Year Event!§f (?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:NonGodPotEffectDisplay.kt$NonGodPotEffectDisplay$by RepoPattern.pattern( "misc.nongodpot.effects", "§7You have §e(?&lt;name&gt;\\d+) §7non-god effects\\.", )</ID>
-    <ID>RepoPatternRegexTest:OwnInventoryData.kt$OwnInventoryData$by RepoPattern.pattern( "data.owninventory.chat.movedsacktoinventory", "§aMoved §r§e\\d* (?&lt;name&gt;.*)§r§a from your Sacks to your inventory.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "dungeonfinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)", )</ID>
     <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "kuudrafinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "members.list.withkind", "Party (?&lt;kind&gt;Leader|Moderators|Members): (?&lt;names&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "members.start", "§6Party Members \\(\\d+\\)", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.disband", ".* §ehas disbanded the party!", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.disconnect", "(?&lt;name&gt;.*) §ewas removed from your party because they disconnected\\.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.inparty", "§eYou'll be partying with: (?&lt;names&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.joined", "(?&lt;name&gt;.*) §ejoined the party\\.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.kicked", "(?&lt;name&gt;.*) §ehas been removed from the party\\.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.left", "(?&lt;name&gt;.*) §ehas left the party\\.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.offline", "§eKicked (?&lt;name&gt;.*) because they were offline\\.", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.transfer.leave", "The party was transferred to (?&lt;newowner&gt;.*) because (?&lt;name&gt;.*) left", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "others.transfer.voluntary", "The party was transferred to (?&lt;newowner&gt;.*) by (?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "you.joined", "§eYou have joined (?&lt;name&gt;.*)'s? §eparty!", )</ID>
-    <ID>RepoPatternRegexTest:PartyAPI.kt$PartyAPI$by patternGroup.pattern( "you.kicked", "§eYou have been kicked from the party by .* §e", )</ID>
-    <ID>RepoPatternRegexTest:PersonalCompactorOverlay.kt$PersonalCompactorOverlay$by group.pattern( "internalname", "PERSONAL_(?&lt;type&gt;[^_]+)_(?&lt;tier&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTest:PestAPI.kt$PestAPI$by patternGroup.pattern( "inventory", "§4§lൠ §cThis plot has §6(?&lt;amount&gt;\\d) Pests?§c!", )</ID>
     <ID>RepoPatternRegexTest:PestAPI.kt$PestAPI$by patternGroup.pattern( "scoreboard.pests", " §7⏣ §[ac]The Garden §4§lൠ§7 x(?&lt;pests&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:PetAPI.kt$PetAPI$by patternGroup.pattern( "item.name.neu.format", "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:PetAPI.kt$PetAPI$by patternGroup.pattern( "menu.title", "Pets(?: \\(\\d+/\\d+\\) )?", )</ID>
     <ID>RepoPatternRegexTest:PowderTracker.kt$PowderTracker$by patternGroup.pattern( "powder.bossbar", "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?&lt;time&gt;.*)§r", )</ID>
     <ID>RepoPatternRegexTest:PowderTracker.kt$PowderTracker$by patternGroup.pattern( "powder.ended", ".*§r§b§l2X POWDER ENDED!.*", )</ID>
     <ID>RepoPatternRegexTest:PowderTracker.kt$PowderTracker$by patternGroup.pattern( "powder.started", ".*§r§b§l2X POWDER STARTED!.*", )</ID>
     <ID>RepoPatternRegexTest:PresentWaypoints.kt$PresentWaypoints$by patternGroup.pattern( "found", "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)", )</ID>
-    <ID>RepoPatternRegexTest:PurseAPI.kt$PurseAPI$by patternGroup.pattern( "coins", "(?:§.)*(?:Piggy|Purse): §6(?&lt;coins&gt;[\\d,.]+)(?: ?(?:§.)*\\([+-](?&lt;earned&gt;[\\d,.]+)\\)?|.*)?$", )</ID>
-    <ID>RepoPatternRegexTest:PurseAPI.kt$PurseAPI$by patternGroup.pattern( "piggy", "Piggy: (?&lt;coins&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "addedtoquiver", "(?:§.)*You've added (?:§.)*(?&lt;type&gt;.*) x(?&lt;amount&gt;.*) (?:§.)*to your quiver!" )</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "cleared", "§aCleared your quiver!|§c§lYour quiver is now completely empty!" )</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "fillup", "§aYou filled your quiver with §f(?&lt;flintAmount&gt;.*) §aextra arrows!" )</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "fillupjax", "(?:§.)*Jax forged (?:§.)*(?&lt;type&gt;.*?)(?:§.)* x(?&lt;amount&gt;[\\d,]+)(?: (?:§.)*for (?:§.)*(?&lt;coins&gt;[\\d,]+) Coins)?(?:§.)*!" )</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "ranout", "§c§lQUIVER! §cYou have run out of §f(?&lt;type&gt;.*)s§c!" )</ID>
+    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "addedtoquiver", "(?:§.)*You've added (?:§.)*(?&lt;type&gt;.*) x(?&lt;amount&gt;.*) (?:§.)*to your quiver!", )</ID>
+    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "cleared", "§aCleared your quiver!|§c§lYour quiver is now completely empty!", )</ID>
+    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "fillupjax", "(?:§.)*Jax forged (?:§.)*(?&lt;type&gt;.*?)(?:§.)* x(?&lt;amount&gt;[\\d,]+)(?: (?:§.)*for (?:§.)*(?&lt;coins&gt;[\\d,]+) Coins)?(?:§.)*!", )</ID>
+    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern( "ranout", "§c§lQUIVER! §cYou have run out of §f(?&lt;type&gt;.*)s§c!", )</ID>
     <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?&lt;arrow&gt;.*)§a!")</ID>
-    <ID>RepoPatternRegexTest:QuiverAPI.kt$QuiverAPI$by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")</ID>
-    <ID>RepoPatternRegexTest:ReforgeHelper.kt$ReforgeHelper$by repoGroup.pattern( "chat.fail", "§cWait a moment before reforging again!|§cWhoa! Slow down there!", )</ID>
-    <ID>RepoPatternRegexTest:ReforgeHelper.kt$ReforgeHelper$by repoGroup.pattern( "chat.success", "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!", )</ID>
     <ID>RepoPatternRegexTest:RestorePieceOfWizardPortalLore.kt$RestorePieceOfWizardPortalLore$by RepoPattern.pattern( "misc.restore.wizard.portal.earned", "§7Earned by:.*" )</ID>
     <ID>RepoPatternRegexTest:RiftBloodEffigies.kt$RiftBloodEffigies$by patternGroup.pattern( "heart", "Effigies: (?&lt;hearts&gt;((§[7c])?⧯)*)" )</ID>
     <ID>RepoPatternRegexTest:RiftBloodEffigies.kt$RiftBloodEffigies$by patternGroup.pattern( "respawn", "§eRespawn §c(?&lt;time&gt;.*) §7\\(or click!\\)" )</ID>
-    <ID>RepoPatternRegexTest:RiftMotesOrb.kt$RiftMotesOrb$by RepoPattern.pattern( "rift.everywhere.motesorb", "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*" )</ID>
-    <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "gemstone", " §[0-9a-f](?&lt;gemrarity&gt;[A-z]*): §[0-9a-f](?&lt;stored&gt;\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?", )</ID>
-    <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "number", "(?:(?:§[0-9a-f](?&lt;level&gt;I{1,3})§7:)?|(?:§7Stored:)?) (?&lt;color&gt;§[0-9a-f])(?&lt;stored&gt;[0-9.,kKmMbB]+)§7/(?&lt;total&gt;\\d+(?:[0-9.,]+)?[kKmMbB]?)", )</ID>
-    <ID>RepoPatternRegexTest:SackAPI.kt$SackAPI$by patternGroup.pattern( "sack", "^(.* Sack|Enchanted .* Sack)\$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "magmaboss", "§7Boss: §[c6e]\\d+%", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by combatSb.pattern( "magmabosshealthbar", "§.[\\w,.]+§f/§a10M§c❤", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "floor3guardians", "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "teammates", "(?:§.)*(?&lt;classAbbv&gt;\\[\\w]) (?:§.)*(?&lt;username&gt;\\w{2,16}) ((?:§.)*(?&lt;classLevel&gt;\\[Lvl?(?&lt;level&gt;[\\w,.]+)?]?)|(?:§.)*(?&lt;health&gt;[\\w,.]+)(?:§.)*.?)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "newyear", "§dNew Year Event!§f \\d*?:?\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "spooky", "§6Spooky Festival§f \\d*?:?\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "travelingzoo", "§aTraveling Zoo§f \\d*:\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventcubedmg", "(?:§.)*Your Cube Damage: §.[\\d+,.]+$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventnextwave", "(?:§.)*Next Wave: (?:§.)*(?:[\\d:]+|Soon!)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventstart", "(?:§.)*Event Start: §.[\\d:]+$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventtotaldmg", "(?:§.)*Your Total Damage: §.[\\d+,.]+.*$", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by eventsSb.pattern( "wintereventwave", "(?:§.)*Wave \\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by kuudraSb.pattern( "tokens", "(?:§.)*Tokens: §.[\\w,]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by kuudraSb.pattern( "wave", "(?:§.)*Wave: (?:§.)*\\d+(?:§.)*(?: §.- §.\\d+:\\d+)?", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "fortunatefreezing.bonus", "Event Bonus: §6\\+\\d+☘", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "fossildust", "Fossil Dust: §f[\\d.,]+.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mineshaft.notstarted", "(?:§.)*Not started.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "miningeventzone", "Zone: §.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mithrilremaining", "Remaining: §a(?:\\d+ Tasty Mithril|FULL)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "mithrilyourmithril", "Your Tasty Mithril: §c\\d+.*", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miningSb.pattern( "nearbyplayers", "Nearby Players: §.(?:\\d+|N/A)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by miscSb.pattern( "wtfarethoselines", "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "autoclosing", "(?:§.)*Auto-closing in: §c(?:\\d+:)?\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "instanceshutdown", "(?:§.)*Instance Shutdown In: (?:§.)*(?&lt;time&gt;(?:\\w+[ydhms] ?)+)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "startingin", "(?:§.)*Starting in: §.(?:\\d+:)?\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "timeelapsed", "(?:§.)*Time Elapsed: (?:§.)*(?&lt;time&gt;(\\w+[ydhms] ?)+)", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by multiUseSb.pattern( "timeleft", "(?:§.)*Time Left: (?:§.)*[\\w:,.\\s]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "clues", "Clues: §.\\d+/\\d+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by riftSb.pattern( "hayeaten", "Hay Eaten: §.[\\d,.]+/[\\d,.]+", )</ID>
-    <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by tablistGroup.pattern( "eventtimestarts", "\\s+Starts In: §r§e(?&lt;time&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ServerRestartTitle.kt$ServerRestartTitle$by patternGroup.pattern( "greedy", "§cServer closing.*", )</ID>
-    <ID>RepoPatternRegexTest:ServerRestartTitle.kt$ServerRestartTitle$by patternGroup.pattern( "time", "§cServer closing: (?&lt;minutes&gt;\\d+):(?&lt;seconds&gt;\\d+) ?§8.*", )</ID>
-    <ID>RepoPatternRegexTest:ShiftClickNPCSell.kt$ShiftClickNPCSell$by RepoPattern.pattern( "inventory.npc.sell.lore", "§7them to this Shop!|§eClick to buyback!" )</ID>
     <ID>RepoPatternRegexTest:ShowMotesNpcSellPrice.kt$ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*" )</ID>
     <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill", "\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;\\w+) \\((?&lt;current&gt;[\\d.,]+)/(?&lt;needed&gt;[\\d.,]+)\\)", )</ID>
     <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.multiplier", "\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;.+) \\((?&lt;current&gt;[\\d.,]+)/(?&lt;needed&gt;[\\d,.]+[kmb])\\)", )</ID>
@@ -467,44 +261,23 @@
     <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.tab.nopercent", " §r§a(?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: §r§e(?&lt;current&gt;[0-9,.]+)§r§6/§r§e(?&lt;needed&gt;[0-9kmb]+)", )</ID>
     <ID>RepoPatternRegexTest:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
     <ID>RepoPatternRegexTest:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
-    <ID>RepoPatternRegexTest:SkyMartCopperPrice.kt$SkyMartCopperPrice$by RepoPattern.pattern( "garden.inventory.skymart.copper", "§c(?&lt;amount&gt;.*) Copper" )</ID>
     <ID>RepoPatternRegexTest:SlayerBossSpawnSoon.kt$SlayerBossSpawnSoon$by RepoPattern.pattern( "slayer.bosswarning.progress", " \\(?(?&lt;progress&gt;[0-9.,k]+)/(?&lt;total&gt;[0-9.,k]+)\\)?.*" )</ID>
     <ID>RepoPatternRegexTest:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!" )</ID>
     <ID>RepoPatternRegexTest:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter" )</ID>
     <ID>RepoPatternRegexTest:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "update", " {3}§dRNG Meter §f- §d(?&lt;exp&gt;.*) Stored XP" )</ID>
     <ID>RepoPatternRegexTest:SprayFeatures.kt$SprayFeatures$by RepoPattern.pattern( "garden.spray.material", "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?&lt;spray&gt;.*)§r§7!", )</ID>
-    <ID>RepoPatternRegexTest:StatsTuning.kt$StatsTuning$by RepoPattern.pattern( "inventory.statstuning.points", "§7Stat has: §e(?&lt;amount&gt;\\d+) points?", )</ID>
-    <ID>RepoPatternRegexTest:SuperCraftFeatures.kt$SuperCraftFeatures$by RepoPattern.pattern( "inventory.supercrafting.craft.new", "§eYou Supercrafted §r§r§r§.(?&lt;item&gt;[^§]+)(?:§r§8x(?&lt;amount&gt;[\\d,]+))?§r§e!" )</ID>
-    <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "cookie", "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*" )</ID>
-    <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "dungeonbuff", "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*" )</ID>
     <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "upgrades", "(?&lt;firstPart&gt;§e[A-Za-z ]+)(?&lt;secondPart&gt; §f[\\w ]+)" )</ID>
-    <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "username", "^\\[(?&lt;sblevel&gt;\\d+)] (?:\\[\\w+] )?(?&lt;username&gt;\\w+)" )</ID>
     <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "winterpowerups", "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*" )</ID>
     <ID>RepoPatternRegexTest:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "click.disable", ".*(disable!)" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "gui", "(Widgets in.*|Widgets on.*)" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "is.enabled", ".*ENABLED" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "main", "§7Currently:.*" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "show", "Shown .* Setting.*|.*Widget Settings" )</ID>
-    <ID>RepoPatternRegexTest:TabWidgetSettings.kt$TabWidgetSettings$by patternGroup.pattern( "sub", "§eClick to .*" )</ID>
     <ID>RepoPatternRegexTest:TeleportPadCompactName.kt$TeleportPadCompactName$by patternGroup.pattern( "name", "§.✦ §aWarp To (?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TeleportPadCompactName.kt$TeleportPadCompactName$by patternGroup.pattern( "noname", "§.✦ §cNo Destination" )</ID>
     <ID>RepoPatternRegexTest:TeleportPadInventoryNumber.kt$TeleportPadInventoryNumber$by RepoPattern.pattern( "misc.teleportpad.number", "§.(?&lt;number&gt;.*) teleport pad" )</ID>
-    <ID>RepoPatternRegexTest:TerracottaPhase.kt$TerracottaPhase$by repoGroup.pattern( "end", "§c\\[BOSS] Sadan§r§f: ENOUGH!", )</ID>
     <ID>RepoPatternRegexTest:TerracottaPhase.kt$TerracottaPhase$by repoGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
     <ID>RepoPatternRegexTest:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "dungeon", "§7Dungeon Score: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "slayer", "§7Slayer XP: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "owner", "§7Owner: §e(?&lt;owner&gt;.+)" )</ID>
     <ID>RepoPatternRegexTest:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "timeremaining", "§7Remaining: §e(?:(?&lt;min&gt;\\d+)m )?(?&lt;sec&gt;\\d+)s" )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "above", "The target is around (?&lt;height&gt;.*) blocks above, at a (?&lt;angle&gt;.*) degrees angle!", )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "below", "The target is around (?&lt;height&gt;.*) blocks below, at a (?&lt;angle&gt;.*) degrees angle!", )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "clickoption", "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]", )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "start.dialogue", "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.", )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "trapper", "\\[NPC] Trevor: You can find your (?&lt;rarity&gt;.*) animal near the (?&lt;location&gt;.*).", )</ID>
-    <ID>RepoPatternRegexTest:TrevorFeatures.kt$TrevorFeatures$by patternGroup.pattern( "zone", "Location: (?&lt;zone&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:TrevorTracker.kt$TrevorTracker$by patternGroup.pattern( "kill", "§aKilling the animal rewarded you §r§5(?&lt;pelts&gt;.*) pelts§r§a.", )</ID>
-    <ID>RepoPatternRegexTest:TrevorTracker.kt$TrevorTracker$by patternGroup.pattern( "selfkill", "§aYour mob died randomly, you are rewarded §r§5(?&lt;pelts&gt;.*) pelts§r§a.", )</ID>
     <ID>RepoPatternRegexTest:TrophyFishMessages.kt$TrophyFishMessages$by RepoPattern.pattern( "fishing.trophy.trophyfish", "§6§lTROPHY FISH! §r§bYou caught an? §r(?&lt;displayName&gt;§[0-9a-f](?:§k)?[\\w -]+) §r(?&lt;displayRarity&gt;§[0-9a-f]§l\\w+)§r§b\\." )</ID>
     <ID>RepoPatternRegexTest:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector", "§9(?&lt;what&gt;\\w+(?: \\w+)?) Collector", )</ID>
     <ID>RepoPatternRegexTest:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector.invalid", "Glacite|Scrap", )</ID>
@@ -519,26 +292,15 @@
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by RepoPattern.pattern( "string.isroman", "^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.amount.behind", "(?&lt;name&gt;(?:§.)*(?:[^§] ?)+)(?:§8x(?&lt;amount&gt;[\\d,]+))?", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.amount.front", "(?: +§8(?:\\+§.)?(?&lt;amount&gt;[\\d.,]+[km]?)x? )?(?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.cost.line", "(?:§5§o)?§7Cost.*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.name.abiphone", ".{2}Abiphone .*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.name.bait", "^(Obfuscated.*|.* Bait)$", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.name.potion", ".*Potion", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.neuitems.enchantmentname", "^(?&lt;format&gt;(?:§.)*)(?&lt;name&gt;[^§]+) (?&lt;level&gt;[IVXL]+)(?: Book)?$", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "item.sack", ".*Sack", )</ID>
-    <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "skyblocktime.season", "(?:Early |Late )?(?&lt;season&gt;Spring|Summer|Autumn|Winter)", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.chatusername", "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?&lt;rankedName&gt;(?:§\\w\\[\\w.+] )?(?:§\\w)?(?&lt;username&gt;\\w+))(?: (?:§\\w)?\\[.+?])?", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
-    <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "tablist.profile", "(?:§.)+Profile: §r§a(?&lt;profile&gt;[\\w\\s]+[^ §]).*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
-    <ID>RepoPatternRegexTest:VerminTracker.kt$VerminTracker$by patternGroup.pattern( "bagline", "§fVacuum Bag: §\\w(?&lt;count&gt;\\d+) (?&lt;vermin&gt;\\w+)" )</ID>
-    <ID>RepoPatternRegexTest:VerminTracker.kt$VerminTracker$by patternGroup.pattern( "binline", "§fVermin Bin: §\\w(?&lt;count&gt;\\d+) (?&lt;vermin&gt;\\w+)" )</ID>
-    <ID>RepoPatternRegexTest:VerminTracker.kt$VerminTracker$by patternGroup.pattern( "fly", ".*§eYou vacuumed a §.*Fly.*" )</ID>
-    <ID>RepoPatternRegexTest:VerminTracker.kt$VerminTracker$by patternGroup.pattern( "silverfish", ".*§eYou vacuumed a §.*Silverfish.*" )</ID>
-    <ID>RepoPatternRegexTest:VerminTracker.kt$VerminTracker$by patternGroup.pattern( "spider", ".*§eYou vacuumed a §.*Spider.*" )</ID>
-    <ID>RepoPatternRegexTest:VisitorAPI.kt$VisitorAPI$by patternGroup.pattern( "visitor.count", "§b§lVisitors: §r§f\\((?&lt;info&gt;.*)\\)", )</ID>
-    <ID>RepoPatternRegexTest:VisitorAPI.kt$VisitorAPI$by patternGroup.pattern( "visitor.name", " (?:§.)+(?&lt;name&gt;§.[^§]+).*", )</ID>
     <ID>RepoPatternRegexTest:VisitorListener.kt$VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
-    <ID>RepoPatternRegexTest:WardrobeAPI.kt$WardrobeAPI$by repoGroup.pattern( "inventory.name", "Wardrobe \\((?&lt;currentPage&gt;\\d+)/\\d+\\)", )</ID>
     <ID>ReturnCount:AnitaMedalProfit.kt$AnitaMedalProfit$private fun readItem(slot: Int, item: ItemStack, table: MutableList&lt;DisplayTableEntry&gt;)</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt$BingoNextStepHelper$private fun readDescription(description: String): NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
@@ -678,7 +440,7 @@
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$lastParticlePoint2!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$lastParticlePoint2?.distance(particlePoint!!)!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint!!</ID>
-    <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint?.subtract(lastParticlePoint2!!)!!</ID>
+    <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint?.let { it - lastParticlePoint2!! }!!</ID>
     <ID>UnsafeCallOnNullableType:SummoningSoulsName.kt$SummoningSoulsName$mobsName.getOrNull(nearestMob)!!</ID>
     <ID>UnsafeCallOnNullableType:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:TiaRelayWaypoints.kt$TiaRelayWaypoints$waypointName!!</ID>
@@ -691,70 +453,10 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
-    <ID>UseOrEmpty:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$event.originalOre?.let { "$it " } ?: ""</ID>
-    <ID>VarCouldBeVal:AdvancedPlayerList.kt$AdvancedPlayerList$private var randomOrderCache = TimeLimitedCache&lt;String, Int&gt;(20.minutes)</ID>
-    <ID>VarCouldBeVal:BestiaryData.kt$BestiaryData$private var indexes = listOf( 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37, 38, 39, 40, 41, 42, 43 )</ID>
-    <ID>VarCouldBeVal:BucketedItemTrackerData.kt$BucketedItemTrackerData$@Expose private var bucketedItems: MutableMap&lt;E, MutableMap&lt;NEUInternalName, TrackedItem&gt;&gt; = HashMap()</ID>
-    <ID>VarCouldBeVal:CarnivalZombieShootout.kt$CarnivalZombieShootout$private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())</ID>
-    <ID>VarCouldBeVal:ChocolateFactoryStrayTracker.kt$ChocolateFactoryStrayTracker$private var claimedStraysSlots = mutableListOf&lt;Int&gt;()</ID>
-    <ID>VarCouldBeVal:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$private var bestiaryDescription = mutableListOf&lt;String&gt;()</ID>
-    <ID>VarCouldBeVal:CraftRoomHolographicMob.kt$CraftRoomHolographicMob$private var entityToHolographicEntity = mapOf( EntityZombie::class.java to HolographicEntities.zombie, EntitySlime::class.java to HolographicEntities.slime, EntityCaveSpider::class.java to HolographicEntities.caveSpider, )</ID>
-    <ID>VarCouldBeVal:CustomWardrobe.kt$CustomWardrobe$private var guiName = "Custom Wardrobe"</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var goodLevel = 0</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant$@Expose private var maxLevel = 0</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var nbtNum: String? = null</ID>
-    <ID>VarCouldBeVal:Enchant.kt$Enchant.Stacking$@Expose private var stackLevel: TreeSet&lt;Int&gt;? = null</ID>
-    <ID>VarCouldBeVal:ErrorManager.kt$ErrorManager$private var cache = TimeLimitedSet&lt;Pair&lt;String, Int&gt;&gt;(10.minutes)</ID>
-    <ID>VarCouldBeVal:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$var nameColor = if (!useless) "§9" else "§7"</ID>
-    <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var currentBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
-    <ID>VarCouldBeVal:ExperimentsProfitTracker.kt$ExperimentsProfitTracker$private var lastBottlesInInventory = mutableMapOf&lt;NEUInternalName, Int&gt;()</ID>
-    <ID>VarCouldBeVal:FarmingWeightDisplay.kt$FarmingWeightDisplay$private var nextPlayers = mutableListOf&lt;UpcomingLeaderboardPlayer&gt;()</ID>
-    <ID>VarCouldBeVal:FlareDisplay.kt$FlareDisplay$private var flares = mutableListOf&lt;Flare&gt;()</ID>
-    <ID>VarCouldBeVal:FontRendererHook.kt$FontRendererHook$private var CHROMA_COLOR: Int = -0x1</ID>
-    <ID>VarCouldBeVal:FontRendererHook.kt$FontRendererHook$private var CHROMA_COLOR_SHADOW: Int = -0xAAAAAB</ID>
-    <ID>VarCouldBeVal:GardenPlotIcon.kt$GardenPlotIcon$private var cachedStack = mutableMapOf&lt;Int, ItemStack&gt;()</ID>
-    <ID>VarCouldBeVal:GardenPlotIcon.kt$GardenPlotIcon$private var originalStack = mutableMapOf&lt;Int, ItemStack&gt;()</ID>
-    <ID>VarCouldBeVal:GardenPlotMenuHighlighting.kt$GardenPlotMenuHighlighting$private var highlightedPlots = mutableMapOf&lt;GardenPlotAPI.Plot, PlotStatusType&gt;()</ID>
-    <ID>VarCouldBeVal:GardenVisitorColorNames.kt$GardenVisitorColorNames$private var visitorColors = mutableMapOf&lt;String, String&gt;() // name -&gt; color code</ID>
-    <ID>VarCouldBeVal:GhostData.kt$GhostData$private var session = mutableMapOf( Option.KILLS to 0.0, Option.SORROWCOUNT to 0.0, Option.VOLTACOUNT to 0.0, Option.PLASMACOUNT to 0.0, Option.GHOSTLYBOOTS to 0.0, Option.BAGOFCASH to 0.0, Option.TOTALDROPS to 0.0, Option.SCAVENGERCOINS to 0.0, Option.MAXKILLCOMBO to 0.0, Option.SKILLXPGAINED to 0.0 )</ID>
-    <ID>VarCouldBeVal:GraphEditor.kt$GraphEditor$var vector = LocationUtils.calculatePlayerFacingDirection()</ID>
-    <ID>VarCouldBeVal:HoppityCollectionStats.kt$HoppityCollectionStats$private var highlightMap = mutableMapOf&lt;String, LorenzColor&gt;()</ID>
     <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;LorenzVec&gt;&gt; get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value }</ID>
-    <ID>VarCouldBeVal:HoppityNpc.kt$HoppityNpc$private var slotsToHighlight = mutableSetOf&lt;Int&gt;()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemList = mutableMapOf&lt;Int, Pair&lt;ItemStack, Int&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemsAddedToInventory = mutableMapOf&lt;Int, PickupEntry&gt;()</ID>
-    <ID>VarCouldBeVal:ItemPickupLog.kt$ItemPickupLog$private var itemsRemovedFromInventory = mutableMapOf&lt;Int, PickupEntry&gt;()</ID>
-    <ID>VarCouldBeVal:LocationUtils.kt$LocationUtils$var yaw = LocationUtils.calculatePlayerYaw() + 180</ID>
-    <ID>VarCouldBeVal:LorenzLogger.kt$LorenzLogger.Companion$private var LOG_DIRECTORY = File("config/skyhanni/logs")</ID>
-    <ID>VarCouldBeVal:MobDetection.kt$MobDetection$private var shouldClear: AtomicBoolean = AtomicBoolean(false)</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var floor2summonsDiedOnce = mutableListOf&lt;EntityOtherPlayerMP&gt;()</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var floor6GiantsSeparateDelay = mutableMapOf&lt;UUID, Pair&lt;Long, BossType&gt;&gt;()</ID>
-    <ID>VarCouldBeVal:MobFinder.kt$MobFinder$private var guardians = mutableListOf&lt;EntityGuardian&gt;()</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NEUInternalName&gt;&gt;</ID>
-    <ID>VarCouldBeVal:PowerStoneGuideFeatures.kt$PowerStoneGuideFeatures$private var missing = mutableMapOf&lt;Int, NEUInternalName&gt;()</ID>
-    <ID>VarCouldBeVal:PunchcardHighlight.kt$PunchcardHighlight$private var playerQueue = mutableListOf&lt;String&gt;()</ID>
-    <ID>VarCouldBeVal:QuiverWarning.kt$QuiverWarning$private var arrowsInInstance = mutableSetOf&lt;ArrowType&gt;()</ID>
-    <ID>VarCouldBeVal:ReforgeHelper.kt$ReforgeHelper$private var waitForChat = AtomicBoolean(false)</ID>
-    <ID>VarCouldBeVal:ReminderManager.kt$ReminderManager$private var listPage = 1</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
-    <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing the exclusive owner of a regex key */ private var exclusivity: MutableMap&lt;String, RepoPatternKeyOwner&gt; = mutableMapOf()</ID>
-    <ID>VarCouldBeVal:SeaCreatureFeatures.kt$SeaCreatureFeatures$private var entityIds = TimeLimitedSet&lt;Int&gt;(6.minutes)</ID>
-    <ID>VarCouldBeVal:SeaCreatureFeatures.kt$SeaCreatureFeatures$private var rareSeaCreatures = TimeLimitedSet&lt;Mob&gt;(6.minutes)</ID>
-    <ID>VarCouldBeVal:ShowFishingItemName.kt$ShowFishingItemName$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(750.milliseconds)</ID>
-    <ID>VarCouldBeVal:SkyblockGuideHighlightFeature.kt$SkyblockGuideHighlightFeature.Companion$private var missing = mutableSetOf&lt;Int&gt;()</ID>
-    <ID>VarCouldBeVal:SlayerItemsOnGround.kt$SlayerItemsOnGround$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(2.seconds)</ID>
-    <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var dingSlope = mutableListOf&lt;Float&gt;()</ID>
-    <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var locations = mutableListOf&lt;LorenzVec&gt;()</ID>
-    <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var resultDisplay = mutableMapOf&lt;Int, Int&gt;()</ID>
-    <ID>VarCouldBeVal:TiaRelayHelper.kt$TiaRelayHelper$private var sounds = mutableMapOf&lt;Int, Sound&gt;()</ID>
-    <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var backupTrapperID: Int = 17</ID>
-    <ID>VarCouldBeVal:TrevorFeatures.kt$TrevorFeatures$private var trapperID: Int = 56</ID>
-    <ID>VarCouldBeVal:TrophyFishDisplay.kt$TrophyFishDisplay$private var recentlyDroppedTrophies = TimeLimitedCache&lt;NEUInternalName, TrophyRarity&gt;(5.seconds)</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var fillerID = "STAINED_GLASS_PANE".toInternalName()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var limboID = "ENDER_PEARL".toInternalName()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillOverflowLuck = mutableMapOf&lt;SkillType, Int&gt;()</ID>
-    <ID>VarCouldBeVal:UserLuckBreakdown.kt$UserLuckBreakdown$private var skillsID = "DIAMOND_SWORD".toInternalName()</ID>
   </CurrentIssues>
 </SmellBaseline>

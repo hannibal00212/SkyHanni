@@ -45,7 +45,7 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
-    private var recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
+    private val recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NEUInternalName>()
 
     private var display = emptyList<Renderable>()

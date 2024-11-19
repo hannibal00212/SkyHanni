@@ -58,6 +58,11 @@ object HoppityCollectionStats {
         "page.current",
         "(?:\\((?<page>\\d+)/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
     )
+
+    /**
+     * REGEX-TEST: §7Duplicates Found: §a9
+     * REGEX-TEST: §7Duplicates Found: §a0
+     */
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
         "§7Duplicates Found: §a(?<duplicates>[\\d,]+)",
@@ -72,6 +77,9 @@ object HoppityCollectionStats {
         "(?:§.)+You (?:have not found this rabbit yet!|cannot find this rabbit until you)",
     )
 
+    /**
+     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     */
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
         "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
@@ -294,7 +302,7 @@ object HoppityCollectionStats {
         }
     }
 
-    private var highlightMap = mutableMapOf<String, LorenzColor>()
+    private val highlightMap = mutableMapOf<String, LorenzColor>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {

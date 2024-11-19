@@ -16,6 +16,10 @@ object ChocolateFactoryInventory {
 
     private val config get() = ChocolateFactoryAPI.config
 
+    /**
+     * REGEX-TEST: §7§aYou have 1 unclaimed reward!
+     * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
+     */
     private val unclaimedRewardsPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "unclaimedrewards",
         "§7§aYou have \\d+ unclaimed rewards?!",

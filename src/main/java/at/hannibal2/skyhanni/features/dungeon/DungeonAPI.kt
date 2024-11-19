@@ -93,17 +93,25 @@ object DungeonAPI {
         "complete",
         "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
+
+    /**
+     * REGEX-TEST: §711/15/24 §8m4F 830,-420
+     */
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
         "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
+
+    /**
+     * REGEX-TEST: §r§r§fBlessing of Power V§r
+     */
     private val blessingPattern by patternGroup.pattern(
         "blessings",
         "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
     )
     private val noBlessingPattern by patternGroup.pattern(
         "noblessings",
-        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
+        "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
     )
 
     enum class DungeonBlessings(var power: Int) {

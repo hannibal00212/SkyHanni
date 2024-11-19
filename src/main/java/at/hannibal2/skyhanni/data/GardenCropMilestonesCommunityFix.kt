@@ -28,6 +28,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestonesCommunityFix {
+
+    /**
+     * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
+     */
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
         ".*§e(?<having>.*)§6/§e(?<max>.*)",

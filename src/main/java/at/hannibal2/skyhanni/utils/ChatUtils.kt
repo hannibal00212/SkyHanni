@@ -268,14 +268,6 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
-    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
-    fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            debug("Sending wrong command to server? ($command)")
-        }
-        sendMessageToServer("/$command")
-    }
-
     fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
         it.isNotEmpty()
     }?.get(0) == commandWithSlash

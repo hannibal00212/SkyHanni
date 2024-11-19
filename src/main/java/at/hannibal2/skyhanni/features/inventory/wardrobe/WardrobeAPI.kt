@@ -32,6 +32,10 @@ object WardrobeAPI {
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
     private val repoGroup = RepoPattern.group("inventory.wardrobe")
+
+    /**
+     * REGEX-TEST: Wardrobe (2/2)
+     */
     private val inventoryPattern by repoGroup.pattern(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",

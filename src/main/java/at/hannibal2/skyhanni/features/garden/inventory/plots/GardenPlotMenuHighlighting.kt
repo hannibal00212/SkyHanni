@@ -19,7 +19,7 @@ object GardenPlotMenuHighlighting {
 
     private val config get() = GardenAPI.config.plotMenuHighlighting
 
-    private var highlightedPlots = mutableMapOf<GardenPlotAPI.Plot, PlotStatusType>()
+    private val highlightedPlots = mutableMapOf<GardenPlotAPI.Plot, PlotStatusType>()
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {

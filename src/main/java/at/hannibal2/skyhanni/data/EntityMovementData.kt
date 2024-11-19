@@ -24,6 +24,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EntityMovementData {
 
+    /**
+     * REGEX-TEST: §7Sending a visit request...
+     * REGEX-TEST: §7Finding player...
+     * REGEX-TEST: §7Warping you to your SkyBlock island...
+     */
     private val warpingPattern by RepoPattern.pattern(
         "data.entity.warping",
         "§7(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\.",

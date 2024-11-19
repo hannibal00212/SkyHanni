@@ -25,10 +25,17 @@ object TrevorTracker {
     private val patternGroup = RepoPattern.group("misc.trevor")
 
     // TODO regex tests
+    /**
+     * REGEX-TEST: §aYour mob died randomly, you are rewarded §r§53 pelts§r§a.
+     */
     private val selfKillMobPattern by patternGroup.pattern(
         "selfkill",
         "§aYour mob died randomly, you are rewarded §r§5(?<pelts>.*) pelts§r§a.",
     )
+
+    /**
+     * REGEX-TEST: §aKilling the animal rewarded you §r§53 pelts§r§a.
+     */
     private val killMobPattern by patternGroup.pattern(
         "kill",
         "§aKilling the animal rewarded you §r§5(?<pelts>.*) pelts§r§a.",
