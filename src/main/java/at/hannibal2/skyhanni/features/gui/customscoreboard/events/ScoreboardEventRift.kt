@@ -24,6 +24,7 @@ object ScoreboardEventRift : ScoreboardEvent() {
         ScoreboardPattern.cluesPattern,
         ScoreboardPattern.barryProtestorsQuestlinePattern,
         ScoreboardPattern.barryProtestorsHandledPattern,
+        ScoreboardPattern.riftDimensionPattern,
     )
 
     override fun showIsland() = RiftAPI.inRift()
