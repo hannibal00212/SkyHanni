@@ -84,6 +84,8 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     override fun toString() = element.configLine
 
     companion object {
+        fun getElements() = entries.map { it.element }
+
         @JvmField
         val defaultOptions = listOf(
             TITLE,
