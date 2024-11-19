@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -110,31 +108,7 @@ object HoppityAPI {
      */
     private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.misc",
-        "(?:§.)*Rabbit Hitman|Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
-    )
-
-    /**
-     * REGEX-TEST: §eChocolate Egg
-     */
-    private val hitmanEggPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hitman.claimable",
-        "§eChocolate Egg",
-    )
-
-    /**
-     * REGEX-TEST: §aClaim All
-     */
-    private val hitmanClaimAllInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hitman.inventory.claimall",
-        "Claim All",
-    )
-
-    /**
-     * REGEX-TEST: Rabbit Hitman
-     */
-    val hitmanInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "hitman.inventory",
-        "(?:§.)*Rabbit Hitman",
+        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
     )
     // </editor-fold>
 
@@ -156,8 +130,6 @@ object HoppityAPI {
                 }
         }
     }
-
-    private var hitmanClaimable: Int = 0
 
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedSlots = mutableListOf<Int>()
@@ -200,6 +172,15 @@ object HoppityAPI {
             slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
+
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
+        hoppityDataSet.reset()
+        EggFoundEvent(
+            type,
+            chatEvent = event,
+            note = note
+        ).post()
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTick(event: SecondPassedEvent) {
@@ -259,7 +240,6 @@ object HoppityAPI {
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
 
         if (sideDishNamePattern.matches(nameText)) EggFoundEvent(SIDE_DISH, index).post()
-        if (hitmanEggPattern.matches(nameText)) EggFoundEvent(HITMAN, index).post()
 
         milestoneNamePattern.matchMatcher(nameText) {
             val lore = clickedStack.getLore()
@@ -269,20 +249,11 @@ object HoppityAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!hitmanInventoryPattern.matches(event.inventoryName)) return
-        hitmanClaimable = event.inventoryItems.count {
-            it.value.hasDisplayName() && hitmanEggPattern.matches(it.value.displayName)
-        }
-    }
-
     @HandleEvent(priority = HIGHEST)
     fun onEggFound(event: EggFoundEvent) {
         hoppityDataSet.lastMeal = event.type
 
-        val message = when (event.type) {
+        when (event.type) {
             SIDE_DISH ->
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
             CHOCOLATE_FACTORY_MILESTONE ->
@@ -293,12 +264,12 @@ object HoppityAPI {
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!"
 
             // Each of these have their own from-Hypixel chats, so we don't need to add a message here
-            in resettingEntries, HITMAN, BOUGHT -> return
+            // as it will be handled in the attemptFireRabbitFound method, from the chat event.
+            in resettingEntries, HITMAN, BOUGHT -> null
             else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
-        }
+        }?.let { hoppityDataSet.hoppityMessages.add(it) }
 
-        hoppityDataSet.hoppityMessages.add(message)
-        if (hoppityDataSet.hoppityMessages.size == 3) attemptFireRabbitFound()
+        if (hoppityDataSet.hoppityMessages.size == 3) attemptFireRabbitFound(event.chatEvent)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -306,27 +277,21 @@ object HoppityAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
-            val alreadyHitman = hoppityDataSet.lastMeal == HITMAN
             hoppityDataSet.reset()
-            val multiHitmanActive = hitmanClaimAllInventoryPattern.matches(InventoryUtils.openInventoryName()) && hitmanClaimable > 0
-            hoppityDataSet.lastMeal =
-                if (alreadyHitman || multiHitmanActive) HITMAN
-                else getEggType(event)
-
-            hoppityDataSet.lastMeal?.let { meal ->
-                EggFoundEvent(
-                    meal,
-                    note = groupOrNull("note")?.removeColor().takeIf { // Only set note if it's a meal egg
-                        meal in resettingEntries
-                    }
-                ).post()
-            }
-
-            attemptFireRabbitFound(event)
+            val type = getEggType(event)
+            val note = groupOrNull("note")?.removeColor()
+            postApiEggFoundEvent(type, event, note)
         }
 
-        val boughtRabbitName = HoppityEggsManager.eggBoughtPattern.matchGroup(event.message, "rabbitname")
-        if (boughtRabbitName == hoppityDataSet.lastName) EggFoundEvent(BOUGHT).post()
+        HoppityEggsManager.hitmanEggFoundPattern.matchMatcher(event.message) {
+            hoppityDataSet.reset()
+            postApiEggFoundEvent(HITMAN, event)
+        }
+
+        HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
+            if (group("rabbitname") != hoppityDataSet.lastName) return@matchMatcher
+            postApiEggFoundEvent(BOUGHT, event)
+        }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.lastName = group("name")
@@ -355,7 +320,7 @@ object HoppityAPI {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true
         }
-        if (event != null) hoppityDataSet.hoppityMessages.add(event.message)
+        event?.let { hoppityDataSet.hoppityMessages.add(it.message) }
         HoppityEggsCompactChat.compactChat(event, hoppityDataSet)
 
         // Theoretically impossible, but a failsafe.

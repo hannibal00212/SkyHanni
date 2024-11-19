@@ -47,6 +47,14 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§cHitman Egg§r§d!
+     */
+    val hitmanEggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.found.hitman",
+        "§d§lHOPPITY'S HUNT §r§dYou found a (?:§.)+Hitman Egg(?:§.)+!",
+    )
+
+    /**
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
      */
