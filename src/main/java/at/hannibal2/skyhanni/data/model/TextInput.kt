@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
+import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -156,6 +157,19 @@ class TextInput {
                 } else {
                     textBox.dropLast(1)
                 }
+
+                Char(127) -> if (SystemUtils.IS_OS_MAC) {
+                    if (carriage != null) {
+                        if (carriage == 0) {
+                            textBox.substring(1)
+                        } else {
+                            this.carriage = carriage.minus(1)
+                            textBox.removeRange(carriage - 1, carriage)
+                        }
+                    } else {
+                        textBox.dropLast(1)
+                    }
+                } else {textBox}
 
                 else -> if (carriage != null) {
                     this.carriage = carriage + 1
