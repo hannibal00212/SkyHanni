@@ -128,7 +128,7 @@ public class HoppityEggsConfig {
     public boolean showCollectedLocationCount = false;
 
     @Expose
-    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all six eggs are ready to be found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnUnclaimedEggs = false;
