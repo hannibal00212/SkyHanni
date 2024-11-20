@@ -23,6 +23,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
+// TODO also fix up this all being coded very poorly and having the same patterns in multiple places
 @SkyHanniModule
 object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
@@ -31,28 +32,47 @@ object DungeonFinderFeatures {
     private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
+        "(?i).*(?:[0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
+        "(?i).*(?:CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(?i).*(PERM|VC|DISCORD).*",
+        "(?i).*(?:PERM|VC|DISCORD).*",
     )
+
+    /**
+     * REGEX-TEST:  §b4sn_§f: §eArcher§b (§e29§b)
+     * REGEX-TEST:  §akaydo_odyak§f: §eBerserk§b (§e26§b)
+     */
     private val memberPattern by patternGroup.pattern(
         "member",
         ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
+
+    /**
+     * REGEX-TEST: §cRequires a Class at Level 25!
+     */
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
-        "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
+        "§c(?:Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
     )
+
+    // TODO why is this same pattern here twice?
+    /**
+     * REGEX-TEST:  §b4sn_§f: §eArcher§b (§e29§b)
+     * REGEX-TEST:  §akaydo_odyak§f: §eBerserk§b (§e26§b)
+     */
     private val classLevelPattern by patternGroup.pattern(
         "class.level",
         " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
+
+    /**
+     * REGEX-TEST: §7§7Note: §fs+ clear first
+     */
     private val notePattern by patternGroup.pattern(
         "note",
         "§7§7Note: §f(?<note>.*)",
@@ -64,35 +84,39 @@ object DungeonFinderFeatures {
      */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM The Catacombs).*",
+        "The Catacombs.*|.*MM The Catacombs.*",
     )
+
+    /**
+     * REGEX-TEST: JohnRealNoob's Party
+     */
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
-        ".*('s Party)",
+        ".*'s Party",
     )
     private val partyFinderTitlePattern by patternGroup.pattern(
         "party.finder.title",
-        "(Party Finder)",
+        "Party Finder",
     )
     private val catacombsGatePattern by patternGroup.pattern(
         "catacombs.gate",
-        "(Catacombs Gate)",
+        "Catacombs Gate",
     )
     private val selectFloorPattern by patternGroup.pattern(
         "select.floor",
-        "(Select Floor)",
+        "Select Floor",
     )
     private val entranceFloorPattern by patternGroup.pattern(
         "entrance",
-        "(.*Entrance)",
+        ".*Entrance",
     )
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "(Floor .*)",
+        "Floor .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
-        "(Any)",
+        "Any",
     )
 
     /**
@@ -101,27 +125,31 @@ object DungeonFinderFeatures {
      */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM|.*Master Mode) The Catacombs.*",
+        "(?:MM|.*Master Mode) The Catacombs.*",
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
-        "(Dungeon: .*)",
+        "Dungeon: .*",
     )
     private val floorFloorPattern by patternGroup.pattern(
         "floor.pattern",
-        "(Floor: .*)",
+        "Floor: .*",
     )
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",
         ".* (?<floorNum>[IV\\d]+)",
     )
+
+    /**
+     * REGEX-TEST: Currently Selected: Mage
+     */
     private val getDungeonClassPattern by patternGroup.pattern(
         "get.dungeon.class",
-        ".* (?<class>.*)",
+        "Currently Selected: (?<class>.*)",
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "§7View and select a dungeon class.",
+        "§7View and select a dungeon class\\.",
     )
 
     //  Variables used

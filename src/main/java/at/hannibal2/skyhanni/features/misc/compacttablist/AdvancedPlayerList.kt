@@ -212,7 +212,7 @@ object AdvancedPlayerList {
         return "$level $playerName ${suffix.trim()}"
     }
 
-    private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
+    private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
     private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
         (Random.nextDouble() * 500).toInt()

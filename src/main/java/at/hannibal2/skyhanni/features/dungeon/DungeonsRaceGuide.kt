@@ -21,9 +21,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonsRaceGuide {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonsRaceGuide
+
+    /**
+     * REGEX-TEST: §D§LPRECURSOR RUINS RACE §e00:05.443            §b1577/1577✎ Mana
+     */
     private val raceActivePattern by RepoPattern.pattern(
         "dungeon.race.active",
-        "§.§.(?<race>[\\w ]+) RACE §.[\\d:.]+"
+        "§.§.(?<race>[\\w ]+) RACE §.[\\d:.]+",
     )
 
     private val parkourHelpers: MutableMap<String, ParkourHelper> = mutableMapOf()

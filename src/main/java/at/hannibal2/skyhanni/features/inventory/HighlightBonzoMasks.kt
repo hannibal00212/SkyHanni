@@ -34,11 +34,11 @@ object HighlightBonzoMasks {
     private val patternGroup = RepoPattern.group("inventory.masks.timers")
     private val bonzoMaskPattern by patternGroup.pattern(
         "bonzo",
-        "Your .*Bonzo's Mask saved your life!"
+        "Your Bonzo's Mask saved your life!",
     )
     private val spiritMaskPattern by patternGroup.pattern(
         "spirit",
-        "Second Wind Activated! Your Spirit Mask saved your life!"
+        "Second Wind Activated! Your Spirit Mask saved your life!",
     )
 
     private val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()

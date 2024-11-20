@@ -25,13 +25,21 @@ object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
+
+    /**
+     * REGEX-TEST: §5§o§a10,032.8 minutes
+     */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a([\\d.,]+) minutes.+\$"
+        "§5§o§a(?<minutes>[\\d.,])+ minutes.*$"
     )
+
+    /**
+     * REGEX-TEST: §5§o§b1,000.4 hours
+     */
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b([\\d.,]+) hours.+\$"
+        "§5§o§b(?<hours>[\\d.,])+ hours.*$"
     )
 
     var tooltipPlaytime = mutableListOf<String>()
@@ -122,7 +130,7 @@ object LimboPlaytime {
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = hoursPattern.matcher(it)
                 if (matcher.find()) {
-                    matcher.group(1).replace(",", "").toDoubleOrNull() ?: 0.0
+                    matcher.group("hours").replace(",", "").toDoubleOrNull() ?: 0.0
                 } else 0.0
             }.toMutableList()
             setMinutes = false
@@ -133,7 +141,7 @@ object LimboPlaytime {
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = minutesPattern.matcher(it)
                 if (matcher.find()) {
-                    matcher.group(1).toDoubleOrNull() ?: 0.0
+                    matcher.group("minutes").toDoubleOrNull() ?: 0.0
                 } else 0.0
             }.toMutableList()
             setMinutes = true

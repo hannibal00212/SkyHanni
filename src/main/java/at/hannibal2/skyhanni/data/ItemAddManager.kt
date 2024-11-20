@@ -33,7 +33,7 @@ object ItemAddManager {
 
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
-        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
+        "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
     )
 
     private var inSackInventory = false
