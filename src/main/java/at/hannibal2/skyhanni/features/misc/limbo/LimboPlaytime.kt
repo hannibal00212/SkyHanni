@@ -31,7 +31,7 @@ object LimboPlaytime {
      */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a(?<minutes>[\\d.,])+ minutes.*\$"
+        "§5§o§a(?<minutes>[\\d.,])+ minutes.*$"
     )
 
     /**
