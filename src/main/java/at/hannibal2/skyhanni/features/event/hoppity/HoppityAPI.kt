@@ -170,7 +170,6 @@ object HoppityAPI {
             processedSlots.remove(slot.slotNumber)
         }
     }
-
     private fun shouldProcessStraySlot(slot: Slot) =
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
@@ -179,7 +178,6 @@ object HoppityAPI {
             slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
-
     private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
         EggFoundEvent(
             type,
