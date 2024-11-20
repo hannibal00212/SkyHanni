@@ -104,7 +104,6 @@ object HoppityAPI {
      * REGEX-TEST: Chocolate Breakfast Egg
      * REGEX-TEST: Chocolate Lunch Egg
      * REGEX-TEST: Chocolate Dinner Egg
-     * REGEX-TEST: Rabbit Hitman
      */
     private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.misc",
