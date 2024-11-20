@@ -55,21 +55,6 @@ object GardenCustomKeybinds {
         // TODO remove workaround
         if (lastWindowOpenTime.passedSince() < 300.milliseconds) return false
 
-        val areDuplicates = map.values
-            .map { it() }
-            .filter { it != Keyboard.KEY_NONE }
-            .let { values -> values.size != values.toSet().size }
-        if (areDuplicates) {
-            if (lastDuplicateKeybindsWarnTime.passedSince() > 30.seconds) {
-                ChatUtils.chatAndOpenConfig(
-                    "Duplicate Custom Keybinds aren't allowed!",
-                    GardenAPI.config::keyBind
-                )
-                lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
-            }
-            return false
-        }
-
         return true
     }
 
