@@ -55,6 +55,10 @@ object CaptureFarmingGear {
         "anitabuff",
         "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!",
     )
+
+    /**
+     * REGEX-TEST: §7You have: §6+52☘ Farming Fortune
+     */
     private val anitaMenuPattern by patternGroup.pattern(
         "anitamenu",
         "§7You have: §6\\+(?<level>.*)☘ Farming Fortune",
@@ -67,18 +71,35 @@ object CaptureFarmingGear {
         "petlevelup",
         "Your (?<pet>.*) leveled up to level .*!",
     )
+
+    /**
+     * REGEX-TEST: Yum! You gain +5☘ Farming Fortune for 48 hours!
+     * REGEX-TEST: Big Yum! You refresh +5☘ Farming Fortune for 48 hours!
+     */
     private val cakePattern by patternGroup.pattern(
         "cake",
         "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!",
     )
+
+    /**
+     * REGEX-TEST:  Strength: §r§c❁170
+     */
     private val strengthPattern by patternGroup.pattern(
         "strength",
         " Strength: §r§c❁(?<strength>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Tier 10: §e70%
+     */
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*",
     )
+
+    /**
+     * REGEX-TEST: §2§l§m              §f§l§m      §r §e7§6/§e10
+     */
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",

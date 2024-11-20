@@ -99,14 +99,38 @@ public class HoppityEggsConfig {
     public boolean showClaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
-        "§eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")
+    @ConfigEditorDropdown
+    public UnclaimedEggsOrder unclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST;
+
+    public enum UnclaimedEggsOrder {
+        SOONEST_FIRST("Soonest First"),
+        MEAL_ORDER("Meal Order"),
+        ;
+
+        private final String name;
+
+        UnclaimedEggsOrder(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
+        "§eThis is not retroactive and may not be fully synced with Hypixel's count."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showCollectedLocationCount = false;
 
     @Expose
-    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all three eggs are ready to be found.")
+    @ConfigOption(name = "Warn When Unclaimed", desc = "Warn when all six eggs are ready to be found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnUnclaimedEggs = false;

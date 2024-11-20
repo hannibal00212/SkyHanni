@@ -73,7 +73,7 @@ object PunchcardHighlight {
     )
 
     private val playerList: MutableSet<String> = mutableSetOf()
-    private var playerQueue = mutableListOf<String>()
+    private val playerQueue = mutableListOf<String>()
 
     private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".toInternalName().getItemStack() }
     private var display: Renderable = Renderable.string("hello")

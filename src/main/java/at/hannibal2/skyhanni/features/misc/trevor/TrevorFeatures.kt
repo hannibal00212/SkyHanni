@@ -50,14 +50,26 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
+
+    /**
+     * REGEX-TEST: [NPC] Trevor: You can find your TRACKABLE animal near the §eDesert Mountain.
+     */
     private val trapperPattern by patternGroup.pattern(
         "trapper",
-        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).",
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)\\.",
     )
+
+    /**
+     * REGEX-TEST: The target is around 40 blocks above, at a 45 degrees angle!
+     */
     private val talbotPatternAbove by patternGroup.pattern(
         "above",
         "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!",
     )
+
+    /**
+     * REGEX-TEST: The target is around 15 blocks below, at a 30 degrees angle!
+     */
     private val talbotPatternBelow by patternGroup.pattern(
         "below",
         "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!",
@@ -66,6 +78,10 @@ object TrevorFeatures {
         "at",
         "You are at the exact height!",
     )
+
+    /**
+     * REGEX-TEST: Location: Mushroom Gorge
+     */
     private val locationPattern by patternGroup.pattern(
         "zone",
         "Location: (?<zone>.*)",
@@ -76,7 +92,7 @@ object TrevorFeatures {
     )
     private val startDialoguePattern by patternGroup.pattern(
         "start.dialogue",
-        "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.",
+        "\\[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task\\.",
     )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
@@ -95,8 +111,8 @@ object TrevorFeatures {
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
     private var currentLabel = "§2Ready"
-    private var trapperID: Int = 56
-    private var backupTrapperID: Int = 17
+    private const val TRAPPER_ID: Int = 56
+    private const val BACKUP_TRAPPER_ID: Int = 17
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
@@ -253,8 +269,8 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!onFarmingIsland()) return
-        var entityTrapper = EntityUtils.getEntityByID(trapperID)
-        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
+        var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
+        if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
                 config.trapperTalkCooldown

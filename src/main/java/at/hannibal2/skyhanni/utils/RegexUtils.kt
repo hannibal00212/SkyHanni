@@ -24,9 +24,6 @@ object RegexUtils {
         return null
     }
 
-    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.firstMatcher(this, consumer)
-
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =

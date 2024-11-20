@@ -54,7 +54,7 @@ object BasketWaypoints {
     @Suppress("MaxLineLength")
     private val basketPattern by patternGroup.pattern(
         "basket",
-        "^((?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$"
+        "^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$"
     )
     private val basketAllFoundPattern by patternGroup.pattern(
         "basket.allfound",
