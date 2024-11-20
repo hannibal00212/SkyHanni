@@ -127,7 +127,6 @@ object GardenCustomKeybinds {
             back.set(Keyboard.KEY_NONE)
             jump.set(Keyboard.KEY_NONE)
             sneak.set(Keyboard.KEY_NONE)
-            Minecraft.getMinecraft().thePlayer.closeScreen()
         }
     }
 
@@ -142,7 +141,6 @@ object GardenCustomKeybinds {
             back.set(Keyboard.KEY_S)
             jump.set(Keyboard.KEY_SPACE)
             sneak.set(Keyboard.KEY_LSHIFT)
-            Minecraft.getMinecraft().thePlayer.closeScreen()
         }
     }
 
