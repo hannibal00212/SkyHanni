@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidateRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -88,12 +87,12 @@ object CurrentElectionScreen : ElectionViewerScreen() {
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
 
-            rankColor?.withAlpha(200).let {
+            rankColor?.addAlpha(200).let {
                 Renderable.drawInsideRoundedRectWithOutline(
                     fullCandidateContainer,
                     Color.BLACK.addAlpha(0),
-                    topOutlineColor = it ?: Color.BLACK.withAlpha(0),
-                    bottomOutlineColor = it ?: Color.BLACK.withAlpha(0),
+                    topOutlineColor = (it ?: Color.BLACK.addAlpha(0)).rgb,
+                    bottomOutlineColor = (it ?: Color.BLACK.addAlpha(0)).rgb,
                     borderOutlineThickness = 4,
                 )
             }
