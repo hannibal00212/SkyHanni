@@ -35,9 +35,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object FishingAPI {
 
+    /**
+     * REGEX-TEST: BRONZE_HUNTER_HELMET
+     * REGEX-TEST: SILVER_HUNTER_CHESTPLATE
+     * REGEX-TEST: GOLD_HUNTER_LEGGINGS
+     * REGEX-TEST: DIAMOND_HUNTER_BOOTS
+     */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)

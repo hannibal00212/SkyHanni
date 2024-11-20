@@ -24,24 +24,36 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object CollectionAPI {
     private val patternGroup = RepoPattern.group("data.collection.api")
+
+    /**
+     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e43,649§6/§e50k
+     */
     private val counterPattern by patternGroup.pattern(
         "counter",
-        ".* §e(?<amount>.*)§6/.*"
+        ".* §e(?<amount>.*)§6/.*",
     )
+
+    /**
+     * REGEX-TEST: §7Total collected: §e261,390
+     */
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
-        "§7Total Collected: §e(?<amount>.*)"
+        "§7Total collected: §e(?<amount>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Nether Wart I: §e46§6%
+     */
     private val collectionTier0Pattern by patternGroup.pattern(
         "tierzero",
-        "§7Progress to .* I: .*"
+        "§7Progress to .* I: .*",
     )
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
     // TODO repo
     private val incorrectCollectionNames = mapOf(
-        "Mushroom" to "RED_MUSHROOM".toInternalName()
+        "Mushroom" to "RED_MUSHROOM".toInternalName(),
     )
 
     @SubscribeEvent

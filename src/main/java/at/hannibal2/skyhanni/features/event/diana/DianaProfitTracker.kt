@@ -41,7 +41,7 @@ object DianaProfitTracker {
     private val patternGroup = RepoPattern.group("diana.chat")
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
+        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
     )
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",

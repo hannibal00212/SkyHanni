@@ -45,7 +45,7 @@ object ItemAbilityCooldown {
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
         "alignedother",
-        "§eYou aligned §r§a.* §r§eother player(s)?!",
+        "§eYou aligned §r§a.* §r§eother players?!",
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",

@@ -306,7 +306,7 @@ object ChatFilter {
 
     private val skymallPerkPattern by RepoPattern.pattern(
         "chat.skymall.perk",
-        "§eNew buff§r§r§r:(.*)",
+        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift

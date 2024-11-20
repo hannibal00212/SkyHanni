@@ -17,6 +17,8 @@ RepoRules:
         active: true
     RepoPatternRegexTest:
         active: true
+    RepoPatternUnnamedGroup:
+        active: true
 
 ImportRules:
     CustomImportOrdering:
