@@ -9,17 +9,18 @@ enum class GraphNodeTag(
     val cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
+    val onlySkyblock: Boolean? = true
 ) {
-    DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev."), // E.g. Spawn points, todos, etc
+    DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev.", onlySkyblock = null), // E.g. Spawn points, todos, etc
 
     // Everywhere
-    NPC("npc", LorenzColor.YELLOW, "NPC", "A NPC to talk to."), // also take from neu repo
-    AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
-    SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
-    POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map."),
+    NPC("npc", LorenzColor.YELLOW, "NPC", "A NPC to talk to.", onlySkyblock = null), // also take from neu repo
+    AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area.", onlySkyblock = null),
+    SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house.", onlySkyblock = null),
+    POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
     //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
-    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
+    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport.", onlySkyblock = null),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),
@@ -85,6 +86,14 @@ enum class GraphNodeTag(
     // The End
     END_GOLEM("end_golem", LorenzColor.RED, "Golem Spawn", "A spot where the golem can spawn in the End.", onlyIsland = IslandType.THE_END),
 
+    // lobby event waypoints
+    HALLOWEEN_BASKET(
+        "event_basket",
+        LorenzColor.LIGHT_PURPLE,
+        "Basket",
+        "A Basket during the Halloween Event.",
+        onlySkyblock = false,
+    ),
     ;
 
     val displayName: String = color.getChatColor() + cleanName

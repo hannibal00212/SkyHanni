@@ -34,7 +34,7 @@ object PrecisionMiningHighlight {
             !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown
         ) return
 
-        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver
+        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver ?: return
         if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
         val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)
