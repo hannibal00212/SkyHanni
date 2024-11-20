@@ -62,6 +62,11 @@ public class ChocolateFactoryConfig {
     public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
 
     @Expose
+    @ConfigOption(name = "Upgrade Warnings", desc = "")
+    @Accordion
+    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
+
+    @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
@@ -143,11 +148,6 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerReminder = true;
-
-    @Expose
-    @ConfigOption(name = "Upgrade Warnings", desc = "")
-    @Accordion
-    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
 
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
