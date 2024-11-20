@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.detektrules.repo
 
-import io.gitlab.arturbosch.detekt.api.CodeSmell
+import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -17,7 +15,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateEntryWithExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import java.util.regex.PatternSyntaxException
 
-class RepoPatternRegexTest(config: Config) : Rule(config) {
+class RepoPatternRegexTest(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "RepoPatternRegexTest",
         Severity.Style,
@@ -55,50 +53,26 @@ class RepoPatternRegexTest(config: Config) : Rule(config) {
         val (regexTests, failingRegexTests) = findRegexTestInKDoc(parent)
 
         if (regexTests.isEmpty()) {
-            report(
-                CodeSmell(
-                    issue,
-                    Entity.from(delegate),
-                    "Repo pattern `$variableName` must have a regex test.",
-                ),
-            )
+            delegate.reportIssue("Repo pattern `$variableName` must have a regex test.")
             return
         }
 
         val pattern = try {
             rawPattern.toPattern()
         } catch (e: PatternSyntaxException) {
-            report(
-                CodeSmell(
-                    issue,
-                    Entity.from(delegate),
-                    "Repo pattern `$variableName` has an invalid regex: `$rawPattern`.",
-                ),
-            )
+            delegate.reportIssue("Repo pattern `$variableName` has an invalid regex: `$rawPattern`.")
             return
         }
 
         regexTests.forEach { test ->
             if (!pattern.matcher(test).find()) {
-                report(
-                    CodeSmell(
-                        issue,
-                        Entity.from(delegate),
-                        "Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`.",
-                    ),
-                )
+                delegate.reportIssue("Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`.")
             }
         }
 
         failingRegexTests.forEach { test ->
             if (pattern.matcher(test).find()) {
-                report(
-                    CodeSmell(
-                        issue,
-                        Entity.from(delegate),
-                        "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` even though it was set to fail.",
-                    ),
-                )
+                delegate.reportIssue("Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` even though it was set to fail.")
             }
         }
     }
