@@ -123,10 +123,6 @@ object PestAPI {
         "chat.pestdeath",
         "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §2(?<pest>.*)§e!",
     )
-
-    /**
-     * REGEX-TEST: §cThere are not any Pests on your Garden right now! Keep farming!
-     */
     val noPestsChatPattern by patternGroup.pattern(
         "chat.nopests",
         "§cThere are not any Pests on your Garden right now! Keep farming!",
@@ -136,7 +132,7 @@ object PestAPI {
      * REGEX-TEST: §eMouse Trap #1§r
      * REGEX-TEST: §eMouse Trap #2§r
      * REGEX-TEST: §eMouse Trap #3§r
-     * REGEX-TEST: §aPest Trap #3
+     * REGEX-TEST: §aPest Trap #3§r
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
