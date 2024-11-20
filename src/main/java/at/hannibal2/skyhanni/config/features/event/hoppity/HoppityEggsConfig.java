@@ -121,8 +121,10 @@ public class HoppityEggsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
-        "§eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigOption(
+        name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
+        "§eThis is not retroactive and may not be fully synced with Hypixel's count."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showCollectedLocationCount = false;
