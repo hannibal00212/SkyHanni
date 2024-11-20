@@ -26,7 +26,7 @@ object DungeonCopilot {
     private val patternGroup = RepoPattern.group("dungeon.copilot")
     private val countdownPattern by patternGroup.pattern(
         "countdown",
-        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.",
+        ".* has started the dungeon countdown. The dungeon will begin in 1 minute.",
     )
 
     /**
@@ -34,7 +34,7 @@ object DungeonCopilot {
      */
     private val witherDoorPattern by patternGroup.pattern(
         "wither.door",
-        "(.*) opened a §r§8§lWITHER §r§adoor!",
+        ".* opened a §r§8§lWITHER §r§adoor!",
     )
     private val bloodDoorPattern by patternGroup.pattern(
         "blood.door",

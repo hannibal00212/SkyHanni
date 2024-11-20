@@ -39,9 +39,13 @@ object UtilsPatterns {
         "(?:§.)+Enchanted Book",
     )
 
+    /**
+     * REGEX-TEST: Obfuscated
+     * REGEX-TEST: Hot Bait
+     */
     val baitPattern by patternGroup.pattern(
         "item.name.bait",
-        "^(Obfuscated.*|.* Bait)$",
+        "^Obfuscated.*|.* Bait$",
     )
 
     val enchantmentNamePattern by patternGroup.pattern(
@@ -96,7 +100,7 @@ object UtilsPatterns {
     )
     val isRomanPattern by RepoPattern.pattern(
         "string.isroman",
-        "^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})",
+        "^M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})",
     )
 
     val sackPattern by patternGroup.pattern(

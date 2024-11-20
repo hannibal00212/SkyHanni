@@ -32,15 +32,15 @@ object DungeonFinderFeatures {
     private val patternGroup = RepoPattern.group("dungeon.finder")
     private val pricePattern by patternGroup.pattern(
         "price",
-        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
+        "(?i).*(?:[0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
+        "(?i).*(?:CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(?i).*(PERM|VC|DISCORD).*",
+        "(?i).*(?:PERM|VC|DISCORD).*",
     )
 
     /**
@@ -57,7 +57,7 @@ object DungeonFinderFeatures {
      */
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
-        "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
+        "§c(?:Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
     )
 
     // TODO why is this same pattern here twice?
@@ -84,7 +84,7 @@ object DungeonFinderFeatures {
      */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM The Catacombs).*",
+        "The Catacombs.*|.*MM The Catacombs.*",
     )
 
     /**
@@ -108,11 +108,11 @@ object DungeonFinderFeatures {
     )
     private val entranceFloorPattern by patternGroup.pattern(
         "entrance",
-        "(.*Entrance)",
+        ".*Entrance",
     )
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "(Floor .*)",
+        "Floor .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
@@ -125,15 +125,15 @@ object DungeonFinderFeatures {
      */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM|.*Master Mode) The Catacombs.*",
+        "(?:MM|.*Master Mode) The Catacombs.*",
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
-        "(Dungeon: .*)",
+        "Dungeon: .*",
     )
     private val floorFloorPattern by patternGroup.pattern(
         "floor.pattern",
-        "(Floor: .*)",
+        "Floor: .*",
     )
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",

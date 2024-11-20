@@ -52,7 +52,7 @@ object SackAPI {
      */
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$",
+        "^(?:.* Sack|Enchanted .* Sack)\$",
     )
 
     /**

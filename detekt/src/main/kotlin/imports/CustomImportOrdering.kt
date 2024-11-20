@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.detektrules.imports
 
 import at.hannibal2.skyhanni.detektrules.PreprocessingPattern
 import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
-import io.gitlab.arturbosch.detekt.api.CodeSmell
+import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
-import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
@@ -15,7 +13,7 @@ import org.jetbrains.kotlin.psi.KtImportList
 /**
  * This rule enforces correct import ordering, while ignoring preprocessed comments and imports that are in a preprocessed block.
  */
-class CustomImportOrdering(config: Config) : Rule(config) {
+class CustomImportOrdering(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "CustomImportOrdering",
         Severity.Style,
@@ -98,17 +96,12 @@ class CustomImportOrdering(config: Config) : Rule(config) {
         val importsCorrect = isImportsCorrectlyOrdered(importList.imports, rawText.lines())
 
         if (!importsCorrect) {
-            report(
-                CodeSmell(
-                    issue,
-                    Entity.from(importList),
-                    "Imports must be ordered in lexicographic order without any empty lines in-between " +
-                        "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
-                        "pre-processed imports.",
-                ),
+            importList.reportIssue(
+                "Imports must be ordered in lexicographic order without any empty lines in-between " +
+                    "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
+                    "pre-processed imports.",
             )
         }
-
         super.visitImportList(importList)
     }
 }

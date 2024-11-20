@@ -67,7 +67,7 @@ object MaxwellAPI {
      */
     private val chatPowerPattern by patternGroup.pattern(
         "chat.power",
-        "§eYou selected the §a(?<power>.*) §e(power )?for your §aAccessory Bag§e!",
+        "§eYou selected the §a(?<power>.*) §e(?:power )?for your §aAccessory Bag§e!",
     )
 
     /**

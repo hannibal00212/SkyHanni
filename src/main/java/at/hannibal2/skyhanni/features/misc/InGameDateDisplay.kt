@@ -27,7 +27,7 @@ object InGameDateDisplay {
      */
     private val monthAndDatePattern by patternGroup.pattern(
         "date",
-        ".*((Early|Late) )?(Winter|Spring|Summer|Autumn) [0-9]{1,2}(nd|rd|th|st)?.*",
+        ".*(?:(?:Early|Late) )?(?:Winter|Spring|Summer|Autumn) [0-9]{1,2}(?:nd|rd|th|st)?.*",
     )
 
     /**
@@ -36,7 +36,7 @@ object InGameDateDisplay {
      */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",
-        "([☀☽࿇])",
+        "[☀☽࿇]",
     )
 
     private var display = ""

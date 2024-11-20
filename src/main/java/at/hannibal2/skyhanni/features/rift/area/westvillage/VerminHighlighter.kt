@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
@@ -54,7 +54,7 @@ object VerminHighlighter {
     }
 
     private fun isVermin(entity: EntityLivingBase): Boolean = when (entity) {
-        is EntityArmorStand -> entity.hasSkullTexture(VERMIN_FLY_TEXTURE) || entity.hasSkullTexture(VERMIN_SPIDER_TEXTURE)
+        is EntityArmorStand -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
         is EntitySilverfish -> entity.baseMaxHealth == 8
 
         else -> false

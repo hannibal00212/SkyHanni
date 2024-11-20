@@ -154,7 +154,7 @@ object ScoreboardPattern {
      */
     val timeElapsedPattern by multiUseSb.pattern(
         "timeelapsed",
-        "(?:§.)*Time Elapsed: (?:§.)*(?<time>(\\w+[ydhms] ?)+)",
+        "(?:§.)*Time Elapsed: (?:§.)*(?<time>(?:\\w+[ydhms] ?)+)",
     )
 
     /**
@@ -200,7 +200,7 @@ object ScoreboardPattern {
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSb.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) ((?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
@@ -249,7 +249,7 @@ object ScoreboardPattern {
      */
     val medalsPattern by farmingSb.pattern(
         "medals",
-        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc][\\d.,]+",
+        "§[6fc]§l(?:GOLD|SILVER|BRONZE) §fmedals: §[6fc][\\d.,]+",
     )
 
     /**
@@ -376,7 +376,7 @@ object ScoreboardPattern {
      */
     val raffleTicketsPattern by miningSb.pattern(
         "raffletickets",
-        "Tickets: §a\\d+ §7\\(\\d+(\\.\\d)?%\\)",
+        "Tickets: §a\\d+ §7\\(\\d+(?:\\.\\d)?%\\)",
     )
 
     /**
@@ -569,7 +569,7 @@ object ScoreboardPattern {
      */
     val flightDurationPattern by miscSb.pattern(
         "flightduration",
-        "^\\s*Flight Duration: §a(:?\\d{1,3})*$",
+        "^\\s*Flight Duration: §a(?::?\\d{1,3})*$",
     )
 
     /**

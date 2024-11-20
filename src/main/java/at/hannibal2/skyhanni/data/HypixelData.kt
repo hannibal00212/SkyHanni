@@ -64,7 +64,7 @@ object HypixelData {
     @Suppress("UnusedPrivateProperty")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
+        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
     )
 
     /**
