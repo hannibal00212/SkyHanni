@@ -109,6 +109,52 @@ object HoppityAPI {
         "inventory.misc",
         "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
     )
+    // </editor-fold>
+
+    data class HoppityStateDataSet(
+        var hoppityMessages: MutableList<String> = mutableListOf(),
+        var duplicate: Boolean = false,
+        var lastRarity: String = "",
+        var lastName: String = "",
+        var lastProfit: String = "",
+        var lastMeal: HoppityEggType? = null,
+        var lastDuplicateAmount: Long? = null
+    ) {
+        fun reset() {
+            val default = HoppityStateDataSet()
+            this::class.memberProperties
+                .filterIsInstance<KMutableProperty1<HoppityStateDataSet, Any?>>()
+                .forEach { prop ->
+                    prop.set(this, prop.get(default))
+                }
+        }
+    }
+
+    private val hoppityDataSet = HoppityStateDataSet()
+    private val processedSlots = mutableListOf<Int>()
+    private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
+    private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
+
+    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+
+    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
+        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
+    } else null
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
+    fun SkyBlockTime.isAlternateDay(): Boolean {
+        if (!isHoppityEvent()) return false
+        // Spring 1st (first day of event) is a normal day.
+        // Spring 2nd is an alternate day, Spring 3rd is a normal day, etc.
+        // So Month 3, day 1 is used as the baseline.
+
+        // Because months are all 31 days, it flip-flops every month.
+        // If the month is 1 or 3, alternate days are on even days.
+        // If the month is 2, alternate days are on odd days.
+        return (month % 2 == 1) == (day % 2 == 0)
+    }
 
     /**
      * REGEX-TEST: Rabbit Hitman
@@ -178,6 +224,14 @@ object HoppityAPI {
             slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
+        EggFoundEvent(
+            type,
+            chatEvent = event,
+            note = note
+        ).post()
+    }
+
     private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
         EggFoundEvent(
             type,

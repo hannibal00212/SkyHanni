@@ -12,10 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(KeyBinding.class)
 public class MixinKeyBinding {
-    @Inject(method = "onTick", at = @At("HEAD"), cancellable = true)
-    private static void noOnTick(int keyCode, CallbackInfo ci) {
-        GardenCustomKeybinds.onTick(keyCode, ci);
-    }
 
     @Inject(method = "isKeyDown", at = @At("HEAD"), cancellable = true)
     public void noIsKeyDown(CallbackInfoReturnable<Boolean> cir) {
@@ -26,6 +22,7 @@ public class MixinKeyBinding {
 
     @Inject(method = "isPressed", at = @At("HEAD"), cancellable = true)
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
+        GardenCustomKeybinds.isKeyPressed((KeyBinding) (Object) this, cir);
         TextInput.Companion.onMinecraftInput((KeyBinding) (Object) this, cir);
         GraphEditor.INSTANCE.onMinecraftInput((KeyBinding) (Object) this, cir);
     }
