@@ -121,7 +121,7 @@ object LocationUtils {
     }
 
     fun calculatePlayerFacingDirection(): LorenzVec {
-        var yaw = LocationUtils.calculatePlayerYaw() + 180
+        val yaw = calculatePlayerYaw() + 180
         return when {
             yaw < 45 -> LorenzVec(0, 0, -1)
             yaw < 135 -> LorenzVec(1, 0, 0)

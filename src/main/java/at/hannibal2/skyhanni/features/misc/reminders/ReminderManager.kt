@@ -34,8 +34,6 @@ object ReminderManager {
     private val storage get() = SkyHanniMod.feature.storage.reminders
     private val config get() = SkyHanniMod.feature.misc.reminders
 
-    private var listPage = 1
-
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
     private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
@@ -102,7 +100,7 @@ object ReminderManager {
             if (args.size < arguments.size + 1) return ChatUtils.userError("/shremind $command -l $argumentText")
             if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found!")
             action(args.drop(2), storage[args.drop(1).first()]!!).apply {
-                listReminders(listPage)
+                listReminders(1)
                 sendMessage(this)
             }
         } else if (storage[args.first()] == null) {

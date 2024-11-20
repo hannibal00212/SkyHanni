@@ -25,7 +25,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private var itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
+    private val itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
 
     // Textures taken from Skytils - moved to REPO
     private val cheapCoins by lazy {

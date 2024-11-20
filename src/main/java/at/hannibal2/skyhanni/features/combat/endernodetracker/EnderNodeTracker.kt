@@ -20,10 +20,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -138,8 +138,8 @@ object EnderNodeTracker {
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
-        miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
-            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
+            it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
         }.sumOf { it.stackSize }
     }
 

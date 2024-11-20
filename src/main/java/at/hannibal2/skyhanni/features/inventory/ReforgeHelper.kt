@@ -54,10 +54,18 @@ object ReforgeHelper {
         "menu.hex",
         "The Hex ➜ Reforges",
     )
+
+    /**
+     * REGEX-TEST: §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
+     */
     private val reforgeChatMessage by repoGroup.pattern(
         "chat.success",
         "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!",
     )
+
+    /**
+     * REGEX-TEST: §cWait a moment before reforging again!
+     */
     private val reforgeChatFail by repoGroup.pattern(
         "chat.fail",
         "§cWait a moment before reforging again!|§cWhoa! Slow down there!",
@@ -87,7 +95,7 @@ object ReforgeHelper {
 
     private const val EXIT_BUTTON = 40
 
-    private var waitForChat = AtomicBoolean(false)
+    private val waitForChat = AtomicBoolean(false)
 
     /** Gatekeeps instant double switches of the state */
     private var waitDelay = false

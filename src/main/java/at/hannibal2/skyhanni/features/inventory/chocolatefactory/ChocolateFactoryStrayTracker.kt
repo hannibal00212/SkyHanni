@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryStrayTracker {
 
     private val config get() = ChocolateFactoryAPI.config
-    private var claimedStraysSlots = mutableListOf<Int>()
+    private val claimedStraysSlots = mutableListOf<Int>()
 
     /**
      * REGEX-TEST: §9Zero §d§lCAUGHT!

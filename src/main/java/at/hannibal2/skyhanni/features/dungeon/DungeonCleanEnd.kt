@@ -31,7 +31,7 @@ object DungeonCleanEnd {
      */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?( *)§r§c(Master Mode )?The Catacombs §r§8- §r§eFloor (.*)",
+        "(?:§f)? *§r§c(?:Master Mode )?The Catacombs §r§8- §r§eFloor .*",
     )
 
     private var bossDone = false

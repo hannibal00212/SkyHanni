@@ -447,7 +447,7 @@ object GraphEditor {
     }
 
     private fun editModeClicks() {
-        var vector = LocationUtils.calculatePlayerFacingDirection()
+        val vector = LocationUtils.calculatePlayerFacingDirection()
         KeyboardManager.WasdInputMatrix.w.handleEditClicks(vector)
         KeyboardManager.WasdInputMatrix.a.handleEditClicks(vector.rotateXZ(Math.toRadians(90.0)))
         KeyboardManager.WasdInputMatrix.s.handleEditClicks(vector.rotateXZ(Math.toRadians(180.0)))
