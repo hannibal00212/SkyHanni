@@ -25,10 +25,18 @@ object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
+
+    /**
+     * REGEX-TEST: §5§o§a10,032.8 minutes
+     */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
         "§5§o§a(?<minutes>[\\d.,])+ minutes.+\$"
     )
+
+    /**
+     * REGEX-TEST: §5§o§b1,000.4 hours
+     */
     private val hoursPattern by patternGroup.pattern(
         "hours",
         "§5§o§b(?<hours>[\\d.,])+ hours.+\$"

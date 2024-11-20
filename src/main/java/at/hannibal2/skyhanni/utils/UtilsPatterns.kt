@@ -39,6 +39,10 @@ object UtilsPatterns {
         "(?:§.)+Enchanted Book",
     )
 
+    /**
+     * REGEX-TEST: Obfuscated
+     * REGEX-TEST: Hot Bait
+     */
     val baitPattern by patternGroup.pattern(
         "item.name.bait",
         "^Obfuscated.*|.* Bait$",
