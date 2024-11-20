@@ -288,7 +288,7 @@ object HoppityCollectionStats {
             val storageSet = residentRabbitData.getOrPut(island) { mutableMapOf() }
             // Only add residents that are not already in the storage set
             if (storageSet.size == residents.size) continue
-            residents.forEach { resident ->
+            residents.filter { !storageSet.containsKey(it) }.forEach { resident ->
                 storageSet[resident] = null
             }
             residentRabbitData[island] = storageSet
