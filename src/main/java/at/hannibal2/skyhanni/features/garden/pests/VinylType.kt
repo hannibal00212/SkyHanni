@@ -11,6 +11,7 @@ enum class VinylType(val displayName: String) {
     WINGS_OF_HARMONY("Wings of Harmony"),
     SLOW_AND_GROOVY("Slow and Groovy"),
     NOT_JUST_A_PEST("Not Just a Pest"),
+    MOUSE_VINLY("Mouse Vinly"),
     NONE("Nothing")
 
     ;

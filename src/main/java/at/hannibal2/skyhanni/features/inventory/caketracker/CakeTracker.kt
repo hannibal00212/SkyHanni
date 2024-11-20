@@ -97,7 +97,7 @@ object CakeTracker {
      */
     private val cakeContainerPattern by patternGroup.pattern(
         "cake.container",
-        "Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag|(Large )?Chest",
+        "Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag|(?:Large )?Chest",
     )
 
     /**

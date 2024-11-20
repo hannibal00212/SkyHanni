@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -13,28 +14,34 @@ enum class HoppityEggType(
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
+    private val altDay: Boolean = false
 ) {
     BREAKFAST("Breakfast", "§6", 7),
     LUNCH("Lunch", "§9", 14),
     DINNER("Dinner", "§a", 21),
-    BRUNCH("Brunch", "§6", -1),
-    DEJEUNER("Déjeuner", "§9", -1),
-    SUPPER("Supper", "§a", -1),
+    BRUNCH("Brunch", "§6", 7, altDay = true),
+    DEJEUNER("Déjeuner", "§9", 14, altDay = true),
+    SUPPER("Supper", "§a", 21, altDay = true),
     SIDE_DISH("Side Dish", "§6§l", -1),
+    HITMAN("Hitman", "§c", -1),
     BOUGHT("Bought", "§a", -1),
-    CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6", -1),
-    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6", -1),
+    CHOCOLATE_SHOP_MILESTONE("Shop Milestone", "§6§l", -1),
+    CHOCOLATE_FACTORY_MILESTONE("Chocolate Milestone", "§6§l", -1),
     STRAY("Stray Rabbit", "§a", -1)
     ;
 
     fun timeUntil(): Duration {
         if (resetsAt == -1) return Duration.INFINITE
         val now = SkyBlockTime.now()
-        if (now.hour >= resetsAt) {
-            return now.copy(day = now.day + 1, hour = resetsAt, minute = 0, second = 0)
-                .asTimeMark().timeUntil()
+        val isEggDayToday = altDay == now.isAlternateDay()
+
+        val daysToAdd = when {
+            isEggDayToday && now.hour < resetsAt -> 0
+            isEggDayToday && now.hour >= resetsAt -> 2
+            else -> 1
         }
-        return now.copy(hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+
+        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
     }
 
     fun markClaimed() {
@@ -69,8 +76,9 @@ enum class HoppityEggType(
             val currentSbTime = SkyBlockTime.now()
             val currentSbDay = currentSbTime.day
             val currentSbHour = currentSbTime.hour
+            val isAltDay = currentSbTime.isAlternateDay()
 
-            for (eggType in resettingEntries) {
+            for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
                 if (currentSbHour < eggType.resetsAt || eggType.lastResetDay == currentSbDay) continue
                 eggType.markSpawned()
                 eggType.lastResetDay = currentSbDay
