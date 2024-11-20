@@ -171,7 +171,7 @@ object EstimatedItemValueCalculator {
             val price = getPriceOrCompositePriceForAttribute(attributeName, attr.second)
             var priceColor = "§7"
             val useless = isUselessAttribute(attributeName)
-            var nameColor = if (!useless) "§9" else "§7"
+            val nameColor = if (!useless) "§9" else "§7"
             if (price != null) {
                 if (price > basePrice && !useless) {
                     subTotal += addAttributePrice(price, basePrice)

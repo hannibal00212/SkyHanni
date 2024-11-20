@@ -5,7 +5,7 @@ import kotlin.math.roundToInt
 
 object GhostData {
 
-    private var session = mutableMapOf(
+    private val session = mutableMapOf(
         Option.KILLS to 0.0,
         Option.SORROWCOUNT to 0.0,
         Option.VOLTACOUNT to 0.0,
@@ -15,7 +15,7 @@ object GhostData {
         Option.TOTALDROPS to 0.0,
         Option.SCAVENGERCOINS to 0.0,
         Option.MAXKILLCOMBO to 0.0,
-        Option.SKILLXPGAINED to 0.0
+        Option.SKILLXPGAINED to 0.0,
     )
 
     // TODO repo

@@ -50,7 +50,7 @@ object GardenVisitorDropStatistics {
      */
     private val acceptPattern by patternGroup.pattern(
         "accept",
-        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]",
+        "OFFER ACCEPTED with (?<visitor>.*) \\((?<rarity>.*)\\)",
     )
 
     /**

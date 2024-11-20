@@ -43,7 +43,7 @@ object FlareDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
-    private var flares = mutableListOf<Flare>()
+    private val flares = mutableListOf<Flare>()
 
     private var activeWarning = false
 
