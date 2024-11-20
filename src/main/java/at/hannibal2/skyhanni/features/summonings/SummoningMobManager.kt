@@ -42,7 +42,7 @@ object SummoningMobManager {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
+        "§aYou have spawned your .+ §r§asoul! §r§d\\((\\d+) Mana\\)",
     )
 
     /**

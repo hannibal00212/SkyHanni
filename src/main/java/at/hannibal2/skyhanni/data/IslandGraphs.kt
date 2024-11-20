@@ -132,7 +132,7 @@ object IslandGraphs {
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(
         "glacitetunnels",
-        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+        "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
     @SubscribeEvent

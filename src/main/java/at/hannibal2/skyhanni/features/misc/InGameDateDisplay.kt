@@ -36,7 +36,7 @@ object InGameDateDisplay {
      */
     private val timeSymbolsPattern by patternGroup.pattern(
         "symbols",
-        "([☀☽࿇])",
+        "[☀☽࿇]",
     )
 
     private var display = ""

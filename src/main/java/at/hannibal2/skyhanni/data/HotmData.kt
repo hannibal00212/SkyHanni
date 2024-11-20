@@ -436,7 +436,7 @@ enum class HotmData(
 
         private val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|",
+            "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
         )
 
         /**
@@ -445,7 +445,7 @@ enum class HotmData(
          */
         private val enabledPattern by patternGroup.pattern(
             "perk.enable",
-            "§a§lENABLED|(§.)*SELECTED",
+            "§a§lENABLED|(?:§.)*SELECTED",
         )
 
         /**

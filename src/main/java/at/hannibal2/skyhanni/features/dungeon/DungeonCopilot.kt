@@ -34,7 +34,7 @@ object DungeonCopilot {
      */
     private val witherDoorPattern by patternGroup.pattern(
         "wither.door",
-        "(.*) opened a §r§8§lWITHER §r§adoor!",
+        ".* opened a §r§8§lWITHER §r§adoor!",
     )
     private val bloodDoorPattern by patternGroup.pattern(
         "blood.door",
