@@ -27,11 +27,11 @@ object LimboPlaytime {
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a([\\d.,]+) minutes.+\$"
+        "§5§o§a[\\d.,]+ minutes.+\$"
     )
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b([\\d.,]+) hours.+\$"
+        "§5§o§b[\\d.,]+ hours.+\$"
     )
 
     var tooltipPlaytime = mutableListOf<String>()

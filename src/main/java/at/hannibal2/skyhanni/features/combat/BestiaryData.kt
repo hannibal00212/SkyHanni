@@ -74,7 +74,7 @@ object BestiaryData {
      */
     private val titlePattern by patternGroup.pattern(
         "title",
-        "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
+        "^(?:\\(\\d+\\/\\d+\\) )?(?:Bestiary|.+) ➜ .+\$"
     )
 
     private var display = emptyList<List<Any>>()

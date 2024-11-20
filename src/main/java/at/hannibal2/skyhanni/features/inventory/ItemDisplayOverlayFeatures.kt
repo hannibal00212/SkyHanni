@@ -98,7 +98,7 @@ object ItemDisplayOverlayFeatures {
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to",
+        "(?:§.)*You were the (?:§.)*(?<rank>\\w+)(?<ordinal>st|nd|rd|th) (?:§.)*to",
     )
 
     /**

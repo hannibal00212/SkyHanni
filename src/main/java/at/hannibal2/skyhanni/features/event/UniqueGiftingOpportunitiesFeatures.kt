@@ -38,11 +38,11 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
     private val giftedPattern by patternGroup.pattern(
         "gifted",
-        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!",
+        "§6\\+1 Unique Gift given! To [^§]+§r§6!",
     )
     private val giftNamePattern by patternGroup.pattern(
         "giftname",
-        "(?:WHITE|RED|GREEN)_GIFT\$",
+        "(?:WHITE|RED|GREEN|[(a,b)+])_GIFT\$",
     )
 
     private var holdingGift = false

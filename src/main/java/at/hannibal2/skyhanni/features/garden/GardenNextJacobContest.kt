@@ -80,7 +80,7 @@ object GardenNextJacobContest {
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§(e○|6☘) §7(?<crop>.*)"
+        "§(?:e○|6☘) §7(?<crop>.*)"
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"

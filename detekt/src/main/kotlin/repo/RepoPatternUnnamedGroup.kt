@@ -27,10 +27,16 @@ class RepoPatternUnnamedGroup(config: Config) : SkyHanniRule(config) {
     }
 
     private fun String.hasUnnamedGroup(): Boolean {
-        return unnamedGroup.containsMatchIn(this)
+        // Remove content inside square brackets
+        val withoutSquareBrackets = squareBracketRegex.replace(this, "")
+        // Check if simplified string contains unnamed groups
+        return unnamedGroupRegex.containsMatchIn(withoutSquareBrackets)
     }
 
     companion object {
-        val unnamedGroup = Regex("""(?<!\\)\((?!\?)""")
+        // Regex to find content inside square brackets, including nested brackets
+        private val squareBracketRegex = Regex("""(?<!\\)\[(?:\^])?(?:\\.|[^]])*]""")
+        // Regex to find unescaped '(' not followed by '?'
+        private val unnamedGroupRegex = Regex("""(?<!\\)\((?!\?)""")
     }
 }
