@@ -110,6 +110,14 @@ object HoppityAPI {
         "inventory.misc",
         "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner) ?)(?:Milestones|Egg)?",
     )
+
+    /**
+     * REGEX-TEST: Rabbit Hitman
+     */
+    val hitmanInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.inventory",
+        "(?:§.)*Rabbit Hitman",
+    )
     // </editor-fold>
 
     data class HoppityStateDataSet(
