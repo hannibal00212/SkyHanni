@@ -41,7 +41,7 @@ object UtilsPatterns {
 
     val baitPattern by patternGroup.pattern(
         "item.name.bait",
-        "^(?:Obfuscated.*|.* Bait)$",
+        "^Obfuscated.*|.* Bait$",
     )
 
     val enchantmentNamePattern by patternGroup.pattern(
