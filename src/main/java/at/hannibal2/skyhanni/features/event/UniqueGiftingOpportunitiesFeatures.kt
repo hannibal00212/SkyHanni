@@ -38,11 +38,11 @@ object UniqueGiftingOpportunitiesFeatures {
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
     private val giftedPattern by patternGroup.pattern(
         "gifted",
-        "§6\\+1 Unique Gift given! To [^§]+§r§6!",
+        "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
     )
     private val giftNamePattern by patternGroup.pattern(
         "giftname",
-        "(?:WHITE|RED|GREEN|[(a,b)+])_GIFT\$",
+        "(?:WHITE|RED|GREEN)_GIFT\$",
     )
 
     private var holdingGift = false
@@ -104,7 +104,7 @@ object UniqueGiftingOpportunitiesFeatures {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         giftedPattern.matchMatcher(event.message) {
-            addGiftedPlayer(group(1))
+            addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }
     }
