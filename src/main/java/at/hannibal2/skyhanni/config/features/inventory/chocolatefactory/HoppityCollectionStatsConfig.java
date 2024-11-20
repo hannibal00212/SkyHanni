@@ -70,7 +70,7 @@ public class HoppityCollectionStatsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show Missing Hotspot Rabbits",
+        name = "Missing Hotspot Rabbits",
         desc = "Show the islands that have the most hotspot rabbits that you are missing."
     )
     @ConfigEditorBoolean
