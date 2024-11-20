@@ -277,13 +277,7 @@ object LorenzUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            Minecraft.getMinecraft().playerController.windowClick(
-                container.windowId,
-                slotNumber,
-                0,
-                1,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(slotNumber, container.windowId, 0, 1)
             this.cancel()
         }
     }

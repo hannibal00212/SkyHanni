@@ -76,13 +76,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            Minecraft.getMinecraft().playerController.windowClick(
-                chest.inventorySlots.windowId,
-                37 + index,
-                2,
-                3,
-                Minecraft.getMinecraft().thePlayer,
-            ) // middle clicks > left clicks
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -179,13 +173,7 @@ object HarpFeatures {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
             event.cancel()
-            Minecraft.getMinecraft().playerController.windowClick(
-                event.container.windowId,
-                it,
-                event.clickedButton,
-                event.clickType,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, event.clickType)
         }
     }
 

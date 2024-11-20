@@ -107,6 +107,7 @@ object MinionFeatures {
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
+        println("onPlayerInteract")
         if (!isEnabled()) return
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
 

@@ -48,7 +48,7 @@ object TestChatCommand {
         val component =
             if (isComplex)
                 try {
-                    IChatComponent.Serializer.jsonToComponent(text)
+                    IChatComponent.Serializer.jsonToComponent(text) ?: ChatComponentText("")
                 } catch (ex: Exception) {
                     ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
                     return

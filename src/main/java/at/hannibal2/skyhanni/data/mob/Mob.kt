@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
+import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
@@ -233,7 +233,7 @@ class Mob(
         internalHighlight()
     }
 
-    val centerCords get() = boundingBox.getCenter()
+    val centerCords get() = boundingBox.getBoxCenter()
 
     override fun hashCode() = id.hashCode()
 

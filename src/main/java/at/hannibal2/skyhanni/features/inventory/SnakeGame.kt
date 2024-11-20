@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -47,13 +48,7 @@ object SnakeGame {
             if (key?.isKeyHeld() == false) continue
             event.cancel()
 
-            Minecraft.getMinecraft().playerController.windowClick(
-                chest.inventorySlots.windowId,
-                slot,
-                2,
-                3,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, 2, 3)
 
             lastClick = SimpleTimeMark.now()
             break
