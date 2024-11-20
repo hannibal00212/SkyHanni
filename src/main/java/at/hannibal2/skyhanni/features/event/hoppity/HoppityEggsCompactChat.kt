@@ -68,7 +68,7 @@ object HoppityEggsCompactChat {
                 "${hoppityDataSet.lastName}$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$hoppityDataSet.lastRarity " else ""}" +
+            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "${hoppityDataSet.lastRarity} " else ""}" +
                 "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
         }
     }
