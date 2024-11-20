@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 
+
 data class ChocolateFactoryUpgrade(
     val slotIndex: Int,
     val level: Int,

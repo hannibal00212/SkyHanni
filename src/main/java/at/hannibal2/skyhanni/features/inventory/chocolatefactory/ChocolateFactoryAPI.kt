@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.Deque
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -90,6 +91,8 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
+
+    var maxMilestoneChocolate = 700_000_000_000L
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
@@ -100,18 +103,30 @@ object ChocolateFactoryAPI {
 
     var currentPrestige = 1
     var chocolatePerSecond = 0.0
+
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
 
     var clickRabbitSlot: Int? = null
 
+    var upgradeCostFormulaConstants = mapOf<Int, Map<String, Double>>()
+    var upgradeCostPerLevel = mapOf<Int, List<Int>>()
+    var maxUpgradeLevelPerPrestige = mapOf<Int, List<Int>>()
+
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
+
+    var allBestPossibleUpgrades = mapOf<Int, Deque<ChocolateFactoryUpgrade>>()
+    var lastUpgradesWhenChecking = mapOf<Int, ChocolateFactoryUpgrade>()
+    var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
+    var totalUpgradeCost = 0L
+
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
+
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -158,6 +173,10 @@ object ChocolateFactoryAPI {
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
+
+        upgradeCostFormulaConstants = data.upgradeCostFormulaConstants
+        upgradeCostPerLevel = data.upgradeCostsPerLevel
+        maxUpgradeLevelPerPrestige = data.maxUpgradeLevelPerPrestige
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
