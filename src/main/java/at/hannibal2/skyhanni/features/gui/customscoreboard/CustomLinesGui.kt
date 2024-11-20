@@ -151,8 +151,13 @@ object CustomLinesGui : GuiScreen() {
         event.register("shcustomlines") {
             aliases = listOf("shcustom", "shcl")
             description = "Opens the Custom Lines editor."
-            callback { SkyHanniMod.screenToOpen = CustomLinesGui }
+            callback { open() }
         }
+    }
+
+    @JvmStatic
+    fun open() {
+        SkyHanniMod.screenToOpen = CustomLinesGui
     }
 
 }

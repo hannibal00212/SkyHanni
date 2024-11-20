@@ -10,7 +10,7 @@ public class CustomLinesConfig {
 
     @ConfigOption(name = "Open Custom Lines GUI", desc = "Open the GUI to edit the custom lines")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable open = CustomLinesGui::openGui;
+    public Runnable open = CustomLinesGui::open;
 
     @Expose
     @ConfigOption(name = "Custom Line 1", desc = "Custom line 1")
