@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
@@ -79,22 +79,22 @@ object WorldEdit {
             RenderUtils.drawWireframeBoundingBoxNea(
                 funAABB(l, l).expandBlock(),
                 Color.RED,
-                event.partialTicks
+                event.partialTicks,
             )
         }
         rightPos?.let { r ->
             RenderUtils.drawWireframeBoundingBoxNea(
                 funAABB(r, r).expandBlock(),
                 Color.BLUE,
-                event.partialTicks
+                event.partialTicks,
             )
         }
         aabb?.let {
             RenderUtils.drawFilledBoundingBoxNea(
                 it.expandBlock(),
-                Color(Color.CYAN.withAlpha(60), true),
+                Color.CYAN.addAlpha(60),
                 partialTicks = event.partialTicks,
-                renderRelativeToCamera = false
+                renderRelativeToCamera = false,
             )
         }
     }
@@ -108,7 +108,7 @@ object WorldEdit {
             null, "help" -> {
                 ChatUtils.chat(
                     "Use a wood axe and left/right click to select a region in the world. " +
-                        "Then use /shworldedit copy or /shworldedit reset."
+                        "Then use /shworldedit copy or /shworldedit reset.",
                 )
             }
 

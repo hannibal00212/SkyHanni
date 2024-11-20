@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraft.block.state.IBlockState
 
 enum class OreType(
@@ -189,7 +189,7 @@ enum class OreType(
 
     val oreBlocks = oreBlocks.toSet()
 
-    val internalName: NEUInternalName = internalName.asInternalName()
+    val internalName: NEUInternalName = internalName.toInternalName()
 
     fun isGemstone(): Boolean = this in gemstones
 

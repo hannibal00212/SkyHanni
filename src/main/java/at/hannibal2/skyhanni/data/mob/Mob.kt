@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -107,8 +108,8 @@ class Mob(
         }
     }
 
-    val isCorrupted get() = baseEntity.isCorrupted() // Can change
-    val isRunic = baseEntity.isRunic() // Does not Change
+    val isCorrupted get() = !RiftAPI.inRift() && baseEntity.isCorrupted() // Can change
+    val isRunic = !RiftAPI.inRift() && baseEntity.isRunic() // Does not Change
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 

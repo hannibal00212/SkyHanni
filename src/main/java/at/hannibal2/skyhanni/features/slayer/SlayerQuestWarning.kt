@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -31,8 +31,8 @@ object SlayerQuestWarning {
     private val config get() = SkyHanniMod.feature.slayer
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
-    private val voidItem = "ASPECT_OF_THE_VOID".asInternalName()
-    private val endItem = "ASPECT_OF_THE_END".asInternalName()
+    private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()
+    private val endItem = "ASPECT_OF_THE_END".toInternalName()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()

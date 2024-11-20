@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.data.DateFormat;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -145,6 +146,16 @@ public class DisplayConfig {
     public boolean skyblockTimeExactMinutes = true;
 
     @Expose
+    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
+    @ConfigEditorBoolean
+    public boolean dateInLobbyCode = true;
+
+    @Expose
+    @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
+    @ConfigEditorDropdown
+    public DateFormat dateFormat = DateFormat.US_SLASH_MMDDYYYY;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
@@ -158,11 +169,6 @@ public class DisplayConfig {
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
     @ConfigEditorBoolean
     public boolean showProfileName = false;
-
-    @Expose
-    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
-    @ConfigEditorBoolean
-    public boolean dateInLobbyCode = true;
 
     @Expose
     @ConfigOption(

@@ -18,9 +18,13 @@ object ShiftClickNPCSell {
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
     private val sellSlot = -4
+
+    /**
+     * REGEX-TEST: §eClick to buyback!
+     */
     private val lastLoreLineOfSellPattern by RepoPattern.pattern(
         "inventory.npc.sell.lore",
-        "§7them to this Shop!|§eClick to buyback!"
+        "§7them to this Shop!|§eClick to buyback!",
     )
 
     var inInventory = false

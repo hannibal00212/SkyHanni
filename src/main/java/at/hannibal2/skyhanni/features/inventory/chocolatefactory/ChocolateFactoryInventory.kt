@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -16,9 +16,13 @@ object ChocolateFactoryInventory {
 
     private val config get() = ChocolateFactoryAPI.config
 
+    /**
+     * REGEX-TEST: §7§aYou have 1 unclaimed reward!
+     * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
+     */
     private val unclaimedRewardsPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "unclaimedrewards",
-        "§7§aYou have \\d+ unclaimed rewards?!"
+        "§7§aYou have \\d+ unclaimed rewards?!",
     )
 
     @SubscribeEvent
@@ -63,7 +67,7 @@ object ChocolateFactoryInventory {
                 slot highlight LorenzColor.RED
             }
             if (slotIndex == ChocolateFactoryAPI.milestoneIndex) {
-                slot.stack?.getLore()?.matchFirst(unclaimedRewardsPattern) {
+                unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
                     slot highlight LorenzColor.RED
                 }
             }

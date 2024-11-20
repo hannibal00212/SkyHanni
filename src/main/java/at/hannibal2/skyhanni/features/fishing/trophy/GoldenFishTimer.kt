@@ -17,12 +17,12 @@ import at.hannibal2.skyhanni.features.fishing.FishingAPI.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -87,8 +87,8 @@ object GoldenFishTimer {
     private val isFishing get() = FishingAPI.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
 
-    private fun checkGoldenFish(entity: EntityLivingBase) {
-        if (entity.inventory.none { it?.getSkullTexture() == GOLDEN_FISH_SKULL_TEXTURE }) return
+    private fun checkGoldenFish(entity: EntityArmorStand) {
+        if (!entity.wearingSkullTexture(GOLDEN_FISH_SKULL_TEXTURE)) return
         possibleGoldenFishEntity = entity
         lastFishEntity = SimpleTimeMark.now()
         handle()
@@ -130,7 +130,7 @@ object GoldenFishTimer {
             val entity = confirmedGoldenFishEntity ?: return
             if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.GREEN.toColor().withAlpha(100)
+                LorenzColor.GREEN.toColor().addAlpha(100),
             ) { true }
             return
         }

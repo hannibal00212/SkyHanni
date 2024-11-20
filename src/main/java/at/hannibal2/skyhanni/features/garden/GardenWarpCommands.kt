@@ -19,9 +19,13 @@ object GardenWarpCommands {
 
     private val config get() = GardenAPI.config.gardenCommands
 
+    /**
+     * REGEX-TEST: /tp 3
+     * REGEX-TEST: /tp barn
+     */
     private val tpPlotPattern by RepoPattern.pattern(
         "garden.warpcommand.tpplot",
-        "/tp (?<plot>.*)"
+        "/tp (?<plot>.*)",
     )
 
     private var lastWarpTime = SimpleTimeMark.farPast()

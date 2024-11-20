@@ -22,6 +22,11 @@ object TabListReader {
     private val config get() = SkyHanniMod.feature.gui.compactTabList
 
     private val patternGroup = RepoPattern.group("misc.compacttablist")
+
+    /**
+     * REGEX-TEST: [164] CalMWolfs ᛝ♲
+     * REGEX-TEST: [328] vayness ☠
+     */
     val usernamePattern by patternGroup.pattern(
         "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
@@ -47,13 +52,21 @@ object TabListReader {
         "effects.count",
         "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
     )
+
+    /**
+     * REGEX-TEST: §r§r§d§lCookie Buff§r§r§r§7§r§7Not active! Obtain booster cookies from the community§r
+     */
     private val cookiePattern by patternGroup.pattern(
         "cookie",
-        "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
+
+    /**
+     * REGEX-TEST: §r§r§6§lDungeon Buffs§r§r§r§7No Buffs active. Find them by exploring the Dungeon!§r
+     */
     private val dungeonBuffPattern by patternGroup.pattern(
         "dungeonbuff",
-        "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
@@ -61,7 +74,7 @@ object TabListReader {
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"

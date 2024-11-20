@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -18,10 +18,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropUpgrades {
 
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
+
+    /**
+     * REGEX-TEST: §7Current Tier: §e7§7/§a9
+     */
     private val tierPattern by patternGroup.pattern(
         "tier",
         "§7Current Tier: §.(?<level>\\d)§7/§a9",
     )
+
+    /**
+     * REGEX-TEST:   §r§6§lCROP UPGRADE §eNether Wart§7 #7
+     */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",
         "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
@@ -47,7 +55,7 @@ object GardenCropUpgrades {
 
         for (item in event.inventoryItems.values) {
             val crop = CropType.getByNameOrNull(item.name.removeColor()) ?: continue
-            item.getLore().matchFirst(tierPattern) {
+            tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)
             }
