@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
-import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -82,7 +82,7 @@ object EndermanSlayerFeatures {
                 }
             }
 
-            if (config.highlightNukekebi && entity.holdingSkullTexture(NUKEKUBI_SKULL_TEXTURE) && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi && entity.hasSkullTexture(NUKEKUBI_SKULL_TEXTURE) && entity !in nukekubiSkulls) {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
