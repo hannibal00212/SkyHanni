@@ -81,7 +81,7 @@ object MinionFeatures {
     )
     private val minionCoinPattern by patternGroup.pattern(
         "chat.coin",
-        "§aYou received §r§6(.*) coins§r§a!"
+        "§aYou received §r§6.* coins§r§a!"
     )
     private val minionTitlePattern by patternGroup.pattern(
         "title",

@@ -101,7 +101,7 @@ object QuickModMenuSwitch {
             return config.javaClass.name
         }
         if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
-            val actualGui = Minecraft.getMinecraft().currentScreen
+            val actualGui = Minecraft.getMinecraft().currentScreen ?: return openGui
             val currentPage = actualGui.javaClass.getDeclaredField("currentPage")
                 .makeAccessible()
                 .get(actualGui)
