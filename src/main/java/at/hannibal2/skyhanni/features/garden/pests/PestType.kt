@@ -93,6 +93,15 @@ enum class PestType(
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
     ),
+    MOUSE(
+        // TODO FIX
+        "Mouse",
+        BossType.GARDEN_PEST_MOUSE,
+        SprayType.MOUSE_SPRAY,
+        VinylType.MOUSE_VINLY,
+        "PEST_MOUSE_MONSTER".toInternalName(),
+        CropType.MUSHROOM,
+    ),
     ;
 
     companion object {

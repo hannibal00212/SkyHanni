@@ -80,9 +80,9 @@ object ItemPickupLog {
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
-    private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
-    private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
     private var dirty = false
 

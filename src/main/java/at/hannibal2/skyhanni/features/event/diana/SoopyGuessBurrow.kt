@@ -36,9 +36,9 @@ object SoopyGuessBurrow {
     private var guessPoint: LorenzVec? = null
 
     private var lastSoundPoint: LorenzVec? = null
-    private var locations = mutableListOf<LorenzVec>()
+    private val locations = mutableListOf<LorenzVec>()
 
-    private var dingSlope = mutableListOf<Float>()
+    private val dingSlope = mutableListOf<Float>()
 
     var distance: Double? = null
     private var distance2: Double? = null
