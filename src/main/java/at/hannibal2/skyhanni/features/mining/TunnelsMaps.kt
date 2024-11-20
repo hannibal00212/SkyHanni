@@ -38,9 +38,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -154,7 +154,7 @@ object TunnelsMaps {
 
     private var clickTranslate = mapOf<Int, String>()
 
-    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
+    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".toInternalName() }
 
     private var isCommission = false
 
@@ -167,7 +167,7 @@ object TunnelsMaps {
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            val type = lore.matchFirst(collectorCommissionPattern) {
+            val type = collectorCommissionPattern.firstMatcher(lore) {
                 group("what")
             } ?: return@mapNotNull null
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
@@ -370,7 +370,7 @@ object TunnelsMaps {
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
-                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
                 ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),

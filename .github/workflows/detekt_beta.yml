@@ -19,8 +19,16 @@ jobs:
             -   name: Run detekt main (w/ typing analysis)
                 run: |
                   ./gradlew detektMain --stacktrace
-            -   name: Annotate detekt failures
-                if: ${{ !cancelled() }}
+            -   name: Check if SARIF file exists
+                id: check_sarif
                 run: |
-                  chmod +x .github/scripts/process_detekt_sarif.sh
-                  ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
+                    if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
+                        echo "exists=true" >> $GITHUB_OUTPUT
+                    else
+                        echo "exists=false" >> $GITHUB_OUTPUT
+                    fi
+            -   name: Annotate detekt failures
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                run: |
+                    chmod +x .github/scripts/process_detekt_sarif.sh
+                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif

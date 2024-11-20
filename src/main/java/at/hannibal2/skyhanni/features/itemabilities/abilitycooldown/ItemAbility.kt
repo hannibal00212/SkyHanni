@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
@@ -83,9 +83,9 @@ enum class ItemAbility(
     ) {
         newVariant = true
         alternateInternalNames.forEach {
-            internalNames.add(it.asInternalName())
+            internalNames.add(it.toInternalName())
         }
-        internalNames.add(name.asInternalName())
+        internalNames.add(name.toInternalName())
     }
 
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
