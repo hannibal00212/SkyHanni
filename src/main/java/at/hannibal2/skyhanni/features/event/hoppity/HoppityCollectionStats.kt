@@ -286,6 +286,7 @@ object HoppityCollectionStats {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         for ((island, residents) in data.residentLocations) {
             val storageSet = residentRabbitData.getOrPut(island) { mutableMapOf() }
+            // Only add residents that are not already in the storage set
             if (storageSet.size == residents.size) continue
             residents.forEach { resident ->
                 storageSet[resident] = null
@@ -392,10 +393,9 @@ object HoppityCollectionStats {
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
             stack.displayName.removeColor().takeIf { HoppityCollectionData.isKnownRabbit(it) }?.let { residentName ->
-                val found = !rabbitNotFoundPattern.anyMatches(lore)
-                residentRabbitData[island]?.let { data ->
-                    data[residentName] = found
-                }
+                residentRabbitData.getOrPut(island) {
+                    mutableMapOf()
+                }[residentName] = !rabbitNotFoundPattern.anyMatches(lore)
             }
         }
     }
@@ -408,8 +408,9 @@ object HoppityCollectionStats {
         hotspotLocationPattern.firstMatcher(lore) {
             val location = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
             stack.displayName.removeColor().takeIf { HoppityCollectionData.isKnownRabbit(it) }?.let { rabbitName ->
-                val found = !rabbitNotFoundPattern.anyMatches(lore)
-                hotspotData.hotspotRabbits.getOrPut(location) { mutableMapOf() }[rabbitName] = found
+                hotspotData.hotspotRabbits.getOrPut(location) {
+                    mutableMapOf()
+                }[rabbitName] = !rabbitNotFoundPattern.anyMatches(lore)
             }
         }
     }
@@ -485,7 +486,7 @@ object HoppityCollectionStats {
     }
 
     private fun addHotspotRabbitsInformationToHud(newList: MutableList<Renderable>) {
-        if (!collectionConfig.showHotspotSummary) return
+        if (!collectionConfig.showHotspotSummary || !HoppityAPI.isHoppityEvent()) return
         val hotspotRabbitData = hotspotRabbitData ?: return
 
         val totalHotspotCount = hotspotRabbitData.hotspotRabbits.values.sumOf { it.size }
