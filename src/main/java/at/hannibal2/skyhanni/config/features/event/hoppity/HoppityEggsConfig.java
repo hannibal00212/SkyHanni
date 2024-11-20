@@ -20,7 +20,7 @@ public class HoppityEggsConfig {
     public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
 
     @Expose
-    @ConfigOption(name = "Event Summary", desc = "")
+    @ConfigOption(name = "Hoppity Hunt Stats Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
 

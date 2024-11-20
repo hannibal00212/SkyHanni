@@ -21,6 +21,7 @@ enum class OutsideSbFeature(private val displayName: String) {
     MOVEMENT_SPEED("Movement Speed"),
     CUSTOM_SCOREBOARD("Custom Scoreboard (only on Hypixel)"),
     MAYOR_OVERLAY("Mayor Overlay"),
+    MINING_EVENT_DISPLAY("Mining Event Display"),
     ;
 
     override fun toString() = displayName

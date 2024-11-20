@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -49,9 +50,11 @@ object ChocolateFactoryStats {
 
         val position = ChocolateFactoryAPI.leaderboardPosition
         val positionText = position?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" }.orEmpty()
-        val leaderboard = "#$positionText $percentile"
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile
+        val percentileText = percentile?.let { "§7Top §a$it%" }.orEmpty()
+        val leaderboard = "#$positionText $percentileText"
         ChocolatePositionChange.update(position, leaderboard)
+        HoppityEventSummary.updateCfPosition(position, percentile)
 
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"

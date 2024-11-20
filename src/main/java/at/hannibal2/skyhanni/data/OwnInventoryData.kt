@@ -37,6 +37,10 @@ object OwnInventoryData {
 
     private var itemAmounts = mapOf<NEUInternalName, Int>()
     private var dirty = false
+
+    /**
+     * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
+     */
     private val sackToInventoryChatPattern by RepoPattern.pattern(
         "data.owninventory.chat.movedsacktoinventory",
         "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory.",

@@ -43,7 +43,7 @@ object GraphEditorBugFinder {
 
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
-            val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag(ignoreConfig = true) != null }?.first
+            val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag() != null }?.first
             if (pathToNearestArea == null) {
                 continue
             }
@@ -56,7 +56,7 @@ object GraphEditorBugFinder {
             for (neighbour in node.neighbours.keys) {
                 val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
                 if (neighbouringAreaNode == areaNode) continue
-                if ((null == node.getAreaTag(ignoreConfig = true))) {
+                if ((null == node.getAreaTag())) {
                     bugs++
                     errorsInWorld[node] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
                 }

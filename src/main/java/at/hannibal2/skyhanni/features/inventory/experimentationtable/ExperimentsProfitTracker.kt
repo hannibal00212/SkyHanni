@@ -62,8 +62,8 @@ object ExperimentsProfitTracker {
 
     private val lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
-    private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
-    private var currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
+    private val lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
+    private val currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {

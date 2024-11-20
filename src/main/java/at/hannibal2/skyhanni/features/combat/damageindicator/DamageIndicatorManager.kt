@@ -66,8 +66,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
 // TODO cut class into smaller pieces
+@SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
 
@@ -680,11 +680,12 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
+        val ridingEntity = entity.ridingEntity
         // Laser phase
-        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
+        if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val ticksAlive = ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {

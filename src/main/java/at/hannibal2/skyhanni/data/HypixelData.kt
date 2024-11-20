@@ -21,9 +21,10 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,10 +33,8 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,15 +47,30 @@ object HypixelData {
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
     )
+
+    /**
+     * REGEX-TEST: §ewww.hypixel.net
+     * REGEX-TEST: §ealpha.hypixel.net
+     */
     private val serverNameScoreboardPattern by patternGroup.pattern(
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
     )
+
+    /**
+     * REGEX-TEST: §b§lArea: §r§7Private Island
+     * REGEX-TEST: §b§lDungeon: §r§7Catacombs
+     */
     @Suppress("UnusedPrivateProperty")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
+        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
     )
+
+    /**
+     * REGEX-TEST: §711/15/24 §8m19CJ
+     * REGEX-TEST: §711/15/24 §8m1F
+     */
     private val serverIdScoreboardPattern by patternGroup.pattern(
         "serverid.scoreboard",
         "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
@@ -65,14 +79,26 @@ object HypixelData {
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+",
     )
+
+    /**
+     * REGEX-TEST:          §r§a§lPlayers §r§f(5)
+     */
     private val playerAmountPattern by patternGroup.pattern(
         "playeramount",
         "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
     )
+
+    /**
+     * REGEX-TEST:           §r§b§lCoop §r§f(4)
+     */
     private val playerAmountCoopPattern by patternGroup.pattern(
         "playeramount.coop",
         "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
     )
+
+    /**
+     * REGEX-TEST:           §r§5§lGuests §r§f(0)
+     */
     private val playerAmountGuestingPattern by patternGroup.pattern(
         "playeramount.guesting",
         "^\\s*(?:§.)*Guests (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
@@ -85,10 +111,18 @@ object HypixelData {
         "playeramount.dungeonparty",
         "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
     )
+
+    /**
+     * REGEX-TEST:            §r§b§lIsland
+     */
     private val soloProfileAmountPattern by patternGroup.pattern(
         "solo.profile.amount",
         "^\\s*(?:§.)*Island\\s*$",
     )
+
+    /**
+     * REGEX-TEST:  §a✌ §7(§a11§7/20)
+     */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
@@ -97,6 +131,12 @@ object HypixelData {
         "guesting.scoreboard",
         "SKYBLOCK GUEST",
     )
+
+    /**
+     * REGEX-TEST: SKYBLOCK
+     * REGEX-TEST: SKYBLOCK GUEST
+     * REGEX-TEST: SKYBLOCK CO-OP
+     */
     private val scoreboardTitlePattern by patternGroup.pattern(
         "scoreboard.title",
         "SK[YI]BLOCK(?: CO-OP| GUEST)?",
@@ -111,7 +151,7 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
-    private var lastLocRaw = SimpleTimeMark.farPast()
+    var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
 
     var hypixelLive = false
@@ -170,7 +210,7 @@ object HypixelData {
             return
         }
 
-        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
@@ -244,7 +284,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
+        scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt()
         }
 
@@ -355,7 +395,7 @@ object HypixelData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
-            checkNEULocraw()
+            sendLocraw()
         }
 
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
@@ -397,18 +437,10 @@ object HypixelData {
         skyBlock = inSkyBlock
     }
 
-    // Modified from NEU.
-    // NEU does not send locraw when not in SkyBlock.
-    // So, as requested by Hannibal, use locraw from
-    // NEU and have NEU send it.
-    // Remove this when NEU dependency is removed
-    private fun checkNEULocraw() {
+    private fun sendLocraw() {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-            }
+            HypixelCommands.locraw()
         }
     }
 
@@ -424,7 +456,7 @@ object HypixelData {
     private fun checkProfileName() {
         if (profileName.isNotEmpty()) return
 
-        TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
+        UtilsPatterns.tabListProfilePattern.firstMatcher(TabListData.getTabList()) {
             profileName = group("profile").lowercase()
             ProfileJoinEvent(profileName).postAndCatch()
         }
