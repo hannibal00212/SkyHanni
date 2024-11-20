@@ -24,7 +24,6 @@ class RepoPatternUnnamedGroup(config: Config) : SkyHanniRule(config) {
         if (repoPatternElement.rawPattern.hasUnnamedGroup()) {
             delegate.reportIssue("Repo pattern `${repoPatternElement.variableName}` must not contain unnamed capture groups.")
         }
-
     }
 
     private fun String.hasUnnamedGroup(): Boolean {
@@ -34,5 +33,4 @@ class RepoPatternUnnamedGroup(config: Config) : SkyHanniRule(config) {
     companion object {
         val unnamedGroup = Regex("""(?<!\\)\((?!\?)""")
     }
-
 }
