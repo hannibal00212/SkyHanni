@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -27,6 +29,9 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onEggFound(eggFoundEvent: EggFoundEvent) {
+        val type = eggFoundEvent.type
+        // Only reset the timer for meal entries and hitman eggs
+        if (type !in resettingEntries && type != HoppityEggType.HITMAN) return
         timer = 30.seconds
         lastTimerSubtraction = null
     }
