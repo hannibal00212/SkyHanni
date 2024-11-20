@@ -119,7 +119,7 @@ object CrystalNucleusChatFilter {
     @Suppress("MaxLineLength")
     private val componentSubmittedPattern by patternGroup.pattern(
         "precursor.submitted",
-        "(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
+        "(?:Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>\\d|one) more).*",
     )
 
     /**
