@@ -25,9 +25,9 @@ object TiaRelayHelper {
 
     private var lastClickSlot = 0
     private var lastClickTime = SimpleTimeMark.farPast()
-    private var sounds = mutableMapOf<Int, Sound>()
+    private val sounds = mutableMapOf<Int, Sound>()
 
-    private var resultDisplay = mutableMapOf<Int, Int>()
+    private val resultDisplay = mutableMapOf<Int, Int>()
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {

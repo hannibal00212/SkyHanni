@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -144,7 +146,7 @@ object IslandExceptions {
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Mage Outlaw"))
 
         baseEntity is EntityPigZombie &&
-            baseEntity.inventory?.get(4)?.getSkullTexture() == MobFilter.NPC_TURD_SKULL ->
+            baseEntity.getEntityHelmet()?.getSkullTexture() == MobFilter.NPC_TURD_SKULL ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Turd"))
 
         baseEntity is EntityOcelot -> if (MobFilter.createDisplayNPC(baseEntity)) {
@@ -257,7 +259,7 @@ object IslandExceptions {
             .firstOrNull {
                 it != null &&
                     it.distanceTo(baseEntity) < 4.0 &&
-                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL_TEXTURE
+                    it.wearingSkullTexture(MobFilter.RAT_SKULL_TEXTURE)
             }?.let {
                 MobData.MobResult.found(Mob(baseEntity, mobType = Mob.Type.BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is EntityZombie) MobData.MobResult.notYetFound else null

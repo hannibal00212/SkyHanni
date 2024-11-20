@@ -1,6 +1,5 @@
 /**
  * TODO LIST
- *  - Bank API (actually maybe not, I like the current design)
  *  - countdown events like fishing festival + fiesta when its not on tablist
  *  - improve hide coin difference to also work with bits, motes, etc
  *  - color options in the purse etc lines
@@ -39,8 +38,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.client.GuiIngameForge
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -58,6 +55,8 @@ object CustomScoreboard {
     private const val GUI_NAME = "Custom Scoreboard"
 
     private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
+
+    private var dirty = false
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -181,32 +180,8 @@ object CustomScoreboard {
         takeIf { !informationFilteringConfig.hideEmptyLinesAtTopAndBottom }
             ?: dropWhile { it.display.isBlank() }.dropLastWhile { it.display.isBlank() }
 
-    private var dirty = false
-
-    // The ElementType for the Vanilla Scoreboard is called HELMET
-    // Thanks to APEC for showing this
-    @SubscribeEvent
-    fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
-        if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            if (isHideVanillaScoreboardEnabled()) {
-                GuiIngameForge.renderObjective = false
-            }
-            if (dirty) {
-                GuiIngameForge.renderObjective = true
-                dirty = false
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(
-            config.enabled,
-            displayConfig.hideVanillaScoreboard,
-            SkyHanniMod.feature.misc.showOutsideSB,
-        ) {
-            if (!isHideVanillaScoreboardEnabled()) dirty = true
-        }
         ConditionalUtils.onToggle(
             config.scoreboardEntries,
             eventsConfig.eventEntries,
@@ -240,20 +215,25 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                ScoreboardConfigElement.entries.forEach { entry ->
-                    add(
-                        "   ${entry.name.firstLetterUppercase()} - " +
-                            "island: ${entry.element.showIsland()} - " +
-                            "show: ${entry.element.showWhen()} - " +
-                            "${entry.element.getLines().map { it.display }}",
-                    )
-                }
+                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }))
+
+                add("Custom Scoreboard Events:")
+                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }))
+
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
                     set.forEach { add("   ${it.line}") }
                 }
             }
         }
+    }
+
+    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>) = entries.map { (name, element) ->
+        val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
+        "   ${name.firstLetterUppercase()} - " +
+            "island: ${element.showIsland()} - " +
+            "show: ${element.showWhen()} - " +
+            lines
     }
 
     @JvmStatic
@@ -268,5 +248,6 @@ object CustomScoreboard {
     private fun isEnabled() =
         (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
 
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
+    @JvmStatic
+    fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 }

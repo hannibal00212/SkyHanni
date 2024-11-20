@@ -26,9 +26,9 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Lunch Egg
      * REGEX-TEST: Chocolate Dinner Egg
      */
-    private val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.name",
-        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner) Egg.*",
+        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
 
     /**
@@ -61,10 +61,11 @@ object HoppityRabbitTheFishChecker {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName()
+            it.value.hasDisplayName() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key

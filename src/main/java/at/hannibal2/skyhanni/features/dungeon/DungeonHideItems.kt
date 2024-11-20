@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -60,7 +61,7 @@ object DungeonHideItems {
 
         if (entity !is EntityArmorStand) return
 
-        val head = entity.inventory[4]
+        val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
@@ -136,8 +137,7 @@ object DungeonHideItems {
         }
 
         if (config.hideHealerFairy) {
-            // Healer Fairy texture is stored in id 0, not id 4 for some reasons.
-            if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
+            if (entity.holdingSkullTexture(HEALER_FAIRY_TEXTURE)) {
                 event.cancel()
                 return
             }
@@ -181,7 +181,7 @@ object DungeonHideItems {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.GOLD.toColor().withAlpha(60)
+                LorenzColor.GOLD.toColor().addAlpha(60),
             ) { shouldColorMovingSkull(entity) }
         }
     }

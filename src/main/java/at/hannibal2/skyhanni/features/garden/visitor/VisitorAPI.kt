@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
+import java.awt.Color
 
 @SkyHanniModule
 object VisitorAPI {
@@ -33,13 +34,23 @@ object VisitorAPI {
     const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
+
+    /**
+     * REGEX-TEST: §b§lVisitors: §r§f(5)
+     */
     val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
-        "§b§lVisitors: §r§f\\((?<info>.*)\\)"
+        "§b§lVisitors: §r§f\\((?<info>.*)\\)",
     )
+
+    /**
+     * REGEX-TEST:  §r§aEmissary Carlton
+     * REGEX-TEST:  §r§6Madame Eleanor Q. Goldsworth III
+     * REGEX-TEST:  §r§9Lazy Miner
+     */
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
-        " (?:§.)+(?<name>§.[^§]+).*"
+        " (?:§.)+(?<name>§.[^§]+).*",
     )
 
     fun getVisitorsMap() = visitors
@@ -156,12 +167,12 @@ object VisitorAPI {
         }
     }
 
-    enum class VisitorStatus(val displayName: String, val color: Int) {
-        NEW("§eNew", LorenzColor.YELLOW.toColor().withAlpha(100)),
-        WAITING("Waiting", -1),
-        READY("§aItems Ready", LorenzColor.GREEN.toColor().withAlpha(80)),
-        ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().withAlpha(80)),
-        REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
+    enum class VisitorStatus(val displayName: String, val color: Color?) {
+        NEW("§eNew", LorenzColor.YELLOW.toColor().addAlpha(100)),
+        WAITING("Waiting", null),
+        READY("§aItems Ready", LorenzColor.GREEN.toColor().addAlpha(80)),
+        ACCEPTED("§7Accepted", LorenzColor.DARK_GRAY.toColor().addAlpha(80)),
+        REFUSED("§cRefused", LorenzColor.RED.toColor().addAlpha(60)),
     }
 
     fun visitorsInTabList(tabList: List<String>): List<String> {

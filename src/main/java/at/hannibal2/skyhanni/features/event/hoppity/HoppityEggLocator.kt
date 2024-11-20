@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -39,8 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
-
-    private val locatorItem = "EGGLOCATOR".asInternalName()
+    val locatorItem = "EGGLOCATOR".toInternalName()
 
     private var lastParticlePosition: LorenzVec? = null
     private var lastParticlePositionForever: LorenzVec? = null

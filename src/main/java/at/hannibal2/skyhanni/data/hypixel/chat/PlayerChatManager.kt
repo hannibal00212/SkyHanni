@@ -71,8 +71,8 @@ object PlayerChatManager {
     /**
      * REGEX-TEST: To nea89o: lol
      * REGEX-TEST: From nea89o: hiii
-     * REGEX-TEST: From stash: Pufferfish
-     * REGEX-TEST: From stash: Wheat
+     * REGEX-FAIL: From stash: Pufferfish
+     * REGEX-FAIL: From stash: Wheat
      * REGEX-TEST: To [MVP+] Eisengolem: Boop!
      * REGEX-TEST: From [MVP+] Eisengolem: Boop!
      * REGEX-TEST: To [MVP+] Eisengolem: danke
@@ -99,16 +99,16 @@ object PlayerChatManager {
 
     /**
      * REGEX-TEST: ♫ §c[Buddy ツ] §b[MVP§d+§b] lrg89
-     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
+     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
-        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)"
+        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)"
     )
 
     /**
      * REGEX-TEST: ♫ §a[✌] §f[Gamer] §b[MVP§d+§b] lrg89
-     * REGEX-TEST: ℻ §b[MVP§5+§b] Alea1337
+     * REGEX-FAIL: ℻ §b[MVP§5+§b] Alea1337
      * REGEX-TEST: ♫ §a[✌] §c[Buddy ツ] §b[MVP§d+§b] lrg89
      */
     private val privateIslandGuestPattern by patternGroup.pattern(

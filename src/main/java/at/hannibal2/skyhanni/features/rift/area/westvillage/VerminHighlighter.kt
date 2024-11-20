@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.EntityLivingBase
@@ -40,7 +40,7 @@ object VerminHighlighter {
             checkedEntities.add(id)
 
             if (!isVermin(entity)) continue
-            val color = config.color.get().toChromaColor().withAlpha(60)
+            val color = config.color.get().toChromaColor().addAlpha(60)
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, color) { isEnabled() }
         }
     }
@@ -54,13 +54,13 @@ object VerminHighlighter {
     }
 
     private fun isVermin(entity: EntityLivingBase): Boolean = when (entity) {
-        is EntityArmorStand -> entity.hasSkullTexture(VERMIN_FLY_TEXTURE) || entity.hasSkullTexture(VERMIN_SPIDER_TEXTURE)
+        is EntityArmorStand -> entity.wearingSkullTexture(VERMIN_FLY_TEXTURE) || entity.wearingSkullTexture(VERMIN_SPIDER_TEXTURE)
         is EntitySilverfish -> entity.baseMaxHealth == 8
 
         else -> false
     }
 
-    private fun hasItemInHand() = InventoryUtils.itemInHandId == "TURBOMAX_VACUUM".asInternalName()
+    private fun hasItemInHand() = InventoryUtils.itemInHandId == "TURBOMAX_VACUUM".toInternalName()
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inWestVillage() && config.enabled && hasItemInHand()
 

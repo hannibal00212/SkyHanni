@@ -14,6 +14,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object CrashOnDeath {
     private val config get() = SkyHanniMod.feature.misc
 
+    /**
+     * REGEX-TEST: §c ☠ §r§7You were killed by §r§4§lMagma Boss§r§7§r§7.
+     */
     private val pattern by RepoPattern.pattern(
         "ownplayer.death.chat",
         "§c ☠ §r§7You (?<reason>.+)",
@@ -27,5 +30,6 @@ object CrashOnDeath {
             Minecraft.getMinecraft().crashed(CrashReport("Not Reading", Throwable("Don't toggle all the Options")))
         }
     }
+
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.crashOnDeath
 }

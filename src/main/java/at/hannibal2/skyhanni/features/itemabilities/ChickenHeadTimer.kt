@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -25,7 +25,7 @@ object ChickenHeadTimer {
     private var lastTime = SimpleTimeMark.farPast()
     private val cooldown = 5.seconds
 
-    private val chickenHead = "CHICKEN_HEAD".asInternalName()
+    private val chickenHead = "CHICKEN_HEAD".toInternalName()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

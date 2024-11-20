@@ -21,7 +21,7 @@ class TabLine(val text: String, val type: TabStringType, val customName: String 
     fun getInfo(): NetworkPlayerInfo? {
         val minecraft = Minecraft.getMinecraft()
         val usernameFromLine = TabStringType.usernameFromLine(text)
-        return minecraft.netHandler.getPlayerInfo(usernameFromLine)
+        return minecraft.netHandler?.getPlayerInfo(usernameFromLine)
     }
 
     private var entity: EntityPlayer? = null

@@ -49,20 +49,28 @@ import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
+import at.hannibal2.skyhanni.utils.StaticDurations;
 import com.google.gson.annotations.Expose;
+import kotlin.time.Duration;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class ProfileSpecificStorage {
 
     private static SimpleTimeMark SimpleTimeMarkFarPast() {
         return GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
+    }
+
+    private static Duration DurationZero() {
+        return GenericWrapper.getDuration(StaticDurations.getZero()).getIt();
     }
 
     @Expose
@@ -521,6 +529,26 @@ public class ProfileSpecificStorage {
 
     }
 
+    public static class CakeData {
+        @Expose
+        public Set<Integer> ownedCakes = new HashSet<>();
+
+        @Expose
+        public Set<Integer> missingCakes = new HashSet<>();
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ownedCakes.hashCode();
+            result = prime * result + missingCakes.hashCode();
+            return result;
+        }
+    }
+
+    @Expose
+    public CakeData cakeData = new CakeData();
+
     @Expose
     public PowderTracker.Data powderTracker = new PowderTracker.Data();
 
@@ -641,6 +669,7 @@ public class ProfileSpecificStorage {
         @Expose
         public int selfKillingAnimals;
 
+        // TODO change to sh tracker
         @Expose
         public Map<TrevorTracker.TrapperMobRarity, Integer> animalRarities = new HashMap<>();
     }
@@ -742,6 +771,9 @@ public class ProfileSpecificStorage {
     @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
+    @Expose
+    public Boolean hoppityStatLiveDisplayToggledOff = false;
+
     public static class HoppityEventStats {
         @Expose
         public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
@@ -758,6 +790,11 @@ public class ProfileSpecificStorage {
 
             @Expose
             public int strays = 0;
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(uniques, dupes, strays);
+            }
         }
 
         @Expose
@@ -767,10 +804,55 @@ public class ProfileSpecificStorage {
         public long strayChocolateGained = 0;
 
         @Expose
-        public long millisInCf = 0;
+        public Duration millisInCf = DurationZero();
+
+        @Expose
+        public int rabbitTheFishFinds = 0;
+
+        public static class LeaderboardPosition {
+            @Expose
+            public int position;
+
+            @Expose
+            public double percentile;
+
+            public LeaderboardPosition(int position, double percentile) {
+                this.position = position;
+                this.percentile = percentile;
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(position, percentile);
+            }
+        }
+
+        @Expose
+        public LeaderboardPosition initialLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
+
+        @Expose
+        public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition(-1, -1.0);
+
+        @Expose
+        public SimpleTimeMark lastLbUpdate = SimpleTimeMarkFarPast();
 
         @Expose
         public boolean summarized = false;
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(
+                mealsFound,
+                rabbitsFound,
+                dupeChocolateGained,
+                strayChocolateGained,
+                millisInCf,
+                rabbitTheFishFinds,
+                initialLeaderboardPosition,
+                finalLeaderboardPosition,
+                summarized
+            );
+        }
     }
 
     @Expose

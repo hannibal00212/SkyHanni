@@ -127,12 +127,12 @@ object IslandGraphs {
 
     /**
      * REGEX-TEST: Dwarven Base Camp
-     * REGEX-TEST: Forge
+     * REGEX-FAIL: Forge
      * REGEX-TEST: Fossil Research Center
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(
         "glacitetunnels",
-        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+        "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
     @SubscribeEvent
