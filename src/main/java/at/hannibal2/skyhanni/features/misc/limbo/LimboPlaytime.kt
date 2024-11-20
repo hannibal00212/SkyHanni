@@ -31,7 +31,7 @@ object LimboPlaytime {
      */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a(?<minutes>[\\d.,])+ minutes.+\$"
+        "§5§o§a(?<minutes>[\\d.,])+ minutes.*\$"
     )
 
     /**
@@ -39,7 +39,7 @@ object LimboPlaytime {
      */
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b(?<hours>[\\d.,])+ hours.+\$"
+        "§5§o§b(?<hours>[\\d.,])+ hours.*$"
     )
 
     var tooltipPlaytime = mutableListOf<String>()
