@@ -181,7 +181,6 @@ object HoppityAPI {
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
-        hoppityDataSet.reset()
         EggFoundEvent(
             type,
             chatEvent = event,
