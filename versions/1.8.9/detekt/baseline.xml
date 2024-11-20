@@ -209,9 +209,9 @@
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.noselectedpower", "(?:§.)*Visit Maxwell in the Hub to learn", )</ID>
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.thaumaturgy.data", "§(?&lt;color&gt;.)\\+(?&lt;amount&gt;[^ ]+)(?&lt;icon&gt;.) (?&lt;name&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:MinionCraftHelper.kt$MinionCraftHelper$by RepoPattern.pattern( "bingo.minion.name", "(?&lt;name&gt;.*) Minion (?&lt;number&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.coin", "§aYou received §r§6.* coins§r§a!" )</ID>
-    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.upgrade", "§aYou have upgraded your Minion to Tier (?&lt;tier&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "title", "Minion [^➜]" )</ID>
+    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.coin", "§aYou received §r§6.* coins§r§a!", )</ID>
+    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "chat.upgrade", "§aYou have upgraded your Minion to Tier (?&lt;tier&gt;.*)", )</ID>
+    <ID>RepoPatternRegexTest:MinionFeatures.kt$MinionFeatures$by patternGroup.pattern( "title", "Minion [^➜]", )</ID>
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
     <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "jerry", "(?:\\[\\w+(?&lt;level&gt;\\d+)\\] )?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerry) \\d+ Hits", )</ID>
