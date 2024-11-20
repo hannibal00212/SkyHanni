@@ -62,6 +62,4 @@ class RepoPatternElement private constructor(
             return regexTests to failingRegexTests
         }
     }
-
-
 }

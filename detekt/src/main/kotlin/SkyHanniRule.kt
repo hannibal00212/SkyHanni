@@ -11,5 +11,4 @@ abstract class SkyHanniRule(config: Config) : Rule(config) {
     protected fun PsiElement.reportIssue(message: String) {
         report(CodeSmell(issue, Entity.from(this), message))
     }
-
 }
