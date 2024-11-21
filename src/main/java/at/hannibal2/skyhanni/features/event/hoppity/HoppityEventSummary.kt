@@ -11,11 +11,13 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -33,6 +35,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -82,6 +85,22 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
+    private val disallowListHoppityIslands by lazy {
+        listOf(
+            IslandType.PRIVATE_ISLAND,
+            IslandType.PRIVATE_ISLAND_GUEST,
+            IslandType.KUUDRA_ARENA,
+            IslandType.CATACOMBS,
+            IslandType.DARK_AUCTION,
+            IslandType.GARDEN,
+            IslandType.GARDEN_GUEST,
+            IslandType.THE_RIFT,
+            IslandType.WINTER,
+            IslandType.MINESHAFT,
+            IslandType.NONE,
+            IslandType.UNKNOWN
+        )
+    }
 
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
@@ -92,6 +111,7 @@ object HoppityEventSummary {
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
     private var statYear: Int = getCurrentSBYear()
+    private var onHoppityIsland = false
 
     private fun inMatchingInventory(): Boolean {
         val setting = liveDisplayConfig.specificInventories
@@ -120,6 +140,7 @@ object HoppityEventSummary {
         val storage = storage ?: return false
         val isToggledOff = storage.hoppityStatLiveDisplayToggledOff
         val isEnabled = liveDisplayConfig.enabled
+        val isIslandEnabled = !liveDisplayConfig.onlyHoppityIslands || onHoppityIsland
         val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
         val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
         val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
@@ -127,6 +148,7 @@ object HoppityEventSummary {
         return LorenzUtils.inSkyBlock &&
             !isToggledOff &&
             isEnabled &&
+            isIslandEnabled &&
             isEventEnabled &&
             isEggLocatorEnabled &&
             isInventoryEnabled
@@ -136,6 +158,12 @@ object HoppityEventSummary {
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        onHoppityIsland = LorenzUtils.inSkyBlock &&
+            disallowListHoppityIslands.none { it.isInIsland() }
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
