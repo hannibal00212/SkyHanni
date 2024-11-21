@@ -79,7 +79,7 @@ object ChocolateFactoryStrayTracker {
      */
     val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.dorado",
-        ".*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
+        ".*§7You caught a stray.*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
 
     /**
@@ -132,7 +132,7 @@ object ChocolateFactoryStrayTracker {
      */
     val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.doradoescape",
-        "(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!)"
+        ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*"
     )
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
