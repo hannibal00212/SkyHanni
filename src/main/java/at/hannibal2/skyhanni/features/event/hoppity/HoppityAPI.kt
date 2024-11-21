@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
+import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -232,6 +233,8 @@ object HoppityAPI {
                 // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
                 // §6§lGolden Rabbit §d§lCAUGHT!
                 // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
+                hoppityDataSet.lastName = "§6El Dorado"
+                hoppityDataSet.lastRarity = LEGENDARY
                 hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, it.slotNumber).post()
             }
