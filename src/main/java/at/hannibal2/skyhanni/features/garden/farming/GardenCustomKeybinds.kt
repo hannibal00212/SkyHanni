@@ -108,7 +108,9 @@ object GardenCustomKeybinds {
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
-        isEnabled() && GardenAPI.toolInHand != null && !isDuplicate && lastWindowOpenTime.passedSince() > 300.milliseconds
+        isEnabled() && GardenAPI.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
+
+    private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
     @JvmStatic
     fun disableAll() {
