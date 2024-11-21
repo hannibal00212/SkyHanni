@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.runBlocking
@@ -36,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
+import kotlin.math.min
 
 @SkyHanniModule
 object GraphEditor {
@@ -140,7 +142,10 @@ object GraphEditor {
             if (activeNode != null) {
                 add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
                 if (dissolvePossible) add("§eDissolve: §6${KeyboardManager.getKeyName(config.dissolveKey)}")
-                if (selectedEdge != null) add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
+                if (selectedEdge != null) {
+                    add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
+                    add("§eCycle Direction: §6${KeyboardManager.getKeyName(config.edgeCycle)}")
+                }
             }
         }
 
@@ -231,17 +236,45 @@ object GraphEditor {
 
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
+        val color = when {
+            selectedEdge == edge -> edgeSelectedColor
+            edge in highlightedEdges -> edgeDijkstraColor
+            else -> edgeColor
+        }
+
         this.draw3DLineNea(
             edge.node1.position.add(0.5, 0.5, 0.5),
             edge.node2.position.add(0.5, 0.5, 0.5),
-            when {
-                selectedEdge == edge -> edgeSelectedColor
-                edge in highlightedEdges -> edgeDijkstraColor
-                else -> edgeColor
-            },
+            color,
             7,
             !seeThroughBlocks,
         )
+        if (edge.direction != EdgeDirection.BOTH) {
+            val lineVec = edge.node2.position - edge.node1.position
+            val center = edge.node1.position + lineVec / 2.0
+            val quad1 = edge.node1.position + lineVec / 4.0
+            val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
+
+            val pyramidSize = lineVec.normalize()
+                .times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
+
+            val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
+
+            fun pyramidDraw(
+                pos: LorenzVec,
+            ) {
+                this.drawPyramid(
+                    pos + lineOffsetVec + pyramidSize,
+                    pos + lineOffsetVec,
+                    pos.crossProduct(lineVec).normalize().times(pyramidSize.length() / 2.5) + pos + lineOffsetVec,
+                    color,
+                )
+            }
+
+            pyramidDraw(center)
+            pyramidDraw(quad1)
+            pyramidDraw(quad2)
+        }
     }
 
     private fun GraphingNode.getNodeColor() = when (this) {
@@ -262,7 +295,7 @@ object GraphEditor {
 
     private fun chatAtDisable() = ChatUtils.clickableChat(
         "Graph Editor is now inactive. §lClick to activate.",
-        GraphEditor::commandIn
+        GraphEditor::commandIn,
     )
 
     private fun input() {
@@ -398,16 +431,22 @@ object GraphEditor {
             inTutorialMode = !inTutorialMode
             ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
         }
-        if (selectedEdge != null && config.splitKey.isKeyClicked()) {
-            val edge = selectedEdge ?: return
-            feedBackInTutorial("Split Edge into a Node and two edges.")
-            val middle = edge.node1.position.middle(edge.node2.position).roundLocationToBlock()
-            val node = GraphingNode(id++, middle)
-            nodes.add(node)
-            edges.remove(edge)
-            addEdge(node, edge.node1)
-            addEdge(node, edge.node2)
-            activeNode = node
+        val selectedEdge = selectedEdge
+        if (selectedEdge != null) {
+            if (config.splitKey.isKeyClicked()) {
+                feedBackInTutorial("Split Edge into a Node and two edges.")
+                val middle = selectedEdge.node1.position.middle(selectedEdge.node2.position).roundLocationToBlock()
+                val node = GraphingNode(id++, middle)
+                nodes.add(node)
+                edges.remove(selectedEdge)
+                addEdge(node, selectedEdge.node1)
+                addEdge(node, selectedEdge.node2)
+                activeNode = node
+            }
+            if (config.edgeCycle.isKeyClicked()) {
+                selectedEdge.cycleDirection(activeNode)
+                feedBackInTutorial("Cycled Direction to: ${selectedEdge.cycleText(activeNode)}")
+            }
         }
         if (dissolvePossible && config.dissolveKey.isKeyClicked()) {
             feedBackInTutorial("Dissolved the node, now it is gone.")
@@ -538,11 +577,11 @@ object GraphEditor {
                 node.name,
                 node.tags.map {
                     it.internalName
-                }
+                },
             )
         }
         val neighbours = GraphEditor.nodes.map { node ->
-            edges.filter { it.isInEdge(node) }.map { edge ->
+            edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
                 val otherNode =
                     if (node == edge.node1) edge.node2
                     else edge.node1
@@ -572,8 +611,16 @@ object GraphEditor {
             graph.map { node ->
                 // TODO: Fix this to not use bang bangs
                 @Suppress("MapGetWithNotNullAssertionOperator")
-                node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
-            }.flatten().distinct(),
+                node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!, EdgeDirection.ONE_TO_TWO) }
+            }.flatten().groupingBy { it.hashCode() }.fold(
+                { key, element -> element },
+                { key, accumulator, element ->
+                    if ((element.node1 == accumulator.node1 && accumulator.direction != element.direction) || (element.node1 == accumulator.node2 && accumulator.direction == element.direction)) {
+                        accumulator.direction = EdgeDirection.BOTH
+                    }
+                    accumulator
+                },
+            ).values,
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
         checkDissolve()
@@ -598,11 +645,17 @@ object GraphEditor {
 
         val path = GraphUtils.findShortestPathAsGraph(current, goal)
 
+        if (path.isEmpty()) {
+            ChatUtils.chat("No Path found")
+        }
+
         val inGraph = path.map { nodes[it.id] }
         highlightedNodes.addAll(inGraph)
 
-        val edge = edges.filter { highlightedNodes.contains(it.node1) && highlightedNodes.contains(it.node2) }
-        highlightedEdges.addAll(edge)
+        highlightedEdges.addAll(
+            highlightedNodes.zipWithNext { a, b -> edges.firstOrNull { it.isValidConnectionFromTo(a, b) } }
+                .filterNotNull(),
+        )
     }
 
     private fun clear() {
@@ -651,7 +704,7 @@ class GraphingNode(
     }
 }
 
-private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
+private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var direction: EdgeDirection = EdgeDirection.BOTH) {
 
     fun isInEdge(node: GraphingNode?) = node1 == node || node2 == node
 
@@ -678,4 +731,50 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
         }
         return result
     }
+
+    fun cycleDirection(standpoint: GraphingNode?) {
+        direction = if (standpoint != node2) {
+            when (direction) {
+                EdgeDirection.BOTH -> EdgeDirection.ONE_TO_TWO
+                EdgeDirection.ONE_TO_TWO -> EdgeDirection.TOW_TO_ONE
+                EdgeDirection.TOW_TO_ONE -> EdgeDirection.BOTH
+            }
+        } else {
+            when (direction) {
+                EdgeDirection.BOTH -> EdgeDirection.TOW_TO_ONE
+                EdgeDirection.TOW_TO_ONE -> EdgeDirection.ONE_TO_TWO
+                EdgeDirection.ONE_TO_TWO -> EdgeDirection.BOTH
+            }
+        }
+    }
+
+    fun cycleText(standpoint: GraphingNode?) = when (direction) {
+        EdgeDirection.BOTH -> "Bidirectional"
+        EdgeDirection.ONE_TO_TWO -> if (standpoint != node1) {
+            "AwayFromYou"
+        } else {
+            "ToYou"
+        }
+
+        EdgeDirection.TOW_TO_ONE -> if (standpoint != node1) {
+            "ToYou"
+        } else {
+            "AwayFromYou"
+        }
+    }
+
+    fun isValidDirectionFrom(standpoint: GraphingNode?) = when (direction) {
+        EdgeDirection.BOTH -> true
+        EdgeDirection.ONE_TO_TWO -> standpoint == node1
+        EdgeDirection.TOW_TO_ONE -> standpoint == node2
+    }
+
+    fun isValidConnectionFromTo(a: GraphingNode, b: GraphingNode): Boolean =
+        ((this.node1 == a && this.node2 == b) || (this.node1 == b && this.node2 == a)) && isValidDirectionFrom(a)
+}
+
+private enum class EdgeDirection {
+    BOTH,
+    ONE_TO_TWO,
+    TOW_TO_ONE,
 }
