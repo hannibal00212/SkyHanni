@@ -81,8 +81,7 @@ object GardenCustomKeybinds {
             with(mcSettings) {
                 map = buildMap {
                     fun add(keyBinding: KeyBinding, property: Property<Int>) {
-                        val value = property.get()
-                        if (value != keyBinding.keyCode) put(keyBinding, value)
+                        put(keyBinding, property.get())
                     }
                     add(keyBindAttack, attack)
                     add(keyBindUseItem, useItem)
