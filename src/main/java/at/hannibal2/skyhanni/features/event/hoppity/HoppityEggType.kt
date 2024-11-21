@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -76,7 +76,7 @@ enum class HoppityEggType(
             get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
 
         @SubscribeEvent
-        fun onProfileJoin() {
+        fun onProfileJoin(event: ProfileJoinEvent) {
             for((meal, lastFoundTimeMark) in mealLastFound.filter {
                 it.value.passedSince() < 20.minutes
             }) {
