@@ -24,6 +24,10 @@ object PlatformUtils {
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
 
+    var validNeuInstalled = false
+
+    fun isNeuLoaded() = validNeuInstalled
+
 }
 
 data class ModInstance(val id: String, val name: String, val version: String)

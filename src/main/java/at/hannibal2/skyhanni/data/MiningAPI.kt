@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonRoomPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -45,6 +46,11 @@ import kotlin.time.Duration.Companion.seconds
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
+
+    /**
+     * REGEX-TEST: Glacite Tunnels
+     * REGEX-TEST: Great Glacite Lake
+     */
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
@@ -151,6 +157,9 @@ object MiningAPI {
     var cold: Int = 0
         private set
 
+    var mineshaftRoomId: String? = null
+        private set
+
     var lastColdUpdate = SimpleTimeMark.farPast()
         private set
     var lastColdReset = SimpleTimeMark.farPast()
@@ -187,6 +196,14 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        if (!inCustomMiningIsland()) return
+
+        dungeonRoomPattern.firstMatcher(event.added) {
+            mineshaftRoomId = group("roomId")
+        } ?: run {
+            mineshaftRoomId = null
+        }
+
         val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
         } ?: return

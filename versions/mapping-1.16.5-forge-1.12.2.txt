@@ -46,6 +46,8 @@ net.minecraft.client.renderer.texture.TextureManager register() loadTexture()
 
 net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
 
+net.minecraft.core.Direction net.minecraft.util.EnumFacing
+
 net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
 
 net.minecraft.core.particles.ParticleTypes ANGRY_VILLAGER VILLAGER_ANGRY
@@ -111,6 +113,7 @@ net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraf
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
 net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
+net.minecraft.network.protocol.game.ServerboundUseItemOnPacket net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock
 
 net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
 
@@ -159,15 +162,21 @@ net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEnt
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
-net.minecraft.world.effect.MobEffects net.minecraft.init.PotionTypes
+net.minecraft.world.effect.MobEffectInstance net.minecraft.potion.PotionEffect
+net.minecraft.world.effect.MobEffects net.minecraft.init.MobEffects
 
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity
 net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
 net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
+net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
+net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 net.minecraft.world.entity.Entity getId() getEntityId()
-net.minecraft.world.entity.Entity level getEntityWorld()
+net.minecraft.world.entity.Entity getUUID() getUniqueID()
+net.minecraft.world.entity.Entity level world
 net.minecraft.world.entity.Entity removed isDead
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
@@ -180,8 +189,10 @@ net.minecraft.world.entity.Entity zo posZ
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
+net.minecraft.world.entity.LivingEntity getItemInHand() getHeldItem()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
 net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
+net.minecraft.world.entity.LivingEntity hasEffect() isPotionActive()
 
 net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
 
@@ -249,6 +260,7 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
+net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
@@ -256,6 +268,10 @@ net.minecraft.world.inventory.Slot index slotNumber
 
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
+
+net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantments
+
+net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
 net.minecraft.world.level.Level getEntity() getEntityByID()
 

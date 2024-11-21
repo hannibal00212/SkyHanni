@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,11 +27,11 @@ object DojoRankDisplay {
     private val patternGroup = RepoPattern.group("inventory.dojo.rankdisplay")
     private val testNamePattern by patternGroup.pattern(
         "name",
-        "(?<color>§\\w)Test of (?<name>.*)"
+        "(?<color>§\\w)Test of (?<name>.*)",
     )
     private val testRankPattern by patternGroup.pattern(
         "rank",
-        "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)"
+        "(?:§\\w)+Your Rank: (?<rank>§\\w.) §8\\((?<score>\\d+)\\)",
     )
     private var belts = mapOf<String, Int>()
 
@@ -54,7 +54,7 @@ object DojoRankDisplay {
             testNamePattern.matchMatcher(name) {
                 val testColor = group("color")
                 val testName = group("name")
-                stack.getLore().matchFirst(testRankPattern) {
+                testRankPattern.firstMatcher(stack.getLore()) {
                     val rank = group("rank")
                     val score = group("score").toInt()
                     val color = if (score in 0..99) "§c" else "§a"
