@@ -24,6 +24,7 @@ data class HoppityEggLocationsJson(
     @Expose val maxRabbits: Int,
     @Expose val maxPrestige: Int,
     @Expose val chocolateMilestones: TreeSet<Long>,
+    @Expose val hitmanCosts: TreeSet<Long>,
     @Expose val chocolateShopMilestones: List<MilestoneJson>,
     @Expose val chocolateFactoryMilestones: List<MilestoneJson>,
     @Expose val residentLocations: Map<IslandType, List<String>>,

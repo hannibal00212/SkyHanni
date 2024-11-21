@@ -218,4 +218,14 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hitmanSlotInfo = false;
+
+    @Expose
+    @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hitmanCosts = true;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hitmanCosts")
+    public Position hitmanCostsPosition = new Position(300, 300, false, true);
 }
