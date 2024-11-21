@@ -615,7 +615,10 @@ object GraphEditor {
             }.flatten().groupingBy { it.hashCode() }.fold(
                 { key, element -> element },
                 { key, accumulator, element ->
-                    if ((element.node1 == accumulator.node1 && accumulator.direction != element.direction) || (element.node1 == accumulator.node2 && accumulator.direction == element.direction)) {
+                    if (
+                        (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                        (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
+                    ) {
                         accumulator.direction = EdgeDirection.BOTH
                     }
                     accumulator
