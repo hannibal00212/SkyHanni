@@ -218,6 +218,23 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<HoppityEggType, SimpleTimeMark> mealLastFound = new HashMap<>();
+
+        public static class HitmanStatsStorage {
+            @Expose
+            @Nullable
+            public Integer availableEggs;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark slotCooldown = null;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark allSlotsCooldown = null;
+        }
+
+        @Expose
+        public HitmanStatsStorage hitmanStats = new HitmanStatsStorage();
     }
 
     @Expose
