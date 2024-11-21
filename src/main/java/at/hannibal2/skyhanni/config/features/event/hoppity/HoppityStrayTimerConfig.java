@@ -18,7 +18,7 @@ public class HoppityStrayTimerConfig {
 
     @Expose
     @ConfigLink(owner = HoppityStrayTimerConfig.class, field = "enabled")
-    public Position strayTimerPosition = new Position(0, 0);
+    public Position strayTimerPosition = new Position(200, 200);
 
     @Expose
     @ConfigOption(name = "Ding For Timer", desc = "Play a ding sound when the timer drops below this number. Set to 0 to disable.")

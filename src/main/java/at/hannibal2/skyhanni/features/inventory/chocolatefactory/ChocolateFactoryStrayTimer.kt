@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
@@ -34,6 +35,14 @@ object ChocolateFactoryStrayTimer {
         if (type !in resettingEntries && type != HoppityEggType.HITMAN) return
         timer = 30.seconds
         lastTimerSubtraction = null
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (timer == Duration.ZERO || timer == 30.seconds) return
+        // Reset the timer if the inventory is closed and the timer is not at 30 seconds
+        // The 30s stray timer only counts if you stay in the inventory for the full duration
+        timer = Duration.ZERO
     }
 
     @SubscribeEvent
