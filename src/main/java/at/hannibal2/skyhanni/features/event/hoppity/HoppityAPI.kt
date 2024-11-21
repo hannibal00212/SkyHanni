@@ -181,8 +181,7 @@ object HoppityAPI {
             if (noLongerExists) {
                 processedStraySlots.remove(slot.slotNumber)
                 straySlotIterations.remove(slot.slotNumber)
-            }
-            else addProcessedStraySlot(slot)
+            } else addProcessedStraySlot(slot)
         }
     }
     private fun shouldProcessStraySlot(slot: Slot, containsBypass: Boolean = false) =
