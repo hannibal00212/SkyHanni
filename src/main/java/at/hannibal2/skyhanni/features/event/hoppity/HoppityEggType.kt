@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -58,7 +59,13 @@ enum class HoppityEggType(
         claimed = false
     }
 
-    fun isClaimed() = claimed
+    private fun hasNotSpawnedFirstDay(): Boolean {
+        val now = SkyBlockTime.now()
+        if (now.month > 4 || altDay && now.day > 2 || !altDay && now.day > 1) return false
+        return now.hour < resetsAt
+    }
+
+    fun isClaimed() = claimed || hasNotSpawnedFirstDay()
     val isResetting get() = resettingEntries.contains(this)
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
     val coloredName get() = "$mealColor$mealName"
