@@ -164,17 +164,24 @@ object HoppityAPI {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    private fun addProcessedSlot(slot: Slot) {
+    private fun addProcessedStraySlot(slot: Slot) {
         processedSlots.add(slot.slotNumber)
-        DelayedRun.runDelayed(5.seconds) { // Assume we caught it on the first 'frame', so we can remove it after 5 seconds.
-            processedSlots.remove(slot.slotNumber)
+        DelayedRun.runDelayed(1.seconds) {
+            val noLongerExists = InventoryUtils.getItemsInOpenChest().filter {
+                shouldProcessStraySlot(it, true)
+            }.none {
+                it.slotNumber == slot.slotNumber &&
+                    it.stack?.displayName == slot.stack?.displayName
+            }
+            if (noLongerExists) processedSlots.remove(slot.slotNumber)
+            else addProcessedStraySlot(slot)
         }
     }
-    private fun shouldProcessStraySlot(slot: Slot) =
+    private fun shouldProcessStraySlot(slot: Slot, containsBypass: Boolean = false) =
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
             // Don't process the same slot twice.
-            !processedSlots.contains(slot.slotNumber) &&
+            (!processedSlots.contains(slot.slotNumber) || containsBypass) &&
             slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
@@ -197,7 +204,6 @@ object HoppityAPI {
                 processed = true
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
-                        hoppityDataSet.lastName = "§9Fish the Rabbit"
                         hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         EggFoundEvent(STRAY, it.slotNumber).post()
                     }
@@ -213,11 +219,10 @@ object HoppityAPI {
                 // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
                 // §6§lGolden Rabbit §d§lCAUGHT!
                 // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
-                hoppityDataSet.lastName = "§6El Dorado"
                 hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, it.slotNumber).post()
             }
-            if (processed) addProcessedSlot(it)
+            if (processed) addProcessedStraySlot(it)
         }
     }
 
