@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
@@ -44,7 +49,8 @@ enum class HoppityEggType(
         return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
     }
 
-    fun markClaimed() {
+    fun markClaimed(mark: SimpleTimeMark? = null) {
+        mealLastFound[this] = mark ?: SimpleTimeMark.now()
         claimed = true
     }
 
@@ -57,7 +63,20 @@ enum class HoppityEggType(
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
     val coloredName get() = "$mealColor$mealName"
 
+    @SkyHanniModule
     companion object {
+        private val mealLastFound
+            get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
+
+        @SubscribeEvent
+        fun onProfileJoin() {
+            for((meal, lastFoundTimeMark) in mealLastFound.filter {
+                it.value.passedSince() < 20.minutes
+            }) {
+                meal.markClaimed(lastFoundTimeMark)
+            }
+        }
+
         val resettingEntries = entries.filter { it.resetsAt != -1 }
 
         fun allFound() = resettingEntries.forEach { it.markClaimed() }

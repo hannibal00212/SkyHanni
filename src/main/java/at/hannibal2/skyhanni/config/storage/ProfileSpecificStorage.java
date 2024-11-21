@@ -215,6 +215,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+
+        @Expose
+        public Map<HoppityEggType, SimpleTimeMark> mealLastFound = new HashMap<>();
     }
 
     @Expose
