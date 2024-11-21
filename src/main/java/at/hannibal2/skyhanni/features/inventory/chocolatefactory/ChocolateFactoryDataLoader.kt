@@ -427,12 +427,12 @@ object ChocolateFactoryDataLoader {
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
                 val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
-                profileStorage.hitmanStats.slotCooldown = nextSlot.timeUntil()
+                profileStorage.hitmanStats.slotCooldown = nextSlot
             }
             hitmanAllSlotsCooldownPattern.matchMatcher(line) {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
-                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots.timeUntil()
+                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
             }
         }
     }
