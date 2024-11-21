@@ -23,12 +23,14 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
+import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -122,7 +124,7 @@ object HoppityAPI {
     data class HoppityStateDataSet(
         var hoppityMessages: MutableList<String> = mutableListOf(),
         var duplicate: Boolean = false,
-        var lastRarity: String = "",
+        var lastRarity: LorenzRarity? = null,
         var lastName: String = "",
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
@@ -139,7 +141,8 @@ object HoppityAPI {
     }
 
     private val hoppityDataSet = HoppityStateDataSet()
-    private val processedSlots = mutableListOf<Int>()
+    private val processedStraySlots = mutableListOf<Int>()
+    private val straySlotIterations = mutableMapOf<Int, Int>()
     private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
     private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
 
@@ -165,7 +168,8 @@ object HoppityAPI {
     }
 
     private fun addProcessedStraySlot(slot: Slot) {
-        processedSlots.add(slot.slotNumber)
+        processedStraySlots.add(slot.slotNumber)
+        if (straySlotIterations.addOrPut(slot.slotNumber, 1) > 20) return
         DelayedRun.runDelayed(1.seconds) {
             val noLongerExists = InventoryUtils.getItemsInOpenChest().filter {
                 shouldProcessStraySlot(it, true)
@@ -173,7 +177,10 @@ object HoppityAPI {
                 it.slotNumber == slot.slotNumber &&
                     it.stack?.displayName == slot.stack?.displayName
             }
-            if (noLongerExists) processedSlots.remove(slot.slotNumber)
+            if (noLongerExists) {
+                processedStraySlots.remove(slot.slotNumber)
+                straySlotIterations.remove(slot.slotNumber)
+            }
             else addProcessedStraySlot(slot)
         }
     }
@@ -181,7 +188,7 @@ object HoppityAPI {
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slot.slotNumber != 13 && slot.slotNumber in 0..26 &&
             // Don't process the same slot twice.
-            (!processedSlots.contains(slot.slotNumber) || containsBypass) &&
+            (!processedStraySlots.contains(slot.slotNumber) || containsBypass) &&
             slot.stack != null && slot.stack.item != null &&
             // All strays are skulls with a display name, and lore.
             slot.stack.hasDisplayName() && slot.stack.item == Items.skull && slot.stack.getLore().isNotEmpty()
@@ -193,6 +200,10 @@ object HoppityAPI {
             note = note
         ).post()
     }
+    private fun getRarityFromHoppityRarity(rarity: String) = hoppityRarities.firstOrNull {
+        it.chatColorCode == rarity.substring(0, 2) || it.rawName == rarity.removeColor()
+    }
+    fun LorenzRarity.toHoppityRarity() = "$chatColorCode§l$rawName"
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onTick(event: SecondPassedEvent) {
@@ -204,6 +215,8 @@ object HoppityAPI {
                 processed = true
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
+                        hoppityDataSet.lastName = "§9Fish the Rabbit"
+                        hoppityDataSet.lastRarity = RARE
                         hoppityDataSet.duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         EggFoundEvent(STRAY, it.slotNumber).post()
                     }
@@ -228,7 +241,7 @@ object HoppityAPI {
 
     private fun shouldProcessMiscSlot(slot: Slot) =
         // Don't process the same slot twice.
-        !processedSlots.contains(slot.slotNumber) &&
+        !processedStraySlots.contains(slot.slotNumber) &&
             slot.stack != null && slot.stack.item != null &&
             // All misc items are skulls, panes, or chests with a display name, and lore.
             shouldProcessMiscSlotItem(slot.stack.item) &&
@@ -306,7 +319,7 @@ object HoppityAPI {
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.lastName = group("name")
             ChocolateFactoryBarnManager.processDataSet(hoppityDataSet)
-            hoppityDataSet.lastRarity = group("rarity")
+            hoppityDataSet.lastRarity = getRarityFromHoppityRarity(group("rarity"))
             attemptFireRabbitFound(event)
         }
 
