@@ -120,7 +120,7 @@ object FarmingWeightDisplay {
     private var isLoadingLeaderboard = false
     private var rankGoal = -1
 
-    private var nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
+    private val nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
 
     private val eliteWeightApiGson by lazy {

@@ -44,7 +44,7 @@ object RiftBloodEffigies {
     )
     val heartsPattern by patternGroup.pattern(
         "heart",
-        "Effigies: (?<hearts>((§[7c])?⧯)*)"
+        "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)"
     )
 
     @SubscribeEvent

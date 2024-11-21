@@ -43,7 +43,7 @@ object RiftGunthersRace {
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
-        "§3§lRIFT RACING §r§eRace finished in \\d+:\\d+.\\d+!.*"
+        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*"
     )
 
     /**

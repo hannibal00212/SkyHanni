@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 class RenderGlobalHook {
 
     fun renderEntitiesOutlines(camera: ICamera?, partialTicks: Float): Boolean {
-        val vec = RenderUtils.exactLocation(Minecraft.getMinecraft().renderViewEntity, partialTicks)
+        val vec = Minecraft.getMinecraft().renderViewEntity?.let { RenderUtils.exactLocation(it, partialTicks) } ?: return false
         return EntityOutlineRenderer.renderEntityOutlines(camera!!, partialTicks, vec)
     }
 

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -118,7 +118,7 @@ object LivingCaveDefenseBlocks {
                 add(DefenseBlock(entity, location))
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
-                    color.withAlpha(50)
+                    color.addAlpha(50),
                 ) { isEnabled() && staticBlocks.any { it.entity == entity } }
             }
         }
@@ -169,7 +169,7 @@ object LivingCaveDefenseBlocks {
         }
     }
 
-    val color get() = config.color.get().toChromaColor()
+    private val color get() = config.color.get().toChromaColor()
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
 

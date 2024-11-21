@@ -423,6 +423,8 @@ tasks.withType<Detekt>().configureEach {
     onlyIf {
         target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
     }
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
 
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -432,10 +434,6 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached

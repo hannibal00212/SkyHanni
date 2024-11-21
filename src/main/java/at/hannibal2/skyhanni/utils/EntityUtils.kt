@@ -11,8 +11,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityLevel
+import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getNameAsString
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
@@ -142,11 +145,14 @@ object EntityUtils {
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
-    // TODO: Make a utils method for just checking the helmet texture
+    @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
         val inventory = this.getWholeInventory() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
+
+    fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
+    fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
@@ -177,7 +183,7 @@ object EntityUtils {
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.entityWorld?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
 
     @SubscribeEvent
     fun onEntityRenderPre(

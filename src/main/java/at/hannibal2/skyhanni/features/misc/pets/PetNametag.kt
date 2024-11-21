@@ -18,8 +18,8 @@ object PetNametag {
     private val config get() = SkyHanniMod.feature.misc.pets.nametag
 
     /**
-     * REGEX-TEST: §8[§7Lv99§8] Ammonite
-     * REGEX-TEST: §8[§7Lv100§8] Endermite§5 ✦
+     * REGEX-TEST: §8[§7Lv99§8] §6Ammonite
+     * REGEX-TEST: §8[§7Lv100§8] §dEndermite§5 ✦
      */
     private val petNametagPattern by RepoPattern.pattern(
         "pet.nametag",
