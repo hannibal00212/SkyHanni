@@ -83,7 +83,7 @@ object GardenCropSpeed {
     }
 
     private fun checkSpeed() {
-        val blocksBroken = blocksBroken.coerceAtMost(20)
+        val blocksBroken = blocksBroken
         this.blocksBroken = 0
 
         if (blocksBroken == 0) {
