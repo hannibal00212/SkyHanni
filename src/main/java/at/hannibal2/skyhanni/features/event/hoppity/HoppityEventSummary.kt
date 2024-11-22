@@ -327,7 +327,7 @@ object HoppityEventSummary {
             val timeNow = SimpleTimeMark.now().toLocalDateTime()
             val timeThen = toLocalDateTime()
 
-            val yearDiff =  timeThen.year - timeNow.year
+            val yearDiff = timeThen.year - timeNow.year
             val monthDiff = timeThen.monthValue - timeNow.monthValue
             val dayDiff = timeThen.dayOfMonth - timeNow.dayOfMonth
 
