@@ -79,7 +79,7 @@ public class HoppityEventSummaryLiveDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Only Hoppity Islands",
-        desc = "§cOnly§r show the card while on Islands that spawn Hoppity Eggs (will not show on Garden/Island)."
+        desc = "§cOnly§r show the card while on Islands that spawn Hoppity Eggs (will not show on Garden, Island, Dungeons etc.)."
     )
     @ConfigEditorBoolean
     public boolean onlyHoppityIslands = false;
