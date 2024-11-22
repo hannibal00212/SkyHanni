@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -57,6 +58,28 @@ public class HoppityEventSummaryLiveDisplayConfig {
     public List<HoppityDateTimeDisplayType> dateTimeDisplay = new ArrayList<>(Collections.singletonList(
         HoppityDateTimeDisplayType.CURRENT
     ));
+
+    public enum HoppityDateTimeFormat {
+        RELATIVE("Relative"),
+        ABSOLUTE("Absolute"),
+        ;
+
+        private final String str;
+
+        HoppityDateTimeFormat(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Date Time Format", desc = "The format of the date and time.")
+    @ConfigEditorDropdown
+    public HoppityDateTimeFormat dateTimeFormat = HoppityDateTimeFormat.RELATIVE;
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")

@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.CURRENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.NEXT_EVENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.PAST_EVENTS
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -56,6 +58,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -144,6 +147,8 @@ object HoppityEventSummary {
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
+    fun MutableList<Renderable>.addCenteredString(string: String) =
+        this.add(Renderable.string(string, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -318,9 +323,30 @@ object HoppityEventSummary {
         timerSecondCounter = 0
     }
 
+    private fun Duration.formatForHoppity(): Pair<String, Boolean> =
+        if (liveDisplayConfig.dateTimeFormat == RELATIVE) Pair(format(maxUnits = 2), false)
+        else {
+            val monthNow = SkyBlockTime.now().month
+            val yearNow = getCurrentSBYear()
+
+            val markThen = (SimpleTimeMark.now() + this)
+            val monthThen = markThen.toSkyBlockTime().month
+            val yearThen = markThen.toSkyBlockTime().year
+
+            val monthDiff = monthThen - monthNow
+            val yearDiff = yearThen - yearNow
+
+            val dateFormat = when {
+                yearDiff == 0 && monthDiff == 0 -> "dd HH:mm"
+                yearDiff == 0 -> "MMM dd HH:mm"
+                else -> "yyyy MMM dd HH:mm"
+            }
+            Pair(markThen.formattedDate(dateFormat), true)
+        }
+
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
-        currentTimerActive = false
+        currentTimerActive = true
         add(
             Renderable.verticalContainer(
                 buildList {
@@ -337,30 +363,21 @@ object HoppityEventSummary {
                     val isNextEvent = statYear > yearNow
 
                     if (isCurrentEvent && liveDisplayConfig.dateTimeDisplay.contains(CURRENT)) {
-                        currentTimerActive = true
-                        eventEnd.timeUntil().format(maxUnits = 2).let {
-                            addString(
-                                "§7Ends in: §f$it",
-                                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                            )
+                        eventEnd.timeUntil().formatForHoppity().let { (str, isAbsolute) ->
+                            val grammarWord = if (isAbsolute) "Ends" else "Ends in"
+                            addCenteredString("§7$grammarWord §f$str")
                         }
                     } else if (isPastEvent && liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS)) {
-                        currentTimerActive = true
-                        eventEnd.passedSince().absoluteValue.format(maxUnits = 2).let {
-                            addString(
-                                "§7Ended: §f$it ago",
-                                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                            )
+                        eventEnd.passedSince().absoluteValue.formatForHoppity().let { (str, isAbsolute) ->
+                            val grammarWord = if (isAbsolute) "" else " ago"
+                            addCenteredString("§7Ended §f$str$grammarWord")
                         }
                     } else if (isNextEvent && liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)) {
-                        currentTimerActive = true
-                        statYear.getEventStartMark().timeUntil().format(maxUnits = 2).let {
-                            addString(
-                                "§7Starts in: §f$it",
-                                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                            )
+                        statYear.getEventStartMark().timeUntil().formatForHoppity().let { (str, isAbsolute) ->
+                            val grammarWord = if (isAbsolute) "Starts" else "Starts in"
+                            addCenteredString("§7$grammarWord §f$str")
                         }
-                    }
+                    } else currentTimerActive = false
 
                 },
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
