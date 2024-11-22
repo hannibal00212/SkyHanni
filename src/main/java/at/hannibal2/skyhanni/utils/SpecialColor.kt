@@ -9,13 +9,11 @@ import java.awt.Color
 object SpecialColor {
     private const val MIN_CHROMA_SECS = 1
     private const val MAX_CHROMA_SECS = 60
-    private var startTime = SimpleTimeMark.farPast()
+    private val startTime = SimpleTimeMark.now()
 
     fun String.toSpecialColor() = Color(toSpecialColorInt(), true)
 
     fun String.toSpecialColorInt(): Int {
-        if (startTime.isFarPast()) startTime = SimpleTimeMark.now()
-
         val (chroma, alpha, red, green, blue) = decompose(this)
         val (hue, sat, bri) = Color.RGBtoHSB(red, green, blue, null)
 
