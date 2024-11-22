@@ -74,14 +74,28 @@ object MinionFeatures {
     private var coinsPerDay = ""
 
     private val patternGroup = RepoPattern.group("minion")
+
+    /**
+     * REGEX-TEST: §aYou have upgraded your Minion to Tier V
+     */
     private val minionUpgradePattern by patternGroup.pattern(
         "chat.upgrade",
         "§aYou have upgraded your Minion to Tier (?<tier>.*)",
     )
+
+    /**
+     * REGEX-TEST: §aYou received §r§64 coins§r§a!
+     * REGEX-TEST: §aYou received §r§610.5 coins§r§a!
+     */
     private val minionCoinPattern by patternGroup.pattern(
         "chat.coin",
         "§aYou received §r§6.* coins§r§a!",
     )
+
+    /**
+     * REGEX-TEST: Redstone Minion IV
+     * REGEX-TEST: Chicken Minion XI
+     */
     private val minionTitlePattern by patternGroup.pattern(
         "title",
         "Minion [^➜]",
