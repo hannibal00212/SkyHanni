@@ -241,7 +241,7 @@ class ItemResolutionQuery {
         val matcher = enchantedBookNamePattern.matcher(displayName)
         if (!matcher.matches()) return null
         val format = matcher.group(1).lowercase()
-        val enchantmentName = matcher.group(2).trim { it <= ' ' }
+        val enchantmentName = matcher.group(2).trim()
         val romanLevel = matcher.group(3)
         val ultimate = (format.contains("§l"))
 
@@ -320,8 +320,13 @@ class ItemResolutionQuery {
         return internalName.uppercase().replace(":", "-")
     }
 
+    private fun resolveToItemListJson(): JsonObject? {
+        val internalName = resolveInternalName() ?: return null
+        return EnoughUpdatesManager.getItemById(internalName)
+    }
+
     fun resolveToItemStack(): ItemStack? {
-        val internalName = knownInternalName ?: return null
-        return EnoughUpdatesManager.jsonToStack(EnoughUpdatesManager.getItemById(internalName))
+        val json = resolveToItemListJson() ?: return null
+        return EnoughUpdatesManager.jsonToStack(json)
     }
 }
