@@ -76,10 +76,6 @@ object ChocolateFactoryStats {
 
         val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
-        val availableHitmanEggs = profileStorage.hitmanStats.availableEggs?.takeIf { it > 0 }
-        val hitmanSingleSlotCd = profileStorage.hitmanStats.slotCooldown?.takeIf { it.isInFuture() }
-        val hitmanAllSlotsCd = profileStorage.hitmanStats.allSlotsCooldown?.takeIf { it.isInFuture() }
-
         val map = buildMap<ChocolateFactoryStat, String> {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
@@ -141,16 +137,6 @@ object ChocolateFactoryStats {
             }
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
-
-            availableHitmanEggs?.let {
-                put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §6$it")
-            }
-            hitmanSingleSlotCd?.let {
-                put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §6${it.timeUntil().format()}")
-            }
-            hitmanAllSlotsCd?.let {
-                put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §6${it.timeUntil().format()}")
-            }
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
 
