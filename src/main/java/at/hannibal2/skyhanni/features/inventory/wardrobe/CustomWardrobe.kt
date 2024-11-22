@@ -89,7 +89,7 @@ object CustomWardrobe {
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
-            loadingPosition.moveTo(position.rawX + (width - loadingRenderable.width) / 2, position.rawY - loadingRenderable.height)
+            loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
             loadingPosition.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 

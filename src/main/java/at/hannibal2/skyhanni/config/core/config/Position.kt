@@ -48,11 +48,11 @@ class Position @JvmOverloads constructor(
     constructor() : this(0, 0)
 
     @Expose
-    var rawX: Int = x
+    var x: Int = x
         private set
 
     @Expose
-    var rawY: Int = y
+    var y: Int = y
         private set
 
     @Expose
@@ -82,28 +82,28 @@ class Position @JvmOverloads constructor(
         get() = if (ignoreCustomScale) DEFAULT_SCALE else (scale * SkyHanniMod.feature.gui.globalScale).coerceIn(MIN_SCALE, MAX_SCALE)
 
     fun set(other: Position) {
-        this.rawX = other.rawX
-        this.rawY = other.rawY
+        this.x = other.x
+        this.y = other.y
         this.centerX = other.centerX
         this.centerY = other.centerY
         this.scale = other.scale
     }
 
     fun moveTo(x: Int, y: Int) {
-        this.rawX = x
-        this.rawY = y
+        this.x = x
+        this.y = y
     }
 
     fun getAbsX0(objWidth: Int): Int {
         val width = GuiScreenUtils.scaledWindowWidth
 
-        return calcAbs0(rawX, width, objWidth)
+        return calcAbs0(x, width, objWidth)
     }
 
     fun getAbsY0(objHeight: Int): Int {
         val height = GuiScreenUtils.scaledWindowHeight
 
-        return calcAbs0(rawY, height, objHeight)
+        return calcAbs0(y, height, objHeight)
     }
 
     private fun calcAbs0(axis: Int, length: Int, objLength: Int): Int {
@@ -119,14 +119,14 @@ class Position @JvmOverloads constructor(
     }
 
     fun moveX(deltaX: Int, objWidth: Int): Int {
-        val (newX, newDeltaX) = adjustWithinBounds(rawX, deltaX, GuiScreenUtils.scaledWindowWidth, objWidth)
-        this.rawX = newX
+        val (newX, newDeltaX) = adjustWithinBounds(x, deltaX, GuiScreenUtils.scaledWindowWidth, objWidth)
+        this.x = newX
         return newDeltaX
     }
 
     fun moveY(deltaY: Int, objHeight: Int): Int {
-        val (newY, newDeltaY) = adjustWithinBounds(rawY, deltaY, GuiScreenUtils.scaledWindowWidth, objHeight)
-        this.rawY = newY
+        val (newY, newDeltaY) = adjustWithinBounds(y, deltaY, GuiScreenUtils.scaledWindowWidth, objHeight)
+        this.y = newY
         return newDeltaY
     }
 
