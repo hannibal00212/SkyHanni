@@ -23,6 +23,7 @@ package at.hannibal2.skyhanni.config.core.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
@@ -184,5 +185,12 @@ class Position @JvmOverloads constructor(
 
         private class FieldNotFoundException(field: String, owner: Class<*>) :
             Exception("Config Link for field $field in class $owner not found")
+
+        fun migrate(element: JsonElement): JsonElement {
+            val obj = element.asJsonObject
+            val center = obj["center"]?.asBoolean ?: return element
+            if (center) obj.addProperty("centerX", true)
+            return obj
+        }
     }
 }
