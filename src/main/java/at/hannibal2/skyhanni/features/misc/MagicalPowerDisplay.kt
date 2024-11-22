@@ -45,7 +45,7 @@ object MagicalPowerDisplay {
      * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        "^(Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
+        "^(?:Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")

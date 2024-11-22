@@ -74,7 +74,7 @@ object BestiaryData {
      */
     private val titlePattern by patternGroup.pattern(
         "title",
-        "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
+        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$"
     )
 
     private var display = emptyList<List<Any>>()
@@ -84,12 +84,12 @@ object BestiaryData {
     private var inInventory = false
     private var isCategory = false
     private var overallProgressEnabled = false
-    private var indexes = listOf(
-        10, 11, 12, 13, 14, 15, 16,
-        19, 20, 21, 22, 23, 24, 25,
-        28, 29, 30, 31, 32, 33, 34,
-        37, 38, 39, 40, 41, 42, 43
-    )
+    private val indexes = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -443,7 +443,7 @@ object BestiaryData {
         if (stack == null) return false
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
-            if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
+            if ("Bestiary" != bestiaryGuiTitleMatcher.group("title")) {
                 var loreContainsFamiliesFound = false
                 for (line in stack.getLore()) {
                     if (line.removeColor().startsWith("Families Found")) {

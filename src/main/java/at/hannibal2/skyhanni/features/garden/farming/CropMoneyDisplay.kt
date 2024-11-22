@@ -168,8 +168,7 @@ object CropMoneyDisplay {
             }
 
             if (config.armor) {
-                val amountPerHour =
-                    it.multiplier * GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
+                val amountPerHour = GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
                 extraArmorCoins = amountPerHour * it.specialDropType.toInternalName().getNpcPrice()
             }
         }
