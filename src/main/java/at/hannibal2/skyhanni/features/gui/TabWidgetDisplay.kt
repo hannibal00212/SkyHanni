@@ -72,7 +72,7 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
                     "Positions" to config.displayPositions,
                 )
             } else {
-                config.displayPositions.addAll(List(sizeDiff) { Position(0, 0) })
+                config.displayPositions.addAll(List(sizeDiff) { Position() })
             }
         }
     }

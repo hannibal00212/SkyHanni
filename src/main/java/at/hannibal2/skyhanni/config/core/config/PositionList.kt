@@ -9,7 +9,7 @@ class PositionList() : ArrayList<Position>(), MutableList<Position> {
     }
 
     constructor(size: Int) : this() {
-        this.addAll(List(size) { Position(0, 0) })
+        this.addAll(List(size) { Position() })
     }
 
     fun setLink(configLink: ConfigLink) {

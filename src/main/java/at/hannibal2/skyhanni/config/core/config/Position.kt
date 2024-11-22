@@ -35,15 +35,17 @@ class Position @JvmOverloads constructor(
     y: Int,
     scale: Float = DEFAULT_SCALE,
     centerX: Boolean = false,
-    centerY: Boolean = false,
+    centerY: Boolean = true,
 ) {
     @JvmOverloads
     constructor(
         x: Int,
         y: Int,
         centerX: Boolean,
-        centerY: Boolean = false,
+        centerY: Boolean = true,
     ) : this(x, y, DEFAULT_SCALE, centerX, centerY)
+
+    constructor() : this(0, 0)
 
     @Expose
     var rawX: Int = x
@@ -67,7 +69,8 @@ class Position @JvmOverloads constructor(
         private set
 
     @Expose
-    private var ignoreCustomScale = false
+    var ignoreCustomScale = false
+        private set
 
     @Transient
     var linkField: Field? = null
@@ -84,11 +87,6 @@ class Position @JvmOverloads constructor(
         this.centerX = other.centerX
         this.centerY = other.centerY
         this.scale = other.scale
-    }
-
-    fun setIgnoreCustomScale(ignoreCustomScale: Boolean): Position {
-        this.ignoreCustomScale = ignoreCustomScale
-        return this
     }
 
     fun moveTo(x: Int, y: Int) {
@@ -130,6 +128,11 @@ class Position @JvmOverloads constructor(
         val (newY, newDeltaY) = adjustWithinBounds(rawY, deltaY, ScaledResolution(Minecraft.getMinecraft()).scaledHeight, objHeight)
         this.rawY = newY
         return newDeltaY
+    }
+
+    fun ignoreScale(): Position {
+        ignoreCustomScale = true
+        return this
     }
 
     private fun adjustWithinBounds(axis: Int, delta: Int, length: Int, objLength: Int): Pair<Int, Int> {

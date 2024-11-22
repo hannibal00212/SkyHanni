@@ -52,6 +52,10 @@ object CustomWardrobe {
     private var editMode = false
     private var waitingForInventoryUpdate = false
 
+    private var position: Position = Position(0, 0).ignoreScale()
+    private var loadingPosition: Position = Position(0, 0).ignoreScale()
+    private var inventoryButtonPosition: Position = Position(0, 0).ignoreScale()
+
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
@@ -78,21 +82,21 @@ object CustomWardrobe {
         }
 
         val (width, height) = renderable.width to renderable.height
-        val pos = Position((gui.width - width) / 2, (gui.height - height) / 2).setIgnoreCustomScale(true)
+
+        position.moveTo((gui.width - width) / 2, (gui.height - height) / 2)
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
-            val loadingPos =
-                Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height).setIgnoreCustomScale(true)
-            loadingPos.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+            loadingPosition.moveTo(position.rawX + (width - loadingRenderable.width) / 2, position.rawY - loadingRenderable.height)
+            loadingPosition.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
 
-        pos.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             GlStateManager.translate(0f, 0f, 400f)
@@ -112,7 +116,8 @@ object CustomWardrobe {
         val accessorGui = gui as AccessorGuiContainer
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        inventoryButtonPosition.moveTo(posX, posY)
+        inventoryButtonPosition.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @SubscribeEvent
