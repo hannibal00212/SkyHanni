@@ -51,7 +51,6 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -857,7 +856,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 

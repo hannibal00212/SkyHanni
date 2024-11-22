@@ -46,7 +46,7 @@ data class SkyBlockTime(
                 Instant.ofEpochMilli(
                     SKYBLOCK_EPOCH_START_MILLIS +
                         (SKYBLOCK_YEAR_MILLIS * year) +
-                        (SKYBLOCK_MONTH_MILLIS * month)
+                        (SKYBLOCK_MONTH_MILLIS * (month - 1))
                 )
             )
 

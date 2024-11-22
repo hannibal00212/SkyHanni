@@ -198,7 +198,7 @@ object GardenOptimalSpeed {
             text,
             config::warning,
             actionName = "change the speed",
-            action = { HypixelCommands.setMaxSpeed() },
+            action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
         )
     }
 
