@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -26,12 +25,14 @@ object ItemNameResolver {
             return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
         }
 
-        resolveEnchantmentByName(itemName)?.let {
+        ItemResolutionQuery.resolveEnchantmentByName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { fixEnchantmentName(it) }
         }
+
         resolveEnchantmentByCleanName(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { it }
         }
+
         if (itemName.endsWith("gemstone", ignoreCase = true)) {
             val split = lowercase.split(" ")
             if (split.size == 3) {
@@ -92,25 +93,6 @@ object ItemNameResolver {
             return null
         }
         return null
-    }
-
-    // does not work without color codes, or with roman numbers
-    // Taken and edited from NEU
-    private fun resolveEnchantmentByName(enchantmentName: String) =
-        UtilsPatterns.enchantmentNamePattern.matchMatcher(enchantmentName) {
-            val name = group("name").trim { it <= ' ' }
-            val ultimate = group("format").lowercase().contains("§l")
-            (
-                (if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else "") +
-                    turboCheck(name).replace(" ", "_").replace("-", "_").uppercase() +
-                    ";" + group("level").romanToDecimal()
-                )
-        }
-
-    private fun turboCheck(text: String): String {
-        if (text == "Turbo-Cocoa") return "Turbo-Coco"
-        if (text == "Turbo-Cacti") return "Turbo-Cactus"
-        return text
     }
 
     // Workaround for duplex

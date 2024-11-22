@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -30,7 +32,6 @@ class ItemResolutionQuery {
     private var guiContext: Gui? = null
 
     companion object {
-        val enchantedBookNamePattern = "^((?:§.)*)([^§]+) ([IVXL]+)$".toPattern()
         private val petPattern = ".*(\\[Lvl .*] )§(.).*".toPattern()
         val petRarities = listOf("COMMON", "UNCOMMON", "RARE", "EPIC", "LEGENDARY", "MYTHIC")
 
@@ -115,6 +116,22 @@ class ItemResolutionQuery {
                 }
             }
             return candidates
+        }
+
+        fun resolveEnchantmentByName(displayName: String): String? =
+            UtilsPatterns.enchantmentNamePattern.matchMatcher(displayName) {
+                val name = group("name").trim { it <= ' ' }
+                val ultimate = group("format").lowercase().contains("§l")
+                val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
+                val cleanedEnchantName = turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
+            }
+
+        private fun turboCheck(text: String): String {
+            if (text == "Turbo-Cocoa") return "Turbo-Coco"
+            if (text == "Turbo-Cacti") return "Turbo-Cactus"
+
+            return text
         }
     }
 
@@ -235,26 +252,6 @@ class ItemResolutionQuery {
     private fun resolveBalloonHatName(): String {
         val color = getExtraAttributes().getString("party_hat_color")
         return "BALLOON_HAT_2024_" + color.uppercase()
-    }
-
-    private fun resolveEnchantmentByName(displayName: String): String? {
-        val matcher = enchantedBookNamePattern.matcher(displayName)
-        if (!matcher.matches()) return null
-        val format = matcher.group(1).lowercase()
-        val enchantmentName = matcher.group(2).trim()
-        val romanLevel = matcher.group(3)
-        val ultimate = (format.contains("§l"))
-
-        val prefix = if (ultimate && enchantmentName != "Ultimate Wise" && enchantmentName != "Ultimate Jerry") "ULTIMATE_" else ""
-        val cleanedEnchantName = turboCheck(enchantmentName).replace(" ", "_").replace("-", "_").uppercase()
-        return "$prefix$cleanedEnchantName;${romanLevel.romanToDecimal()}".uppercase()
-    }
-
-    private fun turboCheck(text: String): String {
-        if (text == "Turbo-Cocoa") return "Turbo-Coco"
-        if (text == "Turbo-Cacti") return "Turbo-Cactus"
-
-        return text
     }
 
     private fun resolveItemInCatacombsRngMeter(): String? {
