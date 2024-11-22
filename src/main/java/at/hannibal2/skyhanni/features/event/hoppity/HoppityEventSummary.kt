@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.CURRENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.NEXT_EVENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.PAST_EVENTS
@@ -294,7 +293,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = getCurrentSBYear().getEventEndMark() ?: return
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getCurrentSBYear().getEventEndMark()
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -323,25 +322,22 @@ object HoppityEventSummary {
         timerSecondCounter = 0
     }
 
-    private fun Duration.formatForHoppity(): Pair<String, Boolean> =
-        if (liveDisplayConfig.dateTimeFormat == RELATIVE) Pair(format(maxUnits = 2), false)
+    private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
+        if (liveDisplayConfig.dateTimeFormat == RELATIVE) Pair(passedSince().absoluteValue.format(maxUnits = 2), false)
         else {
-            val monthNow = SkyBlockTime.now().month
-            val yearNow = getCurrentSBYear()
+            val timeNow = SimpleTimeMark.now().toLocalDateTime()
+            val timeThen = toLocalDateTime()
 
-            val markThen = (SimpleTimeMark.now() + this)
-            val monthThen = markThen.toSkyBlockTime().month
-            val yearThen = markThen.toSkyBlockTime().year
-
-            val monthDiff = monthThen - monthNow
-            val yearDiff = yearThen - yearNow
+            val yearDiff =  timeThen.year - timeNow.year
+            val monthDiff = timeThen.monthValue - timeNow.monthValue
+            val dayDiff = timeThen.dayOfMonth - timeNow.dayOfMonth
 
             val dateFormat = when {
-                yearDiff == 0 && monthDiff == 0 -> "dd HH:mm"
-                yearDiff == 0 -> "MMM dd HH:mm"
-                else -> "yyyy MMM dd HH:mm"
+                yearDiff == 0 && monthDiff == 0 && dayDiff == 0 -> "HH:mm:ss"
+                (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
+                else -> "yyyy-MM-dd HH:mm"
             }
-            Pair(markThen.formattedDate(dateFormat), true)
+            Pair(formattedDate(dateFormat), true)
         }
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
@@ -363,17 +359,17 @@ object HoppityEventSummary {
                     val isNextEvent = statYear > yearNow
 
                     if (isCurrentEvent && liveDisplayConfig.dateTimeDisplay.contains(CURRENT)) {
-                        eventEnd.timeUntil().formatForHoppity().let { (str, isAbsolute) ->
+                        eventEnd.formatForHoppity().let { (str, isAbsolute) ->
                             val grammarWord = if (isAbsolute) "Ends" else "Ends in"
                             addCenteredString("§7$grammarWord §f$str")
                         }
                     } else if (isPastEvent && liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS)) {
-                        eventEnd.passedSince().absoluteValue.formatForHoppity().let { (str, isAbsolute) ->
+                        eventEnd.formatForHoppity().let { (str, isAbsolute) ->
                             val grammarWord = if (isAbsolute) "" else " ago"
                             addCenteredString("§7Ended §f$str$grammarWord")
                         }
                     } else if (isNextEvent && liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)) {
-                        statYear.getEventStartMark().timeUntil().formatForHoppity().let { (str, isAbsolute) ->
+                        statYear.getEventStartMark().formatForHoppity().let { (str, isAbsolute) ->
                             val grammarWord = if (isAbsolute) "Starts" else "Starts in"
                             addCenteredString("§7$grammarWord §f$str")
                         }

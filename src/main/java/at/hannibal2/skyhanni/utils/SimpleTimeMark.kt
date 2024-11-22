@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -55,6 +56,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
         return localDateTime.format(formatter)
     }
+
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
 
     fun toMillis() = millis
 
