@@ -11,6 +11,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class HoppityEventSummaryLiveDisplayConfig {
@@ -28,6 +29,34 @@ public class HoppityEventSummaryLiveDisplayConfig {
     )
     @ConfigEditorInfoText
     public boolean mirrorConfigNote = false;
+
+    public enum HoppityDateTimeDisplayType {
+        CURRENT("Current Event"),
+        PAST_EVENTS("Past Events"),
+        NEXT_EVENT("Next Event"),
+        ;
+
+        private final String str;
+
+        HoppityDateTimeDisplayType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Date/Time Display",
+        desc = "Display the date and time of the event in the header, for the current event, past events, or the next event."
+    )
+    @ConfigEditorDraggableList
+    public List<HoppityDateTimeDisplayType> dateTimeDisplay = new ArrayList<>(Collections.singletonList(
+        HoppityDateTimeDisplayType.CURRENT
+    ));
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
