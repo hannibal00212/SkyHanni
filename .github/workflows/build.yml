@@ -40,8 +40,6 @@ jobs:
     preprocess:
         runs-on: ubuntu-latest
         name: "Build multi version"
-        env:
-            SKIP_DETEKT: "true"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -51,4 +49,4 @@ jobs:
                     mkdir -p .gradle
                     echo skyhanni.multi-version=preprocess-only > .gradle/private.properties
             -   name: Build with Gradle
-                run: ./gradlew build --stacktrace
+                run: ./gradlew build --stacktrace -PskipDetekt=true

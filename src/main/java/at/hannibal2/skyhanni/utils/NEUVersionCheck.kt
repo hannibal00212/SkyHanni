@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Desktop
@@ -27,7 +28,10 @@ object NEUVersionCheck {
             val clazz = Class.forName("io.github.moulberry.notenoughupdates.util.ItemResolutionQuery")
 
             for (field in clazz.methods) {
-                if (field.name == "findInternalNameByDisplayName") return
+                if (field.name == "findInternalNameByDisplayName") {
+                    PlatformUtils.validNeuInstalled = true
+                    return
+                }
             }
         } catch (_: Throwable) {
         }

@@ -215,6 +215,8 @@ enum class Perk(val perkName: String) {
     override fun toString(): String = "$perkName: $description"
 
     companion object {
+        fun resetPerks() = entries.forEach { it.isActive = false }
+
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
 
         fun MayorPerk.toPerk(): Perk? = getPerkFromName(this.renameIfFoxyExtraEventPerkFound())?.let {

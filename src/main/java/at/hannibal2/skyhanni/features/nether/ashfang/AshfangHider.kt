@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -35,7 +36,7 @@ object AshfangHider {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!AshfangManager.active || !config.particles) return
         val entity = event.entity as? EntityArmorStand ?: return
-        if (entity.inventory.any { it?.name == "Glowstone" }) event.cancel()
+        if (entity.getWholeInventory().any { it?.name == "Glowstone" }) event.cancel()
     }
 
     @SubscribeEvent
