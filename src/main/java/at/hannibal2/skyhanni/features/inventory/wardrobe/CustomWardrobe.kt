@@ -52,9 +52,9 @@ object CustomWardrobe {
     private var editMode = false
     private var waitingForInventoryUpdate = false
 
-    private var position: Position = Position(0, 0).ignoreScale()
-    private var loadingPosition: Position = Position(0, 0).ignoreScale()
-    private var inventoryButtonPosition: Position = Position(0, 0).ignoreScale()
+    private val position: Position = Position(0, 0).ignoreScale()
+    private val loadingPosition: Position = Position(0, 0).ignoreScale()
+    private val inventoryButtonPosition: Position = Position(0, 0).ignoreScale()
 
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
