@@ -11,17 +11,21 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 // internal
 // add party update event
 object ScoreboardElementParty : ScoreboardElement() {
+    // TODO cache until next party update event
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
-        add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
-        if (partyConfig.showPartyLeader) PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
 
-        PartyAPI.partyMembers
-            .take(partyConfig.maxPartyList.get())
-            .apply { if (partyConfig.showPartyLeader) remove(PartyAPI.partyLeader) }
-            .forEach {
-                add(" §7- §f$it")
-            }
+        add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
+
+        if (partyConfig.showPartyLeader && PartyAPI.partyLeader != null) {
+            add(" §7- §f${PartyAPI.partyLeader} §e♚")
+        }
+
+        if (partyConfig.showPartyLeader) {
+            PartyAPI.partyMembers.filter { it != PartyAPI.partyLeader }
+        } else {
+            PartyAPI.partyMembers
+        }.take(partyConfig.maxPartyList.get()).forEach { add(" §7- §f$it") }
     }
 
     override fun showWhen() =

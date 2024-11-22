@@ -8,10 +8,9 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -63,7 +62,7 @@ object RiftUpsideDownParkour {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toChromaColor()
+            monochromeColor = config.monochromeColor.get().toSpecialColor()
             lookAhead = config.lookAhead.get() + 1
             outline = config.outline
         }
@@ -76,5 +75,5 @@ object RiftUpsideDownParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled
 }

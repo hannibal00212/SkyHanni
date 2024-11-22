@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
@@ -61,9 +61,8 @@ object TitleManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (endTime.isInPast()) return
 
-        val scaledResolution = ScaledResolution(Minecraft.getMinecraft())
-        val width = scaledResolution.scaledWidth
-        val height = scaledResolution.scaledHeight
+        val width = GuiScreenUtils.scaledWindowWidth
+        val height = GuiScreenUtils.scaledWindowHeight
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -32,7 +33,7 @@ object CraftRoomHolographicMob {
         -117.0, 51.0, -128.0,
     )
     private var entitiesList = listOf<HolographicEntities.HolographicEntity<out EntityLivingBase>>()
-    private var entityToHolographicEntity = mapOf(
+    private val entityToHolographicEntity = mapOf(
         EntityZombie::class.java to HolographicEntities.zombie,
         EntitySlime::class.java to HolographicEntities.slime,
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
@@ -65,7 +66,7 @@ object CraftRoomHolographicMob {
                     append("§a$mobName ")
                 }
                 if (config.showHealth) {
-                    append("§c${theMob.health}♥")
+                    append("§c${theMob.health.roundTo(1)}♥")
                 }
             }.trim()
 

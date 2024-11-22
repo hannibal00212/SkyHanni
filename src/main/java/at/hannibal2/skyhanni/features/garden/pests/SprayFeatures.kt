@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -30,6 +31,8 @@ object SprayFeatures {
         "garden.spray.material",
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
+
+    private val SPRAYONATOR by lazy { "SPRAYONATOR".toInternalName() }
 
     private fun SprayType?.getSprayEffect(): String =
         this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
@@ -72,7 +75,7 @@ object SprayFeatures {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
-        if (!InventoryUtils.itemInHandId.equals("SPRAYONATOR")) return
+        if (InventoryUtils.itemInHandId != SPRAYONATOR) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }

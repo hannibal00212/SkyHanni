@@ -1,0 +1,4 @@
+
+net.fabricmc.api.EnvType net.minecraftforge.api.distmarker.Dist
+net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
+

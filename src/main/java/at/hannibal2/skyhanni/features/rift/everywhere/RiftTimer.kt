@@ -125,7 +125,7 @@ object RiftTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea == "Mirrorverse") return
+        if (RiftAPI.inMirrorVerse) return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }

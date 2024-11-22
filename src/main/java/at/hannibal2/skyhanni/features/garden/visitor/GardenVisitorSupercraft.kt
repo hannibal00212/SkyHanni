@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -31,10 +31,12 @@ object GardenVisitorSupercraft {
     private var lastSuperCraftMaterial = ""
 
     private val superCraftItem by lazy {
-        val neuItem = "GOLD_PICKAXE".asInternalName().getItemStack()
+        val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
             "§bSuper Craft",
+            "§8(From SkyHanni)",
+            "",
             "§7You have the items to craft",
             "§7Click me to open the super crafter!",
         )

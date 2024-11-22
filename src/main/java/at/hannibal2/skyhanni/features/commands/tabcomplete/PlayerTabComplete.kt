@@ -55,9 +55,10 @@ object PlayerTabComplete {
                 parent("kick", "demote", "promote", "transfer") { add(partyMembersEntry) }
                 literal("chat", "disband", "kickoffline", "leave", "list", "mute", "poll", "private", "settings", "warp")
             }
+            add(getExcluding(PlayerCategory.PARTY))
         }
 
-        parent("w", "msg", "tell", "boop") { add(getExcluding()) }
+        parent("w", "msg", "tell", "boop", "boo") { add(getExcluding()) }
 
         parent("visit") {
             add(getExcluding())

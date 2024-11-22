@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -54,7 +54,7 @@ object PabloHelper {
 
         DelayedRun.runNextTick {
             GetFromSackAPI.getFromChatMessageSackItems(
-                itemName.asInternalName().makePrimitiveStack(),
+                itemName.toInternalName().makePrimitiveStack(),
                 "Click here to grab an $itemName from sacks!",
             )
         }

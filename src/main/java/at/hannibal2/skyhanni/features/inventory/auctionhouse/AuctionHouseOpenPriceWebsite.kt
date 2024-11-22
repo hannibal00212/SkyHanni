@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -18,6 +18,7 @@ import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,15 +43,18 @@ object AuctionHouseOpenPriceWebsite {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        // TODO get search from search sign (slot 48) since it can be cut off in title
         ahSearchPattern.matchMatcher(event.inventoryName) {
-            searchTerm = group("searchTerm").removeSuffix("\"").replace(" ", "%20")
+            searchTerm = URLEncoder.encode(group("searchTerm").removeSuffix("\""), "UTF-8").replace("+", "%20")
             displayItem = createDisplayItem()
         }
     }
 
     private fun createDisplayItem() = ItemUtils.createItemStack(
-        "PAPER".asInternalName().getItemStack().item,
+        "PAPER".toInternalName().getItemStack().item,
         "§bPrice History",
+        "§8(From SkyHanni)",
+        "",
         "§7Click here to open",
         "§7the price history",
         "§7of §e$searchTerm",

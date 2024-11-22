@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryStrayTracker {
 
     private val config get() = ChocolateFactoryAPI.config
-    private var claimedStraysSlots = mutableListOf<Int>()
+    private val claimedStraysSlots = mutableListOf<Int>()
 
     /**
      * REGEX-TEST: §9Zero §d§lCAUGHT!
@@ -124,6 +124,15 @@ object ChocolateFactoryStrayTracker {
     val duplicateDoradoStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.doradoduplicate",
         "(?:§.)*already have captured him before.*",
+    )
+
+    /**
+     * REGEX-TEST: §7but he escaped and left behind
+     * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
+     */
+    val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.doradoescape",
+        "(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!)"
     )
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
