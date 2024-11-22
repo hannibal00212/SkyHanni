@@ -90,8 +90,7 @@ object VampireSlayerFeatures {
                 val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
                 if (isIchor || stand.hasSkullTexture(KILLER_SPRING_TEXTURE)) {
                     val color =
-                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor()
-                            .addAlpha(config.withAlpha)
+                        (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
                     if (distance <= 15) {
                         RenderLivingEntityHelper.setEntityColor(
                             stand,
@@ -286,8 +285,7 @@ object VampireSlayerFeatures {
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
             val isSpring = stand.hasSkullTexture(KILLER_SPRING_TEXTURE)
             if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
-            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor()
-                .addAlpha(config.withAlpha)
+            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color).toSpecialColor().addAlpha(config.withAlpha)
             if (distance <= 15) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,

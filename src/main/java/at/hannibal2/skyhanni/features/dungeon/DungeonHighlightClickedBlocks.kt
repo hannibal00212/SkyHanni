@@ -63,8 +63,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color =
-                config.lockedChestColor.toSpecialColor()
+            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toSpecialColor()
         }
     }
 
@@ -75,8 +74,7 @@ object DungeonHighlightClickedBlocks {
 
         val type = event.blockType
 
-        val color =
-            if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toSpecialColor()
+        val color = if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toSpecialColor()
         val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + getBlockProperties(type).name
         blocks[event.position] = ClickedBlock(displayText, color)
 

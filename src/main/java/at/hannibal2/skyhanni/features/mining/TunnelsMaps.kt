@@ -536,6 +536,5 @@ object TunnelsMaps {
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }
