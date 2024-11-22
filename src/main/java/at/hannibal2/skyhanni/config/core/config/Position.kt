@@ -23,12 +23,11 @@ package at.hannibal2.skyhanni.config.core.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import java.lang.reflect.Field
 
 class Position @JvmOverloads constructor(
@@ -96,13 +95,13 @@ class Position @JvmOverloads constructor(
     }
 
     fun getAbsX0(objWidth: Int): Int {
-        val width = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val width = GuiScreenUtils.scaledWindowWidth
 
         return calcAbs0(rawX, width, objWidth)
     }
 
     fun getAbsY0(objHeight: Int): Int {
-        val height = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val height = GuiScreenUtils.scaledWindowHeight
 
         return calcAbs0(rawY, height, objHeight)
     }
@@ -120,13 +119,13 @@ class Position @JvmOverloads constructor(
     }
 
     fun moveX(deltaX: Int, objWidth: Int): Int {
-        val (newX, newDeltaX) = adjustWithinBounds(rawX, deltaX, ScaledResolution(Minecraft.getMinecraft()).scaledWidth, objWidth)
+        val (newX, newDeltaX) = adjustWithinBounds(rawX, deltaX, GuiScreenUtils.scaledWindowWidth, objWidth)
         this.rawX = newX
         return newDeltaX
     }
 
     fun moveY(deltaY: Int, objHeight: Int): Int {
-        val (newY, newDeltaY) = adjustWithinBounds(rawY, deltaY, ScaledResolution(Minecraft.getMinecraft()).scaledHeight, objHeight)
+        val (newY, newDeltaY) = adjustWithinBounds(rawY, deltaY, GuiScreenUtils.scaledWindowWidth, objHeight)
         this.rawY = newY
         return newDeltaY
     }
