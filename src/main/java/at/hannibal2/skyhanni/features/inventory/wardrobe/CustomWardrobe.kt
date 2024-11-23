@@ -90,7 +90,7 @@ object CustomWardrobe {
                 scale = activeScale / 100.0,
             )
             loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
-            loadingPosition.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
@@ -117,7 +117,7 @@ object CustomWardrobe {
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
-        inventoryButtonPosition.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @SubscribeEvent
