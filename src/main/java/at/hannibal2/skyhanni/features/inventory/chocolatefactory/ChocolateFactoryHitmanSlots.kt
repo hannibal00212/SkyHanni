@@ -144,7 +144,7 @@ object ChocolateFactoryHitmanSlots {
 
     private fun Map<Int, ItemStack>.filterNotBorderSlots() = filterKeys {
         it !in 0..8 && it !in 45..53 && // Horizontal borders
-            it % 9 != 0 && it % 8 != 0 // Vertical borders
+            it % 9 != 0 && (it + 1) % 9 != 0 // Vertical borders
     }
 
     private fun getSlotPriceRenderable(): Renderable = Renderable.verticalContainer(
