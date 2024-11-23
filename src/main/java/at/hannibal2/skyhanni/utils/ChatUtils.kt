@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -315,5 +316,9 @@ object ChatUtils {
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
+    }
+
+    fun consoleError(message: String) {
+        System.err.println(" \nSkyHanni-${SkyHanniMod.version} $message\n ")
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.tweaker;
 
 
+import at.hannibal2.skyhanni.utils.ChatUtils;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.CoreModManager;
@@ -29,7 +30,7 @@ public class ModLoadingTweaker implements ITweaker {
             CoreModManager.getIgnoredMods().remove(file);
             CoreModManager.getReparseableCoremods().add(file);
         } catch (URISyntaxException e) {
-            System.err.println("SkyHanni could not re-add itself as mod.");
+            ChatUtils.INSTANCE.consoleError("could not re-add itself as mod.");
             e.printStackTrace();
         }
     }
