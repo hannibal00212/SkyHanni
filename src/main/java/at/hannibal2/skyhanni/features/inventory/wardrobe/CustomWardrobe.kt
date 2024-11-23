@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -31,6 +29,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -388,7 +388,7 @@ object CustomWardrobe {
                 ),
                 blockBottomHover = false,
             ),
-            config.color.backgroundColor.toChromaColor(),
+            config.color.backgroundColor.toSpecialColor(),
             padding = borderPadding,
         )
 
@@ -525,8 +525,8 @@ object CustomWardrobe {
                 ),
                 hoveredColor,
                 padding = 0,
-                topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
-                bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
+                topOutlineColor = config.color.topBorderColor.toSpecialColorInt(),
+                bottomOutlineColor = config.color.bottomBorderColor.toSpecialColorInt(),
                 borderOutlineThickness = 2,
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
@@ -589,7 +589,7 @@ object CustomWardrobe {
         )
 
     private fun WardrobeSlot.getOutlineColor(): Pair<Color, Color> {
-        val (top, bottom) = config.color.topBorderColor.toChromaColor() to config.color.bottomBorderColor.toChromaColor()
+        val (top, bottom) = config.color.topBorderColor.toSpecialColor() to config.color.bottomBorderColor.toSpecialColor()
         return when {
             isEmpty() || locked -> ColorUtils.TRANSPARENT_COLOR to ColorUtils.TRANSPARENT_COLOR
             !isInCurrentPage() -> top.darker(0.5) to bottom.darker(0.5)
@@ -624,8 +624,8 @@ object CustomWardrobe {
             isCurrentSlot() -> equippedColor
             favorite && !config.onlyFavorites -> favoriteColor
             else -> null
-        }?.toChromaColor()?.transformIf({ !isInCurrentPage() }) { darker() }
-            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toChromaColor()
+        }?.toSpecialColor()?.transformIf({ !isInCurrentPage() }) { darker() }
+            ?: (if (isInCurrentPage()) samePageColor else otherPageColor).toSpecialColor()
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 

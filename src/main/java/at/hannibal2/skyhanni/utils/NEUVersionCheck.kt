@@ -39,6 +39,7 @@ object NEUVersionCheck {
     }
 
     private fun neuWarning(what: String) {
+        ChatUtils.consoleError("failed to find NotEnoughUpdates! Reason: $what")
         openPopupWindow(
             "NotEnoughUpdates is $what!\n" +
                 "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
