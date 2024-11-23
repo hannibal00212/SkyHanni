@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 import java.util.TreeSet
 
 data class HoppityEggLocationsJson(
@@ -24,7 +25,7 @@ data class HoppityEggLocationsJson(
     @Expose val maxRabbits: Int,
     @Expose val maxPrestige: Int,
     @Expose val chocolateMilestones: TreeSet<Long>,
-    @Expose val hitmanCosts: TreeSet<Long>,
+    @Expose @SerializedName("hitman_costs") val hitmanCosts: TreeSet<Long>,
     @Expose val chocolateShopMilestones: List<MilestoneJson>,
     @Expose val chocolateFactoryMilestones: List<MilestoneJson>,
     @Expose val residentLocations: Map<IslandType, List<String>>,
