@@ -69,29 +69,36 @@ class Position @JvmOverloads constructor(
         private set
 
     @Expose
-    var ignoreCustomScale = false
-        private set
+    private var ignoreCustomScale = false
 
     @Transient
     var linkField: Field? = null
+        private set
 
     var clicked: Boolean = false
     var internalName: String? = null
+        private set
 
     val effectiveScale: Float
         get() = if (ignoreCustomScale) DEFAULT_SCALE else (scale * SkyHanniMod.feature.gui.globalScale).coerceIn(MIN_SCALE, MAX_SCALE)
 
-    fun set(other: Position) {
+    fun set(other: Position): Position {
         this.x = other.x
         this.y = other.y
         this.centerX = other.centerX
         this.centerY = other.centerY
         this.scale = other.scale
+        return this
     }
 
-    fun moveTo(x: Int, y: Int) {
+    fun getOrSetInternalName(lazy: () -> String): String {
+        return internalName ?: lazy().also { internalName = it }
+    }
+
+    fun moveTo(x: Int, y: Int): Position {
         this.x = x
         this.y = y
+        return this
     }
 
     fun getAbsX0(objWidth: Int): Int {
@@ -130,8 +137,8 @@ class Position @JvmOverloads constructor(
         return newDeltaY
     }
 
-    fun ignoreScale(): Position {
-        ignoreCustomScale = true
+    fun ignoreScale(value: Boolean = true): Position {
+        this.ignoreCustomScale = value
         return this
     }
 
