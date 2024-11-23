@@ -607,24 +607,26 @@ object GraphEditor {
             },
         )
         val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
-        edges.addAll(
-            graph.map { node ->
-                // TODO: Fix this to not use bang bangs
-                @Suppress("MapGetWithNotNullAssertionOperator")
-                node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!, EdgeDirection.ONE_TO_TWO) }
-            }.flatten().groupingBy { it.hashCode() }.fold(
-                { key, element -> element },
-                { key, accumulator, element ->
-                    if (
-                        (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
-                        (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
-                    ) {
-                        accumulator.direction = EdgeDirection.BOTH
-                    }
-                    accumulator
-                },
-            ).values,
+
+        val neighbors = graph.map { node ->
+            // TODO: Fix this to not use bang bangs
+            @Suppress("MapGetWithNotNullAssertionOperator")
+            node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!, EdgeDirection.ONE_TO_TWO) }
+        }.flatten()
+
+        val reduced = neighbors.groupingBy { it }.reduce(
+            { _, accumulator, element ->
+                if (
+                    (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                    (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
+                ) {
+                    accumulator.direction = EdgeDirection.BOTH
+                }
+                accumulator
+            },
         )
+
+        edges.addAll(reduced.values)
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
         checkDissolve()
         selectedEdge = findEdgeBetweenActiveAndClosest()
@@ -671,14 +673,16 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    private fun prune() { // TODO fix
-        val hasNeighbours = nodes.associateWith { false }.toMutableMap()
-        edges.forEach {
-            hasNeighbours[it.node1] = true
-            hasNeighbours[it.node2] = true
+    private fun prune() {} // TODO fix
+    /*
+            val hasNeighbours = nodes.associateWith { false }.toMutableMap()
+            edges.forEach {
+                hasNeighbours[it.node1] = true
+                hasNeighbours[it.node2] = true
+            }
+            nodes.removeIf { hasNeighbours[it] == false }
         }
-        nodes.removeIf { hasNeighbours[it] == false }
-    }
+    */
 
     fun LorenzVec.distanceSqToPlayer(): Double = ghostPosition?.let { distanceSq(it) } ?: distanceSq(playerLocation())
 }
