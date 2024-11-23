@@ -41,7 +41,7 @@ object ArmorDropTracker {
      */
     private val armorPattern by RepoPattern.pattern(
         "garden.armordrops.armor",
-        "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
+        "(?:FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
     private var hasArmor = false

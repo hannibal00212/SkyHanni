@@ -142,7 +142,7 @@ object HoppityCollectionStats {
      */
     private val locationRequirementDescription by patternGroup.pattern(
         "rabbit.requirement.location",
-        "Find 15 unique egg locations in (the )?(?<location>.*)\\..*",
+        "Find 15 unique egg locations in (?:the )?(?<location>.*)\\..*",
     )
 
     private var display = emptyList<Renderable>()
