@@ -319,7 +319,7 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
     fun shutdownMinecraft(reason: String? = null) {
-        val reasonLine = reason?.let { " Reason: $it" } ?: ""
+        val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
         ChatUtils.consoleError("forced the game to shutdown.$reasonLine")
 
         FMLCommonHandler.instance().handleExit(-1)
