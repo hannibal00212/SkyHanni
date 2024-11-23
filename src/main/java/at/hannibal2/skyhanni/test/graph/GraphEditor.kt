@@ -566,9 +566,7 @@ object GraphEditor {
         edges.add(edge)
     } else false
 
-    /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
     private fun compileGraph(): Graph {
-        prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, node ->
             GraphNode(
@@ -672,17 +670,6 @@ object GraphEditor {
         dissolvePossible = false
         ghostPosition = null
     }
-
-    private fun prune() {} // TODO fix
-    /*
-            val hasNeighbours = nodes.associateWith { false }.toMutableMap()
-            edges.forEach {
-                hasNeighbours[it.node1] = true
-                hasNeighbours[it.node2] = true
-            }
-            nodes.removeIf { hasNeighbours[it] == false }
-        }
-    */
 
     fun LorenzVec.distanceSqToPlayer(): Double = ghostPosition?.let { distanceSq(it) } ?: distanceSq(playerLocation())
 }
