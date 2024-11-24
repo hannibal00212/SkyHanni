@@ -206,8 +206,7 @@ object CarryTracker {
     }
 
     private fun getCustomer(customerName: String): Customer {
-        return customers.find { it.name.equals(customerName, ignoreCase = true) }
-            ?: Customer(customerName).also { customers.add(it) }
+        return customers.find { it.name.equals(customerName, ignoreCase = true) } ?: Customer(customerName).also { customers.add(it) }
     }
 
     private fun createDisplay(
@@ -284,23 +283,25 @@ object CarryTracker {
 
         val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
         val missingFormat = formatCost(totalCost - customer.alreadyPaid)
-        add(Renderable.clickAndHover(
-            Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
-            tips = listOf(
-                "§7Carries for §b$customerName",
-                "",
-                "§7Total cost: $totalCostFormat",
-                "§7Already paid: $paidFormat",
-                "§7Still missing: $missingFormat",
-                "",
-                "§eClick to send missing coins in party chat!",
+        add(
+            Renderable.clickAndHover(
+                Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+                tips = listOf(
+                    "§7Carries for §b$customerName",
+                    "",
+                    "§7Total cost: $totalCostFormat",
+                    "§7Already paid: $paidFormat",
+                    "§7Still missing: $missingFormat",
+                    "",
+                    "§eClick to send missing coins in party chat!",
+                ),
+                onClick = {
+                    HypixelCommands.partyChat(
+                        "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
+                    )
+                },
             ),
-            onClick = {
-                HypixelCommands.partyChat(
-                    "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
-                )
-            },
-        ))
+        )
     }
 
     private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.shortFormat()}"
