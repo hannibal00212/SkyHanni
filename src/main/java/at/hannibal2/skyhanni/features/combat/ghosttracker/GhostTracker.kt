@@ -338,7 +338,10 @@ object GhostTracker {
         ),
         BESTIARY_KILLS(
             "§7Bestiary Kills: §e 71,893",
-            { "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators() },
+            {
+                val kills = if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
+                "§7Bestiary Kills: §e$kills"
+            },
         ),
         ;
 
