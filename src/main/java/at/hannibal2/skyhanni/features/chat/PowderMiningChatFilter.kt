@@ -132,7 +132,7 @@ object PowderMiningChatFilter {
      */
     private val powderRewardPattern by patternGroup.pattern(
         "reward.powder",
-        "§r§[d2](?:Gemstone|Mithril) Powder( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[d2](?:Gemstone|Mithril) Powder(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -143,7 +143,7 @@ object PowderMiningChatFilter {
      */
     private val essenceRewardPattern by patternGroup.pattern(
         "reward.essence",
-        "§r§d(?:Gold|Diamond) Essence( §r§8x(?<amount>[\\d,]+))?",
+        "§r§d(?:Gold|Diamond) Essence(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -151,7 +151,7 @@ object PowderMiningChatFilter {
      */
     private val ascensionRopeRewardPattern by patternGroup.pattern(
         "reward.ascensionrope",
-        "§r§9Ascension Rope( §r§8x(?<amount>[\\d,]+))?",
+        "§r§9Ascension Rope(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -159,7 +159,7 @@ object PowderMiningChatFilter {
      */
     private val wishingCompassRewardPattern by patternGroup.pattern(
         "reward.wishingcompass",
-        "§r§aWishing Compass( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aWishing Compass(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -167,7 +167,7 @@ object PowderMiningChatFilter {
      */
     private val oilBarrelRewardPattern by patternGroup.pattern(
         "reward.oilbarrel",
-        "§r§aOil Barrel( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aOil Barrel(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -175,7 +175,7 @@ object PowderMiningChatFilter {
      */
     private val prehistoricEggPattern by patternGroup.pattern(
         "reward.prehistoricegg",
-        "§r§fPrehistoric Egg( §r§8x(?<amount>[\\d,]+))?",
+        "§r§fPrehistoric Egg(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -183,7 +183,7 @@ object PowderMiningChatFilter {
      */
     private val pickonimbusPattern by patternGroup.pattern(
         "reward.pickonimbus",
-        "§r§5Pickonimbus 2000( §r§8x(?<amount>[\\d,]+))?",
+        "§r§5Pickonimbus 2000(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -191,7 +191,7 @@ object PowderMiningChatFilter {
      */
     private val jungleHeartPattern by patternGroup.pattern(
         "reward.jungleheart",
-        "§r§6Jungle Heart( §r§8x(?<amount>[\\d,]+))?",
+        "§r§6Jungle Heart(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -199,7 +199,7 @@ object PowderMiningChatFilter {
      */
     private val sludgeJuicePattern by patternGroup.pattern(
         "reward.sludgejuice",
-        "§r§aSludge Juice( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aSludge Juice(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -207,7 +207,7 @@ object PowderMiningChatFilter {
      */
     private val yoggiePattern by patternGroup.pattern(
         "reward.yoggie",
-        "§r§aYoggie( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aYoggie(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -221,7 +221,7 @@ object PowderMiningChatFilter {
     @Suppress("MaxLineLength")
     private val robotPartsPattern by patternGroup.pattern(
         "reward.robotparts",
-        "§r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)( §r§8x(?<amount>[\\d,]+))?",
+        "§r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -229,7 +229,7 @@ object PowderMiningChatFilter {
      */
     private val treasuritePattern by patternGroup.pattern(
         "reward.treasurite",
-        "§r§5Treasurite( §r§8x(?<amount>[\\d,]+))?",
+        "§r§5Treasurite(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -242,7 +242,7 @@ object PowderMiningChatFilter {
      */
     private val goblinEggPattern by patternGroup.pattern(
         "reward.goblineggs",
-        "(?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg( §r§8x(?<amount>[\\d,]+))?",
+        "(?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -256,7 +256,7 @@ object PowderMiningChatFilter {
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     @Suppress("CyclomaticComplexMethod")

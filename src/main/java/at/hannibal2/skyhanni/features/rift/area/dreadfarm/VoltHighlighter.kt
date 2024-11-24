@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import net.minecraft.client.Minecraft
@@ -22,7 +22,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -67,17 +66,17 @@ object VoltHighlighter {
                         VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
                         VoltState.HOSTILE -> 0x80FF0000.toInt()
                         else -> 0
-                    }
+                    },
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 RenderUtils.drawCylinderInWorld(
-                    Color(SpecialColor.specialToChromaRGB(config.voltColour), true),
+                    config.voltColour.toSpecialColor(),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,
                     radius = LIGHTNING_DISTANCE,
                     partialTicks = event.partialTicks,
-                    height = 20F
+                    height = 20F,
                 )
                 val dischargingSince = chargingSince.getOrDefault(entity, SimpleTimeMark.farPast())
                 val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()
