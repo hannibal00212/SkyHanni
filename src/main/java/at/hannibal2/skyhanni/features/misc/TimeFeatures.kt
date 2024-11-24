@@ -24,10 +24,7 @@ object TimeFeatures {
 
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
-
-    private val timeFormat24h = SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds)":ss" else ""}")
-    private val timeFormat12h = SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds)":ss" else ""} a")
-
+    
     private val startOfNextYear by RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
     }
@@ -35,7 +32,9 @@ object TimeFeatures {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.REAL_TIME.isSelected()) return
-
+        val timeFormat24h = SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds)":ss" else ""}")
+        val timeFormat12h = SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds)":ss" else ""} a")
+        
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h
             val currentTime = timeFormat.format(System.currentTimeMillis())
