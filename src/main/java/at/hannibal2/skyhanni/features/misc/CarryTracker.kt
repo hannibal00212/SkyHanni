@@ -205,9 +205,11 @@ object CarryTracker {
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
-    private fun getCustomer(customerName: String): Customer {
-        return customers.find { it.name.equals(customerName, ignoreCase = true) } ?: Customer(customerName).also { customers.add(it) }
-    }
+    private fun getCustomer(customerName: String): Customer = customers.find {
+            it.name.equals(customerName, ignoreCase = true)
+        } ?: Customer(customerName).also {
+            customers.add(it)
+        }
 
     private fun createDisplay(
         carry: Carry,
