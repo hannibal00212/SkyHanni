@@ -53,14 +53,14 @@ class MobFinder {
     // F2
     private var floor2summons1 = false
     private var floor2summons1SpawnTime = 0L
-    private var floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
+    private val floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
     private var floor2secondPhase = false
     private var floor2secondPhaseSpawnTime = 0L
 
     // F3
     private var floor3GuardianShield = false
     private var floor3GuardianShieldSpawnTime = 0L
-    private var guardians = mutableListOf<EntityGuardian>()
+    private val guardians = mutableListOf<EntityGuardian>()
     private var floor3Professor = false
     private var floor3ProfessorSpawnTime = 0L
     private var floor3ProfessorGuardianPrepare = false
@@ -76,7 +76,7 @@ class MobFinder {
     // F6
     private var floor6Giants = false
     private var floor6GiantsSpawnTime = 0L
-    private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
+    private val floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
