@@ -30,12 +30,12 @@ object PestWarning {
 
     private const val BASE_PEST_COOLDOWN = 300.0
 
-    private var SprayMultiplier: Double = 1.0
-    private var Cooldown: Double? = null
+    private var sprayMultiplier: Double = 1.0
+    private var cooldown: Double? = null
     private var lastPestSpawnTime = SimpleTimeMark.farPast()
     private var warningShown = false
 
-    val storage get() = GardenAPI.storage
+    private val storage get() = GardenAPI.storage
 
     private var equipmentPestCooldown: Int
         get() = storage?.equipmentPestCooldown ?: 0
@@ -82,8 +82,8 @@ object PestWarning {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        SprayMultiplier = checkSpray()
-        Cooldown = BASE_PEST_COOLDOWN * SprayMultiplier * (1 - equipmentPestCooldown.div(100.0))
+        sprayMultiplier = checkSpray()
+        cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0))
     }
 
     @HandleEvent
@@ -117,11 +117,11 @@ object PestWarning {
     @SubscribeEvent
     fun warn(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (Cooldown == null) return
+        if (cooldown == null) return
         if (warningShown) return
 
         val timeSinceLastPest = lastPestSpawnTime.passedSince().inWholeSeconds
-        val cooldownValue = Cooldown ?: return
+        val cooldownValue = cooldown ?: return
         if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
             SoundUtils.createSound("random.orb", 0.5f).playSound()
             LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
