@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -44,6 +43,11 @@ object PestWarning {
             storage?.equipmentPestCooldown = value
         }
 
+    /**
+     * REGEX-TEST: §aYou equipped a §r§5Rooted Pest Vest§r§a!
+     * REGEX-TEST: §aYou equipped a §r§5Rooted Lotus Necklace§r§a!
+     * REGEX-TEST: §aYou equipped a §r§aSqueaky Pesthunter's Gloves§r§a!
+     */
     private val equipmentPattern by RepoPattern.pattern(
         "chat.pest.equipment",
         "§aYou equipped a §r§.(?<reforge>\\S+)? (?<item>.*)§r§a!"
@@ -79,7 +83,7 @@ object PestWarning {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         SprayMultiplier = checkSpray()
-        Cooldown = BASE_PEST_COOLDOWN * SprayMultiplier * (1 - (equipmentPestCooldown?.div(100.0) ?: 0.0))
+        Cooldown = BASE_PEST_COOLDOWN * SprayMultiplier * (1 - equipmentPestCooldown.div(100.0))
     }
 
     @HandleEvent
@@ -113,16 +117,20 @@ object PestWarning {
     private fun checkFinnegan(): Boolean {
         val currentMayor = ElectionAPI.currentMayor
         val currentMinister = ElectionAPI.currentMinister
-        return (currentMayor?.mayorName == "Finnegan" || currentMinister?.mayorName == "Finnegan") &&
-            (currentMayor?.activePerks?.any { it.perkName == "Pest Eradicator" } == true ||
-                currentMinister?.activePerks?.any { it.perkName == "Pest Eradicator" } == true)
+        val isFinneganMayor = currentMayor?.mayorName == "Finnegan"
+        val isFinneganMinister = currentMinister?.mayorName == "Finnegan"
+        val hasPestEradicatorPerk = currentMayor?.activePerks?.any { it.perkName == "Pest Eradicator" } == true ||
+            currentMinister?.activePerks?.any { it.perkName == "Pest Eradicator" } == true
+
+        return (isFinneganMayor || isFinneganMinister) && hasPestEradicatorPerk
     }
 
     @SubscribeEvent
     fun warn(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (LorenzUtils.inSkyBlock && Cooldown != null && !warningShown && config.pestSpawnWarning) {
             val timeSinceLastPest = lastPestSpawnTime.passedSince().inWholeSeconds
-            if (timeSinceLastPest >= Cooldown!! - config.pestSpawnWarningTime) {
+            val cooldownValue = Cooldown ?: return
+            if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
                 SoundUtils.createSound("random.orb", 0.5f).playSound()
                 LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
                 ChatUtils.chat("§cPests cooldown has expired")
