@@ -79,7 +79,7 @@ object ChocolateFactoryStrayTracker {
      */
     val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.dorado",
-        ".*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
+        ".*§7You caught a stray.*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
 
     /**
@@ -100,14 +100,14 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the §7end of the SkyBlock year!",
     )
 
-    // TODO: Fix this pattern so it doesn't only match duplicates.
     /**
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
+     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7!
      */
     @Suppress("MaxLineLength")
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
-        "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
+        "§7You caught a stray (?<color>§.)Fish the Rabbit§7!(?: §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!|.*)?",
     )
 
     /**
@@ -132,7 +132,7 @@ object ChocolateFactoryStrayTracker {
      */
     val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.doradoescape",
-        "(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!)"
+        ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*"
     )
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
@@ -241,7 +241,9 @@ object ChocolateFactoryStrayTracker {
         fishTheRabbitPattern.matchMatcher(loreLine) {
             // Also fairly sure that Fish maxes out at Rare, but...
             val rarity = HoppityAPI.rarityByRabbit(group("color")) ?: return@matchMatcher
-            incrementRarity(rarity, group("amount").formatLong())
+            groupOrNull("amount")?.let { amount ->
+                incrementRarity(rarity, amount.formatLong())
+            } ?: incrementRarity(rarity)
         }
 
         // Golden Strays, Jackpot and Mountain, raw choc only reward.

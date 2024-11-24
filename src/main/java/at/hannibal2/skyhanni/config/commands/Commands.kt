@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
@@ -162,11 +161,6 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        event.register("shimportghostcounterdata") {
-            description = "Manually importing the ghost counter data from GhostCounterV3"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GhostUtil.importCTGhostCounterData() }
-        }
         event.register("shcroptime") {
             description =
                 "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
@@ -383,11 +377,6 @@ object Commands {
         }
 
         // non trackers
-        event.register("shresetghostcounter") {
-            description = "Resets the ghost counter"
-            category = CommandCategory.USERS_RESET
-            callback { GhostUtil.reset() }
-        }
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
