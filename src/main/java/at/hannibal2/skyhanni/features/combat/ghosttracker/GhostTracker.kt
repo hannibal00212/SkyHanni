@@ -16,11 +16,14 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -29,8 +32,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -39,6 +44,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object GhostTracker {
@@ -55,9 +61,15 @@ object GhostTracker {
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
     private var allowedDrops = setOf<NEUInternalName>()
-    private val MAX_BESTIARY_KILLS = getBestiaryKillsUntilLevel(25)
+
+    // TODO: in the future get from neu bestiary data
+    private const val MAX_BESTIARY_KILLS = 100_000
+
+    private var lastNoWidgetWarningTime = SimpleTimeMark.farPast()
+    private var lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.farPast()
 
     private var inArea: Boolean = false
+    private var foundGhostBestiary: Boolean = false
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
@@ -136,11 +148,12 @@ object GhostTracker {
     )
 
     /**
+     * REGEX-TEST:  Ghost 21§r§f: §r§b29,614/40,000
      * REGEX-TEST:  Ghost 15§r§f: §r§b12,449/12,500
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)/(?<killsToNext>[\\d,.]+)",
+        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
     )
 
     /**
@@ -157,26 +170,9 @@ object GhostTracker {
         addSearchString("§e§lGhost Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
         config.ghostTrackerText.forEach { line ->
-            addSearchString(getLine(line, data))
+            addSearchString(line.line(data))
         }
         add(tracker.addTotalProfit(profit, data.kills, "kill"))
-    }
-
-    private fun getLine(line: GhostTrackerLines, data: Data): String = when (line) {
-        GhostTrackerLines.KILLS -> "§7Kills: §e${data.kills.addSeparators()}"
-        GhostTrackerLines.GHOSTS_SINCE_SORROW -> "§7Ghosts Since Sorrow: §e${data.ghostsSinceSorrow.addSeparators()}"
-        GhostTrackerLines.MAX_KILL_COMBO -> "§7Max Kill Combo: §e${data.maxKillCombo.addSeparators()}"
-        GhostTrackerLines.COMBAT_XP_GAINED -> "§7Combat XP Gained: §e${data.combatXpGained.addSeparators()}"
-        GhostTrackerLines.AVERAGE_MAGIC_FIND ->
-            "§7Average Magic Find: §e${
-                getAverageMagicFind(
-                    data.totalMagicFind,
-                    data.totalMagicFindKills,
-                )
-            }"
-
-        GhostTrackerLines.BESTIARY_KILLS ->
-            "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
     }
 
     @SubscribeEvent
@@ -185,6 +181,29 @@ object GhostTracker {
         if (event.gained > 10_000) return
         tracker.modify {
             it.combatXpGained += event.gained.toLong()
+        }
+    }
+
+    @SubscribeEvent
+    fun onSecond(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
+            lastNoWidgetWarningTime = SimpleTimeMark.now()
+            ChatUtils.clickableChat(
+                "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker will not work properly without it.",
+                onClick = HypixelCommands::widget,
+                "§eClick to run /widget!",
+                replaceSameMessage = true,
+            )
+        }
+        if (!foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
+            lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.now()
+            ChatUtils.clickableChat(
+                "§Ghost bestiary not found in Bestiary Tab Widget! Ghost Tracker will not work properly without it.",
+                onClick = HypixelCommands::widget,
+                "§eClick to run /widget!",
+                replaceSameMessage = true,
+            )
         }
     }
 
@@ -228,25 +247,23 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.BESTIARY)) return
-        if (isMaxBestiary || !isEnabled()) return
-        for (line in event.lines) {
+    private fun parseBestiaryWidget(lines: List<String>) {
+        foundGhostBestiary = false
+        for (line in lines) {
             if (maxBestiaryTablistPattern.matches(line)) {
                 currentBestiaryKills = MAX_BESTIARY_KILLS.toLong()
-                continue
+                foundGhostBestiary = true
+                return
             }
 
-            val kills = bestiaryTablistPattern.matchMatcher(line) {
-                group("kills").formatInt().toLong()
-            } ?: continue
-            if (kills <= currentBestiaryKills) continue
+            val kills = bestiaryTablistPattern.matchGroup(line, "kills")?.formatLong() ?: continue
+            foundGhostBestiary = true
+            if (kills <= currentBestiaryKills) return
             val difference = kills - currentBestiaryKills
 
             if (difference > 50) {
                 currentBestiaryKills = kills
-                continue
+                return
             }
 
             currentBestiaryKills = kills
@@ -256,6 +273,13 @@ object GhostTracker {
                 it.ghostsSinceSorrow += difference
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.BESTIARY)) return
+        if (isMaxBestiary || !isEnabled()) return
+        parseBestiaryWidget(event.lines)
     }
 
     @SubscribeEvent
@@ -273,6 +297,7 @@ object GhostTracker {
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
+        if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
     @SubscribeEvent
@@ -290,18 +315,34 @@ object GhostTracker {
 
     private fun isEnabled() = inArea && config.enabled
 
-    enum class GhostTrackerLines(private val display: String) {
-        KILLS("§7Kills: §e7,813"),
-        GHOSTS_SINCE_SORROW("§7Ghosts Since Sorrow: §e71"),
-        MAX_KILL_COMBO("§7Max Kill Combo: §e681"),
-        COMBAT_XP_GAINED("§7Combat XP Gained: §e4,687,800"),
-        AVERAGE_MAGIC_FIND("§7Average Magic Find: §b278.9"),
-        BESTIARY_KILLS("§7Bestiary Kills: §e 71,893"),
+    enum class GhostTrackerLines(private val display: String, val line: Data.() -> String) {
+        KILLS(
+            "§7Kills: §e7,813",
+            { "§7Kills: §e${kills.addSeparators()}" }
+        ),
+        GHOSTS_SINCE_SORROW(
+            "§7Ghosts Since Sorrow: §e71",
+            { "§7Ghosts Since Sorrow: §e${ghostsSinceSorrow.addSeparators()}" },
+        ),
+        MAX_KILL_COMBO(
+            "§7Max Kill Combo: §e681",
+            { "§7Max Kill Combo: §e${maxKillCombo.addSeparators()}" },
+        ),
+        COMBAT_XP_GAINED(
+            "§7Combat XP Gained: §e4,687,800",
+            { "§7Combat XP Gained: §e${combatXpGained.addSeparators()}" },
+        ),
+        AVERAGE_MAGIC_FIND(
+            "§7Average Magic Find: §b278.9",
+            { "§7Average Magic Find: §e${getAverageMagicFind(totalMagicFind, totalMagicFindKills)}" },
+        ),
+        BESTIARY_KILLS(
+            "§7Bestiary Kills: §e 71,893",
+            { "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators() },
+        ),
         ;
 
-        override fun toString(): String {
-            return display
-        }
+        override fun toString(): String = display
     }
 
     @SubscribeEvent
@@ -309,11 +350,7 @@ object GhostTracker {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
         tracker.modify {
-            var count = 0L
-            it.items.forEach { (_, item) ->
-                count += item.timesGained.toInt()
-            }
-            it.totalMagicFindKills = count
+            it.totalMagicFindKills = it.items.values.sumOf { item -> item.timesGained }
         }
         storage.migratedTotalKills = true
     }
@@ -325,32 +362,6 @@ object GhostTracker {
             category = CommandCategory.USERS_RESET
             callback { tracker.resetCommand() }
         }
-    }
-
-    // TODO: In the future move to a utils class and use neu bestiary data
-    private fun getBestiaryKillsUntilLevel(level: Int): Int {
-        var killsUntilLevel = 0
-        for (i in 1..level) {
-            killsUntilLevel += getBestiaryKillsInLevel(i)
-        }
-        return killsUntilLevel
-    }
-
-    private fun getBestiaryKillsInLevel(level: Int): Int = when (level) {
-        1, 2, 3, 4, 5 -> 4
-        6 -> 20
-        7 -> 40
-        8, 9 -> 60
-        10 -> 100
-        11 -> 300
-        12 -> 600
-        13 -> 800
-        14, 15, 16, 17 -> 1_000
-        18 -> 1_200
-        19, 20 -> 1_400
-        21 -> 10_000
-        22, 23, 24, 25 -> 20_000
-        else -> 0
     }
 
     @SubscribeEvent
@@ -365,15 +376,18 @@ object GhostTracker {
             }
         }
 
-        event.move(67, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
-        event.move(67, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
-        event.move(67, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
-        event.move(67, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
-        event.move(67, "#profile.ghostCounter.totalMF", "#profile.ghostStorage.ghostTracker.totalMagicFind")
+        val oldPrefix = "#profile.ghostCounter"
+        val newPrefix = "#profile.ghostStorage.ghostTracker"
 
-        event.move(67, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW", ::migrateItem)
-        event.move(67, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA", ::migrateItem)
-        event.move(67, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA", ::migrateItem)
-        event.move(67, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS", ::migrateItem)
+        event.move(67, "$oldPrefix.data.KILLS", "$newPrefix.kills")
+        event.move(67, "$oldPrefix.data.GHOSTSINCESORROW", "$newPrefix.ghostsSinceSorrow")
+        event.move(67, "$oldPrefix.data.MAXKILLCOMBO", "$newPrefix.maxKillCombo")
+        event.move(67, "$oldPrefix.data.SKILLXPGAINED", "$newPrefix.combatXpGained")
+        event.move(67, "$oldPrefix.totalMF", "$newPrefix.totalMagicFind")
+
+        event.move(67, "$oldPrefix.data.SORROWCOUNT", "$newPrefix.items.SORROW", ::migrateItem)
+        event.move(67, "$oldPrefix.data.PLASMACOUNT", "$newPrefix.items.PLASMA", ::migrateItem)
+        event.move(67, "$oldPrefix.data.VOLTACOUNT", "$newPrefix.items.VOLTA", ::migrateItem)
+        event.move(67, "$oldPrefix.data.GHOSTLYBOOTS", "$newPrefix.items.GHOST_BOOTS", ::migrateItem)
     }
 }

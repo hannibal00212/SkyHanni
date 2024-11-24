@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -35,6 +36,11 @@ public class GhostProfitTrackerConfig {
         GhostTracker.GhostTrackerLines.AVERAGE_MAGIC_FIND,
         GhostTracker.GhostTrackerLines.BESTIARY_KILLS
     ));
+
+    @Expose
+    @ConfigOption(name = "Max Bestiary", desc = "§7This feature will currently not work properly when having max Ghost Bestiary.")
+    @ConfigEditorInfoText(infoTitle = "Warning")
+    public String useless;
 
     @Expose
     @ConfigLink(owner = GhostProfitTrackerConfig.class, field = "enabled")
