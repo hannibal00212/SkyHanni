@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDrops
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -161,23 +162,21 @@ object GhostTracker {
         add(tracker.addTotalProfit(profit, data.kills, "kill"))
     }
 
-    private fun getLine(line: GhostTrackerLines, data: Data): String {
-        return when (line) {
-            GhostTrackerLines.KILLS -> "§7Kills: §e${data.kills.addSeparators()}"
-            GhostTrackerLines.GHOSTS_SINCE_SORROW -> "§7Ghosts Since Sorrow: §e${data.ghostsSinceSorrow.addSeparators()}"
-            GhostTrackerLines.MAX_KILL_COMBO -> "§7Max Kill Combo: §e${data.maxKillCombo.addSeparators()}"
-            GhostTrackerLines.COMBAT_XP_GAINED -> "§7Combat XP Gained: §e${data.combatXpGained.addSeparators()}"
-            GhostTrackerLines.AVERAGE_MAGIC_FIND ->
-                "§7Average Magic Find: §e${
-                    getAverageMagicFind(
-                        data.totalMagicFind,
-                        data.totalMagicFindKills,
-                    )
-                }"
+    private fun getLine(line: GhostTrackerLines, data: Data): String = when (line) {
+        GhostTrackerLines.KILLS -> "§7Kills: §e${data.kills.addSeparators()}"
+        GhostTrackerLines.GHOSTS_SINCE_SORROW -> "§7Ghosts Since Sorrow: §e${data.ghostsSinceSorrow.addSeparators()}"
+        GhostTrackerLines.MAX_KILL_COMBO -> "§7Max Kill Combo: §e${data.maxKillCombo.addSeparators()}"
+        GhostTrackerLines.COMBAT_XP_GAINED -> "§7Combat XP Gained: §e${data.combatXpGained.addSeparators()}"
+        GhostTrackerLines.AVERAGE_MAGIC_FIND ->
+            "§7Average Magic Find: §e${
+                getAverageMagicFind(
+                    data.totalMagicFind,
+                    data.totalMagicFindKills,
+                )
+            }"
 
-            GhostTrackerLines.BESTIARY_KILLS ->
-                "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
-        }
+        GhostTrackerLines.BESTIARY_KILLS ->
+            "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
     }
 
     @SubscribeEvent
@@ -217,7 +216,7 @@ object GhostTracker {
             return
         }
         killComboEndPattern.matchMatcher(event.message) {
-            val kill = group("kill").formatInt().toLong()
+            val kill = group("kill").formatLong()
             tracker.modify {
                 it.maxKillCombo = kill.coerceAtLeast(it.maxKillCombo)
             }
@@ -233,28 +232,28 @@ object GhostTracker {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !isEnabled()) return
-        event.lines.forEach { line ->
-            bestiaryTablistPattern.matchMatcher(line) {
-                val kills = group("kills").formatInt().toLong()
-                if (kills <= currentBestiaryKills) return
-                val difference = kills - currentBestiaryKills
-
-                if (difference > 50) {
-                    currentBestiaryKills = kills
-                    return
-                }
-
-                currentBestiaryKills = kills
-
-                tracker.modify {
-                    it.kills += difference
-                    it.ghostsSinceSorrow += difference
-                }
-                return
-            }
+        for (line in event.lines) {
             if (maxBestiaryTablistPattern.matches(line)) {
                 currentBestiaryKills = MAX_BESTIARY_KILLS.toLong()
-                return
+                continue
+            }
+
+            val kills = bestiaryTablistPattern.matchMatcher(line) {
+                group("kills").formatInt().toLong()
+            } ?: continue
+            if (kills <= currentBestiaryKills) continue
+            val difference = kills - currentBestiaryKills
+
+            if (difference > 50) {
+                currentBestiaryKills = kills
+                continue
+            }
+
+            currentBestiaryKills = kills
+
+            tracker.modify {
+                it.kills += difference
+                it.ghostsSinceSorrow += difference
             }
         }
     }
@@ -268,7 +267,7 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghostDrops
+        allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
     }
 
     @HandleEvent
@@ -337,23 +336,21 @@ object GhostTracker {
         return killsUntilLevel
     }
 
-    private fun getBestiaryKillsInLevel(level: Int): Int {
-        return when (level) {
-            1, 2, 3, 4, 5 -> 4
-            6 -> 20
-            7 -> 40
-            8, 9 -> 60
-            10 -> 100
-            11 -> 300
-            12 -> 600
-            13 -> 800
-            14, 15, 16, 17 -> 1_000
-            18 -> 1_200
-            19, 20 -> 1_400
-            21 -> 10_000
-            22, 23, 24, 25 -> 20_000
-            else -> 0
-        }
+    private fun getBestiaryKillsInLevel(level: Int): Int = when (level) {
+        1, 2, 3, 4, 5 -> 4
+        6 -> 20
+        7 -> 40
+        8, 9 -> 60
+        10 -> 100
+        11 -> 300
+        12 -> 600
+        13 -> 800
+        14, 15, 16, 17 -> 1_000
+        18 -> 1_200
+        19, 20 -> 1_400
+        21 -> 10_000
+        22, 23, 24, 25 -> 20_000
+        else -> 0
     }
 
     @SubscribeEvent
@@ -361,11 +358,11 @@ object GhostTracker {
 
         fun migrateItem(oldData: JsonElement): JsonElement {
             val oldAmount = oldData.asInt
-            val newData = JsonObject()
-            newData.addProperty("timesGained", oldAmount)
-            newData.addProperty("totalAmount", oldAmount)
-            newData.addProperty("hidden", false)
-            return newData
+            return JsonObject().apply {
+                addProperty("timesGained", oldAmount)
+                addProperty("totalAmount", oldAmount)
+                addProperty("hidden", false)
+            }
         }
 
         event.move(67, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
