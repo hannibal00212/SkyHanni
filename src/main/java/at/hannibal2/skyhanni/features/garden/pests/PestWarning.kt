@@ -37,7 +37,7 @@ object PestWarning {
 
     val storage get() = GardenAPI.storage
 
-    var equipmentPestCooldown: Int
+    private var equipmentPestCooldown: Int
         get() = storage?.equipmentPestCooldown ?: 0
         set(value) {
             storage?.equipmentPestCooldown = value
