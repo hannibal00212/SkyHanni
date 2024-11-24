@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
-import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
+import at.hannibal2.skyhanni.config.features.garden.optimalsettings.OptimalSettingsConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
@@ -42,8 +42,8 @@ public class GardenConfig {
     public KeyBindConfig keyBind = new KeyBindConfig();
 
     @Expose
-    @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
-    public OptimalSpeedConfig optimalSpeeds = new OptimalSpeedConfig();
+    @Category(name = "Optimal Settings", desc = "Optimal Speed/Yaw/Pitch Settings")
+    public OptimalSettingsConfig optimalSettings = new OptimalSettingsConfig();
 
     @Expose
     @ConfigOption(name = "Farming Lane", desc = "")

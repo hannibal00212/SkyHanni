@@ -148,6 +148,16 @@ object HypixelCommands {
         else -> send("setmaxspeed $speed")
     }
 
+    //Changes the yaw of the Squeaky Mousemat
+    fun setYaw(yaw: Float) {
+        send("setyaw $yaw")
+    }
+
+    //Changes the pitch of the Squeaky Mousemat
+    fun setPitch(pitch: Float) {
+        send("setpitch $pitch")
+    }
+
     fun showRng(major: String? = null, minor: String? = null) = when {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
