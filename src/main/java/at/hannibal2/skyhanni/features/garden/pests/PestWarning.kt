@@ -116,15 +116,17 @@ object PestWarning {
 
     @SubscribeEvent
     fun warn(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (LorenzUtils.inSkyBlock && Cooldown != null && !warningShown && config.pestSpawnWarning) {
-            val timeSinceLastPest = lastPestSpawnTime.passedSince().inWholeSeconds
-            val cooldownValue = Cooldown ?: return
-            if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
-                SoundUtils.createSound("random.orb", 0.5f).playSound()
-                LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
-                ChatUtils.chat("§cPests cooldown has expired")
-                warningShown = true
-            }
+        if (!isEnabled()) return
+        if (Cooldown == null) return
+        if (warningShown) return
+
+        val timeSinceLastPest = lastPestSpawnTime.passedSince().inWholeSeconds
+        val cooldownValue = Cooldown ?: return
+        if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
+            SoundUtils.createSound("random.orb", 0.5f).playSound()
+            LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
+            ChatUtils.chat("§cPests cooldown has expired")
+            warningShown = true
         }
     }
 
