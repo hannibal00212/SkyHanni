@@ -37,10 +37,7 @@ object SprayFeatures {
     private fun SprayType?.getSprayEffect(): String =
         this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
             pests.joinToString("§7, §6") { it.displayName }
-        } ?: when (this) {
-            SprayType.FINE_FLOUR -> "§6+20☘ Farming Fortune"
-            else -> "§cUnknown Effect"
-        }
+        } ?: "§cUnknown Effect"
 
 
     @SubscribeEvent
