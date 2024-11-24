@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
@@ -85,23 +87,8 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
-    private val disallowListHoppityIslands by lazy {
-        listOf(
-            IslandType.PRIVATE_ISLAND,
-            IslandType.PRIVATE_ISLAND_GUEST,
-            IslandType.KUUDRA_ARENA,
-            IslandType.CATACOMBS,
-            IslandType.DARK_AUCTION,
-            IslandType.GARDEN,
-            IslandType.GARDEN_GUEST,
-            IslandType.THE_RIFT,
-            IslandType.WINTER,
-            IslandType.MINESHAFT,
-            IslandType.NONE,
-            IslandType.UNKNOWN
-        )
-    }
 
+    private var allowedHoppityIslands: Set<IslandType> = setOf()
     private var displayCardRenderables = listOf<Renderable>()
     private var lastKnownStatHash = 0
     private var lastKnownInInvState = false
@@ -160,9 +147,14 @@ object HoppityEventSummary {
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
 
     @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
+    }
+
+    @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         onHoppityIsland = LorenzUtils.inSkyBlock &&
-            disallowListHoppityIslands.none { it.isInIsland() }
+            allowedHoppityIslands.any { it.isInIsland() }
     }
 
     @HandleEvent
