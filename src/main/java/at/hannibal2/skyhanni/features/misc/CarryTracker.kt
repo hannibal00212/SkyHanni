@@ -206,10 +206,10 @@ object CarryTracker {
     }
 
     private fun getCustomer(customerName: String): Customer = customers.find {
-            it.name.equals(customerName, ignoreCase = true)
-        } ?: Customer(customerName).also {
-            customers.add(it)
-        }
+        it.name.equals(customerName, ignoreCase = true)
+    } ?: Customer(customerName).also {
+        customers.add(it)
+    }
 
     private fun createDisplay(
         carry: Carry,
