@@ -25,8 +25,8 @@ object TimeFeatures {
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
-    private val timeFormat24h = SimpleDateFormat("HH:mm${if (config.showSeconds)":ss" else ""}")
-    private val timeFormat12h = SimpleDateFormat("hh:mm${if (config.showSeconds)":ss" else ""} a")
+    private val timeFormat24h = SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds)":ss" else ""}")
+    private val timeFormat12h = SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds)":ss" else ""} a")
 
     private val startOfNextYear by RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
