@@ -58,7 +58,7 @@ object TabListReader {
      */
     private val cookiePattern by patternGroup.pattern(
         "cookie",
-        "Cookie Buff(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Cookie Buff(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
 
     /**
@@ -66,7 +66,7 @@ object TabListReader {
      */
     private val dungeonBuffPattern by patternGroup.pattern(
         "dungeonbuff",
-        "Dungeon Buffs(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Dungeon Buffs(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
@@ -74,7 +74,7 @@ object TabListReader {
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups(?:§.)*(?:\\n(§.)*§7.+)*"
+        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"

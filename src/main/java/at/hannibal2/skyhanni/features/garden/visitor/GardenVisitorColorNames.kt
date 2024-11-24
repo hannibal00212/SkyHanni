@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object GardenVisitorColorNames {
 
-    private var visitorColors = mutableMapOf<String, String>() // name -> color code
+    private val visitorColors = mutableMapOf<String, String>() // name -> color code
     var visitorItems = mutableMapOf<String, List<String>>()
 
     @SubscribeEvent

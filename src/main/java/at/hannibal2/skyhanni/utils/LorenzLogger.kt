@@ -21,7 +21,7 @@ class LorenzLogger(filePath: String) {
 
     companion object {
 
-        private var LOG_DIRECTORY = File("config/skyhanni/logs")
+        private val LOG_DIRECTORY = File("config/skyhanni/logs")
         private var PREFIX_PATH: String
         var hasDone = false
 

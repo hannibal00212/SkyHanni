@@ -66,7 +66,7 @@ object TheGreatSpook {
      */
     private val speakingFearMessagePattern by patternGroup.pattern(
         "chat.speaking",
-        "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
+        "§4\\[FEAR] Public Speaking Demon§r§f: (?:Speak|Say something interesting) (?<name>.*)!",
     )
 
     /**

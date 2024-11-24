@@ -24,7 +24,7 @@ object TabWidgetSettings {
      */
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "(Widgets in.*|Widgets on.*)",
+        "Widgets in.*|Widgets on.*",
     )
 
     /**
@@ -58,7 +58,7 @@ object TabWidgetSettings {
      */
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
-        ".*(disable!)",
+        ".*disable!",
     )
 
     /**
