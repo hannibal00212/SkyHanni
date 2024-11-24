@@ -191,10 +191,50 @@ public class ProfileSpecificStorage {
         public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
+        public Map<IslandType, Map<String, @Nullable Boolean>> residentRabbits = new HashMap<>();
+
+        public static class HotspotRabbitStorage {
+            @Expose
+            @Nullable
+            public Integer skyblockYear;
+
+            @Expose
+            public Map<IslandType, Map<String, @Nullable Boolean>> hotspotRabbits;
+
+            public HotspotRabbitStorage(@Nullable Integer year) {
+                this.skyblockYear = year;
+                this.hotspotRabbits = new HashMap<>();
+            }
+        }
+
+        @Expose
+        public HotspotRabbitStorage hotspotRabbitStorage = new HotspotRabbitStorage(null);
+
+        @Expose
         public Integer hoppityShopYearOpened = null;
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+
+        @Expose
+        public Map<HoppityEggType, SimpleTimeMark> mealLastFound = new HashMap<>();
+
+        public static class HitmanStatsStorage {
+            @Expose
+            @Nullable
+            public Integer availableEggs;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark slotCooldown = null;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark allSlotsCooldown = null;
+        }
+
+        @Expose
+        public HitmanStatsStorage hitmanStats = new HitmanStatsStorage();
     }
 
     @Expose
