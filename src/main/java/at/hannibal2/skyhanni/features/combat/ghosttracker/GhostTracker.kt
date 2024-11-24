@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -196,10 +197,10 @@ object GhostTracker {
                 replaceSameMessage = true,
             )
         }
-        if (!foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
+        if (TabWidget.BESTIARY.isActive && !foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "§Ghost bestiary not found in Bestiary Tab Widget! Ghost Tracker will not work properly without it.",
+                "§cGhost bestiary not found in Bestiary Tab Widget! Ghost Tracker will not work properly without it.",
                 onClick = HypixelCommands::widget,
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -334,7 +335,7 @@ object GhostTracker {
         ),
         AVERAGE_MAGIC_FIND(
             "§7Average Magic Find: §b278.9",
-            { "§7Average Magic Find: §e${getAverageMagicFind(totalMagicFind, totalMagicFindKills)}" },
+            { "§7Average Magic Find: §e${getAverageMagicFind(totalMagicFind, totalMagicFindKills).roundTo(1)}" },
         ),
         BESTIARY_KILLS(
             "§7Bestiary Kills: §e 71,893",
