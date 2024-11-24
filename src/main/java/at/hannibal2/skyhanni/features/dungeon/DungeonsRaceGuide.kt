@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -78,7 +78,7 @@ object DungeonsRaceGuide {
     private fun updateConfig() {
         parkourHelpers.values.forEach {
             it.rainbowColor = config.rainbowColor.get()
-            it.monochromeColor = config.monochromeColor.get().toChromaColor()
+            it.monochromeColor = config.monochromeColor.get().toSpecialColor()
             it.lookAhead = config.lookAhead.get() + 1
         }
     }

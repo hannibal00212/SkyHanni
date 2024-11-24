@@ -15,6 +15,7 @@ class RepoRuleSetProvider : RuleSetProvider {
             listOf(
                 SkullTexturesUseRepo(config),
                 RepoPatternRegexTest(config),
+                RepoPatternUnnamedGroup(config),
             ),
         )
     }

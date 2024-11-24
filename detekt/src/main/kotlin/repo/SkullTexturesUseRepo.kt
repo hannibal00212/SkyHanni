@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.detektrules.repo
 
+import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
 /**
  * This rule reports all instances of hard-coded skull textures in the codebase.
  */
-class SkullTexturesUseRepo(config: Config) : Rule(config) {
+class SkullTexturesUseRepo(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "SkullTexturesUseRepo",
         Severity.Style,
@@ -22,7 +22,7 @@ class SkullTexturesUseRepo(config: Config) : Rule(config) {
 
     private val scannedTextureStarts = listOf(
         "ewogICJ0aW1l",
-        "eyJ0ZXh0dXJl"
+        "eyJ0ZXh0dXJl",
     )
 
     override fun visitStringTemplateExpression(expression: KtStringTemplateExpression) {
@@ -31,13 +31,7 @@ class SkullTexturesUseRepo(config: Config) : Rule(config) {
 
         for (textureStarters in scannedTextureStarts) {
             if (text.startsWith(textureStarters)) {
-                report(
-                    CodeSmell(
-                        issue,
-                        Entity.from(expression),
-                        "Avoid hard-coding skull texture text in strings.",
-                    ),
-                )
+                expression.reportIssue("Avoid hard-coding skull texture text in strings.")
             }
         }
         super.visitStringTemplateExpression(expression)
