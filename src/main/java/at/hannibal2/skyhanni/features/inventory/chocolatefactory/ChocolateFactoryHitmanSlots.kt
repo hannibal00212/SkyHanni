@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.hitmanInventoryPa
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -51,6 +51,7 @@ object ChocolateFactoryHitmanSlots {
     private var cooldownSlotIndices = emptySet<Int>()
     private var slotPricesPaid: List<Long> = emptyList()
     private var slotPricesLeft: List<Long> = emptyList()
+    private var inInventory = false
 
     data class HitmanRabbit(
         val rabbitName: String,
@@ -74,13 +75,15 @@ object ChocolateFactoryHitmanSlots {
     fun onInventoryClose(event: InventoryCloseEvent) {
         // Free all slots when the inventory is closed
         hitmanRabbits.forEach { it.claimedBySlot = false }
+        inInventory = false
     }
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.hitmanSlotInfo) return
-        if (!hitmanInventoryPattern.matches(event.inventory.name)) return
+        if (!inInventory) return
         if (!cooldownSlotIndices.contains(event.slot)) return
+        if (!event.inventory.isTopInventory()) return
 
         val hitmanRabbit = hitmanRabbits.sortedBy { it.claimedAt }.firstOrNull { !it.claimedBySlot }
             ?: return
@@ -106,7 +109,8 @@ object ChocolateFactoryHitmanSlots {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!hitmanInventoryPattern.matches(event.inventoryName)) return
+        inInventory = hitmanInventoryPattern.matches(event.inventoryName)
+        if (!inInventory) return
         handleInventoryHitmanSlotRename(event)
         handleSlotStorageUpdate(event)
     }
@@ -114,7 +118,7 @@ object ChocolateFactoryHitmanSlots {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
-        if (!hitmanInventoryPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!inInventory) return
         config.hitmanCostsPosition.renderRenderable(
             getSlotPriceRenderable(),
             posLabel = "Hitman Slot Costs"
