@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -111,18 +111,7 @@ object PestWarning {
 
     private fun checkSpray(): Double {
         val plot = GardenPlotAPI.getCurrentPlot() ?: return 1.0
-        return if (plot.isSprayExpired) 1.0 else if (checkFinnegan()) 0.25 else 0.5
-    }
-
-    private fun checkFinnegan(): Boolean {
-        val currentMayor = ElectionAPI.currentMayor
-        val currentMinister = ElectionAPI.currentMinister
-        val isFinneganMayor = currentMayor?.mayorName == "Finnegan"
-        val isFinneganMinister = currentMinister?.mayorName == "Finnegan"
-        val hasPestEradicatorPerk = currentMayor?.activePerks?.any { it.perkName == "Pest Eradicator" } == true ||
-            currentMinister?.activePerks?.any { it.perkName == "Pest Eradicator" } == true
-
-        return (isFinneganMayor || isFinneganMinister) && hasPestEradicatorPerk
+        return if (plot.isSprayExpired) 1.0 else if (Perk.PEST_ERADICATOR.isActive) 0.25 else 0.5
     }
 
     @SubscribeEvent
