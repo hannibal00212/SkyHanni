@@ -30,7 +30,7 @@ object StereoHarmonyDisplay {
             ProfileStorageData.profileSpecific?.garden?.activeVinyl = type
         }
 
-    private fun VinylType.getPest() = PestType.entries.find { it.vinyl == this }
+    private fun VinylType.getPest() = PestType.filterableEntries.find { it.vinyl == this }
 
     private val vinylTypeGroup = RepoPattern.group("garden.vinyl")
 

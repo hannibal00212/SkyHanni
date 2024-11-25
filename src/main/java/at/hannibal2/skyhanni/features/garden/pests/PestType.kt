@@ -101,11 +101,23 @@ enum class PestType(
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
     ),
+    // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
+    // Display name intentionally omitted to aid in filtering out this entry.
+    UNKNOWN(
+        "",
+        BossType.DUMMY,
+        spray = null,
+        vinyl = null,
+        "DUMMY".toInternalName(),
+        crop = null,
+    ),
     ;
 
     companion object {
+        val filterableEntries by lazy { entries.filter { it.displayName.isNotEmpty() } }
+
         fun getByNameOrNull(name: String): PestType? {
-            return PestType.entries.firstOrNull { it.displayName.lowercase() == name }
+            return filterableEntries.firstOrNull { it.displayName.lowercase() == name }
         }
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")

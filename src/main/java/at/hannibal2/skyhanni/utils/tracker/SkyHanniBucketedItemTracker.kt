@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -34,6 +37,31 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
 
     fun addCoins(bucket: E, coins: Int) {
         addItem(bucket, SKYBLOCK_COIN, coins)
+    }
+
+    private fun getSelectedBucket(): E? {
+        var selectedBucket: E? = null
+        modify { data ->
+            selectedBucket = data.getSelectedBucket()
+        }
+        return selectedBucket
+    }
+
+    fun addItem(event: ItemAddEvent) {
+        getSelectedBucket()?.let { bucket ->
+            modify {
+                it.addItem(bucket, event.internalName, event.amount)
+            }
+            if (event.source == ItemAddManager.Source.COMMAND) {
+                TrackerManager.commandEditTrackerSuccess = true
+            }
+        } ?: run {
+            ChatUtils.userError(
+                "No bucket selected for §b$name§c." +
+                    " Select one in the §b$name §cGUI, then try again."
+            )
+            event.cancel()
+        }
     }
 
     fun addItem(bucket: E, internalName: NEUInternalName, amount: Int) {
