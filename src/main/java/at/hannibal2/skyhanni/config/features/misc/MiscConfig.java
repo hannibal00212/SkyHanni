@@ -125,15 +125,6 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
-    @ConfigOption(name = "Mouse Lock", desc = "")
-    @Accordion
-    public LockMouseConfig lockMouseConfig = new LockMouseConfig();
-
-    @Expose
-    @ConfigLink(owner = MiscConfig.class, field = "lockMouseConfig")
-    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
-
-    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());

@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
+import at.hannibal2.skyhanni.features.garden.LockMouseLook
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
@@ -63,7 +64,6 @@ import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
@@ -203,11 +203,6 @@ object Commands {
             description = "Translate a message in another language your language."
             category = CommandCategory.USERS_ACTIVE
             callback { Translator.toNativeLanguage(it) }
-        }
-        event.register("shmouselock") {
-            description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
-            category = CommandCategory.USERS_ACTIVE
-            callback { LockMouseLook.mouseLockCommand() }
         }
         event.register("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"

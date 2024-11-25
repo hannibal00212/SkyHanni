@@ -1,13 +1,14 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,7 +28,7 @@ object LockMouseLook {
         "§aTeleported you to .*",
     )
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.garden.lockMouseConfig
     private val storage get() = SkyHanniMod.feature.storage
     var lockedMouse = false
     private var commandUsed = false
@@ -35,8 +36,18 @@ object LockMouseLook {
 
     private val mc get() = Minecraft.getMinecraft()
 
+    @HandleEvent
+    fun onCommandRegister(event: CommandRegistrationEvent) {
+        event.register("shmouselock") {
+            description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+            category = CommandCategory.USERS_ACTIVE
+            callback { mouseLockCommand() }
+        }
+    }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        commandUsed = true
         if (lockedMouse) toggleLock()
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (gameSettings.mouseSensitivity == lockedPosition) {
@@ -48,14 +59,16 @@ object LockMouseLook {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!gardenTeleportPattern.matches(event.message)) return
+        commandUsed = true
         if (lockedMouse) toggleLock()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.lockMouseConfig.lockWithTool) return
-        if (config.lockMouseConfig.onlyGarden && !GardenAPI.inGarden()) return
-        if (config.lockMouseConfig.onlyPlot && GardenAPI.onBarnPlot) return
+        if (!config.lockWithTool) return
+        if (config.onlyGarden && !GardenAPI.inGarden()) return
+        if (config.onlyPlot && GardenAPI.onBarnPlot) return
+        if (config.onlyGround && !mc.thePlayer.onGround) return
         if (commandUsed && lockedMouse) return
 
         if (isHoldingTool() != lockedMouse) {
@@ -73,20 +86,21 @@ object LockMouseLook {
         lockedMouse = !lockedMouse
 
         val gameSettings = Minecraft.getMinecraft().gameSettings
-        var mouseSensitivity = gameSettings.mouseSensitivity
-        if (SensitivityReducer.isEnabled()) mouseSensitivity = SensitivityReducer.doTheMath(mouseSensitivity, true)
 
         if (lockedMouse) {
+            var mouseSensitivity = gameSettings.mouseSensitivity
+            if (SensitivityReducer.isEnabled()) mouseSensitivity = SensitivityReducer.doTheMath(mouseSensitivity, true)
+
             storage.savedMouselockedSensitivity = mouseSensitivity
             gameSettings.mouseSensitivity = lockedPosition
-            if (config.lockMouseConfig.lockMouseLookChatMessage) {
+            if (config.lockMouseLookChatMessage) {
                 if (!commandUsed) return
                 ChatUtils.chat("§bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
             }
         } else {
             if (!SensitivityReducer.isEnabled()) gameSettings.mouseSensitivity = storage.savedMouselockedSensitivity
             else gameSettings.mouseSensitivity = SensitivityReducer.doTheMath(storage.savedMouselockedSensitivity)
-            if (config.lockMouseConfig.lockMouseLookChatMessage) {
+            if (config.lockMouseLookChatMessage) {
                 if (!commandUsed) return
                 ChatUtils.chat("§bMouse rotation is now unlocked.")
             }

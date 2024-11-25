@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.config.features.misc;
+package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class LockMouseConfig {
@@ -30,11 +31,19 @@ public class LockMouseConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only on Ground",
+        desc = "Only Automatically lock mouse when on the ground.")
+    @ConfigEditorBoolean
+    public boolean onlyGround = true;
+
+    @Expose
+    @ConfigOption(
         name = "Disable in Barn",
         desc = "Disable automatic mouse lock in barn plot.")
     @ConfigEditorBoolean
     public Boolean onlyPlot = true;
 
-
-
+    @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "lockMouseConfig")
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 }

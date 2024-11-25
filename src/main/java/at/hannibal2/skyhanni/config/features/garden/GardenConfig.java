@@ -116,6 +116,11 @@ public class GardenConfig {
     public SensitivityReducerConfig sensitivityReducerConfig = new SensitivityReducerConfig();
 
     @Expose
+    @ConfigOption(name = "Mouse Lock", desc = "")
+    @Accordion
+    public LockMouseConfig lockMouseConfig = new LockMouseConfig();
+
+    @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
     @Accordion
     public CropStartLocationConfig cropStartLocation = new CropStartLocationConfig();
