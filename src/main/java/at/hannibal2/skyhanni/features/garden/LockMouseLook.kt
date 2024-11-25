@@ -71,7 +71,7 @@ object LockMouseLook {
         if (config.onlyGround && !mc.thePlayer.onGround) return
         if (commandUsed && lockedMouse) return
 
-        if (isHoldingTool() != lockedMouse) {
+        if (GardenAPI.isHoldingTool() != lockedMouse) {
             commandUsed = false
             toggleLock()
         }
@@ -117,10 +117,6 @@ object LockMouseLook {
         if (lockedMouse) {
             toggleLock()
         }
-    }
-
-    private fun isHoldingTool(): Boolean {
-        return GardenAPI.toolInHand != null
     }
 
     @SubscribeEvent
