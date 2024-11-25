@@ -40,5 +40,5 @@ data class NeuDropsJson(
     // {internal_name}:{amount}
     // ENCHANTED_HUGE_MUSHROOM_2:3
     //
-    fun toInternalName() = id.split(":").first().toInternalName()
+    fun idAsInternalName() = id.split(":").first().toInternalName()
 }

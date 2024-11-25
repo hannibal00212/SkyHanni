@@ -143,17 +143,15 @@ enum class PestType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
 
-        fun getItemMapSize() = itemTypesMap.size
-
         fun getByInternalNameItemOrNull(
             internalName: NEUInternalName,
             lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark>? = null,
             ignoreMouse: Boolean = true
         ): PestType? {
             val matchingPests = filterableEntries.filter {
-                itemTypesMap[it]?.recipes?.any { rec ->
-                    rec.drops.any { drop ->
-                        drop.toInternalName() == internalName
+                itemTypesMap[it]?.recipes?.any { recipe ->
+                    recipe.drops.any { drop ->
+                        drop.idAsInternalName().asString() == internalName.asString()
                     }
                 } ?: false
             }

@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.pests.PestType.Companion.getItemMapSize
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -233,20 +232,12 @@ object PestProfitTracker {
                 } else {
                     ChatUtils.chat("§ePestType for $internalName: §6${pest.displayName}")
                 }
-                ChatUtils.chat("§eNull PestType count: §6$nullPestTypeCount")
-                ChatUtils.chat("§eItemTypesMap length at runtime: §6${itemTypesMapLengthAtRuntime ?: "null"}")
-                ChatUtils.chat("§eReported string: §6$reportedString")
             }
         }
     }
 
-    private var nullPestTypeCount = 0
-    private var itemTypesMapLengthAtRuntime: Int? = null
-    private var reportedString = ""
-
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.
@@ -261,15 +252,12 @@ object PestProfitTracker {
 
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
-                println("Item: $item (Original: $neuInternalName)")
 
                 val pestPossible = PestType.getByInternalNameItemOrNull(item)
-                println("Detected PestType: $pestPossible for item: $item")
 
                 val pest = pestTypeMap.getOrPut(item) {
                     pestPossible ?: PestType.UNKNOWN
                 }
-                println("Final PestType: $pest")
 
                 // If the map for the pest already contains this item, combine the amounts
                 val storage = newItems.getOrPut(pest) { mutableMapOf() }
