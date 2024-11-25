@@ -75,7 +75,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -95,7 +95,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -115,7 +115,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -135,7 +135,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -155,7 +155,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f-58.5°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(-58.5f);
     }
 
@@ -175,7 +175,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f-58.5°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(-58.5f);
     }
 
@@ -195,7 +195,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f45.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(45f);
     }
 
@@ -215,7 +215,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -233,7 +233,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 
@@ -253,7 +253,7 @@ public class CustomOptimalSettingsConfig {
 
         @Expose
         @ConfigOption(name = "Pitch", desc = "Suggested farm pitch: §f0.0°")
-        @ConfigEditorSlider(minValue = -180, maxValue = 180, minStep = 1)
+        @ConfigEditorSlider(minValue = -90, maxValue = 90, minStep = 1)
         public Property<Float> pitch = Property.of(0f);
     }
 }

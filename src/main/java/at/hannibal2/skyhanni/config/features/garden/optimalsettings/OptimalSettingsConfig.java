@@ -5,8 +5,13 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class OptimalSettingsConfig {
 
@@ -37,6 +42,32 @@ public class OptimalSettingsConfig {
     @ConfigOption(name = "Wrong Settings Warning", desc = "Warn via title and chat message when you don't have the optimal speed/pitch/yaw.")
     @ConfigEditorBoolean
     public boolean warning = false;
+
+    @Expose
+    @ConfigOption(name = "Warning Type", desc = "When do you want to be warned about wrong settings?")
+    @ConfigEditorDraggableList
+    public List<WarningType> warningTypes = new ArrayList<>(Arrays.asList(
+        WarningType.WHEN_USING,
+        WarningType.WHEN_FARMING
+    ));
+
+    public enum WarningType {
+        WHEN_USING("§eWhen using §5Rancher's Boots§e/§6Squeaky Mousemat"),
+        WHEN_FARMING("§eWhen farming using wrong settings"),
+        WHEN_WALKING("§eWhen walking around in plots"),
+        ;
+
+        private final String name;
+
+        WarningType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Expose
     @ConfigLink(owner = OptimalSettingsConfig.class, field = "shortcutGUI")
