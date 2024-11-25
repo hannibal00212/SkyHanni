@@ -81,7 +81,9 @@ object BingoCardTips {
         for (line in bingoTip.guide) {
             toolTip.add(index++, " $line")
         }
-        toolTip.add(index++, "§7Found by: §e${bingoTip.found}")
+        bingoTip.found?.let {
+            toolTip.add(index++, "§7Found by: §e$it")
+        }
     }
 
     @SubscribeEvent

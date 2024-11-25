@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -32,6 +31,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -55,7 +55,7 @@ object CustomWardrobe {
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
-    private var guiName = "Custom Wardrobe"
+    private const val GUI_NAME = "Custom Wardrobe"
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
@@ -86,13 +86,13 @@ object CustomWardrobe {
             )
             val loadingPos =
                 Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height).setIgnoreCustomScale(true)
-            loadingPos.renderRenderable(loadingRenderable, posLabel = guiName, addToGuiManager = false)
+            loadingPos.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
 
-        pos.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
+        pos.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             GlStateManager.translate(0f, 0f, 400f)
@@ -112,7 +112,7 @@ object CustomWardrobe {
         val accessorGui = gui as AccessorGuiContainer
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
+        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @SubscribeEvent
@@ -240,7 +240,7 @@ object CustomWardrobe {
         try {
             // Get tooltip from minecraft and other mods
             // TODO add support for advanced tooltip (F3+H)
-            val toolTips = stack.getTooltip(Minecraft.getMinecraft().thePlayer, false)
+            val toolTips = stack.getTooltipCompat(false)
 
             // Modify tooltip via SkyHanni Events
             val mcSlotId = slot.inventorySlots[armorIndex]
@@ -255,7 +255,7 @@ object CustomWardrobe {
                 "Failed to get tooltip for armor piece in CustomWardrobe",
                 "Armor" to stack,
                 "Slot" to slot,
-                "Lore" to stack.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+                "Lore" to stack.getTooltipCompat(false),
             )
             return null
         }
@@ -275,7 +275,7 @@ object CustomWardrobe {
 
         val playerColor = if (!slot.isInCurrentPage()) {
             scale *= 0.9
-            Color.GRAY.withAlpha(100)
+            Color.GRAY.addAlpha(100)
         } else null
 
         return Renderable.fakePlayer(

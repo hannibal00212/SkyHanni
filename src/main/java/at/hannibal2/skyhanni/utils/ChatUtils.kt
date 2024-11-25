@@ -194,7 +194,7 @@ object ChatUtils {
                 if (command != null) {
                     this.command = command
                 }
-            }
+            },
         )
     }
 
@@ -222,7 +222,7 @@ object ChatUtils {
             Text.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
-            }
+            },
         )
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -268,16 +268,9 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
-    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
-    fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            debug("Sending wrong command to server? ($command)")
-        }
-        sendMessageToServer("/$command")
-    }
-
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
+        it.isNotEmpty()
+    }?.get(0) == commandWithSlash
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
@@ -291,7 +284,7 @@ object ChatUtils {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
-            "§eClick to find setting in the config!"
+            "§eClick to find setting in the config!",
         )
     }
 
@@ -302,8 +295,13 @@ object ChatUtils {
         return this
     }
 
-
-    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+    fun clickToActionOrDisable(
+        message: String,
+        option: KMutableProperty0<*>,
+        actionName: String,
+        action: () -> Unit,
+        oneTimeClick: Boolean = false,
+    ) {
         clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
@@ -313,8 +311,8 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n" +
-                "§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
     }

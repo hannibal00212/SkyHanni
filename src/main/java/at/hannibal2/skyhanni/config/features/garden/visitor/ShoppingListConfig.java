@@ -60,4 +60,10 @@ public class ShoppingListConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean itemPreview = true;
+
+    @Expose
+    @ConfigOption(name = "Ignore Spaceman", desc = "Exclude crops requested by Spaceman from the shopping list.")
+    @ConfigEditorBoolean
+    public boolean ignoreSpaceman = false;
+
 }
