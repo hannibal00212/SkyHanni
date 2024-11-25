@@ -71,6 +71,19 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
+    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        getSharedTracker()?.let {
+            it.tryModify(mode, modifyFunction)
+            update()
+        }
+    }
+
+    fun modifyEachMode(modifyFunction: (Data) -> Unit) {
+        DisplayMode.entries.forEach {
+            tryModify(it, modifyFunction)
+        }
+    }
+
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
@@ -180,6 +193,10 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
             get(mode).let(modifyFunction)
+        }
+
+        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+            entries[mode]?.let(modifyFunction)
         }
 
         fun modify(modifyFunction: (Data) -> Unit) {

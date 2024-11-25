@@ -75,7 +75,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         getBucket(it)
     } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
-    fun selectNextSequentialBucket() {
+    fun selectNextSequentialBucket(): E? {
         // Move to the next ordinal, or wrap to null if at the last value
         val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
         selectedBucket = when {
@@ -84,6 +84,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
             else -> selectedBucket // Fallback, shouldn't happen
         }
+        return selectedBucket
+    }
+    fun selectBucket(bucket: E?) {
+        selectedBucket = bucket
     }
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {

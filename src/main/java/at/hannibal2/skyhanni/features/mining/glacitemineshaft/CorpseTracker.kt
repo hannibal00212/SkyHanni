@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -68,6 +70,12 @@ object CorpseTracker {
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
+
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        tracker.addItem(event)
+    }
 
     @SubscribeEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
