@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -12,13 +13,16 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -26,9 +30,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -47,8 +54,7 @@ object PestProfitTracker {
         "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
     )
 
-    private var lastPestKillType = PestType.UNKNOWN
-    private var lastPestKillTime = SimpleTimeMark.farPast()
+    private var lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
         { BucketData() },
@@ -58,12 +64,12 @@ object PestProfitTracker {
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
-            totalPestsKills_DEP = 0L
+            totalPestsKillsDEPREC = 0L
             pestKills.clear()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / totalPestsKills_DEP
+            val percentage = timesGained.toDouble() / getTotalPestCount()
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -81,8 +87,12 @@ object PestProfitTracker {
             )
         }
 
+        fun getTotalPestCount(): Long =
+            if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L
+            else (pestKills.values.sum() + totalPestsKillsDEPREC)
+
         @Expose
-        var totalPestsKills_DEP = 0L
+        var totalPestsKillsDEPREC = 0L
 
         @Expose
         var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
@@ -97,6 +107,7 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+        var pestThisRun = PestType.UNKNOWN
         PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -107,42 +118,51 @@ object PestProfitTracker {
                 "amount" to amount,
                 "full_message" to event.message,
             )
+            pestThisRun = pest
 
-            tryAddItem(pest, internalName, amount, command = false)
+            tryAddItem(pest, internalName, amount)
             addKill(pest)
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-
-            tryAddItem(internalName, 1, command = false)
+            tryAddItem(pestThisRun, internalName, 1)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
 
-    private fun tryAddItem(type: PestType, internalName: NEUInternalName, amount: Int, command: Boolean) {
-        tracker.addItem(type, internalName, amount, command)
+    private fun tryAddItem(type: PestType, internalName: NEUInternalName, amount: Int) {
+        tracker.addItem(type, internalName, amount)
     }
 
     private fun addKill(type: PestType) {
         tracker.modify {
-            it.totalPestsKills_DEP++
+            it.pestKills.addOrPut(type, 1)
         }
-        lastPestKillTime = SimpleTimeMark.now()
+        lastPestKillTimes[type] = SimpleTimeMark.now()
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lPest Profit Tracker")
         val profit = tracker.drawItems(bucketData, { true }, this)
 
-        val pestsKilled = bucketData.totalPestsKills_DEP
+        val totalPestCount = bucketData.getTotalPestCount()
         add(
             Renderable.hoverTips(
-                "§7Pests killed: §e${pestsKilled.addSeparators()}",
-                listOf("§7You killed pests §e${pestsKilled.addSeparators()} §7times."),
+                "§7Pests killed: §e${totalPestCount.addSeparators()}",
+                buildList {
+                    val data = bucketData.pestKills
+                    data[PestType.UNKNOWN]?.let {
+                        "§8Unknown: §e${it.addSeparators()}"
+                    }
+                    // Sort by A-Z in displaying real types
+                    data.toList().sortedBy { it.first.displayName }.forEach { (type, count) ->
+                        "§7${type.displayName}: §e${count.addSeparators()}"
+                    }
+                }
             ).toSearchable(),
         )
-        add(tracker.addTotalProfit(profit, bucketData.totalPestsKills_DEP, "kill"))
+        add(tracker.addTotalProfit(profit, bucketData.getTotalPestCount(), "kill"))
 
         tracker.addPriceFromButton(this)
     }
@@ -151,20 +171,26 @@ object PestProfitTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.isCurrentlyFarming()) return
-        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestAPI.hasVacuumInHand()) return
+        if (lastPestKillTimes.all { it.value.passedSince() > config.timeDisplayed.seconds } && !PestAPI.hasVacuumInHand()) return
 
         tracker.renderDisplay(config.position)
     }
 
     @SubscribeEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         val coins = event.coins
         if (coins > 1000) return
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
-            // HERE
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
-        }
+
+        // Get a list of all that have been killed in the last 2 seconds, it will
+        // want to be the most recent one that was killed.
+        val lastPestKillType = lastPestKillTimes.entries().sortedBy { (_, time) ->
+            time
+        }.firstOrNull { (_, time) ->
+            time.passedSince() < 2.seconds
+        }?.key ?: return
+
+        tracker.addCoins(lastPestKillType, event.coins.roundToInt())
     }
 
     @SubscribeEvent
@@ -179,4 +205,51 @@ object PestProfitTracker {
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(68, "garden.pestProfitTracker.totalPestsKills", "garden.pestProfitTracker.totalPestsKillsDEPREC")
+
+        // Move any items that are in pestProfitTracker.items as the object as a map themselves,
+        // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
+        // respective PestType when possible, and the rest will be moved to UNKNOWN.
+        event.move(
+            68,
+            "garden.pestProfitTracker.items",
+            "garden.pestProfitTracker.bucketedItems",
+        ) { items ->
+            // Data is stored as a map of String to TrackedItem - we need to return a converted map
+            // Create the bucketedItems JSON map of PestTypeString to List of TrackedItem
+            val newMap = JsonObject()
+
+            for ((key, value) in items.asJsonObject.entrySet()) {
+                val itemName = key.toInternalName()
+                val pestType = PestType.getByInternalNameItemOrNull(itemName, lastPestKillTimes)
+                val pestTypeString = pestType?.name ?: "UNKNOWN"
+                val pestTypeJson = newMap.get(pestTypeString)?.asJsonObject ?: JsonObject()
+
+                // Check if the item already exists in pestTypeJson
+                val existingObject = pestTypeJson.get(itemName.asString())?.asJsonObject
+                if (existingObject == null) {
+                    // Add a new item
+                    pestTypeJson.add(itemName.asString(), value)
+                } else {
+                    // Update existing item's fields
+                    val existingAmount = existingObject.get("totalAmount").asInt
+                    val newAmount = value.asJsonObject.get("totalAmount").asInt
+                    existingObject.add("totalAmount", JsonPrimitive(existingAmount + newAmount))
+
+                    val existingTimesGained = existingObject.get("timesGained").asLong
+                    val newTimesGained = value.asJsonObject.get("timesGained").asLong
+                    existingObject.add("timesGained", JsonPrimitive(existingTimesGained + newTimesGained))
+                }
+
+                // Update the map with the modified pestTypeJson
+                newMap.add(pestTypeString, pestTypeJson)
+            }
+
+            newMap
+        }
+    }
+
 }

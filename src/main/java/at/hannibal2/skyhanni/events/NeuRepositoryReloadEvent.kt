@@ -16,6 +16,7 @@ import java.lang.reflect.Type
 
 class NeuRepositoryReloadEvent : LorenzEvent() {
     fun getConstant(file: String): JsonObject? = File(manager.repoLocation, "constants/$file.json").getJson()
+    fun getItems(file: String): JsonObject? = File(manager.repoLocation, "items/$file.json").getJson()
 
     inline fun <reified T : Any> readConstant(file: String, gson: Gson = ConfigManager.gson): T {
         val data = getConstant(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
@@ -35,5 +36,25 @@ class NeuRepositoryReloadEvent : LorenzEvent() {
         RepoUtils.getConstant(manager.repoLocation, constant, gson, T::class.java, type)
     } catch (e: Exception) {
         throw RepoError("Repo parsing error while trying to read constant '$constant'", e)
+    }
+
+    inline fun <reified T : Any> readItem(file: String, gson: Gson = ConfigManager.gson): T {
+        val data = getItems(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
+        return try {
+            gson.fromJson<T>(data)
+        } catch (e: JsonSyntaxException) {
+            ErrorManager.logErrorWithData(
+                e, "$file failed to read from neu repo!",
+                "data" to data,
+            )
+            throw e
+        }
+    }
+
+    inline fun <reified T : Any> getItem(item: String, type: Type? = null, gson: Gson = ConfigManager.gson): T = try {
+        if (!manager.repoLocation.exists()) throw RepoError("NEU-Repo folder does not exist!")
+        RepoUtils.getItem(manager.repoLocation, item, gson, T::class.java, type)
+    } catch (e: Exception) {
+        throw RepoError("Repo parsing error while trying to read item '$item'", e)
     }
 }

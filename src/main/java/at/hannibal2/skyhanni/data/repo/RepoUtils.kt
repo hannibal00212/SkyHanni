@@ -93,6 +93,15 @@ object RepoUtils {
 
     fun <T> getConstant(repoLocation: File, constant: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
         val name = "constants/$constant.json"
+        return getRepoLocation(repoLocation, name, gson, clazz, type)
+    }
+
+    fun <T> getItem(repoLocation: File, item: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
+        val name = "items/$item.json"
+        return getRepoLocation(repoLocation, name, gson, clazz, type)
+    }
+
+    private fun <T> getRepoLocation(repoLocation: File, name: String, gson: Gson, clazz: Class<T>?, type: Type? = null): T {
         val jsonFile = File(repoLocation, name)
         if (!jsonFile.isFile) {
             throw RepoError("Repo file '$name' not found.")
