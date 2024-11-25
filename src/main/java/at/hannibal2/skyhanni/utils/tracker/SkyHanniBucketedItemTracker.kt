@@ -52,13 +52,13 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             modify {
                 it.addItem(bucket, event.internalName, event.amount)
             }
-            if(event.source == ItemAddManager.Source.COMMAND) {
+            if (event.source == ItemAddManager.Source.COMMAND) {
                 TrackerManager.commandEditTrackerSuccess = true
             }
         } ?: run {
             ChatUtils.userError(
                 "No bucket selected for §b$name§c." +
-                    " Select one in the §b${name} §cGUI, then try again."
+                    " Select one in the §b$name §cGUI, then try again."
             )
             event.cancel()
         }
