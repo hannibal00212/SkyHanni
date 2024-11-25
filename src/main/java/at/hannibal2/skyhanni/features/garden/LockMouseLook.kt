@@ -29,7 +29,7 @@ object LockMouseLook {
         "§aTeleported you to .*",
     )
 
-    private val mousematUsedMessage = "§r§aSnapped to squeaky mousemat!§r"
+    const val mousematUsedMessage = "§r§aSnapped to squeaky mousemat!§r"
 
     private val config get() = SkyHanniMod.feature.garden.lockMouseConfig
     private val storage get() = SkyHanniMod.feature.storage
@@ -82,7 +82,7 @@ object LockMouseLook {
         if (
             (GardenAPI.isHoldingTool() != lockedMouse && !config.lockWithTool) ||
             (holdingRod != lockedMouse && !config.lockWithRod)
-            ) {
+        ) {
             commandUsed = false
             toggleLock()
         }
