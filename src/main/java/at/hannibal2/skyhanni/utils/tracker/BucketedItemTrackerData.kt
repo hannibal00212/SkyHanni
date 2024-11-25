@@ -79,11 +79,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket() {
         // Move to the next ordinal, or wrap to null if at the last value
-        selectedBucket = selectedBucket?.let { sb ->
-            val higherOrdinals = buckets.filter { it.ordinal > sb.ordinal }
-            if (higherOrdinals.isEmpty()) null
-            else higherOrdinals.filter { it.isBucketFilterable() }.minByOrNull { it.ordinal }
-        } ?: buckets.first()
+        selectedBucket = if (selectedBucket == null) buckets.first { it.isBucketFilterable() }
+        else selectedBucket?.let { sb ->
+            buckets.filter { it.ordinal > sb.ordinal && it.isBucketFilterable() }.minByOrNull { it.ordinal }
+        }
     }
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {

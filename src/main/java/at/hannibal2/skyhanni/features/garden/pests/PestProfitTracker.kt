@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestType.Companion.getItemMapSize
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,9 +35,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
+import com.google.gson.reflect.TypeToken
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 import kotlin.math.roundToInt
@@ -67,7 +68,7 @@ object PestProfitTracker {
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
-            totalPestsKillsDEPREC = 0L
+            totalPestKills = 0L
             pestKills.clear()
         }
 
@@ -94,10 +95,11 @@ object PestProfitTracker {
 
         fun getTotalPestCount(): Long =
             if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L
-            else (pestKills.values.sum() + totalPestsKillsDEPREC)
+            else (pestKills.values.sum() + totalPestKills)
 
         @Expose
-        var totalPestsKillsDEPREC = 0L
+        @Deprecated("Use pestKills instead")
+        var totalPestKills = 0L
 
         @Expose
         var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
@@ -213,65 +215,71 @@ object PestProfitTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    private var itemsLength = 0
-    private var bucketedItemsLength = 0
+    private val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shpptdebug") {
-            ChatUtils.chat("Items: $itemsLength\nBucketed Items: $bucketedItemsLength")
+        event.register("getpestbyid") {
+            description = "Get the PestType for a given NEUInternalName."
+            callback {
+                if(it.size != 1) {
+                    ChatUtils.chat("§cUsage: /getpestbyid <NEUInternalName>")
+                    return@callback
+                }
+                val internalName = it.firstOrNull()?.toInternalName() ?: return@callback
+                val pest = PestType.getByInternalNameItemOrNull(internalName)
+                if (pest == null) {
+                    ChatUtils.chat("§cNo PestType found for $internalName.")
+                } else {
+                    ChatUtils.chat("§ePestType for $internalName: §6${pest.displayName}")
+                }
+                ChatUtils.chat("§eNull PestType count: §6$nullPestTypeCount")
+                ChatUtils.chat("§eItemTypesMap length at runtime: §6${itemTypesMapLengthAtRuntime ?: "null"}")
+                ChatUtils.chat("§eReported string: §6$reportedString")
+            }
         }
     }
 
+    private var nullPestTypeCount = 0
+    private var itemTypesMapLengthAtRuntime: Int? = null
+    private var reportedString = ""
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(68, "garden.pestProfitTracker.totalPestsKills", "garden.pestProfitTracker.totalPestsKillsDEPREC")
 
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.
         event.move(
             68,
-            "garden.pestProfitTracker.items",
-            "garden.pestProfitTracker.bucketedItems",
+            "#profile.garden.pestProfitTracker.items",
+            "#profile.garden.pestProfitTracker.bucketedItems",
         ) { items ->
-            // Data is stored as a map of String to TrackedItem - we need to return a converted map
-            // Create the bucketedItems JSON map of PestTypeString to List of TrackedItem
-            val newMap = JsonObject()
+            val newItems: MutableMap<PestType, MutableMap<String, TrackedItem>> = mutableMapOf()
+            val type = object : TypeToken<MutableMap<String, TrackedItem>>() {}.type
+            val oldItems: MutableMap<String, TrackedItem> = ConfigManager.gson.fromJson(items, type)
 
-            for ((key, value) in items.asJsonObject.entrySet()) {
-                itemsLength++
+            oldItems.forEach { (neuInternalName, trackedItem) ->
+                val item = neuInternalName.toInternalName()
+                println("Item: $item (Original: $neuInternalName)")
 
-                val itemName = key.toString().toInternalName()
-                val pestType = PestType.getByInternalNameItemOrNull(itemName, lastPestKillTimes)
-                val pestTypeString = pestType?.name ?: "UNKNOWN"
-                var pestTypeJson = newMap.get(pestTypeString)?.asJsonObject
+                val pestPossible = PestType.getByInternalNameItemOrNull(item)
+                println("Detected PestType: $pestPossible for item: $item")
 
-                if (pestTypeJson == null) {
-                    pestTypeJson = JsonObject()
+                val pest = pestTypeMap.getOrPut(item) {
+                    pestPossible ?: PestType.UNKNOWN
                 }
+                println("Final PestType: $pest")
 
-                // Check if the item already exists in pestTypeJson
-                val existingObject = pestTypeJson.get(itemName.asString())?.asJsonObject
-                if (existingObject == null) {
-                    // Add a new item
-                    pestTypeJson.add(itemName.asString(), value)
-                } else {
-                    // Update existing item's fields
-                    val existingAmount = existingObject.get("totalAmount")?.asInt ?: 0
-                    val newAmount = value.asJsonObject.get("totalAmount")?.asInt ?: 0
-                    existingObject.add("totalAmount", JsonPrimitive(existingAmount + newAmount))
-
-                    val existingTimesGained = existingObject.get("timesGained").asLong
-                    val newTimesGained = value.asJsonObject.get("timesGained").asLong
-                    existingObject.add("timesGained", JsonPrimitive(existingTimesGained + newTimesGained))
-                }
+                // If the map for the pest already contains this item, combine the amounts
+                val storage = newItems.getOrPut(pest) { mutableMapOf() }
+                val newItem = storage[neuInternalName] ?: TrackedItem()
+                newItem.totalAmount += trackedItem.totalAmount
+                newItem.timesGained += trackedItem.timesGained
+                storage[neuInternalName] = newItem
             }
 
-            bucketedItemsLength = newMap.entrySet().size
-
-            newMap
+            ConfigManager.gson.toJsonTree(newItems)
         }
     }
-
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemMobJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -119,6 +120,11 @@ enum class PestType(
     ),
     ;
 
+    override fun toString(): String {
+        return displayName
+    }
+
+    @SkyHanniModule
     companion object {
         val filterableEntries by lazy { entries.filter { it.displayName.isNotEmpty() } }
 
@@ -132,14 +138,17 @@ enum class PestType(
         private var itemTypesMap: Map<PestType, NeuItemMobJson> = mapOf()
 
         fun getByNameOrNull(name: String): PestType? {
-            return filterableEntries.firstOrNull { it.displayName.lowercase() == name }
+            return filterableEntries.firstOrNull { it.displayName.lowercase() == name.lowercase() }
         }
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
 
+        fun getItemMapSize() = itemTypesMap.size
+
         fun getByInternalNameItemOrNull(
             internalName: NEUInternalName,
-            lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark>
+            lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark>? = null,
+            ignoreMouse: Boolean = true
         ): PestType? {
             val matchingPests = filterableEntries.filter {
                 itemTypesMap[it]?.recipes?.any { rec ->
@@ -150,14 +159,18 @@ enum class PestType(
             }
             // If none or one was found, return it
             if (matchingPests.size <= 1) return matchingPests.firstOrNull()
+            // If there are precisely 2 matches, and one is mouse, and ignoreMouse is true, return the other
+            if (matchingPests.size == 2 && ignoreMouse && matchingPests.any { it == FIELD_MOUSE }) {
+                return matchingPests.first { it != FIELD_MOUSE }
+            }
             // See if either of the matching pests was killed recently
             val recentPests = matchingPests.filter {
-                val lastKillTime = lastPestKillTimes.getOrNull(it) ?: return@filter false
+                val lastKillTime = lastPestKillTimes?.getOrNull(it) ?: return@filter false
                 lastKillTime.passedSince() < 2.seconds
             }
             // If only one was killed recently, return it
             return if (recentPests.size == 1) recentPests.first()
-            else if (recentPests.size > 1) lastPestKillTimes.entries().minByOrNull {
+            else if (recentPests.size > 1) lastPestKillTimes?.entries()?.minByOrNull {
                 it.value.passedSince()
             }?.key
             else UNKNOWN
