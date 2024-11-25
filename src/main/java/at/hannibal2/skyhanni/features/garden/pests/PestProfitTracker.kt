@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -16,7 +14,6 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -67,7 +64,7 @@ object PestProfitTracker {
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
-            totalPestKills = 0L
+            totalPestsKills = 0L
             pestKills.clear()
         }
 
@@ -94,11 +91,11 @@ object PestProfitTracker {
 
         fun getTotalPestCount(): Long =
             if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L
-            else (pestKills.values.sum() + totalPestKills)
+            else (pestKills.values.sum() + totalPestsKills)
 
         @Expose
         @Deprecated("Use pestKills instead")
-        var totalPestKills = 0L
+        var totalPestsKills = 0L
 
         @Expose
         var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
@@ -214,33 +211,12 @@ object PestProfitTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    private val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("getpestbyid") {
-            description = "Get the PestType for a given NEUInternalName."
-            callback {
-                if(it.size != 1) {
-                    ChatUtils.chat("§cUsage: /getpestbyid <NEUInternalName>")
-                    return@callback
-                }
-                val internalName = it.firstOrNull()?.toInternalName() ?: return@callback
-                val pest = PestType.getByInternalNameItemOrNull(internalName)
-                if (pest == null) {
-                    ChatUtils.chat("§cNo PestType found for $internalName.")
-                } else {
-                    ChatUtils.chat("§ePestType for $internalName: §6${pest.displayName}")
-                }
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.
+        val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
         event.move(
             68,
             "#profile.garden.pestProfitTracker.items",
@@ -252,11 +228,8 @@ object PestProfitTracker {
 
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
-
-                val pestPossible = PestType.getByInternalNameItemOrNull(item)
-
                 val pest = pestTypeMap.getOrPut(item) {
-                    pestPossible ?: PestType.UNKNOWN
+                    PestType.getByInternalNameItemOrNull(item)
                 }
 
                 // If the map for the pest already contains this item, combine the amounts

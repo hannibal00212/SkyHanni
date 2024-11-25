@@ -143,35 +143,88 @@ enum class PestType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
 
-        fun getByInternalNameItemOrNull(
-            internalName: NEUInternalName,
-            lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark>? = null,
-            ignoreMouse: Boolean = true
-        ): PestType? {
-            val matchingPests = filterableEntries.filter {
-                itemTypesMap[it]?.recipes?.any { recipe ->
-                    recipe.drops.any { drop ->
-                        drop.idAsInternalName().asString() == internalName.asString()
-                    }
-                } ?: false
-            }
-            // If none or one was found, return it
-            if (matchingPests.size <= 1) return matchingPests.firstOrNull()
-            // If there are precisely 2 matches, and one is mouse, and ignoreMouse is true, return the other
-            if (matchingPests.size == 2 && ignoreMouse && matchingPests.any { it == FIELD_MOUSE }) {
-                return matchingPests.first { it != FIELD_MOUSE }
-            }
-            // See if either of the matching pests was killed recently
-            val recentPests = matchingPests.filter {
-                val lastKillTime = lastPestKillTimes?.getOrNull(it) ?: return@filter false
-                lastKillTime.passedSince() < 2.seconds
-            }
-            // If only one was killed recently, return it
-            return if (recentPests.size == 1) recentPests.first()
-            else if (recentPests.size > 1) lastPestKillTimes?.entries()?.minByOrNull {
-                it.value.passedSince()
-            }?.key
-            else UNKNOWN
-        }
+        private val internalNameMap: Map<NEUInternalName, PestType?> = mapOf(
+            // Beetle deterministic drops
+            "ENCHANTED_NETHER_STALK" to BEETLE,
+            "PESTERMINATOR;1" to BEETLE,
+            "VINYL_BEETLE" to BEETLE,
+            "MUTANT_NETHER_STALK" to BEETLE,
+
+            // Cricket deterministic drops
+            "ENCHANTED_CARROT" to CRICKET,
+            "ENCHANTED_GOLDEN_CARROT" to CRICKET,
+            "VINYL_CRICKET_CHOIR" to CRICKET,
+            "CHIRPING_STEREO" to CRICKET,
+
+            // Earthworm deterministic drops
+            "ENCHANTED_MELON" to EARTHWORM,
+            "VINYL_EARTHWORM_ENSEMBLE" to EARTHWORM,
+            "ENCHANTED_MELON_BLOCK" to EARTHWORM,
+            "BOOKWORM_BOOK" to EARTHWORM,
+
+            // Field Mouse deterministic drops
+            "SQUEAKY_TOY" to FIELD_MOUSE,
+            "SQUEAKY_MOUSEMAT" to FIELD_MOUSE,
+
+            // Fly deterministic drops
+            "ENCHANTED_WHEAT" to FLY,
+            "BEADY_EYES" to FLY,
+            "VINYL_PRETTY_FLY" to FLY,
+            "ENCHANTED_HAY_BALE" to FLY,
+            // Old fly drops
+            "TIGHTLY_TIED_HAY_BALE" to FLY,
+            "ENCHANTED_HAY_BLOCK" to FLY,
+
+            // Locust deterministic drops
+            "ENCHANTED_POTATO" to LOCUST,
+            "VINYL_CICADA_SYMPHONY" to LOCUST,
+            "ENCHANTED_BAKED_POTATO" to LOCUST,
+            "SUNDER;6" to LOCUST,
+
+            // Mite deterministic drops
+            "ENCHANTED_CACTUS_GREEN" to MITE,
+            "VINYL_DYNAMITES" to MITE,
+            "ENCHANTED_CACTUS" to MITE,
+            "ATMOSPHERIC_FILTER" to MITE,
+
+            // Mosquito deterministic drops
+            "ENCHANTED_SUGAR" to MOSQUITO,
+            "VINYL_BUZZIN_BEATS" to MOSQUITO,
+            "ENCHANTED_SUGAR_CANE" to MOSQUITO,
+            "CLIPPED_WINGS" to MOSQUITO,
+
+            // Moth deterministic drops
+            "ENCHANTED_COCOA" to MOTH,
+            "VINYL_WINGS_OF_HARMONY" to MOTH,
+            "ENCHANTED_COOKIE" to MOTH,
+            "WRIGGLING_LARVA" to MOTH,
+
+            // Rat deterministic drops
+            "ENCHANTED_PUMPKIN" to RAT,
+            "VINYL_RODENT_REVOLUTION" to RAT,
+            "POLISHED_PUMPKIN" to RAT,
+            "RAT;4" to RAT,
+
+            // Slug deterministic drops
+            "ENCHANTED_RED_MUSHROOM" to SLUG,
+            "ENCHANTED_BROWN_MUSHROOM" to SLUG,
+            "VINYL_SLOW_AND_GROOVY" to SLUG,
+            "ENCHANTED_HUGE_MUSHROOM_1" to SLUG,
+            "ENCHANTED_HUGE_MUSHROOM_2" to SLUG,
+            "SLUG;3" to SLUG,
+            "SLUG;4" to SLUG,
+
+            // Indeterministic drops
+            "COMPOST" to UNKNOWN,
+            "HONEY_JAR" to UNKNOWN,
+            "DUNG" to UNKNOWN,
+            "PLANT_MATTER" to UNKNOWN,
+            "CHEESE_FUEL" to UNKNOWN,
+            "DYE_DUNG" to UNKNOWN,
+        ).map {
+            it.key.toInternalName() to it.value
+        }.toMap()
+
+        fun getByInternalNameItemOrNull(internalName: NEUInternalName): PestType = internalNameMap[internalName] ?: UNKNOWN
     }
 }
