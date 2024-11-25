@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.optimalsettings;
+package at.hannibal2.skyhanni.config.features.garden.farmingsettings;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class OptimalSettingsConfig {
+public class FarmingSettingsConfig {
 
     @Expose
     @ConfigOption(name = "Custom Optimal Speeds/Yaws/Pitches", desc = "")
     @Accordion
-    public CustomOptimalSettingsConfig customSettings = new CustomOptimalSettingsConfig();
+    public CustomFarmingSettingsConfig customSettings = new CustomFarmingSettingsConfig();
 
     @Expose
     @ConfigOption(name = "Show on HUD", desc = "Show the optimal settings for your current tool in the hand.\n" +
@@ -70,11 +70,11 @@ public class OptimalSettingsConfig {
     }
 
     @Expose
-    @ConfigLink(owner = OptimalSettingsConfig.class, field = "shortcutGUI")
+    @ConfigLink(owner = FarmingSettingsConfig.class, field = "shortcutGUI")
     public Position signPosition = new Position(20, -195, false, true);
 
     @Expose
-    @ConfigLink(owner = OptimalSettingsConfig.class, field = "showOnHUD")
+    @ConfigLink(owner = FarmingSettingsConfig.class, field = "showOnHUD")
     public Position pos = new Position(5, -200, false, true);
 
 }

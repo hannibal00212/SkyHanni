@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.garden.optimalsettings
+package at.hannibal2.skyhanni.features.garden.farmingsettings
 
-import at.hannibal2.skyhanni.config.features.garden.optimalsettings.OptimalSettingsConfig.WarningType
+import at.hannibal2.skyhanni.config.features.garden.farmingsettings.FarmingSettingsConfig.WarningType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object OptimalSettingsAPI {
+object FarmingSettingsAPI {
 
     private val config get() = GardenAPI.config.optimalSettings
     private val configCustomSettings get() = config.customSettings

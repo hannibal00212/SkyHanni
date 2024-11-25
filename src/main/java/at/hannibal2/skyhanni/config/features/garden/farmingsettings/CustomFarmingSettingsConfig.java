@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden.optimalsettings;
+package at.hannibal2.skyhanni.config.features.garden.farmingsettings;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
-public class CustomOptimalSettingsConfig {
+public class CustomFarmingSettingsConfig {
 
     @Expose
     @ConfigOption(name = "Wheat", desc = "")

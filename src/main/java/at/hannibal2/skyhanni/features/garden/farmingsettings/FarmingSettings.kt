@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.optimalsettings
+package at.hannibal2.skyhanni.features.garden.farmingsettings
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -15,7 +15,7 @@ import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object GardenOptimalSettings {
+object FarmingSettings {
 
     private val config get() = GardenAPI.config.optimalSettings
 
@@ -27,7 +27,7 @@ object GardenOptimalSettings {
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign() && !gui.isMousematSign()) return
 
-        display = OptimalSettingsAPI.createDisplay(gui)
+        display = FarmingSettingsAPI.createDisplay(gui)
     }
 
     @SubscribeEvent
@@ -46,8 +46,8 @@ object GardenOptimalSettings {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden() || GardenAPI.hideExtraGuis() || (!config.warning && !config.showOnHUD)) return
 
-        if (config.showOnHUD) config.pos.renderRenderable(OptimalSettingsAPI.createStatus(), posLabel = "Garden Optimal Settings")
-        if (config.warning && config.warningTypes.isNotEmpty()) OptimalSettingsAPI.handleWarning()
+        if (config.showOnHUD) config.pos.renderRenderable(FarmingSettingsAPI.createStatus(), posLabel = "Garden Optimal Settings")
+        if (config.warning && config.warningTypes.isNotEmpty()) FarmingSettingsAPI.handleWarning()
     }
 
     private fun isShortcutGUIEnabled() = GardenAPI.inGarden() && config.shortcutGUI
