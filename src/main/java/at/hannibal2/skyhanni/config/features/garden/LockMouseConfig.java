@@ -33,7 +33,6 @@ public class LockMouseConfig {
     @ConfigOption(
         name = "Lock with Rod",
         desc = "Automatically lock your mouse when holding a fishing rod.")
-    )
     @ConfigEditorBoolean
     public boolean lockWithRod = false;
 
