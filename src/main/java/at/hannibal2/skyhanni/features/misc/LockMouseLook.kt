@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -28,7 +30,10 @@ object LockMouseLook {
     private val config get() = SkyHanniMod.feature.misc
     private val storage get() = SkyHanniMod.feature.storage
     var lockedMouse = false
+    private var commandUsed = false
     private const val lockedPosition = -1F / 3F
+
+    private val mc get() = Minecraft.getMinecraft()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -46,6 +51,24 @@ object LockMouseLook {
         if (lockedMouse) toggleLock()
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!config.lockMouseConfig.lockWithTool) return
+        if (config.lockMouseConfig.onlyGarden && !GardenAPI.inGarden()) return
+        if (config.lockMouseConfig.onlyPlot && GardenAPI.onBarnPlot) return
+        if (commandUsed && lockedMouse) return
+
+        if (isHoldingTool() != lockedMouse) {
+            commandUsed = false
+            toggleLock()
+        }
+    }
+
+    fun mouseLockCommand() {
+        commandUsed = true
+        toggleLock()
+    }
+
     fun toggleLock() {
         lockedMouse = !lockedMouse
 
@@ -56,13 +79,15 @@ object LockMouseLook {
         if (lockedMouse) {
             storage.savedMouselockedSensitivity = mouseSensitivity
             gameSettings.mouseSensitivity = lockedPosition
-            if (config.lockMouseLookChatMessage) {
+            if (config.lockMouseConfig.lockMouseLookChatMessage) {
+                if (!commandUsed) return
                 ChatUtils.chat("§bMouse rotation is now locked. Type /shmouselock to unlock your rotation")
             }
         } else {
             if (!SensitivityReducer.isEnabled()) gameSettings.mouseSensitivity = storage.savedMouselockedSensitivity
             else gameSettings.mouseSensitivity = SensitivityReducer.doTheMath(storage.savedMouselockedSensitivity)
-            if (config.lockMouseLookChatMessage) {
+            if (config.lockMouseConfig.lockMouseLookChatMessage) {
+                if (!commandUsed) return
                 ChatUtils.chat("§bMouse rotation is now unlocked.")
             }
         }
@@ -78,6 +103,10 @@ object LockMouseLook {
         if (lockedMouse) {
             toggleLock()
         }
+    }
+
+    private fun isHoldingTool(): Boolean {
+        return GardenAPI.toolInHand != null
     }
 
     @SubscribeEvent

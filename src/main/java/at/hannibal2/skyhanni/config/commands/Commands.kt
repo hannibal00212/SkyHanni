@@ -207,7 +207,7 @@ object Commands {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
-            callback { LockMouseLook.toggleLock() }
+            callback { LockMouseLook.mouseLockCommand() }
         }
         event.register("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"

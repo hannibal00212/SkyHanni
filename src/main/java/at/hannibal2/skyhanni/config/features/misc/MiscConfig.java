@@ -125,6 +125,15 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
+    @ConfigOption(name = "Mouse Lock", desc = "")
+    @Accordion
+    public LockMouseConfig lockMouseConfig = new LockMouseConfig();
+
+    @Expose
+    @ConfigLink(owner = MiscConfig.class, field = "lockMouseConfig")
+    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
@@ -273,17 +282,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lesserOrbHider = false;
-
-    @Expose
-    @ConfigOption(
-        name = "Lock Mouse Message",
-        desc = "Show a message in chat when toggling §e/shmouselock§7.")
-    @ConfigEditorBoolean
-    public boolean lockMouseLookChatMessage = true;
-
-    // Does not have a config element!
-    @Expose
-    public Position lockedMouseDisplay = new Position(400, 200, 0.8f);
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
