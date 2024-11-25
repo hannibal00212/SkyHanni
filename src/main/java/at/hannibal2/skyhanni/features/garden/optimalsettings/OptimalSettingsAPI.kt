@@ -168,15 +168,9 @@ object OptimalSettingsAPI {
     fun handleWarning() {
         if (lastWarnTime.passedSince() < 20.seconds) return
 
-        println("test")
-
         val optimalSpeed = optimalSpeed ?: lastCropType?.getOptimalSettings()?.speed ?: return
         val optimalYaw = optimalYaw ?: lastCropType?.getOptimalSettings()?.yaw ?: return
         val optimalPitch = optimalPitch ?: lastCropType?.getOptimalSettings()?.pitch ?: return
-
-        println(optimalSpeed)
-        println(optimalYaw)
-        println(optimalPitch)
 
         val speedWarn = optimalSpeed != currentSpeed
         val yawWarn = optimalYaw != currentYaw
@@ -190,8 +184,6 @@ object OptimalSettingsAPI {
         for (type in config.warningTypes) {
             if (recentlySwitchedTool) continue
 
-            println(type)
-
             when (type) {
                 WarningType.WHEN_USING -> {
                     if (speedWarn && isWearingRanchers()) {
@@ -201,8 +193,6 @@ object OptimalSettingsAPI {
                     }
 
                     if (!isHolding(mousemat)) continue
-
-                    println("test3")
 
                     if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
                     if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
