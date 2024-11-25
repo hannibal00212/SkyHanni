@@ -17,10 +17,25 @@ public class LockMouseConfig {
 
     @Expose
     @ConfigOption(
-        name = "Lock Mouse with Tool",
+        name = "Lock with Tool",
         desc = "Automatically lock your mouse when holding a tool.")
     @ConfigEditorBoolean
     public boolean lockWithTool = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Lock Mouse with Mousemat",
+        desc = "Automatically lock your mouse after using a Mousemat to set your angle.")
+    @ConfigEditorBoolean
+    public boolean lockAfterMousemat = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Lock with Rod",
+        desc = "Automatically lock your mouse when holding a fishing rod.")
+    )
+    @ConfigEditorBoolean
+    public boolean lockWithRod = false;
 
     @Expose
     @ConfigOption(

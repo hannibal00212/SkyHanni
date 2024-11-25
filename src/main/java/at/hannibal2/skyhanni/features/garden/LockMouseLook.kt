@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.holdingRod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,6 +28,8 @@ object LockMouseLook {
         "chat.garden.teleport",
         "§aTeleported you to .*",
     )
+
+    private val mousematUsedMessage = "§r§aSnapped to squeaky mousemat!§r"
 
     private val config get() = SkyHanniMod.feature.garden.lockMouseConfig
     private val storage get() = SkyHanniMod.feature.storage
@@ -58,20 +61,28 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!gardenTeleportPattern.matches(event.message)) return
-        commandUsed = false
-        if (lockedMouse) toggleLock()
+        if (gardenTeleportPattern.matches(event.message)) {
+            commandUsed = false
+            if (lockedMouse) toggleLock()
+        }
+
+        if (event.message == mousematUsedMessage && config.lockAfterMousemat) {
+            commandUsed = false
+            if (!lockedMouse) toggleLock()
+        }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!config.lockWithTool) return
         if (config.onlyGarden && !GardenAPI.inGarden()) return
         if (config.onlyPlot && GardenAPI.onBarnPlot) return
         if (config.onlyGround && !mc.thePlayer.onGround) return
         if (commandUsed && lockedMouse) return
 
-        if (GardenAPI.isHoldingTool() != lockedMouse) {
+        if (
+            (GardenAPI.isHoldingTool() != lockedMouse && !config.lockWithTool) ||
+            (holdingRod != lockedMouse && !config.lockWithRod)
+            ) {
             commandUsed = false
             toggleLock()
         }
