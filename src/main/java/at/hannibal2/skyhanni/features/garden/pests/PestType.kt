@@ -1,16 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemMobJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 enum class PestType(
     val displayName: String,
@@ -127,15 +121,6 @@ enum class PestType(
     @SkyHanniModule
     companion object {
         val filterableEntries by lazy { entries.filter { it.displayName.isNotEmpty() } }
-
-        @SubscribeEvent
-        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-            itemTypesMap = filterableEntries.associateWith {
-                event.readItem<NeuItemMobJson>(it.internalName.asString())
-            }
-        }
-
-        private var itemTypesMap: Map<PestType, NeuItemMobJson> = mapOf()
 
         fun getByNameOrNull(name: String): PestType? {
             return filterableEntries.firstOrNull { it.displayName.lowercase() == name.lowercase() }

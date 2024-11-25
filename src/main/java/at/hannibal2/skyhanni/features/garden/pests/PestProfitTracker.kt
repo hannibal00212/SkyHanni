@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,7 +55,7 @@ object PestProfitTracker {
         "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
     )
 
-    private var lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
+    private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
         { BucketData() },
@@ -91,7 +92,7 @@ object PestProfitTracker {
 
         fun getTotalPestCount(): Long =
             if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L
-            else (pestKills.values.sum() + totalPestsKills)
+            else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
 
         @Expose
         @Deprecated("Use pestKills instead")
@@ -176,7 +177,10 @@ object PestProfitTracker {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.isCurrentlyFarming()) return
-        if (lastPestKillTimes.all { it.value.passedSince() > config.timeDisplayed.seconds } && !PestAPI.hasVacuumInHand()) return
+        val allInactive = lastPestKillTimes.all {
+            it.value.passedSince() > config.timeDisplayed.seconds
+        }
+        if (allInactive && !PestAPI.hasVacuumInHand()) return
 
         tracker.renderDisplay(config.position)
     }
@@ -211,12 +215,21 @@ object PestProfitTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
+    private val oldMiceDrops = listOf(
+        "COMPOST",
+        "HONEY_JAR",
+        "DUNG",
+        "PLANT_MATTER",
+        "CHEESE_FUEL",
+    ).map { it.toInternalName() }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.
         val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
+        val pestKillCountMap: MutableMap<PestType, Long> = mutableMapOf()
         event.move(
             68,
             "#profile.garden.pestProfitTracker.items",
@@ -228,8 +241,11 @@ object PestProfitTracker {
 
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
-                val pest = pestTypeMap.getOrPut(item) {
-                    PestType.getByInternalNameItemOrNull(item)
+                val pest = when {
+                    item in oldMiceDrops -> PestType.FIELD_MOUSE
+                    else -> pestTypeMap.getOrPut(item) {
+                        PestType.getByInternalNameItemOrNull(item)
+                    }
                 }
 
                 // If the map for the pest already contains this item, combine the amounts
@@ -238,9 +254,26 @@ object PestProfitTracker {
                 newItem.totalAmount += trackedItem.totalAmount
                 newItem.timesGained += trackedItem.timesGained
                 storage[neuInternalName] = newItem
+                // If the timesGained is higher than pestKillCountMap[pest], update it
+                if (pest != PestType.UNKNOWN) { // Ignore UNKNOWN, as we don't want inflated kill counts
+                    pestKillCountMap[pest] = pestKillCountMap.getOrDefault(pest, 0).coerceAtLeast(newItem.timesGained)
+                }
             }
 
             ConfigManager.gson.toJsonTree(newItems)
+        }
+
+        event.add(68, "#profile.garden.pestProfitTracker.pestKills") {
+            ConfigManager.gson.toJsonTree(pestKillCountMap)
+        }
+
+        event.transform(68, "#profile.garden.pestProfitTracker.totalPestsKills") { entry ->
+            // Subtract all pestKillCountMap values from the totalPestsKills
+            JsonPrimitive(
+                entry.asLong - pestKillCountMap.entries.filter {
+                    it.key != PestType.UNKNOWN
+                }.sumOf { it.value }
+            )
         }
     }
 }
