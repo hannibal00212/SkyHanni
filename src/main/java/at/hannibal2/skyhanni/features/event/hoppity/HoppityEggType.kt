@@ -65,6 +65,14 @@ enum class HoppityEggType(
         return now.hour < resetsAt
     }
 
+    fun hasRemainingSpawns(): Boolean {
+        val hoppityEndMark = HoppityAPI.getEventEndMark() ?: return false
+        // If it's before the last two days of the event, we can assume there are more spawns
+        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        // Otherwise we have to check if the next spawn is after the end of the event
+        return timeUntil() < hoppityEndMark.timeUntil()
+    }
+
     fun isClaimed() = claimed || hasNotSpawnedFirstDay()
     val isResetting get() = resettingEntries.contains(this)
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
