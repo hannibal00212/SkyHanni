@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.farmingsettings
 
 import at.hannibal2.skyhanni.config.features.garden.farmingsettings.FarmingSettingsConfig.WarningType
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -63,12 +61,11 @@ object FarmingSettingsAPI {
     private var currentYaw = 0f
     private var currentPitch = 0f
 
-    private var optimalSpeed: Int? = null
-    private var optimalYaw: Float? = null
-    private var optimalPitch: Float? = null
-
     private var cropType: CropType? = null
-    private var lastCropType: CropType? = null
+
+    private val optimalSpeed get() = cropType?.getOptimalSettings()?.speed
+    private val optimalYaw get() = cropType?.getOptimalSettings()?.yaw
+    private val optimalPitch get() = cropType?.getOptimalSettings()?.pitch
 
     private data class CropSettings(val speed: Int, val yaw: Float, val pitch: Float)
     private data class CropPropertys(val speed: Property<Float>, val yaw: Property<Float>, val pitch: Property<Float>)
@@ -128,9 +125,9 @@ object FarmingSettingsAPI {
     fun createStatus(): Renderable? {
         if (!GardenAPI.hasFarmingToolInHand() && !isHolding(rancherBoots) && !isHolding(mousemat)) return null
 
-        val optimalSpeed = optimalSpeed ?: lastCropType?.getOptimalSettings()?.speed ?: return null
-        val optimalYaw = optimalYaw ?: lastCropType?.getOptimalSettings()?.yaw ?: return null
-        val optimalPitch = optimalPitch ?: lastCropType?.getOptimalSettings()?.pitch ?: return null
+        val optimalSpeed = optimalSpeed ?: return null
+        val optimalYaw = optimalYaw ?: return null
+        val optimalPitch = optimalPitch ?: return null
 
         val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val recentlyStartedSneaking = sneaking && sneakingSince.passedSince() < 5.seconds
@@ -166,49 +163,45 @@ object FarmingSettingsAPI {
     }
 
     fun handleWarning() {
-        if (lastWarnTime.passedSince() < 20.seconds) return
+        if (!isEnabled()) return
+        lastWarnTime = SimpleTimeMark.now()
 
-        val optimalSpeed = optimalSpeed ?: lastCropType?.getOptimalSettings()?.speed ?: return
-        val optimalYaw = optimalYaw ?: lastCropType?.getOptimalSettings()?.yaw ?: return
-        val optimalPitch = optimalPitch ?: lastCropType?.getOptimalSettings()?.pitch ?: return
+        if (WarningType.WHEN_USING.isSelected()) sendWarnings(WarningType.WHEN_USING)
+
+        if (Minecraft.getMinecraft().thePlayer.onGround && !GardenAPI.onBarnPlot) {
+            if (WarningType.WHEN_FARMING.isSelected() && GardenAPI.isCurrentlyFarming()) sendWarnings(WarningType.WHEN_FARMING)
+            if (WarningType.WHEN_WALKING.isSelected()) sendWarnings(WarningType.WHEN_WALKING)
+        }
+    }
+
+    private fun sendWarnings(type: WarningType) {
+        val optimalSpeed = optimalSpeed ?: return
+        val optimalYaw = optimalYaw ?: return
+        val optimalPitch = optimalPitch ?: return
 
         val speedWarn = optimalSpeed != currentSpeed
         val yawWarn = optimalYaw != currentYaw
         val pitchWarn = optimalPitch != currentPitch
 
-        if ((!speedWarn && !yawWarn && !pitchWarn) || recentlySwitchedTool) return
-        lastWarnTime = SimpleTimeMark.now()
-
-        val mousematPresent = InventoryUtils.getItemsInOwnInventory().any { it.getInternalNameOrNull() == mousemat }
-
-        for (type in config.warningTypes) {
-            if (type == null) continue
-
-            when (type) {
-                WarningType.WHEN_USING -> {
-                    if (speedWarn && isWearingRanchers()) {
-                        LorenzUtils.sendTitle("§cWrong Speed! Fix it in chat.", 3.seconds)
-                        warn("speed", currentSpeed, optimalSpeed, true)
-                    }
-
-                    if (isHolding(mousemat)) {
-                        if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
-                        if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
-                    }
-                }
-
-                WarningType.WHEN_FARMING, WarningType.WHEN_WALKING -> {
-                    if (Minecraft.getMinecraft().thePlayer.onGround && !GardenAPI.onBarnPlot) {
-                        if (type == WarningType.WHEN_FARMING && !GardenAPI.isCurrentlyFarming()) continue
-
-                        LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
-
-                        if (speedWarn) warn("speed", currentSpeed, optimalSpeed, isWearingRanchers())
-                        if (yawWarn) warn("yaw", currentYaw, optimalYaw, mousematPresent)
-                        if (pitchWarn) warn("pitch", currentPitch, optimalPitch, mousematPresent)
-                    }
-                }
+        if (type == WarningType.WHEN_USING) {
+            if (speedWarn && isWearingRanchers()) {
+                LorenzUtils.sendTitle("§cWrong Speed! Fix it in chat.", 3.seconds)
+                warn("speed", currentSpeed, optimalSpeed, true)
             }
+
+            if (isHolding(mousemat)) {
+                LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
+                if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
+                if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
+            }
+        } else {
+            LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
+
+            val mousematPresent = InventoryUtils.getItemsInOwnInventory().any { it.getInternalNameOrNull() == mousemat }
+
+            if (speedWarn) warn("speed", currentSpeed, optimalSpeed, isWearingRanchers())
+            if (yawWarn) warn("yaw", currentYaw, optimalYaw, mousematPresent)
+            if (pitchWarn) warn("pitch", currentPitch, optimalPitch, mousematPresent)
         }
     }
 
@@ -249,7 +242,7 @@ object FarmingSettingsAPI {
     }
 
     private fun warnText(type: String, current: String, optimal: String): String {
-        val cropInHand = cropType ?: lastCropType ?: return ""
+        val cropInHand = cropType ?: return ""
         return "§cWrong $type while farming ${cropInHand.cropName} detected!" +
             "\n§eCurrent ${type.firstLetterUppercase()}: §f$current§e, Optimal ${type.firstLetterUppercase()}: §f$optimal"
     }
@@ -257,6 +250,8 @@ object FarmingSettingsAPI {
     private fun isWearingRanchers() = InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots
 
     private fun isHolding(internalName: NEUInternalName) = InventoryUtils.getItemInHand()?.getInternalNameOrNull() == internalName
+
+    private fun WarningType.isSelected(): Boolean = config.warningTypes.contains(this)
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -280,33 +275,7 @@ object FarmingSettingsAPI {
         if (!isEnabled()) return
 
         lastToolSwitch = SimpleTimeMark.now()
-        cropType = event.crop
-        event.crop?.let { lastCropType = it }
-
-        val optimalSettings = cropType?.getOptimalSettings() ?: return
-
-        optimalSpeed = optimalSettings.speed
-        optimalYaw = optimalSettings.yaw
-        optimalPitch = optimalSettings.pitch
-    }
-
-    @SubscribeEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        if (!isEnabled()) return
-
-        for (value in CropType.entries) {
-            val propertys = value.getConfig()
-
-            listOf(
-                propertys.speed to { optimalSpeed = propertys.speed.get().toInt() },
-                propertys.yaw to { optimalYaw = propertys.yaw.get() },
-                propertys.pitch to { optimalPitch = propertys.pitch.get() },
-            ).forEach { (property, action) ->
-                ConditionalUtils.onToggle(property) {
-                    if (value == cropType) action()
-                }
-            }
-        }
+        event.crop?.let { cropType = it }
     }
 
     private fun CropType.getOptimalSettings(): CropSettings = with(getConfig()) {
