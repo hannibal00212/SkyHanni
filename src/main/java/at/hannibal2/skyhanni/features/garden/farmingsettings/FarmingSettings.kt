@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object FarmingSettings {
 
-    private val config get() = GardenAPI.config.optimalSettings
+    private val config get() = GardenAPI.config.farmingSettings
 
     private var display = listOf<Renderable>()
 
@@ -71,5 +71,19 @@ object FarmingSettings {
         event.move(3, "garden.optimalSpeedCustom.mushroom", "garden.optimalSpeeds.customSpeed.mushroom")
 
         event.move(14, "garden.optimalSpeeds.enabled", "garden.optimalSpeeds.showOnHUD")
+
+        event.move(67, "garden.optimalSpeeds.signEnabled", "garden.farmingSettings.shortcutGUI")
+        event.move(67, "garden.optimalSpeeds.compactRancherGui", "garden.farmingSettings.compactShortcutGUI")
+        event.move(67, "garden.optimalSpeeds.customSpeed", "garden.farmingSettings.customSettings")
+        event.move(67, "garden.optimalSpeedCustom.wheat", "garden.farmingSettings.customSettings.wheat.speed")
+        event.move(3, "garden.optimalSpeedCustom.carrot", "garden.farmingSettings.customSettings.carrot.speed")
+        event.move(3, "garden.optimalSpeedCustom.potato", "garden.farmingSettings.customSettings.potato.speed")
+        event.move(3, "garden.optimalSpeedCustom.netherWart", "garden.farmingSettings.customSettings.netherWart.speed")
+        event.move(3, "garden.optimalSpeedCustom.pumpkin", "garden.farmingSettings.customSettings.pumpkin.speed")
+        event.move(3, "garden.optimalSpeedCustom.melon", "garden.farmingSettings.customSettings.melon.speed")
+        event.move(3, "garden.optimalSpeedCustom.cocoaBeans", "garden.farmingSettings.customSettings.cocoaBeans.speed")
+        event.move(3, "garden.optimalSpeedCustom.sugarCane", "garden.farmingSettings.customSettings.sugarCane.speed")
+        event.move(3, "garden.optimalSpeedCustom.cactus", "garden.farmingSettings.customSettings.cactus.speed")
+        event.move(3, "garden.optimalSpeedCustom.mushroom", "garden.farmingSettings.customSettings.mushroom.speed")
     }
 }

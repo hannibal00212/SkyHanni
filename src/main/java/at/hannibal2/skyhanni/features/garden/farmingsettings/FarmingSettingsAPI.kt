@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FarmingSettingsAPI {
 
-    private val config get() = GardenAPI.config.optimalSettings
+    private val config get() = GardenAPI.config.farmingSettings
     private val configCustomSettings get() = config.customSettings
 
     private var sneakingSince = SimpleTimeMark.farFuture()

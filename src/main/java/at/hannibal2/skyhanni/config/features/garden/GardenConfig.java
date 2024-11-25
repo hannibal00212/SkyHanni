@@ -43,7 +43,7 @@ public class GardenConfig {
 
     @Expose
     @Category(name = "Farming Settings", desc = "Optimal Speed/Yaw/Pitch Settings")
-    public FarmingSettingsConfig optimalSettings = new FarmingSettingsConfig();
+    public FarmingSettingsConfig farmingSettings = new FarmingSettingsConfig();
 
     @Expose
     @ConfigOption(name = "Farming Lane", desc = "")
