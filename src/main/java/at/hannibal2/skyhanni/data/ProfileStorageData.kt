@@ -95,7 +95,6 @@ object ProfileStorageData {
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {
-            println("Tablist missing debug:\n${TabListData.getTabList()}")
             ChatUtils.clickableChat(
                 "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
                     "This is needed for the mod to function! And therefore this warning cannot be disabled",

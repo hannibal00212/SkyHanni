@@ -25,9 +25,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -36,6 +38,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
@@ -112,16 +115,28 @@ object PestAPI {
     )
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
+     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
+     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
+     * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
      */
     val pestDeathChatPattern by patternGroup.pattern(
         "chat.pestdeath",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!",
+        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §2(?<pest>.*)§e!",
     )
     val noPestsChatPattern by patternGroup.pattern(
         "chat.nopests",
         "§cThere are not any Pests on your Garden right now! Keep farming!",
+    )
+
+    /**
+     * REGEX-TEST: §eMouse Trap #1§r
+     * REGEX-TEST: §eMouse Trap #2§r
+     * REGEX-TEST: §eMouse Trap #3§r
+     * REGEX-TEST: §aPest Trap #3§r
+     */
+    private val pestTrapPattern by patternGroup.pattern(
+        "entity.pesttrap",
+        "(?:§.)+(?:Pest|Mouse) Trap(?: #\\d+)?(?:§.)+"
     )
 
     var gardenJoinTime = SimpleTimeMark.farPast()
@@ -280,6 +295,10 @@ object PestAPI {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
+    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
+        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
+    }
+
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
         repeat(removedPests) {
@@ -288,8 +307,10 @@ object PestAPI {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot()
-            ?: ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+        val plot = getNearestInfestedPlot() ?: run {
+            if (isNearPestTrap()) return
+            else ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+        }
 
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--

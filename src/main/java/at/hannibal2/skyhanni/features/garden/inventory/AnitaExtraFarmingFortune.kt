@@ -23,9 +23,12 @@ object AnitaExtraFarmingFortune {
 
     private val config get() = GardenAPI.config.anitaShop
 
+    /**
+     * REGEX-TEST: §5§o§aJacob's Ticket §8x450
+     */
     private val realAmountPattern by RepoPattern.pattern(
         "garden.inventory.anita.extrafortune.realamount",
-        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)"
+        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)",
     )
 
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()

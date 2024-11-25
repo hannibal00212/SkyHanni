@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
@@ -43,7 +43,7 @@ object RiftLarva {
 
     private fun findLarvas() {
         for (stand in getEntities<EntityArmorStand>()) {
-            if (stand.hasSkullTexture(LARVA_SKULL_TEXTURE)) {
+            if (stand.wearingSkullTexture(LARVA_SKULL_TEXTURE)) {
                 RenderLivingEntityHelper.setEntityColor(
                     stand,
                     config.highlightColor.toChromaColor().addAlpha(1),

@@ -32,16 +32,9 @@ object FirePillarDisplay {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        val entityNames = EntityUtils.getEntities<EntityArmorStand>().map {
-            it.name
-        }
-        val seconds = entityNamePattern.firstMatcher(entityNames) {
-            group("seconds")
-        }
-
-        display = seconds?.let {
-            "§cFire Pillar: §b${seconds}s"
-        }.orEmpty()
+        val entityNames = EntityUtils.getEntities<EntityArmorStand>().map { it.name }
+        val seconds = entityNamePattern.firstMatcher(entityNames) { group("seconds") }
+        display = seconds?.let { "§cFire Pillar: §b${it}s" }.orEmpty()
     }
 
     @SubscribeEvent

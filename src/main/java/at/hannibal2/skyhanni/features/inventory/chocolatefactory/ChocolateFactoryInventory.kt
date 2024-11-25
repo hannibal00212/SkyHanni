@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
@@ -16,6 +17,10 @@ object ChocolateFactoryInventory {
 
     private val config get() = ChocolateFactoryAPI.config
 
+    /**
+     * REGEX-TEST: §7§aYou have 1 unclaimed reward!
+     * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
+     */
     private val unclaimedRewardsPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "unclaimedrewards",
         "§7§aYou have \\d+ unclaimed rewards?!",
@@ -99,6 +104,9 @@ object ChocolateFactoryInventory {
 
         // this would break ChocolateFactoryKeybinds otherwise
         if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) return
+
+        // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
+        if (KeyboardManager.isShiftKeyDown() && slotNumber in ChocolateFactoryAPI.rabbitSlots.keys) return
 
         event.makePickblock()
     }

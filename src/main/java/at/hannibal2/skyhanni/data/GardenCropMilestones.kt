@@ -21,10 +21,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object GardenCropMilestones {
 
     private val patternGroup = RepoPattern.group("data.garden.milestone")
+
+    /**
+     * REGEX-TEST: §7Harvest §fWheat §7on your Garden to
+     * REGEX-TEST: §7Harvest §fCocoa Beans §7on your
+     */
     private val cropPattern by patternGroup.pattern(
         "crop",
         "§7Harvest §f(?<name>.*) §7on .*",
     )
+
+    /**
+     * REGEX-TEST: §7Total: §a36,967,397
+     */
     val totalPattern by patternGroup.pattern(
         "total",
         "§7Total: §a(?<name>.*)",

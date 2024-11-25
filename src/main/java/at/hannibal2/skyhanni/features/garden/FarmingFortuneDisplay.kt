@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -265,13 +266,18 @@ object FarmingFortuneDisplay {
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
-    private fun getPestFFReduction(): Int = when (PestAPI.scoreboardPests) {
-        in 0..3 -> 0
-        4 -> 5
-        5 -> 15
-        6 -> 30
-        7 -> 50
-        else -> 75
+    private fun getPestFFReduction(): Int {
+        val bpc = SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue ?: 0.0
+        val pests = (PestAPI.scoreboardPests - floor(bpc / 100).toInt()).coerceAtLeast(0)
+
+        return when (pests) {
+            in 0..3 -> 0
+            4 -> 5
+            5 -> 15
+            6 -> 30
+            7 -> 50
+            else -> 75
+        }
     }
 
     fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())

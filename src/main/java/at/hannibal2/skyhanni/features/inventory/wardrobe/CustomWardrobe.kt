@@ -55,7 +55,7 @@ object CustomWardrobe {
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
-    private var guiName = "Custom Wardrobe"
+    private const val GUI_NAME = "Custom Wardrobe"
 
     @SubscribeEvent
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
@@ -86,13 +86,13 @@ object CustomWardrobe {
             )
             val loadingPos =
                 Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height).setIgnoreCustomScale(true)
-            loadingPos.renderRenderable(loadingRenderable, posLabel = guiName, addToGuiManager = false)
+            loadingPos.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
 
-        pos.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
+        pos.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             GlStateManager.translate(0f, 0f, 400f)
@@ -112,7 +112,7 @@ object CustomWardrobe {
         val accessorGui = gui as AccessorGuiContainer
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
+        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @SubscribeEvent
