@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -87,6 +90,8 @@ object PestProfitTracker {
             )
         }
 
+        override fun PestType.isBucketFilterable() = PestType.filterableEntries.contains(this)
+
         fun getTotalPestCount(): Long =
             if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L
             else (pestKills.values.sum() + totalPestsKillsDEPREC)
@@ -144,6 +149,8 @@ object PestProfitTracker {
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
         addSearchString("§e§lPest Profit Tracker")
+        tracker.addBucketSelector(this, bucketData, "Pest Type")
+
         val profit = tracker.drawItems(bucketData, { true }, this)
 
         val totalPestCount = bucketData.getTotalPestCount()
@@ -206,6 +213,16 @@ object PestProfitTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
+    private var itemsLength = 0
+    private var bucketedItemsLength = 0
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shpptdebug") {
+            ChatUtils.chat("Items: $itemsLength\nBucketed Items: $bucketedItemsLength")
+        }
+    }
+
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(68, "garden.pestProfitTracker.totalPestsKills", "garden.pestProfitTracker.totalPestsKillsDEPREC")
@@ -223,10 +240,16 @@ object PestProfitTracker {
             val newMap = JsonObject()
 
             for ((key, value) in items.asJsonObject.entrySet()) {
-                val itemName = key.toInternalName()
+                itemsLength++
+
+                val itemName = key.toString().toInternalName()
                 val pestType = PestType.getByInternalNameItemOrNull(itemName, lastPestKillTimes)
                 val pestTypeString = pestType?.name ?: "UNKNOWN"
-                val pestTypeJson = newMap.get(pestTypeString)?.asJsonObject ?: JsonObject()
+                var pestTypeJson = newMap.get(pestTypeString)?.asJsonObject
+
+                if (pestTypeJson == null) {
+                    pestTypeJson = JsonObject()
+                }
 
                 // Check if the item already exists in pestTypeJson
                 val existingObject = pestTypeJson.get(itemName.asString())?.asJsonObject
@@ -235,18 +258,17 @@ object PestProfitTracker {
                     pestTypeJson.add(itemName.asString(), value)
                 } else {
                     // Update existing item's fields
-                    val existingAmount = existingObject.get("totalAmount").asInt
-                    val newAmount = value.asJsonObject.get("totalAmount").asInt
+                    val existingAmount = existingObject.get("totalAmount")?.asInt ?: 0
+                    val newAmount = value.asJsonObject.get("totalAmount")?.asInt ?: 0
                     existingObject.add("totalAmount", JsonPrimitive(existingAmount + newAmount))
 
                     val existingTimesGained = existingObject.get("timesGained").asLong
                     val newTimesGained = value.asJsonObject.get("timesGained").asLong
                     existingObject.add("timesGained", JsonPrimitive(existingTimesGained + newTimesGained))
                 }
-
-                // Update the map with the modified pestTypeJson
-                newMap.add(pestTypeString, pestTypeJson)
             }
+
+            bucketedItemsLength = newMap.entrySet().size
 
             newMap
         }

@@ -157,7 +157,9 @@ enum class PestType(
             }
             // If only one was killed recently, return it
             return if (recentPests.size == 1) recentPests.first()
-            else if (recentPests.size > 1) recentPests.min()
+            else if (recentPests.size > 1) lastPestKillTimes.entries().minByOrNull {
+                it.value.passedSince()
+            }?.key
             else UNKNOWN
         }
     }

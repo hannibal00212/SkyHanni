@@ -19,6 +19,8 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
 
     open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
 
+    abstract fun E.isBucketFilterable(): Boolean
+
     override fun reset() {
         bucketedItems.clear()
         selectedBucket = null
@@ -77,13 +79,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket() {
         // Move to the next ordinal, or wrap to null if at the last value
-        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
-        selectedBucket = when {
-            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
-            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
-            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
-            else -> selectedBucket // Fallback, shouldn't happen
-        }
+        selectedBucket = selectedBucket?.let { sb ->
+            val higherOrdinals = buckets.filter { it.ordinal > sb.ordinal }
+            if (higherOrdinals.isEmpty()) null
+            else higherOrdinals.filter { it.isBucketFilterable() }.minByOrNull { it.ordinal }
+        } ?: buckets.first()
     }
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
