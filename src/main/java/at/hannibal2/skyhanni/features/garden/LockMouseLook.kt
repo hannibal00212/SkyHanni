@@ -47,7 +47,7 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        commandUsed = true
+        commandUsed = false
         if (lockedMouse) toggleLock()
         val gameSettings = Minecraft.getMinecraft().gameSettings
         if (gameSettings.mouseSensitivity == lockedPosition) {
@@ -59,7 +59,7 @@ object LockMouseLook {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!gardenTeleportPattern.matches(event.message)) return
-        commandUsed = true
+        commandUsed = false
         if (lockedMouse) toggleLock()
     }
 

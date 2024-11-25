@@ -17,8 +17,8 @@ public class LockMouseConfig {
 
     @Expose
     @ConfigOption(
-        name = "Auto Lock",
-        desc = "Automatically lock your mouse when holding a tool on the garden.")
+        name = "Lock Mouse with Tool",
+        desc = "Automatically lock your mouse when holding a tool.")
     @ConfigEditorBoolean
     public boolean lockWithTool = false;
 

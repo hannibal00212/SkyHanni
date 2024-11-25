@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
-import at.hannibal2.skyhanni.features.garden.LockMouseLook
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
