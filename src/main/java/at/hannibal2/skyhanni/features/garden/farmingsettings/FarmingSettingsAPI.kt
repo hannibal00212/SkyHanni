@@ -176,31 +176,31 @@ object FarmingSettingsAPI {
         val yawWarn = optimalYaw != currentYaw
         val pitchWarn = optimalPitch != currentPitch
 
-        if (!speedWarn && !yawWarn && !pitchWarn) return
+        if ((!speedWarn && !yawWarn && !pitchWarn) || recentlySwitchedTool) return
         lastWarnTime = SimpleTimeMark.now()
 
         val mousematPresent = InventoryUtils.getItemsInOwnInventory().any { it.getInternalNameOrNull() == mousemat }
 
         for (type in config.warningTypes) {
-            if (recentlySwitchedTool) continue
+            if (type == null) continue
 
             when (type) {
                 WarningType.WHEN_USING -> {
                     if (speedWarn && isWearingRanchers()) {
                         LorenzUtils.sendTitle("§cWrong Speed! Fix it in chat.", 3.seconds)
-
                         warn("speed", currentSpeed, optimalSpeed, true)
                     }
 
-                    if (!isHolding(mousemat)) continue
-
-                    if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
-                    if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
+                    if (isHolding(mousemat)) {
+                        if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
+                        if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
+                    }
                 }
 
                 WarningType.WHEN_FARMING, WarningType.WHEN_WALKING -> {
                     if (Minecraft.getMinecraft().thePlayer.onGround && !GardenAPI.onBarnPlot) {
                         if (type == WarningType.WHEN_FARMING && !GardenAPI.isCurrentlyFarming()) continue
+
                         LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
 
                         if (speedWarn) warn("speed", currentSpeed, optimalSpeed, isWearingRanchers())
@@ -208,8 +208,6 @@ object FarmingSettingsAPI {
                         if (pitchWarn) warn("pitch", currentPitch, optimalPitch, mousematPresent)
                     }
                 }
-
-                null -> continue
             }
         }
     }
