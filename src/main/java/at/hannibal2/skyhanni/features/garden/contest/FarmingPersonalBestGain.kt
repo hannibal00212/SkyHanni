@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FarmingPersonalBestGain {
     private val config get() = GardenAPI.config
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private val maxPB = mutableMapOf<CropType, Double>() //Crop, Max PB
+    private val maxPB = mutableMapOf<CropType, Double>()
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
@@ -101,7 +101,7 @@ object FarmingPersonalBestGain {
         val oldFF = oldCollected / collectionPerFF
         val ffDiff = newFF - oldFF
 
-        if(oldFF<100){
+        if (oldFF < 100) {
             ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
         }
     }
