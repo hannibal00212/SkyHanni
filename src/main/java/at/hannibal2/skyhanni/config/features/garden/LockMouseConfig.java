@@ -24,7 +24,7 @@ public class LockMouseConfig {
 
     @Expose
     @ConfigOption(
-        name = "Lock Mouse with Mousemat",
+        name = "Lock with Mousemat",
         desc = "Automatically lock your mouse after using a Mousemat to set your angle.")
     @ConfigEditorBoolean
     public boolean lockAfterMousemat = false;

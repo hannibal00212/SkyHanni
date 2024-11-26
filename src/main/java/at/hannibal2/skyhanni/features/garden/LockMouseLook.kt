@@ -29,7 +29,7 @@ object LockMouseLook {
         "§aTeleported you to .*",
     )
 
-    const val mousematUsedMessage = "§r§aSnapped to squeaky mousemat!§r"
+    const val mousematUsedMessage = "§aSnapped to squeaky mousemat!"
 
     private val config get() = SkyHanniMod.feature.garden.lockMouseConfig
     private val storage get() = SkyHanniMod.feature.storage
@@ -67,24 +67,40 @@ object LockMouseLook {
         }
 
         if (event.message == mousematUsedMessage && config.lockAfterMousemat) {
-            commandUsed = false
+            commandUsed = true
             if (!lockedMouse) toggleLock()
         }
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (config.onlyGarden && !GardenAPI.inGarden()) return
-        if (config.onlyPlot && GardenAPI.onBarnPlot) return
-        if (config.onlyGround && !mc.thePlayer.onGround) return
         if (commandUsed && lockedMouse) return
+        if (config.onlyGarden && !GardenAPI.inGarden()) {
+            if (lockedMouse) toggleLock()
+            return
+        }
+        if (config.onlyPlot && GardenAPI.onBarnPlot) {
+            if (lockedMouse) toggleLock()
+            return
+        }
+        if (config.onlyGround && !mc.thePlayer.onGround) {
+            if (lockedMouse) toggleLock()
+            return
+        }
 
-        if (
-            (GardenAPI.isHoldingTool() != lockedMouse && !config.lockWithTool) ||
-            (holdingRod != lockedMouse && !config.lockWithRod)
-        ) {
-            commandUsed = false
-            toggleLock()
+        when {
+            GardenAPI.isHoldingTool() && config.lockWithTool && !holdingRod -> {
+                if (!lockedMouse) toggleLock()
+                commandUsed = false
+            }
+            holdingRod && config.lockWithRod && !GardenAPI.isHoldingTool() -> {
+                if (!lockedMouse) toggleLock()
+                commandUsed = false
+            }
+            else -> {
+                if (lockedMouse) toggleLock()
+                commandUsed = false
+            }
         }
     }
 
