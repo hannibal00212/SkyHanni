@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FarmingPersonalBestGain {
     private val config get() = GardenAPI.config
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private val maxPB = mutableMapOf<CropType, Integer>()
+    private val maxPB = mutableMapOf<CropType, Int>()
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!

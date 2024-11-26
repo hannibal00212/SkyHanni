@@ -14,7 +14,7 @@ data class GardenJson(
     @Expose val visitors: Map<String, GardenVisitor>,
     @Expose @SerializedName("organic_matter") val organicMatter: Map<NEUInternalName, Double>,
     @Expose val fuel: Map<NEUInternalName, Double>,
-    @Expose @SerializedName("max_personal_best") val maxPersonalBest: Map<CropType, Integer>,
+    @Expose @SerializedName("max_personal_best") val maxPersonalBest: Map<CropType, Int>,
 )
 
 data class GardenVisitor(
