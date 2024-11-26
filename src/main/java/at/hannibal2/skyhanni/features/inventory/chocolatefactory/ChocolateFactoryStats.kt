@@ -105,9 +105,9 @@ object ChocolateFactoryStats {
                 val sortedEntries = HoppityEggType.resettingEntries.sortedBy { it.resetsAt }
                 val nextMeal = sortedEntries.firstOrNull {
                     it.resetsAt > sbTimeThen.hour && it.altDay == sbTimeThen.isAlternateDay()
-                } ?: sortedEntries.firstOrNull {
-                    it.resetsAt < sbTimeThen.hour && it.altDay != sbTimeThen.isAlternateDay()
-                }
+                } ?: sortedEntries.filter {
+                    it.altDay != sbTimeThen.isAlternateDay()
+                }.minByOrNull { it.resetsAt }
                 sbTimeThen.copy(hour = nextMeal?.resetsAt ?: 0, minute = 0, second = 0).asTimeMark().timeUntil()
             }
         }
