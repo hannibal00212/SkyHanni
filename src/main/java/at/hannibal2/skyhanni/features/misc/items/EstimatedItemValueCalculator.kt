@@ -334,7 +334,7 @@ object EstimatedItemValueCalculator {
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         val price = MITHRIL_INFUSION.getPrice()
-        list.add("§7Mithril Infusion: §a§l✔ §7(§6 ${price.shortFormat()}§7)")
+        list.add("§7Mithril Infusion: §a§l✔ §7(§6${price.shortFormat()}§7)")
         return price
     }
 
