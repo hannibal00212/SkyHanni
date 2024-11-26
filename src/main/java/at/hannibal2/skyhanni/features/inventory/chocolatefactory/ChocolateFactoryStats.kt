@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.extraSlotsInDuration
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
@@ -14,6 +16,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -89,10 +93,28 @@ object ChocolateFactoryStats {
         val hitmanSingleSlotCd = hitmanStats.slotCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
         val hitmanAllSlotsCd = hitmanStats.allSlotsCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
 
-        val hitman28ClaimsReady = max(
-            hitmanStats.getTimeToNumSlots(28).inWholeSeconds,
-            hitmanStats.getTimeToHuntCount(28).inWholeSeconds,
-        ).takeIf { it > 0 }?.seconds?.format() ?: "§aReady Now"
+        val hitman28TimeToSlots = hitmanStats.getTimeToNumSlots(28)
+        val hitman28TimeToHunts = hitmanStats.getTimeToHuntCount(28)
+        val hitman28InhibitedBySpawns = hitman28TimeToHunts > hitman28TimeToSlots
+
+        val hitman28ClaimsReadyTime = when {
+            hitman28InhibitedBySpawns -> hitman28TimeToHunts
+            else -> {
+                // We're inhibited by when slots are available
+                val timeMarkThen = SimpleTimeMark.now() + hitman28TimeToSlots
+                // Figure out when the next egg spawn after that time is
+                val sbTimeThen = timeMarkThen.toSkyBlockTime()
+                val sortedEntries = HoppityEggType.resettingEntries.sortedBy { it.resetsAt }
+                val nextMeal = sortedEntries.firstOrNull {
+                    it.resetsAt > sbTimeThen.hour && it.altDay == sbTimeThen.isAlternateDay()
+                } ?: sortedEntries.firstOrNull {
+                    it.resetsAt < sbTimeThen.hour && it.altDay != sbTimeThen.isAlternateDay()
+                }
+                sbTimeThen.copy(hour = nextMeal?.resetsAt ?: 0, minute = 0, second = 0).asTimeMark().timeUntil()
+            }
+        }
+
+        val hitman28ClaimsReady = hitman28ClaimsReadyTime.takeIf { it > Duration.ZERO }?.format() ?: "§aReady Now"
 
         var hitmanSlotsFullTime = Duration.ZERO
         val openSlotsNow = hitmanStats.getOpenSlots()
