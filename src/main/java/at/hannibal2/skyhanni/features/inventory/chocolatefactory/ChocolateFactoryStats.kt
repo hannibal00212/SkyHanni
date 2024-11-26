@@ -117,12 +117,14 @@ object ChocolateFactoryStats {
         var hitmanSlotsFullTime = Duration.ZERO
         val openSlotsNow = hitmanStats.getOpenSlots()
         var runningOpenSlots = openSlotsNow
-        while (runningOpenSlots > 0) {
+        var loops = 0
+        while (runningOpenSlots > 0 && loops < 10) {
             // See how long it will take to fill those slots
             val timeToFill = hitmanStats.getTimeToHuntCount(runningOpenSlots)
             // Determine how many extra slots will be available after that time
             runningOpenSlots = hitmanStats.extraSlotsInDuration(timeToFill, runningOpenSlots)
             hitmanSlotsFullTime += timeToFill
+            loops++ // Runaway protection
         }
         val hitmanSlotsFull =
             if (openSlotsNow == 0) "§7Cooldown..."
