@@ -59,10 +59,10 @@ enum class HoppityEggType(
         claimed = false
     }
 
-    private fun hasNotSpawnedFirstDay(): Boolean {
+    private fun hasNotFirstSpawnedYet(): Boolean {
         val now = SkyBlockTime.now()
-        if (now.month > 4 || altDay && now.day > 2 || !altDay && now.day > 1) return false
-        return now.hour < resetsAt
+        if (now.month > 4 || (altDay && now.day > 2) || (!altDay && now.day > 1)) return false
+        return (altDay && now.day < 2) || now.hour < resetsAt
     }
 
     fun hasRemainingSpawns(): Boolean {
@@ -73,7 +73,7 @@ enum class HoppityEggType(
         return timeUntil() < hoppityEndMark.timeUntil()
     }
 
-    fun isClaimed() = claimed || hasNotSpawnedFirstDay()
+    fun isClaimed() = claimed || hasNotFirstSpawnedYet()
     val isResetting get() = resettingEntries.contains(this)
     val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
     val coloredName get() = "$mealColor$mealName"
