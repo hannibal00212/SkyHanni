@@ -25,7 +25,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object ChocolateFactoryHitmanSlots {
+object HitmanSlots {
 
     // <editor-fold desc="Patterns">
     /**

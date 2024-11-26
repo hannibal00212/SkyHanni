@@ -49,8 +49,8 @@ object HitmanAPI {
     fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
         val existingHunted = this.availableEggs ?: 0
         val firstHuntMeal =
-            HoppityEggType.resettingEntries.sortedBy { it.timeUntil() }.firstOrNull { !it.isClaimed() } ?:
-            HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
+            HoppityEggType.resettingEntries.sortedBy { it.timeUntil() }.firstOrNull { !it.isClaimed() }
+                ?: HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
         val isAlreadyClaimed = firstHuntMeal.isClaimed()
         val timeToFirstHunt = firstHuntMeal.nextTime() + when {
             isAlreadyClaimed -> 20.minutes
