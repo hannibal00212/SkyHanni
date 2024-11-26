@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "at.hannibal2.skyhanni"
-    version = "0.28.Beta.14"
+    version = "0.28.Beta.15"
     repositories {
         mavenCentral()
         mavenLocal()
