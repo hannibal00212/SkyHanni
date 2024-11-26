@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -224,11 +224,11 @@ object ChocolateFactoryStrayTracker {
         return if (goldenList.isEmpty()) "" else ("\n" + goldenList.joinToString("\n"))
     }
 
-    fun handleStrayClicked(slot: Slot) {
-        if (!isEnabled() || claimedStraysSlots.contains(slot.slotNumber)) return
+    fun handleStrayClicked(slotNumber: Int, itemStack: ItemStack): Boolean {
+        if (!isEnabled() || claimedStraysSlots.contains(slotNumber)) return false
 
-        claimedStraysSlots.add(slot.slotIndex)
-        val loreLine = formLoreToSingleLine(slot.stack.getLore())
+        claimedStraysSlots.add(slotNumber)
+        val loreLine = formLoreToSingleLine(itemStack.getLore())
 
         // "Base" strays - Common -> Epic, raw choc only reward.
         strayLorePattern.matchMatcher(loreLine) {
@@ -273,6 +273,8 @@ object ChocolateFactoryStrayTracker {
             }
             incrementGoldenType("dorado")
         }
+
+        return true
     }
 
     @SubscribeEvent
