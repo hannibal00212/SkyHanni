@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
-import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
@@ -129,10 +128,6 @@ object Commands {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGUI.onCommand() }
         }
-        event.register("shcommands") {
-            description = "Shows this list"
-            callback { HelpCommand.onCommand(it) }
-        }
         event.register("shdefaultoptions") {
             description = "Select default options"
             callback { DefaultConfigFeatures.onCommand(it) }
@@ -169,7 +164,7 @@ object Commands {
         }
         event.register("shcroptime") {
             description =
-                "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropTimeCommand.onCommand(it) }
         }
