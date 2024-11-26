@@ -12,12 +12,16 @@ object GuildMessages {
 
     private val patternGroup = RepoPattern.group("chat.guild")
 
+    /**
+     * REGEX-TEST: §f    §r§eToday:           §r§2403 Guild Experience
+     * REGEX-TEST: §f    §r§eNov 20 2024:   §r§219069 Guild Experience
+     */
     private val guildExpSummary by patternGroup.pattern(
         "exp.summary",
         "§f\\s+§r§e(?:Today|[A-Za-z]{3} \\d{1,2} \\d{4}):\\s+§r§2(?<gexp>\\d+)\\s+Guild Experience",
     )
 
-    private val guildExpStart = "§bGuild Exp Contributions:"
+    private const val guildExpStart = "§bGuild Exp Contributions:"
     private var isTrackingGuildExp = false
     private var totalGexp = 0
     private var counter = 0
