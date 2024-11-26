@@ -197,7 +197,9 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.OPEN_HITMAN_SLOTS, "§eOpen Hitman Slots: §6$openSlotsNow")
             put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
             put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
-            put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
+            // Current calculation code is bugged for this stat in particular
+            // put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
+            put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §c§oComing Soon")
             put(ChocolateFactoryStat.HITMAN_28_SLOTS, "§e28 Hitman Claims: §b$hitman28ClaimsReady")
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
