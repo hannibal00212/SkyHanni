@@ -49,7 +49,7 @@ object ChocolateFactoryStats {
         config.position.renderRenderables(display, posLabel = "Chocolate Factory Stats")
     }
 
-    @Suppress("LongMethod")
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     fun updateDisplay() {
         val profileStorage = profileStorage ?: return
 
