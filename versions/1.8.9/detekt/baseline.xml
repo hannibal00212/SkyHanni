@@ -18,7 +18,6 @@
     <ID>CyclomaticComplexMethod:GardenBestCropTime.kt$GardenBestCropTime$fun drawBestDisplay(currentCrop: CropType?): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
-    <ID>CyclomaticComplexMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
@@ -35,7 +34,6 @@
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
     <ID>LongMethod:CopyNearbyEntitiesCommand.kt$CopyNearbyEntitiesCommand$fun command(args: Array&lt;String&gt;)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
-    <ID>LongMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
@@ -179,12 +177,6 @@
     <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "crop", "§(?:e○|6☘) §7(?&lt;crop&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:GardenPlotAPI.kt$GardenPlotAPI$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!" )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "bestiary", ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?&lt;previousLevel&gt;\\d+)➜(?:§\\d|§\\w)(?&lt;nextLevel&gt;\\d+).*", )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "combatsection", ".*[+](?&lt;gained&gt;[0-9,.]+) (?&lt;skillName&gt;[A-Za-z]+) \\((?&lt;progress&gt;(?&lt;current&gt;[0-9.,]+)/(?&lt;total&gt;[0-9.,]+)|(?&lt;percent&gt;[0-9.]+)%)\\).*", )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "ghostxp", "(?&lt;current&gt;\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?&lt;total&gt;\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)", )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "killcomboexpired", "§cYour Kill Combo has expired! You reached a (?&lt;combo&gt;.*) Kill Combo!", )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "skilllevel", ".*§e§lSkills: §r§a(?&lt;skillName&gt;.*) (?&lt;skillLevel&gt;\\d+).*", )</ID>
-    <ID>RepoPatternRegexTest:GhostCounter.kt$GhostCounter$by patternGroup.pattern( "skillxp", "[+](?&lt;gained&gt;[0-9,.]+) \\((?&lt;current&gt;[0-9,.]+)(?:/(?&lt;total&gt;[0-9,.]+))?\\)", )</ID>
     <ID>RepoPatternRegexTest:GlacitePowderFeatures.kt$GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
     <ID>RepoPatternRegexTest:HotmData.kt$HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
@@ -355,7 +347,6 @@
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Int::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Long::plus)!!</ID>
-    <ID>UnsafeCallOnNullableType:CombatUtils.kt$CombatUtils$a!!</ID>
     <ID>UnsafeCallOnNullableType:CompactBestiaryChatMessage.kt$CompactBestiaryChatMessage$it.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:ConfigManager.kt$ConfigManager$file!!</ID>
     <ID>UnsafeCallOnNullableType:CorpseTracker.kt$CorpseTracker$applicableKeys.first().key!!</ID>
@@ -389,7 +380,6 @@
     <ID>UnsafeCallOnNullableType:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$cultivatingData[crop]!!</ID>
     <ID>UnsafeCallOnNullableType:GardenCropMilestonesCommunityFix.kt$GardenCropMilestonesCommunityFix$map[crop]!!</ID>
     <ID>UnsafeCallOnNullableType:GardenPlotIcon.kt$GardenPlotIcon$originalStack[index]!!</ID>
-    <ID>UnsafeCallOnNullableType:GhostCounter.kt$GhostCounter$storage?.totalMF!!</ID>
     <ID>UnsafeCallOnNullableType:Graph.kt$Graph.Companion$position!!</ID>
     <ID>UnsafeCallOnNullableType:Graph.kt$distances.distances[end]!!</ID>
     <ID>UnsafeCallOnNullableType:GriffinBurrowHelper.kt$GriffinBurrowHelper$particleBurrows[targetLocation]!!</ID>
