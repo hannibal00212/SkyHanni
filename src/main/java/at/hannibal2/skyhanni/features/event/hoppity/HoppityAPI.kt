@@ -102,16 +102,10 @@ object HoppityAPI {
      * REGEX-TEST: Chocolate Factory
      * REGEX-TEST: Chocolate Shop Milestones
      * REGEX-TEST: Chocolate Factory Milestones
-     * REGEX-TEST: Chocolate Breakfast Egg
-     * REGEX-TEST: Chocolate Lunch Egg
-     * REGEX-TEST: Chocolate Dinner Egg
-     * REGEX-TEST: Chocolate Brunch Egg
-     * REGEX-TEST: Chocolate Déjeuner Egg
-     * REGEX-TEST: Chocolate Supper Egg
      */
     private val miscProcessInvPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.misc",
-        "(?:§.)*Chocolate (?:Shop |(?:Factory|Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) ?)(?:Milestones|Egg)?",
+        "(?:§.)*Chocolate (?:Shop |Factory ?)(?:Milestones)?",
     )
 
     /**
@@ -142,12 +136,12 @@ object HoppityAPI {
         }
     }
 
-    private val hoppityDataSet = HoppityStateDataSet()
-    private val processedStraySlots = mutableListOf<Int>()
-    private val S_GLASS_PANE_ITEM by lazy { Item.getItemFromBlock(Blocks.stained_glass_pane) }
-    private val CHEST_ITEM by lazy { Item.getItemFromBlock(Blocks.chest) }
-
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+    private val hoppityDataSet = HoppityStateDataSet()
+    private val processedStraySlots = mutableMapOf<Int, String>()
+    private val miscProcessableItemTypes by lazy {
+        listOf(Items.skull, Item.getItemFromBlock(Blocks.stained_glass_pane))
+    }
 
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
@@ -168,9 +162,7 @@ object HoppityAPI {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    private fun InventoryUpdatedEvent.checkProcessedSlots() = processedStraySlots.removeIf { !inventoryItems.containsKey(it) }
-
-    private fun Map<Int, ItemStack>.filterStraySlots() = filter { (slotNumber, stack) ->
+    private fun Map<Int, ItemStack>.filterStrayProcessable() = filter { (slotNumber, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotNumber != 13 && slotNumber in 0..26 &&
             // Don't process the same slot twice.
@@ -181,12 +173,10 @@ object HoppityAPI {
             stack.hasDisplayName() && stack.getLore().isNotEmpty()
     }
 
-    // All misc items are skulls, panes, or chests with a display name, and lore.
-    private val miscProcessableItemTypes = listOf(Items.skull, S_GLASS_PANE_ITEM, CHEST_ITEM)
+
     private fun Slot.isMiscProcessable() =
-        // Stack must not be null, and must be a skull, pane, or chest.
-        stack != null && stack.item != null &&
-            stack.item in miscProcessableItemTypes &&
+        // All misc items are skulls or panes, with a display name, and lore.
+        stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
             stack.hasDisplayName() && stack.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
@@ -204,9 +194,15 @@ object HoppityAPI {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        event.checkProcessedSlots()
+        // Remove any processed stray slots that are no longer in the inventory.
+        processedStraySlots.entries.removeIf {
+            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.displayName != it.value
+        }
+
+        // Only process if we're in the Chocolate Factory.
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        event.inventoryItems.filterStraySlots().forEach { (slotNumber, itemStack) ->
+
+        event.inventoryItems.filterStrayProcessable().forEach { (slotNumber, itemStack) ->
             var processed = false
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(itemStack.displayName) {
                 processed = ChocolateFactoryStrayTracker.handleStrayClicked(slotNumber, itemStack)
@@ -234,7 +230,7 @@ object HoppityAPI {
                 hoppityDataSet.duplicate = itemStack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, slotNumber).post()
             }
-            if (processed) processedStraySlots.add(slotNumber)
+            if (processed) processedStraySlots[slotNumber] = itemStack.displayName
         }
     }
 
