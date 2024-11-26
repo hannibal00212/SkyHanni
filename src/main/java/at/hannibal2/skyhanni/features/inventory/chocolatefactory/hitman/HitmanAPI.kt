@@ -30,10 +30,11 @@ object HitmanAPI {
     /**
      * Return the number of extra slots that will be available after the given duration.
      */
-    fun HitmanStatsStorage.extraSlotsInDuration(duration: Duration): Int {
-        val currentSlots = this.getOpenSlots().takeIf { it < MAX_SLOT_COUNT } ?: return 0
+    fun HitmanStatsStorage.extraSlotsInDuration(duration: Duration, setSlotNumber: Int? = null): Int {
+        val currentSlots = (setSlotNumber ?: this.getOpenSlots()).takeIf { it < MAX_SLOT_COUNT } ?: return 0
         val slotCooldown = this.slotCooldown ?: return 0
         val minutesUntilSlot = slotCooldown.timeUntil().inPartialMinutes
+        if (minutesUntilSlot >= duration.inPartialMinutes) return 0
         for (i in 1..MAX_SLOT_COUNT) {
             // If the next slot would put us at the max slot count, return the number of slots
             if (currentSlots + i == MAX_SLOT_COUNT) return i

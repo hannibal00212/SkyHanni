@@ -95,15 +95,17 @@ object ChocolateFactoryStats {
         ).takeIf { it > 0 }?.seconds?.format() ?: "§aReady Now"
 
         var hitmanSlotsFullTime = Duration.ZERO
-        val openSlotsProper = hitmanStats.getOpenSlots()
-        var openSlotsFuture = openSlotsProper
-        while (openSlotsFuture > 0) {
-            val timeToHuntSlots = hitmanStats.getTimeToHuntCount(openSlotsFuture)
-            openSlotsFuture = hitmanStats.extraSlotsInDuration(timeToHuntSlots)
-            hitmanSlotsFullTime += timeToHuntSlots
+        val openSlotsNow = hitmanStats.getOpenSlots()
+        var runningOpenSlots = openSlotsNow
+        while (runningOpenSlots > 0) {
+            // See how long it will take to fill those slots
+            val timeToFill = hitmanStats.getTimeToHuntCount(runningOpenSlots)
+            // Determine how many extra slots will be available after that time
+            runningOpenSlots = hitmanStats.extraSlotsInDuration(timeToFill, runningOpenSlots)
+            hitmanSlotsFullTime += timeToFill
         }
         val hitmanSlotsFull =
-            if (openSlotsProper == 0) "§7Cooldown..."
+            if (openSlotsNow == 0) "§7Cooldown..."
             else hitmanSlotsFullTime.takeIf { it > Duration.ZERO }?.format() ?: "§cFull Now"
 
         val map = buildMap {
