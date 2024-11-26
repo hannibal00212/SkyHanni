@@ -24,9 +24,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.max
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryStats {
