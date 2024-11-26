@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.extraSlotsInDuration
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToHuntCount
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToNumSlots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,6 +20,9 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.max
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryStats {
@@ -76,7 +83,29 @@ object ChocolateFactoryStats {
 
         val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
-        val map = buildMap<ChocolateFactoryStat, String> {
+        val hitmanStats = profileStorage.hitmanStats
+        val availableHitmanEggs = hitmanStats.availableEggs?.takeIf { it > 0 }?.toString() ?: "§7None"
+        val hitmanSingleSlotCd = hitmanStats.slotCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
+        val hitmanAllSlotsCd = hitmanStats.allSlotsCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
+
+        val hitman28ClaimsReady = max(
+            hitmanStats.getTimeToNumSlots(28).inWholeSeconds,
+            hitmanStats.getTimeToHuntCount(28).inWholeSeconds,
+        ).takeIf { it > 0 }?.seconds?.format() ?: "§aReady Now"
+
+        var hitmanSlotsFullTime = Duration.ZERO
+        val openSlotsProper = hitmanStats.getOpenSlots()
+        var openSlotsFuture = openSlotsProper
+        while (openSlotsFuture > 0) {
+            val timeToHuntSlots = hitmanStats.getTimeToHuntCount(openSlotsFuture)
+            openSlotsFuture = hitmanStats.extraSlotsInDuration(timeToHuntSlots)
+            hitmanSlotsFullTime += timeToHuntSlots
+        }
+        val hitmanSlotsFull =
+            if (openSlotsProper == 0) "§7Cooldown..."
+            else hitmanSlotsFullTime.takeIf { it > Duration.ZERO }?.format() ?: "§cFull Now"
+
+        val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
             val maxSuffix = if (ChocolateFactoryAPI.isMax()) {
@@ -118,25 +147,32 @@ object ChocolateFactoryStats {
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
             )
 
-            if (ChocolateFactoryAPI.isMaxPrestige()) {
-                val allTime = ChocolateAmount.ALL_TIME.chocolate()
-                val nextChocolateMilestone = ChocolateFactoryAPI.getNextMilestoneChocolate(allTime)
-                val amountUntilNextMilestone = nextChocolateMilestone - allTime
-                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(nextChocolateMilestone)
-
-                if (amountUntilNextMilestone >= 0) {
-                    put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Next Milestone: $maxMilestoneEstimate")
-                    put(
-                        ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
-                        "§eChocolate To Next Milestone: §6${amountUntilNextMilestone.addSeparators()}",
-                    )
-                }
-            } else {
-                put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
-                put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
+            val allTime = ChocolateAmount.ALL_TIME.chocolate()
+            val nextChocolateMilestone = ChocolateFactoryAPI.getNextMilestoneChocolate(allTime)
+            val amountUntilNextMilestone = nextChocolateMilestone - allTime
+            val amountFormat = amountUntilNextMilestone.addSeparators()
+            val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(nextChocolateMilestone)
+            val prestigeData = when {
+                !ChocolateFactoryAPI.isMaxPrestige() -> mapOf(
+                    ChocolateFactoryStat.TIME_TO_PRESTIGE to "§eTime To Prestige: $prestigeEstimate",
+                    ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE to "§eChocolate To Prestige: §6$chocolateUntilPrestige"
+                )
+                amountUntilNextMilestone >= 0 -> mapOf(
+                    ChocolateFactoryStat.TIME_TO_PRESTIGE to "§eTime To Next Milestone: $maxMilestoneEstimate",
+                    ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE to "§eChocolate To Next Milestone: §6$amountFormat"
+                )
+                else -> emptyMap()
             }
+            putAll(prestigeData)
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
+
+            put(ChocolateFactoryStat.HITMAN_HEADER, "§c§lRabbit Hitman")
+            put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §b$availableHitmanEggs")
+            put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
+            put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
+            put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
+            put(ChocolateFactoryStat.HITMAN_28_SLOTS, "§e28 Hitman Claims: §b$hitman28ClaimsReady")
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
 
@@ -199,9 +235,12 @@ object ChocolateFactoryStats {
             "§eBest Upgrade: §b 59m 4s",
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
         ),
+        HITMAN_HEADER("§c§lRabbit Hitman"),
         AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §b3"),
-        HITMAN_SLOT_COOLDOWN("§Hitman Slot Cooldown: §b8m 6s"),
+        HITMAN_SLOT_COOLDOWN("§eHitman Slot Cooldown: §b8m 6s"),
         HITMAN_ALL_SLOTS("§eAll Hitman Slots Cooldown: §b8h 8m 6s"),
+        HITMAN_FULL_SLOTS("§eFull Hitman Slots: §b2h 10m"),
+        HITMAN_28_SLOTS("§e28 Hitman Claims: §b3h 20m"),
         ;
 
         override fun toString(): String {

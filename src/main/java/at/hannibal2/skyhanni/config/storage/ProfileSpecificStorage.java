@@ -222,7 +222,7 @@ public class ProfileSpecificStorage {
         public static class HitmanStatsStorage {
             @Expose
             @Nullable
-            public Integer availableEggs;
+            public Integer availableEggs = null;
 
             @Expose
             @Nullable

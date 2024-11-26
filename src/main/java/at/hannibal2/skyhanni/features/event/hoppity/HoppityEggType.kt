@@ -20,7 +20,7 @@ enum class HoppityEggType(
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
-    private val altDay: Boolean = false
+    val altDay: Boolean = false
 ) {
     BREAKFAST("Breakfast", "§6", 7),
     LUNCH("Lunch", "§9", 14),
@@ -48,6 +48,10 @@ enum class HoppityEggType(
         }
 
         return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+    }
+
+    fun nextTime(): SimpleTimeMark {
+        return SimpleTimeMark.now() + timeUntil()
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {
