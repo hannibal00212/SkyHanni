@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FarmingPersonalBestGain {
     private val config get() = GardenAPI.config
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
+    private val maxPB = mutableMapOf<CropType, Double>() //Crop, Max PB
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
@@ -46,6 +49,16 @@ object FarmingPersonalBestGain {
     var oldCollected: Double? = null
     var newFF: Double? = null
     var crop: String? = null
+    var cropType: CropType? = null
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GardenJson>("Garden")
+        maxPB.clear()
+        for ((crop, pb) in data.maxPersonalBest) {
+            maxPB[crop] = pb
+        }
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -55,6 +68,7 @@ object FarmingPersonalBestGain {
             newCollected = group("collected").formatDouble()
             checkDelayed()
         }
+
         oldPattern.matchMatcher(event.message) {
             oldCollected = group("collected").formatDouble()
             checkDelayed()
@@ -63,7 +77,7 @@ object FarmingPersonalBestGain {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
             crop = cropName
-            val cropType = CropType.getByName(cropName)
+            cropType = CropType.getByName(cropName)
             GardenAPI.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }
@@ -74,21 +88,22 @@ object FarmingPersonalBestGain {
     private fun checkDelayed() = DelayedRun.runNextTick { check() }
 
     private fun check() {
-        val newCollected = newCollected ?: return
         val oldCollected = oldCollected ?: return
-        val newFF = newFF ?: return
+        val newFF = newFF?.coerceAtMost(100.0) ?: return
         val crop = crop ?: return
-
+        val maxPB = maxPB[cropType] ?: return
         this.newCollected = null
         this.oldCollected = null
         this.newFF = null
         this.crop = null
 
-        val collectionPerFF = newCollected / newFF
+        val collectionPerFF = maxPB / 100
         val oldFF = oldCollected / collectionPerFF
         val ffDiff = newFF - oldFF
 
-        ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
+        if(oldFF<100){
+            ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
+        }
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.contestPersonalBestIncreaseFF
