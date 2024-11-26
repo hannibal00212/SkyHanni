@@ -193,7 +193,8 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
 
             put(ChocolateFactoryStat.HITMAN_HEADER, "§c§lRabbit Hitman")
-            put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §b$availableHitmanEggs")
+            put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §6$availableHitmanEggs")
+            put(ChocolateFactoryStat.OPEN_HITMAN_SLOTS, "§eOpen Hitman Slots: §6$openSlotsNow")
             put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
             put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
             put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
@@ -261,7 +262,8 @@ object ChocolateFactoryStats {
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
         ),
         HITMAN_HEADER("§c§lRabbit Hitman"),
-        AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §b3"),
+        AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §63"),
+        OPEN_HITMAN_SLOTS("§eOpen Hitman Slots: §63"),
         HITMAN_SLOT_COOLDOWN("§eHitman Slot Cooldown: §b8m 6s"),
         HITMAN_ALL_SLOTS("§eAll Hitman Slots Cooldown: §b8h 8m 6s"),
         HITMAN_FULL_SLOTS("§eFull Hitman Slots: §b2h 10m"),
