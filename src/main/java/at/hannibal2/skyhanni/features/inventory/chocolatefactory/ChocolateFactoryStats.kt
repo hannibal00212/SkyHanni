@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.extraSlotsInDuration
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToHuntCount
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToNumSlots
@@ -114,8 +113,9 @@ object ChocolateFactoryStats {
 
         val hitman28ClaimsReady = hitman28ClaimsReadyTime.takeIf { it > Duration.ZERO }?.format() ?: "§aReady Now"
 
-        var hitmanSlotsFullTime = Duration.ZERO
         val openSlotsNow = hitmanStats.getOpenSlots()
+
+        /* var hitmanSlotsFullTime = Duration.ZERO
         var runningOpenSlots = openSlotsNow
         var loops = 0
         while (runningOpenSlots > 0 && loops < 10) {
@@ -129,6 +129,7 @@ object ChocolateFactoryStats {
         val hitmanSlotsFull =
             if (openSlotsNow == 0) "§7Cooldown..."
             else hitmanSlotsFullTime.takeIf { it > Duration.ZERO }?.format() ?: "§cFull Now"
+         */
 
         val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
