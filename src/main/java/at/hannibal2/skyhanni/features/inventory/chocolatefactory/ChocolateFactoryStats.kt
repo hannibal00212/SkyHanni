@@ -222,12 +222,13 @@ object ChocolateFactoryStats {
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
 
+            put(ChocolateFactoryStat.HITMAN_HEADER, "§c§lRabbit Hitman")
+            put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §6$availableHitmanEggs")
+            put(ChocolateFactoryStat.OPEN_HITMAN_SLOTS, "§eOpen Hitman Slots: §6$openSlotsNow")
+            put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
+            put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
+
             if (HoppityAPI.isHoppityEvent()) {
-                put(ChocolateFactoryStat.HITMAN_HEADER, "§c§lRabbit Hitman")
-                put(ChocolateFactoryStat.AVAILABLE_HITMAN_EGGS, "§eAvailable Hitman Eggs: §6$availableHitmanEggs")
-                put(ChocolateFactoryStat.OPEN_HITMAN_SLOTS, "§eOpen Hitman Slots: §6$openSlotsNow")
-                put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
-                put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
                 put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
                 put(ChocolateFactoryStat.HITMAN_28_SLOTS, "§e28 Hitman Claims: §b$hitman28ClaimsReady")
             }
