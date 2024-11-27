@@ -98,8 +98,8 @@ object FarmingPersonalBestGain {
         this.newFF = null
         this.crop = null
 
-        val oldFF = oldCollected / pbIncrement
-        val newOverflowFF = newCollected / pbIncrement
+        val oldFF = oldCollected / (pbIncrement * 100)
+        val newOverflowFF = newCollected / (pbIncrement * 100)
         val ffDiff = newFF - oldFF
         val overflowFFDiff = newOverflowFF - oldFF
 
