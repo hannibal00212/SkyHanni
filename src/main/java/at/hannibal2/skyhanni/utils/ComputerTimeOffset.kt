@@ -45,7 +45,7 @@ object ComputerTimeOffset {
     private fun checkOffset() {
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.coroutineScope.launch {
-            offsetMillis = getNtpOffset("time.google.com")
+            offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
             offsetMillis?.let {
                 tryDisplayOffset(wasOffsetBefore)
             }
