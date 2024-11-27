@@ -29,6 +29,8 @@ object ItemPriceUtils {
             NEUInternalName.RUBY_CRYSTAL -> return 0.0
             NEUInternalName.SKYBLOCK_COIN -> return 1.0
             NEUInternalName.WISP_POTION -> return 20_000.0
+            NEUInternalName.ENCHANTED_HAY_BLOCK -> return 7_776.0
+            NEUInternalName.TIGHTLY_TIED_HAY_BALE -> return 1_119_744.0
         }
 
         if (priceSource != ItemPriceSource.NPC_SELL) {
