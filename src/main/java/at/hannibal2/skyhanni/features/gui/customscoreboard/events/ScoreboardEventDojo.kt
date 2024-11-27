@@ -20,7 +20,7 @@ object ScoreboardEventDojo : ScoreboardEvent() {
 
     override fun getDisplay() = patterns.allMatches(getSbLines())
 
-    override fun showWhen() = LorenzUtils.skyBlockArea == "Dojo"
+    override fun showWhen() = LorenzUtils.skyBlockArea in listOf("Dojo", "Dojo Arena")
 
     override val configLine = "§7(All Dojo Lines)"
 
