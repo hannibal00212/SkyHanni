@@ -78,8 +78,8 @@ object ChocolateFactoryTimeTowerManager {
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
             val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
-                "§cYour Time Tower just expired and has $charges remaining."
-                    + "§cClick here to open the Chocolate Factory Menu.",
+                "§cYour Time Tower just expired and has $charges remaining." +
+                        "§cClick here to open the Chocolate Factory Menu.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
