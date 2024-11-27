@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -64,7 +64,7 @@ object BazaarCancelledBuyOrderClipboard {
         if (!stack.name.contains("Cancel Order")) return
 
         val lore = stack.getLore()
-        lore.matchFirst(lastAmountPattern) {
+        lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
         }

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -33,7 +33,7 @@ object CarnivalShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private val NAME_TAG_ITEM by lazy { "NAME_TAG".asInternalName().getItemStack().item }
+    private val NAME_TAG_ITEM by lazy { "NAME_TAG".toInternalName().getItemStack().item }
 
     private var repoEventShops = mutableListOf<EventShop>()
     private var currentProgress: EventShopProgress? = null
@@ -44,8 +44,8 @@ object CarnivalShopHelper {
     private var shopSpecificInfoItemStack: ItemStack? = null
 
     /**
-     * REGEX-TEST: Your Tokens: §a1,234,567
-     * REGEX-TEST: Your Tokens: §a0
+     * REGEX-TEST: §7Your Tokens: §a1,234,567
+     * REGEX-TEST: §7Your Tokens: §a0
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",

@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
@@ -87,9 +87,11 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (isEnabled() || !(event.isMod(2) && hasMoved)) return
-        hasMoved = false
-        updatePosition()
+        if (!isEnabled()) return
+        if (event.isMod(2) && hasMoved) {
+            updatePosition()
+            hasMoved = false
+        }
     }
 
     @SubscribeEvent
@@ -276,7 +278,7 @@ object IslandAreas {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = config.pathfinder.color.get().toChromaColor()
+        val color = config.pathfinder.color.get().toSpecialColor()
         node.pathFind(
             displayName,
             color,
@@ -287,7 +289,7 @@ object IslandAreas {
             allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
-        hasMoved = true
+        updatePosition()
     }
 
     fun isEnabled() = IslandGraphs.currentIslandGraph != null

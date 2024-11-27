@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
@@ -42,7 +41,7 @@ object ItemPriceUtils {
             }
 
             if (this == JACK_O_LANTERN) {
-                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
+                return "PUMPKIN".toInternalName().getPrice(priceSource) + 1
             }
         }
         if (this == GOLDEN_CARROT) {
@@ -119,7 +118,7 @@ object ItemPriceUtils {
         return if (name.isEmpty()) {
             InventoryUtils.getItemInHand()?.getInternalName()
         } else {
-            val internalName = name.asInternalName()
+            val internalName = name.toInternalName()
             if (internalName.getItemStackOrNull() != null) {
                 internalName
             } else {

@@ -33,14 +33,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -115,7 +114,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toSpecialColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get(),
             )
@@ -125,8 +124,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toSpecialColor(),
+                endColor = barConfig.barStartColor.toSpecialColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get(),

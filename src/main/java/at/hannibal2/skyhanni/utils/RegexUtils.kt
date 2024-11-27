@@ -10,10 +10,6 @@ object RegexUtils {
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
 
-    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
-    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        pattern.firstMatcher(this, consumer)
-
     inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? {
         for (line in sequence) {
             matcher(line).let { if (it.matches()) return consumer(it) }
@@ -28,16 +24,10 @@ object RegexUtils {
         return null
     }
 
-    @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.firstMatcher(this, consumer)
-
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
         firstMatcherWithIndex(list.asSequence(), consumer)
-
-    @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.matchAll(this, consumer)
 
     inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
         for (line in list) {
