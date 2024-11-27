@@ -56,6 +56,7 @@ object ComputerTimeOffset {
         val client = NTPUDPClient()
         val address = InetAddress.getByName(ntpServer)
         val timeInfo = client.getTime(address)
+        client.close()
 
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds
