@@ -45,6 +45,7 @@ object ChocolateFactoryStrayTracker {
     private val config get() = ChocolateFactoryAPI.config
     private val claimedStraysSlots = mutableListOf<Int>()
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §9Zero §d§lCAUGHT!
      * REGEX-TEST: §6§lGolden Rabbit §d§lCAUGHT!
@@ -134,6 +135,7 @@ object ChocolateFactoryStrayTracker {
         "stray.doradoescape",
         ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*"
     )
+    // </editor-fold>
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
         drawDisplay(it)
