@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.extraSlotsInDuration
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToHuntCount
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToNumSlots
@@ -115,21 +116,27 @@ object ChocolateFactoryStats {
 
         val openSlotsNow = hitmanStats.getOpenSlots()
 
-        /* var hitmanSlotsFullTime = Duration.ZERO
-        var runningOpenSlots = openSlotsNow
+        var hitmanSlotsFullTime = Duration.ZERO
+        var slotsToFill = openSlotsNow
+        var reachedInhibitor = false
         var loops = 0
-        while (runningOpenSlots > 0 && loops < 10) {
-            // See how long it will take to fill those slots
-            val timeToFill = hitmanStats.getTimeToHuntCount(runningOpenSlots)
-            // Determine how many extra slots will be available after that time
-            runningOpenSlots = hitmanStats.extraSlotsInDuration(timeToFill, runningOpenSlots)
-            hitmanSlotsFullTime += timeToFill
-            loops++ // Runaway protection
+        while (!reachedInhibitor && loops++ < 100) {
+            // Calculate the time needed to fill this many slots
+            val timeToSlots = hitmanStats.getTimeToHuntCount(slotsToFill)
+            // How many additional slots spawned in that time?
+            val extraSlotsInTime = hitmanStats.extraSlotsInDuration(timeToSlots, slotsToFill)
+            // If we didn't get any extra slots, we're done
+            if (extraSlotsInTime == 0) {
+                hitmanSlotsFullTime = timeToSlots
+                reachedInhibitor = true
+            } else {
+                slotsToFill += extraSlotsInTime
+            }
         }
         val hitmanSlotsFull =
             if (openSlotsNow == 0) "§7Cooldown..."
             else hitmanSlotsFullTime.takeIf { it > Duration.ZERO }?.format() ?: "§cFull Now"
-         */
+
 
         val map = buildMap {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
@@ -198,9 +205,7 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.OPEN_HITMAN_SLOTS, "§eOpen Hitman Slots: §6$openSlotsNow")
             put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
             put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
-            // Current calculation code is bugged for this stat in particular
-            // put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
-            put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §c§oComing Soon")
+            put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
             put(ChocolateFactoryStat.HITMAN_28_SLOTS, "§e28 Hitman Claims: §b$hitman28ClaimsReady")
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
