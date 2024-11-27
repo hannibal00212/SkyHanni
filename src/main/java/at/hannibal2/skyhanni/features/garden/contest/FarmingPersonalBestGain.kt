@@ -16,9 +16,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-    private val config get() = GardenAPI.config
+    private val config get() = GardenAPI.config.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private val maxPB = mutableMapOf<CropType, Int>()
+    private val pbIncrement = mutableMapOf<CropType, Int>()
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
@@ -54,9 +54,9 @@ object FarmingPersonalBestGain {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        maxPB.clear()
-        for ((crop, pb) in data.maxPersonalBest) {
-            maxPB[crop] = pb
+        pbIncrement.clear()
+        for ((crop, pb) in data.personalBestIncrement) {
+            pbIncrement[crop] = pb
         }
     }
 
@@ -88,21 +88,26 @@ object FarmingPersonalBestGain {
     private fun checkDelayed() = DelayedRun.runNextTick { check() }
 
     private fun check() {
+        val newCollected = newCollected ?: return
         val oldCollected = oldCollected ?: return
-        val newFF = newFF?.coerceAtMost(100.0) ?: return
+        val newFF = newFF ?: return
         val crop = crop ?: return
-        val maxPB = maxPB[cropType] ?: return
+        val pbIncrement = pbIncrement[cropType] ?: return
         this.newCollected = null
         this.oldCollected = null
         this.newFF = null
         this.crop = null
 
-        val collectionPerFF = maxPB / 100
-        val oldFF = oldCollected / collectionPerFF
+        val oldFF = oldCollected / (pbIncrement * 100)
+        val newOverflowFF = newCollected / (pbIncrement * 100)
         val ffDiff = newFF - oldFF
+        val overflowFFDiff = newOverflowFF - oldFF
 
-        if (oldFF < 100) {
+        if (oldFF < 100 && !config.contestPersonalBestOverflow) {
             ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
+        } else if (newOverflowFF > 100 && config.contestPersonalBestOverflow) {
+            ChatUtils.chat("You have §6${newOverflowFF.roundTo(2)}☘ $crop Fortune §eincluding overflow!")
+            ChatUtils.chat("This is §6${overflowFFDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
         }
     }
 
