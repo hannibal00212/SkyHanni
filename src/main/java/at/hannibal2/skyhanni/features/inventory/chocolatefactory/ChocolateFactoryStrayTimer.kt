@@ -45,10 +45,7 @@ object ChocolateFactoryStrayTimer {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (timer == Duration.ZERO || timer == 30.seconds) return
-        // Reset the timer if the inventory is closed and the timer is not at 30 seconds
-        // The 30s stray timer only counts if you stay in the inventory for the full duration
-        timer = Duration.ZERO
+        if (timer > Duration.ZERO) timer = 30.seconds
     }
 
     @SubscribeEvent
