@@ -163,7 +163,7 @@ object FarmingSettingsAPI {
     }
 
     fun handleWarning() {
-        if (!isEnabled()) return
+        if (!isEnabled() || lastWarnTime.passedSince() < 20.seconds) return
         lastWarnTime = SimpleTimeMark.now()
 
         if (WarningType.WHEN_USING.isSelected()) sendWarnings(WarningType.WHEN_USING)
