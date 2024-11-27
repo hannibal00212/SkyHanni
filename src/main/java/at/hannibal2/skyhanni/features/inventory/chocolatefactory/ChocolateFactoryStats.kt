@@ -100,6 +100,7 @@ object ChocolateFactoryStats {
         val currentEventEnd = HoppityAPI.getEventEndMark()
         val hitman28InhibitedByEventEnd = SimpleTimeMark.now() + timeToGoal > (currentEventEnd ?: SimpleTimeMark.farFuture())
 
+        val hitman28Color = if (hitman28InhibitedByEventEnd) "§c" else "§b"
         val hitman28ClaimsReadyTime = when {
             hitman28InhibitedByEventEnd -> currentEventEnd?.timeUntil() ?: Duration.ZERO
             hitman28InhibitedBySpawns -> hitman28TimeToHunts
@@ -118,7 +119,8 @@ object ChocolateFactoryStats {
             }
         }
 
-        val hitman28ClaimsReady = hitman28ClaimsReadyTime.takeIf { it > Duration.ZERO }?.format() ?: "§aReady Now"
+        val hitman28TimeFormat = hitman28ClaimsReadyTime.takeIf { it > Duration.ZERO }?.format() ?: "§aReady Now"
+        val hitman28ClaimsReady = "$hitman28Color$hitman28TimeFormat"
 
         val openSlotsNow = hitmanStats.getOpenSlots()
 
