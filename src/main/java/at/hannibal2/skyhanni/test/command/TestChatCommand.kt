@@ -18,7 +18,7 @@ object TestChatCommand {
                 "   §7[-complex]§e: §7Parse the message as a JSON chat component",
                 "   §7[-clipboard]§e: §7Read the message from the clipboard",
                 "   §7[-s]§e: §7Hide the testing message",
-                "   §7[-s-a]§e: §7Hide everything but the final message", // Not really sure why you'd want this
+                "   §7[-sa]§e: §7Hide everything but the final message", // Not really sure why you'd want this
             )
             ChatUtils.userError("Specify a chat message to test!\n${syntaxStrings.joinToString("\n")}")
             return
@@ -30,23 +30,23 @@ object TestChatCommand {
             val isComplex = mutArgs.remove("-complex")
             // cant use multi lines without clipboard
             val isClipboard = mutArgs.remove("-clipboard") || multiLines
-            val isAllHidden = mutArgs.remove("-s-a")
-            val isHidden = mutArgs.remove("-s") || isAllHidden
+            val isSilentAll = mutArgs.remove("-sa")
+            val isSilent = mutArgs.remove("-s") || isSilentAll
             val text = if (isClipboard) {
                 OSUtils.readFromClipboard()
                     ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
             if (multiLines) {
                 for (line in text.split("\n")) {
-                    extracted(isComplex, line, isHidden, isAllHidden)
+                    extracted(isComplex, line, isSilent, isSilentAll)
                 }
             } else {
-                extracted(isComplex, text, isHidden, isAllHidden)
+                extracted(isComplex, text, isSilent, isSilentAll)
             }
         }
     }
 
-    private fun extracted(isComplex: Boolean, text: String, isHidden: Boolean, isAllHidden: Boolean) {
+    private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component =
             if (isComplex)
                 try {
@@ -63,9 +63,9 @@ object TestChatCommand {
 
         val rawText = component.formattedText.stripHypixelMessage()
             .replace("§", "&").replace("\n", "\\n")
-        if (!isHidden) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
+        if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
 
-        test(component, isAllHidden)
+        test(component, isSilentAll)
     }
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
