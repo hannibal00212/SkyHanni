@@ -79,7 +79,7 @@ object ChocolateFactoryTimeTowerManager {
             val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
                 "§cYour Time Tower just expired and has $charges remaining. " +
-                    "§cClick here to open the Chocolate Factory Menu.",
+                    "Click here to open the Chocolate Factory Menu.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
