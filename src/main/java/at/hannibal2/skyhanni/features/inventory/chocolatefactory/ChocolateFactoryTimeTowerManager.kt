@@ -101,7 +101,7 @@ object ChocolateFactoryTimeTowerManager {
 
         ChatUtils.clickToActionOrDisable(
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages! " +
-                "§cClick here to open the Chocolate Factory menu.",
+                "Click here to open the Chocolate Factory menu.",
             config::timeTowerWarning,
             actionName = "open Chocolate Factory",
             action = { HypixelCommands.chocolateFactory() },
