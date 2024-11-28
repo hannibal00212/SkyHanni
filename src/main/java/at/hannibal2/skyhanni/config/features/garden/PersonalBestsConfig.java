@@ -22,6 +22,5 @@ public class PersonalBestsConfig {
         desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100"
     )
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean contestPersonalBestOverflow = false;
 }
