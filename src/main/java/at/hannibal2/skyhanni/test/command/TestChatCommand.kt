@@ -33,8 +33,7 @@ object TestChatCommand {
             val isSilentAll = mutArgs.remove("-sa")
             val isSilent = mutArgs.remove("-s") || isSilentAll
             val text = if (isClipboard) {
-                OSUtils.readFromClipboard()
-                    ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
+                OSUtils.readFromClipboard() ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
             if (multiLines) {
                 for (line in text.split("\n")) {
@@ -47,22 +46,19 @@ object TestChatCommand {
     }
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
-        val component =
-            if (isComplex)
-                try {
-                    IChatComponent.Serializer.jsonToComponent(text)
-                } catch (ex: Exception) {
-                    ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
-                    return
-                }
-            else ChatComponentText(text.replace("&", "§"))
+        val component = if (isComplex) try {
+            IChatComponent.Serializer.jsonToComponent(text)
+        } catch (ex: Exception) {
+            ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+            return
+        }
+        else ChatComponentText(text.replace("&", "§"))
 
         println("component unformatted: ${component.unformattedText}")
         println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")
         println(component)
 
-        val rawText = component.formattedText.stripHypixelMessage()
-            .replace("§", "&").replace("\n", "\\n")
+        val rawText = component.formattedText.stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
         if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
 
         test(component, isSilentAll)
