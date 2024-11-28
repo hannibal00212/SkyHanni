@@ -100,7 +100,7 @@ object ChocolateFactoryTimeTowerManager {
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
 
         ChatUtils.clickToActionOrDisable(
-            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages!" +
+            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages! " +
                 "§cClick here to open the Chocolate Factory menu.",
             config::timeTowerWarning,
             actionName = "open Chocolate Factory",
