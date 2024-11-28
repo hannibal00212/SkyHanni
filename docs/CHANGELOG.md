@@ -15,6 +15,14 @@
 + Added the ability to display the Hoppity Event Card in real-time within a GUI element. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2749)
     +  This replaces the command `/shhoppitystats` (but it can be used to view past events).
     +  Can be configured to toggle visibility with a keybind.
++ Added a 30-second stay timer to Chocolate Factory after a Meal Egg is opened. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hoppity Event stat text for Hitman Rabbits. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hoppity Collection highlighting for Resident and Hotspot Rabbits. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
+    + Highlights Resident/Hotspot Rabbits on your current island.
++ Added Resident and Hotspot Rabbit overview option to Hoppity Collection stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hitman slot tracking to display the most recent rabbits you obtained. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
+    + Displays slots with an active cooldown.
++ Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 
 #### Inventory Features
 
@@ -56,6 +64,8 @@
 
 + Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
     +  Tracks items and profit while using the Draconic Altar in the End.
++ Added Ghost Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1753)
+    + Replaces the outdated and buggy Ghost Counter.
 
 #### Event Features
 
@@ -153,6 +163,7 @@
     +  Separated title and footer alignment.
     +  Added a custom alpha footer.
 + Added the Hot Chocolate Mixin to the Non-God Pot Effects feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2965)
++ Added the Hot Chocolate Mixin to the Non-God Pot Effects feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2965)
 
 ### Fixes
 
@@ -215,6 +226,9 @@
 + Fixed El Dorado and Fish the Rabbit not being correctly highlighted in the Hoppity Collection Stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2908)
 + Fixed a softlock that occurs when forcefully exiting the Meal Egg menu (due to death, warping, etc.). - Daveed (https://github.com/hannibal002/SkyHanni/pull/2910)
 + Fixed Hoppity Stats `/cf` reminders not working after initial login. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2919)
++ Fixed Hoppity Meals being marked as spawned immediately when the Hoppity Hunt started. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Fixed an issue with Hoppity Chat Compact duplicating El Dorado messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Fixed "Fish the Rabbit" being detected only on duplicate instances. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 
 #### Garden Fixes
 
@@ -232,6 +246,12 @@
 + Fixed the pest spawn timer not working. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2954)
 + Fixed the Item Number display not working for Vacuum (Garden). - Luna (https://github.com/hannibal002/SkyHanni/pull/2955)
 + Fixed pest death messages not being detected, tracked, or blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2953)
++ Updated Farming Fortune calculation to use 2 FF per Pesterminator level. - Luna (https://github.com/hannibal002/SkyHanni/pull/2978)
++ Updated the maximum possible Farming Fortune from the Pesterminator armor enchantment from 5 to 12 per piece. - Luna (https://github.com/hannibal002/SkyHanni/pull/2978)
++ Updated maximum Farming Fortune from the Pest Bestiary from 60 to 66. - Luna (https://github.com/hannibal002/SkyHanni/pull/2978)
++ Fixed a bug that sometimes caused BPS to be underestimated while farming in the Garden. - Chissl (https://github.com/hannibal002/SkyHanni/pull/2975)
++ Fixed loading farming weight errors caused by the Mouse Pest. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/2967)
++ Fixed a crash caused by Custom Garden Keybinds. - Empa (https://github.com/hannibal002/SkyHanni/pull/2969)
 
 #### Crimson Isle Fixes
 
@@ -400,6 +420,11 @@
 + Removed the deprecated NEUItems.getPrice method. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2944)
 + Added many more regex tests. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2937)
 + Added a Detekt rule to enforce repo patterns to be accompanied by at least one regex test. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2931)
++ A bit less confusion in carry tracker logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2911)
++ Improved error messages in the console when something goes horribly wrong. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2976)
++ Switched to using non-deprecated color functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2972)
++ Translated SpecialColor to Kotlin. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2854)
++ Deprecated `ColorUtils.toChromaColor()` methods and moved them to SpecialColor. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2854)
 
 ## Version 0.27
 
