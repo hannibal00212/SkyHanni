@@ -100,43 +100,45 @@ object GardenBestCropTime {
                 return@buildList
             }
 
-            var number = 0
-            for (crop in sorted.keys) {
-                if (crop.isMaxed(useOverflow)) continue
-                val millis = timeTillNextCrop[crop]?.milliseconds ?: continue
-                // TODO, change functionality to use enum rather than ordinals
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
-                val duration = millis.format(biggestUnit, maxUnits = 2)
-                val isCurrent = crop == currentCrop
-                number++
-                if (number > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) continue
-
-                val line = Renderable.horizontalContainer(
-                    buildList {
-                        if (!config.next.bestCompact) {
-                            addString("§7$number# ")
-                        }
-                        addCropIcon(crop)
-
-                        val color = if (isCurrent) "§e" else "§7"
-                        val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-                        val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
-                        val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
-
-                        val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
-                        val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""
-                        addString("$color$contestFormat$cropName$tier§b$duration")
-
-                        if (gardenExp && !config.next.bestCompact) {
-                            val gardenExpForTier = getGardenExpForTier(nextTier)
-                            addString(" §7(§2$gardenExpForTier §7Exp)")
-                        }
-                    },
-                )
-                add(line)
+            sorted.keys.withIndex().forEach { (index, crop) ->
+                createCropEntry(crop, index, useOverflow, gardenExp, currentCrop)?.let(::add)
             }
         },
     )
+
+    private fun createCropEntry(crop: CropType, index: Int, useOverflow: Boolean, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
+        if (crop.isMaxed(useOverflow)) return null
+        val millis = timeTillNextCrop[crop]?.milliseconds ?: return null
+        // TODO, change functionality to use enum rather than ordinals
+        val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+        val duration = millis.format(biggestUnit, maxUnits = 2)
+        val isCurrent = crop == currentCrop
+        val index = index + 1
+        if (index > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) return null
+
+        return Renderable.horizontalContainer(
+            buildList {
+                if (!config.next.bestCompact) {
+                    addString("§7$index# ")
+                }
+                addCropIcon(crop)
+
+                val color = if (isCurrent) "§e" else "§7"
+                val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
+                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
+                val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
+
+                val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
+                val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""
+                addString("$color$contestFormat$cropName$tier§b$duration")
+
+                if (gardenExp && !config.next.bestCompact) {
+                    val gardenExpForTier = getGardenExpForTier(nextTier)
+                    addString(" §7(§2$gardenExpForTier §7Exp)")
+                }
+            },
+        )
+    }
 
     private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10
 
