@@ -15,9 +15,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SuperCraftFeatures {
+
+    /**
+     * REGEX-TEST: §eYou Supercrafted §r§r§r§aEnchanted Ender Pearl§r§e!
+     * REGEX-TEST: §eYou Supercrafted §r§r§r§9Enchanted Mithril §r§8x3§r§e!
+     */
     val craftedPattern by RepoPattern.pattern(
         "inventory.supercrafting.craft.new",
-        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!"
+        "§eYou Supercrafted §r§r§r§.(?<item>[^§]+)(?:§r§8x(?<amount>[\\d,]+))?§r§e!",
     )
     private val config get() = SkyHanniMod.feature.inventory.gfs
 

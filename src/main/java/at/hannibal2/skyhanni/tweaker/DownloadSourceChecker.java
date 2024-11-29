@@ -13,6 +13,8 @@ import java.io.FileReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DownloadSourceChecker {
 
@@ -78,9 +80,20 @@ public class DownloadSourceChecker {
             }
         ));
 
+        // Compile the regex pattern for matching an empty host
+        Pattern pattern = Pattern.compile("https:\\/\\/.*.com\\/$|about:internet");
+        Matcher matcher = pattern.matcher(uriToSimpleString(host));
+
+        // Check if the host is empty (Brave is cutting everything past .com/ from the host)
+        String cutHostMessage = "";
+        if (matcher.find()) {
+            cutHostMessage = "\n\nYour browser MAY have interfered with the download process.\n" +
+                "Try downloading the file using a different browser (Microsoft Edge, Google Chrome, etc.).";
+        }
+
         JOptionPane.showOptionDialog(
             frame,
-            String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
+            String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)) + cutHostMessage,
             "SkyHanni " + MOD_VERSION + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,

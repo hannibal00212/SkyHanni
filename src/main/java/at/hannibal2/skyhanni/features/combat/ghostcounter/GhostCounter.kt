@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -121,9 +121,9 @@ object GhostCounter {
     private var currentSkill = ""
     private var currentSkillLevel = -1
     private const val CONFIG_VALUE_VERSION = 1
-    private val SORROW = "SORROW".asInternalName()
-    private val PLASMA = "PLASMA".asInternalName()
-    private val VOLTA = "VOLTA".asInternalName()
+    private val SORROW = "SORROW".toInternalName()
+    private val PLASMA = "PLASMA".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

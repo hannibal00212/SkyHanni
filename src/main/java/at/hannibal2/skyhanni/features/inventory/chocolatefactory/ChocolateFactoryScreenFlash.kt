@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -23,7 +26,7 @@ import kotlin.math.sin
 object ChocolateFactoryScreenFlash {
 
     private val config get() = ChocolateFactoryAPI.config
-    var flashScreen = false
+    private var flashScreen = false
 
     @SubscribeEvent
     fun onTick(event: SecondPassedEvent) {
@@ -41,6 +44,12 @@ object ChocolateFactoryScreenFlash {
         }
     }
 
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        if (event.eggType != HoppityEggType.STRAY) return
+        flashScreen = false
+    }
+
     private fun isSpecial(slot: Slot) =
         clickMeGoldenRabbitPattern.matches(slot.stack.name) || slot.stack.getSkullTexture() in specialRabbitTextures
 
@@ -55,7 +64,7 @@ object ChocolateFactoryScreenFlash {
             0,
             minecraft.displayWidth,
             minecraft.displayHeight,
-            (alpha shl 24) or (config.rabbitWarning.flashColor.toChromaColorInt() and 0xFFFFFF),
+            (alpha shl 24) or (config.rabbitWarning.flashColor.toSpecialColorInt() and 0xFFFFFF),
         )
         GlStateManager.color(1F, 1F, 1F, 1F)
     }

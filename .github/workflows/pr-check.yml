@@ -8,10 +8,15 @@ jobs:
     verify-changelog:
         if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
         runs-on: ubuntu-latest
-
+        concurrency:
+            group: verify-changelog-${{ github.event.pull_request.number }}
+            cancel-in-progress: true
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
 
             -   uses: ./.github/actions/setup-normal-workspace
 
@@ -50,8 +55,8 @@ jobs:
                         const commentBody = `${test}`
                         
                         github.rest.issues.createComment({
-                          issue_number: context.issue.number,
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          body: commentBody
+                            issue_number: context.issue.number,
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            body: commentBody
                         })
