@@ -74,6 +74,14 @@ object NumberUtil {
     }
 
     /**
+     * Only shows decimal places if necessary.
+     */
+    fun Double.prettyRound(decimals: Int): String {
+        val rounded = this.roundTo(decimals)
+        return (if (rounded % 1 == 0.0) rounded else rounded.toInt()).toString()
+    }
+
+    /**
      * This code was unmodified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/22186845
      * @author jpdymond

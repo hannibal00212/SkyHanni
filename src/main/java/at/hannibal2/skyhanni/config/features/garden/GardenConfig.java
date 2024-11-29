@@ -141,6 +141,11 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Jacob Contest Stats", desc = "")
+    @Accordion
+    public JacobContestStatsConfig jacobContestStats = new JacobContestStatsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -181,6 +186,10 @@ public class GardenConfig {
     public boolean jacobContestTimes = true;
 
     @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
+    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
+
+    @Expose
     @ConfigOption(
         name = "Custom BPS",
         desc = "Use custom Blocks per Second value in some GUIs instead of the real one."
@@ -199,19 +208,6 @@ public class GardenConfig {
     public double jacobContestCustomBpsValue = 19.9;
 
     @Expose
-    @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
-    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Contest Summary",
-        desc = "Show the average Blocks Per Second and blocks clicked at the end of a Jacob Farming Contest in chat."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean jacobContestSummary = true;
-
-    @Expose
     @ConfigOption(
         name = "Personal Best Increase FF",
         desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
@@ -220,7 +216,6 @@ public class GardenConfig {
     @FeatureToggle
     public boolean contestPersonalBestIncreaseFF = true;
 
-    // Does not have a config element!
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
 
