@@ -37,6 +37,7 @@ enum class SkyblockStat(
     HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>.*)", " §c❣ Health Regen §f(?<value>.*)"),
     VITALITY("§4♨", " Vitality: §r§4♨(?<value>.*)", " §4♨ Vitality §f(?<value>.*)"),
     MENDING("§a☄", " Mending: §r§a☄(?<value>.*)", " §a☄ Mending §f(?<value>.*)"),
+    // TODO rename to TRUE_DEFENSE
     TRUE_DEFENCE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>.*)", " §eⓈ Swing Range §f(?<value>.*)"),
     SPEED("§f✦", " Speed: §r§f✦(?<value>.*)", " §f✦ Speed §f(?<value>.*)"), // TODO add the way sba did get it (be careful with 500+ Speed)
