@@ -19,7 +19,7 @@ public class PersonalBestsConfig {
     @Expose
     @ConfigOption(
         name = "Overflow Personal Bests",
-        desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100"
+        desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100."
     )
     @ConfigEditorBoolean
     public boolean overflow = false;
