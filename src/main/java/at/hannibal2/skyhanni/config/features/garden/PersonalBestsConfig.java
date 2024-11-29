@@ -14,7 +14,7 @@ public class PersonalBestsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean contestPersonalBestIncreaseFF = true;
+    public boolean increaseFF = true;
 
     @Expose
     @ConfigOption(
@@ -22,5 +22,5 @@ public class PersonalBestsConfig {
         desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100"
     )
     @ConfigEditorBoolean
-    public boolean contestPersonalBestOverflow = false;
+    public boolean overflow = false;
 }
