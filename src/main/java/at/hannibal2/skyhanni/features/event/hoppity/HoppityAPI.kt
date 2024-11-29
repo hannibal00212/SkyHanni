@@ -144,6 +144,7 @@ object HoppityAPI {
     }
 
     fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) SkyBlockTime.now().year.getEventEndMark() else null
     fun Int.getEventEndMark(): SimpleTimeMark =
         SkyBlockTime.fromSeason(this, SkyblockSeason.SUMMER, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
     fun Int.getEventStartMark(): SimpleTimeMark =
