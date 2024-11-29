@@ -138,8 +138,8 @@ object EnderNodeTracker {
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
-        miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
-            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
+            it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
         }.sumOf { it.stackSize }
     }
 
