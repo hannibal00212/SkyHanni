@@ -52,7 +52,7 @@ object CakeTracker {
 
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
-    private val maxTrackerHeight get() = config.maxHeight.get()
+    private val maxTrackerHeight: Float get() = config.maxHeight.get()
 
     private var currentYear = 0
     private var inCakeInventory = false
@@ -429,7 +429,7 @@ object CakeTracker {
         } else add(
             Renderable.scrollList(
                 getCakeRanges(cakeList, config.displayOrderType, config.displayType),
-                height = maxTrackerHeight,
+                height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
                 showScrollableTipsInList = true
             )

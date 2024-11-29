@@ -76,5 +76,5 @@ public class CakeTrackerConfig {
         desc = "Maximum height of the tracker."
     )
     @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 10)
-    public Property<Integer> maxHeight = Property.of(250);
+    public Property<Float> maxHeight = Property.of(250F);
 }

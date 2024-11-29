@@ -977,7 +977,10 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
             showScrollableTipsInList: Boolean = false
         ) = object : Renderable {
-            override val width = list.maxOf { it.width }
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
+            override var width = list.maxOf { it.width }
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1006,10 +1009,17 @@ interface Renderable {
                 // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
                 // there are more items above
                 if (showScrollableTipsInList && scroll.asInt() > 0) {
-                    val tip = string("§7§oMore items above (scroll)")
-                    tip.renderXAligned(posX, posY, width)
-                    GlStateManager.translate(0f, tip.height.toFloat(), 0f)
-                    renderY += tip.height
+                    width = maxOf(width, scrollUpTip.width)
+                    scrollUpTip.renderXAligned(posX, posY, width)
+                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                    renderY += scrollUpTip.height
+                    virtualY += scrollUpTip.height
+                }
+
+                // Pre-reserve space for the scroll down tip
+                if (showScrollableTipsInList) {
+                    renderY += scrollDownTip.height
+                    virtualY += scrollDownTip.height
                 }
 
                 for (renderable in list) {
@@ -1031,10 +1041,13 @@ interface Renderable {
                 // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
                 // there are more items below
                 if (showScrollableTipsInList && virtualY > end) {
-                    val tip = string("§7§oMore items below (scroll)")
-                    tip.renderXAligned(posX, posY + height - tip.height, width)
-                    GlStateManager.translate(0f, tip.height.toFloat(), 0f)
-                    renderY += tip.height
+                    width = maxOf(width, scrollDownTip.width)
+                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
+                    GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
+                } else if (showScrollableTipsInList) {
+                    // De-allocate the space reserved for the scroll down tip
+                    renderY -= scrollDownTip.height
+                    virtualY -= scrollDownTip.height
                 }
 
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
