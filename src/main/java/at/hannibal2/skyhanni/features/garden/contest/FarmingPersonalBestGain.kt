@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FarmingPersonalBestGain {
     private val config get() = GardenAPI.config.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private val pbIncrement = mutableMapOf<CropType, Int>()
+    private var pbIncrement = mapOf<CropType, Int>()
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
@@ -54,10 +55,12 @@ object FarmingPersonalBestGain {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        pbIncrement.clear()
-        for ((crop, pb) in data.personalBestIncrement) {
-            pbIncrement[crop] = pb
-        }
+        pbIncrement = data.personalBestIncrement
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(68, "garden.contestPersonalBestIncreaseFF", "garden.personalBests.increaseFF")
     }
 
     @SubscribeEvent
@@ -103,13 +106,13 @@ object FarmingPersonalBestGain {
         val ffDiff = newFF - oldFF
         val overflowFFDiff = newOverflowFF - oldFF
 
-        if (oldFF < 100 && !config.contestPersonalBestOverflow) {
+        if (oldFF < 100 && !config.overflow) {
             ChatUtils.chat("This is §6${ffDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
-        } else if (newOverflowFF > 100 && config.contestPersonalBestOverflow) {
+        } else if (newOverflowFF > 100 && config.overflow) {
             ChatUtils.chat("You have §6${newOverflowFF.roundTo(2)}☘ $crop Fortune §eincluding overflow!")
             ChatUtils.chat("This is §6${overflowFFDiff.roundTo(2)}☘ $crop Fortune §emore than previously!")
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.contestPersonalBestIncreaseFF
+    fun isEnabled() = GardenAPI.inGarden() && config.increaseFF
 }
