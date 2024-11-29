@@ -63,6 +63,7 @@ object NonGodPotEffectDisplay {
         VOID("§6Ender Portal Fumes", true),
         BLAZE("§fGabagoey", true),
         GLOWING_MUSH("§2Glowing Mush Mixin", true),
+        HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 

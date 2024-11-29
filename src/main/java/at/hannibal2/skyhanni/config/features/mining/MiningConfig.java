@@ -99,7 +99,7 @@ public class MiningConfig {
     @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean privateIslandNoPickaxeAbility = false;
+    public boolean privateIslandNoPickaxeAbility = true;
 
     @Expose
     @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")
