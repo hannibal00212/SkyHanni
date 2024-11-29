@@ -331,7 +331,7 @@ object FarmingFortuneDisplay {
     fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
-    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 1.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 2.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())

@@ -574,7 +574,8 @@ object FarmingWeightDisplay {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
             apiData.crops
             for (crop in apiData.crops) {
-                cropWeight[crop.key] = crop.value
+                val cropType = CropType.getByNameOrNull(crop.key) ?: continue
+                cropWeight[cropType] = crop.value
             }
             hasFetchedCropWeights = true
         } catch (e: Exception) {

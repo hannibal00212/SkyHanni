@@ -93,11 +93,19 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            if (LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
+            if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.itemName, sellOfferPrice, instantBuyPrice, product)
     }.toMap()
+
+    private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {
+        "ENCHANTMENT_COUNTER_STRIKE_3",
+        "ENCHANTMENT_COUNTER_STRIKE_4",
+        -> true
+
+        else -> false
+    }
 
     private fun BazaarQuickStatus.isEmpty(): Boolean = with(this) {
         sellPrice == 0.0 &&
