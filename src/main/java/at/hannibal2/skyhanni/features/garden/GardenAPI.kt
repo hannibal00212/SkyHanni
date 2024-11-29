@@ -172,8 +172,7 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    // TODO rename to addCropIcon
-    fun MutableList<Renderable>.addCropIconRenderable(
+    fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
         scale: Double = NEUItems.itemFontSize,
         highlight: Boolean = false,

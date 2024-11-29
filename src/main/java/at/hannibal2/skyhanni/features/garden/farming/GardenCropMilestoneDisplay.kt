@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIconRenderable
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
@@ -307,7 +308,7 @@ object GardenCropMilestoneDisplay {
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(
             buildList {
-                addCropIconRenderable(mushroom)
+                addCropIcon(mushroom)
                 addString("§7Mushroom Milestone $nextTier")
             },
         )

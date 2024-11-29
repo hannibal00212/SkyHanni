@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIconRenderable
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -116,7 +116,7 @@ object GardenBestCropTime {
                         if (!config.next.bestCompact) {
                             addString("§7$number# ")
                         }
-                        addCropIconRenderable(crop)
+                        addCropIcon(crop)
 
                         val color = if (isCurrent) "§e" else "§7"
                         val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
