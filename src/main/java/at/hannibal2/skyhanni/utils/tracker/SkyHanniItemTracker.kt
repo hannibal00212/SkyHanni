@@ -33,6 +33,10 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
+    fun addCoins(amount: Int, command: Boolean) {
+        addItem(SKYBLOCK_COIN, amount, command)
+    }
+
     fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         modify {
             it.addItem(internalName, amount, command)

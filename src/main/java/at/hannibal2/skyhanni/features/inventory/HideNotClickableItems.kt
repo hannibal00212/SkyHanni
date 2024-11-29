@@ -69,6 +69,16 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    /**
+     * REGEX-TEST: SEEDS
+     * REGEX-TEST: CARROT_ITEM
+     * REGEX-TEST: POTATO_ITEM
+     * REGEX-TEST: PUMPKIN_SEEDS
+     * REGEX-TEST: SUGAR_CANE
+     * REGEX-TEST: MELON_SEEDS
+     * REGEX-TEST: CACTUS
+     * REGEX-TEST: INK_SACK-3
+     */
     private val seedsPattern by RepoPattern.pattern(
         "inventory.hidenotclickable.seeds",
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",

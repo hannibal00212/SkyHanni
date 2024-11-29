@@ -34,10 +34,20 @@ object VisitorAPI {
     const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
+
+    /**
+     * REGEX-TEST: §b§lVisitors: §r§f(5)
+     */
     val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)",
     )
+
+    /**
+     * REGEX-TEST:  §r§aEmissary Carlton
+     * REGEX-TEST:  §r§6Madame Eleanor Q. Goldsworth III
+     * REGEX-TEST:  §r§9Lazy Miner
+     */
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
         " (?:§.)+(?<name>§.[^§]+).*",

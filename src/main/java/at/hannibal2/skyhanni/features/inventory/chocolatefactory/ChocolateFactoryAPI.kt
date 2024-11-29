@@ -39,10 +39,19 @@ object ChocolateFactoryAPI {
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
+
+    /**
+     * REGEX-TEST: 46,559,892,200 Chocolate
+     */
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
         "(?<amount>[\\d,]+) Chocolate",
     )
+
+    /**
+     * REGEX-TEST: Hoppity
+     * REGEX-TEST: Chocolate Factory Milestones
+     */
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "Hoppity|Chocolate Factory Milestones",
@@ -73,18 +82,20 @@ object ChocolateFactoryAPI {
     var barnIndex = 34
     var infoIndex = 13
     var productionInfoIndex = 45
-    var prestigeIndex = 28
+    var prestigeIndex = 27
     var milestoneIndex = 53
-    var leaderboardIndex = 51
+    var leaderboardIndex = 52
     var handCookieIndex = 38
     var timeTowerIndex = 39
     var shrineIndex = 41
     var coachRabbitIndex = 42
-    var maxRabbits = 395
+    var rabbitHitmanIndex = 51
+    var maxRabbits = 503
+    var hitmanCosts = TreeSet<Long>()
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
-    private var maxPrestige = 5
+    private var maxPrestige = 6
 
     var inChocolateFactory = false
     var chocolateFactoryPaused = false
@@ -143,9 +154,11 @@ object ChocolateFactoryAPI {
         timeTowerIndex = data.timeTowerIndex
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
+        rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
         chocolateMilestones = data.chocolateMilestones
+        hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits

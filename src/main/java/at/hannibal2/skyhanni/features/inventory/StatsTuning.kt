@@ -24,6 +24,9 @@ object StatsTuning {
 
     private val config get() = SkyHanniMod.feature.inventory.statsTuning
 
+    /**
+     * REGEX-TEST: §7Stat has: §e3 points
+     */
     private val statPointsPattern by RepoPattern.pattern(
         "inventory.statstuning.points",
         "§7Stat has: §e(?<amount>\\d+) points?",

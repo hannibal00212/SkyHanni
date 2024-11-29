@@ -33,7 +33,7 @@ object CraftRoomHolographicMob {
         -117.0, 51.0, -128.0,
     )
     private var entitiesList = listOf<HolographicEntities.HolographicEntity<out EntityLivingBase>>()
-    private var entityToHolographicEntity = mapOf(
+    private val entityToHolographicEntity = mapOf(
         EntityZombie::class.java to HolographicEntities.zombie,
         EntitySlime::class.java to HolographicEntities.slime,
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
