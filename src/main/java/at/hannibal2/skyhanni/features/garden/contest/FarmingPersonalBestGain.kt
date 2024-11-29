@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object FarmingPersonalBestGain {
     private val config get() = GardenAPI.config.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
-    private var pbIncrement = mapOf<CropType, Int>()
+    private var personalBestIncrements = mapOf<CropType, Int>()
 
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYou collected §e1,400,694 §fitems! §d§lPERSONAL BEST§f!
@@ -55,7 +55,7 @@ object FarmingPersonalBestGain {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        pbIncrement = data.personalBestIncrement
+        personalBestIncrements = data.personalBestIncrement
     }
 
     @SubscribeEvent
@@ -95,7 +95,7 @@ object FarmingPersonalBestGain {
         val oldCollected = oldCollected ?: return
         val newFF = newFF ?: return
         val crop = crop ?: return
-        val pbIncrement = pbIncrement[cropType] ?: return
+        val pbIncrement = personalBestIncrements[cropType] ?: return
         this.newCollected = null
         this.oldCollected = null
         this.newFF = null
