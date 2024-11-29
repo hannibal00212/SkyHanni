@@ -1016,10 +1016,10 @@ interface Renderable {
                     virtualY += scrollUpTip.height
                 }
 
-                // Pre-reserve space for the scroll down tip
-                if (showScrollableTipsInList) {
-                    renderY += scrollDownTip.height
+                val atScrollEnd = scroll.asInt() == virtualHeight - height
+                if (!atScrollEnd) {
                     virtualY += scrollDownTip.height
+                    renderY += scrollDownTip.height
                 }
 
                 for (renderable in list) {
@@ -1044,10 +1044,6 @@ interface Renderable {
                     width = maxOf(width, scrollDownTip.width)
                     scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
                     GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
-                } else if (showScrollableTipsInList) {
-                    // De-allocate the space reserved for the scroll down tip
-                    renderY -= scrollDownTip.height
-                    virtualY -= scrollDownTip.height
                 }
 
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
