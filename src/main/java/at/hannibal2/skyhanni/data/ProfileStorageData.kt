@@ -33,7 +33,7 @@ object ProfileStorageData {
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
-    var hypixelDataLoaded = false
+    private var hypixelDataLoaded = false
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -84,7 +84,7 @@ object ProfileStorageData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (noTabListTime == SimpleTimeMark.farPast()) return
+        if (noTabListTime.isFarPast()) return
 
         playerSpecific?.let {
             // do not try to load the data when hypixel has not yet send the profile loaded message

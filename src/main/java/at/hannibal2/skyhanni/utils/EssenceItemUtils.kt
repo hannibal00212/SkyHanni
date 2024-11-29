@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -35,7 +35,7 @@ object EssenceItemUtils {
                 upgradePrices[tier] = EssenceUpgradePrice(essencePrice, coinPrice, itemPrice)
             }
 
-            val internalName = name.asInternalName()
+            val internalName = name.toInternalName()
             itemPrices[internalName] = upgradePrices
         }
         return itemPrices
@@ -65,7 +65,7 @@ object EssenceItemUtils {
     }
 
     private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let {
-        it[0].asInternalName() to it[1].toLong()
+        it[0].toInternalName() to it[1].toLong()
     }
 
     private fun loadEssencePrices(data: NeuEssenceCostJson): MutableMap<Int, EssencePrice> {

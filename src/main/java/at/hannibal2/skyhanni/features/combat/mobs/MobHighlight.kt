@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -40,7 +40,7 @@ object MobHighlight {
         if (config.corruptedMobHighlight && event.health == baseMaxHealth * 3) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
+                LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
             ) { config.corruptedMobHighlight }
         }
     }
@@ -54,14 +54,14 @@ object MobHighlight {
         if (config.arachneKeeperHighlight && (maxHealth == 3_000 || maxHealth == 12_000) && entity is EntityCaveSpider) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_BLUE.toColor().withAlpha(127)
+                LorenzColor.DARK_BLUE.toColor().addAlpha(127),
             ) { config.arachneKeeperHighlight }
         }
 
         if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
+                LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
             ) { config.corleoneHighlighter }
         }
 
@@ -73,17 +73,17 @@ object MobHighlight {
                 if (isZealot || isBruiser) {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
-                        LorenzColor.DARK_AQUA.toColor().withAlpha(127)
+                        LorenzColor.DARK_AQUA.toColor().addAlpha(127),
                     ) { config.zealotBruiserHighlighter }
                 }
             }
 
             if (config.chestZealotHighlighter) {
-                val isHoldingChest = (entity as? EntityEnderman)?.getBlockInHand()?.block == Blocks.ender_chest
+                val isHoldingChest = entity.getBlockInHand()?.block == Blocks.ender_chest
                 if ((isZealot || isBruiser) && isHoldingChest) {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
-                        LorenzColor.GREEN.toColor().withAlpha(127)
+                        LorenzColor.GREEN.toColor().addAlpha(127),
                     ) { config.chestZealotHighlighter }
                 }
             }
@@ -92,7 +92,7 @@ object MobHighlight {
             if (config.specialZealotHighlighter && maxHealth.ignoreDerpy() == 2_000) {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
-                    LorenzColor.DARK_RED.toColor().withAlpha(50)
+                    LorenzColor.DARK_RED.toColor().addAlpha(50),
                 ) { config.specialZealotHighlighter }
             }
         }
@@ -147,14 +147,14 @@ object MobHighlight {
     private fun markArachneMinis(entity: EntityLivingBase) {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity,
-            LorenzColor.GOLD.toColor().withAlpha(50)
+            LorenzColor.GOLD.toColor().addAlpha(50),
         ) { config.arachneBossHighlighter }
     }
 
     private fun markArachne(entity: EntityLivingBase) {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity,
-            LorenzColor.RED.toColor().withAlpha(50)
+            LorenzColor.RED.toColor().addAlpha(50),
         ) { config.arachneBossHighlighter }
     }
 }

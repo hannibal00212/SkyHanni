@@ -42,13 +42,17 @@ object HarpFeatures {
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
     private val patternGroup = RepoPattern.group("harp")
+
+    /**
+     * REGEX-TEST: Harp - Amazing Grace
+     */
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
         "Harp.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*",
+        "Melody",
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
@@ -120,7 +124,7 @@ object HarpFeatures {
         val minecraft = Minecraft.getMinecraft()
         val width = GuiScreenUtils.scaledWindowWidth
         val height = GuiScreenUtils.scaledWindowHeight
-        minecraft.currentScreen.setWorldAndResolution(minecraft, width, height)
+        minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
     }
 
     @SubscribeEvent
