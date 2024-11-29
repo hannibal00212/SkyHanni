@@ -93,6 +93,7 @@
 + Renamed some commands for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2642)
 + Added Spirit Sceptre message to block annoying messages. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2863)
 + Added `/boo` support for tab completion. - Empa (https://github.com/hannibal002/SkyHanni/pull/2885)****
++ Command aliases are now visible in `/shcommands`. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2993)
 
 #### Combat Improvements
 
@@ -127,6 +128,8 @@
     +  Updated the Chocolate leaderboard during events.
     +  The leaderboard can optionally set reminders to switch servers to update this stat.
 + Added more granular control over when the Hoppity Live Display is shown. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2919)
++ The Hoppity Unclaimed Eggs display is now more accurate at the end of events. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2986)
+
 
 #### Great Spook Improvements
 
@@ -229,6 +232,9 @@
 + Fixed Hoppity Meals being marked as spawned immediately when the Hoppity Hunt started. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 + Fixed an issue with Hoppity Chat Compact duplicating El Dorado messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 + Fixed "Fish the Rabbit" being detected only on duplicate instances. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Fixed stray rabbits that were intermittently not being tracked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2994)
++ Fixed the stray timer not resetting when changing islands. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2994)
++ Fixed an issue where Meal Eggs were incorrectly marked as available on Day 1. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2986)
 
 #### Garden Fixes
 
@@ -265,6 +271,7 @@
 
 + Fixed /shtranslate not working in most cases. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2693)
 + Fixed tab completions for /p [IGN]. - appable (https://github.com/hannibal002/SkyHanni/pull/2769)
++ Fixed the ordering of the `/shcommands` list. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2993)
 
 #### Mining Fixes
 
@@ -334,6 +341,7 @@
 + Fixed incorrect skill XP for max-level skills. - Empa (https://github.com/hannibal002/SkyHanni/pull/2921)
 + Fixed Tab Widgets sometimes not getting updating. - Empa (https://github.com/hannibal002/SkyHanni/pull/2923)
 + Fixed the inability to delete characters when searching on trackers on Mac (again). - 0xDoge (https://github.com/hannibal002/SkyHanni/pull/2951)
++ Fixed computer time offset calculation errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2998)
 
 ### Technical Details
 
@@ -425,6 +433,8 @@
 + Switched to using non-deprecated color functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2972)
 + Translated SpecialColor to Kotlin. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2854)
 + Deprecated `ColorUtils.toChromaColor()` methods and moved them to SpecialColor. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2854)
++ Fixed various bugs in `/shtestmessage`. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2982)
++ Updated the enchant-exclusive regex to restore chat tooltip functionality. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2985)
 
 ## Version 0.27
 
