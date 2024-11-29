@@ -101,7 +101,7 @@ object GardenBestCropTime {
             }
 
             sorted.keys.withIndex().forEach { (index, crop) ->
-                createCropEntry(crop, index, useOverflow, gardenExp, currentCrop)?.let(::add)
+                createCropEntry(crop, index + 1, useOverflow, gardenExp, currentCrop)?.let(::add)
             }
         },
     )
@@ -113,7 +113,6 @@ object GardenBestCropTime {
         val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
         val duration = millis.format(biggestUnit, maxUnits = 2)
         val isCurrent = crop == currentCrop
-        val index = index + 1
         if (index > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) return null
 
         return Renderable.horizontalContainer(
