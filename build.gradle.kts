@@ -215,7 +215,7 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))

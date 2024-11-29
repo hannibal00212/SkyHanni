@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import java.awt.Color
 
 object ColorUtils {
 
-    /** Transfer string colors from the config to [Color] */
-    fun String.toChromaColor() = Color(toChromaColorInt(), true)
-    fun String.toChromaColorInt() = SpecialColor.specialToChromaRGB(this)
+    @Deprecated("Use toSpecialColor() instead", ReplaceWith("this.toSpecialColor()"))
+    fun String.toChromaColor() = this.toSpecialColor()
+
+    @Deprecated("Use toSpecialColorInt() instead", ReplaceWith("this.toSpecialColorInt()"))
+    fun String.toChromaColorInt() = this.toSpecialColorInt()
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 

@@ -60,6 +60,7 @@ public class HoppityEventSummaryConfig {
 
     public enum HoppityStat {
         MEAL_EGGS_FOUND("§7You found §b45§7/§a47 §6Chocolate Meal Eggs§7."),
+        HITMAN_EGGS("§7You recovered §b20§7/§a40 §7missed §6Meal Eggs §7from §cRabbit Hitman§7."),
         HOPPITY_RABBITS_BOUGHT("§7You bought §b7 §fRabbits §7from §aHoppity§7."),
         SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish Eggs §r§7in the §6Chocolate Factory§7."),
         MILESTONE_RABBITS("§7You claimed §b2 §6§lMilestone Rabbits§7."),
