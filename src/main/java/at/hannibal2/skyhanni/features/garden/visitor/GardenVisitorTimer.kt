@@ -36,6 +36,10 @@ object GardenVisitorTimer {
 
     private val config get() = GardenAPI.config.visitors.timer
 
+    /**
+     * REGEX-TEST:  Next Visitor: §r§b11m
+     * REGEX-TEST:  Next Visitor: §r§c§lQueue Full!
+     */
     private val timePattern by RepoPattern.pattern(
         "garden.visitor.timer.time.new",
         " Next Visitor: §r(?<info>.*)",

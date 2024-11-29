@@ -50,14 +50,12 @@ object GraphEditorBugFinder {
             val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
             nearestArea[node] = areaNode
         }
-        var bugs = 0
         for (node in nodes) {
             val areaNode = nearestArea[node]?.name ?: continue
             for (neighbour in node.neighbours.keys) {
                 val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
                 if (neighbouringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    bugs++
                     errorsInWorld[node] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
                 }
             }
@@ -67,11 +65,9 @@ object GraphEditorBugFinder {
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
                 errorsInWorld[node] = "§cMissing name despite having tags"
-                bugs++
             }
             if (tagsEmpty > nameNull) {
                 errorsInWorld[node] = "§cMissing tags despite having name"
-                bugs++
             }
         }
 
@@ -82,14 +78,12 @@ object GraphEditorBugFinder {
             val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.position.distanceSqToPlayer() } }
             closestForeignNodes.forEach {
                 errorsInWorld[it] = "§cDisjoint node network"
-                bugs++
             }
             val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
             val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
             closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
 
-        println("found $bugs bugs!")
         this.errorsInWorld = errorsInWorld
         if (clusters.size <= 1) {
             errorsInWorld.keys.minByOrNull {

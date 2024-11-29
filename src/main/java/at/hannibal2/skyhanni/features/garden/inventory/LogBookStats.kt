@@ -23,17 +23,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object LogBookStats {
 
     private val groupPattern = RepoPattern.group("garden.inventory.logbook")
+
+    /**
+     * REGEX-TEST: §7Times Visited: §a22
+     */
     private val visitedPattern by groupPattern.pattern(
         "visited",
-        "§7Times Visited: §a(?<timesVisited>[0-9,.]+)"
+        "§7Times Visited: §a(?<timesVisited>[0-9,.]+)",
     )
+
+    /**
+     * REGEX-TEST: §7Offers Accepted: §a21
+     */
     private val acceptedPattern by groupPattern.pattern(
         "accepted",
-        "§7Offers Accepted: §a(?<timesAccepted>[0-9,.]+)"
+        "§7Offers Accepted: §a(?<timesAccepted>[0-9,.]+)",
     )
+
+    /**
+     * REGEX-TEST: §ePage 3
+     */
     private val pagePattern by groupPattern.pattern(
         "page.current",
-        "§ePage (?<page>\\d)"
+        "§ePage (?<page>\\d)",
     )
 
     private val config get() = GardenAPI.config
@@ -86,7 +98,7 @@ object LogBookStats {
             config.logBookStatsPos.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "Visitor's LogBook Stats"
+                posLabel = "Visitor's LogBook Stats",
             )
         }
     }

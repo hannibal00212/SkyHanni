@@ -35,18 +35,34 @@ object ChocolateFactoryDataLoader {
     private val config get() = ChocolateFactoryAPI.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
+    // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: §674.15 §8per second
+     */
     private val chocolatePerSecondPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.persecond",
         "§6(?<amount>[\\d.,]+) §8per second",
     )
+
+    /**
+     * REGEX-TEST: §7All-time Chocolate: §67,645,879,859
+     */
     private val chocolateAllTimePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.alltime",
         "§7All-time Chocolate: §6(?<amount>[\\d,]+)",
     )
+
+    /**
+     * REGEX-TEST: §6Chocolate Factory III
+     */
     private val prestigeLevelPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "prestige.level",
         "§6Chocolate Factory (?<prestige>[IVX]+)",
     )
+
+    /**
+     * REGEX-TEST: §7Chocolate this Prestige: §6330,382,389
+     */
     private val chocolateThisPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.thisprestige",
         "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)",
@@ -59,10 +75,18 @@ object ChocolateFactoryDataLoader {
         "chocolate.max",
         "§7Max Chocolate: §6(?<max>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7§cRequires 4B Chocolate this Prestige!
+     */
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.forprestige",
         "§7§cRequires (?<amount>\\w+) Chocolate this.*",
     )
+
+    /**
+     * REGEX-TEST: §7Total Multiplier: §61.399x
+     */
     private val chocolateMultiplierPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.multiplier",
         "§7Total Multiplier: §6(?<amount>[\\d.]+)x",
@@ -77,22 +101,43 @@ object ChocolateFactoryDataLoader {
         "leaderboard.place",
         "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?",
     )
+
+    /**
+     * REGEX-TEST: §7§8You are in the top §65.06%§8 of players!
+     */
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.percentile",
         "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!",
     )
+
+    /**
+     * REGEX-TEST: §7Your Barn: §a16§7/§a450 Rabbits
+     */
     private val barnAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "barn.amount",
         "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits",
     )
+
+    /**
+     * REGEX-TEST: §7Charges: §e2§7/§a3
+     */
     private val timeTowerAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "timetower.amount",
         "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §7Status: §a§lACTIVE §f59m58s
+     * REGEX-TEST:
+     */
     private val timeTowerStatusPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "timetower.status",
         "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)",
     )
+
+    /**
+     * REGEX-TEST: §7Next Charge: §a7h59m58s
+     */
     private val timeTowerRechargePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "timetower.recharge",
         "§7Next Charge: §a(?<duration>\\w+)",
@@ -109,22 +154,65 @@ object ChocolateFactoryDataLoader {
         "rabbit.clickme.golden",
         "§6§lGolden Rabbit §8- §a(?<name>.*)",
     )
+
+    /**
+     * REGEX-TEST: Rabbit Bro - [14] Employee
+     */
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.amount",
         "Rabbit \\S+ - \\[(?<amount>\\d+)].*",
     )
+
+    /**
+     * REGEX-TEST: Time Tower I
+     */
     private val upgradeTierPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "upgradetier",
         ".*\\s(?<tier>[IVXLC]+)",
     )
+
+    /**
+     * REGEX-TEST: Rabbit Bro - Unemployed
+     */
     private val unemployedRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.unemployed",
         "Rabbit \\w+ - Unemployed",
     )
+
+    /**
+     * REGEX-TEST: Rabbit Shrine
+     * REGEX-TEST: Coach Jackrabbit
+     */
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "other.upgrade",
         "Rabbit Shrine|Coach Jackrabbit",
     )
+
+    /**
+     * REGEX-TEST: §7Available eggs: §a0
+     */
+    private val hitmanAvailableEggsPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.availableeggs",
+        "§7Available eggs: §a(?<amount>\\d+)",
+    )
+
+    /**
+     * REGEX-TEST: §7Slot cooldown: §a8m 6s
+     */
+    private val hitmanSingleSlotCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.slotcooldown",
+        "§7Slot cooldown: §a(?<duration>[\\w ]+)",
+    )
+
+    /**
+     * REGEX-TEST: §7All slots in: §a8h 8m 6s
+     */
+    private val hitmanAllSlotsCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.allslotscooldown",
+        "§7All slots in: §a(?<duration>[\\w ]+)",
+    )
+
+    // </editor-fold>
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -189,6 +277,7 @@ object ChocolateFactoryDataLoader {
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.productionInfoIndex) ?: return
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.leaderboardIndex) ?: return
         val barnItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.barnIndex) ?: return
+        val hitmanItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.rabbitHitmanIndex) ?: return
 
         ChocolateFactoryAPI.factoryUpgrades = emptyList()
 
@@ -199,6 +288,7 @@ object ChocolateFactoryDataLoader {
         processProductionItem(productionInfoItem)
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
+        processHitmanItem(hitmanItem)
 
         profileStorage.rawChocPerSecond = (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now()
@@ -323,6 +413,26 @@ object ChocolateFactoryDataLoader {
                 val timeUntilTower = TimeUtils.getDuration(formattedGroup)
                 val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
                 profileStorage.nextTimeTower = nextTimeTower
+            }
+        }
+    }
+
+    private fun processHitmanItem(item: ItemStack) {
+        val profileStorage = profileStorage ?: return
+
+        for (line in item.getLore()) {
+            hitmanAvailableEggsPattern.matchMatcher(line) {
+                profileStorage.hitmanStats.availableEggs = group("amount").formatInt()
+            }
+            hitmanSingleSlotCooldownPattern.matchMatcher(line) {
+                val timeUntilSlot = TimeUtils.getDuration(group("duration"))
+                val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
+                profileStorage.hitmanStats.slotCooldown = nextSlot
+            }
+            hitmanAllSlotsCooldownPattern.matchMatcher(line) {
+                val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
+                val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
+                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
             }
         }
     }

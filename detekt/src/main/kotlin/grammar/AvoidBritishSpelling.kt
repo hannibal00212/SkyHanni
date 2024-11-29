@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.detektrules.grammar
 
+import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 
@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
  * This rule reports all usages of the british spelling over the american spelling in the codebase,
  * this will ignore any type annotations, i.e., `@ConfigEditorColour` will not be reported.
  */
-class AvoidBritishSpelling(config: Config) : Rule(config) {
+class AvoidBritishSpelling(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "AvoidBritishSpelling",
         Severity.Style,
@@ -32,13 +32,7 @@ class AvoidBritishSpelling(config: Config) : Rule(config) {
 
         for (word in scannedWords) {
             if (text.contains(word.key, ignoreCase = true)) {
-                report(
-                    CodeSmell(
-                        issue,
-                        Entity.from(expression),
-                        "Avoid using the word '${word.key}' in code, '${word.value}' is preferred instead.",
-                    ),
-                )
+                expression.reportIssue("Avoid using the word '${word.key}' in code, '${word.value}' is preferred instead.")
             }
         }
         super.visitStringTemplateExpression(expression)

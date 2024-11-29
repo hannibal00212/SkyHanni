@@ -36,7 +36,7 @@ object CarnivalZombieShootout {
     private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
 
-    private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
+    private val lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
 
     private var content = Renderable.horizontalContainer(listOf())
     private var drawZombies = mapOf<EntityZombie, ZombieType>()

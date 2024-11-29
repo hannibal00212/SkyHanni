@@ -17,10 +17,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object ComposterInventoryNumbers {
 
     private val patternGroup = RepoPattern.group("garden.composter.inventory.numbers")
+
+    /**
+     * REGEX-TEST: §2§l§m      §f§l§m              §r §e37,547.5§6/§e130k
+     */
     private val valuePattern by patternGroup.pattern(
         "value",
         ".* §e(?<having>.*)§6/(?<total>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7§7Compost Available: §a62
+     */
     private val amountPattern by patternGroup.pattern(
         "amount",
         "§7§7Compost Available: §a(?<amount>.*)",

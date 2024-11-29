@@ -17,10 +17,18 @@ object ServerRestartTitle {
 
     private val config get() = SkyHanniMod.feature.misc
     private val patternGroup = RepoPattern.group("features.misc.serverrestart")
+
+    /**
+     * REGEX-TEST: §cServer closing: 03:11 §8m77A
+     */
     private val restartingPattern by patternGroup.pattern(
         "time",
         "§cServer closing: (?<minutes>\\d+):(?<seconds>\\d+) ?§8.*",
     )
+
+    /**
+     * REGEX-TEST: §cServer closing: 03:11 §8m77A
+     */
     val restartingGreedyPattern by patternGroup.pattern(
         "greedy",
         "§cServer closing.*",

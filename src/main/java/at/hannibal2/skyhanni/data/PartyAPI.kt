@@ -19,54 +19,107 @@ import kotlin.random.Random
 object PartyAPI {
 
     private val patternGroup = RepoPattern.group("data.party")
+
+    /**
+     * REGEX-TEST: §eYou have joined §b[MVP§d+§b] Throwpo's §eparty!
+     */
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
         "§eYou have joined (?<name>.*)'s? §eparty!",
     )
+
+    /**
+     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ejoined the party.
+     */
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
         "(?<name>.*) §ejoined the party\\.",
     )
+
+    /**
+     * REGEX-TEST: §eYou'll be partying with: §a[VIP] FungalBeatle550
+     */
     private val othersInThePartyPattern by patternGroup.pattern(
         "others.inparty",
         "§eYou'll be partying with: (?<names>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7246sweets §ehas left the party.
+     */
     private val otherLeftPattern by patternGroup.pattern(
         "others.left",
         "(?<name>.*) §ehas left the party\\.",
     )
+
+    /**
+     * REGEX-TEST: §7riblets §ehas been removed from the party.
+     */
     private val otherKickedPattern by patternGroup.pattern(
         "others.kicked",
         "(?<name>.*) §ehas been removed from the party\\.",
     )
+
+    /**
+     * REGEX-TEST: §eKicked §b[MVP§d+§b] Throwpo§e because they were offline.
+     */
     private val otherOfflineKickedPattern by patternGroup.pattern(
         "others.offline",
         "§eKicked (?<name>.*) because they were offline\\.",
     )
+
+    /**
+     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ewas removed from your party because they disconnected.
+     */
     private val otherDisconnectedPattern by patternGroup.pattern(
         "others.disconnect",
         "(?<name>.*) §ewas removed from your party because they disconnected\\.",
     )
+
+    /**
+     * REGEX-TEST: The party was transferred to [MVP+] CalMWolfs because [MVP+] Throwpo left
+     */
     private val transferOnLeavePattern by patternGroup.pattern(
         "others.transfer.leave",
         "The party was transferred to (?<newowner>.*) because (?<name>.*) left",
     )
+
+    /**
+     * REGEX-TEST: The party was transferred to [MVP+] Throwpo by [MVP+] CalMWolfs
+     */
     val transferVoluntaryPattern by patternGroup.pattern(
         "others.transfer.voluntary",
         "The party was transferred to (?<newowner>.*) by (?<name>.*)",
     )
+
+    /**
+     * REGEX-TEST: §b[MVP§d+§b] Throwpo §ehas disbanded the party!
+     */
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
         ".* §ehas disbanded the party!",
     )
+
+    /**
+     * REGEX-TEST: §eYou have been kicked from the party by §b[MVP§d+§b] Throwpo §e
+     */
     private val kickedPattern by patternGroup.pattern(
         "you.kicked",
         "§eYou have been kicked from the party by .* §e",
     )
+
+    /**
+     * REGEX-TEST: §6Party Members (2)
+     */
     private val partyMembersStartPattern by patternGroup.pattern(
         "members.start",
         "§6Party Members \\(\\d+\\)",
     )
+
+    /**
+     * REGEX-TEST: Party Members: [MVP+] Throwpo ●
+     * REGEX-TEST: Party Leader: [MVP+] CalMWolfs ●
+     */
     private val partyMemberListPattern by patternGroup.pattern(
         "members.list.withkind",
         "Party (?<kind>Leader|Moderators|Members): (?<names>.*)",
@@ -75,6 +128,10 @@ object PartyAPI {
         "kuudrafinder.join",
         "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)",
     )
+
+    /**
+     * REGEX-TEST: §dParty Finder §f> §bGhostsTM §ejoined the dungeon group! (§bArcher Level 9§e)
+     */
     private val dungeonFinderJoinPattern by patternGroup.pattern(
         "dungeonfinder.join",
         "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)",
