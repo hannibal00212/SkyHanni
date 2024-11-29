@@ -95,12 +95,12 @@ object FarmingPersonalBestGain {
         val oldCollected = oldCollected ?: return
         val newFF = newFF ?: return
         val crop = crop ?: return
-        val pbIncrement = personalBestIncrements[cropType] ?: return
         this.newCollected = null
         this.oldCollected = null
         this.newFF = null
         this.crop = null
 
+        val pbIncrement = personalBestIncrements[cropType] ?: return
         val oldFF = oldCollected / (pbIncrement * 100)
         val newOverflowFF = newCollected / (pbIncrement * 100)
         val ffDiff = newFF - oldFF
