@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIconRenderable
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -160,7 +159,7 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(
             buildList {
-                addCropIconRenderable(crop)
+                addCropIcon(crop)
                 if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
                     addString("§7" + crop.cropName + " §eMAXED")
                 } else {
