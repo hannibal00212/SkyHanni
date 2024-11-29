@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events
 
-class PurseChangeEvent(val coins: Double, val reason: PurseChangeCause) : LorenzEvent()
+class PurseChangeEvent(val coins: Double, val purse: Double, val reason: PurseChangeCause) : LorenzEvent()
 
 enum class PurseChangeCause {
     GAIN_MOB_KILL,

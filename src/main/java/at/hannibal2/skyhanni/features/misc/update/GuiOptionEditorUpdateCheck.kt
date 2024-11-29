@@ -46,7 +46,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         GlStateManager.scale(2F, 2F, 1F)
         val currentVersion = SkyHanniMod.version
-        val sameVersion = currentVersion.equals(nextVersion, true)
+        val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
                 if (nextVersion != null && !sameVersion) "➜ $GREEN$nextVersion" else "",
