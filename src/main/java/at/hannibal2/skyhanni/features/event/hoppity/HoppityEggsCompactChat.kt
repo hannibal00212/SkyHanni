@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.toHoppityRarity
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,7 +49,7 @@ object HoppityEggsCompactChat {
             in resettingEntries -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Egg"
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
-        val rarityString = hoppityDataSet.lastRarity?.toHoppityRarity() ?: "§C§L???"
+        val rarityString = hoppityDataSet.lastRarity?.let { "${it.chatColorCode}§l${it.rawName}" } ?: "§C§L???"
         val rarityFormat = when {
             hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.DUPE) -> "$rarityString "
             !hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.NEW) -> "$rarityString "
