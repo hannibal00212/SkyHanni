@@ -152,19 +152,20 @@ object PestProfitTracker {
 
         val profit = tracker.drawItems(bucketData, { true }, this)
 
-        val totalPestCount = bucketData.getTotalPestCount()
+        val selectedBucket = bucketData.selectedBucket
+        val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
+        val pestCountFormat = (selectedBucket?.displayName ?: "Pests") + " killed: §e${pestCount.addSeparators()}"
+
         add(
-            Renderable.hoverTips(
-                "§7Pests killed: §e${totalPestCount.addSeparators()}",
-                buildList {
-                    val data = bucketData.pestKills
-                    // Sort by A-Z in displaying real types
-                    data.toList().sortedBy { it.first.displayName }.forEach { (type, count) ->
-                        add("§7${type.displayName}: §e${count.addSeparators()}")
-                    }
-                }
-            ).toSearchable(),
+            when {
+                selectedBucket != null -> Renderable.hoverTips(
+                    pestCountFormat,
+                    bucketData.getDescription(pestCount)
+                ).toSearchable()
+                else -> Renderable.string(pestCountFormat).toSearchable()
+            }
         )
+
         add(tracker.addTotalProfit(profit, bucketData.getTotalPestCount(), "kill"))
 
         tracker.addPriceFromButton(this)
