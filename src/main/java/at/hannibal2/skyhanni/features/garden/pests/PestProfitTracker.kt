@@ -158,12 +158,9 @@ object PestProfitTracker {
                 "§7Pests killed: §e${totalPestCount.addSeparators()}",
                 buildList {
                     val data = bucketData.pestKills
-                    data[PestType.UNKNOWN]?.let {
-                        "§8Unknown: §e${it.addSeparators()}"
-                    }
                     // Sort by A-Z in displaying real types
                     data.toList().sortedBy { it.first.displayName }.forEach { (type, count) ->
-                        "§7${type.displayName}: §e${count.addSeparators()}"
+                        add("§7${type.displayName}: §e${count.addSeparators()}")
                     }
                 }
             ).toSearchable(),
