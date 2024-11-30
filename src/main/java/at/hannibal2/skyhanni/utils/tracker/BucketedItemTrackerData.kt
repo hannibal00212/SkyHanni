@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
@@ -65,18 +66,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     }
 
     @Expose
-    private var selectedBucket: E? = null
+    var selectedBucket: E? = null
     @Expose
     private val bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
-    private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
-        it.value.isNotEmpty()
-    }.keys.toMutableList()
-    fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let {
-        getBucket(it)
-    } ?: flattenBuckets()
-    fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket(): E? {
         selectedBucket = if (selectedBucket == null) buckets.first { it.isBucketSelectable() }
         else selectedBucket?.let { sb ->
@@ -84,14 +77,13 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         }
         return selectedBucket
     }
-    fun selectBucket(bucket: E?) {
-        selectedBucket = bucket
-    }
 
-    private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
+    private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
+    fun getSelectedBucketItems() = selectedBucket?.let { getBucketItems(it) } ?: flattenBucketsItems()
+    private fun flattenBucketsItems(): MutableMap<NEUInternalName, TrackedItem> {
         val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()
-        getPoppedBuckets().distinct().forEach { bucket ->
-            getBucket(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
+        buckets.distinct().forEach { bucket ->
+            getBucketItems(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
                 flatMap.merge(key, value) { existing, new ->
                     existing.copy(
                         hidden = false,

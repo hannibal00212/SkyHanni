@@ -38,6 +38,14 @@ enum class PestType(
         "PEST_EARTHWORM_MONSTER".toInternalName(),
         CropType.MELON,
     ),
+    FIELD_MOUSE(
+        "Field Mouse",
+        BossType.GARDEN_PEST_FIELD_MOUSE,
+        spray = null,
+        vinyl = null,
+        "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
+        crop = null,
+    ),
     FLY(
         "Fly",
         BossType.GARDEN_PEST_FLY,
@@ -93,14 +101,6 @@ enum class PestType(
         VinylType.SLOW_AND_GROOVY,
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
-    ),
-    FIELD_MOUSE(
-        "Field Mouse",
-        BossType.GARDEN_PEST_FIELD_MOUSE,
-        spray = null,
-        vinyl = null,
-        "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
-        crop = null,
     ),
     // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
     // Display name intentionally omitted to aid in filtering out this entry.

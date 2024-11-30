@@ -48,7 +48,7 @@ object CorpseTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
-                getSelectedBucket()?.let {
+                selectedBucket?.let {
                     corpsesLooted[it]?.toInt()
                 } ?: corpsesLooted.sumAllValues().toInt()
             )
@@ -68,7 +68,7 @@ object CorpseTracker {
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
 
-        fun getCorpseCount(): Long = getSelectedBucket()?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
+        fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
@@ -99,7 +99,7 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let {
+        val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
             listOf(it)
         } ?: enumValues<CorpseType>().toList()
             .filter { bucketData.corpsesLooted[it] != null }
