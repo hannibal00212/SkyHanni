@@ -197,12 +197,14 @@ enum class PestType(
             "SLUG;3" to SLUG,
             "SLUG;4" to SLUG,
 
+            // Spray drops only tracked from mice
+            "COMPOST" to FIELD_MOUSE,
+            "HONEY_JAR" to FIELD_MOUSE,
+            "DUNG" to FIELD_MOUSE,
+            "PLANT_MATTER" to FIELD_MOUSE,
+            "CHEESE_FUEL" to FIELD_MOUSE,
+
             // Indeterministic drops
-            "COMPOST" to UNKNOWN,
-            "HONEY_JAR" to UNKNOWN,
-            "DUNG" to UNKNOWN,
-            "PLANT_MATTER" to UNKNOWN,
-            "CHEESE_FUEL" to UNKNOWN,
             "DYE_DUNG" to UNKNOWN,
         ).map {
             it.key.toInternalName() to it.value

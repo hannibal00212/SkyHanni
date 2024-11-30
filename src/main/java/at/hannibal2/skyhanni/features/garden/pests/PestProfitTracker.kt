@@ -215,14 +215,6 @@ object PestProfitTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    private val oldMiceDrops = listOf(
-        "COMPOST",
-        "HONEY_JAR",
-        "DUNG",
-        "PLANT_MATTER",
-        "CHEESE_FUEL",
-    ).map { it.toInternalName() }
-
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
@@ -241,11 +233,8 @@ object PestProfitTracker {
 
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
-                val pest = when {
-                    item in oldMiceDrops -> PestType.FIELD_MOUSE
-                    else -> pestTypeMap.getOrPut(item) {
-                        PestType.getByInternalNameItemOrNull(item)
-                    }
+                val pest = pestTypeMap.getOrPut(item) {
+                    PestType.getByInternalNameItemOrNull(item)
                 }
 
                 // If the map for the pest already contains this item, combine the amounts
@@ -263,11 +252,11 @@ object PestProfitTracker {
             ConfigManager.gson.toJsonTree(newItems)
         }
 
-        event.add(68, "#profile.garden.pestProfitTracker.pestKills") {
+        event.add(69, "#profile.garden.pestProfitTracker.pestKills") {
             ConfigManager.gson.toJsonTree(pestKillCountMap)
         }
 
-        event.transform(68, "#profile.garden.pestProfitTracker.totalPestsKills") { entry ->
+        event.transform(69, "#profile.garden.pestProfitTracker.totalPestsKills") { entry ->
             // Subtract all pestKillCountMap values from the totalPestsKills
             JsonPrimitive(
                 entry.asLong - pestKillCountMap.entries.filter {

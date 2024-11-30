@@ -78,11 +78,16 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket(): E? {
-        selectedBucket = if (selectedBucket == null) buckets.first { it.isBucketFilterable() }
-        else selectedBucket?.let { sb ->
-            buckets.filter { it.ordinal > sb.ordinal && it.isBucketFilterable() }.minByOrNull { it.ordinal }
+        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
+        selectedBucket = when {
+            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
+            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
+            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
+            else -> selectedBucket // Fallback, shouldn't happen
         }
-        return selectedBucket
+        return if (selectedBucket != null && !selectedBucket!!.isBucketFilterable()) {
+             selectNextSequentialBucket()
+        } else selectedBucket
     }
     fun selectBucket(bucket: E?) {
         selectedBucket = bucket
