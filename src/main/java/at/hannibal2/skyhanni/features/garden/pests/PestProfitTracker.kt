@@ -154,11 +154,12 @@ object PestProfitTracker {
 
         val selectedBucket = bucketData.selectedBucket
         val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
-        val pestCountFormat = (selectedBucket?.displayName ?: "Pests") + " killed: §e${pestCount.addSeparators()}"
+        val pestCountFormat = "§7" + (selectedBucket?.displayName ?: "Pests") + " killed: §e${pestCount.addSeparators()}"
 
         add(
             when {
-                selectedBucket != null -> Renderable.hoverTips(
+                selectedBucket != null -> Renderable.string(pestCountFormat).toSearchable()
+                else -> Renderable.hoverTips(
                     pestCountFormat,
                     buildList {
                         // Sort by A-Z in displaying real types
@@ -169,7 +170,6 @@ object PestProfitTracker {
                         }
                     }
                 ).toSearchable()
-                else -> Renderable.string(pestCountFormat).toSearchable()
             }
         )
 
