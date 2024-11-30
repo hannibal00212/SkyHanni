@@ -86,7 +86,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             else -> selectedBucket // Fallback, shouldn't happen
         }
         return if (selectedBucket != null && !selectedBucket!!.isBucketFilterable()) {
-             selectNextSequentialBucket()
+            selectNextSequentialBucket()
         } else selectedBucket
     }
     fun selectBucket(bucket: E?) {
