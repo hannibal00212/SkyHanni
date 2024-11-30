@@ -160,7 +160,14 @@ object PestProfitTracker {
             when {
                 selectedBucket != null -> Renderable.hoverTips(
                     pestCountFormat,
-                    bucketData.getDescription(pestCount)
+                    buildList {
+                        // Sort by A-Z in displaying real types
+                        bucketData.pestKills.toList().sortedBy {
+                            it.first.displayName
+                        }.forEach { (type, count) ->
+                            add("§7${type.displayName}: §e${count.addSeparators()}")
+                        }
+                    }
                 ).toSearchable()
                 else -> Renderable.string(pestCountFormat).toSearchable()
             }
