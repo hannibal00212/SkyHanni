@@ -30,7 +30,7 @@ object ReplaceRomanNumerals {
      */
     private val findRomanNumeralPattern by patternGroup.pattern(
         "findroman",
-        "[ ➜](?=[MDCLXVI])(M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3}))(.?)"
+        "[ ➜](?=[MDCLXVI])(?<roman>M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3}))(?<extra>.?)"
     )
 
     /**
@@ -41,6 +41,9 @@ object ReplaceRomanNumerals {
         "^[\\w-']"
     )
 
+    /**
+     * REGEX-TEST: ➜
+     */
     private val allowedCharactersAfter by patternGroup.pattern(
         "allowedcharactersafter",
         "[➜):]?"
@@ -83,7 +86,7 @@ object ReplaceRomanNumerals {
      */
     private fun String.transformLine(overrideBlockOne: Boolean = false): String {
         val (romanNumeral, rest) = findRomanNumeralPattern.findMatcher(this.removeFormatting()) {
-            group(1) to group(2)
+            group("roman") to group("extra")
         } ?: return this
 
         if (romanNumeral.isNullOrEmpty() || !romanNumeral.isRoman() || isWordPattern.matches(rest)) {
@@ -98,7 +101,7 @@ object ReplaceRomanNumerals {
     }
 
     private fun String.recursiveSplit(romanNumeral: String) =
-        this.split(romanNumeral,limit=2).let { it[0] + romanNumeral + it[1].transformLine() }
+        this.split(romanNumeral, limit = 2).let { it[0] + romanNumeral + it[1].transformLine() }
 
     private fun String.removeFormatting() = removeColor().replace(",", "")
 
