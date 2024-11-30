@@ -166,7 +166,7 @@ object PestProfitTracker {
                         bucketData.pestKills.toList().sortedBy {
                             it.first.displayName
                         }.forEach { (type, count) ->
-                            add("§7${type.displayName}: §e${count.addSeparators()}")
+                            add("§7${type.pluralName}: §e${count.addSeparators()}")
                         }
                     }
                 ).toSearchable()
