@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -154,7 +155,7 @@ object PestProfitTracker {
 
         val selectedBucket = bucketData.selectedBucket
         val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
-        val pestCountFormat = "§7" + (selectedBucket?.displayName ?: "Pests") + " killed: §e${pestCount.addSeparators()}"
+        val pestCountFormat = "§7${selectedBucket?.pluralName ?: "Pests"} killed: §e${pestCount.addSeparators()}"
 
         add(
             when {

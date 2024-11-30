@@ -13,6 +13,7 @@ enum class PestType(
     val vinyl: VinylType?,
     val internalName: NEUInternalName,
     val crop: CropType?,
+    val pluralName: String? = "${displayName}s",
 ) {
     BEETLE(
         "Beetle",
@@ -45,6 +46,7 @@ enum class PestType(
         vinyl = null,
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
+        pluralName = "Field Mice",
     ),
     FLY(
         "Fly",
@@ -53,6 +55,7 @@ enum class PestType(
         VinylType.PRETTY_FLY,
         "PEST_FLY_MONSTER".toInternalName(),
         CropType.WHEAT,
+        pluralName = "Flies",
     ),
     LOCUST(
         "Locust",
@@ -77,6 +80,7 @@ enum class PestType(
         VinylType.BUZZIN_BEATS,
         "PEST_MOSQUITO_MONSTER".toInternalName(),
         CropType.SUGAR_CANE,
+        pluralName = "Mosquitoes",
     ),
     MOTH(
         "Moth",
