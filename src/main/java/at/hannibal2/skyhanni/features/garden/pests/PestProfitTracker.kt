@@ -231,7 +231,7 @@ object PestProfitTracker {
         val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
         val pestKillCountMap: MutableMap<PestType, Long> = mutableMapOf()
         event.move(
-            68,
+            69,
             "#profile.garden.pestProfitTracker.items",
             "#profile.garden.pestProfitTracker.bucketedItems",
         ) { items ->
