@@ -126,7 +126,7 @@ class MobFinder {
     private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
         if (!GardenAPI.inGarden()) return null
 
-        return PestType.entries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+        return PestType.filterableEntries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
             ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 

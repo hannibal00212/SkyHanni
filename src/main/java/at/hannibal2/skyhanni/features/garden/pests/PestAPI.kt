@@ -69,7 +69,7 @@ object PestAPI {
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
 
-    fun SprayType.getPests() = PestType.entries.filter { it.spray == this }
+    fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
     private val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(

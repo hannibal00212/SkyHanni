@@ -2,13 +2,10 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -75,28 +72,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             val hidden = it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!.hidden
             it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!.hidden = hidden
         }
-
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
-        }
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
-        }
-    }
-
-    fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addSearchableSelector<ItemPriceSource>(
-                "",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
-                onChange = {
-                    config.priceSource = it.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
-                    update()
-                },
-            )
-        }
+        handlePossibleRareDrop(internalName, amount)
     }
 
     fun addBucketSelector(

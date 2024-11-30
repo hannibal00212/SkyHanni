@@ -15,6 +15,8 @@ class NEUInternalName private constructor(private val internalName: String) {
         val RUBY_CRYSTAL = "RUBY_CRYSTAL".toInternalName()
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
         val WISP_POTION = "WISP_POTION".toInternalName()
+        val ENCHANTED_HAY_BLOCK = "ENCHANTED_HAY_BLOCK".toInternalName()
+        val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
 
         @Deprecated("Name changed", ReplaceWith("this.toInternalName()"))
         fun String.asInternalName() = toInternalName()

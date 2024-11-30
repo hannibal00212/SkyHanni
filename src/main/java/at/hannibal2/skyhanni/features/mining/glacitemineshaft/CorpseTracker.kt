@@ -63,6 +63,8 @@ object CorpseTracker {
         override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
+        override fun CorpseType.isBucketFilterable() = true
+
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
 

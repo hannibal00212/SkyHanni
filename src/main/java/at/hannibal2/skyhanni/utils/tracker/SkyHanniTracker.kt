@@ -4,13 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -209,6 +213,30 @@ open class SkyHanniTracker<Data : TrackerData>(
             "displayMode" to displayMode,
             "availableModes" to entries.keys,
         )
+    }
+
+    fun handlePossibleRareDrop(internalName: NEUInternalName, amount: Int) {
+        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
+        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+        }
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
+        }
+    }
+
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
+        if (isInventoryOpen()) {
+            lists.addSearchableSelector<ItemPriceSource>(
+                "",
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                onChange = { entry ->
+                    config.priceSource = entry.let { ItemPriceSource.entries[entry.ordinal] } // todo avoid ordinal
+                    update()
+                },
+            )
+        }
     }
 
     enum class DisplayMode(val displayName: String) {
