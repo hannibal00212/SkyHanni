@@ -88,7 +88,7 @@ object PestProfitTracker {
             )
         }
 
-        override fun PestType.isBucketFilterable() = PestType.filterableEntries.contains(this)
+        override fun PestType.isBucketSelectable() = PestType.filterableEntries.contains(this)
 
         fun getTotalPestCount(): Long =
             if (getSelectedBucket() != null) pestKills[getSelectedBucket()] ?: 0L

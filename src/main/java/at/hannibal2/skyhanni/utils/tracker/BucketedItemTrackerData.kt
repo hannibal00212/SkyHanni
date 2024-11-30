@@ -19,7 +19,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
 
     open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
 
-    abstract fun E.isBucketFilterable(): Boolean
+    abstract fun E.isBucketSelectable(): Boolean
 
     override fun reset() {
         bucketedItems.clear()
@@ -78,16 +78,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket(): E? {
-        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
-        selectedBucket = when {
-            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
-            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
-            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
-            else -> selectedBucket // Fallback, shouldn't happen
+        selectedBucket = if (selectedBucket == null) buckets.first { it.isBucketSelectable() }
+        else selectedBucket?.let { sb ->
+            buckets.filter { it.ordinal > sb.ordinal && it.isBucketSelectable() }.minByOrNull { it.ordinal }
         }
-        return if (selectedBucket != null && !selectedBucket!!.isBucketFilterable()) {
-            selectNextSequentialBucket()
-        } else selectedBucket
+        return selectedBucket
     }
     fun selectBucket(bucket: E?) {
         selectedBucket = bucket
