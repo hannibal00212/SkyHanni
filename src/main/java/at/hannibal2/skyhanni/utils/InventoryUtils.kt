@@ -12,6 +12,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -139,5 +140,7 @@ object InventoryUtils {
         controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
 
-    fun Slot.isTopInventory() = inventory is ContainerLocalMenu
+    fun Slot.isTopInventory() = inventory.isTopInventory()
+
+    fun IInventory.isTopInventory() = this is ContainerLocalMenu
 }
