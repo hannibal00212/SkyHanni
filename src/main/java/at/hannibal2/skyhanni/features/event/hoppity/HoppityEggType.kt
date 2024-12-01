@@ -86,7 +86,7 @@ enum class HoppityEggType(
         @SubscribeEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
             mealLastFound.forEach { (meal, mark) ->
-                if (mark.passedSince() < 20.minutes) meal.markClaimed(mark)
+                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
                 else meal.markSpawned()
             }
         }
