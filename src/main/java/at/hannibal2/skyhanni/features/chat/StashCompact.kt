@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -85,7 +87,8 @@ object StashCompact {
         override fun toString() = name
 
         companion object {
-            fun fromStringOrNull(string: String) = entries.find { it.name.equals(string, ignoreCase = true) }
+            fun Matcher.fromGroup() = StashType.fromStringOrNull(group("type"))
+            private fun fromStringOrNull(string: String) = entries.find { it.name.equals(string, ignoreCase = true) }
         }
     }
 
@@ -120,14 +123,14 @@ object StashCompact {
                 emptyLineWarned = true
             }
 
-            val type = StashType.fromStringOrNull(group("type")) ?: return
+            val type = fromGroup() ?: return
             currentType = type
             currentMessages[type] = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            val type = StashType.fromStringOrNull(group("type")) ?: return
+            val type = fromGroup() ?: return
             currentMessages[type]?.differingMaterialsCount = group("count").formatInt()
             event.blockedReason = "stash_compact"
         }
