@@ -113,7 +113,7 @@ object StashCompact {
             val emptyEnabled = filterConfig.empty
             val hideWarnings = config.disableEmptyWarnings
             val tenSecPassed = (joinedProfileAt?.passedSince() ?: 0.seconds) > 10.seconds
-            if (emptyEnabled && !hideWarnings && !emptyLineWarned && tenSecPassed) {
+            if (!emptyEnabled && !hideWarnings && !emptyLineWarned && tenSecPassed) {
                 ChatUtils.clickToActionOrDisable(
                     "Above empty lines were left behind by §6/sh stash compact§e." +
                         "This can be prevented with §6/sh empty messages§e.",
@@ -124,28 +124,28 @@ object StashCompact {
                 emptyLineWarned = true
             }
 
-            currentType = fromGroup() ?: return
-            val currentType = currentType ?: return
+            currentType = fromGroup() ?: return@matchMatcher
+            val currentType = currentType ?: return@matchMatcher
             currentMessages[currentType] = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            currentType = fromGroup() ?: return
+            currentType = fromGroup() ?: return@matchMatcher
             currentMessages[currentType]?.differingMaterialsCount = group("count").formatInt()
             event.blockedReason = "stash_compact"
         }
 
-        if (pickupStashPattern.matches(event.message)) {
-            val currentType = currentType ?: return
+        pickupStashPattern.matchMatcher(event.message) {
+            event.blockedReason = "stash_compact"
+            val currentType = currentType ?: return@matchMatcher
 
-            val currentMessage = currentMessages[currentType] ?: return
-            val lastMessage = lastMessages[currentType]
-            if (currentMessage.materialCount <= config.hideLowWarningsThreshold) return
-            if (config.hideDuplicateCounts && currentMessage == lastMessage) return
+            val currentMessage = currentMessages[currentType] ?: return@matchMatcher
+            val lastMessage = lastMessages[currentType] ?: return@matchMatcher
+            if (currentMessage.materialCount <= config.hideLowWarningsThreshold) return@matchMatcher
+            if (config.hideDuplicateCounts && currentMessage == lastMessage) return@matchMatcher
 
             currentMessage.sendCompactedStashMessage()
-            event.blockedReason = "stash_compact"
         }
 
         if (!config.hideAddedMessages) return
