@@ -51,34 +51,31 @@ object HitmanAPI {
      */
     fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
         val existingHunted = this.availableEggs ?: 0
-        if (existingHunted >= huntCount) return Duration.ZERO // Already have enough hunted
-
-        var totalDuration = Duration.ZERO
-        var huntsNeeded = huntCount - existingHunted
-        var currentTime = SkyBlockTime.now()
-        val claimedMeals = mutableSetOf<HoppityEggType>()
-
-        while (huntsNeeded > 0) {
-            // Find the next available meal that is not claimed yet
-            val availableMeals = HoppityEggType.resettingEntries.filter { !claimedMeals.contains(it) }
-
-            // Calculate timeUntil() from the updated currentTime
-            val nextMeal = availableMeals.minByOrNull { it.timeUntil(currentTime) } ?: return Duration.INFINITE
-            val timeUntilMeal = nextMeal.timeUntil(currentTime)
-
-            // If the meal is already claimed, wait for the next reset (add 20 minutes)
-            val timeToNextHunt = if (nextMeal.isClaimed()) timeUntilMeal + 20.minutes else timeUntilMeal
-
-            // Accumulate total duration and update currentTime
-            totalDuration += timeToNextHunt
-            currentTime += timeToNextHunt
-
-            // Mark the meal as claimed for future iterations
-            claimedMeals.add(nextMeal)
-            huntsNeeded--
+        val firstHuntMeal =
+            HoppityEggType.resettingEntries.sortedBy { it.timeUntil() }.firstOrNull { !it.isClaimed() }
+                ?: HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
+        val isAlreadyClaimed = firstHuntMeal.isClaimed()
+        val timeToFirstHunt = firstHuntMeal.nextTime() + when {
+            isAlreadyClaimed -> 20.minutes
+            else -> Duration.ZERO
         }
+        var timeToAllHunts = timeToFirstHunt
+        var daysTil = 0
+        var nextMeal = firstHuntMeal
+        for (i in (1 + existingHunted) until huntCount) {
+            val candidate = HoppityEggType.resettingEntries.firstOrNull {
+                it.resetsAt > nextMeal.resetsAt && it.altDay == nextMeal.altDay
+            }
+            if (candidate == null) {
+                if (i != 0) daysTil++
+                nextMeal = HoppityEggType.resettingEntries.filter {
+                    it.resetsAt < nextMeal.resetsAt && it.altDay != nextMeal.altDay
+                }.minByOrNull { it.timeUntil() } ?: return Duration.INFINITE
+            } else nextMeal = candidate
 
-        return totalDuration
+            timeToAllHunts = nextMeal.nextTime()
+        }
+        return timeToAllHunts.timeUntil() + (daysTil * 20.minutes)
     }
 
     fun HitmanStatsStorage.getOpenSlots(): Int {
