@@ -77,6 +77,7 @@ object HitmanAPI {
             // If no candidate was found, return the time until the last candidate
             if (candidate == null) {
                 candidate = nextHuntMeal
+                tilSpawnDuration += 40.minutes
                 tilSpawnDuration = realTimeUntil(candidate, tilSpawnDuration)
             }
 
