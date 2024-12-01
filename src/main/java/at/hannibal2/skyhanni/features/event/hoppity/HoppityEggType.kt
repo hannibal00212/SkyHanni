@@ -36,22 +36,18 @@ enum class HoppityEggType(
     STRAY("Stray", "§a", -1)
     ;
 
-    fun timeUntil(): Duration {
+    fun timeUntil(fromTime: SkyBlockTime = SkyBlockTime.now()): Duration {
         if (resetsAt == -1) return Duration.INFINITE
-        val now = SkyBlockTime.now()
-        val isEggDayToday = altDay == now.isAlternateDay()
+        val isEggDayToday = altDay == fromTime.isAlternateDay()
 
         val daysToAdd = when {
-            isEggDayToday && now.hour < resetsAt -> 0
-            isEggDayToday && now.hour >= resetsAt -> 2
+            isEggDayToday && fromTime.hour < resetsAt -> 0
+            isEggDayToday && fromTime.hour >= resetsAt -> 2
             else -> 1
         }
 
-        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
-    }
-
-    fun nextTime(): SimpleTimeMark {
-        return SimpleTimeMark.now() + timeUntil()
+        val targetTime = fromTime.copy(day = fromTime.day + daysToAdd, hour = resetsAt, minute = 0, second = 0)
+        return targetTime.asTimeMark().timeUntil()
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {

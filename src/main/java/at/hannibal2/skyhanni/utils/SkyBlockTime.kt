@@ -117,6 +117,11 @@ data class SkyBlockTime(
                 else -> "th"
             }
         }
+
+        operator fun SkyBlockTime.plus(duration: kotlin.time.Duration): SkyBlockTime {
+            val millis = toMillis() + duration.inWholeMilliseconds
+            return fromInstant(Instant.ofEpochMilli(millis))
+        }
     }
 }
 
