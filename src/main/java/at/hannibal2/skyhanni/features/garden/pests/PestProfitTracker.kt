@@ -195,6 +195,7 @@ object PestProfitTracker {
         if (!isEnabled() || event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         val coins = event.coins
         if (coins > 1000) return
+        if (lastPestKillTimes.isEmpty()) return
 
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
