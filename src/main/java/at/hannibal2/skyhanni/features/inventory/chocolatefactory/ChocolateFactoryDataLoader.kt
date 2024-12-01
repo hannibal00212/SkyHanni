@@ -404,6 +404,7 @@ object ChocolateFactoryDataLoader {
             if (timeTowerAmountEmptyPattern.matches(line)) {
                 profileStorage.currentTimeTowerUses = 0
                 profileStorage.maxTimeTowerUses = 0
+                profileStorage.currentTimeTowerUses = 0
             }
             timeTowerStatusPattern.matchMatcher(line) {
                 val activeTime = group("acitveTime")
