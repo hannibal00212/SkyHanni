@@ -53,6 +53,7 @@ object StashCompact {
     /**
      * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
      * REGEX-TEST: §f                §6§l>>> §6§lCLICK HERE§e to pick them up! §6§l<<<
+     * REGEX-TEST: §f                §3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
@@ -123,15 +124,15 @@ object StashCompact {
                 emptyLineWarned = true
             }
 
-            val type = fromGroup() ?: return
-            currentType = type
-            currentMessages[type] = StashMessage(group("count").formatInt(), group("type"))
+            currentType = fromGroup() ?: return
+            val currentType = currentType ?: return
+            currentMessages[currentType] = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            val type = fromGroup() ?: return
-            currentMessages[type]?.differingMaterialsCount = group("count").formatInt()
+            currentType = fromGroup() ?: return
+            currentMessages[currentType]?.differingMaterialsCount = group("count").formatInt()
             event.blockedReason = "stash_compact"
         }
 
