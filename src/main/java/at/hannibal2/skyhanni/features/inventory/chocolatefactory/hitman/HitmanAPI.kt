@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.inPartialMinutes
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.times
 
 @SkyHanniModule
@@ -49,46 +51,50 @@ object HitmanAPI {
      */
     fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
         val firstHuntMeal =
-            HoppityEggType.resettingEntries.sortedBy { it.timeUntil() }.firstOrNull { !it.isClaimed() }
+            HoppityEggType.sortedEntries.firstOrNull { !it.isClaimed() }
                 ?: HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
-        val isAlreadyClaimed = firstHuntMeal.isClaimed()
-        val firstHuntTime = firstHuntMeal.nextTime()
-        var timeInSbDays = if (isAlreadyClaimed) 1 else 0
-        var timeInPartialDays = firstHuntTime.timeUntil()
+
         var nextHuntMeal = firstHuntMeal
+        var tilSpawnDuration = nextHuntMeal.timeUntil()
 
         val boundedHuntRange = (1 + (this.availableEggs ?: 0))..huntCount
 
         for (i in boundedHuntRange) {
+            // Try to find the next meal on the same day
             var candidate = HoppityEggType.sortedEntries.firstOrNull {
                 it.resetsAt > nextHuntMeal.resetsAt && it.altDay == nextHuntMeal.altDay &&
-                    (!it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays))
+                    (!it.isClaimed() || !willBeClaimed(it, tilSpawnDuration))
             }
+            candidate?.let { tilSpawnDuration = realTimeUntil(it, tilSpawnDuration) }
+
+            // Try to find the next meal on the next day
             if (candidate == null) {
-                timeInSbDays++
                 candidate = HoppityEggType.sortedEntries.firstOrNull {
-                    it.altDay != nextHuntMeal.altDay &&
-                        (!it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays))
+                    it.resetsAt == nextHuntMeal.resetsAt + 1 && it.altDay != nextHuntMeal.altDay &&
+                        (!it.isClaimed() || !willBeClaimed(it, tilSpawnDuration))
                 }
+                candidate?.let { tilSpawnDuration = realTimeUntil(it, tilSpawnDuration) }
             }
+
+            // If no candidate was found, return the time until the last candidate
             if (candidate == null) {
-                timeInSbDays++
-                candidate = HoppityEggType.sortedEntries.firstOrNull {
-                    !it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays)
-                }
+                candidate = nextHuntMeal
+                tilSpawnDuration = realTimeUntil(candidate, tilSpawnDuration)
             }
-            // This should never happen, but just in case
-            if (candidate == null) return Duration.ZERO
 
             nextHuntMeal = candidate
-            timeInPartialDays = nextHuntMeal.timeUntil()
         }
-        return timeInPartialDays + (timeInSbDays * 20.minutes)
+        return tilSpawnDuration
     }
 
-    private fun willBeClaimed(meal: HoppityEggType, wholeSbDays: Int, partialDays: Duration): Boolean {
+    private fun realTimeUntil(meal: HoppityEggType, tilSpawnDuration: Duration): Duration {
+        val timeUntil = meal.timeUntil()
+        return (tilSpawnDuration / 20.minutes).toInt() * 20.minutes + timeUntil
+    }
+
+    private fun willBeClaimed(meal: HoppityEggType, afterDuration: Duration): Boolean {
         if (!meal.isClaimed()) return false
-        return partialDays + (wholeSbDays * 20.minutes) < meal.timeUntil()
+        return afterDuration < meal.timeUntil()
     }
 
     fun HitmanStatsStorage.getOpenSlots(): Int {
