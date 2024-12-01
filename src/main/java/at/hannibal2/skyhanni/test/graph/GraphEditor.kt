@@ -266,15 +266,15 @@ object GraphEditor {
         val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
 
         fun pyramidDraw(
-                pos: LorenzVec,
-            ) {
-                this.drawPyramid(
-                    pos + lineOffsetVec + pyramidSize,
-                    pos + lineOffsetVec,
-                    pos.crossProduct(lineVec).normalize().times(pyramidSize.length() / 2.5) + pos + lineOffsetVec,
-                    color,
-                )
-            }
+            pos: LorenzVec,
+        ) {
+            this.drawPyramid(
+                pos + lineOffsetVec + pyramidSize,
+                pos + lineOffsetVec,
+                pos.crossProduct(lineVec).normalize().times(pyramidSize.length() / 2.5) + pos + lineOffsetVec,
+                color,
+            )
+        }
 
         pyramidDraw(center)
         pyramidDraw(quad1)
@@ -459,18 +459,23 @@ object GraphEditor {
             val edge2 = edgePair[1]
             val neighbors1 = if (edge1.node1 == activeNode) edge1.node2 else edge1.node1
             val neighbors2 = if (edge2.node1 == activeNode) edge2.node2 else edge2.node1
+            val direction =
+                if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) EdgeDirection.BOTH else when {
+                    edge1.isValidConnectionFromTo(neighbors1, activeNode) && edge2.isValidConnectionFromTo(
+                        activeNode,
+                        neighbors2,
+                    ) -> EdgeDirection.ONE_TO_TWO
+
+                    edge1.isValidConnectionFromTo(activeNode, neighbors1) && edge2.isValidConnectionFromTo(
+                        neighbors2,
+                        activeNode,
+                    ) -> EdgeDirection.TOW_TO_ONE
+
+                    else -> EdgeDirection.BOTH
+                }
             edges.removeAll(edgePair)
             nodes.remove(activeNode)
             activeNode = null
-            val direction = if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) EdgeDirection.BOTH else {
-                val a = edge1.node1 == edge2.node1
-                val b = edge1.direction == edge2.direction
-                if ((a && b) || (!a && !b)) {
-                    if (edge1.isValidDirectionFrom(neighbors1)) EdgeDirection.ONE_TO_TWO else EdgeDirection.TOW_TO_ONE
-                } else {
-                    EdgeDirection.BOTH
-                }
-            }
             addEdge(neighbors1, neighbors2, direction)
         }
     }
@@ -777,7 +782,7 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode, var
         EdgeDirection.TOW_TO_ONE -> standpoint == node2
     }
 
-    fun isValidConnectionFromTo(a: GraphingNode, b: GraphingNode): Boolean =
+    fun isValidConnectionFromTo(a: GraphingNode?, b: GraphingNode?): Boolean =
         ((this.node1 == a && this.node2 == b) || (this.node1 == b && this.node2 == a)) && isValidDirectionFrom(a)
 }
 
