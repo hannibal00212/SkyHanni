@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -251,7 +253,13 @@ object PestAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (pestDeathChatPattern.matches(event.message)) {
+        pestDeathChatPattern.matchMatcher(event.message) {
+            val pest = PestType.getByNameOrNull(group("pest")) ?: return
+            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+
+            // Field Mice drop 6 separate items, but we only want to count the kill once
+            if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
+
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
         }

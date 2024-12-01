@@ -55,6 +55,7 @@ object PestProfitTracker {
         "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
     )
 
+    val DUNG_ITEM = "DUNG".toInternalName()
     private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
@@ -125,7 +126,11 @@ object PestProfitTracker {
             pestThisRun = pest
 
             tryAddItem(pest, internalName, amount)
-            addKill(pest)
+
+            // Field Mice drop 6 separate items, but we only want to count the kill once
+            if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
+            else if (pest != PestType.FIELD_MOUSE) addKill(pest)
+
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
