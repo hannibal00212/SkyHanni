@@ -48,32 +48,47 @@ object HitmanAPI {
      * Return the time until the given number of rabbits can be hunted.
      */
     fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
-        val existingHunted = this.availableEggs ?: 0
         val firstHuntMeal =
             HoppityEggType.resettingEntries.sortedBy { it.timeUntil() }.firstOrNull { !it.isClaimed() }
                 ?: HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
         val isAlreadyClaimed = firstHuntMeal.isClaimed()
-        val timeToFirstHunt = firstHuntMeal.nextTime() + when {
-            isAlreadyClaimed -> 20.minutes
-            else -> Duration.ZERO
-        }
-        var timeToAllHunts = timeToFirstHunt
-        var daysTil = 0
-        var nextMeal = firstHuntMeal
-        for (i in (1 + existingHunted) until huntCount) {
-            val candidate = HoppityEggType.resettingEntries.firstOrNull {
-                it.resetsAt > nextMeal.resetsAt && it.altDay == nextMeal.altDay
+        val firstHuntTime = firstHuntMeal.nextTime()
+        var timeInSbDays = if (isAlreadyClaimed) 1 else 0
+        var timeInPartialDays = firstHuntTime.timeUntil()
+        var nextHuntMeal = firstHuntMeal
+
+        val boundedHuntRange = (1 + (this.availableEggs ?: 0))..huntCount
+
+        for (i in boundedHuntRange) {
+            var candidate = HoppityEggType.sortedEntries.firstOrNull {
+                it.resetsAt > nextHuntMeal.resetsAt && it.altDay == nextHuntMeal.altDay &&
+                    (!it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays))
             }
             if (candidate == null) {
-                if (i != 0) daysTil++
-                nextMeal = HoppityEggType.resettingEntries.filter {
-                    it.resetsAt < nextMeal.resetsAt && it.altDay != nextMeal.altDay
-                }.minByOrNull { it.timeUntil() } ?: return Duration.INFINITE
-            } else nextMeal = candidate
+                timeInSbDays++
+                candidate = HoppityEggType.sortedEntries.firstOrNull {
+                    it.altDay != nextHuntMeal.altDay &&
+                        (!it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays))
+                }
+            }
+            if (candidate == null) {
+                timeInSbDays++
+                candidate = HoppityEggType.sortedEntries.firstOrNull {
+                    !it.isClaimed() || !willBeClaimed(it, timeInSbDays, timeInPartialDays)
+                }
+            }
+            // This should never happen, but just in case
+            if (candidate == null) return Duration.ZERO
 
-            timeToAllHunts = nextMeal.nextTime()
+            nextHuntMeal = candidate
+            timeInPartialDays = nextHuntMeal.timeUntil()
         }
-        return timeToAllHunts.timeUntil() + (daysTil * 20.minutes)
+        return timeInPartialDays + (timeInSbDays * 20.minutes)
+    }
+
+    private fun willBeClaimed(meal: HoppityEggType, wholeSbDays: Int, partialDays: Duration): Boolean {
+        if (!meal.isClaimed()) return false
+        return partialDays + (wholeSbDays * 20.minutes) < meal.timeUntil()
     }
 
     fun HitmanStatsStorage.getOpenSlots(): Int {
