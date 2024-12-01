@@ -61,7 +61,7 @@ enum class HoppityEggType(
 
     private fun hasNotFirstSpawnedYet(): Boolean {
         val now = SkyBlockTime.now()
-        if (now.month > 4 || (altDay && now.day > 2) || (!altDay && now.day > 1)) return false
+        if (now.month > 1 || (altDay && now.day > 2) || (!altDay && now.day > 1)) return false
         return (altDay && now.day < 2) || now.hour < resetsAt
     }
 
