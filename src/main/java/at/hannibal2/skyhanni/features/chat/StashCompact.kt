@@ -84,7 +84,7 @@ object StashCompact {
         MATERIAL("material", Pair("§b", "§3")),
         ;
 
-        override fun toString() = name
+        override fun toString() = internalName
 
         companion object {
             fun Matcher.fromGroup() = StashType.fromStringOrNull(group("type"))
