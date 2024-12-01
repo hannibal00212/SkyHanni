@@ -42,6 +42,7 @@ object ChocolateFactoryBlockOpen {
         if (!LorenzUtils.inSkyBlock) return
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
+        if (LorenzUtils.isBingoProfile) return
 
         if (config.mythicRabbitRequirement && !MythicRabbitPetWarning.correctPet()) {
             event.cancelOpen()
