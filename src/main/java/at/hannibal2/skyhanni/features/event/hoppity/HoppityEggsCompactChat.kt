@@ -49,9 +49,16 @@ object HoppityEggsCompactChat {
             in resettingEntries -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Egg"
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
+        val rarityString = hoppityDataSet.lastRarity?.let { "${it.chatColorCode}§l${it.rawName}" } ?: "§C§L???"
+        val rarityFormat = when {
+            hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.DUPE) -> "$rarityString "
+            !hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.NEW) -> "$rarityString "
+            else -> ""
+        }
+        val nameFormat = hoppityDataSet.lastName.takeIf { it.isNotEmpty() } ?: "§C§L???"
 
         return if (hoppityDataSet.duplicate) {
-            val format = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
+            val extraChocFormat = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = hoppityDataSet.lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
@@ -62,14 +69,10 @@ object HoppityEggsCompactChat {
                 }.orEmpty()
             } else ""
 
-            val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "${hoppityDataSet.lastRarity} " else ""}" +
-                "${hoppityDataSet.lastName}$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate $rarityFormat$nameFormat$dupeNumberFormat §7(§6+$extraChocFormat Chocolate§7$timeStr)"
         } else {
-            val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "${hoppityDataSet.lastRarity} " else ""}" +
-                "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7(${hoppityDataSet.lastProfit}§7)"
         }
     }
 

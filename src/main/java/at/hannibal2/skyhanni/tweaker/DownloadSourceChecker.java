@@ -82,7 +82,8 @@ public class DownloadSourceChecker {
 
         // Compile the regex pattern for matching an empty host
         Pattern pattern = Pattern.compile("https:\\/\\/.*.com\\/$|about:internet");
-        Matcher matcher = pattern.matcher(uriToSimpleString(host));
+        String readableHost = uriToSimpleString(host);
+        Matcher matcher = pattern.matcher(readableHost);
 
         // Check if the host is empty (Brave is cutting everything past .com/ from the host)
         String cutHostMessage = "";
@@ -91,9 +92,10 @@ public class DownloadSourceChecker {
                 "Try downloading the file using a different browser (Microsoft Edge, Google Chrome, etc.).";
         }
 
+        System.err.println("SkyHanni-" + MOD_VERSION + " detected a untrusted download source host: '" + readableHost + "'");
         JOptionPane.showOptionDialog(
             frame,
-            String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)) + cutHostMessage,
+            String.format(String.join("\n", SECURITY_POPUP), readableHost) + cutHostMessage,
             "SkyHanni " + MOD_VERSION + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
