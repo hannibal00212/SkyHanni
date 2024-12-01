@@ -4,16 +4,23 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFact
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.inPartialMinutes
 import kotlin.math.ceil
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.times
 
 @SkyHanniModule
 object HitmanAPI {
 
     private val MAX_SLOT_COUNT get() = ChocolateFactoryAPI.hitmanCosts.size
+    private val sortedEntries get() = HoppityEggType.sortedResettingEntries
+    private val orderOrdinalMap: Map<HoppityEggType, HoppityEggType> by lazy {
+        sortedEntries.mapIndexed { index, hoppityEggType ->
+            hoppityEggType to sortedEntries[(index + 1) % sortedEntries.size]
+        }.toMap()
+    }
 
     /**
      * Get the time until the given number of slots are available.
@@ -48,47 +55,46 @@ object HitmanAPI {
      * Return the time until the given number of rabbits can be hunted.
      */
     fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
-        val firstHuntMeal =
-            HoppityEggType.sortedEntries.firstOrNull { !it.isClaimed() }
-                ?: HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return Duration.ZERO
+        var nextHuntMeal = sortedEntries.firstOrNull { !it.isClaimed() }
+            ?: sortedEntries.firstOrNull() ?: return Duration.ZERO
 
-        var nextHuntMeal = firstHuntMeal
-        var tilSpawnDuration = nextHuntMeal.timeUntil()
+        val initialAvailable: MutableList<HoppityEggType> = sortedEntries.filter {
+            !it.isClaimed() && it != nextHuntMeal
+        }.toMutableList()
 
-        val boundedHuntRange = (1 + (this.availableEggs ?: 0))..huntCount
+        var tilSpawnDuration = if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil() else Duration.ZERO
 
-        for (i in boundedHuntRange) {
-            // Try to find the next meal on the same day
-            var candidate = HoppityEggType.sortedEntries.firstOrNull {
-                it.resetsAt > nextHuntMeal.resetsAt && it.altDay == nextHuntMeal.altDay &&
-                    (!it.isClaimed() || !willBeClaimed(it, tilSpawnDuration))
-            }
-            candidate?.let { tilSpawnDuration = realTimeUntil(it, tilSpawnDuration) }
+        fun HoppityEggType.passesNotClaimed() =
+            (initialAvailable.contains(this) || !willBeClaimed(this, tilSpawnDuration))
 
-            // Try to find the next meal on the next day
-            if (candidate == null) {
-                candidate = HoppityEggType.sortedEntries.firstOrNull {
-                    it.resetsAt == nextHuntMeal.resetsAt + 1 && it.altDay != nextHuntMeal.altDay &&
-                        (!it.isClaimed() || !willBeClaimed(it, tilSpawnDuration))
-                }
-                candidate?.let { tilSpawnDuration = realTimeUntil(it, tilSpawnDuration) }
-            }
+        for (i in (1 + (this.availableEggs ?: 0))..<huntCount) {
+            val candidate = sortedEntries.firstOrNull {
+                // Try to find the next meal on the same day
+                it.resetsAt > nextHuntMeal.resetsAt && it.altDay == nextHuntMeal.altDay && it.passesNotClaimed()
+            } ?: sortedEntries.firstOrNull {
+                // Try to find the next meal on the next day
+                it.altDay != nextHuntMeal.altDay && it.passesNotClaimed()
+            } ?: orderOrdinalMap[nextHuntMeal] ?: return Duration.ZERO
 
-            // If no candidate was found, return the time until the last candidate
-            if (candidate == null) {
-                candidate = nextHuntMeal
-                tilSpawnDuration += 40.minutes
-                tilSpawnDuration = realTimeUntil(candidate, tilSpawnDuration)
-            }
+            if (initialAvailable.contains(candidate)) initialAvailable.remove(candidate)
+            else tilSpawnDuration += candidate.timeFromAnother(nextHuntMeal)
 
             nextHuntMeal = candidate
         }
         return tilSpawnDuration
     }
 
-    private fun realTimeUntil(meal: HoppityEggType, tilSpawnDuration: Duration): Duration {
-        val timeUntil = meal.timeUntil()
-        return (tilSpawnDuration / 20.minutes).toInt() * 20.minutes + timeUntil
+    /**
+     * Return the duration between two HoppityEggTypes' spawn times.
+     */
+    private fun HoppityEggType.timeFromAnother(another: HoppityEggType): Duration {
+        val diffInSbHours = when {
+            this.altDay != another.altDay -> 24 - another.resetsAt + this.resetsAt
+            this.resetsAt == another.resetsAt -> 48
+            this.resetsAt > another.resetsAt -> this.resetsAt - another.resetsAt
+            else -> another.resetsAt - this.resetsAt
+        }
+        return (diffInSbHours * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds
     }
 
     private fun willBeClaimed(meal: HoppityEggType, afterDuration: Duration): Boolean {

@@ -97,7 +97,7 @@ enum class HoppityEggType(
         }
 
         val resettingEntries = entries.filter { it.resetsAt != -1 }
-        val sortedEntries = entries.sortedBy { it.resetsAt }
+        val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
 
         fun allFound() = resettingEntries.forEach { it.markClaimed() }
 
