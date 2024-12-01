@@ -250,17 +250,22 @@ object GraphEditor {
             !seeThroughBlocks,
         )
         if (edge.direction != EdgeDirection.BOTH) {
-            val lineVec = edge.node2.position - edge.node1.position
-            val center = edge.node1.position + lineVec / 2.0
-            val quad1 = edge.node1.position + lineVec / 4.0
-            val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
+            drawDirection(edge, color)
+        }
+    }
 
-            val pyramidSize = lineVec.normalize()
-                .times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
+    private fun LorenzRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
+        val lineVec = edge.node2.position - edge.node1.position
+        val center = edge.node1.position + lineVec / 2.0
+        val quad1 = edge.node1.position + lineVec / 4.0
+        val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
 
-            val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
+        val pyramidSize = lineVec.normalize()
+            .times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
 
-            fun pyramidDraw(
+        val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
+
+        fun pyramidDraw(
                 pos: LorenzVec,
             ) {
                 this.drawPyramid(
@@ -271,10 +276,9 @@ object GraphEditor {
                 )
             }
 
-            pyramidDraw(center)
-            pyramidDraw(quad1)
-            pyramidDraw(quad2)
-        }
+        pyramidDraw(center)
+        pyramidDraw(quad1)
+        pyramidDraw(quad2)
     }
 
     private fun GraphingNode.getNodeColor() = when (this) {
