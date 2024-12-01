@@ -458,7 +458,16 @@ object GraphEditor {
             edges.removeAll(edgePair)
             nodes.remove(activeNode)
             activeNode = null
-            addEdge(neighbors1, neighbors2)
+            val direction = if (edge1.direction == EdgeDirection.BOTH || edge2.direction == EdgeDirection.BOTH) EdgeDirection.BOTH else {
+                val a = edge1.node1 == edge2.node1
+                val b = edge1.direction == edge2.direction
+                if ((a && b) || (!a && !b)) {
+                    if (edge1.isValidDirectionFrom(neighbors1)) EdgeDirection.ONE_TO_TWO else EdgeDirection.TOW_TO_ONE
+                } else {
+                    EdgeDirection.BOTH
+                }
+            }
+            addEdge(neighbors1, neighbors2, direction)
         }
     }
 
