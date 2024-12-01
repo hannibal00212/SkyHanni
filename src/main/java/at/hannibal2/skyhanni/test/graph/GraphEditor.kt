@@ -439,8 +439,8 @@ object GraphEditor {
                 val node = GraphingNode(id++, middle)
                 nodes.add(node)
                 edges.remove(selectedEdge)
-                addEdge(node, selectedEdge.node1)
-                addEdge(node, selectedEdge.node2)
+                addEdge(selectedEdge.node1, node, selectedEdge.direction)
+                addEdge(node, selectedEdge.node2, selectedEdge.direction)
                 activeNode = node
             }
             if (config.edgeCycle.isKeyClicked()) {
@@ -557,14 +557,15 @@ object GraphEditor {
         ).let { e -> edges.indexOfFirst { it == e }.takeIf { it != -1 } }
         else null
 
-    private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) = if (node1 != null && node2 != null && node1 != node2) {
-        val edge = GraphingEdge(node1, node2)
-        if (edge.isInEdge(activeNode)) {
-            checkDissolve()
-            selectedEdge = findEdgeBetweenActiveAndClosest()
-        }
-        edges.add(edge)
-    } else false
+    private fun addEdge(node1: GraphingNode?, node2: GraphingNode?, direction: EdgeDirection = EdgeDirection.BOTH) =
+        if (node1 != null && node2 != null && node1 != node2) {
+            val edge = GraphingEdge(node1, node2, direction)
+            if (edge.isInEdge(activeNode)) {
+                checkDissolve()
+                selectedEdge = findEdgeBetweenActiveAndClosest()
+            }
+            edges.add(edge)
+        } else false
 
     private fun compileGraph(): Graph {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
