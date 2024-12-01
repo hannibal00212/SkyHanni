@@ -315,8 +315,7 @@ enum class TabWidget(
     EVENT_TRACKERS(
         // language=RegExp
         "§e§lEvent Trackers:",
-    )
-
+    ),
     ;
 
     /** The pattern for the first line of the widget*/
@@ -331,6 +330,7 @@ enum class TabWidget(
 
     /** Both are inclusive */
     var boundary = -1 to -1
+        private set
 
     /** Is this widget currently visible in the tab list */
     var isActive: Boolean = false
