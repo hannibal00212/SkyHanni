@@ -49,6 +49,8 @@ object PestProfitTracker {
      * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §6(§6+1,344☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
+     * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
