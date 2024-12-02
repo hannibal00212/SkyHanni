@@ -58,8 +58,40 @@ object PestProfitTracker {
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    // Todo: Move these and the adjustmentMap to repo
     private val ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
     private val ENCHANTED_RED_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
+    private val ENCHANTED_HAY_BALE_ITEM = "ENCHANTED_HAY_BALE".toInternalName()
+    private val POLISHED_PUMPKIN_ITEM = "POLISHED_PUMPKIN".toInternalName()
+    private val ENCHANTED_CACTUS_ITEM = "ENCHANTED_CACTUS".toInternalName()
+    private val ENCHANTED_SUGAR_CANE_ITEM = "ENCHANTED_SUGAR_CANE".toInternalName()
+    private val ENCHANTED_COOKIE_ITEM = "ENCHANTED_COOKIE".toInternalName()
+    private val MUTANT_NETHER_WART_ITEM = "MUTANT_NETHER_STALK".toInternalName()
+    private val ENCHANTED_GOLDEN_CARROT_ITEM = "ENCHANTED_GOLDEN_CARROT".toInternalName()
+    private val ENCHANTED_BAKED_POTATO_ITEM = "ENCHANTED_BAKED_POTATO".toInternalName()
+    private val ENCHANTED_MELON_BLOCK_ITEM = "ENCHANTED_MELON_BLOCK".toInternalName()
+    /**
+     * See: https://hypixel.net/threads/hypixel-skyblock-0-20-8-pesthunters-wares-chocolate-factory-additions-and-more.5804948/
+     *
+     * The amount of items dropped when a Rare+ drop is obtained is never in the message itself, so we have to
+     * retroactively determine the amount based on the item and the pest type.
+     */
+    private val adjustmentMap = mapOf(
+        PestType.FLY to mapOf(ENCHANTED_HAY_BALE_ITEM to 3),
+        PestType.RAT to mapOf(POLISHED_PUMPKIN_ITEM to 3),
+        PestType.SLUG to mapOf(
+            ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM to 15,
+            ENCHANTED_RED_MUSHROOM_BLOCK_ITEM to 15
+        ),
+        PestType.MITE to mapOf(ENCHANTED_CACTUS_ITEM to 6),
+        PestType.MOSQUITO to mapOf(ENCHANTED_SUGAR_CANE_ITEM to 6),
+        PestType.MOTH to mapOf(ENCHANTED_COOKIE_ITEM to 11),
+        PestType.BEETLE to mapOf(MUTANT_NETHER_WART_ITEM to 9),
+        PestType.CRICKET to mapOf(ENCHANTED_GOLDEN_CARROT_ITEM to 12),
+        PestType.LOCUST to mapOf(ENCHANTED_BAKED_POTATO_ITEM to 10),
+        PestType.EARTHWORM to mapOf(ENCHANTED_MELON_BLOCK_ITEM to 15)
+    )
+
     private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
@@ -143,16 +175,7 @@ object PestProfitTracker {
     }
 
     private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType): Int {
-        return when {
-            pestType == PestType.SLUG -> {
-                when (internalName) {
-                    ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM -> 15
-                    ENCHANTED_RED_MUSHROOM_BLOCK_ITEM -> 15
-                    else -> this
-                }
-            }
-            else -> this
-        }
+        return adjustmentMap[pestType]?.get(internalName) ?: this
     }
 
     private fun tryAddItem(type: PestType, internalName: NEUInternalName, amount: Int) {
