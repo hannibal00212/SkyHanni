@@ -25,11 +25,11 @@ abstract class ChangelogVerification : DefaultTask() {
     val prBodyLines get() = prBody.lines()
 
     private val prLink = "ignored"
-    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md"
+    private val templateLocation = "https://github.com/hannibal002/SkyHanni/blob/beta/pull_request_template.md?plain=1"
 
     @TaskAction
     fun scanChangelog() {
-        if (prBodyLines.contains("exclude_from_changelog")) {
+        if (prBodyLines.let { it.contains("exclude_from_changelog") || it.contains("ignore_from_changelog") }) {
             println("PR is excluded from changelog verification")
             return
         }

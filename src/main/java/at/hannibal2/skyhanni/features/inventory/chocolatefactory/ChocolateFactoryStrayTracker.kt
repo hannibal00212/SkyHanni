@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.inventory.Slot
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -43,8 +43,9 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryStrayTracker {
 
     private val config get() = ChocolateFactoryAPI.config
-    private var claimedStraysSlots = mutableListOf<Int>()
+    private val claimedStraysSlots = mutableListOf<Int>()
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §9Zero §d§lCAUGHT!
      * REGEX-TEST: §6§lGolden Rabbit §d§lCAUGHT!
@@ -79,7 +80,7 @@ object ChocolateFactoryStrayTracker {
      */
     val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.dorado",
-        ".*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
+        ".*§7You caught a stray.*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
 
     /**
@@ -100,14 +101,14 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the §7end of the SkyBlock year!",
     )
 
-    // TODO: Fix this pattern so it doesn't only match duplicates.
     /**
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
+     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7!
      */
     @Suppress("MaxLineLength")
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
-        "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
+        "§7You caught a stray (?<color>§.)Fish the Rabbit§7!(?: §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!|.*)?",
     )
 
     /**
@@ -125,6 +126,16 @@ object ChocolateFactoryStrayTracker {
         "stray.doradoduplicate",
         "(?:§.)*already have captured him before.*",
     )
+
+    /**
+     * REGEX-TEST: §7but he escaped and left behind
+     * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
+     */
+    val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.doradoescape",
+        ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*"
+    )
+    // </editor-fold>
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
         drawDisplay(it)
@@ -215,11 +226,11 @@ object ChocolateFactoryStrayTracker {
         return if (goldenList.isEmpty()) "" else ("\n" + goldenList.joinToString("\n"))
     }
 
-    fun handleStrayClicked(slot: Slot) {
-        if (!isEnabled() || claimedStraysSlots.contains(slot.slotNumber)) return
+    fun handleStrayClicked(slotNumber: Int, itemStack: ItemStack): Boolean {
+        if (!isEnabled() || claimedStraysSlots.contains(slotNumber)) return false
 
-        claimedStraysSlots.add(slot.slotIndex)
-        val loreLine = formLoreToSingleLine(slot.stack.getLore())
+        claimedStraysSlots.add(slotNumber)
+        val loreLine = formLoreToSingleLine(itemStack.getLore())
 
         // "Base" strays - Common -> Epic, raw choc only reward.
         strayLorePattern.matchMatcher(loreLine) {
@@ -232,7 +243,9 @@ object ChocolateFactoryStrayTracker {
         fishTheRabbitPattern.matchMatcher(loreLine) {
             // Also fairly sure that Fish maxes out at Rare, but...
             val rarity = HoppityAPI.rarityByRabbit(group("color")) ?: return@matchMatcher
-            incrementRarity(rarity, group("amount").formatLong())
+            groupOrNull("amount")?.let { amount ->
+                incrementRarity(rarity, amount.formatLong())
+            } ?: incrementRarity(rarity)
         }
 
         // Golden Strays, Jackpot and Mountain, raw choc only reward.
@@ -262,6 +275,8 @@ object ChocolateFactoryStrayTracker {
             }
             incrementGoldenType("dorado")
         }
+
+        return true
     }
 
     @SubscribeEvent

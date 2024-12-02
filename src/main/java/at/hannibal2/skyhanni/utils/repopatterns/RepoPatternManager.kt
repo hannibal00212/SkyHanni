@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
@@ -51,7 +52,7 @@ object RepoPatternManager {
     /**
      * Map containing the exclusive owner of a regex key
      */
-    private var exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
+    private val exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
 
     /**
      * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
@@ -60,11 +61,6 @@ object RepoPatternManager {
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
-    private val isInDevEnv = try {
-        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    } catch (_: Exception) {
-        true
-    }
 
     private val insideTest = Launch.blackboard == null
 
@@ -88,8 +84,9 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (isInDevEnv || LorenzEvent.isInGuardedEventHandler)
+        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
+        }
     }
 
     /**
@@ -243,13 +240,15 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
+        require(keyShape.matches(key)) {
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers and dots."
+        }
     }
 
     /**
