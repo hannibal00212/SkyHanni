@@ -143,10 +143,12 @@ object HoppityAPI {
         listOf(Items.skull, Item.getItemFromBlock(Blocks.stained_glass_pane))
     }
 
-    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
-        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 4).asTimeMark()
-    } else null
+    fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) SkyBlockTime.now().year.getEventEndMark() else null
+    fun Int.getEventEndMark(): SimpleTimeMark =
+        SkyBlockTime.fromSeason(this, SkyblockSeason.SUMMER, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
+    fun Int.getEventStartMark(): SimpleTimeMark =
+        SkyBlockTime.fromSeason(this, SkyblockSeason.SPRING, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
