@@ -27,8 +27,10 @@ enum class SkyblockSeason(
         override fun toString(): String = str
     }
 
+    fun isSeason(): Boolean = currentSeason == this
     fun getPerk(abbreviate: Boolean): String = if (abbreviate) abbreviatedPerk else perk
     fun getSeason(abbreviate: Boolean): String = if (abbreviate) season.take(4) else season
+    fun getDisplayMonth(modifier: SkyblockSeasonModifier? = null): Int = getMonth(modifier) + 1
     fun getMonth(modifier: SkyblockSeasonModifier? = null): Int =
         when (this) {
             SPRING -> 1
