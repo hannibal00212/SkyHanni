@@ -39,10 +39,11 @@ object StockOfStonkFeature {
 
     /**
      * REGEX-TEST: §5§o§7§7▶ §c§lTOP 5,000§7 - §5Stock of Stonks §8x2
+     * REGEX-TEST: §5§o§7§a▶ §a§lTOP 100§7 - §5Stock of Stonks §8x25
      */
     private val topPattern by repoGroup.pattern(
         "top",
-        "§5§o§7§.▶ §c§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
+        "§5§o§7§.▶ §.§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
     )
 
     /**
