@@ -58,6 +58,8 @@ object PestProfitTracker {
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    private val ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
+    private val ENCHANTED_RED_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
     private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
@@ -116,16 +118,14 @@ object PestProfitTracker {
         if (!isEnabled()) return
         var pestThisRun = PestType.UNKNOWN
         PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
-            val amount = group("amount").toInt()
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
                 "pest_name" to group("pest"),
-                "item_name" to group("item"),
-                "amount" to amount,
                 "full_message" to event.message,
             )
             pestThisRun = pest
+            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val amount = group("amount").toInt().fixAmount(internalName, pest)
 
             tryAddItem(pest, internalName, amount)
 
@@ -139,6 +139,19 @@ object PestProfitTracker {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
             tryAddItem(pestThisRun, internalName, 1)
             // pests always have guaranteed loot, therefore there's no need to add kill here
+        }
+    }
+
+    private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType): Int {
+        return when {
+            pestType == PestType.SLUG -> {
+                when (internalName) {
+                    ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM -> 15
+                    ENCHANTED_RED_MUSHROOM_BLOCK_ITEM -> 15
+                    else -> this
+                }
+            }
+            else -> this
         }
     }
 
