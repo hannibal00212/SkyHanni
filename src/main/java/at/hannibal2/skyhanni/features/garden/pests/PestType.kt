@@ -216,6 +216,6 @@ enum class PestType(
             it.key.toInternalName() to it.value
         }.toMap()
 
-        fun getByInternalNameItemOrNull(internalName: NEUInternalName): PestType = internalNameMap[internalName] ?: UNKNOWN
+        fun getByInternalNameItemOrNull(internalName: NEUInternalName): PestType? = internalNameMap[internalName]
     }
 }

@@ -5,12 +5,14 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -34,6 +36,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 import kotlin.math.roundToInt
@@ -58,40 +61,6 @@ object PestProfitTracker {
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
-    // Todo: Move these and the adjustmentMap to repo
-    private val ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_1".toInternalName()
-    private val ENCHANTED_RED_MUSHROOM_BLOCK_ITEM = "ENCHANTED_HUGE_MUSHROOM_2".toInternalName()
-    private val ENCHANTED_HAY_BALE_ITEM = "ENCHANTED_HAY_BALE".toInternalName()
-    private val POLISHED_PUMPKIN_ITEM = "POLISHED_PUMPKIN".toInternalName()
-    private val ENCHANTED_CACTUS_ITEM = "ENCHANTED_CACTUS".toInternalName()
-    private val ENCHANTED_SUGAR_CANE_ITEM = "ENCHANTED_SUGAR_CANE".toInternalName()
-    private val ENCHANTED_COOKIE_ITEM = "ENCHANTED_COOKIE".toInternalName()
-    private val MUTANT_NETHER_WART_ITEM = "MUTANT_NETHER_STALK".toInternalName()
-    private val ENCHANTED_GOLDEN_CARROT_ITEM = "ENCHANTED_GOLDEN_CARROT".toInternalName()
-    private val ENCHANTED_BAKED_POTATO_ITEM = "ENCHANTED_BAKED_POTATO".toInternalName()
-    private val ENCHANTED_MELON_BLOCK_ITEM = "ENCHANTED_MELON_BLOCK".toInternalName()
-    /**
-     * See: https://hypixel.net/threads/hypixel-skyblock-0-20-8-pesthunters-wares-chocolate-factory-additions-and-more.5804948/
-     *
-     * The amount of items dropped when a Rare+ drop is obtained is never in the message itself, so we have to
-     * retroactively determine the amount based on the item and the pest type.
-     */
-    private val adjustmentMap = mapOf(
-        PestType.FLY to mapOf(ENCHANTED_HAY_BALE_ITEM to 3),
-        PestType.RAT to mapOf(POLISHED_PUMPKIN_ITEM to 3),
-        PestType.SLUG to mapOf(
-            ENCHANTED_BROWN_MUSHROOM_BLOCK_ITEM to 15,
-            ENCHANTED_RED_MUSHROOM_BLOCK_ITEM to 15
-        ),
-        PestType.MITE to mapOf(ENCHANTED_CACTUS_ITEM to 6),
-        PestType.MOSQUITO to mapOf(ENCHANTED_SUGAR_CANE_ITEM to 6),
-        PestType.MOTH to mapOf(ENCHANTED_COOKIE_ITEM to 11),
-        PestType.BEETLE to mapOf(MUTANT_NETHER_WART_ITEM to 9),
-        PestType.CRICKET to mapOf(ENCHANTED_GOLDEN_CARROT_ITEM to 12),
-        PestType.LOCUST to mapOf(ENCHANTED_BAKED_POTATO_ITEM to 10),
-        PestType.EARTHWORM to mapOf(ENCHANTED_MELON_BLOCK_ITEM to 15)
-    )
-
     private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
         "Pest Profit Tracker",
@@ -99,6 +68,7 @@ object PestProfitTracker {
         { it.garden.pestProfitTracker },
         { drawDisplay(it) },
     )
+    private var adjustmentMap: Map<PestType, Map<NEUInternalName, Int>> = mapOf()
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
@@ -148,7 +118,7 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        var pestThisRun = PestType.UNKNOWN
+        var pestThisRun: PestType? = null
         PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -168,10 +138,26 @@ object PestProfitTracker {
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
-            tryAddItem(pestThisRun, internalName, 1)
+            val itemGroup = group("item")
+            val internalName = NEUInternalName.fromItemNameOrNull(itemGroup) ?: return
+            val pest = pestThisRun ?: PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            val amount = 1.fixAmount(internalName, pest)
+
+            // If the amount was fixed, edit the chat message to reflect the change
+            if (amount != 1) {
+                event.chatComponent = ChatComponentText(
+                    event.message.replace(itemGroup, "§a${amount}x $itemGroup"),
+                )
+            }
+
+            tryAddItem(pest, internalName, amount)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
     }
 
     private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType): Int {
@@ -283,7 +269,7 @@ object PestProfitTracker {
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
                 val pest = pestTypeMap.getOrPut(item) {
-                    PestType.getByInternalNameItemOrNull(item)
+                    PestType.getByInternalNameItemOrNull(item) ?: PestType.UNKNOWN
                 }
 
                 // If the map for the pest already contains this item, combine the amounts
