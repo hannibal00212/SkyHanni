@@ -231,6 +231,10 @@ public class ProfileSpecificStorage {
             @Expose
             @Nullable
             public SimpleTimeMark allSlotsCooldown = null;
+
+            @Expose
+            @Nullable
+            public Integer purchasedSlots = null;
         }
 
         @Expose

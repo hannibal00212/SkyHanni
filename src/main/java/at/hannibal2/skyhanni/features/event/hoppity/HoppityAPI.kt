@@ -145,7 +145,7 @@ object HoppityAPI {
 
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
-        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
+        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 4).asTimeMark()
     } else null
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
