@@ -228,13 +228,13 @@ object PestProfitTracker {
 
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
-        val lastPestKillType = lastPestKillTimes.entries().sortedBy { (_, time) ->
+        val recentKills = lastPestKillTimes.entries().toList().sortedBy { (_, time) ->
             time
-        }.firstOrNull { (_, time) ->
+        }.filter { (_, time) ->
             time.passedSince() < 2.seconds
-        }?.key ?: return
+        }.takeIf { it.isNotEmpty() } ?: return
 
-        tracker.addCoins(lastPestKillType, event.coins.roundToInt())
+        tracker.addCoins(recentKills.first().key, event.coins.roundToInt())
     }
 
     @SubscribeEvent
