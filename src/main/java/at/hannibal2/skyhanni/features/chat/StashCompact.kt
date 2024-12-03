@@ -79,12 +79,10 @@ object StashCompact {
     private var emptyLineWarned = false
     private var joinedProfileAt: SimpleTimeMark? = null
 
-    enum class StashType(val internalName: String, val colorCodePair: Pair<String, String>) {
+    enum class StashType(val displayName: String, val colorCodePair: Pair<String, String>) {
         ITEM("item", Pair("§e", "§6")),
         MATERIAL("material", Pair("§b", "§3")),
         ;
-
-        override fun toString() = internalName
 
         companion object {
             fun Matcher.fromGroup() = StashType.fromStringOrNull(group("type"))
@@ -156,7 +154,7 @@ object StashCompact {
     private fun StashMessage.sendCompactedStashMessage() {
         val currentType = currentType ?: return
 
-        val typeNameFormat = StringUtils.pluralize(materialCount, currentType.toString())
+        val typeNameFormat = StringUtils.pluralize(materialCount, currentType.displayName)
         val (mainColor, accentColor) = currentType.colorCodePair
 
         val typeStringExtra = differingMaterialsCount?.let {
