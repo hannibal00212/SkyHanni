@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay.DataType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -15,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -23,9 +27,12 @@ import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenPlotAPI {
+
+
 
     private val patternGroup = RepoPattern.group("garden.plot")
 
@@ -82,6 +89,15 @@ object GardenPlotAPI {
         "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
     )
 
+    /**
+     * REGEX-TEST: Spray: §r§7None
+     * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
+     * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
+     */
+    private val plotSprayedTablistPattern by patternGroup.pattern(
+        "tablist.spray",
+        " Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\(((?<minutes>\\d+)m)?( )?((?<seconds>\\d+)s)?\\))?.*"
+    )
     var plots = listOf<Plot>()
 
     fun getCurrentPlot(): Plot? {
@@ -310,6 +326,47 @@ object GardenPlotAPI {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!GardenAPI.inGarden()) return
+        for (line in event.tabList) {
+            plotSprayedTablistPattern.matchMatcher(line) {
+                val plot = getCurrentPlot() ?: return
+                val sprayName = group("spray") ?: return
+                val minutes = group("minutes")?.toInt() ?: 0
+                val seconds = group("seconds")?.toInt() ?: 0
+                val time = if (seconds == 0) (minutes+1).minutes
+                            else minutes.minutes + seconds.seconds
+                if (plot.currentSpray != null) {
+                    if (sprayName == "None") {
+                        plot.removeSpray()
+                    } else {
+                        val spray = SprayType.getByName(sprayName) ?: return
+                        if (plot.getData()?.sprayExpiryTime!! >= SimpleTimeMark.now() + time + 6.seconds
+                            || plot.getData()?.sprayExpiryTime!! <= SimpleTimeMark.now() + time - 1.minutes
+                            || plot.getData()?.sprayType != spray)
+                            plot.setSpray(spray,time)
+                    }
+                } else {
+                    val spray = SprayType.getByName(sprayName) ?: return
+                    if (sprayName == "None") return
+                    plot.setSpray(spray,time)
+                }
+            }
+        }
+    }
+
+    private fun readData(tabList: List<String>) {
+        val newData = mutableMapOf<DataType, String>()
+        for (line in tabList) {
+            for (type in DataType.entries) {
+                type.pattern.matchMatcher(line) {
+                    newData[type] = group(1)
+                    }
+                }
+            }
+        }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
