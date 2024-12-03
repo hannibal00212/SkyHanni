@@ -30,8 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenPlotAPI {
 
-
-
     private val patternGroup = RepoPattern.group("garden.plot")
 
     /**
@@ -91,6 +89,7 @@ object GardenPlotAPI {
      * REGEX-TEST: Spray: §r§7None
      * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
      * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
+     * REGEX-TEST: Spray: §r§aCompost §r§7(53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spray",
