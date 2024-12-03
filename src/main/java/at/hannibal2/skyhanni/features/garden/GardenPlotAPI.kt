@@ -96,7 +96,7 @@ object GardenPlotAPI {
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spray",
-        " Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\(((?<minutes>\\d+)m)?( )?((?<seconds>\\d+)s)?\\))?.*"
+        " Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\(((?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?.*"
     )
     var plots = listOf<Plot>()
 
