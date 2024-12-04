@@ -35,6 +35,7 @@ object ChocolateFactoryDataLoader {
     private val config get() = ChocolateFactoryAPI.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §674.15 §8per second
      */
@@ -126,6 +127,14 @@ object ChocolateFactoryDataLoader {
     )
 
     /**
+     * REGEX-TEST: §7What does it do? Nobody knows...
+     */
+    private val timeTowerAmountEmptyPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "timetower.amount.empty",
+        "§7What does it do\\? Nobody knows\\.\\.\\.",
+    )
+
+    /**
      * REGEX-TEST: §7Status: §a§lACTIVE §f59m58s
      * REGEX-TEST:
      */
@@ -186,6 +195,32 @@ object ChocolateFactoryDataLoader {
         "other.upgrade",
         "Rabbit Shrine|Coach Jackrabbit",
     )
+
+    /**
+     * REGEX-TEST: §7Available eggs: §a0
+     */
+    private val hitmanAvailableEggsPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.availableeggs",
+        "§7Available eggs: §a(?<amount>\\d+)",
+    )
+
+    /**
+     * REGEX-TEST: §7Slot cooldown: §a8m 6s
+     */
+    private val hitmanSingleSlotCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.slotcooldown",
+        "§7Slot cooldown: §a(?<duration>[\\w ]+)",
+    )
+
+    /**
+     * REGEX-TEST: §7All slots in: §a8h 8m 6s
+     */
+    private val hitmanAllSlotsCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.allslotscooldown",
+        "§7All slots in: §a(?<duration>[\\w ]+)",
+    )
+
+    // </editor-fold>
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -250,6 +285,7 @@ object ChocolateFactoryDataLoader {
         val productionInfoItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.productionInfoIndex) ?: return
         val leaderboardItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.leaderboardIndex) ?: return
         val barnItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.barnIndex) ?: return
+        val hitmanItem = InventoryUtils.getItemAtSlotIndex(ChocolateFactoryAPI.rabbitHitmanIndex) ?: return
 
         ChocolateFactoryAPI.factoryUpgrades = emptyList()
 
@@ -260,6 +296,7 @@ object ChocolateFactoryDataLoader {
         processProductionItem(productionInfoItem)
         processLeaderboardItem(leaderboardItem)
         processBarnItem(barnItem)
+        processHitmanItem(hitmanItem)
 
         profileStorage.rawChocPerSecond = (ChocolateFactoryAPI.chocolatePerSecond / profileStorage.chocolateMultiplier + .01).toInt()
         profileStorage.lastDataSave = SimpleTimeMark.now()
@@ -364,6 +401,11 @@ object ChocolateFactoryDataLoader {
                 profileStorage.maxTimeTowerUses = group("max").formatInt()
                 ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
             }
+            if (timeTowerAmountEmptyPattern.matches(line)) {
+                profileStorage.currentTimeTowerUses = 0
+                profileStorage.maxTimeTowerUses = 0
+                profileStorage.currentTimeTowerUses = 0
+            }
             timeTowerStatusPattern.matchMatcher(line) {
                 val activeTime = group("acitveTime")
                 if (activeTime.isNotEmpty()) {
@@ -384,6 +426,26 @@ object ChocolateFactoryDataLoader {
                 val timeUntilTower = TimeUtils.getDuration(formattedGroup)
                 val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
                 profileStorage.nextTimeTower = nextTimeTower
+            }
+        }
+    }
+
+    private fun processHitmanItem(item: ItemStack) {
+        val profileStorage = profileStorage ?: return
+
+        for (line in item.getLore()) {
+            hitmanAvailableEggsPattern.matchMatcher(line) {
+                profileStorage.hitmanStats.availableEggs = group("amount").formatInt()
+            }
+            hitmanSingleSlotCooldownPattern.matchMatcher(line) {
+                val timeUntilSlot = TimeUtils.getDuration(group("duration"))
+                val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
+                profileStorage.hitmanStats.slotCooldown = nextSlot
+            }
+            hitmanAllSlotsCooldownPattern.matchMatcher(line) {
+                val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
+                val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
+                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
             }
         }
     }
