@@ -221,20 +221,13 @@ object PestProfitTracker {
 
     @SubscribeEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled() || event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        val coins = event.coins
-        if (coins > 1000) return
-        if (lastPestKillTimes.isEmpty()) return
+        if (!isEnabled() || event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
+        val coins = event.coins.takeIf { it in 1000.0..10000.0 } ?: return
 
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
-        val recentKills = lastPestKillTimes.entries().toList().sortedBy { (_, time) ->
-            time
-        }.filter { (_, time) ->
-            time.passedSince() < 2.seconds
-        }.takeIf { it.isNotEmpty() } ?: return
-
-        tracker.addCoins(recentKills.first().key, event.coins.roundToInt())
+        val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
+        tracker.addCoins(pest, coins.roundToInt())
     }
 
     @SubscribeEvent
