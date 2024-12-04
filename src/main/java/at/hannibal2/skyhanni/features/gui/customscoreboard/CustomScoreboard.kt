@@ -216,10 +216,10 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }, currentIslandEntries))
+                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }))
 
                 add("Custom Scoreboard Events:")
-                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
+                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }))
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
@@ -229,14 +229,13 @@ object CustomScoreboard {
         }
     }
 
-    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>, currentIslandList: List<ScoreboardElement>) =
-        entries.map { (name, element) ->
-            val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
-            "   ${name.firstLetterUppercase()} - " +
-                "island: ${element.showIsland()} - " +
-                "in Island: ${element in currentIslandList} - " +
-                "show: ${element.showWhen()} - " +
-                lines
+    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>) = entries.map { (name, element) ->
+        val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
+        "   ${name.firstLetterUppercase()} - " +
+            "island: ${element.showIsland()} - " +
+            "in Island: ${element in currentIslandEntries} - " +
+            "show: ${element.showWhen()} - " +
+            lines
         }
 
     @JvmStatic
