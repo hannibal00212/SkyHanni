@@ -767,6 +767,82 @@ object RenderUtils {
         drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
     }
 
+    fun LorenzRenderWorldEvent.drawPyramid(
+        topPoint: LorenzVec,
+        baseCenterPoint: LorenzVec,
+        baseEdgePoint: LorenzVec,
+        color: Color,
+        depth: Boolean = true,
+    ) {
+        GlStateManager.enableBlend()
+        GlStateManager.disableLighting()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.disableTexture2D()
+        GlStateManager.disableCull()
+        GlStateManager.enableAlpha()
+        if (!depth) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST)
+            GlStateManager.depthMask(false)
+        }
+        GlStateManager.pushMatrix()
+
+        color.bindColor()
+
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        worldRenderer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION)
+        val inverseView = getViewerPos(partialTicks)
+        RenderUtils.translate(inverseView.negated())
+
+        worldRenderer.pos(topPoint).endVertex()
+
+        val corner1 = baseEdgePoint
+
+        val cornerCenterVec = baseEdgePoint - baseCenterPoint
+
+        val corner3 = baseCenterPoint - cornerCenterVec
+
+        val baseTopVecNormalized = (topPoint - baseCenterPoint).normalize()
+
+        val corner2 = baseTopVecNormalized.crossProduct(cornerCenterVec) + baseCenterPoint
+        val corner4 = cornerCenterVec.crossProduct(baseTopVecNormalized) + baseCenterPoint
+
+        worldRenderer.pos(corner1).endVertex()
+        worldRenderer.pos(corner2).endVertex()
+
+        worldRenderer.pos(corner2).endVertex()
+        worldRenderer.pos(corner3).endVertex()
+
+        worldRenderer.pos(corner3).endVertex()
+        worldRenderer.pos(corner4).endVertex()
+
+        worldRenderer.pos(corner4).endVertex()
+        worldRenderer.pos(corner1).endVertex()
+
+        tessellator.draw()
+
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
+
+        worldRenderer.pos(corner1).endVertex()
+        worldRenderer.pos(corner4).endVertex()
+        worldRenderer.pos(corner3).endVertex()
+        worldRenderer.pos(corner2).endVertex()
+
+
+        tessellator.draw()
+
+
+        GlStateManager.popMatrix()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableCull()
+        GlStateManager.disableBlend()
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        if (!depth) {
+            GL11.glEnable(GL11.GL_DEPTH_TEST)
+            GlStateManager.depthMask(true)
+        }
+    }
+
     // Todo: Gauge whether or not partialTicks is actually necessary, or if it can be removed
     @Suppress("UnusedParameter")
     fun drawCylinderInWorld(
@@ -1736,7 +1812,6 @@ object RenderUtils {
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
     }
-
 
     /**
      * Method to draw a rounded textured rect.

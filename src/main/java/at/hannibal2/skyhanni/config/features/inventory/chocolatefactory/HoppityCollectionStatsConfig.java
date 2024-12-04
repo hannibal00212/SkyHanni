@@ -62,7 +62,7 @@ public class HoppityCollectionStatsConfig {
     @Expose
     @ConfigOption(
         name = "Missing Resident Rabbits",
-        desc = "Show the islands that you have the most missing resident rabbits om."
+        desc = "Show the islands that you have the most missing resident rabbits on."
     )
     @ConfigEditorBoolean
     @FeatureToggle
