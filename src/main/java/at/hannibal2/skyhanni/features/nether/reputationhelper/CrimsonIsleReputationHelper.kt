@@ -46,14 +46,13 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     var tabListQuestsMissing = false
 
     /**
-     *  c - Barbarian Not Accepted
-     *  d - Mage Not Accepted
-     *  e - Accepted
-     *  a - Completed
+     * REGEX-TEST:  §r§c✖ Rescue Mission
+     * REGEX-TEST:  §r§a✔ Digested Mushrooms §r§8x20
+     * REGEX-TEST:  §r§c✖ Slugfish §r§8x1
      */
     val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputation.tablist",
-        " §r§[cdea].*",
+        "crimson.reputationhelper.tablist.quest",
+        " (?:§.*)?(?<status>[✖✔]) (?<name>.+?)(?: (?:§.)*?x(?<amount>\\d+))?",
     )
 
     init {

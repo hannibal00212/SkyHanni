@@ -127,6 +127,14 @@ object ChocolateFactoryDataLoader {
     )
 
     /**
+     * REGEX-TEST: §7What does it do? Nobody knows...
+     */
+    private val timeTowerAmountEmptyPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "timetower.amount.empty",
+        "§7What does it do\\? Nobody knows\\.\\.\\.",
+    )
+
+    /**
      * REGEX-TEST: §7Status: §a§lACTIVE §f59m58s
      * REGEX-TEST:
      */
@@ -392,6 +400,11 @@ object ChocolateFactoryDataLoader {
                 profileStorage.currentTimeTowerUses = group("uses").formatInt()
                 profileStorage.maxTimeTowerUses = group("max").formatInt()
                 ChocolateFactoryTimeTowerManager.checkTimeTowerWarning(true)
+            }
+            if (timeTowerAmountEmptyPattern.matches(line)) {
+                profileStorage.currentTimeTowerUses = 0
+                profileStorage.maxTimeTowerUses = 0
+                profileStorage.currentTimeTowerUses = 0
             }
             timeTowerStatusPattern.matchMatcher(line) {
                 val activeTime = group("acitveTime")

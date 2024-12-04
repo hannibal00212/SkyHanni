@@ -34,11 +34,11 @@ object GardenVisitorSupercraft {
         val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
-            "§bSuper Craft",
+            "§bSupercraft",
             "§8(From SkyHanni)",
             "",
-            "§7You have the items to craft",
-            "§7Click me to open the super crafter!",
+            "§7You have the items to craft.",
+            "§7Click me to open the supercrafter!",
         )
     }
 
