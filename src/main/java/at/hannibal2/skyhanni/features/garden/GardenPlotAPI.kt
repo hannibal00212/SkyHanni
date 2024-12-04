@@ -421,7 +421,10 @@ object GardenPlotAPI {
     @HandleEvent
     fun onPlotChange(event: PlotChangeEvent) {
         ChatUtils.debug("Current Plot: " + event.plot?.name)
-        TabWidget.reSendEvents()
+        DelayedRun.runDelayed(3.seconds) {
+            TabWidget.reSendEvents()
+        }
+
     }
 
     @SubscribeEvent
