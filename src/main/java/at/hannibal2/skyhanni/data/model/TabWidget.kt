@@ -469,7 +469,6 @@ enum class TabWidget(
         fun reSendEvents() = entries.forEach {
             if (it.isActive) {
                 it.postNewEvent(it.lines)
-                ChatUtils.debug("Updating $it")
             } else {
                 it.postClearEvent()
             }
