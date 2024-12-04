@@ -246,18 +246,20 @@ object GardenPlotAPI {
     }
 
     private fun sendSprayMessage(plot: String, spray: String, time: String) {
-        ChatUtils.chat("§r§aPlot §r§7- §r§b${plot} §r§7was sprayed with §r§a$spray§r§7!§r")
+        ChatUtils.chat("§r§aPlot §r§7- §r§b$plot §r§7was sprayed with §r§a$spray§r§7!§r")
         ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
     }
 
-    private fun isSprayAccurate(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType): Boolean {
+    private fun isSprayAccurate(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType,
+                                newSpray: SprayType): Boolean {
         return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
             sprayExpiryTime <= expectedExpireTime - 1.minutes ||
             currentSpray != newSpray
     }
 
-    private fun sprayMessageEligible(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType): Boolean {
-        return (sprayExpiryTime >= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
+    private fun sprayMessageEligible(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType,
+                                     newSpray: SprayType): Boolean {
+        return (sprayExpiryTime <= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
             config.newSprayNotification
     }
     fun Plot.isBarn() = id == 0
@@ -398,7 +400,7 @@ object GardenPlotAPI {
                     } else {
                         if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
                             if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
-                                sendSprayMessage(plot.name,sprayName,timeString)
+                                sendSprayMessage(plot.name, sprayName, timeString)
                             }
                             plot.setSpray(newSpray, time)
                         }
@@ -406,7 +408,7 @@ object GardenPlotAPI {
                 } else {
                     if (newSpray == null) return
                     if (config.newSprayNotification) {
-                        sendSprayMessage(plot.name,sprayName,timeString)
+                        sendSprayMessage(plot.name, sprayName, timeString)
                     }
                     plot.setSpray(newSpray, time)
                 }
