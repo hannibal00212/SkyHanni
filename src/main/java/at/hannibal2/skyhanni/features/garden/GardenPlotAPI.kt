@@ -1,13 +1,18 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.garden.composter.ComposterDisplay.DataType
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -19,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -93,7 +99,7 @@ object GardenPlotAPI {
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spray",
-        " Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\(((?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?.*"
+        "Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?"
     )
     var plots = listOf<Plot>()
 
@@ -102,6 +108,19 @@ object GardenPlotAPI {
     }
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
+
+    private var currentPlot : Plot? = null
+
+    fun checkCurrentPlot() {
+        if (getCurrentPlot() != currentPlot) {
+            currentPlot = getCurrentPlot()
+            updateCurrentPlot()
+        }
+    }
+
+    private fun updateCurrentPlot() {
+        PlotChangeEvent(currentPlot).post()
+    }
 
     class PlotData(
         @Expose
@@ -325,45 +344,49 @@ object GardenPlotAPI {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
-        for (line in event.tabList) {
-            plotSprayedTablistPattern.matchMatcher(line) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
+        for (line in event.lines) {
+            plotSprayedTablistPattern.matchMatcher(line.trim()) {
                 val plot = getCurrentPlot() ?: return
                 val sprayName = group("spray") ?: return
                 val minutes = group("minutes")?.toInt() ?: 0
                 val seconds = group("seconds")?.toInt() ?: 0
                 val time = if (seconds == 0) (minutes+1).minutes
                             else minutes.minutes + seconds.seconds
+                val spray = SprayType.getByName(sprayName)
                 if (plot.currentSpray != null) {
-                    if (sprayName == "None") {
+                    if (spray == null) {
                         plot.removeSpray()
                     } else {
-                        val spray = SprayType.getByName(sprayName) ?: return
                         if (plot.getData()?.sprayExpiryTime!! >= SimpleTimeMark.now() + time + 6.seconds
                             || plot.getData()?.sprayExpiryTime!! <= SimpleTimeMark.now() + time - 1.minutes
                             || plot.getData()?.sprayType != spray)
                             plot.setSpray(spray,time)
                     }
                 } else {
-                    val spray = SprayType.getByName(sprayName) ?: return
-                    if (sprayName == "None") return
+                    if (spray == null) return
                     plot.setSpray(spray,time)
                 }
             }
         }
     }
 
-    private fun readData(tabList: List<String>) {
-        val newData = mutableMapOf<DataType, String>()
-        for (line in tabList) {
-            for (type in DataType.entries) {
-                type.pattern.matchMatcher(line) {
-                    newData[type] = group(1)
-                    }
-                }
+    @HandleEvent
+    fun onPlotChange(event: PlotChangeEvent) {
+        ChatUtils.debug("Current Plot: " + event.plot?.name)
+        TabWidget.reSendEvents()
+    }
+
+    @SubscribeEvent
+    fun onPlayerMove(event: EntityMoveEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (event.entity == Minecraft.getMinecraft().thePlayer) {
+            DelayedRun.runDelayed(.5.seconds) {
+                checkCurrentPlot()
             }
         }
+    }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
