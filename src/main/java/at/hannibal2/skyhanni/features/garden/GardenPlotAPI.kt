@@ -245,6 +245,21 @@ object GardenPlotAPI {
         }
     }
 
+    private fun sendSprayMessage(plot: String, spray: String, time: String) {
+        ChatUtils.chat("§r§aPlot §r§7- §r§b${plot} §r§7was sprayed with §r§a$spray§r§7!§r")
+        ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
+    }
+
+    private fun isSprayAccurate(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType): Boolean {
+        return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
+            sprayExpiryTime <= expectedExpireTime - 1.minutes ||
+            currentSpray != newSpray
+    }
+
+    private fun sprayMessageEligible(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType): Boolean {
+        return (sprayExpiryTime >= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
+            config.newSprayNotification
+    }
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
@@ -354,47 +369,46 @@ object GardenPlotAPI {
             plotSprayedTablistPattern.matchMatcher(line.trim()) {
 
                 val plot = getCurrentPlot() ?: return
+
                 val sprayName = group("spray").trim()
                 val minutes = group("minutes")?.toInt() ?: 0
                 val seconds = group("seconds")?.toInt() ?: 0
+
                 val time = if (seconds == 0) (minutes + 1).minutes
                 else minutes.minutes + seconds.seconds
+
                 val timeString = when {
                     minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
                     minutes != 0 -> "${minutes + 1}m"
                     else -> "${seconds}s"
                 }
-                val sprayExpiryTime = plot.getData()?.sprayExpiryTime ?: return
-                val spray = SprayType.getByName(sprayName)
+
+                val newSpray = SprayType.getByName(sprayName)
 
                 if (plot.currentSpray != null) {
-                    if (spray == null) {
+                    val expectedExpireTime = SimpleTimeMark.now() + time
+                    val data = plot.getData() ?: return
+
+                    val sprayExpiryTime = data.sprayExpiryTime ?: return
+                    val currentSpray = data.sprayType ?: return
+
+                    if (newSpray == null) {
                         plot.removeSpray()
+                        return
                     } else {
-                        if (sprayExpiryTime >= SimpleTimeMark.now() + time + 6.seconds ||
-                            sprayExpiryTime <= SimpleTimeMark.now() + time - 1.minutes ||
-                            plot.getData()?.sprayType != spray
-                            ) {
-                            if (
-                                (sprayExpiryTime >= SimpleTimeMark.now() + time - 10.minutes ||
-                                    plot.getData()?.sprayType != spray
-                                ) &&
-                                config.newSprayNotification
-                                ) {
-                                ChatUtils.chat("§r§aPlot §r§7- §r§b${plot.name} §r§7was sprayed with §r§a$sprayName§r§7!§r")
-                                ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
+                        if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                            if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                                sendSprayMessage(plot.name,sprayName,timeString)
                             }
-                            plot.setSpray(spray, time)
+                            plot.setSpray(newSpray, time)
                         }
                     }
                 } else {
-                    if (spray == null) return
+                    if (newSpray == null) return
                     if (config.newSprayNotification) {
-                        ChatUtils.chat("§r§aPlot §r§7- §r§b${plot.name} §r§7was sprayed with §r§a$sprayName§r§7!§r")
-                        ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
+                        sendSprayMessage(plot.name,sprayName,timeString)
                     }
-                    plot.setSpray(spray, time)
-
+                    plot.setSpray(newSpray, time)
                 }
             }
         }
