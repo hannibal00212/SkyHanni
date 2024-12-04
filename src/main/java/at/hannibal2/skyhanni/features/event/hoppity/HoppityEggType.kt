@@ -61,7 +61,7 @@ enum class HoppityEggType(
 
     private fun hasNotFirstSpawnedYet(): Boolean {
         val now = SkyBlockTime.now()
-        if (now.month > 4 || (altDay && now.day > 2) || (!altDay && now.day > 1)) return false
+        if (now.month > 1 || (altDay && now.day > 2) || (!altDay && now.day > 1)) return false
         return (altDay && now.day < 2) || now.hour < resetsAt
     }
 
@@ -85,10 +85,9 @@ enum class HoppityEggType(
 
         @SubscribeEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            for ((meal, lastFoundTimeMark) in mealLastFound.filter {
-                it.value.passedSince() < 20.minutes
-            }) {
-                meal.markClaimed(lastFoundTimeMark)
+            mealLastFound.forEach { (meal, mark) ->
+                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
+                else meal.markSpawned()
             }
         }
 
