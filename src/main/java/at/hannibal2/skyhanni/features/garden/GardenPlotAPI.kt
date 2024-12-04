@@ -250,15 +250,17 @@ object GardenPlotAPI {
         ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
     }
 
-    private fun isSprayAccurate(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType,
-                                newSpray: SprayType): Boolean {
+    private fun isSprayAccurate(
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType
+    ): Boolean {
         return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
             sprayExpiryTime <= expectedExpireTime - 1.minutes ||
             currentSpray != newSpray
     }
 
-    private fun sprayMessageEligible(sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType,
-                                     newSpray: SprayType): Boolean {
+    private fun sprayMessageEligible(
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType
+    ): Boolean {
         return (sprayExpiryTime <= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
             config.newSprayNotification
     }
