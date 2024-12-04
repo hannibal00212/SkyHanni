@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,6 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 object GardenPlotAPI {
 
     private val patternGroup = RepoPattern.group("garden.plot")
+    private val config get() = PestAPI.config.spray
 
     /**
      * REGEX-TEST: §aPlot §7- §b4
@@ -96,10 +98,11 @@ object GardenPlotAPI {
      * REGEX-TEST: Spray: §r§aCompost §r§7(12m)
      * REGEX-TEST: Spray: §r§aCompost §r§7(1m 3s)
      * REGEX-TEST: Spray: §r§aCompost §r§7(53s)
+     * REGEX-TEST: Spray: §r§aHoney Jar §r§7(53s)
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spray",
-        "Spray: §r§[7a](?<spray>\\w+)(?: §r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?"
+        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?"
     )
     var plots = listOf<Plot>()
 
@@ -349,11 +352,16 @@ object GardenPlotAPI {
         for (line in event.lines) {
             plotSprayedTablistPattern.matchMatcher(line.trim()) {
                 val plot = getCurrentPlot() ?: return
-                val sprayName = group("spray") ?: return
+                val sprayName = group("spray").trim()
                 val minutes = group("minutes")?.toInt() ?: 0
                 val seconds = group("seconds")?.toInt() ?: 0
                 val time = if (seconds == 0) (minutes + 1).minutes
                 else minutes.minutes + seconds.seconds
+                val timeString = when {
+                    minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
+                    minutes != 0 -> "${minutes+1}m"
+                    else -> "${seconds}s"
+                }
                 val spray = SprayType.getByName(sprayName)
                 if (plot.currentSpray != null) {
                     if (spray == null) {
@@ -361,13 +369,25 @@ object GardenPlotAPI {
                     } else {
                         if ((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time + 6.seconds ||
                             (plot.getData()?.sprayExpiryTime ?: return) <= SimpleTimeMark.now() + time - 1.minutes ||
-                            plot.getData()?.sprayType != spray
-                        )
+                            plot.getData()?.sprayType != spray) {
+                            if (((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time - 10.minutes ||
+                                    plot.getData()?.sprayType != spray) &&
+                                config.newSprayNotification) {
+                                ChatUtils.chat("§r§aPlot §r§7- §r§b${plot.name} §r§7was sprayed with §r§a$sprayName§r§7!§r")
+                                ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
+                            }
                             plot.setSpray(spray, time)
+                        }
                     }
                 } else {
                     if (spray == null) return
+                    if (config.newSprayNotification) {
+                        ChatUtils.chat("§r§aPlot §r§7- §r§b${plot.name} §r§7was sprayed with §r§a$sprayName§r§7!§r")
+                        ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
+                    }
                     plot.setSpray(spray, time)
+
+
                 }
             }
         }
