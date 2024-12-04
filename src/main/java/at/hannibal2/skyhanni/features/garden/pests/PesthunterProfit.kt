@@ -74,12 +74,10 @@ object PesthunterProfit {
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = item.displayName
-        if (itemName == " ") return
-        if (itemName == "§cClose") return
-        if (itemName == "§aSell Item") return
-        if (itemName == "§6Pesthunter's Wares") return
+        if (itemName == " " || itemName == "§cClose") return
+        if (itemName == "§aSell Item" || itemName == "§6Pesthunter's Wares") return
 
-        val totalCost = getFullCost( getRequiredItems(item) )
+        val totalCost = getFullCost(getRequiredItems(item))
         if (totalCost < 0) return
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
