@@ -353,7 +353,7 @@ object GardenPlotAPI {
                 val minutes = group("minutes")?.toInt() ?: 0
                 val seconds = group("seconds")?.toInt() ?: 0
                 val time = if (seconds == 0) (minutes + 1).minutes
-                        else minutes.minutes + seconds.seconds
+                else minutes.minutes + seconds.seconds
                 val spray = SprayType.getByName(sprayName)
                 if (plot.currentSpray != null) {
                     if (spray == null) {
@@ -361,7 +361,8 @@ object GardenPlotAPI {
                     } else {
                         if ((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time + 6.seconds ||
                             (plot.getData()?.sprayExpiryTime ?: return) <= SimpleTimeMark.now() + time - 1.minutes ||
-                            plot.getData()?.sprayType != spray)
+                            plot.getData()?.sprayType != spray
+                            )
                             plot.setSpray(spray, time)
                     }
                 } else {
