@@ -143,7 +143,7 @@ object PesthunterProfit {
         return items
     }
 
-    private fun getFullCost(requiredItems: MutableList<String>): Double {
+    private fun getFullCost(requiredItems: List<String>): Double {
         var otherItemsPrice = 0.0
         for (itemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(itemName)
