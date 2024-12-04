@@ -368,7 +368,6 @@ object GardenPlotAPI {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
-
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
@@ -423,9 +422,8 @@ object GardenPlotAPI {
     fun onPlotChange(event: PlotChangeEvent) {
         ChatUtils.debug("Current Plot: " + event.plot?.name)
         DelayedRun.runDelayed(3.seconds) {
-            TabWidget.reSendEvents()
+            TabWidget.forceUpdateWidget(TabWidget.PESTS)
         }
-
     }
 
     @SubscribeEvent
