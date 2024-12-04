@@ -362,7 +362,7 @@ object GardenPlotAPI {
                         if ((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time + 6.seconds ||
                             (plot.getData()?.sprayExpiryTime ?: return) <= SimpleTimeMark.now() + time - 1.minutes ||
                             plot.getData()?.sprayType != spray
-                            )
+                        )
                             plot.setSpray(spray, time)
                     }
                 } else {
