@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -73,7 +75,7 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
@@ -81,14 +83,17 @@ object InventoryUtils {
     fun getBoots(): ItemStack? = getArmor()[0]
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
+        if (!PlatformUtils.isNeuLoaded()) {
+            return@RecalculatingValue false
+        }
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 
             val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField.get(config)
+            val storage = storageField[config]
 
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField.get(storage) as Boolean
+            booleanField[storage] as Boolean
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false

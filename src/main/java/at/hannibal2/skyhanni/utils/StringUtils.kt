@@ -334,13 +334,6 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
-    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    fun generateRandomString(length: Int): String {
-        var res: String = ""
-        repeat(length) { res += CHARS.random() }
-        return res
-    }
-
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)

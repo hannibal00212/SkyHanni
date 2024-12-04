@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -41,8 +41,8 @@ object AshfangHighlights {
         val entity = event.entity
         DelayedRun.runNextTick {
             when {
-                entity.hasSkullTexture(BLAZING_SOUL) -> blazingSouls += entity
-                entity.hasSkullTexture(GRAVITY_ORB) -> gravityOrbs += entity
+                entity.wearingSkullTexture(BLAZING_SOUL) -> blazingSouls += entity
+                entity.wearingSkullTexture(GRAVITY_ORB) -> gravityOrbs += entity
             }
         }
     }
