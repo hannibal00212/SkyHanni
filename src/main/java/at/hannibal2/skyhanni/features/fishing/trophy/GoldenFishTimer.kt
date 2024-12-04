@@ -52,18 +52,34 @@ object GoldenFishTimer {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.goldenFishTimer
 
     private val patternGroup = RepoPattern.group("fishing.goldenfish")
+
+    /**
+     * REGEX-TEST: §9You spot a §r§6Golden Fish §r§9surface from beneath the lava!
+     */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
         "§9You spot a §r§6Golden Fish §r§9surface from beneath the lava!",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9escapes your hook but looks weakened.
+     */
     private val interactPattern by patternGroup.pattern(
         "interact",
         "§9The §r§6Golden Fish §r§9escapes your hook but looks weakened\\.",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9is weak!
+     */
     private val weakPattern by patternGroup.pattern(
         "weak",
         "§9The §r§6Golden Fish §r§9is weak!",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9swims back beneath the lava...
+     */
     private val despawnPattern by patternGroup.pattern(
         "despawn",
         "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\.",
@@ -72,7 +88,8 @@ object GoldenFishTimer {
     private val timeOut = 10.seconds
     private val despawnTime = 1.minutes
     private val maxRodTime = 3.minutes
-    private val minimumSpawnTime = 15.minutes
+    private val minimumSpawnTime = 8.minutes
+    private val maximumSpawnTime = 12.minutes
     private const val MAX_INTERACTIONS = 3
 
     private var lastFishEntity = SimpleTimeMark.farPast()
@@ -186,7 +203,7 @@ object GoldenFishTimer {
             if (!isGoldenFishActive()) {
                 if (lastGoldenFishTime.isFarPast()) add("§7Last Golden Fish: §cNone this session")
                 else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
-                if (lastRodThrowTime.isFarPast()) add("§7Last Row Throw: §cNone yet")
+                if (lastRodThrowTime.isFarPast()) add("§7Last Rod Throw: §cNone yet")
                 else add(
                     "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
                         "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
@@ -199,7 +216,8 @@ object GoldenFishTimer {
                 )
                 else {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
-                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
+                    val diff = maximumSpawnTime - minimumSpawnTime
+                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
                     add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
                 }
             } else {
