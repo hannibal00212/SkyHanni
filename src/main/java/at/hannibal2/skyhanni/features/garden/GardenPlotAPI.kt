@@ -109,7 +109,7 @@ object GardenPlotAPI {
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AxisAlignedBB, val middle: LorenzVec)
 
-    private var currentPlot : Plot? = null
+    private var currentPlot: Plot? = null
 
     fun checkCurrentPlot() {
         if (getCurrentPlot() != currentPlot) {
@@ -352,21 +352,21 @@ object GardenPlotAPI {
                 val sprayName = group("spray") ?: return
                 val minutes = group("minutes")?.toInt() ?: 0
                 val seconds = group("seconds")?.toInt() ?: 0
-                val time = if (seconds == 0) (minutes+1).minutes
-                            else minutes.minutes + seconds.seconds
+                val time = if (seconds == 0) (minutes + 1).minutes
+                        else minutes.minutes + seconds.seconds
                 val spray = SprayType.getByName(sprayName)
                 if (plot.currentSpray != null) {
                     if (spray == null) {
                         plot.removeSpray()
                     } else {
-                        if (plot.getData()?.sprayExpiryTime!! >= SimpleTimeMark.now() + time + 6.seconds
-                            || plot.getData()?.sprayExpiryTime!! <= SimpleTimeMark.now() + time - 1.minutes
-                            || plot.getData()?.sprayType != spray)
-                            plot.setSpray(spray,time)
+                        if ((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time + 6.seconds ||
+                            (plot.getData()?.sprayExpiryTime ?: return) <= SimpleTimeMark.now() + time - 1.minutes ||
+                            plot.getData()?.sprayType != spray)
+                            plot.setSpray(spray, time)
                     }
                 } else {
                     if (spray == null) return
-                    plot.setSpray(spray,time)
+                    plot.setSpray(spray, time)
                 }
             }
         }
