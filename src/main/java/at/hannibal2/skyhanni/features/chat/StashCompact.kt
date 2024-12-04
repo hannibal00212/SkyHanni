@@ -86,7 +86,7 @@ object StashCompact {
 
         companion object {
             fun Matcher.fromGroup() = StashType.fromStringOrNull(group("type"))
-            private fun fromStringOrNull(string: String) = entries.find { it.name.equals(string, ignoreCase = true) }
+            private fun fromStringOrNull(string: String) = entries.find { it.displayName == string }
         }
     }
 
@@ -138,9 +138,10 @@ object StashCompact {
             val currentType = currentType ?: return@matchMatcher
 
             val currentMessage = currentMessages[currentType] ?: return@matchMatcher
-            val lastMessage = lastMessages[currentType] ?: return@matchMatcher
             if (currentMessage.materialCount <= config.hideLowWarningsThreshold) return@matchMatcher
-            if (config.hideDuplicateCounts && currentMessage == lastMessage) return@matchMatcher
+            lastMessages[currentType]?.let { lastMessage ->
+                if (config.hideDuplicateCounts && lastMessage == currentMessage) return@matchMatcher
+            }
 
             currentMessage.sendCompactedStashMessage()
         }
