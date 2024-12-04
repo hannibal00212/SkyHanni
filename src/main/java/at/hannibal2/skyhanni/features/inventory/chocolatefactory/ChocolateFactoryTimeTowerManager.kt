@@ -94,6 +94,7 @@ object ChocolateFactoryTimeTowerManager {
         if (!config.timeTowerWarning) return
         if (!timeTowerFull()) return
         if (ReminderUtils.isBusy()) return
+        if (maxCharges() == 0) return
 
         val warningSeparation = if (inInventory) 30.seconds else 5.minutes
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
