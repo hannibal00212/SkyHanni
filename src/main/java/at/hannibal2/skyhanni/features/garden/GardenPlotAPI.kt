@@ -372,7 +372,7 @@ object GardenPlotAPI {
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
-            for (line in event.lines) {
+        for (line in event.lines) {
             plotSprayedTablistPattern.matchMatcher(line.trim()) {
 
                 val sprayName = group("spray").trim()
