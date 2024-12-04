@@ -349,8 +349,10 @@ object GardenPlotAPI {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+
         for (line in event.lines) {
             plotSprayedTablistPattern.matchMatcher(line.trim()) {
+
                 val plot = getCurrentPlot() ?: return
                 val sprayName = group("spray").trim()
                 val minutes = group("minutes")?.toInt() ?: 0
@@ -359,20 +361,26 @@ object GardenPlotAPI {
                 else minutes.minutes + seconds.seconds
                 val timeString = when {
                     minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
-                    minutes != 0 -> "${minutes+1}m"
+                    minutes != 0 -> "${minutes + 1}m"
                     else -> "${seconds}s"
                 }
+                val sprayExpiryTime = plot.getData()?.sprayExpiryTime ?: return
                 val spray = SprayType.getByName(sprayName)
+
                 if (plot.currentSpray != null) {
                     if (spray == null) {
                         plot.removeSpray()
                     } else {
-                        if ((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time + 6.seconds ||
-                            (plot.getData()?.sprayExpiryTime ?: return) <= SimpleTimeMark.now() + time - 1.minutes ||
-                            plot.getData()?.sprayType != spray) {
-                            if (((plot.getData()?.sprayExpiryTime ?: return) >= SimpleTimeMark.now() + time - 10.minutes ||
-                                    plot.getData()?.sprayType != spray) &&
-                                config.newSprayNotification) {
+                        if (sprayExpiryTime >= SimpleTimeMark.now() + time + 6.seconds ||
+                            sprayExpiryTime <= SimpleTimeMark.now() + time - 1.minutes ||
+                            plot.getData()?.sprayType != spray
+                            ) {
+                            if (
+                                (sprayExpiryTime >= SimpleTimeMark.now() + time - 10.minutes ||
+                                    plot.getData()?.sprayType != spray
+                                ) &&
+                                config.newSprayNotification
+                                ) {
                                 ChatUtils.chat("§r§aPlot §r§7- §r§b${plot.name} §r§7was sprayed with §r§a$sprayName§r§7!§r")
                                 ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
                             }
@@ -386,7 +394,6 @@ object GardenPlotAPI {
                         ChatUtils.chat("§r§7This will expire in §r§a$timeString§r§7!§r")
                     }
                     plot.setSpray(spray, time)
-
 
                 }
             }
