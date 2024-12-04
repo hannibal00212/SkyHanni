@@ -28,8 +28,8 @@ object OtherInventoryData {
         close(event.gui.getTitle())
     }
 
-    fun close(title: String, reopenSameName: Boolean = false) {
-        InventoryCloseEvent(title, reopenSameName).postAndCatch()
+    fun close(title: String?, reopenSameName: Boolean = false) {
+        InventoryCloseEvent(title ?: "Null", reopenSameName).postAndCatch()
         currentInventory = null
     }
 
@@ -46,7 +46,7 @@ object OtherInventoryData {
         val packet = event.packet
 
         if (packet is S2EPacketCloseWindow) {
-            close(Minecraft.getMinecraft().currentScreen.getTitle())
+            close(Minecraft.getMinecraft().currentScreen?.getTitle())
         }
 
         if (packet is S2DPacketOpenWindow) {

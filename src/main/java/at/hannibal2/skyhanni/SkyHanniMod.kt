@@ -96,7 +96,7 @@ class SkyHanniMod {
         if (screenToOpen != null) {
             screenTicks++
             if (screenTicks == 5) {
-                val title = Minecraft.getMinecraft().currentScreen.getTitle()
+                val title = Minecraft.getMinecraft().currentScreen?.getTitle()
                 Minecraft.getMinecraft().thePlayer.closeScreen()
                 OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(screenToOpen)
