@@ -51,11 +51,6 @@ object EssenceItemUtils {
         for ((tier, rawItems) in extraItems.mapKeys { it.key.toInt() }) {
             val itemPrices = mutableMapOf<NEUInternalName, Int>()
 
-            rawItems.map {
-                println("${it.split(":").size == 2}: $it")
-                1
-            }
-
             for ((itemName, amount) in rawItems.map { split(it) }) {
                 if (itemName == NEUInternalName.SKYBLOCK_COIN) {
                     collectCoinPrices[tier] = amount
