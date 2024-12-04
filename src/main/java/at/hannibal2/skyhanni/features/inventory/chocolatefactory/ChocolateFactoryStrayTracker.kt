@@ -84,8 +84,7 @@ object ChocolateFactoryStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7A hoard of §aStray Rabbits §7has appeared!
-     * REGEX-TEST: §r§7A hoard of §r§aStray Rabbits §r§7has appeared!
+     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has §7appeared!
      */
     private val strayHoardPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.hoard",
@@ -94,7 +93,6 @@ object ChocolateFactoryStrayTracker {
 
     /**
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+5 Chocolate §7until the §7end of the SkyBlock year!
-     *
      */
     private val goldenStrayClick by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldenclick",
@@ -261,11 +259,13 @@ object ChocolateFactoryStrayTracker {
         // Golden Strays, "Golden Click"
         goldenStrayClick.matchMatcher(loreLine) {
             incrementGoldenType("goldenclick")
+            incrementRarity(LEGENDARY, 0)
         }
 
         // Golden Strays, hoard/stampede
         strayHoardPattern.matchMatcher(loreLine.removeResets()) {
             incrementGoldenType("stampede")
+            incrementRarity(LEGENDARY, 0)
         }
 
         // El Dorado - all catches
