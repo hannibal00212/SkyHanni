@@ -146,7 +146,7 @@ public class ProfileSpecificStorage {
         public int timeTowerCooldown = 8;
 
         @Expose
-        public int maxTimeTowerUses = 3;
+        public int maxTimeTowerUses = 0;
 
         @Expose
         public boolean hasMuRabbit = false;
