@@ -369,10 +369,11 @@ object GardenPlotAPI {
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
 
-        for (line in event.lines) {
-            plotSprayedTablistPattern.matchMatcher(line.trim()) {
+        val plot = getCurrentPlot() ?: return
+        if (plot.isBarn()) return
 
-                val plot = getCurrentPlot() ?: return
+            for (line in event.lines) {
+            plotSprayedTablistPattern.matchMatcher(line.trim()) {
 
                 val sprayName = group("spray").trim()
                 val minutes = group("minutes")?.toInt() ?: 0
