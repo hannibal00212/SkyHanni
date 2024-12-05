@@ -164,8 +164,7 @@ object CakeTracker {
             addCake(year)
         }
         if (cakeBakerClaimedPattern.matches(event.message)) {
-            val year = currentYear
-            addCake(year)
+            addCake(currentYear)
         }
     }
 
