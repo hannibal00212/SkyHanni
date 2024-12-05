@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -45,8 +47,8 @@ object DataWatcherAPI {
     //$$ private val DATA_VALUE_HEALTH = EntityDataManager.createKey(EntityLivingBase::class.java, DataSerializers.FLOAT)
     //#endif
 
-    @SubscribeEvent
-    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent) {
+    @HandleEvent
+    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
             //#if MC < 1.12
             if (updatedEntry.dataValueId == DATA_VALUE_CUSTOM_NAME) {

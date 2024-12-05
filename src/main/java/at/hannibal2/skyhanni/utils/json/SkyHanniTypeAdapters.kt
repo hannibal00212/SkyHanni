@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -34,7 +34,7 @@ object SkyHanniTypeAdapters {
 
     val INTERNAL_NAME: TypeAdapter<NEUInternalName> = SimpleStringTypeAdapter(
         { this.asString() },
-        { this.asInternalName() },
+        { this.toInternalName() },
     )
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(

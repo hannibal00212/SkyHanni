@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -22,18 +23,18 @@ object LesserOrbHider {
 
     private val LESSER_TEXTURE by lazy { SkullTextureHolder.getTexture("") }
 
-    @SubscribeEvent
-    fun onArmorChange(event: EntityEquipmentChangeEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onArmorChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
         val entity = event.entity
         val itemStack = event.newItemStack ?: return
 
-        if (entity is EntityArmorStand && event.isHand && itemStack.getSkullTexture() == LESSER_TEXTURE) {
+        if (event.isHand && itemStack.getSkullTexture() == LESSER_TEXTURE) {
             hiddenEntities.add(entity)
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
 
         if (event.entity in hiddenEntities) {
