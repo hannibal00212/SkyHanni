@@ -51,24 +51,7 @@ private typealias DisplayType = CakeTrackerDisplayType
 @SkyHanniModule
 object CakeTracker {
 
-    private val storage get() = ProfileStorageData.profileSpecific?.cakeData
-    private val config get() = SkyHanniMod.feature.inventory.cakeTracker
-
-    private var currentYear = 0
-    private var inCakeInventory = false
-    private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
-    private var inAuctionHouse = false
-    private var slotHighlightCache = mapOf<Int, Color>()
-    private var searchingForCakes = false
-    private var knownCakesInCurrentInventory = listOf<Int>()
-    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
-
-    private var cakeRenderables = listOf<Renderable>()
-    private var lastKnownCakeDataHash = 0
-
-    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
-    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
-
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §cNew Year Cake (Year 360)
      * REGEX-TEST: §cNew Year Cake (Year 1,000)
@@ -118,6 +101,33 @@ object CakeTracker {
         "Auctions: \"New Year C.*",
     )
 
+    /**
+     * REGEX-TEST: §aYou claimed a §r§cNew Year Cake§r§a!
+     */
+    private val cakeBakerClaimedPattern by patternGroup.pattern(
+        "cake.baker.claimed",
+        "§aYou claimed a (?:§.)*New Year Cake(?:§.)*!",
+    )
+    // </editor-fold>
+
+    private val storage get() = ProfileStorageData.profileSpecific?.cakeData
+    private val config get() = SkyHanniMod.feature.inventory.cakeTracker
+
+    private var currentYear = 0
+    private var inCakeInventory = false
+    private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
+    private var inAuctionHouse = false
+    private var slotHighlightCache = mapOf<Int, Color>()
+    private var searchingForCakes = false
+    private var knownCakesInCurrentInventory = listOf<Int>()
+    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
+
+    private var cakeRenderables = listOf<Renderable>()
+    private var lastKnownCakeDataHash = 0
+
+    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
+    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
+
     private fun addCake(cakeYear: Int) {
         val storage = storage ?: return
         val changed = storage.ownedCakes.add(cakeYear)
@@ -152,6 +162,9 @@ object CakeTracker {
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()
             addCake(year)
+        }
+        if (cakeBakerClaimedPattern.matches(event.message)) {
+            addCake(currentYear)
         }
     }
 

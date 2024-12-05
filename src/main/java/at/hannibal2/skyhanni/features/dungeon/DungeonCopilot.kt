@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
@@ -107,12 +108,9 @@ object DungeonCopilot {
         nextStep = step
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (!searchForKey) return
 

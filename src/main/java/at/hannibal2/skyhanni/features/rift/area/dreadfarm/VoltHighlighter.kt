@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -38,9 +40,9 @@ object VoltHighlighter {
     private val CHARGE_TIME = 12.seconds
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
-    @SubscribeEvent
-    fun onArmorChange(event: EntityEquipmentChangeEvent) {
-        if (!RiftAPI.inRift() || !config.voltWarning) return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
+        if (!config.voltWarning) return
         val player = Minecraft.getMinecraft().thePlayer ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
