@@ -16,7 +16,7 @@ public class ChocolateFactoryRabbitWarningConfig {
 
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "Warn when stray rabbits of a certain tier appear.")
-    @ConfigEditorBoolean
+    @ConfigEditorDropdown
     public StrayTypeEntry rabbitWarningLevel = StrayTypeEntry.ALL;
 
     @Expose
@@ -35,7 +35,6 @@ public class ChocolateFactoryRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
-    @NotNull
     public StrayTypeEntry flashScreenLevel = StrayTypeEntry.SPECIAL;
 
     public enum StrayTypeEntry {
