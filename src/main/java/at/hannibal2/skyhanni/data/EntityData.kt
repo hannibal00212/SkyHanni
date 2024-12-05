@@ -100,7 +100,7 @@ object EntityData {
 
     private fun postRenderNametag(entity: Entity, chatComponent: ChatComponentText) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
-        event.postAndCatch()
+        event.post()
         event.chatComponent
     }
 
