@@ -36,7 +36,7 @@ public class ChocolateFactoryRabbitWarningConfig {
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
     @NotNull
-    public StrayTypeEntry flashScreenType = StrayTypeEntry.SPECIAL;
+    public StrayTypeEntry flashScreenLevel = StrayTypeEntry.SPECIAL;
 
     public enum StrayTypeEntry {
         SPECIAL("Special Only"),

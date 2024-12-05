@@ -35,7 +35,7 @@ object ChocolateFactoryScreenFlash {
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         flashScreen = InventoryUtils.getItemsInOpenChest().any {
-            when (config.rabbitWarning.flashScreenType) {
+            when (config.rabbitWarning.flashScreenLevel) {
                 StrayTypeEntry.SPECIAL -> isSpecial(it)
 
                 StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(it, LorenzRarity.LEGENDARY)
