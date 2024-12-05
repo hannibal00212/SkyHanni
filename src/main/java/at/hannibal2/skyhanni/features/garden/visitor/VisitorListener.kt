@@ -144,14 +144,13 @@ object VisitorListener {
         GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+        if (entity.name == "§e§lCLICK") {
             event.cancel()
         }
     }
