@@ -262,7 +262,7 @@ object GardenPlotAPI {
         sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType
     ): Boolean {
         return (sprayExpiryTime <= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
-            config.newSprayNotification
+            config.newSprayNotification && sprayExpiryTime > SimpleTimeMark.now() + 1.minutes
     }
     fun Plot.isBarn() = id == 0
 
