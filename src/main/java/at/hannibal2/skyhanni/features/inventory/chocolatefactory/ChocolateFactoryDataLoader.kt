@@ -563,15 +563,14 @@ object ChocolateFactoryDataLoader {
         val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
         val warningConfig = config.rabbitWarning
 
-        if (clickMeRabbitPattern.matches(item.name) || isGoldenRabbit) {
-            if (shouldWarnAboutStray(item)) {
-                if (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures) {
-                    SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
-                } else SoundUtils.playBeepSound()
-            }
-
-            ChocolateFactoryAPI.clickRabbitSlot = slotIndex
+        if (!clickMeRabbitPattern.matches(item.name) && !isGoldenRabbit) return
+        if (shouldWarnAboutStray(item)) {
+            if (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures) {
+                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+            } else SoundUtils.playBeepSound()
         }
+
+        ChocolateFactoryAPI.clickRabbitSlot = slotIndex
     }
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningType) {
@@ -582,9 +581,7 @@ object ChocolateFactoryDataLoader {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> {
-            clickMeRabbitPattern.matches(item.name) || isSpecial(item)
-        }
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.name) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
         else -> false

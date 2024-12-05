@@ -64,9 +64,9 @@ object ChocolateFactoryScreenFlash {
                 skullRarity.ordinal >= rarity.ordinal
             } ?: false
         } ?: false
+
     private fun isRarityOrHigher(slot: Slot, rarity: LorenzRarity) =
         slot.stack?.let { isRarityOrHigher(it, rarity) } ?: false
-
 
     fun isSpecial(stack: ItemStack) =
         clickMeGoldenRabbitPattern.matches(stack.name) || stack.getSkullTexture() in specialRabbitTextures
@@ -79,13 +79,8 @@ object ChocolateFactoryScreenFlash {
         if (!flashScreen) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        Gui.drawRect(
-            0,
-            0,
-            minecraft.displayWidth,
-            minecraft.displayHeight,
-            (alpha shl 24) or (config.rabbitWarning.flashColor.toSpecialColorInt() and 0xFFFFFF),
-        )
+        val color = (alpha shl 24) or (config.rabbitWarning.flashColor.toSpecialColorInt() and 0xFFFFFF)
+        Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 }
