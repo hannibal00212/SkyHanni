@@ -108,28 +108,10 @@ object CakeTracker {
         "§aYou claimed a (?:§.)*New Year Cake(?:§.)*!",
     )
     // </editor-fold>
-    
+
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
     private val maxTrackerHeight: Float get() = config.maxHeight.get()
-
-    private var currentYear = 0
-    private var inCakeInventory = false
-    private var timeOpenedCakeInventory = SimpleTimeMark.farPast()
-    private var inAuctionHouse = false
-    private var slotHighlightCache = mapOf<Int, Color>()
-    private var searchingForCakes = false
-    private var knownCakesInCurrentInventory = listOf<Int>()
-    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
-
-    private var cakeRenderables = listOf<Renderable>()
-    private var lastKnownCakeDataHash = 0
-
-    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
-    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
-
-    private val storage get() = ProfileStorageData.profileSpecific?.cakeData
-    private val config get() = SkyHanniMod.feature.inventory.cakeTracker
 
     private var currentYear = 0
     private var inCakeInventory = false
