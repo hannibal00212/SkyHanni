@@ -573,7 +573,7 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryAPI.clickRabbitSlot = slotIndex
     }
 
-    private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningType) {
+    private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
 
         StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)

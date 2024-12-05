@@ -17,7 +17,7 @@ public class ChocolateFactoryRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorBoolean
-    public StrayTypeEntry rabbitWarningType = StrayTypeEntry.ALL;
+    public StrayTypeEntry rabbitWarningLevel = StrayTypeEntry.ALL;
 
     @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +
