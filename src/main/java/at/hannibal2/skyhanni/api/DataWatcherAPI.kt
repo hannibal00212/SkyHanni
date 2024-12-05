@@ -5,18 +5,17 @@ import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.entity.Entity
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.EntityWither
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 //#if MC > 1.12
 //$$ import net.minecraft.entity.Entity
 //$$ import net.minecraft.network.datasync.DataSerializers
@@ -55,7 +54,7 @@ object DataWatcherAPI {
                 //#else
                 //$$ if (updatedEntry.key == DATA_VALUE_CUSTOM_NAME) {
                 //#endif
-                EntityCustomNameUpdateEvent(event.entity.customNameTag, event.entity).postAndCatch()
+                EntityCustomNameUpdateEvent(event.entity, event.entity.customNameTag).post()
             }
 
             //#if MC < 1.12
