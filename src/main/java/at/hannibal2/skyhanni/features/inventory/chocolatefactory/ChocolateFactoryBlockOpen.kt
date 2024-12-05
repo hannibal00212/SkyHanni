@@ -53,7 +53,7 @@ object ChocolateFactoryBlockOpen {
         val slotDisplayName = event.slot?.stack?.displayName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
 
-        if (tryBlock() != TryBlockResult.SUCCESS) event.cancel()
+        if (checkIsBlocked()) event.cancel()
     }
 
     @SubscribeEvent
@@ -63,11 +63,13 @@ object ChocolateFactoryBlockOpen {
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
 
-        if (tryBlock() != TryBlockResult.SUCCESS) {
+        if (checkIsBlocked()) {
             commandSentTimer = SimpleTimeMark.now()
             event.cancel()
         }
     }
+
+    private fun checkIsBlocked() = tryBlock() != TryBlockResult.SUCCESS
 
     private enum class TryBlockResult {
         SUCCESS,
