@@ -166,7 +166,7 @@ object ChocolateFactoryBlockOpen {
             TimeUtils.getDuration(group("time"))
         } ?: return
 
-        profileStorage?.godPotExpiryTime = SimpleTimeMark.now().plus(expiryDuration)
+        profileStorage?.godPotExpiryTime = SimpleTimeMark.now() + expiryDuration
     }
 
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
