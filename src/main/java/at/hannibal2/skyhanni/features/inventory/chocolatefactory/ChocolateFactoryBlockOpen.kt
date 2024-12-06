@@ -162,7 +162,7 @@ object ChocolateFactoryBlockOpen {
             return
         }
 
-        val expiryDuration =potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
+        val expiryDuration = potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
             TimeUtils.getDuration(group("time"))
         } ?: return
 
