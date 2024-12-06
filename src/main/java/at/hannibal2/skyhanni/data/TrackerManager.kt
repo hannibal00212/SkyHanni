@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -62,12 +63,12 @@ object TrackerManager {
         }
 
         commandEditTrackerSuccess = false
-        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).postAndCatch()
+        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).post()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onItemAdd(event: ItemAddEvent) {
-        if (event.source != ItemAddManager.Source.COMMAND || event.isCanceled) return
+        if (event.source != ItemAddManager.Source.COMMAND || event.isCancelled) return
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
         }

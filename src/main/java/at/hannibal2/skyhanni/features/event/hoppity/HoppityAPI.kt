@@ -5,11 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT_ABIPHONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
@@ -24,6 +27,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -49,6 +53,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.memberProperties
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityAPI {
@@ -88,6 +93,14 @@ object HoppityAPI {
     private val shopLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "milestone.shop",
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
+    )
+
+    /**
+     * REGEX-TEST: /selectnpcoption hoppity r_2_1
+     */
+    val pickupOutgoingCommandPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hoppity.call.pickup.outgoing",
+        "\\/selectnpcoption hoppity r_2_1",
     )
 
     /**
@@ -143,13 +156,21 @@ object HoppityAPI {
         listOf(Items.skull, Item.getItemFromBlock(Blocks.stained_glass_pane))
     }
 
+    private var checkNextInvOpen = false
+    private var lastHoppityCallAccept: SimpleTimeMark? = null
+
+    // If there is a time since lastHoppityCallAccept, we can assume this is an abiphone call
+    private fun getBoughtType(): HoppityEggType = if (lastHoppityCallAccept != null) BOUGHT_ABIPHONE else BOUGHT
+
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
         SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
     } else null
+
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
     }
+
     fun SkyBlockTime.isAlternateDay(): Boolean {
         if (!isHoppityEvent()) return false
         // Spring 1st (first day of event) is a normal day.
@@ -188,8 +209,27 @@ object HoppityAPI {
     }
 
     @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!checkNextInvOpen) return
+        checkNextInvOpen = false
+        if (event.inventoryName != "Hoppity") return
+        lastHoppityCallAccept = SimpleTimeMark.now()
+    }
+
+    @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         processedStraySlots.clear()
+        if (lastHoppityCallAccept == null) return
+        DelayedRun.runDelayed(1.seconds) {
+            lastHoppityCallAccept = null
+        }
+    }
+
+    @SubscribeEvent
+    fun onCommandSend(event: MessageSendToServerEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!pickupOutgoingCommandPattern.matches(event.message)) return
+        checkNextInvOpen = true
     }
 
     @SubscribeEvent
@@ -257,16 +297,19 @@ object HoppityAPI {
         when (event.type) {
             SIDE_DISH ->
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
+
             CHOCOLATE_FACTORY_MILESTONE ->
                 "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
             CHOCOLATE_SHOP_MILESTONE ->
                 "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
             STRAY ->
                 "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!"
 
             // Each of these have their own from-Hypixel chats, so we don't need to add a message here
             // as it will be handled in the attemptFireRabbitFound method, from the chat event.
-            in resettingEntries, HITMAN, BOUGHT -> null
+            in resettingEntries, HITMAN, BOUGHT, BOUGHT_ABIPHONE -> null
             else -> "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type: §c§l${event.type}"
         }?.let { hoppityDataSet.hoppityMessages.add(it) }
 
@@ -291,7 +334,7 @@ object HoppityAPI {
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname") != hoppityDataSet.lastName) return@matchMatcher
-            postApiEggFoundEvent(BOUGHT, event)
+            postApiEggFoundEvent(getBoughtType(), event)
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
