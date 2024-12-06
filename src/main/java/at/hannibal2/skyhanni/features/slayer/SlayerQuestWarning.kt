@@ -113,7 +113,7 @@ object SlayerQuestWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 

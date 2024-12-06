@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
@@ -329,9 +330,9 @@ object IslandGraphs {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (currentIslandGraph != null && event.entity == Minecraft.getMinecraft().thePlayer) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (currentIslandGraph != null && event.isLocalPlayer) {
             hasMoved = true
         }
     }

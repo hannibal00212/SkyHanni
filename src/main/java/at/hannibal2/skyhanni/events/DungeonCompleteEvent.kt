@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class DungeonCompleteEvent(val floor: String) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class DungeonCompleteEvent(val floor: String) : SkyHanniEvent()

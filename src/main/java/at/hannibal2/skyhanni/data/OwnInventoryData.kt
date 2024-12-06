@@ -191,6 +191,6 @@ object OwnInventoryData {
 
         if (internalName.startsWith("MAP-")) return
 
-        ItemAddInInventoryEvent(internalName, add).postAndCatch()
+        ItemAddInInventoryEvent(internalName, add).post()
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
@@ -74,7 +75,7 @@ object FriendAPI {
         FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
     }.friends
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (SkyHanniMod.friendsData.players == null) {
             SkyHanniMod.friendsData.players = mutableMapOf()
