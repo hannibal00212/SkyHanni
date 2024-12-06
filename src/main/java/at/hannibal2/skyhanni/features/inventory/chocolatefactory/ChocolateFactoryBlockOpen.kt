@@ -156,16 +156,15 @@ object ChocolateFactoryBlockOpen {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock || !event.isGodPotEffectsFilterSelect()) return
 
-        val potionLore = event.inventoryItems[10]?.getLore()
-        if (potionLore == null) {
+        val potionLore = event.inventoryItems[10]?.getLore() ?: run {
             // No active god pot effects found, reset the expiry time
             profileStorage?.godPotExpiryTime = SimpleTimeMark.farPast()
             return
         }
 
-        potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
+        profileStorage?.godPotExpiryTime = potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
             val expiryDuration = TimeUtils.getDuration(group("time"))
-            profileStorage?.godPotExpiryTime = SimpleTimeMark.now().plus(expiryDuration)
+            SimpleTimeMark.now().plus(expiryDuration)
         }
     }
 
