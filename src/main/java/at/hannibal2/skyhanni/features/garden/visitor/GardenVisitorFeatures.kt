@@ -129,7 +129,7 @@ object GardenVisitorFeatures {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
@@ -356,22 +356,22 @@ object GardenVisitorFeatures {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
         GardenVisitorDropStatistics.deniedVisitors += 1
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
-        VisitorAcceptEvent(event.visitor).postAndCatch()
+        VisitorAcceptEvent(event.visitor).post()
         update()
         GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
         GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRender(event: VisitorRenderEvent) {
         val visitor = event.visitor
         val text = visitor.status.displayName
@@ -516,7 +516,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
         val name = visitor.visitorName

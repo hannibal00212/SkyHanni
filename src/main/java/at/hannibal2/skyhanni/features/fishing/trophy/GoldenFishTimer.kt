@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -283,7 +284,7 @@ object GoldenFishTimer {
         goingDownPost = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isActive()) return
         if (isGoldenFishActive()) return

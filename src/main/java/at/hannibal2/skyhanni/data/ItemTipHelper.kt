@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -14,7 +15,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -39,7 +39,7 @@ object ItemTipHelper {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniDebugsAndTests.globalRender) return
