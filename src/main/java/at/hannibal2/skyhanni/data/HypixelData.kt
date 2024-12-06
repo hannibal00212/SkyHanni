@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -100,7 +101,7 @@ object HypixelData {
      * §abToph
      * §bChissl
      */
-    private val playerAmountCoopPattern by patternGroup.pattern(
+    private val playerAmountOnIslandPattern by patternGroup.pattern(
         "playeramount.coop",
         "^§.\\[[§\\w]{6,11}] §r.*",
     )
@@ -187,7 +188,7 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
-    var coopOnIslandCount = 0
+    var playerAmountOnIsland = 0
 
     // Data from locraw
     var locrawData: JsonObject? = null
@@ -288,14 +289,17 @@ object HypixelData {
                 }
             }
         }
-        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
 
-        return amount + coopOnIslandCount
+        if (!isPlayerIsland()) {
+            playerAmountOnIsland = 0
+        }
+
+        return amount + playerAmountOnIsland
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
-            return group("maxamount").toInt() + coopOnIslandCount
+            return group("maxamount").toInt() + playerAmountOnIsland
         }
 
         return when (skyBlockIsland) {
@@ -459,7 +463,8 @@ object HypixelData {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
-            TabWidget.COOP -> countCoopOnIsland(event)
+            TabWidget.COOP -> countPlayersOnIsland(event)
+            TabWidget.ISLAND -> countPlayersOnIsland(event)
             else -> Unit
         }
     }
@@ -582,8 +587,17 @@ object HypixelData {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    private fun countCoopOnIsland(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.COOP)) return
-        coopOnIslandCount = playerAmountCoopPattern.allMatches(event.lines).size
+    private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
+        if (event.isClear()) return
+        playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
+    }
+
+    private fun isPlayerIsland(): Boolean {
+        return LorenzUtils.skyBlockIsland.isAnyOf(
+            IslandType.GARDEN,
+            IslandType.GARDEN_GUEST,
+            IslandType.PRIVATE_ISLAND,
+            IslandType.PRIVATE_ISLAND_GUEST,
+        )
     }
 }
