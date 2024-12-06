@@ -16,7 +16,6 @@ import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
-import moe.nea.libautoupdate.UpdateSource
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
@@ -134,7 +133,7 @@ object UpdateManager {
     }
 
     private val context = UpdateContext(
-        UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
+        CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
             val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)

@@ -238,7 +238,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 

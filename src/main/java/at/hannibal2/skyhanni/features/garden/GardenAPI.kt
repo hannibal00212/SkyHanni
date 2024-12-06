@@ -129,7 +129,7 @@ object GardenAPI {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+        GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
 
     private fun checkItemInHand() {
@@ -221,7 +221,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).post()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {

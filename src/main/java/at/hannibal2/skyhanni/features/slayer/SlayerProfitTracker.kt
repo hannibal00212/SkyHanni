@@ -151,7 +151,7 @@ object SlayerProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
