@@ -93,17 +93,25 @@ object DungeonAPI {
         "complete",
         "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
-    private val dungeonRoomPattern by patternGroup.pattern(
+
+    /**
+     * REGEX-TEST: §711/15/24 §8m4F 830,-420
+     */
+    val dungeonRoomPattern by patternGroup.pattern(
         "room",
         "§7\\d+/\\d+/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
+
+    /**
+     * REGEX-TEST: §r§r§fBlessing of Power V§r
+     */
     private val blessingPattern by patternGroup.pattern(
         "blessings",
         "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
     )
     private val noBlessingPattern by patternGroup.pattern(
         "noblessings",
-        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
+        "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -182,7 +190,7 @@ object DungeonAPI {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
-            DungeonEnterEvent(floor).postAndCatch()
+            DungeonEnterEvent(floor).post()
             return
         }
         if (!inDungeon()) return
@@ -250,7 +258,7 @@ object DungeonAPI {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
-            DungeonStartEvent(floor).postAndCatch()
+            DungeonStartEvent(floor).post()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {
             isUniqueClass = true
@@ -267,7 +275,7 @@ object DungeonAPI {
         }
         dungeonComplete.matchMatcher(event.message) {
             completed = true
-            DungeonCompleteEvent(floor).postAndCatch()
+            DungeonCompleteEvent(floor).post()
             return
         }
     }

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,7 +23,7 @@ object BazaarOpenPriceWebsite {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
-        val neuItem = "PAPER".asInternalName().getItemStack()
+        val neuItem = "PAPER".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
             "§bPrice History",
@@ -34,7 +35,7 @@ object BazaarOpenPriceWebsite {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         BazaarApi.currentlyOpenedProduct ?: return
