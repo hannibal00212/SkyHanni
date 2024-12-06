@@ -130,7 +130,8 @@ object HypixelBazaarFetcher {
             if (rawResponse == null || rawResponse.toString() == "{}") {
                 ChatUtils.chat(
                     "§cFailed loading Bazaar Price data!\n" +
-                        "Please wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                        "§cPlease wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                    replaceSameMessage = true,
                 )
             } else {
                 ErrorManager.logErrorWithData(

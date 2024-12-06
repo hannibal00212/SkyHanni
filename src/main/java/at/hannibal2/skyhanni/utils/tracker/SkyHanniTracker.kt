@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -36,6 +37,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
+    private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
     private val textInput = TextInput()
 
@@ -83,14 +85,17 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        if (dirty || TrackerManager.dirty) {
+        val searchEnabled = config.trackerSearchEnabled.get()
+        if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                buildFinalDisplay(searchables.buildSearchBox(textInput))
+                if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+                else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }
+        wasSearchEnabled = searchEnabled
 
         position.renderRenderables(display, posLabel = name)
     }

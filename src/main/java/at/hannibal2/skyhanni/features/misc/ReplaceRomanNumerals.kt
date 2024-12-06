@@ -56,7 +56,7 @@ object ReplaceRomanNumerals {
         event.toolTip.replaceAll { it.transformLine() }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onChatHover(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return

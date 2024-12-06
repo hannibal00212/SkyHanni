@@ -129,7 +129,7 @@ object EnchantParser {
     /**
      * For tooltips that are shown when hovering over an item from /show
      */
-    @SubscribeEvent
+    @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return

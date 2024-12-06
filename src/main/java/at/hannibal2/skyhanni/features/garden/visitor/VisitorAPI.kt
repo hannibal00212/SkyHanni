@@ -70,11 +70,11 @@ object VisitorAPI {
 
         when (newStatus) {
             VisitorStatus.ACCEPTED -> {
-                VisitorAcceptedEvent(visitor).postAndCatch()
+                VisitorAcceptedEvent(visitor).post()
             }
 
             VisitorStatus.REFUSED -> {
-                VisitorRefusedEvent(visitor).postAndCatch()
+                VisitorRefusedEvent(visitor).post()
             }
 
             else -> {}
@@ -105,7 +105,7 @@ object VisitorAPI {
         if (!visitors.containsKey(name)) return false
         val visitor = visitors[name] ?: return false
         visitors = visitors.editCopy { remove(name) }
-        VisitorLeftEvent(visitor).postAndCatch()
+        VisitorLeftEvent(visitor).post()
         return true
     }
 
@@ -113,7 +113,7 @@ object VisitorAPI {
         if (visitors.containsKey(name)) return false
         val visitor = Visitor(name, status = VisitorStatus.NEW)
         visitors = visitors.editCopy { this[name] = visitor }
-        VisitorArrivalEvent(visitor).postAndCatch()
+        VisitorArrivalEvent(visitor).post()
         return true
     }
 
