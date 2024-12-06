@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -49,27 +50,34 @@ object HoppityEggsCompactChat {
             in resettingEntries -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Egg"
             else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
         }
+        val nameFormat = hoppityDataSet.lastName.takeIf { it.isNotEmpty() } ?: "§C§L???"
+        val rarityString = hoppityDataSet.lastRarity?.let { "${it.chatColorCode}§l${it.rawName}" } ?: "§C§L???"
+        val rarityFormat = when {
+            hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.DUPE) -> "$rarityString "
+            !hoppityDataSet.duplicate && rarityConfig in listOf(RarityType.BOTH, RarityType.NEW) -> "$rarityString "
+            else -> ""
+        }
+
 
         return if (hoppityDataSet.duplicate) {
-            val format = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
-            val timeFormatted = hoppityDataSet.lastDuplicateAmount?.let {
+            val dupeChocAmount = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
+            val timeFormat = hoppityDataSet.lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
-
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
                 (HoppityCollectionStats.getRabbitCount(hoppityDataSet.lastName)).takeIf { it > 0 }?.let {
                     " §7(§b#$it§7)"
                 }.orEmpty()
             } else ""
 
-            val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
-            val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "${hoppityDataSet.lastRarity} " else ""}" +
-                "${hoppityDataSet.lastName}$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
+            val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormat§7" else ""
+            val dupeChocColor = if (eventConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d" else "§6"
+
+            val dupeChocFormat = " §7(§6+$dupeChocColor$dupeChocAmount §6Chocolate§7$timeStr)"
+
+            "$mealNameFormat! §7Duplicate $rarityFormat$nameFormat$dupeNumberFormat$dupeChocFormat"
         } else {
-            val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "${hoppityDataSet.lastRarity} " else ""}" +
-                "${hoppityDataSet.lastName} §7(${hoppityDataSet.lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7(${hoppityDataSet.lastProfit}§7)"
         }
     }
 

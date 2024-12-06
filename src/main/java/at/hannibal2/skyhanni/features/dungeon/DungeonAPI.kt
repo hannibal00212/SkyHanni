@@ -190,7 +190,7 @@ object DungeonAPI {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
-            DungeonEnterEvent(floor).postAndCatch()
+            DungeonEnterEvent(floor).post()
             return
         }
         if (!inDungeon()) return
@@ -258,7 +258,7 @@ object DungeonAPI {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
-            DungeonStartEvent(floor).postAndCatch()
+            DungeonStartEvent(floor).post()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {
             isUniqueClass = true
@@ -275,7 +275,7 @@ object DungeonAPI {
         }
         dungeonComplete.matchMatcher(event.message) {
             completed = true
-            DungeonCompleteEvent(floor).postAndCatch()
+            DungeonCompleteEvent(floor).post()
             return
         }
     }

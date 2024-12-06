@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -53,7 +54,7 @@ object EnigmaSoulWaypoints {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
@@ -123,7 +124,7 @@ object EnigmaSoulWaypoints {
                         IslandGraphs.pathFind(
                             it,
                             "$name Enigma Soul",
-                            config.color.toChromaColor(),
+                            config.color.toSpecialColor(),
                             condition = { config.showPathFinder }
                         )
                     }
@@ -162,7 +163,7 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
-                event.drawWaypointFilled(it, config.color.toChromaColor(), seeThroughBlocks = true, beacon = true)
+                event.drawWaypointFilled(it, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(it.up(), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }

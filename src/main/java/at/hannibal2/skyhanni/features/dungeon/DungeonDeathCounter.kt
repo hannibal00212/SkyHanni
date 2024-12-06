@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -77,7 +78,7 @@ object DungeonDeathCounter {
         display = color + "Deaths: $deaths"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         deaths = 0
         update()

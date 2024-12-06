@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -161,7 +162,7 @@ object DungeonBossAPI {
         bossPhase = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
         bossPhase = null
     }

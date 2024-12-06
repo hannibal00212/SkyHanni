@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -64,7 +65,7 @@ object GardenVisitorTimer {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
@@ -203,7 +204,7 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
