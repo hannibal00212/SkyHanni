@@ -1,27 +1,24 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.EffectDurationChangeEvent
+import at.hannibal2.skyhanni.events.EffectDurationChangeType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
+import at.hannibal2.skyhanni.features.misc.effects.EffectAPI.NonGodPotEffect
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -31,6 +28,7 @@ object ChocolateFactoryBlockOpen {
     private val config get() = SkyHanniMod.feature.inventory.chocolateFactory
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: /cf
      * REGEX-TEST: /cf test
@@ -51,67 +49,21 @@ object ChocolateFactoryBlockOpen {
         "inventory.chocolatefactory.openitem",
         "§6(?:Open )?Chocolate Factory",
     )
-
-    /**
-     * REGEX-TEST: §a§lSCHLURP! §r§eThe effects of the §r§9Hot Chocolate Mixin §r§ehave been extended by §r§986h 24m§r§e!
-     * They will pause if your §r§cGod Potion §r§eexpires.
-     */
-    private val hotChocolateMixinConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.hotchocolatemixinconsume",
-        "(?:§.)+.*(?:§.)+Hot Chocolate Mixin ?(?:§.)+.*extended by (?:§.)+(?<time>[dhms0-9 ]*)(?:§.)+!.*",
-    )
-
-    /**
-     * REGEX-TEST: §a§lGULP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSIP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSLURP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     */
-    private val godPotConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.godpotconsume",
-        "(?:§.)+.*(?:§.)+God Potion ?(?:§.)+.*grants you powers for (?:§.)+(?<time>[dhms0-9 ]*)(?:§.)+!.*",
-    )
-
-    /**
-     * REGEX-TEST: §cGod Potion§f: 4d
-     */
-    private val godPotTabPattern by RepoPattern.pattern(
-        "stats.tabpatterns.godpot",
-        "(?:§.)*God Potion(?:§.)*: (?:§.)*(?<time>[dhms0-9 ]+)(?:§.)*",
-    )
-
-    /**
-     * REGEX-TEST: (1/2) Active Effects
-     */
-    private val effectsInventoryPattern by RepoPattern.pattern(
-        "inventory.effects",
-        "(?:§.)?(?:[(\\d\\/)]* )?Active Effects",
-    )
-
-    /**
-     * REGEX-TEST: §aFilter
-     */
-    private val filterPattern by RepoPattern.pattern(
-        "inventory.effects.filter",
-        "§aFilter",
-    )
-
-    /**
-     * REGEX-TEST: §b▶ God Potion Effects
-     */
-    private val godPotEffectsFilterSelectPattern by RepoPattern.pattern(
-        "inventory.effects.filtergodpotselect",
-        "§b▶ God Potion Effects",
-    )
-
-    /**
-     * REGEX-TEST: §7Remaining: §f105:01:34
-     */
-    private val potionRemainingLoreTimerPattern by RepoPattern.pattern(
-        "inventory.effects.effecttimeleft",
-        "§7Remaining: §f(?<time>[\\d:]+)",
-    )
+    // </editor-fold>
 
     private var commandSentTimer = SimpleTimeMark.farPast()
+
+    @HandleEvent
+    fun onEffectUpdate(event: EffectDurationChangeEvent) {
+        if (event.effect != NonGodPotEffect.HOT_CHOCOLATE || event.duration == null) return
+        val chocolateFactory = profileStorage?.chocolateFactory ?: return
+
+        chocolateFactory.hotChocolateMixinExpiry = when (event.durationChangeType) {
+            EffectDurationChangeType.ADD -> chocolateFactory.hotChocolateMixinExpiry + event.duration
+            EffectDurationChangeType.REMOVE -> SimpleTimeMark.farPast()
+            EffectDurationChangeType.SET -> SimpleTimeMark.now() + event.duration
+        }
+    }
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -121,61 +73,6 @@ object ChocolateFactoryBlockOpen {
 
         if (checkIsBlocked()) event.cancel()
     }
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        hotChocolateMixinConsumePattern.matchMatcher(event.message) {
-            val durationAdded = TimeUtils.getDuration(group("time"))
-            val asTimeMark = SimpleTimeMark.now().plus(durationAdded)
-            val existingValue = profileStorage?.chocolateFactory?.hotChocolateMixinExpiry
-            profileStorage?.chocolateFactory?.hotChocolateMixinExpiry =
-                existingValue?.let { it + durationAdded } ?: asTimeMark
-        }
-        godPotConsumePattern.matchMatcher(event.message) {
-            val durationAdded = TimeUtils.getDuration(group("time"))
-            val asTimeMark = SimpleTimeMark.now().plus(durationAdded)
-            val existingValue = profileStorage?.godPotExpiryTime
-            profileStorage?.godPotExpiryTime = existingValue?.let { it + durationAdded } ?: asTimeMark
-        }
-    }
-
-    @SubscribeEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        for (line in event.footer.split("\n")) {
-            godPotTabPattern.matchMatcher(line) {
-                val expiryDuration = TimeUtils.getDuration(group("time"))
-                val expiryTime = SimpleTimeMark.now().plus(expiryDuration)
-                profileStorage?.godPotExpiryTime = expiryTime
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock || !event.isGodPotEffectsFilterSelect()) return
-
-        val potionLore = event.inventoryItems[10]?.getLore() ?: run {
-            // No active god pot effects found, reset the expiry time
-            profileStorage?.godPotExpiryTime = SimpleTimeMark.farPast()
-            return
-        }
-
-        val expiryDuration = potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
-            TimeUtils.getDuration(group("time"))
-        } ?: return
-
-        profileStorage?.godPotExpiryTime = SimpleTimeMark.now() + expiryDuration
-    }
-
-    private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
-        effectsInventoryPattern.matches(this.inventoryName) &&
-            this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.displayName)
-            }?.getLore()?.any {
-                godPotEffectsFilterSelectPattern.matches(it)
-            } ?: false
 
     @SubscribeEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
