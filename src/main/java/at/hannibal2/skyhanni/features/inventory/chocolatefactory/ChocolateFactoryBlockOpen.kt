@@ -162,10 +162,11 @@ object ChocolateFactoryBlockOpen {
             return
         }
 
-        profileStorage?.godPotExpiryTime = potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
-            val expiryDuration = TimeUtils.getDuration(group("time"))
-            SimpleTimeMark.now().plus(expiryDuration)
-        }
+        val expiryDuration =potionRemainingLoreTimerPattern.firstMatcher(potionLore) {
+            TimeUtils.getDuration(group("time"))
+        } ?: return
+
+        profileStorage?.godPotExpiryTime = SimpleTimeMark.now().plus(expiryDuration)
     }
 
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
