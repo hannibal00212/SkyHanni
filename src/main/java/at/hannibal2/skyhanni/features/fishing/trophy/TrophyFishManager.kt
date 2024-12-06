@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
@@ -28,7 +29,7 @@ object TrophyFishManager {
 
     private var loadedNeu = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeu || !config.loadFromNeuPV) return
 

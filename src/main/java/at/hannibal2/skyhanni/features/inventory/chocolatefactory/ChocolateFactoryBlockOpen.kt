@@ -33,7 +33,7 @@ object ChocolateFactoryBlockOpen {
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "/(?:cf|(?:chocolate)?factory)(?: .*)?",
+        "\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
     /**

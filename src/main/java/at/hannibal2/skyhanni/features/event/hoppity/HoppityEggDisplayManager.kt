@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -59,7 +60,7 @@ object HoppityEggDisplayManager {
         GlStateManager.disableBlend()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
         if (!shouldHidePlayer) return
