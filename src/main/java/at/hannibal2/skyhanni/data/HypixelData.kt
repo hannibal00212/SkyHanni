@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -89,11 +90,11 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:           §r§b§lCoop §r§f(4)
+     * REGEX-TEST: §8[§r§2168§r§8] §r§aMelonLordDe §r§6§l℻
      */
     private val playerAmountCoopPattern by patternGroup.pattern(
         "playeramount.coop",
-        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+        "§.\\[(?: .*)?",
     )
 
     /**
@@ -177,6 +178,8 @@ object HypixelData {
 
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
+
+    var coopOnIslandCount = 0
 
     // Data from locraw
     var locrawData: JsonObject? = null
@@ -263,7 +266,6 @@ object HypixelData {
         var amount = 0
         val playerPatternList = mutableListOf(
             playerAmountPattern,
-            playerAmountCoopPattern,
             playerAmountGuestingPattern,
         )
         if (DungeonAPI.inDungeon()) {
@@ -278,7 +280,7 @@ object HypixelData {
                 }
             }
         }
-        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
+        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) } + coopOnIslandCount
 
         return amount
     }
@@ -449,6 +451,7 @@ object HypixelData {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
+            TabWidget.COOP -> countCoopOnline(event)
             else -> Unit
         }
     }
@@ -569,5 +572,16 @@ object HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
+    }
+
+
+    private fun countCoopOnline(event: WidgetUpdateEvent) {
+        var coopCount = 0
+        for(line in event.lines) {
+            playerAmountPattern.matchMatcher(line) {
+                coopCount += 1
+            }
+        }
+        coopOnIslandCount = coopCount
     }
 }
