@@ -69,7 +69,7 @@ object DungeonCleanEnd {
         lastBossId = -1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
@@ -79,7 +79,7 @@ object DungeonCleanEnd {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return

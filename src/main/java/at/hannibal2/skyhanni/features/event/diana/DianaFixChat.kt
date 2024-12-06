@@ -120,7 +120,7 @@ object DianaFixChat {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         foundGuess = true
 

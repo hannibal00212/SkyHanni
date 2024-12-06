@@ -69,7 +69,7 @@ object KuudraAPI {
             tierPattern.matchMatcher(line) {
                 val tier = group("tier").toInt()
                 kuudraTier = tier
-                KuudraEnterEvent(tier).postAndCatch()
+                KuudraEnterEvent(tier).post()
             }
         }
     }
@@ -84,7 +84,7 @@ object KuudraAPI {
         val message = event.message
         completePattern.matchMatcher(message) {
             val tier = kuudraTier ?: return
-            KuudraCompleteEvent(tier).postAndCatch()
+            KuudraCompleteEvent(tier).post()
         }
     }
 
