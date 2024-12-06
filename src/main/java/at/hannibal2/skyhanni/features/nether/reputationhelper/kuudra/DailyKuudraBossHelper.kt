@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
@@ -40,7 +41,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraDone(event: KuudraCompleteEvent) {
         val tier = event.kuudraTier
         val kuudraTier = getByTier(tier) ?: return

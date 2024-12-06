@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class BossbarUpdateEvent(val bossbar: String) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class BossbarUpdateEvent(val bossbar: String) : SkyHanniEvent()
