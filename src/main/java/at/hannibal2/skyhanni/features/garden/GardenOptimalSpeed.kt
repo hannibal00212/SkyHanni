@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -14,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -37,7 +38,7 @@ object GardenOptimalSpeed {
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
-    private val rancherBoots = "RANCHERS_BOOTS".asInternalName()
+    private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
     /**
      * This speed value represents the walking speed, not the speed stat.
@@ -120,7 +121,7 @@ object GardenOptimalSpeed {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
@@ -198,7 +199,7 @@ object GardenOptimalSpeed {
             text,
             config::warning,
             actionName = "change the speed",
-            action = { HypixelCommands.setMaxSpeed() },
+            action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
         )
     }
 

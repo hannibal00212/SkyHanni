@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 
-data class EntityEquipmentChangeEvent(
-    val entity: Entity,
+data class EntityEquipmentChangeEvent<T : Entity>(
+    val entity: T,
     val equipmentSlot: Int,
     val newItemStack: ItemStack?,
-) : LorenzEvent() {
+) : GenericSkyHanniEvent<T>(entity.javaClass) {
 
     val isHead get() = equipmentSlot == EQUIPMENT_SLOT_HEAD
     val isChest get() = equipmentSlot == EQUIPMENT_SLOT_CHEST

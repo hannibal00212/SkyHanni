@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -50,7 +51,7 @@ object RiftTimer {
         currentTime = 0.seconds
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
         if (!isEnabled() || RiftAPI.inRiftRace) return
@@ -130,7 +131,7 @@ object RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!RiftAPI.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {

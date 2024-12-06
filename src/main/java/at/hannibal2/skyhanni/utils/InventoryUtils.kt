@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
@@ -71,7 +73,7 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
@@ -138,5 +140,7 @@ object InventoryUtils {
         controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
 
-    fun Slot.isTopInventory() = inventory is ContainerLocalMenu
+    fun Slot.isTopInventory() = inventory.isTopInventory()
+
+    fun IInventory.isTopInventory() = this is ContainerLocalMenu
 }

@@ -20,6 +20,9 @@ import org.lwjgl.input.Mouse
 @SkyHanniModule
 object KeyboardManager {
 
+    const val LEFT_MOUSE = -100
+    const val RIGHT_MOUSE = -99
+
     private var lastClickedMouseButton = -1
 
     // A mac-only key, represents Windows key on windows (but different key code)
@@ -53,7 +56,7 @@ object KeyboardManager {
     @SubscribeEvent
     fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+        if (GuiKeyPressEvent(guiScreen).post()) {
             event.isCanceled = true
         }
     }
