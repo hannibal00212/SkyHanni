@@ -39,6 +39,6 @@ object BossbarData {
         if (previousServerBossbar.isNotEmpty()) previousServerBossbar = ""
 
         bossbar = bossbarLine
-        BossbarUpdateEvent(bossbarLine).postAndCatch()
+        BossbarUpdateEvent(bossbarLine).post()
     }
 }

@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConf
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -288,7 +289,7 @@ object PowderMiningChatFilter {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
-                val amountParsed = amountStr.replace(",", "").toInt()
+                val amountParsed = amountStr.formatInt()
                 return if (amountParsed < config.powderFilterThreshold) "powder_mining_powder"
                 else "no_filter"
             }
