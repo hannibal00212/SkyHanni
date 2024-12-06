@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
@@ -146,7 +146,7 @@ public class ProfileSpecificStorage {
         public int timeTowerCooldown = 8;
 
         @Expose
-        public int maxTimeTowerUses = 3;
+        public int maxTimeTowerUses = 0;
 
         @Expose
         public boolean hasMuRabbit = false;
@@ -191,10 +191,50 @@ public class ProfileSpecificStorage {
         public Map<IslandType, Set<LorenzVec>> collectedEggLocations = new HashMap<>();
 
         @Expose
+        public Map<IslandType, Map<String, @Nullable Boolean>> residentRabbits = new HashMap<>();
+
+        public static class HotspotRabbitStorage {
+            @Expose
+            @Nullable
+            public Integer skyblockYear;
+
+            @Expose
+            public Map<IslandType, Map<String, @Nullable Boolean>> hotspotRabbits;
+
+            public HotspotRabbitStorage(@Nullable Integer year) {
+                this.skyblockYear = year;
+                this.hotspotRabbits = new HashMap<>();
+            }
+        }
+
+        @Expose
+        public HotspotRabbitStorage hotspotRabbitStorage = new HotspotRabbitStorage(null);
+
+        @Expose
         public Integer hoppityShopYearOpened = null;
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+
+        @Expose
+        public Map<HoppityEggType, SimpleTimeMark> mealLastFound = new HashMap<>();
+
+        public static class HitmanStatsStorage {
+            @Expose
+            @Nullable
+            public Integer availableEggs;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark slotCooldown = null;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark allSlotsCooldown = null;
+        }
+
+        @Expose
+        public HitmanStatsStorage hitmanStats = new HitmanStatsStorage();
     }
 
     @Expose
@@ -218,7 +258,7 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
-    public Map<SkyblockStat,Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
+    public Map<SkyblockStat, Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
 
     @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
@@ -502,31 +542,18 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
-    public GhostCounter ghostCounter = new GhostCounter();
+    public GhostStorage ghostStorage = new GhostStorage();
 
-    public static class GhostCounter {
-
-        @Expose
-        public Map<GhostData.Option, Double> data = new HashMap<>();
+    public static class GhostStorage {
 
         @Expose
-        public boolean ctDataImported = false;
+        public GhostTracker.Data ghostTracker = new GhostTracker.Data();
 
         @Expose
-        public double bestiaryNextLevel = 0;
+        public Long bestiaryKills = 0L;
 
         @Expose
-        public double bestiaryCurrentKill = 0;
-
-        @Expose
-        public double bestiaryKillNeeded = 0;
-
-        @Expose
-        public double totalMF = 0;
-
-        @Expose
-        public int configUpdateVersion = 0;
-
+        public boolean migratedTotalKills = false;
     }
 
     public static class CakeData {

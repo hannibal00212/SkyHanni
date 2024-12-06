@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -26,7 +27,7 @@ object PlayerDeathMessages {
         checkOtherPlayers()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (!LorenzUtils.inSkyBlock) return
 

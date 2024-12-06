@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.auctionhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -18,6 +19,7 @@ import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,8 +44,9 @@ object AuctionHouseOpenPriceWebsite {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        // TODO get search from search sign (slot 48) since it can be cut off in title
         ahSearchPattern.matchMatcher(event.inventoryName) {
-            searchTerm = group("searchTerm").removeSuffix("\"").replace(" ", "%20")
+            searchTerm = URLEncoder.encode(group("searchTerm").removeSuffix("\""), "UTF-8").replace("+", "%20")
             displayItem = createDisplayItem()
         }
     }
@@ -64,7 +67,7 @@ object AuctionHouseOpenPriceWebsite {
         displayItem = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory is InventoryPlayer) return
