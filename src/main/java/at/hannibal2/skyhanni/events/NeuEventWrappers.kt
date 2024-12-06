@@ -59,7 +59,7 @@ object NeuEventWrappers {
         val apiData = event.data ?: return
         try {
             val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+            NeuProfileDataLoadedEvent(playerData).post()
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
