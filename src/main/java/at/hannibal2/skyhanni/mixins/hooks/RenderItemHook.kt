@@ -20,7 +20,7 @@ fun renderItemOverlayPost(
         xPosition,
         yPosition,
         text
-    ).postAndCatch()
+    ).post()
 }
 
 fun renderItemReturn(stack: ItemStack, x: Int, y: Int) {

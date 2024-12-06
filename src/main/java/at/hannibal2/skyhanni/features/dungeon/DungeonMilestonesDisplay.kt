@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -72,7 +73,7 @@ object DungeonMilestonesDisplay {
         currentMilestone = 0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         currentMilestone = 0
         update()

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -151,7 +152,7 @@ object DicerRngDropTracker {
     private var cropInHand: CropType? = null
     private var toolName = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null

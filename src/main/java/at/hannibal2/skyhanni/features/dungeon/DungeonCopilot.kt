@@ -124,13 +124,13 @@ object DungeonCopilot {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         changeNextStep("Clear first room")
         searchForKey = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonEnterEvent) {
         changeNextStep("Talk to Mort")
         searchForKey = true
