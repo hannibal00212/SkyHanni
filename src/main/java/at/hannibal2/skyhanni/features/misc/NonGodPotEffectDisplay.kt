@@ -241,8 +241,7 @@ object NonGodPotEffectDisplay {
         if (this != NonGodPotEffect.HOT_CHOCOLATE) return
 
         val chocolateFactory = ProfileStorageData.profileSpecific?.chocolateFactory ?: return
-        val currentExpiry = chocolateFactory.hotChocolateMixinExpiry ?: SimpleTimeMark.now()
-        chocolateFactory.hotChocolateMixinExpiry = currentExpiry.plus(duration)
+        chocolateFactory.hotChocolateMixinExpiry = SimpleTimeMark.now() + duration
     }
 
     // TODO use TablistFooterUpdateEvent instead
