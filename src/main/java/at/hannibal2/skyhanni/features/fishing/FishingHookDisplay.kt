@@ -27,7 +27,7 @@ object FishingHookDisplay {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         reset()
     }

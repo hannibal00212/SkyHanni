@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory.plots
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -61,7 +62,7 @@ object GardenPlotIcon {
         editMode = 0
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return

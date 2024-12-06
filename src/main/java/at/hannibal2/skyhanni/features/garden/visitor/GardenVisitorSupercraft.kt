@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -50,7 +51,7 @@ object GardenVisitorSupercraft {
     }
 
     // needs to run later than onVisitorOpen at GardenVisitorFeatures
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         visitor.offer?.offerItem ?: return
@@ -92,7 +93,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!hasIngredients) return
         if (event.inventory is InventoryPlayer) return
