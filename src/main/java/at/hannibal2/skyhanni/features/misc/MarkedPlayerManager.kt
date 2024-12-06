@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -71,8 +71,8 @@ object MarkedPlayerManager {
     private fun EntityOtherPlayerMP.setColor() {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             this,
-            config.entityColor.get().toColor().withAlpha(127),
-            ::isEnabled
+            config.entityColor.get().toColor().addAlpha(127),
+            ::isEnabled,
         )
     }
 

@@ -77,7 +77,7 @@ class GuiContainerHook(guiAny: Any) {
         mouseY: Int,
         ci: CallbackInfo,
     ) {
-        if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
+        if (DrawScreenAfterEvent(mouseX, mouseY, ci).post()) ci.cancel()
     }
 
 }
