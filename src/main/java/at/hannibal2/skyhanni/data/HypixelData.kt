@@ -90,11 +90,19 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST: §8[§r§2168§r§8] §r§aMelonLordDe §r§6§l℻
+     * REGEX-TEST:       	§r§b§lCoop §r§f(8)
+     * §8[§r§a§r§8] §r§bBpoth §r§6§l℻
+     * §8[§r§2168§r§8] §r§aMelonLordDe §r§6§l℻
+     * §aMulanLord
+     * §aOkuuUnyu
+     * §aImNotToph
+     * §aIdcDom
+     * §abToph
+     * §bChissl
      */
     private val playerAmountCoopPattern by patternGroup.pattern(
         "playeramount.coop",
-        "§.\\[(?: .*)?",
+        "^§.\\[[§\\w]{6,11}] §r.*",
     )
 
     /**
@@ -280,14 +288,14 @@ object HypixelData {
                 }
             }
         }
-        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) } + coopOnIslandCount
+        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
 
-        return amount
+        return amount + coopOnIslandCount
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
-            return group("maxamount").toInt()
+            return group("maxamount").toInt() + coopOnIslandCount
         }
 
         return when (skyBlockIsland) {
@@ -451,7 +459,7 @@ object HypixelData {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
-            TabWidget.COOP -> countCoopOnline(event)
+            TabWidget.COOP -> countCoopOnIsland(event)
             else -> Unit
         }
     }
@@ -574,14 +582,8 @@ object HypixelData {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-
-    private fun countCoopOnline(event: WidgetUpdateEvent) {
-        var coopCount = 0
-        for(line in event.lines) {
-            playerAmountPattern.matchMatcher(line) {
-                coopCount += 1
-            }
-        }
-        coopOnIslandCount = coopCount
+    private fun countCoopOnIsland(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.COOP)) return
+        coopOnIslandCount = playerAmountCoopPattern.allMatches(event.lines).size
     }
 }
