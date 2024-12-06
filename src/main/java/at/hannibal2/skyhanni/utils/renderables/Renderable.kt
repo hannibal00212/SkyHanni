@@ -975,8 +975,12 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            showScrollableTipsInList: Boolean = false
         ) = object : Renderable {
-            override val width = list.maxOf { it.width }
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
+            override var width = list.maxOf { it.width }
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1001,6 +1005,23 @@ interface Renderable {
                 var renderY = 0
                 var virtualY = 0
                 var found = false
+
+                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+                // there are more items above
+                if (showScrollableTipsInList && scroll.asInt() > 0) {
+                    width = maxOf(width, scrollUpTip.width)
+                    scrollUpTip.renderXAligned(posX, posY, width)
+                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                    renderY += scrollUpTip.height
+                    virtualY += scrollUpTip.height
+                }
+
+                val atScrollEnd = scroll.asInt() == virtualHeight - height
+                if (!atScrollEnd) {
+                    virtualY += scrollDownTip.height
+                    renderY += scrollDownTip.height
+                }
+
                 for (renderable in list) {
                     if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
                         renderable.renderXAligned(posX, posY + renderY, width)
@@ -1016,6 +1037,15 @@ interface Renderable {
                     }
                     virtualY += renderable.height
                 }
+
+                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+                // there are more items below
+                if (showScrollableTipsInList && virtualY > end) {
+                    width = maxOf(width, scrollDownTip.width)
+                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
+                    GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }

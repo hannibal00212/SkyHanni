@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -42,10 +44,8 @@ object DungeonHideItems {
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
 
         if (entity is EntityItem) {
@@ -170,12 +170,9 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
-    fun onEntityMove(event: EntityMoveEvent) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onEntityMove(event: EntityMoveEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()

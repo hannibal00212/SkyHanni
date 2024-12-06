@@ -99,7 +99,7 @@ object ExperimentsProfitTracker {
         var startCost = 0L
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
 

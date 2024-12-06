@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
@@ -52,7 +53,7 @@ object FarmingWeightDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         // Reset speed
         weightPerSecond = -1.0
@@ -574,7 +575,8 @@ object FarmingWeightDisplay {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
             apiData.crops
             for (crop in apiData.crops) {
-                cropWeight[crop.key] = crop.value
+                val cropType = CropType.getByNameOrNull(crop.key) ?: continue
+                cropWeight[cropType] = crop.value
             }
             hasFetchedCropWeights = true
         } catch (e: Exception) {
