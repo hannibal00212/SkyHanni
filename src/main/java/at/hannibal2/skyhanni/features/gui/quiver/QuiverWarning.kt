@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.quiver
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ArrowType
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -30,14 +31,14 @@ object QuiverWarning {
     private val config get() = SkyHanniMod.feature.combat.quiverConfig
 
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
-    private var arrowsInInstance = mutableSetOf<ArrowType>()
+    private val arrowsInInstance = mutableSetOf<ArrowType>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         onInstanceComplete()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         onInstanceComplete()
     }
@@ -71,7 +72,7 @@ object QuiverWarning {
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val amount = event.currentAmount
         val arrow = event.currentArrow ?: return

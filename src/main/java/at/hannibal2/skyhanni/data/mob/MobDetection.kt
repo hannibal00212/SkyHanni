@@ -58,7 +58,7 @@ object MobDetection {
 
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
-    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
+    private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
@@ -252,7 +252,7 @@ object MobDetection {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
             event.entity is EntityBat && event.health == 6 -> {

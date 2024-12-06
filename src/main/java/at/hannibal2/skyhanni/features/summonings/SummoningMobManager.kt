@@ -42,7 +42,7 @@ object SummoningMobManager {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
+        "§aYou have spawned your .+ §r§asoul! §r§d\\(\\d+ Mana\\)",
     )
 
     /**
@@ -60,7 +60,7 @@ object SummoningMobManager {
      */
     private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d+) summoned allies!",
+        "§cThe Seraph recalled your \\d+ summoned allies!",
     )
 
     private val despawnPatterns = listOf(

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
 enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
@@ -45,7 +45,7 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
             entries.forEach { it.pattern }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onActionBarUpdate(event: ActionBarUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
@@ -57,7 +57,7 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
                         ActionBarValueUpdateEvent(data)
                     } else null
                 }
-            }.forEach { it.postAndCatch() }
+            }.forEach { it.post() }
         }
     }
 }
