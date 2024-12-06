@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
@@ -227,7 +228,7 @@ object CroesusChestTracker {
         event.stackTip = "§a✔"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))

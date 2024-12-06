@@ -69,7 +69,7 @@ object DataWatcherAPI {
 
                 if (event.entity is EntityWither && health == 300 && event.entity.entityId < 0) continue
                 if (event.entity is EntityLivingBase) {
-                    EntityHealthUpdateEvent(event.entity, health.derpy()).postAndCatch()
+                    EntityHealthUpdateEvent(event.entity, health.derpy()).post()
                 }
             }
         }
