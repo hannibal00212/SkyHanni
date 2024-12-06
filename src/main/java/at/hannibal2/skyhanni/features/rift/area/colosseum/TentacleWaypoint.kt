@@ -26,7 +26,7 @@ object TentacleWaypoint {
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private var tentacles = mutableMapOf<EntityLivingBase, Int>()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
         val entity = event.entity as? EntitySlime ?: return
@@ -38,7 +38,7 @@ object TentacleWaypoint {
         if (entity.slimeSize !in 4..8) return
         if (entity in tentacles) return
 
-        tentacles += event.entity to 0
+        tentacles += entity to 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
