@@ -62,7 +62,7 @@ object HarpFeatures {
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return

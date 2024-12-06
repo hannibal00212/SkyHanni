@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,13 +11,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ProfitPerExcavation {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!config.profitPerExcavation) return
         val loot = event.loot

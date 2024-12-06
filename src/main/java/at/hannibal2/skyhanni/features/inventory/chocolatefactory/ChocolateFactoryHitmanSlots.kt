@@ -78,7 +78,7 @@ object ChocolateFactoryHitmanSlots {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.hitmanSlotInfo) return
         if (!inInventory) return

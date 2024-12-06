@@ -56,7 +56,7 @@ object KeyboardManager {
     @SubscribeEvent
     fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+        if (GuiKeyPressEvent(guiScreen).post()) {
             event.isCanceled = true
         }
     }
