@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
@@ -100,8 +101,6 @@ import kotlin.time.Duration.Companion.milliseconds
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
 
-    val existsForThisIsland get() = currentIslandGraph != null
-
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
     private var secondClosestNode: GraphNode? = null
@@ -129,12 +128,12 @@ object IslandGraphs {
 
     /**
      * REGEX-TEST: Dwarven Base Camp
-     * REGEX-TEST: Forge
+     * REGEX-FAIL: Forge
      * REGEX-TEST: Fossil Research Center
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(
         "glacitetunnels",
-        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+        "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
     @SubscribeEvent
@@ -174,6 +173,10 @@ object IslandGraphs {
             inGlaciteTunnels = now
             loadDwarvenMines()
         }
+    }
+
+    fun loadLobby(lobby: String) {
+        reloadFromJson(lobby)
     }
 
     private fun loadDwarvenMines() {
@@ -226,7 +229,7 @@ object IslandGraphs {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (currentIslandGraph == null) return
         if (event.isMod(2)) {
             handleTick()
             checkMoved()
@@ -327,9 +330,9 @@ object IslandGraphs {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (LorenzUtils.inSkyBlock && event.entity == Minecraft.getMinecraft().thePlayer) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (currentIslandGraph != null && event.isLocalPlayer) {
             hasMoved = true
         }
     }
@@ -402,8 +405,8 @@ object IslandGraphs {
      * Activates pathfinding to a location in the island.
      *
      * @param location The goal of the pathfinder.
-     * @param label The name of the naviation goal in chat.
-     * @param color The color of the lines in world.
+     * @param label The name of the navigation goal in chat. Cannot be empty.
+     * @param color The color of the lines in the world.
      * @param onFound The callback that gets fired when the goal is reached.
      * @param condition The pathfinding stops when the condition is no longer valid.
      */
@@ -414,6 +417,7 @@ object IslandGraphs {
         onFound: () -> Unit = {},
         condition: () -> Boolean,
     ) {
+        require(label.isNotEmpty()) { "Label cannot be empty." }
         reset()
         shouldAllowRerouting = false
         pathFind0(location, label, color, onFound, condition)
@@ -466,7 +470,7 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
-                "§e[SkyHanni] Navigation manually stopped!".asComponent().send(PATHFIND_ID)
+                "§e[SkyHanni] Navigation stopped!".asComponent().send(PATHFIND_ID)
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
@@ -475,7 +479,7 @@ object IslandGraphs {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (currentIslandGraph == null) return
         val path = fastestPath ?: return
 
         // maybe reuse for debuggin

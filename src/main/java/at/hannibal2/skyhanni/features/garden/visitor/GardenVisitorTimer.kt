@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -36,6 +37,10 @@ object GardenVisitorTimer {
 
     private val config get() = GardenAPI.config.visitors.timer
 
+    /**
+     * REGEX-TEST:  Next Visitor: §r§b11m
+     * REGEX-TEST:  Next Visitor: §r§c§lQueue Full!
+     */
     private val timePattern by RepoPattern.pattern(
         "garden.visitor.timer.time.new",
         " Next Visitor: §r(?<info>.*)",
@@ -60,7 +65,7 @@ object GardenVisitorTimer {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
@@ -83,7 +88,7 @@ object GardenVisitorTimer {
         var millis = visitorInterval
         var queueFull = false
 
-        TabListData.getTabList().matchFirst(timePattern) {
+        timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
                 display = Renderable.string("§cVisitors not unlocked!")
@@ -157,11 +162,12 @@ object GardenVisitorTimer {
             else -> "e"
         }
 
+        val adjustedMillis = if (GardenAPI.isCurrentlyFarming()) millis / 3 else millis
         val extraSpeed = if (GardenAPI.isCurrentlyFarming()) {
-            val duration = (millis / 3) * (GardenCropSpeed.getRecentBPS() / 20)
+            val duration = adjustedMillis * (GardenCropSpeed.getRecentBPS() / 20)
             "§7/§$formatColor" + duration.format()
         } else ""
-        if (config.newVisitorPing && millis < 10.seconds) {
+        if (config.newVisitorPing && adjustedMillis < 10.seconds) {
             SoundUtils.playBeepSound()
         }
 
@@ -198,7 +204,7 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds

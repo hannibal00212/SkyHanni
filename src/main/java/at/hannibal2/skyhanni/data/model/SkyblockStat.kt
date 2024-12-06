@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -37,7 +38,7 @@ enum class SkyblockStat(
     HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>.*)", " §c❣ Health Regen §f(?<value>.*)"),
     VITALITY("§4♨", " Vitality: §r§4♨(?<value>.*)", " §4♨ Vitality §f(?<value>.*)"),
     MENDING("§a☄", " Mending: §r§a☄(?<value>.*)", " §a☄ Mending §f(?<value>.*)"),
-    TRUE_DEFENCE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
+    TRUE_DEFENSE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>.*)", " §eⓈ Swing Range §f(?<value>.*)"),
     SPEED("§f✦", " Speed: §r§f✦(?<value>.*)", " §f✦ Speed §f(?<value>.*)"), // TODO add the way sba did get it (be careful with 500+ Speed)
     SEA_CREATURE_CHANCE("§3α", " Sea Creature Chance: §r§3α(?<value>.*)", " §3α Sea Creature Chance §f(?<value>.*)"),
@@ -63,7 +64,7 @@ enum class SkyblockStat(
     FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>.*)", " §6☘ Foraging Fortune §f(?<value>.*)"),
     FARMING_FORTUNE("§6☘", " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>.*)", " (?:§7§m|§6)☘ Farming Fortune (?:§f)?(?<value>.*)"),
     MINING_FORTUNE("§6☘", " Mining Fortune: §r§6☘(?<value>.*)", " §6☘ Mining Fortune §f(?<value>.*)"),
-    FEAR("§a☠", "", ""), // Skyblock does not like fear. It only shows during Great Spook, therefore no Data.
+    FEAR("§5☠", " Fear: §r§5☠(?<value>.*)", " §5☠ Fear §f(?<value>.*)"),
     COLD_RESISTANCE("§b❄", " Cold Resistance: §r§b❄(?<value>.*)", ""),
     WHEAT_FORTUNE("§7☘", "", " §7(?:§m)☘ Wheat Fortune (?<value>.*)"),
     CARROT_FORTUNE("§7☘", "", " §7(?:§m)☘ Carrot Fortune (?<value>.*)"),
@@ -87,8 +88,8 @@ enum class SkyblockStat(
     UNKNOWN("§c?", "", "")
     ;
 
-    var lastKnownValue: Double
-        get() = ProfileStorageData.profileSpecific?.stats?.get(this) ?: 0.0
+    var lastKnownValue: Double?
+        get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
@@ -101,7 +102,7 @@ enum class SkyblockStat(
 
     val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = icon + lastKnownValue.roundToInt()
+    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
@@ -170,6 +171,11 @@ enum class SkyblockStat(
                 entry.lastSource = type
                 break // Exit the inner loop once a match is found
             }
+        }
+
+        @SubscribeEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
         }
     }
 }

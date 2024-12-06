@@ -29,7 +29,7 @@ public class ModLoadingTweaker implements ITweaker {
             CoreModManager.getIgnoredMods().remove(file);
             CoreModManager.getReparseableCoremods().add(file);
         } catch (URISyntaxException e) {
-            System.err.println("SkyHanni could not re-add itself as mod.");
+            System.err.println("SkyHanni-@MOD_VERSION@ could not re-add itself as mod.");
             e.printStackTrace();
         }
     }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -32,6 +31,10 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     companion object {
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
+    }
+
+    fun addCoins(amount: Int, command: Boolean) {
+        addItem(SKYBLOCK_COIN, amount, command)
     }
 
     fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
@@ -188,7 +191,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         add("§7to edit the number.")
         add("§7Use negative numbers to remove items.")
 
-        if (SkyHanniMod.feature.dev.debug.enabled) {
+        if (LorenzUtils.debug) {
             add("")
             add("§7$internalName")
         }

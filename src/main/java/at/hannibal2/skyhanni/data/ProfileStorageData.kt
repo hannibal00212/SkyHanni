@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -33,7 +34,7 @@ object ProfileStorageData {
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
-    var hypixelDataLoaded = false
+    private var hypixelDataLoaded = false
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -84,14 +85,14 @@ object ProfileStorageData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (noTabListTime == SimpleTimeMark.farPast()) return
+        if (noTabListTime.isFarPast()) return
 
         playerSpecific?.let {
             // do not try to load the data when hypixel has not yet send the profile loaded message
             if (it.multipleProfiles && !hypixelDataLoaded) return
         }
 
-        if (noTabListTime.passedSince() < 5.seconds) return
+        if (noTabListTime.passedSince() < 2.seconds) return
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {
@@ -102,11 +103,13 @@ object ProfileStorageData {
                     HypixelCommands.widget()
                 },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
         } else {
             ChatUtils.chat(
                 "§cExtra Information from Tab list not found! " +
                     "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
+                replaceSameMessage = true,
             )
         }
     }
@@ -123,7 +126,7 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }

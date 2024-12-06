@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -40,10 +40,18 @@ object GetFromSackAPI {
     val commandsWithSlash = commands.map { "/$it" }
 
     private val patternGroup = RepoPattern.group("gfs.chat")
+
+    /**
+     * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
+     */
     private val fromSacksChatPattern by patternGroup.pattern(
         "from",
         "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory.",
     )
+
+    /**
+     * REGEX-TEST: §cYou have no Compost in your Sacks!
+     */
     private val missingChatPattern by patternGroup.pattern(
         "missing",
         "§cYou have no (?<item>.+) in your Sacks!",
@@ -75,12 +83,6 @@ object GetFromSackAPI {
     private var lastTimeOfCommand = SimpleTimeMark.farPast()
 
     private var lastItemStack: PrimitiveItemStack? = null
-
-    @Deprecated("", ReplaceWith("SackAPI.sackListInternalNames"))
-    val sackListInternalNames get() = SackAPI.sackListInternalNames
-
-    @Deprecated("", ReplaceWith("SackAPI.sackListNames"))
-    val sackListNames get() = SackAPI.sackListNames
 
     private fun addToQueue(items: List<PrimitiveItemStack>) = queue.addAll(items)
 
@@ -185,7 +187,7 @@ object GetFromSackAPI {
         val replacedString = itemString.replace("_", " ")
 
         val item = when {
-            SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
+            SackAPI.sackListInternalNames.contains(itemString) -> itemString.toInternalName()
             SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",

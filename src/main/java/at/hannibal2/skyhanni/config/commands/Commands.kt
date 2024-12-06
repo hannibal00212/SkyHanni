@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
-import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
@@ -34,7 +32,6 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -64,11 +61,9 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -132,10 +127,6 @@ object Commands {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGUI.onCommand() }
         }
-        event.register("shcommands") {
-            description = "Shows this list"
-            callback { HelpCommand.onCommand(it) }
-        }
         event.register("shdefaultoptions") {
             description = "Select default options"
             callback { DefaultConfigFeatures.onCommand(it) }
@@ -153,10 +144,6 @@ object Commands {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
         }
-        event.register("shcarry") {
-            description = "Keep track of carries you do."
-            callback { CarryTracker.onCommand(it) }
-        }
         event.register("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
             callback { MarkedPlayerManager.command(it) }
@@ -169,14 +156,9 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        event.register("shimportghostcounterdata") {
-            description = "Manually importing the ghost counter data from GhostCounterV3"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GhostUtil.importCTGhostCounterData() }
-        }
         event.register("shcroptime") {
             description =
-                "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropTimeCommand.onCommand(it) }
         }
@@ -291,22 +273,12 @@ object Commands {
             category = CommandCategory.USERS_ACTIVE
             callback { PestFinder.teleportNearestInfestedPlot() }
         }
-        event.register("shhoppitystats") {
-            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
-            category = CommandCategory.USERS_ACTIVE
-            callback { HoppityEventSummary.sendStatsMessage(it) }
-        }
         event.register("shcolors") {
             description = "Prints a list of all Minecraft color & formatting codes in chat."
             category = CommandCategory.USERS_ACTIVE
             @Suppress("AvoidBritishSpelling")
             aliases = listOf("shcolor", "shcolours", "shcolour")
             callback { ColorFormattingHelper.printColorCodeList() }
-        }
-        event.register("shtps") {
-            description = "Informs in chat about the server ticks per second (TPS)."
-            category = CommandCategory.USERS_ACTIVE
-            callback { TpsCounter.tpsCommand() }
         }
     }
 
@@ -400,11 +372,6 @@ object Commands {
         }
 
         // non trackers
-        event.register("shresetghostcounter") {
-            description = "Resets the ghost counter"
-            category = CommandCategory.USERS_RESET
-            callback { GhostUtil.reset() }
-        }
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
@@ -782,7 +749,7 @@ object Commands {
             callback { GriffinBurrowHelper.setTestBurrow(it) }
         }
         event.register("shtestisland") {
-            description = "Sets the current skyblock island for testing purposes."
+            description = "Changes the SkyBlock island SkyHanni thinks you are on"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
         }
