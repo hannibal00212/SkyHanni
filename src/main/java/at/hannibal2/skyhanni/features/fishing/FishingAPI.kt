@@ -43,7 +43,7 @@ object FishingAPI {
      */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
@@ -70,7 +70,7 @@ object FishingAPI {
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
         bobberHasTouchedLiquid = false
-        FishingBobberCastEvent(event.entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).post()
     }
 
     private fun resetBobber() {
@@ -103,7 +103,7 @@ object FishingAPI {
                 }
 
                 bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).postAndCatch()
+                FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
     }
@@ -117,7 +117,7 @@ object FishingAPI {
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()

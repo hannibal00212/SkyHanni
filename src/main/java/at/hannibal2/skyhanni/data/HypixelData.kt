@@ -64,7 +64,7 @@ object HypixelData {
     @Suppress("UnusedPrivateProperty")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
-        "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
+        "(?:§.)*(?:Area|Dungeon): (?:§.)*(?<island>.*)",
     )
 
     /**
@@ -419,7 +419,7 @@ object HypixelData {
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
-                HypixelJoinEvent().postAndCatch()
+                HypixelJoinEvent.post()
                 SkyHanniMod.repo.displayRepoStatus(true)
             }
         }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -50,7 +51,7 @@ object GardenVisitorDropStatistics {
      */
     private val acceptPattern by patternGroup.pattern(
         "accept",
-        "OFFER ACCEPTED with (?<visitor>.*) [(](?<rarity>.*)[)]",
+        "OFFER ACCEPTED with (?<visitor>.*) \\((?<rarity>.*)\\)",
     )
 
     /**
@@ -117,7 +118,7 @@ object GardenVisitorDropStatistics {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorAccept(event: VisitorAcceptEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return

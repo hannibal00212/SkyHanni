@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonRoomPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -152,6 +153,9 @@ object MiningAPI {
     var cold: Int = 0
         private set
 
+    var mineshaftRoomId: String? = null
+        private set
+
     var lastColdUpdate = SimpleTimeMark.farPast()
         private set
     var lastColdReset = SimpleTimeMark.farPast()
@@ -188,6 +192,14 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        if (!inCustomMiningIsland()) return
+
+        dungeonRoomPattern.firstMatcher(event.added) {
+            mineshaftRoomId = group("roomId")
+        } ?: run {
+            mineshaftRoomId = null
+        }
+
         val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
         } ?: return
@@ -236,7 +248,7 @@ object MiningAPI {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.name == LorenzUtils.getPlayerName()) {
             updateCold(0)
@@ -465,7 +477,7 @@ object MiningAPI {
         // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
-        ColdUpdateEvent(newCold).postAndCatch()
+        ColdUpdateEvent(newCold).post()
         cold = newCold
     }
 

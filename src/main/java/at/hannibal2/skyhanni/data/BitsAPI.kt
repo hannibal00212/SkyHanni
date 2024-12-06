@@ -105,7 +105,7 @@ object BitsAPI {
      */
     private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
-        "§7Bits Available: §b(?<toClaim>[\\d,]+)(§3.+)?",
+        "§7Bits Available: §b(?<toClaim>[\\d,]+)(?:§3.+)?",
     )
 
     /**
@@ -143,7 +143,7 @@ object BitsAPI {
      */
     private val noCookieActiveCookieMenuPattern by bitsGuiGroup.pattern(
         "cookiemenucookieactive",
-        "(§7§cYou do not currently have a|§cBooster Cookie active!)",
+        "§7§cYou do not currently have a|§cBooster Cookie active!",
     )
 
     /**
@@ -175,7 +175,7 @@ object BitsAPI {
      */
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
         "famerankmenuname",
-        "^(Community Shop|Booster Cookie)$",
+        "^Community Shop|Booster Cookie$",
     )
 
     /**
@@ -184,7 +184,7 @@ object BitsAPI {
      */
     private val fameRankGuiStackPattern by bitsGuiGroup.pattern(
         "famerankmenustack",
-        "^(§aCommunity Shop|§eFame Rank)$",
+        "^§aCommunity Shop|§eFame Rank$",
     )
 
     @SubscribeEvent
@@ -383,10 +383,10 @@ object BitsAPI {
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
     private fun sendBitsGainEvent(difference: Int) =
-        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
 
-    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
-    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).post()
+    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && profileStorage != null
 

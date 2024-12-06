@@ -52,7 +52,7 @@ object SackAPI {
      */
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$",
+        "^(?:.* Sack|Enchanted .* Sack)\$",
     )
 
     /**
@@ -273,7 +273,7 @@ object SackAPI {
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
-        sackEvent.postAndCatch()
+        sackEvent.post()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }

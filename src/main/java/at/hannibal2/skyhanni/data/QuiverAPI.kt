@@ -100,7 +100,7 @@ object QuiverAPI {
      * REGEX-TEST: BOSS_SPIRIT_BOW
      * REGEX-TEST: CRYPT_BOW
      */
-    private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
+    private val fakeBowsPattern by group.pattern("fakebows", "^(?:BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
 
     /**
@@ -282,7 +282,7 @@ object QuiverAPI {
     }
 
     private fun postUpdateEvent(arrowType: ArrowType? = currentArrow) {
-        QuiverUpdateEvent(arrowType, currentAmount).postAndCatch()
+        QuiverUpdateEvent(arrowType, currentAmount).post()
     }
 
     @SubscribeEvent

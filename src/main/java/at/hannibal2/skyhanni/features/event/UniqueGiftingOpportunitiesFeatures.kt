@@ -36,10 +36,20 @@ object UniqueGiftingOpportunitiesFeatures {
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
+
+    /**
+     * REGEX-TEST: §6+1 Unique Gift given! To oBlazin§r§6!
+     */
     private val giftedPattern by patternGroup.pattern(
         "gifted",
-        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!",
+        "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
     )
+
+    /**
+     * REGEX-TEST: WHITE_GIFT
+     * REGEX-TEST: RED_GIFT
+     * REGEX-TEST: GREEN_GIFT
+     */
     private val giftNamePattern by patternGroup.pattern(
         "giftname",
         "(?:WHITE|RED|GREEN)_GIFT\$",
@@ -70,10 +80,9 @@ object UniqueGiftingOpportunitiesFeatures {
         addGiftedPlayer(matchedPlayer.name)
     }
 
-    @SubscribeEvent
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent) {
-        val entity = event.entity as? EntityArmorStand ?: return
-        analyzeArmorStand(entity)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+        analyzeArmorStand(event.entity)
     }
 
     @HandleEvent
@@ -104,7 +113,7 @@ object UniqueGiftingOpportunitiesFeatures {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         giftedPattern.matchMatcher(event.message) {
-            addGiftedPlayer(group(1))
+            addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }
     }

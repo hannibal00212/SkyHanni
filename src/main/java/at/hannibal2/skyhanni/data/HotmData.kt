@@ -436,7 +436,7 @@ enum class HotmData(
 
         private val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|",
+            "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
         )
 
         /**
@@ -445,7 +445,7 @@ enum class HotmData(
          */
         private val enabledPattern by patternGroup.pattern(
             "perk.enable",
-            "§a§lENABLED|(§.)*SELECTED",
+            "§a§lENABLED|(?:§.)*SELECTED",
         )
 
         /**
@@ -638,7 +638,7 @@ enum class HotmData(
 
                 HotmAPI.PowderType.entries.forEach {
                     it.pattern(isHeartItem).matchMatcher(line) {
-                        val powder = group("powder").replace(",", "").toLong()
+                        val powder = group("powder").formatLong()
                         if (isHeartItem) {
                             it.setCurrent(powder)
                         }
@@ -732,7 +732,7 @@ enum class HotmData(
             event.lines.forEach {
                 powderPattern.matchMatcher(it) {
                     val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
-                    val amount = group("amount").replace(",", "").toLong()
+                    val amount = group("amount").formatLong()
                     val difference = amount - type.getCurrent()
 
                     if (difference > 0) {
