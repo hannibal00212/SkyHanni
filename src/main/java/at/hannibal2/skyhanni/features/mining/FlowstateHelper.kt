@@ -118,7 +118,7 @@ object FlowstateHelper {
         } else blockBreakStreak * flowstateLevel
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
         hasFlowstate()
     }

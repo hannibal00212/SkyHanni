@@ -90,7 +90,7 @@ object MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
-            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
+            ItemInHandChangeEvent(newItem, oldItem).post()
         }
     }
 

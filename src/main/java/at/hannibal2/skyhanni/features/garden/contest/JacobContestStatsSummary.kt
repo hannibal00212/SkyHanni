@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object JacobContestStatsSummary {
@@ -30,7 +29,7 @@ object JacobContestStatsSummary {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFarmingContest(event: FarmingContestEvent) {
         if (!isEnabled()) return
 

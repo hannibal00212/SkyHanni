@@ -126,7 +126,7 @@ object VisitorListener {
         VisitorAPI.inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return

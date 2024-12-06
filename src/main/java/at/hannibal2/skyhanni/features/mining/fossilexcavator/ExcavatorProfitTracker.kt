@@ -159,7 +159,7 @@ object ExcavatorProfitTracker {
         return profit - scrapPrice
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 

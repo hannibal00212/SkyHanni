@@ -47,7 +47,7 @@ object FishingBaitWarnings {
         wasUsingBait = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobber(event: FishingBobberInLiquidEvent) {
         if (!isEnabled()) return
         DelayedRun.runDelayed(500.milliseconds) {

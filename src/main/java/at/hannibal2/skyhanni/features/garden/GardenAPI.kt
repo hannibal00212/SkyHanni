@@ -130,7 +130,7 @@ object GardenAPI {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+        GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
 
     private fun checkItemInHand() {

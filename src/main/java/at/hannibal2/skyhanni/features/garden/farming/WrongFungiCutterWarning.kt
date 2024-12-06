@@ -56,7 +56,7 @@ object WrongFungiCutterWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (event.crop == CropType.MUSHROOM) {
             readItem(event.toolItem ?: error("Tool item is null"))

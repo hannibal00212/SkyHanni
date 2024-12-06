@@ -134,7 +134,7 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
     }

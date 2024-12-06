@@ -62,7 +62,7 @@ object GardenCropSpeed {
         lastBrokenCrop = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (isEnabled()) {
             resetSpeed()

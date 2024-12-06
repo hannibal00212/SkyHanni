@@ -15,12 +15,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ItemTipHelper {
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return

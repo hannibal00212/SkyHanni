@@ -277,7 +277,7 @@ object GoldenFishTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         if (!isActive()) return
         goingDownInit = true

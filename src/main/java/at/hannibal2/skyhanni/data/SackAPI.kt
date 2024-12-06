@@ -273,7 +273,7 @@ object SackAPI {
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
-        sackEvent.postAndCatch()
+        sackEvent.post()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }

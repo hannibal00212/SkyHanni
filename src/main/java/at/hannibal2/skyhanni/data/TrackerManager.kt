@@ -62,7 +62,7 @@ object TrackerManager {
         }
 
         commandEditTrackerSuccess = false
-        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).postAndCatch()
+        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).post()
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
         }

@@ -55,7 +55,7 @@ object ItemAddManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -86,7 +86,7 @@ object ItemAddManager {
     }
 
     private fun Source.addItem(internalName: NEUInternalName, amount: Int) {
-        ItemAddEvent(internalName, amount, this).postAndCatch()
+        ItemAddEvent(internalName, amount, this).post()
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()

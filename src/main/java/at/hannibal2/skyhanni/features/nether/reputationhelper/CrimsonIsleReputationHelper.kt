@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -85,7 +86,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         dirty = true
     }

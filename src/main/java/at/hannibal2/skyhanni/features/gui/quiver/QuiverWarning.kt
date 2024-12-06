@@ -38,7 +38,7 @@ object QuiverWarning {
         onInstanceComplete()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         onInstanceComplete()
     }
@@ -72,7 +72,7 @@ object QuiverWarning {
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val amount = event.currentAmount
         val arrow = event.currentArrow ?: return
