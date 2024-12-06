@@ -22,7 +22,7 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Matriach Helper", desc = "Helper for Heavy Pearls")
+    @ConfigOption(name = "Matriarch Helper", desc = "Helper for Heavy Pearls")
     @Accordion
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
 

@@ -24,7 +24,7 @@ public class GraphConfig {
 
     @Expose
     @ConfigOption(name = "Toggle Ghost Position", desc = "Creates or removes the Ghost Position. This helps editing nodes tht are in the air.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_F)
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int toggleGhostPosition = Keyboard.KEY_NONE;
 
     @Expose
@@ -96,6 +96,11 @@ public class GraphConfig {
     @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int dissolveKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Edge Cycle", desc = "Cycles the direction of the edge.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_H)
+    public int edgeCycle = Keyboard.KEY_H;
 
     @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")

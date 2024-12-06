@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorJsonEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ContributorsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
@@ -22,13 +23,11 @@ object ContributorManager {
         contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
     }
 
-    @SubscribeEvent
-    fun onRenderNametag(event: EntityDisplayNameEvent) {
+    @HandleEvent
+    fun onRenderNametag(event: EntityDisplayNameEvent<EntityPlayer>) {
         if (!config.contributorNametags) return
-        (event.entity as? EntityPlayer)?.let { player ->
-            if (player.isRealPlayer()) getSuffix(event.entity.name)?.let {
-                event.chatComponent.appendSibling(ChatComponentText(" $it"))
-            }
+        if (event.entity.isRealPlayer()) getSuffix(event.entity.name)?.let {
+            event.chatComponent.appendSibling(ChatComponentText(" $it"))
         }
     }
 

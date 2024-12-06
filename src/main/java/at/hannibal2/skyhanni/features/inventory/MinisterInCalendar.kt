@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -57,7 +58,7 @@ object MinisterInCalendar {
         ministerItemStack = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return
