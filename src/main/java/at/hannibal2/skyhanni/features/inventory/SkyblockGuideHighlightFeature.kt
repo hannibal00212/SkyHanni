@@ -77,7 +77,7 @@ class SkyblockGuideHighlightFeature private constructor(
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
         private var activeObject: SkyblockGuideHighlightFeature? = null
-        private var missing = mutableSetOf<Int>()
+        private val missing = mutableSetOf<Int>()
 
         fun isEnabled() = LorenzUtils.inSkyBlock
         fun close() {

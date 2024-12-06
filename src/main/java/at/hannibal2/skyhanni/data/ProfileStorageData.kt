@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -95,7 +96,6 @@ object ProfileStorageData {
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {
-            println("Tablist missing debug:\n${TabListData.getTabList()}")
             ChatUtils.clickableChat(
                 "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
                     "This is needed for the mod to function! And therefore this warning cannot be disabled",
@@ -126,7 +126,7 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }

@@ -27,7 +27,7 @@ object FishingHookDisplay {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         reset()
     }
@@ -55,8 +55,8 @@ object FishingHookDisplay {
         potentialArmorStands.add(event.entity)
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
 

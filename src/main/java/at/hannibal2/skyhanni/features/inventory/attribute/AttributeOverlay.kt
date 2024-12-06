@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getAttributesLevels
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getRollType
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -31,7 +31,7 @@ object AttributeOverlay {
 
     private val cachedData = TimeLimitedCache<ItemStack, CachedData>(5.seconds)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
 

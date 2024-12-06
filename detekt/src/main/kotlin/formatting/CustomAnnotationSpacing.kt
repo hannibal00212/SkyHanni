@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.detektrules.formatting
 
 import at.hannibal2.skyhanni.detektrules.PreprocessingPattern.Companion.containsPreprocessingPattern
+import at.hannibal2.skyhanni.detektrules.SkyHanniRule
 import io.gitlab.arturbosch.detekt.api.CodeSmell
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
-import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.com.intellij.psi.PsiComment
 import org.jetbrains.kotlin.com.intellij.psi.PsiWhiteSpace
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.psi.psiUtil.siblings
  * This rule enforces the default spacing rules for annotations but allows preprocessed comments to be between
  * an annotation and the annotated construct.
  */
-class CustomAnnotationSpacing(config: Config) : Rule(config) {
+class CustomAnnotationSpacing(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "CustomAnnotationSpacing",
         Severity.Style,
@@ -38,13 +38,7 @@ class CustomAnnotationSpacing(config: Config) : Rule(config) {
         }
 
         if (hasInvalidSpacing) {
-            report(
-                CodeSmell(
-                    issue,
-                    Entity.from(annotationEntry),
-                    "Annotations should occur immediately before the annotated construct"
-                )
-            )
+            annotationEntry.reportIssue("Annotations should occur immediately before the annotated construct.")
         }
         super.visitAnnotationEntry(annotationEntry)
     }
