@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -229,9 +231,18 @@ object NonGodPotEffectDisplay {
                     }
                     effectDuration[effect] = Timer(duration)
                     update()
+                    effect.updateCfBlock(duration)
                 }
             }
         }
+    }
+
+    private fun NonGodPotEffect.updateCfBlock(duration: Duration) {
+        if (this != NonGodPotEffect.HOT_CHOCOLATE) return
+
+        val chocolateFactory = ProfileStorageData.profileSpecific?.chocolateFactory ?: return
+        val currentExpiry = chocolateFactory.hotChocolateMixinExpiry ?: SimpleTimeMark.now()
+        chocolateFactory.hotChocolateMixinExpiry = currentExpiry.plus(duration)
     }
 
     // TODO use TablistFooterUpdateEvent instead

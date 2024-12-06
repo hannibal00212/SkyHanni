@@ -235,6 +235,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public HitmanStatsStorage hitmanStats = new HitmanStatsStorage();
+
+        @Expose
+        public SimpleTimeMark hotChocolateMixinExpiry = SimpleTimeMarkFarPast();
     }
 
     @Expose
@@ -302,6 +305,9 @@ public class ProfileSpecificStorage {
         @Nullable
         public SimpleTimeMark boosterCookieExpiryTime = null;
     }
+
+    @Expose
+    public SimpleTimeMark godPotExpiryTime = SimpleTimeMarkFarPast();
 
     @Expose
     public Map<LorenzVec, MinionConfig> minions = new HashMap<>();

@@ -201,6 +201,12 @@ public class ChocolateFactoryConfig {
     public boolean boosterCookieRequirement = false;
 
     @Expose
+    @ConfigOption(name = "Hot Chocolate Mixin", desc = "Blocks running /cf without §9Hot Chocolate Mixin §7active.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hotChocolateMixinRequirement = false;
+
+    @Expose
     @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
     @ConfigEditorBoolean
     @FeatureToggle
