@@ -72,10 +72,9 @@ object HitmanAPI {
             else nextHuntMeal.timeUntil() // Otherwise, just the time until the next spawn
 
         // Determine if the given meal will 'still' be claimed before the given duration
-        fun HoppityEggType.willBeClaimedAfter(afterDuration: Duration): Boolean =
-            !this.isClaimed() && this.timeUntil() < afterDuration
+        fun HoppityEggType.willBeClaimableAfter(duration: Duration): Boolean = this.timeUntil() < duration
         fun HoppityEggType.passesNotClaimed() =
-            (initialAvailable.contains(this) || !this.willBeClaimedAfter(tilSpawnDuration))
+            (initialAvailable.contains(this) || this.willBeClaimableAfter(tilSpawnDuration))
 
         // Loop through the meals until the given number of meals can be hunted
         for (i in (1 + (this.availableEggs ?: 0))..<huntCount) {
