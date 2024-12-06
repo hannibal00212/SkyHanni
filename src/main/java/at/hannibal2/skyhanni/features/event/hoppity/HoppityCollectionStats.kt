@@ -259,7 +259,7 @@ object HoppityCollectionStats {
 
     private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         replacementCache[event.originalItem.displayName]?.let { event.replace(it) }
     }

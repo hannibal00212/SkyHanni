@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,7 +25,7 @@ object ArmorStackDisplay {
         " (?:§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         val stacks = armorStackPattern.findMatcher(event.actionBar) {

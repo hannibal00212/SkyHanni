@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DungeonHubRacesJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -63,7 +64,7 @@ object DungeonsRaceGuide {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         currentRace = null

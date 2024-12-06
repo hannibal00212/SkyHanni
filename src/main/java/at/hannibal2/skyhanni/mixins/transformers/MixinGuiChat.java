@@ -53,7 +53,7 @@ public class MixinGuiChat {
         // we get the original component back
         GuiChatHook.INSTANCE.setReplacement((ChatComponentText) component);
 
-        new ChatHoverEvent((ChatComponentText) component).postAndCatch();
+        new ChatHoverEvent((ChatComponentText) component).post();
     }
 
     @ModifyArg(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiChat;handleComponentHover(Lnet/minecraft/util/IChatComponent;II)V"), index = 0)
