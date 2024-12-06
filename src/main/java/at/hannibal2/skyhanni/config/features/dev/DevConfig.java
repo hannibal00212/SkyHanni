@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -123,6 +124,14 @@ public class DevConfig {
         desc = "Forces the number format to use the en_US locale.")
     @ConfigEditorBoolean
     public boolean numberFormatOverride = false;
+
+    @Expose
+    @ConfigOption(
+        name = "NTP Server",
+        desc = "Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!"
+    )
+    @ConfigEditorText
+    public String ntpServer = "time.google.com";
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")

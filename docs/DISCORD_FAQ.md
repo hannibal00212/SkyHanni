@@ -68,6 +68,9 @@ _Frequently Asked Questions_
 > While interrupting your current chain to focus on a nearby burrow might feel counterintuitive, it ultimately benefits you in the long run. 
 > The existing chain isn't reset, and you gain the advantage of a higher burrow digging rate.
 
+> **14: Why are the Players in Custom Wardrobe hidden?**
+> If you are using [VolcAddons](https://github.com/zhenga8533/VolcAddons), disable Hide Far/Hide Close Entities.
 
-*This FAQ was last updated on August 26th, 2024.
+
+*This FAQ was last updated on November 24th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

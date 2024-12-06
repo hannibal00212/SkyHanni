@@ -13,11 +13,12 @@ object TestChatCommand {
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
             val syntaxStrings = listOf(
-                "§7Syntax: §e/shtestmessage §7<§e-chat message§7> §7[-lines] [-complex] [-clipboard] [-s]",
+                "§7Syntax: §e/shtestmessage §7<§echat message§7> [flags]",
                 "   §7[-lines]§e: §7Split the message into multiple by newlines",
                 "   §7[-complex]§e: §7Parse the message as a JSON chat component",
                 "   §7[-clipboard]§e: §7Read the message from the clipboard",
-                "   §7[-s]§e: §7Hide the output message",
+                "   §7[-s]§e: §7Hide the testing message",
+                "   §7[-sa]§e: §7Hide everything but the final message", // Not really sure why you'd want this
             )
             ChatUtils.userError("Specify a chat message to test!\n${syntaxStrings.joinToString("\n")}")
             return
@@ -29,51 +30,53 @@ object TestChatCommand {
             val isComplex = mutArgs.remove("-complex")
             // cant use multi lines without clipboard
             val isClipboard = mutArgs.remove("-clipboard") || multiLines
-            val isHidden = mutArgs.remove("-s")
+            val isSilentAll = mutArgs.remove("-sa")
+            val isSilent = mutArgs.remove("-s") || isSilentAll
             val text = if (isClipboard) {
-                OSUtils.readFromClipboard()
-                    ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
+                OSUtils.readFromClipboard() ?: return@launchCoroutine ChatUtils.userError("Clipboard does not contain a string!")
             } else mutArgs.joinToString(" ")
             if (multiLines) {
                 for (line in text.split("\n")) {
-                    extracted(isComplex, line, isHidden)
+                    extracted(isComplex, line, isSilent, isSilentAll)
                 }
             } else {
-                extracted(isComplex, text, isHidden)
+                extracted(isComplex, text, isSilent, isSilentAll)
             }
         }
     }
 
-    private fun extracted(isComplex: Boolean, text: String, isHidden: Boolean) {
-        val component =
-            if (isComplex)
-                try {
-                    IChatComponent.Serializer.jsonToComponent(text)
-                } catch (ex: Exception) {
-                    ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
-                    return
-                }
-            else ChatComponentText(text.replace("&", "§"))
-        // TODO add additional hide parameter
-//         if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
-        test(component, isHidden)
+    private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
+        val component = if (isComplex) try {
+            IChatComponent.Serializer.jsonToComponent(text)
+        } catch (ex: Exception) {
+            ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
+            return
+        }
+        else ChatComponentText(text.replace("&", "§"))
+
+        println("component unformatted: ${component.unformattedText}")
+        println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")
+        println(component)
+
+        val rawText = component.formattedText.stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
+        if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
+
+        test(component, isSilentAll)
     }
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
         val event = LorenzChatEvent(message, componentText)
-        event.postAndCatch()
-
-        if (isHidden) return
+        event.postAndCatch() // TODO don't use deprecated function
 
         if (event.blockedReason != "") {
-            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
-        } else {
-            val finalMessage = event.chatComponent
-            if (finalMessage.formattedText.stripHypixelMessage() != message) {
-                ChatUtils.chat("§eChat modified!")
-            }
-            ChatUtils.chat(finalMessage)
+            if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
+            return
         }
+        val finalMessage = event.chatComponent
+        if (!isHidden && finalMessage.formattedText.stripHypixelMessage() != message) {
+            ChatUtils.chat("§eChat modified!")
+        }
+        ChatUtils.chat(finalMessage)
     }
 }
