@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farmingsettings
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.farmingsettings.FarmingSettingsConfig.WarningType
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -270,7 +271,7 @@ object FarmingSettingsAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (!isEnabled()) return
 

@@ -50,8 +50,7 @@ object ChocolateFactoryStrayTimer {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!HoppityAPI.isHoppityEvent() || !ChocolateFactoryAPI.inChocolateFactory) return
-        if (timer <= Duration.ZERO) return
+        if (!ChocolateFactoryAPI.inChocolateFactory || timer <= Duration.ZERO) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO

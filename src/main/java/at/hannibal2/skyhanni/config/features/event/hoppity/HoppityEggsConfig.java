@@ -237,6 +237,11 @@ public class HoppityEggsConfig {
     public boolean showDuplicateNumber = false;
 
     @Expose
+    @ConfigOption(name = "Recolor Time-Towered Chocolate", desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.")
+    @ConfigEditorBoolean
+    public boolean recolorTTChocolate = false;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
