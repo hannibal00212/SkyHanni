@@ -267,6 +267,7 @@ object NonGodPotEffectDisplay {
                             val duration = TimeUtils.getDuration(string.split("§f")[1])
                             effectDuration[effect] = Timer(duration)
                             update()
+                            effect.updateCfBlock(duration)
                         } catch (e: IndexOutOfBoundsException) {
                             ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
                         }
