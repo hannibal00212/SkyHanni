@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -61,7 +62,7 @@ object GardenCropSpeed {
         lastBrokenCrop = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (isEnabled()) {
             resetSpeed()
@@ -73,7 +74,7 @@ object GardenCropSpeed {
         GardenCropMilestoneDisplay.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
 

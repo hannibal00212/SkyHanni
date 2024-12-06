@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-@Suppress("UnusedPrivateProperty")
-class DungeonEnterEvent(dungeonFloor: String) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class DungeonEnterEvent(val dungeonFloor: String) : SkyHanniEvent()

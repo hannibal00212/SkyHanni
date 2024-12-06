@@ -402,7 +402,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat(result.joinToString("\n"), prefix = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = event.guiContainer.slotUnderMouse ?: return

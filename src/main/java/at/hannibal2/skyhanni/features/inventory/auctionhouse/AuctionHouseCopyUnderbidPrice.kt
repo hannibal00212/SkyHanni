@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.auctionhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -57,7 +58,7 @@ object AuctionHouseCopyUnderbidPrice {
         ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!LorenzUtils.inSkyBlock) return

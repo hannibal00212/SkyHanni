@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -125,7 +126,7 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }

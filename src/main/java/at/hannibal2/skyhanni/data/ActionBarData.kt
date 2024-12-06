@@ -30,7 +30,7 @@ object ActionBarData {
         val message = original.formattedText.stripHypixelMessage()
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, event.message)
-        actionBarEvent.postAndCatch()
+        actionBarEvent.post()
         if (event.message.formattedText != actionBarEvent.chatComponent.formattedText) {
             event.message = actionBarEvent.chatComponent
         }

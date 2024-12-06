@@ -465,8 +465,13 @@ object HoppityEventSummary {
         (mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
 
+    private fun HoppityEventStats.getBoughtCount(): Int =
+        (mealsFound[HoppityEggType.BOUGHT] ?: 0) +
+            (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
+
     private fun HoppityEventStats.getMealEggCount(): Int =
         mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt()
+
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
@@ -489,7 +494,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
-                stats.mealsFound[HoppityEggType.BOUGHT]?.let {
+                stats.getBoughtCount().takeIf { it > 0 }?.let {
                     val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
                     statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
                 }
