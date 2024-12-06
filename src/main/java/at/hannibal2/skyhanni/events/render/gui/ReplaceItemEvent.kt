@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.events.render.gui
 
-import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.InventoryBasic
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, val slot: Int) : LorenzEvent() {
+class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, val slot: Int) : SkyHanniEvent() {
     var replacement: ItemStack? = null
         private set
 
@@ -24,7 +24,7 @@ class ReplaceItemEvent(val inventory: IInventory, val originalItem: ItemStack, v
         ) {
             val originalItem = inventoryContents.getOrNull(slot) ?: return
             val event = ReplaceItemEvent(inventory, originalItem, slot)
-            event.postAndCatch()
+            event.post()
             event.replacement?.let { cir.returnValue = it }
         }
     }
