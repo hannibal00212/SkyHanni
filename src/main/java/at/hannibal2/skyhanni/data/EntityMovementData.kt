@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -68,9 +70,9 @@ object EntityMovementData {
         nextTeleport = null
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (!LorenzUtils.inSkyBlock || event.entity != Minecraft.getMinecraft().thePlayer) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (!event.isLocalPlayer) return
 
         val nextData = nextTeleport ?: return
 
@@ -99,7 +101,7 @@ object EntityMovementData {
             val distance = newLocation.distance(oldLocation)
             if (distance > 0.01) {
                 entityLocation[entity] = newLocation
-                EntityMoveEvent(entity, oldLocation, newLocation, distance).postAndCatch()
+                EntityMoveEvent(entity, oldLocation, newLocation, distance).post()
             }
         }
     }
