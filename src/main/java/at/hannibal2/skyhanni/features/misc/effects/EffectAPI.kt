@@ -145,9 +145,8 @@ object EffectAPI {
         }
         godPotConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
-            val asTimeMark = SimpleTimeMark.now().plus(durationAdded)
-            val existingValue = profileStorage?.godPotExpiryTime
-            profileStorage?.godPotExpiryTime = existingValue?.let { it + durationAdded } ?: asTimeMark
+            val existingValue = profileStorage?.godPotExpiryTime?.takeIfInitialized() ?: SimpleTimeMark.now()
+            profileStorage?.godPotExpiryTime = existingValue + durationAdded
         }
 
         var effect: NonGodPotEffect? = null
@@ -218,9 +217,7 @@ object EffectAPI {
         if (!LorenzUtils.inSkyBlock) return
         for (line in event.footer.split("\n")) {
             godPotTabPattern.matchMatcher(line) {
-                val expiryDuration = TimeUtils.getDuration(group("time"))
-                val expiryTime = SimpleTimeMark.now().plus(expiryDuration)
-                profileStorage?.godPotExpiryTime = expiryTime
+                profileStorage?.godPotExpiryTime = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
             }
             for (effect in NonGodPotEffect.entries) {
                 val tabListName = effect.tabListName
