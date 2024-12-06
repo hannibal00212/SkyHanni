@@ -45,7 +45,7 @@ object ComputerTimeOffset {
     private fun checkOffset() {
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.coroutineScope.launch {
-            offsetMillis = getNtpOffset("time.google.com")
+            offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
             offsetMillis?.let {
                 tryDisplayOffset(wasOffsetBefore)
             }
@@ -53,9 +53,10 @@ object ComputerTimeOffset {
     }
 
     private fun getNtpOffset(ntpServer: String): Duration? = try {
-        val client = NTPUDPClient()
-        val address = InetAddress.getByName(ntpServer)
-        val timeInfo = client.getTime(address)
+        val timeInfo = NTPUDPClient().use { client ->
+            val address = InetAddress.getByName(ntpServer)
+            client.getTime(address)
+        }
 
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds

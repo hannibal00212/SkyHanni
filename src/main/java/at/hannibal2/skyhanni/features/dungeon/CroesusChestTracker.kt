@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
@@ -20,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -57,7 +58,7 @@ object CroesusChestTracker {
     private const val BACK_ARROW_SLOT = 45
     private const val MAX_CHESTS = 60
 
-    private val kismetInternalName = "KISMET_FEATHER".asInternalName()
+    private val kismetInternalName = "KISMET_FEATHER".toInternalName()
 
     private var inCroesusInventory = false
     private var croesusEmpty = false
@@ -227,7 +228,7 @@ object CroesusChestTracker {
         event.stackTip = "§a✔"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))

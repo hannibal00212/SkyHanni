@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
+import java.io.Serializable
+import java.nio.file.Path
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -23,7 +25,7 @@ import kotlin.io.path.outputStream
 plugins {
     idea
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
@@ -213,7 +215,7 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -275,6 +277,21 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
+fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+    if (buildPathsFile.exists()) {
+        sourceSet.get().apply {
+            val buildPaths = buildPathsFile.readText().lineSequence()
+                .map { it.substringBefore("#").trim() }
+                .filter { it.isNotBlank() }
+                .toSet()
+            kotlin.include(buildPaths)
+            java.include(buildPaths)
+        }
+    }
+}
+includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
+includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
@@ -295,6 +312,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveAppendix.set("mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -367,6 +385,7 @@ preprocess {
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -404,8 +423,10 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
+        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
     }
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
 
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -415,26 +436,18 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
 }
 
-abstract class ShotApplicationJarProcessor @Inject constructor(val shots: Shots) : MinecraftJarProcessor<MinecraftJarProcessor.Spec> {
-    private class EnsureCompile(shots: Shots) : ShotApplicationJarProcessor(shots)
-    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? {
-        return object : MinecraftJarProcessor.Spec {}
-    }
+abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
+    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
+    Serializable {
 
-    override fun processJar(
-        source: java.nio.file.Path,
-        spec: MinecraftJarProcessor.Spec,
-        context: ProcessorContext?
-    ) {
+    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
+
+    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
         val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
         ZipFile(source.toFile()).use { input ->
             ZipOutputStream(dest.outputStream()).use { output ->
@@ -444,7 +457,7 @@ abstract class ShotApplicationJarProcessor @Inject constructor(val shots: Shots)
         dest.moveTo(source, overwrite = true)
     }
 
-    override fun getName(): String {
-        return "Shots"
-    }
+    override fun getName(): String = "Shots"
+
+    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }

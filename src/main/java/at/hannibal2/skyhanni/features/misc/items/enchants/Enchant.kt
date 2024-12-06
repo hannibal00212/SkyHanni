@@ -21,10 +21,10 @@ open class Enchant : Comparable<Enchant> {
     var loreName = ""
 
     @Expose
-    private var goodLevel = 0
+    private val goodLevel = 0
 
     @Expose
-    private var maxLevel = 0
+    private val maxLevel = 0
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate
@@ -102,14 +102,14 @@ open class Enchant : Comparable<Enchant> {
 
     class Stacking : Enchant() {
         @Expose
-        private var nbtNum: String? = null
+        private val nbtNum: String? = null
 
         @Expose
         @Suppress("UnusedPrivateProperty")
         private val statLabel: String? = null
 
         @Expose
-        private var stackLevel: TreeSet<Int>? = null
+        private val stackLevel: TreeSet<Int>? = null
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
     }

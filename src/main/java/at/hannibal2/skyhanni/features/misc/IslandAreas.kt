@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -27,12 +26,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,7 +53,7 @@ object IslandAreas {
         display = null
         targetNode = null
         hasMoved = true
-        updateArea("no_area")
+        updateArea("no_area", onlyInternal = true)
     }
 
     fun nodeMoved() {
@@ -87,21 +87,17 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!IslandGraphs.existsForThisIsland) return
-
+        if (!isEnabled()) return
         if (event.isMod(2) && hasMoved) {
-            hasMoved = false
             updatePosition()
+            hasMoved = false
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (isEnabled() && event.isLocalPlayer) {
+            hasMoved = true
         }
     }
 
@@ -162,10 +158,11 @@ object IslandAreas {
             val distance = difference.roundTo(0).toInt()
             val text = "$coloredName§7: §e$distance$suffix"
 
+            val isConfigVisible = node.getAreaTag(useConfig = true) != null
             if (!foundCurrentArea) {
                 foundCurrentArea = true
 
-                val inAnArea = name != "no_area"
+                val inAnArea = name != "no_area" && isConfigVisible
                 if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
                         addSearchString("§eCurrent area: $coloredName")
@@ -173,13 +170,14 @@ object IslandAreas {
                         addSearchString("§7Not in an area.")
                     }
                 }
-                updateArea(name)
+                updateArea(name, onlyInternal = !isConfigVisible)
 
                 addSearchString("§eAreas nearby:")
                 continue
             }
 
             if (name == "no_area") continue
+            if (!isConfigVisible) continue
             foundAreas++
 
             add(
@@ -221,11 +219,11 @@ object IslandAreas {
         }
     }
 
-    private fun updateArea(name: String) {
+    private fun updateArea(name: String, onlyInternal: Boolean) {
         if (name != currentAreaName) {
             val oldArea = currentAreaName
             currentAreaName = name
-            GraphAreaChangeEvent(name, oldArea).post()
+            GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
 
@@ -233,6 +231,8 @@ object IslandAreas {
     fun onAreaChange(event: GraphAreaChangeEvent) {
         val name = event.area
         val inAnArea = name != "no_area"
+        // when this is a small area and small areas are disabled via config
+        if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
             LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
         }
@@ -240,14 +240,15 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
             if (name == currentAreaName) continue
             if (name == "no_area") continue
             val position = node.position
-            val color = node.getAreaTag()?.color?.getChatColor().orEmpty()
+            val areaTag = node.getAreaTag(useConfig = true) ?: continue
+            val color = areaTag.color.getChatColor()
             if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
         }
@@ -269,15 +270,15 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(useConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = config.pathfinder.color.get().toChromaColor()
+        val color = config.pathfinder.color.get().toSpecialColor()
         node.pathFind(
             displayName,
             color,
@@ -288,8 +289,8 @@ object IslandAreas {
             allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
-        hasMoved = true
+        updatePosition()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }
