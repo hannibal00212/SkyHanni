@@ -83,6 +83,14 @@ data class LorenzVec(
 
     fun angleInDeg(other: LorenzVec) = Math.toDegrees(angleInRad(other))
 
+    fun crossProduct(other: LorenzVec): LorenzVec = LorenzVec(
+        this.y * other.z - this.z * other.y,
+        this.z * other.x - this.x * other.z,
+        this.x * other.y - this.y * other.x,
+    )
+
+    fun scaledTo(other: LorenzVec) = this.normalize().times(other.length())
+
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
 
     fun inverse() = LorenzVec(1.0 / x, 1.0 / y, 1.0 / z)
