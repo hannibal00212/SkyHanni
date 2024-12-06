@@ -91,15 +91,7 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:       	§r§b§lCoop §r§f(8)
-     * §8[§r§a§r§8] §r§bBpoth §r§6§l℻
-     * §8[§r§2168§r§8] §r§aMelonLordDe §r§6§l℻
-     * §aMulanLord
-     * §aOkuuUnyu
-     * §aImNotToph
-     * §aIdcDom
-     * §abToph
-     * §bChissl
+     * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
         "playeramount.coop",
@@ -120,14 +112,6 @@ object HypixelData {
     private val dungeonPartyAmountPattern by patternGroup.pattern(
         "playeramount.dungeonparty",
         "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:            §r§b§lIsland
-     */
-    private val soloProfileAmountPattern by patternGroup.pattern(
-        "solo.profile.amount",
-        "^\\s*(?:§.)*Island\\s*$",
     )
 
     /**
