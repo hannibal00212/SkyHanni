@@ -52,7 +52,7 @@ object EntityData {
             val oldMaxHealth = maxHealthMap.getOrDefault(id, -1)
             if (oldMaxHealth != maxHealth) {
                 maxHealthMap[id] = maxHealth
-                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
+                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
             }
         }
     }
@@ -83,7 +83,7 @@ object EntityData {
             val health = (it.`object` as Float).toInt()
             if (entity is EntityWither && health == 300 && entityId < 0) return
             if (entity is EntityLivingBase) {
-                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
+                EntityHealthUpdateEvent(entity, health.derpy()).post()
             }
         }
     }
@@ -107,7 +107,7 @@ object EntityData {
     @JvmStatic
     fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
         val event = EntityHealthDisplayEvent(text)
-        event.postAndCatch()
+        event.post()
         event.text
     }
 
