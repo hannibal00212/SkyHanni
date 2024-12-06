@@ -70,7 +70,7 @@ object HoppityEggsManager {
      */
     val rabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found",
-        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!",
+        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\(§.§L(?<rarity>.*)§7\\)!",
     )
 
     /**

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PetNametag {
@@ -26,10 +26,9 @@ object PetNametag {
         "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?",
     )
 
-    @SubscribeEvent
-    fun onNameTagRender(event: EntityDisplayNameEvent) {
+    @HandleEvent
+    fun onNameTagRender(event: EntityDisplayNameEvent<EntityArmorStand>) {
         if (!isEnabled()) return
-        if (event.entity !is EntityArmorStand) return
 
         petNametagPattern.matchMatcher(event.chatComponent.unformattedText) {
             val start = group("start")
