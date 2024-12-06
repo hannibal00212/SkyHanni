@@ -17,12 +17,21 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object HitmanAPI {
 
+    private const val MINUTES_PER_DAY = 20 // Real minutes per SkyBlock day
+    private const val SB_HR_PER_DAY = 24 // SkyBlock hours per day
     private val sortedEntries get() = HoppityEggType.sortedResettingEntries
     private val orderOrdinalMap: Map<HoppityEggType, HoppityEggType> by lazy {
         sortedEntries.mapIndexed { index, hoppityEggType ->
             hoppityEggType to sortedEntries[(index + 1) % sortedEntries.size]
         }.toMap()
     }
+
+    /**
+     * Determine if the given meal will 'still' be claimed before the given duration
+     */
+    private fun HoppityEggType.willBeClaimableAfter(duration: Duration): Boolean = this.timeUntil() < duration
+    private fun HoppityEggType.passesNotClaimed(tilSpawnDuration: Duration, initialAvailable: MutableList<HoppityEggType>) =
+        (initialAvailable.contains(this) || this.willBeClaimableAfter(tilSpawnDuration))
 
     /**
      * Get the time until the given number of slots are available.
@@ -32,7 +41,7 @@ object HitmanAPI {
         if (currentSlots >= numSlots) return Duration.ZERO
         val slotCooldown = this.slotCooldown ?: return Duration.ZERO
         val minutesUntilSlot = slotCooldown.timeUntil().inPartialMinutes
-        val minutesUntilSlots = minutesUntilSlot + ((numSlots - currentSlots - 1) * 20)
+        val minutesUntilSlots = minutesUntilSlot + ((numSlots - currentSlots - 1) * MINUTES_PER_DAY)
         return minutesUntilSlots.minutes
     }
 
@@ -47,52 +56,70 @@ object HitmanAPI {
         for (i in 1..(this.purchasedSlots ?: 0)) {
             // If the next slot would put us at the max slot count, return the number of slots
             if (currentSlots + i == ((this.purchasedSlots ?: 0))) return i
-            val minutesUntilSlots = minutesUntilSlot + ((i - 1) * 20)
+            val minutesUntilSlots = minutesUntilSlot + ((i - 1) * MINUTES_PER_DAY)
             if (minutesUntilSlots >= duration.inPartialMinutes) return i
         }
         return 0 // Should never reach here
     }
 
     /**
-     * Return the time until the given number of rabbits can be hunted.
+     * Determine the first meal that would be hunted by Hitman if given an infinite amount of time.
      */
-    private fun HitmanStatsStorage.getTimeToHuntCount(huntCount: Int): Duration {
-        var nextHuntMeal = sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil() }
+    private fun getFirstHuntedMeal(): HoppityEggType =
+        sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil() }
             ?: sortedEntries.minByOrNull { it.timeUntil() }
             ?: ErrorManager.skyHanniError("Could not find next meal to hunt")
 
+    /**
+     * Determine the next meal that would be hunted by Hitman if given an infinite amount of time.
+     */
+    private fun getNextHuntedMeal(
+        previousMeal: HoppityEggType,
+        duration: Duration,
+        initialAvailable: MutableList<HoppityEggType>
+    ) = sortedEntries.filter {
+        it.passesNotClaimed(duration, initialAvailable)
+    }.firstOrNull {
+        // Try to find the next meal on the same day
+        (it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay) ||
+            // Try to find the next meal on the next day
+            it.altDay != previousMeal.altDay
+    } ?: orderOrdinalMap[previousMeal] ?: ErrorManager.skyHanniError(
+        "Could not find next meal to hunt after $previousMeal"
+    )
+
+    /**
+     * Return the time until the given number of rabbits can be hunted.
+     */
+    private fun HitmanStatsStorage.getTimeToHuntCount(targetHuntCount: Int): Duration {
+        // Store the initial meal to hunt
+        var nextHuntMeal = getFirstHuntedMeal()
         // Store a list of all the meals that will be available to hunt at their next spawn
-        val initialAvailable: MutableList<HoppityEggType> = sortedEntries.filter {
+        val initialAvailable = sortedEntries.filter {
             !it.isClaimed() && it != nextHuntMeal
         }.toMutableList()
 
         // Will store the total time until the given number of meals can be hunted
         var tilSpawnDuration: Duration =
-            if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil() + 40.minutes // 40 min for -next- cycle after spawn
+            if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil() + (MINUTES_PER_DAY * 2).minutes // -next- cycle after spawn
             else nextHuntMeal.timeUntil() // Otherwise, just the time until the next spawn
 
-        // Determine if the given meal will 'still' be claimed before the given duration
-        fun HoppityEggType.willBeClaimableAfter(duration: Duration): Boolean = this.timeUntil() < duration
-        fun HoppityEggType.passesNotClaimed() =
-            (initialAvailable.contains(this) || this.willBeClaimableAfter(tilSpawnDuration))
-
+        // Determine how many hunts we need to perform
+        val huntRange = (1 + (this.availableEggs ?: 0))..targetHuntCount
         // Loop through the meals until the given number of meals can be hunted
-        for (i in (1 + (this.availableEggs ?: 0))..<huntCount) {
-            val candidate = sortedEntries.firstOrNull {
-                // Try to find the next meal on the same day
-                it.resetsAt > nextHuntMeal.resetsAt && it.altDay == nextHuntMeal.altDay && it.passesNotClaimed()
-            } ?: sortedEntries.firstOrNull {
-                // Try to find the next meal on the next day
-                it.altDay != nextHuntMeal.altDay && it.passesNotClaimed()
-            } ?: orderOrdinalMap[nextHuntMeal] ?: ErrorManager.skyHanniError(
-                "Could not find next meal to hunt after $nextHuntMeal"
-            )
+        for (i in huntRange) {
+            // Determine the next meal to hunt
+            val candidate = getNextHuntedMeal(nextHuntMeal, tilSpawnDuration, initialAvailable)
 
+            // If the meal was initially available, we don't need to wait for it to spawn
             if (initialAvailable.contains(candidate)) initialAvailable.remove(candidate)
+            // Otherwise we need do, so we add the time until the next spawn
             else tilSpawnDuration += candidate.timeFromAnother(nextHuntMeal)
 
+            // Cycle through
             nextHuntMeal = candidate
         }
+
         return tilSpawnDuration
     }
 
@@ -101,8 +128,8 @@ object HitmanAPI {
      */
     private fun HoppityEggType.timeFromAnother(another: HoppityEggType): Duration {
         val diffInSbHours = when {
-            this == another -> 48
-            this.altDay != another.altDay -> 24 - another.resetsAt + this.resetsAt
+            this == another -> (SB_HR_PER_DAY * 2)
+            this.altDay != another.altDay -> SB_HR_PER_DAY - another.resetsAt + this.resetsAt
             this.resetsAt > another.resetsAt -> this.resetsAt - another.resetsAt
             else -> another.resetsAt - this.resetsAt
         }
@@ -120,7 +147,7 @@ object HitmanAPI {
         if (allSlotsCooldown.isInPast()) return this.purchasedSlots ?: 0
 
         val minutesUntilAll = allSlotsCooldown.timeUntil().inPartialMinutes
-        val slotsOnCooldown = ceil(minutesUntilAll / 20).toInt()
+        val slotsOnCooldown = ceil(minutesUntilAll / MINUTES_PER_DAY).toInt()
         return (this.purchasedSlots ?: 0) - slotsOnCooldown
     }
 
@@ -132,7 +159,7 @@ object HitmanAPI {
         val eventEndMark = HoppityAPI.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
         var slotsToFill = slotsOpenNow
-        for (i in (0..99)) { // Runaway protection
+        for (i in (0..10)) { // Runaway protection
             // Calculate time needed to fill this many slots
             val timeToSlots = this.getTimeToHuntCount(slotsToFill)
 
@@ -185,8 +212,8 @@ object HitmanAPI {
         }.minByOrNull { it.resetsAt } ?: ErrorManager.skyHanniError("Could not find next meal after all slots")
 
         // Return the adjusted time until the next meal
-        val dayDiff = if (nextMealAfterAllSlots.altDay != isAllSlotDayAlt) 1 else 0
-        val hourDiff = nextMealAfterAllSlots.resetsAt - sbTimeAllSlots.hour + dayDiff * 24
-        return Pair(timeToSlots + (hourDiff * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds, false)
+        val sbDayDiff = if (nextMealAfterAllSlots.altDay != isAllSlotDayAlt) 1 else 0
+        val sbHourDiff = nextMealAfterAllSlots.resetsAt - sbTimeAllSlots.hour + sbDayDiff * SB_HR_PER_DAY
+        return Pair(timeToSlots + (sbHourDiff * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds, false)
     }
 }
