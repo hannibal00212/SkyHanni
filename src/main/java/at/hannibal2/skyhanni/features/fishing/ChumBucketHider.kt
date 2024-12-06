@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
@@ -27,13 +29,11 @@ object ChumBucketHider {
         reset()
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!config.enabled.get()) return
 
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (entity in hiddenEntities) {
             event.cancel()
@@ -65,7 +65,7 @@ object ChumBucketHider {
 
         // Chum Bucket
         if (config.hideBucket.get() &&
-            entity.inventory.any {
+            entity.getWholeInventory().any {
                 it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket")
             }
         ) {

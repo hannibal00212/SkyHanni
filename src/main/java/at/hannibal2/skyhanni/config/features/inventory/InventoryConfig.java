@@ -135,6 +135,11 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
+  
+    @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();

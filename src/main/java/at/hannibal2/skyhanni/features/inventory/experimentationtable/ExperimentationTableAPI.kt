@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -37,17 +38,13 @@ object ExperimentationTableAPI {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
         val entity = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
         } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
-    // TODO: Add to repo
-    private const val EXPERIMENTATION_TABLE_SKULL =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
-            "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
-
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**

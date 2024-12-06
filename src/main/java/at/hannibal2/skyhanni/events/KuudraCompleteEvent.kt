@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class KuudraCompleteEvent(val kuudraTier: Int) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class KuudraCompleteEvent(val kuudraTier: Int) : SkyHanniEvent()

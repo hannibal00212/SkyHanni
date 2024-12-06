@@ -56,7 +56,7 @@ object FarmingLaneFeatures {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }

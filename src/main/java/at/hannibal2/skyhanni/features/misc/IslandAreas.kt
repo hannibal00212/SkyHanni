@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -27,12 +26,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -87,21 +87,17 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!IslandGraphs.existsForThisIsland) return
-
+        if (!isEnabled()) return
         if (event.isMod(2) && hasMoved) {
-            hasMoved = false
             updatePosition()
+            hasMoved = false
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (isEnabled() && event.isLocalPlayer) {
+            hasMoved = true
         }
     }
 
@@ -244,7 +240,7 @@ object IslandAreas {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
@@ -282,7 +278,7 @@ object IslandAreas {
         targetNode = node
         val tag = node.getAreaTag() ?: return
         val displayName = tag.color.getChatColor() + node.name
-        val color = config.pathfinder.color.get().toChromaColor()
+        val color = config.pathfinder.color.get().toSpecialColor()
         node.pathFind(
             displayName,
             color,
@@ -293,8 +289,8 @@ object IslandAreas {
             allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
-        hasMoved = true
+        updatePosition()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock
+    fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }

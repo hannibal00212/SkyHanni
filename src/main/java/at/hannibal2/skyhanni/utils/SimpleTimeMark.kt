@@ -31,6 +31,10 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis == Long.MAX_VALUE
 
+    fun isFarPastOrFuture() = isFarPast() || isFarFuture()
+
+    fun takeIfInitialized() = if (isFarPastOrFuture()) null else this
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
     override fun toString(): String = when (this) {

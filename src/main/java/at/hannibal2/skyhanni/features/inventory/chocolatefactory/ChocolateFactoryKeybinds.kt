@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,7 +17,7 @@ object ChocolateFactoryKeybinds {
     private val config get() = ChocolateFactoryAPI.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return

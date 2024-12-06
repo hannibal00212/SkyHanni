@@ -15,14 +15,9 @@ import org.jetbrains.annotations.NotNull;
 public class ChocolateFactoryRabbitWarningConfig {
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "Warn when the rabbit that needs to be clicked appears.")
-    @ConfigEditorBoolean
-    public boolean rabbitWarning = true;
-
-    @Expose
-    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits)")
-    @ConfigEditorBoolean
-    public boolean specialRabbitWarning = true;
+    @ConfigOption(name = "Rabbit Warning", desc = "Warn when stray rabbits of a certain tier appear.")
+    @ConfigEditorDropdown
+    public StrayTypeEntry rabbitWarningLevel = StrayTypeEntry.ALL;
 
     @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +
@@ -40,17 +35,20 @@ public class ChocolateFactoryRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
-    @NotNull
-    public FlashScreenTypeEntry flashScreenType = FlashScreenTypeEntry.SPECIAL;
+    public StrayTypeEntry flashScreenLevel = StrayTypeEntry.SPECIAL;
 
-    public enum FlashScreenTypeEntry {
-        SPECIAL("Special"),
+    public enum StrayTypeEntry {
+        SPECIAL("Special Only"),
+        LEGENDARY_P("§6Legendary§7+"),
+        EPIC_P("§5Epic§7+"),
+        RARE_P("§9Rare§7+"),
+        UNCOMMON_P("§aUncommon§7+"),
         ALL("All"),
         NONE("None"),
         ;
         private final String str;
 
-        FlashScreenTypeEntry(String str) {
+        StrayTypeEntry(String str) {
             this.str = str;
         }
 

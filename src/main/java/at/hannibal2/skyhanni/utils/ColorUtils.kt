@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import java.awt.Color
 
 object ColorUtils {
 
-    /** Transfer string colors from the config to [Color] */
-    fun String.toChromaColor() = Color(toChromaColorInt(), true)
-    fun String.toChromaColorInt() = SpecialColor.specialToChromaRGB(this)
+    @Deprecated("Use toSpecialColor() instead", ReplaceWith("this.toSpecialColor()"))
+    fun String.toChromaColor() = this.toSpecialColor()
+
+    @Deprecated("Use toSpecialColorInt() instead", ReplaceWith("this.toSpecialColorInt()"))
+    fun String.toChromaColorInt() = this.toSpecialColorInt()
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 
@@ -35,9 +39,6 @@ object ColorUtils {
     )
 
     val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
-
-    @Deprecated("Don't use int colors", ReplaceWith("this.addAlpha()"))
-    fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (rgb and 0x00ffffff)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 
