@@ -82,7 +82,7 @@ object BazaarApi {
         if (inBazaarInventory) {
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
-            BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
+            BazaarOpenedProductEvent(openedProduct, event).post()
         }
     }
 
