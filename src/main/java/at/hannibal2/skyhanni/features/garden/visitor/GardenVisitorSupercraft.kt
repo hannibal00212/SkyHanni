@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -34,11 +35,11 @@ object GardenVisitorSupercraft {
         val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
-            "§bSuper Craft",
+            "§bSupercraft",
             "§8(From SkyHanni)",
             "",
-            "§7You have the items to craft",
-            "§7Click me to open the super crafter!",
+            "§7You have the items to craft.",
+            "§7Click me to open the supercrafter!",
         )
     }
 
@@ -50,7 +51,7 @@ object GardenVisitorSupercraft {
     }
 
     // needs to run later than onVisitorOpen at GardenVisitorFeatures
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         visitor.offer?.offerItem ?: return
@@ -92,7 +93,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!hasIngredients) return
         if (event.inventory is InventoryPlayer) return

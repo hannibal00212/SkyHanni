@@ -100,6 +100,7 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.EMPTY_2, "")
             put(ChocolateFactoryStat.EMPTY_3, "")
             put(ChocolateFactoryStat.EMPTY_4, "")
+            put(ChocolateFactoryStat.EMPTY_5, "")
 
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
@@ -185,6 +186,7 @@ object ChocolateFactoryStats {
         EMPTY_2(""),
         EMPTY_3(""),
         EMPTY_4(""),
+        EMPTY_5(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
         TIME_TOWER_FULL(
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
@@ -197,6 +199,9 @@ object ChocolateFactoryStats {
             "§eBest Upgrade: §b 59m 4s",
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
         ),
+        AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §b3"),
+        HITMAN_SLOT_COOLDOWN("§Hitman Slot Cooldown: §b8m 6s"),
+        HITMAN_ALL_SLOTS("§eAll Hitman Slots Cooldown: §b8h 8m 6s"),
         ;
 
         override fun toString(): String {

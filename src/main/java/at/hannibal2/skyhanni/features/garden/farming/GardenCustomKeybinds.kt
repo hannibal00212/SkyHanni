@@ -5,13 +5,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.mixins.transformers.AccessorKeyBinding
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
@@ -34,15 +33,11 @@ object GardenCustomKeybinds {
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var isDuplicate = false
 
-    private fun Int.keybind() = (mcSettings.keyBindAttack as AccessorKeyBinding).hash_skyhanni.lookup(this)
-        ?: ErrorManager.skyHanniError("Keybind $this not found")
-
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding]?.keybind() ?: return
-        val accessor = override as AccessorKeyBinding
-        cir.returnValue = accessor.pressed_skyhanni
+        val override = map[keyBinding] ?: return
+        cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
@@ -86,8 +81,7 @@ object GardenCustomKeybinds {
             with(mcSettings) {
                 map = buildMap {
                     fun add(keyBinding: KeyBinding, property: Property<Int>) {
-                        val value = property.get()
-                        if (value != keyBinding.keyCode) put(keyBinding, value)
+                        put(keyBinding, property.get())
                     }
                     add(keyBindAttack, attack)
                     add(keyBindUseItem, useItem)
@@ -114,7 +108,9 @@ object GardenCustomKeybinds {
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
-        isEnabled() && GardenAPI.toolInHand != null && !isDuplicate && lastWindowOpenTime.passedSince() > 300.milliseconds
+        isEnabled() && GardenAPI.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
+
+    private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
     @JvmStatic
     fun disableAll() {

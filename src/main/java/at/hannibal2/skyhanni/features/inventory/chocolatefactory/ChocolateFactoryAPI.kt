@@ -91,6 +91,7 @@ object ChocolateFactoryAPI {
     var coachRabbitIndex = 42
     var rabbitHitmanIndex = 51
     var maxRabbits = 503
+    var hitmanCosts = TreeSet<Long>()
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
@@ -157,6 +158,7 @@ object ChocolateFactoryAPI {
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
         chocolateMilestones = data.chocolateMilestones
+        hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits

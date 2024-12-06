@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -91,8 +93,8 @@ object DungeonLividFinder {
         lividArmorStandId = null
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!inLividBossRoom() || !config.hideWrong) return
         if (livid == null && lividArmorStandId == null) return // in case livid detection fails, don't hide anything
         if (event.entity.mob in fakeLivids) event.cancel()

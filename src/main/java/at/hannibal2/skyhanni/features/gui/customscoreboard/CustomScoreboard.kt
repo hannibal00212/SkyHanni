@@ -10,7 +10,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -77,7 +79,7 @@ object CustomScoreboard {
         config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
@@ -199,7 +201,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        updateIslandEntries()
+        if (event.newIsland != IslandType.NONE) updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
@@ -215,10 +217,10 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }))
+                addAll(formatEntriesDebug(config.scoreboardEntries.get().map { it.name to it.element }, currentIslandEntries))
 
                 add("Custom Scoreboard Events:")
-                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }))
+                addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
@@ -228,13 +230,15 @@ object CustomScoreboard {
         }
     }
 
-    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>) = entries.map { (name, element) ->
-        val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
-        "   ${name.firstLetterUppercase()} - " +
-            "island: ${element.showIsland()} - " +
-            "show: ${element.showWhen()} - " +
-            lines
-    }
+    private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>, currentIslandList: List<ScoreboardElement>) =
+        entries.map { (name, element) ->
+            val lines = element.getLines().takeIf { it.isNotEmpty() }?.joinToString(", ") { it.display } ?: "No lines to display"
+            "   ${name.firstLetterUppercase()} - " +
+                "island: ${element.showIsland()} - " +
+                "in Island: ${element in currentIslandList} - " +
+                "show: ${element.showWhen()} - " +
+                lines
+        }
 
     @JvmStatic
     fun resetAppearance() {
