@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -26,6 +27,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PesthunterProfit {
+
+    data class PesthunterTrade(val internalName: NEUInternalName, val coinsPerPest: Double)
+    var bestPesthunterTrade = mutableListOf<PesthunterTrade>()
 
     private val config get() = GardenAPI.config.pests.pesthunterShop
     private var display = emptyList<Renderable>()
@@ -82,13 +86,9 @@ object PesthunterProfit {
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
-        var internalName = NEUInternalName.fromItemNameOrNull(name)
+        var internalName = NEUInternalName.fromItemNameOrNull(name.replace("[Lvl 100]", "[Lvl {LVL}]"))
         if (internalName == null) {
             internalName = item.getInternalName()
-        }
-
-        if (itemName == "§7[Lvl 100] §6Hedgehog") {
-            internalName = NEUInternalName.fromItemNameOrInternalName("HEDGEHOG;4")
         }
 
         val itemPrice = internalName.getPrice() * amount
@@ -100,7 +100,7 @@ object PesthunterProfit {
         val color = if (profitPerPest > 0) "§6" else "§c"
 
         val hover = listOf(
-            itemName.replace("[Lvl 100]", "[Lvl 1]"),
+            itemName.replace("[Lvl {LVL}]", "[Lvl 1]"),
             "",
             "§7Item price: §6${itemPrice.shortFormat()} ",
             "§7Material cost: §6${totalCost.shortFormat()} ",
@@ -110,7 +110,7 @@ object PesthunterProfit {
 
         table.add(
             DisplayTableEntry(
-                itemName.replace("[Lvl 100]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
+                itemName.replace("[Lvl {LVL}]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
                 "$color${profitPerPest.shortFormat()}",
                 profitPerPest,
                 internalName,
@@ -118,6 +118,11 @@ object PesthunterProfit {
                 highlightsOnHoverSlots = listOf(slot),
             ),
         )
+
+        if (bestPesthunterTrade.isEmpty() || profitPerPest > bestPesthunterTrade.maxByOrNull { it.coinsPerPest }!!.coinsPerPest) {
+            bestPesthunterTrade.clear()
+            bestPesthunterTrade.add(PesthunterTrade(internalName, profitPerPest))
+        }
     }
 
     private fun getRequiredItems(item: ItemStack): MutableList<String> {
