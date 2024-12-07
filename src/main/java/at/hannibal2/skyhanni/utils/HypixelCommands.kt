@@ -106,6 +106,10 @@ object HypixelCommands {
         send("bp $position")
     }
 
+    fun openEnderChest(position: Int) {
+        send("ec $position")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
