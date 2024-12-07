@@ -118,9 +118,12 @@ object PesthunterProfit {
             ),
         )
 
-        if (bestPesthunterTrade.isEmpty() || profitPerPest > (bestPesthunterTrade.maxByOrNull {
-                it.coinsPerPest
-            }?.coinsPerPest ?: 0.0)) {
+        if (bestPesthunterTrade.isEmpty() || profitPerPest > (
+                bestPesthunterTrade.maxByOrNull {
+                    it.coinsPerPest
+                }?.coinsPerPest ?: 0.0
+                )
+        ) {
             bestPesthunterTrade.clear()
             bestPesthunterTrade.add(PesthunterTrade(internalName, profitPerPest))
         }
