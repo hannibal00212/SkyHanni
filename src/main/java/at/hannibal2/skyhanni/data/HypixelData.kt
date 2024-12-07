@@ -94,7 +94,7 @@ object HypixelData {
      * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
      */
     private val playerAmountOnIslandPattern by patternGroup.pattern(
-        "playeramount.coop",
+        "playeramount.onisland",
         "^§.\\[[§\\w]{6,11}] §r.*",
     )
 
