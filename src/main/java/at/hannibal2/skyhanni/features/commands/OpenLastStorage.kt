@@ -38,7 +38,8 @@ object OpenLastStorage {
 
         // Non-Hypixel combined "last opened" command for backpack + ender chest
         if (!event.message.startsWith("/lastopened", ignoreCase = true) &&
-            !event.message.startsWith("/lo", ignoreCase = true)
+            // cannot use startsWith because of /locraw
+            !event.message.equals("/lo", ignoreCase = true)
         ) {
             return
         }
