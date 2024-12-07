@@ -69,6 +69,7 @@ object OpenLastStorage {
                 return true
             }
             openLastBackPack()
+            lastStorageType = StorageType.BACKPACK
             return true
         }
 
@@ -103,6 +104,7 @@ object OpenLastStorage {
                 return true
             }
             openLastEnderChest()
+            lastStorageType = StorageType.ENDER_CHEST
             return true
         }
 
