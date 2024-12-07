@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -274,7 +274,7 @@ object HypixelData {
             }
         }
 
-        if (!isPlayerIsland()) {
+        if (!inAnyIsland(IslandType.GARDEN, IslandType.GARDEN_GUEST, IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST)) {
             playerAmountOnIsland = 0
         }
 
@@ -574,14 +574,5 @@ object HypixelData {
     private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
         playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
-    }
-
-    private fun isPlayerIsland(): Boolean {
-        return LorenzUtils.skyBlockIsland.isAnyOf(
-            IslandType.GARDEN,
-            IslandType.GARDEN_GUEST,
-            IslandType.PRIVATE_ISLAND,
-            IslandType.PRIVATE_ISLAND_GUEST,
-        )
     }
 }
