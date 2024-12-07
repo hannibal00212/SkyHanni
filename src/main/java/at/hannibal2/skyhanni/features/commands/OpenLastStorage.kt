@@ -43,6 +43,8 @@ object OpenLastStorage {
             return
         }
 
+        event.isCanceled = true
+
         if (lastStorageType == StorageType.ENDER_CHEST) {
             openLastEnderChest()
         } else if (lastStorageType == StorageType.BACKPACK) {
@@ -111,8 +113,8 @@ object OpenLastStorage {
         }
         val intArg = parts[1].toIntOrNull()
         if (intArg != null) {
-            // Surprisingly, "/ec [int <= 0]" still is a valid command and leads to "/ec 1"!
-            lastEnderChest = if (intArg > 9) -1 else intArg
+            // Surprisingly, "/ec [int <= 0]" would still be a valid command and lead to "/ec 1"!
+            lastEnderChest = if (intArg < 1 || intArg > 9) -1 else intArg
         }
 
         return true
