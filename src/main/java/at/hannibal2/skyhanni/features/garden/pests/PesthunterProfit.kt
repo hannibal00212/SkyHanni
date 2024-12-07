@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -119,7 +118,9 @@ object PesthunterProfit {
             ),
         )
 
-        if (bestPesthunterTrade.isEmpty() || profitPerPest > bestPesthunterTrade.maxByOrNull { it.coinsPerPest }!!.coinsPerPest) {
+        if (bestPesthunterTrade.isEmpty() || profitPerPest > (bestPesthunterTrade.maxByOrNull {
+                it.coinsPerPest
+            }?.coinsPerPest ?: 0.0)) {
             bestPesthunterTrade.clear()
             bestPesthunterTrade.add(PesthunterTrade(internalName, profitPerPest))
         }
