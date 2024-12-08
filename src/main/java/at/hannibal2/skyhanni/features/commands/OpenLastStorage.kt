@@ -19,13 +19,14 @@ object OpenLastStorage {
     // account has at least one partial ender chest page unlocked
     private var lastStorageType = StorageType.ENDER_CHEST
 
-    private fun openLastStorage(storageTypeToOpen: StorageType) {
-        val storageItem = when (storageTypeToOpen) {
+    private fun openLastStorage(selectedStorageType: StorageType) {
+        val storageItem = when (selectedStorageType) {
             StorageType.BACKPACK -> lastBackpack.also { backpack -> backpack?.let { HypixelCommands.openBackpack(it) } }
-            StorageType.ENDER_CHEST -> lastEnderChest.also { enderChest -> enderChest?.let { HypixelCommands.openEnderChest(it) } }        }
+            StorageType.ENDER_CHEST -> lastEnderChest.also { enderChest -> enderChest?.let { HypixelCommands.openEnderChest(it) } }
+        }
 
-        val storageMessage = storageItem?.let { "Opened last ${storageTypeToOpen.name.lowercase().replace("_", " ")} $it." }
-            ?: "No last ${storageTypeToOpen.name.lowercase().replace("_", " ")} to open."
+        val storageMessage = storageItem?.let { "Opened last ${selectedStorageType.name.lowercase().replace("_", " ")} $it." }
+            ?: "No last ${selectedStorageType.name.lowercase().replace("_", " ")} to open."
 
         ChatUtils.chat(storageMessage)
     }
