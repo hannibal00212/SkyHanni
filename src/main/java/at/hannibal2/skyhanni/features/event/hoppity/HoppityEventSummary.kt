@@ -362,42 +362,7 @@ object HoppityEventSummary {
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
         currentTimerActive = true
-        add(
-            Renderable.verticalContainer(
-                buildList {
-                    addString(
-                        "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    )
-                    val eventEnd = statYear.getEventEndMark()
-                    val yearNow = getCurrentSBYear()
-                    val isHoppity = HoppityAPI.isHoppityEvent()
-
-                    val isCurrentEvent = isHoppity && statYear == yearNow
-                    val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
-                    val isNextEvent = statYear > yearNow
-
-                    if (isCurrentEvent && liveDisplayConfig.dateTimeDisplay.contains(CURRENT)) {
-                        eventEnd.formatForHoppity().let { (str, isAbsolute) ->
-                            val grammarWord = if (isAbsolute) "Ends" else "Ends in"
-                            addCenteredString("§7$grammarWord §f$str")
-                        }
-                    } else if (isPastEvent && liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS)) {
-                        eventEnd.formatForHoppity().let { (str, isAbsolute) ->
-                            val grammarWord = if (isAbsolute) "" else " ago"
-                            addCenteredString("§7Ended §f$str$grammarWord")
-                        }
-                    } else if (isNextEvent && liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)) {
-                        statYear.getEventStartMark().formatForHoppity().let { (str, isAbsolute) ->
-                            val grammarWord = if (isAbsolute) "Starts" else "Starts in"
-                            addCenteredString("§7$grammarWord §f$str")
-                        }
-                    } else currentTimerActive = false
-
-                },
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ),
-        )
+        add(buildTitle(statYear))
 
         // Conditionally add year switcher renderable for inventory or chest screens
         if (isInInventory()) {
@@ -424,6 +389,46 @@ object HoppityEventSummary {
         }
         add(cardRenderable)
     }
+
+    private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
+        buildList {
+            addString(
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            )
+            val eventEnd = statYear.getEventEndMark()
+            val yearNow = getCurrentSBYear()
+            val isHoppity = HoppityAPI.isHoppityEvent()
+
+            val isCurrentEvent = isHoppity && statYear == yearNow
+            val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
+            val isNextEvent = statYear > yearNow
+
+            when {
+                isCurrentEvent && liveDisplayConfig.dateTimeDisplay.contains(CURRENT) -> {
+                    eventEnd.formatForHoppity().let { (str, isAbsolute) ->
+                        val grammarWord = if (isAbsolute) "Ends" else "Ends in"
+                        addCenteredString("§7$grammarWord §f$str")
+                    }
+                }
+                isPastEvent && liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS) -> {
+                    eventEnd.formatForHoppity().let { (str, isAbsolute) ->
+                        val grammarWord = if (isAbsolute) "" else " ago"
+                        addCenteredString("§7Ended §f$str$grammarWord")
+                    }
+                }
+                isNextEvent && liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT) -> {
+                    statYear.getEventStartMark().formatForHoppity().let { (str, isAbsolute) ->
+                        val grammarWord = if (isAbsolute) "Starts" else "Starts in"
+                        addCenteredString("§7$grammarWord §f$str")
+                    }
+                }
+                else -> currentTimerActive = false
+            }
+
+        },
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+    )
 
     private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
         val storage = storage ?: return null
