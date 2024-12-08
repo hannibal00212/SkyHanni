@@ -32,13 +32,15 @@ class RepoPatternRegexTest(config: Config) : SkyHanniRule(config) {
 
         repoPatternElement.regexTests.forEach { test ->
             if (!repoPatternElement.pattern.matcher(test).find()) {
-                delegate.reportIssue("Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`.")
+                delegate.reportIssue("Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`. " +
+                    "[View on Regex101](${repoPatternElement.regex101Url})")
             }
         }
 
         repoPatternElement.failingRegexTests.forEach { test ->
             if (repoPatternElement.pattern.matcher(test).find()) {
-                delegate.reportIssue("Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` even though it was set to fail.")
+                delegate.reportIssue("Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
+                    "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})")
             }
         }
     }
