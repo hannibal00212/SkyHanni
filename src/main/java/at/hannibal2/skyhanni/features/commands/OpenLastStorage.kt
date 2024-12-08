@@ -24,14 +24,14 @@ object OpenLastStorage {
     // account has at least one partial ender chest page unlocked
     private var lastStorageType = StorageType.ENDER_CHEST
 
-    private fun openLastStorage(selectedStorageType: StorageType) {
-        val storageItem = when (selectedStorageType) {
+    private fun openLastStoragePage(storageType: StorageType) {
+        val storageItem = when (storageType) {
             StorageType.BACKPACK -> lastBackpack.also { backpack -> backpack?.let { HypixelCommands.openBackpack(it) } }
             StorageType.ENDER_CHEST -> lastEnderChest.also { enderChest -> enderChest?.let { HypixelCommands.openEnderChest(it) } }
         }
 
-        val storageMessage = storageItem?.let { "Opened last ${selectedStorageType.name.lowercase().replace("_", " ")} $it." }
-            ?: "No last ${selectedStorageType.name.lowercase().replace("_", " ")} to open."
+        val storageMessage = storageItem?.let { "Opened last ${storageType.name.lowercase().replace("_", " ")} $it." }
+            ?: "No last ${storageType.name.lowercase().replace("_", " ")} to open."
 
         ChatUtils.chat(storageMessage)
     }
@@ -59,7 +59,7 @@ object OpenLastStorage {
             description = "Opens the storage page last accessed by either /ec or /bp"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
-            callback { openLastStorage(lastStorageType) }
+            callback { openLastStoragePage(lastStorageType) }
         }
     }
 
@@ -78,7 +78,7 @@ object OpenLastStorage {
         ) {
             event.isCanceled = true
             // Opener function will check whether previous value != null
-            openLastStorage(storageType)
+            openLastStoragePage(storageType)
             return
         }
 
