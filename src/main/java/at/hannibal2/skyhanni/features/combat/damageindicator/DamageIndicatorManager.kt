@@ -51,7 +51,6 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -66,7 +65,9 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+// TODO cut class into smaller pieces
 @SkyHanniModule
+@Suppress("LargeClass")
 object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
@@ -74,7 +75,6 @@ object DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
-
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
@@ -90,7 +90,7 @@ object DamageIndicatorManager {
         return damagePattern.matcher(name).matches()
     }
 
-    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(type: BossType) = data.entries.any { it.value.bossType == type }
 
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
@@ -288,7 +288,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+            // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -366,12 +366,12 @@ object DamageIndicatorManager {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
+            data[entity.uniqueID]?.let {
+                val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 
-                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
+                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).post()
             }
             entityData.lastHealth = health
 
@@ -679,11 +679,12 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
+        val ridingEntity = entity.ridingEntity
         // Laser phase
-        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
+        if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val ticksAlive = ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
@@ -836,13 +837,13 @@ object DamageIndicatorManager {
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
         )
-        DamageIndicatorDetectedEvent(entityData).postAndCatch()
+        DamageIndicatorDetectedEvent(entityData).post()
         return entityData
     }
 
     private fun checkFinalBoss(finalBoss: Boolean, id: Int) {
         if (finalBoss) {
-            DamageIndicatorFinalBossEvent(id).postAndCatch()
+            DamageIndicatorFinalBossEvent(id).post()
         }
     }
 
@@ -855,7 +856,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
@@ -897,13 +898,13 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val data = data[event.entity.uniqueID] ?: return
         if (event.health <= 1) {
             if (!data.firstDeath) {
                 data.firstDeath = true
-                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+                DamageIndicatorDeathEvent(event.entity, data).post()
             }
         }
     }

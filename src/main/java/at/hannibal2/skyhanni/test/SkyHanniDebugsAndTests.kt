@@ -26,6 +26,8 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -40,11 +42,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -126,7 +126,7 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.pathFind(location)
+            IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
         }
         ChatUtils.chat("set test waypoint")
     }
@@ -137,8 +137,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
+    @Suppress("EmptyFunctionBlock")
     private fun asyncTest(args: Array<String>) {
-
     }
 
     fun findNullConfig(args: Array<String>) {
@@ -306,9 +306,9 @@ object SkyHanniDebugsAndTests {
 
     private var lastManualContestDataUpdate = SimpleTimeMark.farPast()
 
-    fun clearContestData() {
+    fun resetContestData() {
         if (lastManualContestDataUpdate.passedSince() < 30.seconds) {
-            ChatUtils.userError("§cYou already cleared Jacob's Contest data recently!")
+            ChatUtils.userError("§cYou already reset Jacob's Contest data recently!")
             return
         }
         lastManualContestDataUpdate = SimpleTimeMark.now()
@@ -328,12 +328,15 @@ object SkyHanniDebugsAndTests {
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
         val z = (location.z + 0.001).roundTo(1)
-        if (args.size == 1 && args[0].equals("json", false)) {
-            OSUtils.copyToClipboard("\"$x:$y:$z\"")
-            return
-        }
+        val (clipboard, format) = formatLocation(x, y, z, args.getOrNull(0))
+        OSUtils.copyToClipboard(clipboard)
+        ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
+    }
 
-        OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
+    private fun formatLocation(x: Double, y: Double, z: Double, parameter: String?): Pair<String, String> = when (parameter) {
+        "json" -> "$x:$y:$z" to "json"
+        "pathfind" -> "`/shtestwaypoint $x $y $z pathfind`" to "pathfind"
+        else -> "LorenzVec($x, $y, $z)" to "LorenzVec"
     }
 
     fun debugVersion() {
@@ -379,17 +382,17 @@ object SkyHanniDebugsAndTests {
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
-            input.asInternalName().getItemStackOrNull()?.let { item ->
+            input.toInternalName().getItemStackOrNull()?.let { item ->
                 val itemName = item.itemName
                 val internalName = item.getInternalName()
                 add("§einternal name: §7${internalName.asString()}")
                 add("§einternal name -> item name: '$itemName§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -398,7 +401,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat(result.joinToString("\n"), prefix = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = event.guiContainer.slotUnderMouse ?: return
@@ -487,6 +490,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    @Suppress("EmptyFunctionBlock")
     fun onChat(event: LorenzChatEvent) {
     }
 
@@ -494,7 +498,8 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             itemRenderDebug()
         }
 
@@ -529,7 +534,8 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             dragAbleTest()
         }
     }
@@ -577,8 +583,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }
-                    .toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
@@ -599,7 +604,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
-        val originalOre = event.originalOre?.let { "$it " } ?: ""
+        val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }

@@ -45,11 +45,11 @@ object MineshaftPityDisplay {
             profileStorage?.blocksBroken = value
         }
 
-    private var PityBlock.efficientMiner: Int
-        get() = minedBlocks.firstOrNull { it.pityBlock == this }?.efficientMiner ?: 0
+    private var PityBlock.spreadBlocksBroken: Int
+        get() = minedBlocks.firstOrNull { it.pityBlock == this }?.spreadBlocksBroken ?: 0
         set(value) {
-            minedBlocks.firstOrNull { it.pityBlock == this }?.let { it.efficientMiner = value } ?: run {
-                minedBlocks.add(PityData(this, efficientMiner = value))
+            minedBlocks.firstOrNull { it.pityBlock == this }?.let { it.spreadBlocksBroken = value } ?: run {
+                minedBlocks.add(PityData(this, spreadBlocksBroken = value))
             }
         }
 
@@ -92,7 +92,7 @@ object MineshaftPityDisplay {
                 if (originalOre != null) addOrPut(originalOre, -1)
             }
             .map { (block, amount) ->
-                block.getPityBlock()?.let { it.efficientMiner += amount }
+                block.getPityBlock()?.let { it.spreadBlocksBroken += amount }
             }
 
         update()
@@ -105,7 +105,7 @@ object MineshaftPityDisplay {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
             val counterUntilPity = MAX_COUNTER - pityCounter
-            val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.efficientMiner }
+            val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.spreadBlocksBroken }
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
@@ -124,7 +124,7 @@ object MineshaftPityDisplay {
                 minedBlocks.forEach {
                     add(
                         "    §7${it.pityBlock.displayName} mined: " +
-                            "§e${it.blocksBroken.addSeparators()} [+${it.efficientMiner.addSeparators()} efficient miner]" +
+                            "§e${it.blocksBroken.addSeparators()} [+${it.spreadBlocksBroken.addSeparators()} spread]" +
                             " §6(${it.pityBlock.getPity().addSeparators()}/${counterUntilPity.addSeparators()})",
                     )
                 }
@@ -283,7 +283,7 @@ object MineshaftPityDisplay {
     data class PityData(
         @Expose val pityBlock: PityBlock,
         @Expose var blocksBroken: Int = 0,
-        @Expose var efficientMiner: Int = 0,
+        @Expose var spreadBlocksBroken: Int = 0,
     )
 
     enum class PityBlock(
@@ -301,11 +301,6 @@ object MineshaftPityDisplay {
 
         GEMSTONE(
             "Gemstone",
-            /*listOf(
-                OreType.RUBY, OreType.AMBER, OreType.AMETHYST, OreType.JADE,
-                OreType.SAPPHIRE, OreType.TOPAZ, OreType.JASPER, OreType.OPAL,
-                OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT,
-            ),*/
             OreType.entries.filter { it.isGemstone() },
             4,
             ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),
@@ -344,7 +339,7 @@ object MineshaftPityDisplay {
                 return entries.firstOrNull { oreType in it.oreTypes }
             }
 
-            fun PityBlock.getPity() = (blocksBroken + efficientMiner / 2.0) * multiplier
+            fun PityBlock.getPity() = (blocksBroken + spreadBlocksBroken / 2.0) * multiplier
         }
     }
 }

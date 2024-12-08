@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -58,29 +60,31 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ) = when {
-        baseEntity is EntityZombie && armorStand != null &&
+        baseEntity is EntityZombie &&
+            armorStand != null &&
             (armorStand.name == "§e﴾ §c§lThe Watcher§r§r §e﴿" || armorStand.name == "§3§lWatchful Eye§r") ->
             MobData.MobResult.found(
                 MobFactories.special(baseEntity, armorStand.cleanName(), armorStand),
             )
 
-        baseEntity is EntityCaveSpider -> MobUtils.getClosedArmorStand(baseEntity, 2.0).takeNonDefault()
+        baseEntity is EntityCaveSpider -> MobUtils.getClosestArmorStand(baseEntity, 2.0).takeNonDefault()
             .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Shadow Assassin" ->
-            MobUtils.getClosedArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
+            MobUtils.getClosestArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
                 .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "The Professor" ->
             MobUtils.getArmorStand(baseEntity, 9)
                 .makeMobResult { MobFactories.boss(baseEntity, it) }
 
-        baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() &&
+        baseEntity is EntityOtherPlayerMP &&
+            baseEntity.isNPC() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
-            baseEntity.name.contains("Livid") -> MobUtils.getClosedArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+            baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
-        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name ?: "") ->
+        baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
 
         else -> null
@@ -142,7 +146,7 @@ object IslandExceptions {
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Mage Outlaw"))
 
         baseEntity is EntityPigZombie &&
-            baseEntity.inventory?.get(4)?.getSkullTexture() == MobFilter.NPC_TURD_SKULL ->
+            baseEntity.getEntityHelmet()?.getSkullTexture() == MobFilter.NPC_TURD_SKULL ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Turd"))
 
         baseEntity is EntityOcelot -> if (MobFilter.createDisplayNPC(baseEntity)) {
@@ -174,7 +178,8 @@ object IslandExceptions {
         baseEntity: EntityLivingBase,
         armorStand: EntityArmorStand?,
     ) = when {
-        baseEntity is EntityMagmaCube && armorStand != null &&
+        baseEntity is EntityMagmaCube &&
+            armorStand != null &&
             armorStand.cleanName() == "[Lv100] Bal ???❤" ->
             MobData.MobResult.found(
                 Mob(baseEntity, Mob.Type.BOSS, armorStand, "Bal", levelOrTier = 100),
@@ -188,7 +193,8 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ) = when {
-        baseEntity is EntityOcelot && armorStand?.isDefaultValue() == false &&
+        baseEntity is EntityOcelot &&
+            armorStand?.isDefaultValue() == false &&
             armorStand.name.startsWith("§8[§7Lv155§8] §cAzrael§r") ->
             MobUtils.getArmorStand(baseEntity, 1)
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
@@ -203,7 +209,8 @@ object IslandExceptions {
             MobUtils.getArmorStand(baseEntity, 2)
                 .makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
 
-        baseEntity is EntityZombie && armorStand?.isDefaultValue() == true &&
+        baseEntity is EntityZombie &&
+            armorStand?.isDefaultValue() == true &&
             MobUtils.getNextEntity(baseEntity, 4)?.name?.startsWith("§e") == true ->
             petCareHandler(baseEntity)
 
@@ -250,8 +257,9 @@ object IslandExceptions {
             .take(RAT_SEARCH_UP_TO - RAT_SEARCH_START + 1)
             .map { i -> MobUtils.getArmorStand(baseEntity, i) }
             .firstOrNull {
-                it != null && it.distanceTo(baseEntity) < 4.0 &&
-                    it.inventory?.get(4)?.getSkullTexture() == MobFilter.RAT_SKULL
+                it != null &&
+                    it.distanceTo(baseEntity) < 4.0 &&
+                    it.wearingSkullTexture(MobFilter.RAT_SKULL_TEXTURE)
             }?.let {
                 MobData.MobResult.found(Mob(baseEntity, mobType = Mob.Type.BASIC, armorStand = it, name = "Rat"))
             } ?: if (nextEntity is EntityZombie) MobData.MobResult.notYetFound else null

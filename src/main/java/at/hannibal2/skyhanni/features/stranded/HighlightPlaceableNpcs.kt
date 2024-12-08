@@ -28,14 +28,10 @@ object HighlightPlaceableNpcs {
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
     )
-
-    // TODO Please add regex tests
     private val clickToSetPattern by RepoPattern.pattern(
         "clicktoset",
         "§7§eClick to set the location of this NPC!",
     )
-
-    // TODO Please add regex tests
     private val clickToSpawnPattern by RepoPattern.pattern(
         "clicktospawn",
         "§elocation!",
@@ -84,9 +80,7 @@ object HighlightPlaceableNpcs {
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lore.isEmpty() ||
-            !(clickToSetPattern.matches(lore.last()) ||
-                clickToSpawnPattern.matches(lore.last()))) {
+        if (lore.isEmpty() || !(clickToSetPattern.matches(lore.last()) || clickToSpawnPattern.matches(lore.last()))) {
             return false
         }
 

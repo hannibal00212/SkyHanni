@@ -179,9 +179,6 @@ enum class HotmData(
         { level -> mapOf(HotmReward.MINING_SPEED to level * 40.0) },
     ),
 
-
-
-
     SUBTERRANEAN_FISHER(
         "Subterranean Fisher",
         40,
@@ -192,7 +189,6 @@ enum class HotmData(
                 HotmReward.SEA_CREATURE_CHANCE to 1 + (level * 0.1),
             )
         },
-
     ),
 
 
@@ -421,7 +417,8 @@ enum class HotmData(
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
-        val abilities = listOf(PICKOBULUS, MINING_SPEED_BOOST, MANIAC_MINER, GEMSTONE_INFUSION, ANOMALOUS_DESIRE, SHEER_FORCE)
+        val abilities =
+            listOf(PICKOBULUS, MINING_SPEED_BOOST, MANIAC_MINER, GEMSTONE_INFUSION, ANOMALOUS_DESIRE, SHEER_FORCE)
 
         private val inventoryPattern by patternGroup.pattern(
             "inventory",
@@ -439,19 +436,32 @@ enum class HotmData(
 
         private val notUnlockedPattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(§.)*Requires.*|.*Mountain!|(§.)*Click to unlock!|",
+            "(?:§.)*Requires.*|.*Mountain!|(?:§.)*Click to unlock!|",
         )
 
+        /**
+         * REGEX-TEST: §a§lSELECTED
+         * REGEX-TEST: §a§lENABLED
+         */
         private val enabledPattern by patternGroup.pattern(
             "perk.enable",
-            "§a§lENABLED|(§.)*SELECTED",
+            "§a§lENABLED|(?:§.)*SELECTED",
         )
+
+        /**
+         * REGEX-TEST: §eClick to select!
+         * REGEX-TEST: §c§lDISABLED
+         */
+        @Suppress("UnusedPrivateProperty")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
-            "§c§lDISABLED|§7§eClick to select!",
+            "§c§lDISABLED|§eClick to select!",
         ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 
+        /**
+         * REGEX-TEST: §7Cost
+         */
         val perkCostPattern by patternGroup.pattern(
             "perk.cost",
             "(?:§.)*§7Cost",
@@ -459,7 +469,7 @@ enum class HotmData(
 
         private val resetChatPattern by patternGroup.pattern(
             "reset.chat",
-            "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset.",
+            "§aReset your §r§5Heart of the Mountain§r§a! Your Perks and Abilities have been reset\\.",
         )
 
         private val heartItemPattern by patternGroup.pattern(
@@ -471,11 +481,17 @@ enum class HotmData(
             "§cReset Heart of the Mountain",
         )
 
+        /**
+         * REGEX-TEST: §7Token of the Mountain: §515
+         */
         private val heartTokensPattern by patternGroup.pattern(
             "inventory.heart.token",
             "§7Token of the Mountain: §5(?<token>\\d+)",
         )
 
+        /**
+         * REGEX-TEST:   §8- §54 Token of the Mountain
+         */
         private val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
             "\\s+§8- §5(?<token>\\d+) Token of the Mountain",
@@ -497,7 +513,7 @@ enum class HotmData(
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder",
-            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)"
+            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)",
         )
 
         var inInventory = false
@@ -529,7 +545,7 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
-            (0..CORE_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
+            for (level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
                 val map = mutableMapOf<HotmReward, Double>()
                 if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
                 if (level >= 2) map.addOrPut(HotmReward.ABILITY_LEVEL, 1.0)
@@ -622,7 +638,7 @@ enum class HotmData(
 
                 HotmAPI.PowderType.entries.forEach {
                     it.pattern(isHeartItem).matchMatcher(line) {
-                        val powder = group("powder").replace(",", "").toLong()
+                        val powder = group("powder").formatLong()
                         if (isHeartItem) {
                             it.setCurrent(powder)
                         }
@@ -678,7 +694,7 @@ enum class HotmData(
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            ScoreboardPattern.powderPattern.firstMatcher(event.scoreboard) {
+            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
@@ -716,7 +732,7 @@ enum class HotmData(
             event.lines.forEach {
                 powderPattern.matchMatcher(it) {
                     val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
-                    val amount = group("amount").replace(",", "").toLong()
+                    val amount = group("amount").formatLong()
                     val difference = amount - type.getCurrent()
 
                     if (difference > 0) {

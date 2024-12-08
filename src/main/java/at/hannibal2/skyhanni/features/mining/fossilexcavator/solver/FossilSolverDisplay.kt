@@ -33,10 +33,18 @@ object FossilSolverDisplay {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+
+    /**
+     * REGEX-TEST: Chisel Charges Remaining: 3
+     */
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
         "Chisel Charges Remaining: (?<charges>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: Fossil Excavation Progress: 8.3%
+     */
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",
         "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
@@ -188,7 +196,7 @@ object FossilSolverDisplay {
 
         if (inExcavatorMenu) {
             // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
-            config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator Solver")
+            config.position.renderString("§eExcavator solver GUI", posLabel = "Fossil Excavator Solver")
             return
         }
 

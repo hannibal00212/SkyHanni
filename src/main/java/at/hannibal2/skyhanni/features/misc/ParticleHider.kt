@@ -25,12 +25,16 @@ object ParticleHider {
         }
 
         val type = event.type
-        if (SkyHanniMod.feature.misc.particleHiders.hideCloseRedstoneParticles && type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2) {
+        if (SkyHanniMod.feature.misc.particleHiders.hideCloseRedstoneParticles &&
+            type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2
+        ) {
             event.cancel()
             return
         }
 
-        if (SkyHanniMod.feature.misc.particleHiders.hideFireballParticles && (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)) {
+        if (SkyHanniMod.feature.misc.particleHiders.hideFireballParticles &&
+            (type == EnumParticleTypes.SMOKE_NORMAL || type == EnumParticleTypes.SMOKE_LARGE)
+        ) {
             for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
                 val distance = entity.getLorenzVec().distance(event.location)
                 if (distance < 5) {

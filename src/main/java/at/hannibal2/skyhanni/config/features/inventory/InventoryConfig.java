@@ -85,6 +85,11 @@ public class InventoryConfig {
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
+    @ConfigOption(name = "Focus Mode", desc="")
+    @Accordion
+    public FocusModeConfig focusMode = new FocusModeConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
@@ -130,6 +135,11 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
+
+    @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
@@ -138,6 +148,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Fann Cost Per XP/Bits", desc = "")
     @Accordion
     public FannCostConfig fannCost = new FannCostConfig();
+
+    @Expose
+    @ConfigOption(name = "Attribute Overlay", desc = "")
+    @Accordion
+    public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -237,6 +252,12 @@ public class InventoryConfig {
     public boolean itemStars = false;
 
     @Expose
+    @ConfigOption(name = "Ultimate Enchant Star", desc = "Show a star on Enchanted Books with an Ultimate Enchant.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ultimateEnchantStar = false;
+
+    @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
     // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
@@ -299,8 +320,21 @@ public class InventoryConfig {
     public boolean hexAsColorInLore = true;
 
     @Expose
+    @ConfigOption(name = "Essence Shop Helper", desc = "Show extra information about remaining upgrades in essence shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean essenceShopHelper = true;
+
+    @Expose
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean snakeGameKeybinds = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightActiveBeaconEffect = true;
+
 }

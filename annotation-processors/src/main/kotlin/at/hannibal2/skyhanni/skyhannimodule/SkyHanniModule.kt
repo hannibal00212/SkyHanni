@@ -7,4 +7,8 @@ annotation class SkyHanniModule(
      * If the module will only be loaded in a development environment.
      */
     val devOnly: Boolean = false,
+    /**
+     * If the module will only be loaded while neu is installed
+     */
+    val neuRequired: Boolean = false,
 )

@@ -21,7 +21,7 @@ object CompactExperimentRewards {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    private var gainedRewards = mutableListOf<String>()
+    private val gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()
     private var currentMessage = ""
 
@@ -89,7 +89,7 @@ object CompactExperimentRewards {
     }
 
     private fun sendMessage(reward: String?) {
-        if (gainedRewards.last() != reward || currentMessage == "") return
+        if (gainedRewards.lastOrNull() != reward || currentMessage == "") return
 
         val expList = mutableListOf<String>().apply {
             gainedRewards.forEach { add("§8+$it") }

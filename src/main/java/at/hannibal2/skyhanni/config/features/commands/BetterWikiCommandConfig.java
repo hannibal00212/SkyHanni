@@ -53,7 +53,7 @@ public class BetterWikiCommandConfig {
     public boolean menuOpenWiki = false;
 
     @Expose
-    @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Wiki with this keybind.\n" +
+    @ConfigOption(name = "Wiki Key", desc = "Search for an item's wiki page with this keybind.\n" +
         "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int wikiKeybind = Keyboard.KEY_NONE;

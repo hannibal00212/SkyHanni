@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -32,5 +33,10 @@ public class MixinGuiScreen {
     @Inject(method = "handleKeyboardInput", at = @At("HEAD"), cancellable = true)
     public void handleKeyboardInput(CallbackInfo ci) {
         TextInput.Companion.onGuiInput(ci);
+    }
+
+    @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;isShiftKeyDown()Z"))
+    public boolean handleComponentClick() {
+        return false;
     }
 }

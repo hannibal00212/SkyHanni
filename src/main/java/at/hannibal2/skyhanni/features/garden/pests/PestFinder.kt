@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,10 +42,6 @@ object PestFinder {
     private val config get() = PestAPI.config.pestFinder
 
     private var display = emptyList<Renderable>()
-    val noPestsChatPattern by RepoPattern.pattern(
-        "chat.garden.no.pest",
-        "§cThere are not any Pests on your Garden right now! Keep farming!",
-    )
 
     @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
@@ -118,12 +113,15 @@ object PestFinder {
         }
     }
 
+    private fun heldItemDisabled() = config.onlyWithVacuum && !PestAPI.hasVacuumInHand()
+    private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+
     // priority to low so that this happens after other renderPlot calls.
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+        if (heldItemDisabled() && timePassedDisabled()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -157,8 +155,8 @@ object PestFinder {
         val isInaccurate = plot.isPestCountInaccurate
         val location = playerLocation.copy(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-        val text = "§e" + (if (isInaccurate) "?" else
-            pests
+        val text = "§e" + (
+            if (isInaccurate) "?" else pests
             ) + " §c$pestsName §7in §b$plotName"
         event.drawDynamicText(
             location, text, 1.5,
@@ -172,7 +170,7 @@ object PestFinder {
         if (!GardenAPI.inGarden()) return
         if (!config.noPestTitle) return
 
-        if (noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
+        if (PestAPI.noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
     }
 
     @SubscribeEvent

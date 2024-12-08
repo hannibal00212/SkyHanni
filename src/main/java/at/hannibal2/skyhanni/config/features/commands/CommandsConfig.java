@@ -55,8 +55,7 @@ public class CommandsConfig {
     public boolean transferCooldown = false;
 
     @Expose
-    @ConfigOption(name = "Transfer Cooldown Ended Message", desc = "Sends a message in chat when the transfer cooldown ends.")
+    @ConfigOption(name = "Transfer Cooldown Message", desc = "Sends a message in chat when the transfer cooldown ends.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean transferCooldownMessage = false;
 }

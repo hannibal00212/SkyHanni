@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -35,15 +37,14 @@ object ExperimentationTableAPI {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(experimentationTableSkull) } ?: return
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
-    private val experimentationTableSkull =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
-            "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
-
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**
@@ -68,7 +69,7 @@ object ExperimentationTableAPI {
      */
     val rewardPattern by patternGroup.pattern(
         "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish",
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish",
     )
 
     /**
@@ -117,9 +118,25 @@ object ExperimentationTableAPI {
     /**
      * REGEX-TEST: Titanic Experience Bottle
      */
+    val experienceBottleChatPattern by patternGroup.pattern(
+        "chat.xpbottle",
+        "(?:Colossal |Titanic |Grand |\\b)Experience Bottle",
+    )
+
+    /**
+     * REGEX-TEST: TITANIC_EXP_BOTTLE
+     */
     val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
-        "(?:Titanic |Grand |\\b)Experience Bottle",
+        "(?:COLOSSAL_|TITANIC_|GRAND_|\\b)EXP_BOTTLE",
+    )
+
+    /**
+     * REGEX-TEST: Remaining Clicks: 22
+     */
+    val remainingClicksPattern by patternGroup.pattern(
+        "clicks",
+        "Remaining Clicks: (?<clicks>\\d+)"
     )
 
     /**
@@ -150,8 +167,10 @@ object ExperimentationTableAPI {
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
      */
-    val petNamePattern by patternGroup.pattern(
+    private val petNamePattern by patternGroup.pattern(
         "guardianpet",
         "§[956d]Guardian.*",
     )
+
+    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet)
 }

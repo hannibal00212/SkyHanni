@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConf
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -33,6 +34,7 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
+    // TODO rename to "openedRewards" ?
     private var unclosedRewards = false
 
     /**
@@ -61,10 +63,12 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§66§r§c to mine Ruby Gemstone Block§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
+     * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§64§r§c to mine Mithril§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
      */
+    @Suppress("MaxLineLength")
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
-        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!.+",
+        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine .+",
     )
 
     /**
@@ -101,22 +105,22 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:    §r§a§r§aGreen Goblin Egg
-     * REGEX-TEST:    §r§9Goblin Egg
-     * REGEX-TEST:    §r§dDiamond Essence
-     * REGEX-TEST:    §r§dGold Essence
-     * REGEX-TEST:    §r§dGold Essence §r§8x3
-     * REGEX-TEST:    §r§dGemstone Powder §r§8x537
-     * REGEX-TEST:    §r§dDiamond Essence §r§8x2
-     * REGEX-TEST:    §r§2Mithril Powder §r§8x153
-     * REGEX-TEST:    §r§5Treasurite
-     * REGEX-TEST:    §r§f⸕ Rough Amber Gemstone §r§8x24
-     * REGEX-TEST:    §r§f❤ Rough Ruby Gemstone §r§8x24
-     * REGEX-TEST:    §r§f❈ Rough Amethyst Gemstone §r§8x24
-     * REGEX-TEST:    §r§9§r§eYellow Goblin Egg
-     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone
-     * REGEX-TEST:    §r§aWishing Compass §r§8x3
-     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone §r§8x2
+     * REGEX-TEST:     §r§a§r§aGreen Goblin Egg
+     * REGEX-TEST:     §r§9Goblin Egg
+     * REGEX-TEST:     §r§dDiamond Essence
+     * REGEX-TEST:     §r§dGold Essence
+     * REGEX-TEST:     §r§dGold Essence §r§8x3
+     * REGEX-TEST:     §r§dGemstone Powder §r§8x537
+     * REGEX-TEST:     §r§dDiamond Essence §r§8x2
+     * REGEX-TEST:     §r§2Mithril Powder §r§8x153
+     * REGEX-TEST:     §r§5Treasurite
+     * REGEX-TEST:     §r§f⸕ Rough Amber Gemstone §r§8x24
+     * REGEX-TEST:     §r§f❤ Rough Ruby Gemstone §r§8x24
+     * REGEX-TEST:     §r§f❈ Rough Amethyst Gemstone §r§8x24
+     * REGEX-TEST:     §r§9§r§eYellow Goblin Egg
+     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone
+     * REGEX-TEST:     §r§aWishing Compass §r§8x3
+     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone §r§8x2
      */
     val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
@@ -129,7 +133,7 @@ object PowderMiningChatFilter {
      */
     private val powderRewardPattern by patternGroup.pattern(
         "reward.powder",
-        "§r§[d2](?:Gemstone|Mithril) Powder( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[d2](?:Gemstone|Mithril) Powder(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -140,7 +144,7 @@ object PowderMiningChatFilter {
      */
     private val essenceRewardPattern by patternGroup.pattern(
         "reward.essence",
-        "§r§d(?:Gold|Diamond) Essence( §r§8x(?<amount>[\\d,]+))?",
+        "§r§d(?:Gold|Diamond) Essence(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -148,7 +152,7 @@ object PowderMiningChatFilter {
      */
     private val ascensionRopeRewardPattern by patternGroup.pattern(
         "reward.ascensionrope",
-        "§r§9Ascension Rope( §r§8x(?<amount>[\\d,]+))?",
+        "§r§9Ascension Rope(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -156,7 +160,7 @@ object PowderMiningChatFilter {
      */
     private val wishingCompassRewardPattern by patternGroup.pattern(
         "reward.wishingcompass",
-        "§r§aWishing Compass( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aWishing Compass(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -164,7 +168,7 @@ object PowderMiningChatFilter {
      */
     private val oilBarrelRewardPattern by patternGroup.pattern(
         "reward.oilbarrel",
-        "§r§aOil Barrel( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aOil Barrel(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -172,7 +176,7 @@ object PowderMiningChatFilter {
      */
     private val prehistoricEggPattern by patternGroup.pattern(
         "reward.prehistoricegg",
-        "§r§fPrehistoric Egg( §r§8x(?<amount>[\\d,]+))?",
+        "§r§fPrehistoric Egg(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -180,7 +184,7 @@ object PowderMiningChatFilter {
      */
     private val pickonimbusPattern by patternGroup.pattern(
         "reward.pickonimbus",
-        "§r§5Pickonimbus 2000( §r§8x(?<amount>[\\d,]+))?",
+        "§r§5Pickonimbus 2000(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -188,7 +192,7 @@ object PowderMiningChatFilter {
      */
     private val jungleHeartPattern by patternGroup.pattern(
         "reward.jungleheart",
-        "§r§6Jungle Heart( §r§8x(?<amount>[\\d,]+))?",
+        "§r§6Jungle Heart(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -196,7 +200,7 @@ object PowderMiningChatFilter {
      */
     private val sludgeJuicePattern by patternGroup.pattern(
         "reward.sludgejuice",
-        "§r§aSludge Juice( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aSludge Juice(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -204,7 +208,7 @@ object PowderMiningChatFilter {
      */
     private val yoggiePattern by patternGroup.pattern(
         "reward.yoggie",
-        "§r§aYoggie( §r§8x(?<amount>[\\d,]+))?",
+        "§r§aYoggie(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -215,9 +219,10 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§9Electron Transmitter
      * REGEX-TEST: §r§9Superlite Motor
      */
+    @Suppress("MaxLineLength")
     private val robotPartsPattern by patternGroup.pattern(
         "reward.robotparts",
-        "§r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)( §r§8x(?<amount>[\\d,]+))?",
+        "§r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -225,7 +230,7 @@ object PowderMiningChatFilter {
      */
     private val treasuritePattern by patternGroup.pattern(
         "reward.treasurite",
-        "§r§5Treasurite( §r§8x(?<amount>[\\d,]+))?",
+        "§r§5Treasurite(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -238,7 +243,7 @@ object PowderMiningChatFilter {
      */
     private val goblinEggPattern by patternGroup.pattern(
         "reward.goblineggs",
-        "(?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg( §r§8x(?<amount>[\\d,]+))?",
+        "(?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     /**
@@ -246,12 +251,16 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§a❈ Flawed Amethyst Gemstone §r§8x4
      * REGEX-TEST: §r§9⸕ Fine Amber Gemstone
      * REGEX-TEST: §r§5⸕ Flawless Amber Gemstone
+     * REGEX-TEST: §r§f❁ Rough Jasper Gemstone §r§8x24
+     * REGEX-TEST: §r§a❁ Flawed Jasper Gemstone
      */
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
+    @Suppress("CyclomaticComplexMethod")
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
@@ -275,18 +284,18 @@ object PowderMiningChatFilter {
         // To simplify regex statements, this check is done outside
         val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
 
-        //Powder
+        // Powder
         powderRewardPattern.matchMatcher(ssMessage) {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
-                val amountParsed = amountStr.replace(",", "").toInt()
+                val amountParsed = amountStr.formatInt()
                 return if (amountParsed < config.powderFilterThreshold) "powder_mining_powder"
                 else "no_filter"
             }
         }
 
-        //Essence
+        // Essence
         essenceRewardPattern.matchMatcher(ssMessage) {
             if (config.essenceFilterThreshold == 20) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: "1"
@@ -301,11 +310,12 @@ object PowderMiningChatFilter {
         blockGoblinEggs(ssMessage)?.let { return it }
         blockGemstones(ssMessage)?.let { return it }
 
-        //Fallback default
+        // Fallback default
         return null
     }
 
-    var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
+        emptyMap()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -339,7 +349,7 @@ object PowderMiningChatFilter {
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
             return when (val colorStr = groupOrNull("color")?.lowercase()) {
-                //'Colorless', base goblin eggs will never be shown in this code path
+                // 'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
                     "powder_mining_goblin_eggs"
@@ -358,7 +368,7 @@ object PowderMiningChatFilter {
                 else -> {
                     ErrorManager.logErrorWithData(
                         NoSuchElementException(),
-                        "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
+                        "Unknown Goblin Egg color detected in Powder Mining Filter: '$colorStr' - please report this in the Discord!",
                         noStackTrace = true,
                     )
                     "no_filter"
@@ -380,7 +390,8 @@ object PowderMiningChatFilter {
                 "amethyst" -> gemstoneConfig.amethystGemstones
                 "jade" -> gemstoneConfig.jadeGemstones
                 "topaz" -> gemstoneConfig.topazGemstones
-                //Failure case that should never be reached
+                "jasper" -> gemstoneConfig.jasperGemstones
+                // Failure case that should never be reached
                 else -> return "no_filter"
             }
 

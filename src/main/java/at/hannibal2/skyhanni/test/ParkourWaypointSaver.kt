@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -77,7 +77,7 @@ object ParkourWaypointSaver {
         } else {
             for (location in locations) {
                 val aabb = location.boundingToOffset(1.0, 1.0, 1.0).expandBlock()
-                event.drawFilledBoundingBox_nea(aabb, LorenzColor.GREEN.toColor(), 1f)
+                event.drawFilledBoundingBoxNea(aabb, LorenzColor.GREEN.toColor(), 1f)
             }
         }
     }

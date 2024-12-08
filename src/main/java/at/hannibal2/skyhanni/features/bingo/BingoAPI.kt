@@ -111,7 +111,7 @@ object BingoAPI {
     } + LorenzUtils.formatPercentage(percentage)
 
     fun getBingoIcon(rank: Int): String {
-        val rankIcon = getIcon(rank) ?: ""
+        val rankIcon = getIcon(rank).orEmpty()
         return if (rank != -1) {
             "$rankIcon $rank"
         } else {

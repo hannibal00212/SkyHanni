@@ -28,7 +28,8 @@ object JoinCrystalHollows {
         if (message == "§cYou do not have an active Crystal Hollows pass!") {
             lastWrongPassTime = System.currentTimeMillis()
             if (!IslandType.DWARVEN_MINES.isInIsland()) {
-                ChatUtils.clickableChat("Click here to warp to Dwarven Mines!",
+                ChatUtils.clickableChat(
+                    "Click here to warp to Dwarven Mines!",
                     onClick = {
                         HypixelCommands.warp("mines")
                     }, "§eClick to run /warp mines!"

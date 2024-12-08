@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -83,7 +84,7 @@ object FishingProfitTracker {
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {
             // TODO find better way to tell if the item is a trophy
-            val neuInternalNames = itemCategories["Trophy Fish"]!!
+            val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
             return if (internalName in neuInternalNames) {
                 SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingAPI.getFilletPerTrophy(internalName)
@@ -96,10 +97,10 @@ object FishingProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
-    private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
+    private val MAGMA_FISH by lazy { "MAGMA_FISH".toInternalName() }
 
-    private val nameAll: CategoryName = "All"
-    private var currentCategory: CategoryName = nameAll
+    private const val NAME_ALL: CategoryName = "All"
+    private var currentCategory: CategoryName = NAME_ALL
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
@@ -110,7 +111,7 @@ object FishingProfitTracker {
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[nameAll] = data.items.size
+        map[NAME_ALL] = data.items.size
         for ((name, items) in itemCategories) {
             val amount = items.count { it in data.items }
             if (amount > 0) {
@@ -145,7 +146,7 @@ object FishingProfitTracker {
         checkMissingItems(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = nameAll
+            currentCategory = NAME_ALL
         }
 
         if (tracker.isInventoryOpen()) {
@@ -160,11 +161,10 @@ object FishingProfitTracker {
             )
         }
 
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
+        val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
-            val items = itemCategories[currentCategory]!!
-            { it in items }
+            { it in (itemCategories[currentCategory].orEmpty()) }
         }
         return filter
     }
@@ -187,7 +187,7 @@ object FishingProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
@@ -244,7 +244,7 @@ object FishingProfitTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         tracker.firstUpdate()
     }

@@ -22,13 +22,13 @@ object Text {
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
         val result = ChatComponentText("")
-        components.forEachIndexed { index, it ->
-            when (it) {
-                is IChatComponent -> result.appendSibling(it)
-                is String -> result.appendText(it)
-                is List<*> -> result.appendSibling(join(*it.toTypedArray(), separator = separator))
+        components.forEachIndexed { index, component ->
+            when (component) {
+                is IChatComponent -> result.appendSibling(component)
+                is String -> result.appendText(component)
+                is List<*> -> result.appendSibling(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
-                else -> error("Unsupported type: ${it::class.simpleName}")
+                else -> error("Unsupported type: ${component::class.simpleName}")
             }
 
             if (index < components.size - 1 && separator != null) {

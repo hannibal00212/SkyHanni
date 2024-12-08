@@ -38,7 +38,7 @@ object GuildAPI {
         }
     }
 
-    fun isInGuild(name: String) = ProfileStorageData.playerSpecific?.guildMembers?.let {
-        name in it
-    } ?: false
+    fun isInGuild(name: String) = name in getAllMembers()
+
+    fun getAllMembers() = ProfileStorageData.playerSpecific?.guildMembers.orEmpty()
 }

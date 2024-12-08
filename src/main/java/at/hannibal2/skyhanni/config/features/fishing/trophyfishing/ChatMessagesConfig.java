@@ -82,4 +82,19 @@ public class ChatMessagesConfig {
     @ConfigOption(name = "Silver Duplicates", desc = "Hide duplicate messages for silver Trophy Fishes from chat.")
     @ConfigEditorBoolean
     public boolean silverHider = false;
+
+    @Expose
+    @ConfigOption(name = "Gold Alert", desc = "Send an alert upon catching a gold Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean goldAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Diamond Alert", desc = "Send an alert upon catching a diamond Trophy Fish.")
+    @ConfigEditorBoolean
+    public boolean diamondAlert = false;
+
+    @Expose
+    @ConfigOption(name = "Play Sound Alert", desc = "Play a sound effect when rare trophy fishes are caught.")
+    @ConfigEditorBoolean
+    public boolean playSound = true;
 }

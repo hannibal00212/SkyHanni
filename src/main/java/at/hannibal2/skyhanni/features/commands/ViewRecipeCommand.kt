@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -30,12 +31,20 @@ object ViewRecipeCommand {
         if (!config.viewRecipeLowerCase) return
         if (event.senderIsSkyhanni()) return
 
-        val item = pattern.matchMatcher(event.message.lowercase()) {
-            group("item").uppercase().replace(" ", "_")
+        val input = pattern.matchMatcher(event.message.lowercase()) {
+            group("item").uppercase()
         } ?: return
 
+        val args = input.split(" ")
+        val endsWithPageNumber = args.last().isInt()
+        val finalCommand = if (endsWithPageNumber) {
+            "${args.dropLast(1).joinToString("_")} ${args.last()}"
+        } else {
+            input.replace(" ", "_")
+        }
+
         event.cancel()
-        HypixelCommands.viewRecipe(item)
+        HypixelCommands.viewRecipe(finalCommand)
     }
 
     val list by lazy {

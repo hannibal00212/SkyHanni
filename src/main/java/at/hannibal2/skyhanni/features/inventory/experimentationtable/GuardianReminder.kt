@@ -2,16 +2,14 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -30,19 +28,20 @@ object GuardianReminder {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private var lastInventoryOpen = SimpleTimeMark.farPast()
-    private var lastWarn = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Experimentation Table") return
-        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
-
         lastInventoryOpen = SimpleTimeMark.now()
 
-        if (lastWarn.passedSince() < 5.seconds) return
-        lastWarn = SimpleTimeMark.now()
+        DelayedRun.runDelayed(200.milliseconds, ::warn)
+    }
+
+    private fun warn() {
+        if (ExperimentationTableAPI.hasGuardianPet()) return
+
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
             config::guardianReminder,
@@ -56,6 +55,7 @@ object GuardianReminder {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
+        if (ExperimentationTableAPI.hasGuardianPet()) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         sendTitle(gui.width, gui.height)
@@ -71,7 +71,7 @@ object GuardianReminder {
         GlStateManager.translate(0f, -150f, 500f)
         Renderable.drawInsideRoundedRect(
             Renderable.string("§cWrong Pet equipped!", 1.5),
-            Color(Color.DARK_GRAY.withAlpha(0), true),
+            Color.DARK_GRAY,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 125, width, height)

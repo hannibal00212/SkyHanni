@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -17,12 +18,12 @@ import at.hannibal2.skyhanni.features.fishing.FishingAPI.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,10 +35,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
@@ -53,18 +53,34 @@ object GoldenFishTimer {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.goldenFishTimer
 
     private val patternGroup = RepoPattern.group("fishing.goldenfish")
+
+    /**
+     * REGEX-TEST: §9You spot a §r§6Golden Fish §r§9surface from beneath the lava!
+     */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
         "§9You spot a §r§6Golden Fish §r§9surface from beneath the lava!",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9escapes your hook but looks weakened.
+     */
     private val interactPattern by patternGroup.pattern(
         "interact",
         "§9The §r§6Golden Fish §r§9escapes your hook but looks weakened\\.",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9is weak!
+     */
     private val weakPattern by patternGroup.pattern(
         "weak",
         "§9The §r§6Golden Fish §r§9is weak!",
     )
+
+    /**
+     * REGEX-TEST: §9The §r§6Golden Fish §r§9swims back beneath the lava...
+     */
     private val despawnPattern by patternGroup.pattern(
         "despawn",
         "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\.",
@@ -73,7 +89,8 @@ object GoldenFishTimer {
     private val timeOut = 10.seconds
     private val despawnTime = 1.minutes
     private val maxRodTime = 3.minutes
-    private val minimumSpawnTime = 15.minutes
+    private val minimumSpawnTime = 8.minutes
+    private val maximumSpawnTime = 12.minutes
     private const val MAX_INTERACTIONS = 3
 
     private var lastFishEntity = SimpleTimeMark.farPast()
@@ -88,15 +105,14 @@ object GoldenFishTimer {
     private val isFishing get() = FishingAPI.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
 
-    private fun checkGoldenFish(entity: EntityLivingBase) {
-        if (entity.inventory.none { it?.getSkullTexture() == GOLDEN_FISH_SKULL_TEXTURE }) return
+    private fun checkGoldenFish(entity: EntityArmorStand) {
+        if (!entity.wearingSkullTexture(GOLDEN_FISH_SKULL_TEXTURE)) return
         possibleGoldenFishEntity = entity
         lastFishEntity = SimpleTimeMark.now()
         handle()
     }
 
-    private const val GOLDEN_FISH_SKULL_TEXTURE =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzgzMTA2MDE5OCwKICAicHJvZmlsZUlkIiA6ICJiN2ZkYmU2N2NkMDA0NjgzYjlmYTllM2UxNzczODI1NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJDVUNGTDE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzEyMGNmM2MwYTQwZmM2N2UwZTVmZTBjNDZiMGFlNDA5YWM3MTAzMGE3NjU2ZGExN2IxMWVkMDAxNjQ1ODg4ZmUiCiAgICB9CiAgfQp9"
+    private val GOLDEN_FISH_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("GOLDEN_FISH") }
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
@@ -132,7 +148,7 @@ object GoldenFishTimer {
             val entity = confirmedGoldenFishEntity ?: return
             if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
-                LorenzColor.GREEN.toColor().withAlpha(100)
+                LorenzColor.GREEN.toColor().addAlpha(100),
             ) { true }
             return
         }
@@ -188,7 +204,7 @@ object GoldenFishTimer {
             if (!isGoldenFishActive()) {
                 if (lastGoldenFishTime.isFarPast()) add("§7Last Golden Fish: §cNone this session")
                 else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
-                if (lastRodThrowTime.isFarPast()) add("§7Last Row Throw: §cNone yet")
+                if (lastRodThrowTime.isFarPast()) add("§7Last Rod Throw: §cNone yet")
                 else add(
                     "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
                         "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
@@ -201,7 +217,8 @@ object GoldenFishTimer {
                 )
                 else {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
-                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
+                    val diff = maximumSpawnTime - minimumSpawnTime
+                    val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
                     add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
                 }
             } else {
@@ -260,19 +277,18 @@ object GoldenFishTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         if (!isActive()) return
         goingDownInit = true
         goingDownPost = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isActive()) return
         if (isGoldenFishActive()) return
         val entity = event.entity as? EntityArmorStand ?: return
-        entity.inventory.forEach { it?.getSkullTexture()?.let { texture -> println(texture) } }
 
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }

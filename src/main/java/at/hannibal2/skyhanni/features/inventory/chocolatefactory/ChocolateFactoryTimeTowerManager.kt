@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -23,6 +22,7 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
     @SubscribeEvent
@@ -45,24 +45,30 @@ object ChocolateFactoryTimeTowerManager {
 
         if (ChocolateFactoryAPI.inChocolateFactory) return
 
-        val nextCharge = profileStorage.nextTimeTower
+        if (timeTowerFullTimeMark().isInPast()) {
+            profileStorage.currentTimeTowerUses = maxCharges()
+        } else {
+            var nextCharge = profileStorage.nextTimeTower
+            while (nextCharge.isInPast() && !nextCharge.isFarPast()) {
+                profileStorage.currentTimeTowerUses++
+                nextCharge += ChocolateFactoryAPI.timeTowerChargeDuration()
+                profileStorage.nextTimeTower = nextCharge
+                warnAboutNewCharge = true
+            }
+        }
 
-        if (nextCharge.isInPast() && !nextCharge.isFarPast() && currentCharges() < maxCharges()) {
-            profileStorage.currentTimeTowerUses++
-
-            val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
-            profileStorage.nextTimeTower = nextTimeTower
-
+        if (currentCharges() > 0 && currentCharges() < maxCharges()) {
             if (!config.timeTowerWarning || timeTowerActive()) return
+            if (!warnAboutNewCharge) return
             ChatUtils.clickableChat(
-                "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
-                    "Click here to use one.",
+                "Your Time Tower has an available charge §7(${timeTowerCharges()})§e. " +
+                    "Click here to open the Chocolate Factory menu.",
                 onClick = { HypixelCommands.chocolateFactory() },
                 HOVER_TEXT,
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
-            return
+            warnAboutNewCharge = false
         }
         checkTimeTowerWarning(false)
     }
@@ -72,7 +78,8 @@ object ChocolateFactoryTimeTowerManager {
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
             val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
-                "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
+                "§cYour Time Tower just expired and has $charges remaining. " +
+                    "Click here to open the Chocolate Factory Menu.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
@@ -88,12 +95,14 @@ object ChocolateFactoryTimeTowerManager {
         if (!config.timeTowerWarning) return
         if (!timeTowerFull()) return
         if (ReminderUtils.isBusy()) return
+        if (maxCharges() == 0) return
 
         val warningSeparation = if (inInventory) 30.seconds else 5.minutes
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
 
         ChatUtils.clickToActionOrDisable(
-            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages!",
+            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages! " +
+                "Click here to open the Chocolate Factory menu.",
             config::timeTowerWarning,
             actionName = "open Chocolate Factory",
             action = { HypixelCommands.chocolateFactory() },

@@ -72,7 +72,10 @@ object ShowMotesNpcSellPrice {
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
-            event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes §7($size x §d${(baseMotes / size).addSeparators()} Motes§7)")
+            event.toolTip.add(
+                "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
+                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)"
+            )
         } else {
             event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes")
         }
@@ -134,29 +137,31 @@ object ShowMotesNpcSellPrice {
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
-            newDisplay.add(buildList {
-                val (index, value) = pair
-                add("  §7- ")
-                val stack = internalName.getItemStack()
-                add(stack)
-                val price = value.formatPrice()
-                val valuePer = stack.motesNpcPrice() ?: continue
-                val tips = buildList {
-                    add("§6Item: ${stack.displayName}")
-                    add("§6Value per: §d$valuePer Motes")
-                    add("§6Total in chest: §d${(value / valuePer).toInt()}")
-                    add("")
-                    add("§6Total value: §d$price coins")
-                }
-                add(
-                    Renderable.hoverTips(
-                        "§6${stack.displayName}: §b$price",
-                        tips,
-                        highlightsOnHoverSlots = index,
-                        stack = stack
+            newDisplay.add(
+                buildList {
+                    val (index, value) = pair
+                    add("  §7- ")
+                    val stack = internalName.getItemStack()
+                    add(stack)
+                    val price = value.formatPrice()
+                    val valuePer = stack.motesNpcPrice() ?: continue
+                    val tips = buildList {
+                        add("§6Item: ${stack.displayName}")
+                        add("§6Value per: §d$valuePer Motes")
+                        add("§6Total in chest: §d${(value / valuePer).toInt()}")
+                        add("")
+                        add("§6Total value: §d$price coins")
+                    }
+                    add(
+                        Renderable.hoverTips(
+                            "§6${stack.displayName}: §b$price",
+                            tips,
+                            highlightsOnHoverSlots = index,
+                            stack = stack
+                        )
                     )
-                )
-            })
+                }
+            )
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         newDisplay.addAsSingletonList("§7Total price: §b$total")

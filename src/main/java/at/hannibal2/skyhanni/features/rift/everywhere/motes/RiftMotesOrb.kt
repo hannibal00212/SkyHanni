@@ -23,9 +23,13 @@ object RiftMotesOrb {
 
     private val config get() = RiftAPI.config.motesOrbs
 
+    /**
+     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
+     * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+25 Motes§r§d, recovered §r§a+2ф Rift Time§r§d!
+     */
     private val motesPattern by RepoPattern.pattern(
         "rift.everywhere.motesorb",
-        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*"
+        "§5§lORB! §r§dPicked up §r§5+.* Motes§r§d.*",
     )
 
     private var motesOrbs = emptyList<MotesOrb>()
@@ -87,7 +91,7 @@ object RiftMotesOrb {
                 orb.pickedUp = true
             }
 
-            val location = orb.location.add(y = 0.5)
+            val location = orb.location.up(0.5)
             val sizeOffset = (5 - config.size) * -0.1
             val color = if (orb.pickedUp) LorenzColor.GRAY else LorenzColor.LIGHT_PURPLE
             val text = color.getChatColor() + "Motes Orb"

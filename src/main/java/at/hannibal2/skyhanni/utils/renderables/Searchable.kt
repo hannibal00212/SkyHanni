@@ -9,14 +9,14 @@ fun Renderable.toSearchable(searchText: String? = null) = Searchable(this, searc
 fun Searchable.toRenderable() = renderable
 fun List<Searchable>.toRenderable() = map { it.toRenderable() }
 fun List<Searchable>.toMap() = associate { it.renderable to it.string }
-val searchPrefix = "§eSearch: §7"
+const val SEARCH_PREFIX = "§eSearch: §7"
 fun List<Searchable>.buildSearchBox(
     textInput: TextInput,
 ): Renderable {
     val key = 0
     return Renderable.searchBox(
         Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1),
-        searchPrefix,
+        SEARCH_PREFIX,
         onUpdateSize = { println("onUpdateSize") },
         textInput = textInput,
         key = key,
@@ -39,7 +39,7 @@ fun List<Searchable>.buildSearchableScrollable(
             scrollValue = scrollValue,
             velocity = velocity,
         ),
-        searchPrefix,
+        SEARCH_PREFIX,
         onUpdateSize = { println("onUpdateSize") },
         textInput = textInput,
         key = key,
@@ -51,7 +51,7 @@ fun Map<List<Renderable>, String?>.buildSearchableTable(): Renderable {
     val key = 0
     return Renderable.searchBox(
         Renderable.searchableTable(toMap(), textInput = textInput, key = key + 1),
-        searchPrefix,
+        SEARCH_PREFIX,
         onUpdateSize = { println("onUpdateSize") },
         textInput = textInput,
         key = key,

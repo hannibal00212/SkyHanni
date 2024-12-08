@@ -36,9 +36,9 @@ object SoopyGuessBurrow {
     private var guessPoint: LorenzVec? = null
 
     private var lastSoundPoint: LorenzVec? = null
-    private var locations = mutableListOf<LorenzVec>()
+    private val locations = mutableListOf<LorenzVec>()
 
-    private var dingSlope = mutableListOf<Float>()
+    private val dingSlope = mutableListOf<Float>()
 
     var distance: Double? = null
     private var distance2: Double? = null
@@ -122,7 +122,7 @@ object SoopyGuessBurrow {
         val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
 
         distance = distance2!!
-        val changesHelp = particlePoint?.subtract(lastParticlePoint2!!)!!
+        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
         var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
         changes = changes.map { o -> o / lineDist }
 
@@ -136,6 +136,7 @@ object SoopyGuessBurrow {
         }
     }
 
+    @Suppress("MaxLineLength")
     private fun solveEquationThing(x: LorenzVec, y: LorenzVec): LorenzVec {
         val a =
             (-y.x * x.y * x.x - y.y * x.y * x.z + y.y * x.y * x.x + x.y * x.z * y.z + x.x * x.z * y.x - x.x * x.z * y.z) / (x.y * y.x - x.y * y.z + x.x * y.z - y.x * x.z + y.y * x.z - y.y * x.x)
@@ -175,7 +176,8 @@ object SoopyGuessBurrow {
                     }
 
                     val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
+                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                        LorenzVec(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
                             slopeThing[slopeThing.size - 1]
@@ -245,7 +247,7 @@ object SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        BurrowGuessEvent(finalLocation).postAndCatch()
+                        BurrowGuessEvent(finalLocation).post()
                     }
                 }
             }
@@ -265,7 +267,7 @@ object SoopyGuessBurrow {
 
             distance = distance2!!
 
-            val changesHelp = particlePoint?.subtract(lastParticlePoint2!!)!!
+            val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
 
             var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
             changes = changes.map { o -> o / lineDist }

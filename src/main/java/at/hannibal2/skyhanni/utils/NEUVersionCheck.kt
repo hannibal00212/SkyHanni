@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.FMLCommonHandler
 import java.awt.Desktop
@@ -27,7 +28,10 @@ object NEUVersionCheck {
             val clazz = Class.forName("io.github.moulberry.notenoughupdates.util.ItemResolutionQuery")
 
             for (field in clazz.methods) {
-                if (field.name == "findInternalNameByDisplayName") return
+                if (field.name == "findInternalNameByDisplayName") {
+                    PlatformUtils.validNeuInstalled = true
+                    return
+                }
             }
         } catch (_: Throwable) {
         }
@@ -35,6 +39,7 @@ object NEUVersionCheck {
     }
 
     private fun neuWarning(what: String) {
+        System.err.println("SkyHanni-@MOD_VERSION@ ${"failed to find NotEnoughUpdates! Reason: $what"}")
         openPopupWindow(
             "NotEnoughUpdates is $what!\n" +
                 "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
@@ -52,6 +57,7 @@ object NEUVersionCheck {
     /**
      * Taken and modified from Skytils
      */
+    @Suppress("PrintStackTrace")
     private fun openPopupWindow(errorMessage: String, vararg options: Pair<String, String>) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())

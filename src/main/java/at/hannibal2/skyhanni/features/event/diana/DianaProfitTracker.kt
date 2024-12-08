@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -41,7 +42,7 @@ object DianaProfitTracker {
     private val patternGroup = RepoPattern.group("diana.chat")
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
+        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
     )
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
@@ -107,7 +108,7 @@ object DianaProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!(DianaAPI.isDoingDiana() && config.enabled)) return
 
@@ -139,7 +140,9 @@ object DianaProfitTracker {
             tryHide(event)
         }
 
-        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" || message == "§eFollow the arrows to find the §r§6treasure§r§e!") {
+        if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
+            message == "§eFollow the arrows to find the §r§6treasure§r§e!"
+        ) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }

@@ -32,9 +32,10 @@ object GardenVisitorCompactChat {
      * REGEX-TEST:     §7§8+§d1,241 Gemstone Powder
      * REGEX-TEST:     §7§8+§2Crystal Hollows Pass
      */
+    @Suppress("MaxLineLength")
     private val visitorRewardPattern by patternGroup.pattern(
         "visitorreward",
-        "^ {4}(?:(?:§.)+\\+)?(?:(?<amountcolor>§.)(?<amount>[\\d,]+(?:\\.?(?:\\d)?k)?)x? )?(?:(?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: (?:(?:§.)?)?x(?<altamount>\\d+))?\$"
+        "^ {4}(?:(?:§.)+\\+)?(?:(?<amountcolor>§.)(?<amount>[\\d,]+(?:\\.?(?:\\d)?k)?)x? )?(?:(?<rewardcolor>(?:§.)+)?(?<reward>.*?))(?: (?:(?:§.)?)?x(?<altamount>\\d+))?\$",
     )
 
     /**
@@ -44,19 +45,31 @@ object GardenVisitorCompactChat {
      */
     private val fullyAcceptedPattern by patternGroup.pattern(
         "fullyaccepted",
-        "§6§lOFFER ACCEPTED §8with (?<color>§.)?(?<name>.*) §8\\((?<rarity>.*)\\)"
+        "§6§lOFFER ACCEPTED §8with (?<color>§.)?(?<name>.*) §8\\((?<rarity>.*)\\)",
     )
+
+    /**
+     * REGEX-TEST: Copper
+     * REGEX-TEST: Farming XP
+     * REGEX-TEST: Farming Experience
+     * REGEX-TEST: Garden Experience
+     * REGEX-TEST: Bits
+     */
     private val discardRewardNamePattern by patternGroup.pattern(
         "disregardrewardname",
-        "^(Copper|Farming XP|Farming Experience|Garden Experience|Bits)\$"
+        "^(?:Copper|Farming XP|Farming Experience|Garden Experience|Bits)\$",
     )
+
+    /**
+     * REGEX-TEST:   §a§lREWARDS
+     */
     private val rewardsTextPattern by patternGroup.pattern(
         "rewardstext",
-        "^ {2}§a§lREWARDS"
+        "^ {2}§a§lREWARDS",
     )
 
     private var visitorAcceptedChat = mutableListOf<String>()
-    private var visitorNameFormatted = "";
+    private var visitorNameFormatted = ""
     private var rewardsList = mutableListOf<String>()
 
     @SubscribeEvent
@@ -82,10 +95,10 @@ object GardenVisitorCompactChat {
             visitorNameFormatted = "$visitorColor$visitorName"
         }
 
-        //If visitor name has not yet been matched, we aren't looking at a visitor accept message, and can ignore this.
-        if (visitorNameFormatted.isBlank()) return;
+        // If visitor name has not yet been matched, we aren't looking at a visitor accept message, and can ignore this.
+        if (visitorNameFormatted.isBlank()) return
 
-        //Match rewards and transform
+        // Match rewards and transform
         visitorRewardPattern.matchMatcher(transformedMessage) {
             val rewardColor = groupOrNull("rewardcolor")
             val amountColor = groupOrNull("amountcolor")
@@ -105,11 +118,11 @@ object GardenVisitorCompactChat {
                 if (altAmount == null) "" else "$altAmount "
             }
 
-            //Don't add name for copper, farming XP, garden XP, or bits
+            // Don't add name for copper, farming XP, garden XP, or bits
             val rewardString = if (discardRewardNamePattern.matcher(reward).matches()) "" else reward
 
             rewardsList.add(
-                "$fullTextColor$amountString$rewardString"
+                "$fullTextColor$amountString$rewardString",
             )
         }
 
@@ -127,8 +140,8 @@ object GardenVisitorCompactChat {
     }
 
     private fun sendCompact() {
-        //This prevents commission rewards, crop milestone data, etc. from triggering incorrectly
-        if (visitorNameFormatted.isBlank()) return;
+        // This prevents commission rewards, crop milestone data, etc. from triggering incorrectly
+        if (visitorNameFormatted.isBlank()) return
 
         if (visitorAcceptedChat.isNotEmpty()) {
             ChatUtils.hoverableChat(createCompactVisitorMessage(), hover = visitorAcceptedChat, prefix = false)

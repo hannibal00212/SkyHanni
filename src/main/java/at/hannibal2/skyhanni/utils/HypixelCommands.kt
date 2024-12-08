@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackAPI
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.ChatUtils.debug
+import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 object HypixelCommands {
     fun skyblock() {
@@ -61,7 +63,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackAPI.getFromSack(itemName.asInternalName(), amount)
+        GetFromSackAPI.getFromSack(itemName.toInternalName(), amount)
     }
 
     fun widget() {
@@ -140,9 +142,10 @@ object HypixelCommands {
         send("pq $quality")
     }
 
-    // Changes the speed of rancher boots in garden
-    fun setMaxSpeed() {
-        send("setmaxspeed")
+    // Changes the speed of Rancher's Boots
+    fun setMaxSpeed(speed: Int? = null) = when {
+        speed == null -> send("setmaxspeed")
+        else -> send("setmaxspeed $speed")
     }
 
     fun showRng(major: String? = null, minor: String? = null) = when {
@@ -158,9 +161,26 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun bank() {
+        send("bank")
+    }
+
+    fun pickupStash() {
+        send("pickupstash")
+    }
+
+    fun viewStash(type: String) {
+        send("viewstash $type")
+    }
+
+    fun locraw() {
+        send("locraw")
+    }
+
     private fun send(command: String) {
-        @Suppress("DEPRECATION")
-        // TODO rename function
-        ChatUtils.sendCommandToServer(command)
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
+        sendMessageToServer("/$command")
     }
 }

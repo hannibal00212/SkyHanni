@@ -1,26 +1,33 @@
 package at.hannibal2.skyhanni.features.commands
 
-import at.hannibal2.skyhanni.config.commands.Commands
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandBuilder
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.Commands.commandList
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import net.minecraft.util.IChatComponent
 
+@SkyHanniModule
 object HelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
     private const val HELP_ID = -6457563
 
-    private fun createCommandEntry(command: Commands.CommandInfo): IChatComponent {
+    private fun createCommandEntry(command: CommandBuilder): IChatComponent {
         val category = command.category
         val color = category.color
         val description = command.description.splitLines(200).replace("§r", "§7")
         val categoryDescription = category.description.splitLines(200).replace("§r", "§7")
+        val aliases = command.aliases
 
         return Text.text("§7 - $color${command.name}") {
             this.hover = Text.multiline(
                 "§e/${command.name}",
+                if (aliases.isNotEmpty()) "§7Aliases: ${aliases.joinToString(", ")}" else null,
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
                 "",
                 "$color§l${category.categoryName}",
@@ -30,9 +37,11 @@ object HelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<Commands.CommandInfo>) {
+    private fun showPage(page: Int, search: String, commands: List<CommandBuilder>) {
         val filtered = commands.filter {
-            it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
+            it.name.contains(search, ignoreCase = true) ||
+                it.aliases.any { alias -> alias.contains(search, ignoreCase = true) } ||
+                it.description.contains(search, ignoreCase = true)
         }
 
         val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
@@ -47,7 +56,7 @@ object HelpCommand {
         ) { createCommandEntry(it) }
     }
 
-    fun onCommand(args: Array<String>, commands: List<Commands.CommandInfo>) {
+    private fun onCommand(args: Array<String>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {
@@ -57,6 +66,15 @@ object HelpCommand {
             page = 1
             search = args.joinToString(" ")
         }
-        showPage(page, search, commands)
+        showPage(page, search, commandList.sortedWith(compareBy({ it.category.ordinal }, { it.name })))
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shcommands") {
+            description = "Shows this list"
+            aliases = listOf("shhelp", "shcommand", "shcmd", "shc")
+            callback { onCommand(it) }
+        }
     }
 }

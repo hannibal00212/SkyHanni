@@ -7,6 +7,39 @@ import java.net.URI
 
 object OSUtils {
 
+    enum class OperatingSystem {
+        LINUX,
+        SOLARIS,
+        WINDOWS,
+        MACOS,
+        UNKNOWN,
+    }
+
+    fun getOperatingSystemRaw(): String = System.getProperty("os.name")
+
+    fun getOperatingSystem(): OperatingSystem {
+        val osName = getOperatingSystemRaw().lowercase()
+        return when {
+            osName.contains("win") -> OperatingSystem.WINDOWS
+            osName.contains("mac") -> OperatingSystem.MACOS
+            osName.contains("solaris") || osName.contains("sunos") -> OperatingSystem.SOLARIS
+            osName.contains("linux") || osName.contains("unix") -> OperatingSystem.LINUX
+
+            else -> OperatingSystem.UNKNOWN
+        }
+    }
+
+    val isWindows: Boolean
+    val isMac: Boolean
+    val isLinux: Boolean
+
+    init {
+        val os = getOperatingSystem()
+        isWindows = os == OperatingSystem.WINDOWS
+        isMac = os == OperatingSystem.MACOS
+        isLinux = os == OperatingSystem.LINUX
+    }
+
     @JvmStatic
     fun openBrowser(url: String) {
         val desktopSupported = Desktop.isDesktopSupported()
@@ -17,7 +50,7 @@ object OSUtils {
             } catch (e: IOException) {
                 ErrorManager.logErrorWithData(
                     e, "Error while opening website.",
-                    "url" to url
+                    "url" to url,
                 )
             }
         } else {

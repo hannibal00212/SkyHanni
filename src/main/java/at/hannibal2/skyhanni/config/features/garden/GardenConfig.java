@@ -141,6 +141,11 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Bests", desc = "")
+    @Accordion
+    public PersonalBestsConfig personalBests = new PersonalBestsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -210,15 +215,6 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean jacobContestSummary = true;
-
-    @Expose
-    @ConfigOption(
-        name = "Personal Best Increase FF",
-        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean contestPersonalBestIncreaseFF = true;
 
     // Does not have a config element!
     @Expose

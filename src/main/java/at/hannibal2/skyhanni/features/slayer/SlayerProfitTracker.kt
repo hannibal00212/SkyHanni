@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
@@ -143,14 +144,14 @@ object SlayerProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuestComplete(event: SlayerQuestCompleteEvent) {
         getTracker()?.modify {
             it.slayerCompletedCount++
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
@@ -246,7 +247,7 @@ object SlayerProfitTracker {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun clearProfitCommand(args: Array<String>) {
+    fun resetCommand() {
         if (itemLogCategory == "") {
             ChatUtils.userError(
                 "No current slayer data found! " +

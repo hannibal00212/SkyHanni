@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class CropMilestoneUpdateEvent : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+object CropMilestoneUpdateEvent : SkyHanniEvent()

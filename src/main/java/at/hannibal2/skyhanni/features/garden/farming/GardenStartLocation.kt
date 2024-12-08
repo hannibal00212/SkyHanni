@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.CropStartLocationConfig.CropLocationMode
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -50,7 +50,7 @@ object GardenStartLocation {
         ChatUtils.chat("You changed your Crop Start Location for ${crop.cropName}!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK || !GardenAPI.hasFarmingToolInHand()) return
@@ -64,7 +64,7 @@ object GardenStartLocation {
             ChatUtils.chat("Auto updated your Crop Start Location for ${crop.cropName}")
         }
 
-        lastFarmedLocations[crop] = LorenzVec.getBlockBelowPlayer().add(0.0, 1.0, 0.0)
+        lastFarmedLocations[crop] = LocationUtils.playerLocation().roundLocationToBlock()
         shouldShowLastFarmedWaypoint = false
     }
 

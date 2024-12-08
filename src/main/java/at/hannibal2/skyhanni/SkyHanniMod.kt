@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.Commands
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -59,9 +59,9 @@ class SkyHanniMod {
 
         SkyHanniEvents.init(modules)
 
-        Commands.init()
+        CommandRegistrationEvent.post()
 
-        PreInitFinishedEvent().post()
+        PreInitFinishedEvent.post()
     }
 
     @Mod.EventHandler

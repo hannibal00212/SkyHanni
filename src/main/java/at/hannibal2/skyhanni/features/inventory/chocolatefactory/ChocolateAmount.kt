@@ -31,6 +31,7 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
 
     companion object {
         fun chocolateSinceUpdate(): Long {
+            if (ChocolateFactoryAPI.isMax()) return 0L
             val lastUpdate = profileStorage?.lastDataSave ?: return 0
             val currentTime = SimpleTimeMark.now()
             val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds

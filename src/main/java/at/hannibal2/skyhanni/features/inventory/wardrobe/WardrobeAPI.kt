@@ -32,6 +32,10 @@ object WardrobeAPI {
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
     private val repoGroup = RepoPattern.group("inventory.wardrobe")
+
+    /**
+     * REGEX-TEST: Wardrobe (2/2)
+     */
     private val inventoryPattern by repoGroup.pattern(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
@@ -190,9 +194,9 @@ object WardrobeAPI {
                     add("$slotInfo is empty")
                 } else {
                     add(slotInfo)
-                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armourName ->
+                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
                         slot.getData()?.armor?.get(id)?.name?.let { name ->
-                            add("   $armourName: $name")
+                            add("   $armorName: $name")
                         }
                     }
                 }

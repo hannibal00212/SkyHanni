@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("dev.deftu.gradle.preprocess") version "0.6.1"
+    id("dev.deftu.gradle.preprocess") version "0.7.1"
     id("net.kyori.blossom") version "1.3.2" apply false
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "at.hannibal2.skyhanni"
-    version = "0.27.Beta.12"
+    version = "0.28.Beta.17"
     repositories {
         mavenCentral()
         mavenLocal()
@@ -25,7 +25,8 @@ allprojects {
         }
         maven("https://repo.spongepowered.org/maven/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-        maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
+        maven("https://jitpack.io") {
+            // NotEnoughUpdates (compiled against)
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
@@ -42,8 +43,9 @@ preprocess {
     ProjectTarget.activeVersions().forEach { target ->
         nodes[target] = createNode(target.projectName, target.minecraftVersion.versionNumber, target.mappingStyle.identifier)
         val p = project(target.projectPath)
-        if (target.isForge)
+        if (target.isForge) {
             p.extra.set("loom.platform", "forge")
+        }
     }
     ProjectTarget.activeVersions().forEach { child ->
         val parent = child.linkTo ?: return@forEach

@@ -8,19 +8,17 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -29,10 +27,6 @@ object CraftMaterialsFromBazaar {
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
     private val materialSlots = listOf(10, 11, 12, 19, 20, 21, 28, 29, 30)
-    private val inventoryPattern by RepoPattern.pattern(
-        "inventory.recipe.title",
-        ".* Recipe"
-    )
 
     private var inRecipeInventory = false
     private var purchasing = false
@@ -43,11 +37,11 @@ object CraftMaterialsFromBazaar {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        val correctInventoryName = inventoryPattern.matches(event.inventoryName)
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
 
-        inRecipeInventory = correctInventoryName && correctItem && !purchasing
+        inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
         val recipeName = items[25]?.itemName ?: return
@@ -79,7 +73,8 @@ object CraftMaterialsFromBazaar {
                         listOf("§eClick here to buy the items from bazaar!"),
                         onClick = {
                             getFromBazaar(neededMaterials)
-                        })
+                        },
+                    ),
                 )
             }
         }
@@ -109,9 +104,14 @@ object CraftMaterialsFromBazaar {
                 val priceMultiplier = amount * multiplier
                 val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
                     " §6${(material.getPrice() * priceMultiplier).shortFormat(false)}"
-                add(Renderable.optionalLink(text, onClick = {
-                    BazaarApi.searchForBazaarItem(material, priceMultiplier)
-                }))
+                add(
+                    Renderable.optionalLink(
+                        text,
+                        onClick = {
+                            BazaarApi.searchForBazaarItem(material, priceMultiplier)
+                        },
+                    ),
+                )
             }
             add(
                 Renderable.clickAndHover(
@@ -120,7 +120,8 @@ object CraftMaterialsFromBazaar {
                     onClick = {
                         purchasing = false
                         display = emptyList()
-                    })
+                    },
+                ),
             )
             addMultipliers()
         }
@@ -141,8 +142,8 @@ object CraftMaterialsFromBazaar {
                         onClick = {
                             multiplier = m
                             updateBazaarDisplay()
-                        }
-                    )
+                        },
+                    ),
                 )
             } else {
                 addString(text)

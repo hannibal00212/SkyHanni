@@ -13,17 +13,22 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
+//#if MC<1.12
+import net.minecraft.world.WorldSettings
+//#else
+//$$ import net.minecraft.world.GameType
+//#endif
 
 @SkyHanniModule
 object TabListData {
@@ -74,10 +79,10 @@ object TabListData {
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
         val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
 
-            val widgets = TabWidget.entries.filter { it.isActive }
-                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
-            val string =
-                "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+        val widgets = TabWidget.entries.filter { it.isActive }
+            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
+        val string =
+            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
 
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Tab list copied into the clipboard!")
@@ -92,8 +97,13 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
+                //#if MC<1.12
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR
+                //#else
+                //$$ o1.gameType != GameType.SPECTATOR,
+                //$$ o2.gameType != GameType.SPECTATOR
+                //#endif
             )
                 .compare(
                     if (team1 != null) team1.registeredName else "",
@@ -104,13 +114,17 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
+        //#if MC<1.16
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        //#else
+        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(LorenzUtils.stripVanillaMessage(name))
+            result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
         return result.dropLast(1)
@@ -140,9 +154,9 @@ object TabListData {
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText ?: ""
+        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText ?: ""
+        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).postAndCatch()
         }

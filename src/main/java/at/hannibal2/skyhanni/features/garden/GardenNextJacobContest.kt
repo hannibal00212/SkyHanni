@@ -57,7 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenNextJacobContest {
 
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
     private var display = emptyList<Any>()
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
@@ -74,14 +74,13 @@ object GardenNextJacobContest {
      * REGEX-TEST: Late Summer, Year 351
      * REGEX-TEST: Autumn, Year 351
      */
-
     val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§(e○|6☘) §7(?<crop>.*)"
+        "§(?:e○|6☘) §7(?<crop>.*)"
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
@@ -441,7 +440,7 @@ object GardenNextJacobContest {
             SkyHanniMod.coroutineScope.launch {
                 openPopupWindow(
                     "<html>Farming Contest soon!<br />" +
-                        "Crops: ${cropTextNoColor}</html>"
+                        "Crops: $cropTextNoColor</html>"
                 )
             }
         }
@@ -515,8 +514,10 @@ object GardenNextJacobContest {
     }
 
     private fun isEnabled() =
-        config.display && ((LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
-            (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock))
+        config.display && (
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+                (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
+            )
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
     private fun isSendEnabled() =
@@ -563,7 +564,10 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                ChatUtils.chat(
+                    "This year's contests aren't available to fetch automatically yet, " +
+                        "please load them from your calendar or wait 10 minutes."
+                )
                 ChatUtils.clickableChat(
                     "Click here to open your calendar!",
                     onClick = { HypixelCommands.calendar() },

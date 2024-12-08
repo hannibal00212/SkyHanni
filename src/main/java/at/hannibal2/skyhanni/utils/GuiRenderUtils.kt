@@ -132,8 +132,7 @@ object GuiRenderUtils {
             // borders
             GuiScreen.drawRect(
                 tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor,
-
-                )
+            )
 
             GuiScreen.drawRect(
                 tooltipX + tooltipTextWidth + 2,

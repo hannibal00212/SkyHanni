@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -144,8 +145,11 @@ object LimboTimeTracker {
 
     fun printStats(onlyPlaytime: Boolean = false) {
         val timeInLimbo: Int = if (inLimbo) limboJoinTime.passedSince().inWholeSeconds.toInt() else 0
-        val playtime: Int = if (inLimbo) (storage?.playtime
-            ?: 0) + limboJoinTime.passedSince().inWholeSeconds.toInt() else storage?.playtime ?: 0
+        val playtime: Int = if (inLimbo) (
+            storage?.playtime ?: 0
+            ) + limboJoinTime.passedSince().inWholeSeconds.toInt()
+        else storage?.playtime ?: 0
+
         if (onlyPlaytime) {
             ChatUtils.chat("§aYou have ${playtime / 3600} hours and ${playtime % 3600 / 60} minutes playtime!", false)
         } else {
@@ -185,7 +189,7 @@ object LimboTimeTracker {
         notMigratedPB = personalBest
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (!doMigrate) return
         if (notMigratedPB != 0) {

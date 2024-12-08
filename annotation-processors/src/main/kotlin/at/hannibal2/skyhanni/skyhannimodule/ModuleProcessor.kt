@@ -25,8 +25,10 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
 
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
+
         minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
             ?.asStarProjectedType()
+                ?: return emptyList()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -82,6 +84,11 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
     }
 
+    private fun isNEUAnnotation(klass: KSClassDeclaration): Boolean {
+        val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
+        return annotation.arguments.find { it.name?.asString() == "neuRequired" }?.value as? Boolean ?: false
+    }
+
     // TODO use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
 
@@ -99,11 +106,14 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
             it.write("object LoadedModules {\n")
             it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
+            it.write("    val hasNeu: Boolean get() = at.hannibal2.skyhanni.utils.system.PlatformUtils.isNeuLoaded()\n")
             it.write("    val modules: List<Any> = buildList {\n")
 
             symbols.forEach { symbol ->
                 if (isDevAnnotation(symbol)) {
                     it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
+                } else if (isNEUAnnotation(symbol)) {
+                    it.write("        if (hasNeu) add(${symbol.qualifiedName!!.asString()})\n")
                 } else {
                     it.write("        add(${symbol.qualifiedName!!.asString()})\n")
                 }

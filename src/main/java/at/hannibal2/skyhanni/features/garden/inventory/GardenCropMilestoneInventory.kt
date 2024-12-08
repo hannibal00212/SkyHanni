@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -24,7 +25,7 @@ object GardenCropMilestoneInventory {
     private var average = -1.0
     private val config get() = GardenAPI.config
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!config.number.averageCropMilestone) return
 

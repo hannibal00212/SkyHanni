@@ -7,17 +7,17 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -28,9 +28,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyMartCopperPrice {
 
+    /**
+     * REGEX-TEST: §c250 Copper
+     */
     private val copperPattern by RepoPattern.pattern(
         "garden.inventory.skymart.copper",
-        "§c(?<amount>.*) Copper"
+        "§c(?<amount>.*) Copper",
     )
 
     private var display = emptyList<Renderable>()
@@ -72,7 +75,7 @@ object SkyMartCopperPrice {
                     add("§7Profit per purchase: §6${profit.shortFormat()} ")
                     add("")
                     add("§7Copper amount: §c${copper.addSeparators()} ")
-                    add("§7Profit per copper: §6${perFormat} ")
+                    add("§7Profit per copper: §6$perFormat ")
                 }
                 table.add(
                     DisplayTableEntry(
@@ -81,8 +84,8 @@ object SkyMartCopperPrice {
                         factor,
                         internalName,
                         hover,
-                        highlightsOnHoverSlots = listOf(slot)
-                    )
+                        highlightsOnHoverSlots = listOf(slot),
+                    ),
                 )
             }
         }
@@ -104,7 +107,7 @@ object SkyMartCopperPrice {
             config.copperPricePos.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "SkyMart Copper Price"
+                posLabel = "SkyMart Copper Price",
             )
         }
     }

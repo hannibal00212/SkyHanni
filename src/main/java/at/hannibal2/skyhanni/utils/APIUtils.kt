@@ -30,7 +30,7 @@ object APIUtils {
     private val ctx: SSLContext? = run {
         try {
             val myKeyStore = KeyStore.getInstance("JKS")
-            myKeyStore.load(APIUtils.javaClass.getResourceAsStream("/keystore.jks"), "changeit".toCharArray())
+            myKeyStore.load(APIUtils.javaClass.getResourceAsStream("/skyhanni-keystore.jks"), "changeit".toCharArray())
             val kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
             val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
             kmf.init(myKeyStore, null)
@@ -181,9 +181,16 @@ object APIUtils {
 
     private fun readResponse(entity: HttpEntity): JsonObject {
         val retSrc = EntityUtils.toString(entity) ?: return JsonObject()
-        val parsed = parser.parse(retSrc)
-        if (parsed.isJsonNull) return JsonObject()
-        return parsed as JsonObject
+
+        try {
+            val parsed = parser.parse(retSrc)
+            if (parsed.isJsonNull) return JsonObject()
+
+            return parsed as JsonObject
+        } catch (_: Throwable) {
+            // This causes content types that aren't JSON to be ignored
+            return JsonObject()
+        }
     }
 
     fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {

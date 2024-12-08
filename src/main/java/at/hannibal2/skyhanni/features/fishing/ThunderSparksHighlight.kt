@@ -10,25 +10,23 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 @SkyHanniModule
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
-    private const val TEXTURE =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzUwNDM3MjI1NiwKICAicHJvZmlsZUlkIiA6ICI2MzMyMDgwZTY3YTI0Y2MxYjE3ZGJhNzZmM2MwMGYxZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJUZWFtSHlkcmEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2IzMzI4ZDNlOWQ3MTA0MjAzMjI1NTViMTcyMzkzMDdmMTIyNzBhZGY4MWJmNjNhZmM1MGZhYTA0YjVjMDZlMSIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+    private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
     private val sparks = mutableListOf<EntityArmorStand>()
 
     @SubscribeEvent
@@ -36,7 +34,7 @@ object ThunderSparksHighlight {
         if (!isEnabled()) return
 
         EntityUtils.getEntities<EntityArmorStand>().filter {
-            it !in sparks && it.hasSkullTexture(TEXTURE)
+            it !in sparks && it.hasSkullTexture(THUNDER_SPARK_TEXTURE)
         }.forEach { sparks.add(it) }
     }
 
@@ -44,10 +42,8 @@ object ThunderSparksHighlight {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val special = config.color
-        val color = Color(SpecialColor.specialToChromaRGB(special), true)
+        val color = config.color.toSpecialColor()
 
-        val playerLocation = LocationUtils.playerLocation()
         for (spark in sparks) {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
@@ -55,10 +51,10 @@ object ThunderSparksHighlight {
             val seeThroughBlocks =
                 sparkLocation.distanceToPlayer() < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
             event.drawWaypointFilled(
-                sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks
+                sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
-            if (sparkLocation.distance(playerLocation) < 10) {
-                event.drawString(sparkLocation.add(y = 1.5), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)
+            if (sparkLocation.distanceToPlayer() < 10) {
+                event.drawString(sparkLocation.up(1.5), "Thunder Spark", seeThroughBlocks = seeThroughBlocks)
             }
         }
     }

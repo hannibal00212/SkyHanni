@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -42,7 +43,7 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("${prefix}${formattedAmount}")
+                Renderable.string("$prefix$formattedAmount")
             },
         ),
         ICON(
@@ -78,11 +79,11 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
-    private val coinIcon = "COIN_TALISMAN".asInternalName()
+    private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
-    private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
-    private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
     private var dirty = false
 
@@ -97,8 +98,11 @@ object ItemPickupLog {
         "SKYBLOCK_MENU",
         "CANCEL_PARKOUR_ITEM",
         "CANCEL_RACE_ITEM",
+        "MAXOR_ENERGY_CRYSTAL",
+        "ELLE_SUPPLIES",
+        "ELLE_FUEL_CELL",
     )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
+    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -114,7 +118,7 @@ object ItemPickupLog {
         itemsRemovedFromInventory.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !config.sack) return
 
@@ -144,11 +148,11 @@ object ItemPickupLog {
             itemList.clear()
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-            val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val cursorItem = Minecraft.getMinecraft().thePlayer?.inventory?.itemStack
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
-                //this prevents items inside hypixel guis counting when picked up
+                // this prevents items inside hypixel guis counting when picked up
                 if (oldItemList.contains(hash)) {
                     inventoryItems.add(cursorItem)
                 }

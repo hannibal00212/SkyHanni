@@ -19,7 +19,7 @@ SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to [H
 * **Helpful GUIs:** View important information at a glance.
 * **Extra Chat Messages:** Receive reminders and tips at the right moment.
 * **Object Highlighters:** Focus on important items in inventories or highlight mobs in the world.
-* **Highly Customizeable Displays:** Personalise your Scoreboard, Tab List or chat format.
+* **Highly Customizable Displays:** Personalise your Scoreboard, Tab List or chat format.
 * [And **much** more!](docs/FEATURES.md)
 
 SkyHanni is especially useful when doing farming, slayers, Bingo, Diana, fishing, Rift or mining.
@@ -35,7 +35,7 @@ SkyHanni is especially useful when doing farming, slayers, Bingo, Diana, fishing
 Give feedback or just chat with others on our community Discord!
 
 * **Bug Reports:** Use the `#bug-reports` channel when you find broken features (please check out `#faq` and `#known-bugs`).
-* **Quick Help** Ask in `#support` for questions and problems with the the mod or Minecraft in general.
+* **Quick Help** Ask in `#support` for questions and problems with the mod or Minecraft in general.
 * **Feature Suggestions:** Feel fre to tell your ideas in `#suggestions` channel for new features and improvements to the mod. (Don't copy from existing mods or break Hypixel rules).
 * **General Chat:** Chat with other SkyHanni users in `#skyblock-general` channel about the game.
 

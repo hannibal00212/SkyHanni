@@ -59,13 +59,22 @@ object BestiaryData {
         "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
     )
 
+    /**
+     * REGEX-TEST: 9/10
+     * REGEX-TEST: 6/6
+     */
     private val progressPattern by patternGroup.pattern(
         "progress",
         "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
     )
+
+    /**
+     * REGEX-TEST: (1/2) Bestiary ➜ The Catacombs
+     * REGEX-TEST: Bestiary ➜ Dwarven Mines
+     */
     private val titlePattern by patternGroup.pattern(
         "title",
-        "^(?:\\(\\d+/\\d+\\) )?(Bestiary|.+) ➜ (.+)\$"
+        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$"
     )
 
     private var display = emptyList<List<Any>>()
@@ -75,12 +84,12 @@ object BestiaryData {
     private var inInventory = false
     private var isCategory = false
     private var overallProgressEnabled = false
-    private var indexes = listOf(
-        10, 11, 12, 13, 14, 15, 16,
-        19, 20, 21, 22, 23, 24, 25,
-        28, 29, 30, 31, 32, 33, 34,
-        37, 38, 39, 40, 41, 42, 43
-    )
+    private val indexes = listOf(
+        10..16,
+        19..25,
+        28..34,
+        37..43,
+    ).flatten()
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -279,10 +288,12 @@ object BestiaryData {
             val isUnlocked = mob.actualRealTotalKill != 0.toLong()
             val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
-                newDisplay.add(buildList {
-                    add(" §7- ")
-                    add("${mob.name}: §cNot unlocked!")
-                })
+                newDisplay.add(
+                    buildList {
+                        add(" §7- ")
+                        add("${mob.name}: §cNot unlocked!")
+                    }
+                )
                 continue
             }
             if (isMaxed && config.hideMaxed) continue
@@ -358,7 +369,8 @@ object BestiaryData {
                 // todo: avoid ordinal
                 config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
-            })
+            }
+        )
 
         newDisplay.addButton(
             prefix = "§7Display Type: ",
@@ -367,7 +379,8 @@ object BestiaryData {
                 // todo: avoid ordinal
                 config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
-            })
+            }
+        )
 
         newDisplay.addButton(
             prefix = "§7Number Type: ",
@@ -377,6 +390,7 @@ object BestiaryData {
                 update()
             }
         )
+
         newDisplay.addButton(
             prefix = "§7Hide Maxed: ",
             getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
@@ -391,18 +405,21 @@ object BestiaryData {
         if (catList.isNotEmpty()) {
             newDisplay.addAsSingletonList("§7Category")
             for (cat in catList) {
-                newDisplay.add(buildList {
-                    add(" §7- ${cat.name}§7: ")
-                    val element = when {
-                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
-                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                        cat.familiesFound < cat.totalFamilies ->
-                            "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, §b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                newDisplay.add(
+                    buildList {
+                        add(" §7- ${cat.name}§7: ")
+                        val element = when {
+                            cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                            cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                            cat.familiesFound < cat.totalFamilies ->
+                                "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
+                                    "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
 
-                        else -> continue
+                            else -> continue
+                        }
+                        add(element)
                     }
-                    add(element)
-                })
+                )
             }
         }
     }
@@ -426,7 +443,7 @@ object BestiaryData {
         if (stack == null) return false
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
-            if ("Bestiary" != bestiaryGuiTitleMatcher.group(1)) {
+            if ("Bestiary" != bestiaryGuiTitleMatcher.group("title")) {
                 var loreContainsFamiliesFound = false
                 for (line in stack.getLore()) {
                     if (line.removeColor().startsWith("Families Found")) {
@@ -441,8 +458,9 @@ object BestiaryData {
             return true
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a")
-                && loreList[1].startsWith("§7Results: §a")
+            if (loreList.size >= 2 &&
+                loreList[0].startsWith("§7Query: §a") &&
+                loreList[1].startsWith("§7Results: §a")
             ) {
                 return true
             }
@@ -457,7 +475,7 @@ object BestiaryData {
 
     enum class NumberType(val type: String) {
         INT("Normal (1, 2, 3)"),
-        ROMAN("Roman (I, II, III")
+        ROMAN("Roman (I, II, III)")
     }
 
     enum class DisplayType(val type: String) {

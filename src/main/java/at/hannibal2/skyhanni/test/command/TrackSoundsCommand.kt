@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -36,7 +37,13 @@ object TrackSoundsCommand {
     private var display: List<Renderable> = emptyList()
     private var worldSounds: Map<LorenzVec, List<PlaySoundEvent>> = emptyMap()
 
+    // TODO write abstract code for this and TrackParticlesCommand
     fun command(args: Array<String>) {
+        if (!LorenzUtils.inSkyBlock) {
+            ChatUtils.userError("This command only works in SkyBlock!")
+            return
+        }
+
         if (args.firstOrNull() == "end") {
             if (!isRecording) {
                 ChatUtils.userError("Nothing to end")
@@ -107,10 +114,10 @@ object TrackSoundsCommand {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} sounds", 0.8)
 
-                var offset = -0.2
+                var offset = 0.2
                 value.groupBy { it.soundName }.forEach { (soundName, sounds) ->
-                    event.drawDynamicText(key.up(offset), "§7§l$soundName §7(§e${sounds.size}§7)", 0.8)
-                    offset -= 0.2
+                    event.drawDynamicText(key.down(offset), "§7§l$soundName §7(§e${sounds.size}§7)", 0.8)
+                    offset += 0.2
                 }
             } else {
                 val sound = value.first()
@@ -122,7 +129,7 @@ object TrackSoundsCommand {
 
                 event.drawDynamicText(key, "§7§l${sound.soundName}", 0.8)
                 event.drawDynamicText(
-                    key.up(-0.2),
+                    key.down(0.2),
                     "§7P: §e${sound.pitch.roundTo(2)} §7V: $volumeColor${sound.volume.roundTo(2)}",
                     scaleMultiplier = 0.8,
                 )

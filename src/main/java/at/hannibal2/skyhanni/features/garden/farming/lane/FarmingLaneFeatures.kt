@@ -49,7 +49,6 @@ object FarmingLaneFeatures {
         TOO_SLOW("§cToo slow!"),
         CALCULATING("§aCalculating.."),
         NORMAL(""),
-        ;
     }
 
     @HandleEvent
@@ -57,7 +56,7 @@ object FarmingLaneFeatures {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         display = emptyList()
     }

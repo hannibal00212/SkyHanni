@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnigmaSoulsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -10,20 +11,21 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -36,13 +38,13 @@ object EnigmaSoulWaypoints {
 
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
     private var inInventory = false
-    private var soulLocations = mapOf<String, LorenzVec>()
+    var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
 
     private val item by lazy {
-        val neuItem = "SKYBLOCK_ENIGMA_SOUL".asInternalName().getItemStack()
+        val neuItem = "SKYBLOCK_ENIGMA_SOUL".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
             "§5Toggle Missing",
@@ -52,7 +54,7 @@ object EnigmaSoulWaypoints {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
@@ -89,6 +91,9 @@ object EnigmaSoulWaypoints {
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
+            if (inventoryUnfound.contains("Buttons")) {
+                RiftAPI.trackingButtons = !RiftAPI.trackingButtons
+            }
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -107,11 +112,22 @@ object EnigmaSoulWaypoints {
         val name = split.last()
         if (!soulLocations.contains(name)) return
 
+        if (name == "Buttons") {
+            RiftAPI.trackingButtons = !RiftAPI.trackingButtons
+        }
+
         if (!trackedSouls.contains(name)) {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
             if (config.showPathFinder) {
                 soulLocations[name]?.let {
-                    IslandGraphs.pathFind(it, config.color.toChromaColor(), condition = { config.showPathFinder })
+                    if (!(name == "Buttons" && WoodenButtonsHelper.showButtons())) {
+                        IslandGraphs.pathFind(
+                            it,
+                            "$name Enigma Soul",
+                            config.color.toSpecialColor(),
+                            condition = { config.showPathFinder }
+                        )
+                    }
                 }
             }
             trackedSouls.add(name)
@@ -147,8 +163,8 @@ object EnigmaSoulWaypoints {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
-                event.drawWaypointFilled(it, config.color.toChromaColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(it.add(y = 1), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
+                event.drawWaypointFilled(it, config.color.toSpecialColor(), seeThroughBlocks = true, beacon = true)
+                event.drawDynamicText(it.up(), "§5${soul.removeSuffix(" Soul")} Soul", 1.5)
             }
         }
     }
@@ -188,6 +204,9 @@ object EnigmaSoulWaypoints {
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
+            if (closestSoul == "Buttons") {
+                RiftAPI.trackingButtons = false
+            }
         }
     }
 

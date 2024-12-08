@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class DungeonBossRoomEnterEvent : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+object DungeonBossRoomEnterEvent : SkyHanniEvent()

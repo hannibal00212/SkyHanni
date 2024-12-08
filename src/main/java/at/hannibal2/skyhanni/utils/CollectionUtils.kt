@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
@@ -20,7 +20,7 @@ object CollectionUtils {
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount) this.poll() ?: break
+        repeat(amount) { this.poll() ?: return this }
         return this
     }
 
@@ -93,7 +93,7 @@ object CollectionUtils {
         val map = mutableMapOf<K, Int>()
         for (item in this) {
             val key = selector(item)
-            map[key] = map.getOrDefault(key, 0) + 1
+            map.addOrPut(key, 1)
         }
         return map
     }
@@ -115,6 +115,22 @@ object CollectionUtils {
             }
         }
         return null
+    }
+
+    /**
+     * Returns a sublist of this list, starting after the first occurrence of the specified element.
+     *
+     * @param after The element after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
+    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+        val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
     }
 
     fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
@@ -144,10 +160,7 @@ object CollectionUtils {
         return this
     }
 
-    /**
-     * This does not work inside a [buildList] block
-     */
-    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+    fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
@@ -258,6 +271,15 @@ object CollectionUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
+    fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,
@@ -285,14 +307,15 @@ object CollectionUtils {
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(Enchantment.protection, 0)
+            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
     fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
-        generateSequence(start) { it + 1 }.map { (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn }
-            .takeWhile { it <= end }
+        generateSequence(start) { it + 1 }.map {
+            (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
+        }.takeWhile { it <= end }
 
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
         addItemStack(internalName.getItemStack())

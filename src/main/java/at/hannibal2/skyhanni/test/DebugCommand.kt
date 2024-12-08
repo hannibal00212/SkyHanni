@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.RepoManager.Companion.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -30,15 +32,14 @@ object DebugCommand {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"
-            } else "no search specified, only showing interesting stuff:"
+            } else "no search specified, only showing interesting stuff:",
         )
 
         val event = DebugDataCollectEvent(list, search)
 
         // calling default debug stuff
         player(event)
-        repoAutoUpdate(event)
-        repoLocation(event)
+        repoData(event)
         globalRender(event)
         skyblockStatus(event)
         profileName(event)
@@ -127,7 +128,9 @@ object DebugCommand {
         event.addIrrelevant {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")
-            add("skyBlockArea: '${LorenzUtils.skyBlockArea}'")
+            add("skyBlockArea:")
+            add("  scoreboard: '${LorenzUtils.skyBlockArea}'")
+            add("  graph network: '${IslandAreas.currentAreaName}'")
             add("isOnAlphaServer: '${LorenzUtils.isOnAlphaServer}'")
         }
     }
@@ -144,18 +147,34 @@ object DebugCommand {
         }
     }
 
-    private fun repoAutoUpdate(event: DebugDataCollectEvent) {
-        event.title("Repo Auto Update")
-        if (SkyHanniMod.feature.dev.repo.repoAutoUpdate) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData("The repo does not auto update because auto update is disabled!")
-        }
-    }
+    private fun repoData(event: DebugDataCollectEvent) {
+        event.title("Repo Information")
+        val config = SkyHanniMod.feature.dev.repo
 
-    private fun repoLocation(event: DebugDataCollectEvent) {
-        event.title("Repo Location")
-        event.addIrrelevant("repo location: '${RepoManager.getRepoLocation()}'")
+        val hasDefaultSettings = config.location.hasDefaultSettings()
+        val list = buildList {
+            add(" repoAutoUpdate: ${config.repoAutoUpdate}")
+            add(" usingBackupRepo: ${RepoManager.usingBackupRepo}")
+            if (hasDefaultSettings) {
+                add((" repo location: default"))
+            } else {
+                add(" non-default repo location: '${RepoManager.getRepoLocation()}'")
+            }
+
+            if (RepoManager.unsuccessfulConstants.isNotEmpty()) {
+                add(" unsuccessful constants:")
+                for (constant in RepoManager.unsuccessfulConstants) {
+                    add("  - $constant")
+                }
+            }
+        }
+
+        val isRelevant = RepoManager.usingBackupRepo || RepoManager.unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        if (isRelevant) {
+            event.addData(list)
+        } else {
+            event.addIrrelevant(list)
+        }
     }
 
     private fun player(event: DebugDataCollectEvent) {

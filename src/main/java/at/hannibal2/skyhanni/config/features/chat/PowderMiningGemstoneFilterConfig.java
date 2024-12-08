@@ -42,6 +42,11 @@ public class PowderMiningGemstoneFilterConfig {
     @ConfigEditorDropdown
     public GemstoneFilterEntry topazGemstones = GemstoneFilterEntry.FINE_UP;
 
+    @Expose
+    @ConfigOption(name = "Jasper", desc = "Hide Jasper gemstones under a certain quality.")
+    @ConfigEditorDropdown
+    public GemstoneFilterEntry jasperGemstones = GemstoneFilterEntry.FINE_UP;
+
     public enum GemstoneFilterEntry {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
