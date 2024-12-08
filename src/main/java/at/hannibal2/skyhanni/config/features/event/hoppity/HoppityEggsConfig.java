@@ -30,6 +30,11 @@ public class HoppityEggsConfig {
     public HoppityWarpMenuConfig warpMenu = new HoppityWarpMenuConfig();
 
     @Expose
+    @ConfigOption(name = "Stray Timer", desc = "")
+    @Accordion
+    public HoppityStrayTimerConfig strayTimer = new HoppityStrayTimerConfig();
+
+    @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -230,6 +235,11 @@ public class HoppityEggsConfig {
     @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
     @ConfigEditorBoolean
     public boolean showDuplicateNumber = false;
+
+    @Expose
+    @ConfigOption(name = "Recolor Time-Towered Chocolate", desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.")
+    @ConfigEditorBoolean
+    public boolean recolorTTChocolate = false;
 
     @Expose
     @ConfigOption(
