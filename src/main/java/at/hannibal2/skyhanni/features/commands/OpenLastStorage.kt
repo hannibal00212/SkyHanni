@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,6 +57,7 @@ object OpenLastStorage {
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shlastopened") {
             description = "Opens the storage page last accessed by either /ec or /bp"
+            category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
             callback { openLastStorage(lastStorageType) }
         }
