@@ -36,9 +36,9 @@ value class ServerTimeMark private constructor(val ticks: Long) : Comparable<Ser
 
     override fun compareTo(other: ServerTimeMark): Int = ticks.compareTo(other.ticks)
 
-    override fun toString(): String = when (this) {
-        FAR_PAST -> "The Far Past"
-        FAR_FUTURE -> "The Far Future"
+    override fun toString(): String = when (ticks) {
+        FAR_PAST_TICKS -> "The Far Past"
+        FAR_FUTURE_TICKS -> "The Far Future"
         else -> "ServerTimeMark(ticks=$ticks, now=${MinecraftData.totalServerTicks})"
     }
 
