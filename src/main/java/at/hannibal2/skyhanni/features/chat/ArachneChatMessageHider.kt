@@ -36,21 +36,21 @@ object ArachneChatMessageHider {
 
     /**
      * REGEX-TEST: §dArachne's Keeper used §r§2Venom Shot §r§don you hitting you for §r§c87.7 damage §r§dand infecting you with venom.
-     * REGEX-TEST: §dArachne used §r§2Venom Shot §r§don you hitting you for §r§c58 damage §r§dand infecting you with venom.§r§7
+     * REGEX-TEST: §dArachne used §r§2Venom Shot §r§don you hitting you for §r§c58 damage §r§dand infecting you with venom.
      * REGEX-TEST: §dArachne's Brood used §r§2Venom Shot §r§don you hitting you for §r§c19.8 damage §r§dand infecting you with venom.
      */
     private val venomShotPattern by patternGroup.pattern(
         "venom",
-        "§dArachne('s Keeper)? used §r§2Venom Shot §r§don you hitting you for §r§c[\\d.,]+ damage §r§dand infecting you with venom\\."
+        "§dArachne(?:'s (?:Keeper|Brood))? used §r§2Venom Shot §r§don you hitting you for §r§c[\\\\d.,]+ damage §r§dand infecting you with venom\\\\."
     )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (shouldHide(event.message)) {
-            event.blockedReason = "arachne"
-        }
+        if (!shouldHide(event.message)) return
+        event.blockedReason = "arachne"
     }
+
     private fun shouldHide(message: String): Boolean {
 
         venomShotPattern.matchMatcher(message) {
