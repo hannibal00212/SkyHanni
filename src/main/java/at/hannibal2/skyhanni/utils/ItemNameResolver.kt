@@ -17,7 +17,7 @@ object ItemNameResolver {
             return it
         }
 
-        getInternalNameOrNullIgnoreCase(itemName)?.let {
+        getInternalNameOrNullIgnoreCase(lowercase)?.let {
             return itemNameCache.getOrPut(lowercase) { it }
         }
 
@@ -108,8 +108,7 @@ object ItemNameResolver {
     }
 
     private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
-        val lowercase = itemName.lowercase()
-        itemNameCache[lowercase]?.let {
+        itemNameCache[itemName]?.let {
             return it
         }
 
@@ -118,13 +117,13 @@ object ItemNameResolver {
         }
 
         // supports colored names, rarities
-        NEUItems.allItemsCache[lowercase]?.let {
-            itemNameCache[lowercase] = it
+        NEUItems.allItemsCache[itemName]?.let {
+            itemNameCache[itemName] = it
             return it
         }
 
         // if nothing got found with colors, try without colors
-        val removeColor = lowercase.removeColor()
+        val removeColor = itemName.removeColor()
         return NEUItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 }
