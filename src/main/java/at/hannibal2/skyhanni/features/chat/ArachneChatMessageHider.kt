@@ -48,6 +48,7 @@ object ArachneChatMessageHider {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         if (!shouldHide(event.message)) return
+
         event.blockedReason = "arachne"
     }
 
@@ -58,7 +59,6 @@ object ArachneChatMessageHider {
         }
 
         if (LorenzUtils.skyBlockArea == "Arachne's Sanctuary") return false
-
 
         arachneCallingPattern.matchMatcher(message) {
             return true
