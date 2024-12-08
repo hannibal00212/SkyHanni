@@ -49,7 +49,7 @@ object SprayFeatures {
 
         display = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
-            val type = SprayType.getByName(sprayName)
+            val type = SprayType.getByNameOrNull(sprayName)
             val sprayEffect = type.getSprayEffect()
             "§a${type?.displayName ?: sprayName} §7(§6$sprayEffect§7)"
         } ?: return

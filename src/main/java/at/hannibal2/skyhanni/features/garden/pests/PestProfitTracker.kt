@@ -15,8 +15,11 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -59,6 +63,18 @@ object PestProfitTracker {
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
         "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
+    )
+
+    /**
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aPlant Matter§r§7!
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aDung§r§7!
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aHoney Jar§r§7!
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aTasty Cheese§r§7!
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aCompost§r§7!
+     */
+    private val sprayonatorUsedPattern by patternGroup.pattern(
+        "sprayonator",
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- .* §r§7with §r§.(?<spray>.*)§r§7!",
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
@@ -108,7 +124,12 @@ object PestProfitTracker {
 
         @Expose
         var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
+
+        @Expose
+        var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java)
     }
+
+    private fun SprayType.addSprayUsed() = tracker.modify { it.spraysUsed.addOrPut(this, 1) }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
@@ -119,12 +140,17 @@ object PestProfitTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+        event.checkPestChats()
+        event.checkSprayChats()
+    }
+
+    private fun LorenzChatEvent.checkPestChats() {
         var pestThisRun: PestType? = null
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
+        PestAPI.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
                 "pest_name" to group("pest"),
-                "full_message" to event.message,
+                "full_message" to message,
             )
             pestThisRun = pest
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -136,9 +162,9 @@ object PestProfitTracker {
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
             else if (pest != PestType.FIELD_MOUSE) addKill(pest)
 
-            if (config.hideChat) event.blockedReason = "pest_drop"
+            if (config.hideChat) blockedReason = "pest_drop"
         }
-        pestRareDropPattern.matchMatcher(event.message) {
+        pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NEUInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = pestThisRun ?: PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
@@ -146,13 +172,19 @@ object PestProfitTracker {
 
             // If the amount was fixed, edit the chat message to reflect the change
             if (amount != 1) {
-                event.chatComponent = ChatComponentText(
-                    event.message.replace(itemGroup, "§a${amount}x $itemGroup"),
+                chatComponent = ChatComponentText(
+                    message.replace(itemGroup, "§a${amount}x $itemGroup"),
                 )
             }
 
             tryAddItem(pest, internalName, amount)
             // pests always have guaranteed loot, therefore there's no need to add kill here
+        }
+    }
+
+    private fun LorenzChatEvent.checkSprayChats() {
+        sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
+            SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
     }
 
@@ -202,6 +234,23 @@ object PestProfitTracker {
                 ).toSearchable()
             }
         )
+
+        if (selectedBucket == null || selectedBucket.spray != null) {
+            val applicableSprays = SprayType.getByPestTypeOrAll(selectedBucket)
+            val applicableSpraysUsed = bucketData.spraysUsed.filterKeys { it in applicableSprays }
+            val spraysUsedFormat = "§7Sprays used: §a${applicableSpraysUsed.values.sum().addSeparators()}"
+
+            add(
+                Renderable.hoverTips(
+                    spraysUsedFormat,
+                    buildList {
+                        applicableSpraysUsed.forEach { (spray, count) ->
+                            add("§7${spray.displayName}: §a${count.addSeparators()}")
+                        }
+                    }
+                ).toSearchable()
+            )
+        }
 
         add(tracker.addTotalProfit(profit, bucketData.getTotalPestCount(), "kill"))
 

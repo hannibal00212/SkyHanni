@@ -11,6 +11,11 @@ enum class SprayType(val displayName: String) {
 
     companion object {
 
-        fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByPestTypeOrAll(pestType: PestType?) = entries.filter {
+            it == pestType?.spray
+        }.takeIf {
+            it.isNotEmpty()
+        } ?: entries
     }
 }
