@@ -12,10 +12,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object OpenLastStorage {
-    private enum class StorageType(val commands: List<String>) {
-        ENDER_CHEST(listOf("/enderchest", "/ec")),
-        BACKPACK(listOf("/backpack", "/bp")),
+    private enum class StorageType(val commands: List<String>, val validPages: IntRange, val openStorage: (Int) -> Unit) {
+        ENDER_CHEST(listOf("/enderchest", "/ec"), 1..9, { HypixelCommands.openEnderChest(it) }),
+        BACKPACK(listOf("/backpack", "/bp"), 0..18, { HypixelCommands.openBackpack(it) }),
         ;
+
+        val storageName = name.lowercase().replace("_", " ")
+        var lastPage: Int? = null
+        fun isValidPage(page: Int) = page in validPages
 
         companion object {
             fun fromCommand(command: String): StorageType? {
@@ -24,23 +28,17 @@ object OpenLastStorage {
         }
     }
 
-    private var lastBackpack: Int? = null
-    private var lastEnderChest: Int? = null
-
-    // Default to Ender Chest as last storage type, since every profile on any
-    // account has at least one partial ender chest page unlocked
+    // Default to Ender Chest as last storage type, since every profile on any account has at least one partial ender chest page unlocked
     private var lastStorageType = StorageType.ENDER_CHEST
 
     private fun openLastStoragePage(storageType: StorageType) {
-        val storageItem = when (storageType) {
-            StorageType.BACKPACK -> lastBackpack.also { backpack -> backpack?.let { HypixelCommands.openBackpack(it) } }
-            StorageType.ENDER_CHEST -> lastEnderChest.also { enderChest -> enderChest?.let { HypixelCommands.openEnderChest(it) } }
-        }
 
-        val storageMessage = storageItem?.let { "Opened last ${storageType.name.lowercase().replace("_", " ")} $it." }
-            ?: "No last ${storageType.name.lowercase().replace("_", " ")} to open."
+        storageType.lastPage?.let { storageType.openStorage(it) }
 
-        ChatUtils.chat(storageMessage)
+        val message = storageType.lastPage?.let { page ->
+            "Opened last ${storageType.storageName} $page."
+        } ?: "No last ${storageType.storageName} to open."
+        ChatUtils.chat(message)
     }
 
     @SubscribeEvent
@@ -65,34 +63,27 @@ object OpenLastStorage {
     }
 
     private fun handleStorage(args: List<String>, storageType: StorageType): Boolean {
-
         if (args.size > 1 && args[1] == "-") {
             openLastStoragePage(storageType)
             return true
         }
-        val lastStorageVariable = when (storageType) {
-            StorageType.BACKPACK -> ::lastBackpack
-            StorageType.ENDER_CHEST -> ::lastEnderChest
-        }
 
+        // No argument means open the first page of the respective storage
         if (args.size <= 1) {
-            // No argument means open the first page of the respective storage
-            lastStorageVariable.set(1)
+            storageType.lastPage = 1
             lastStorageType = storageType
             return false
         }
 
         val intArg = args[1].toIntOrNull() ?: return false
 
-        lastStorageVariable.set(
-            when (storageType) {
-                // "/bp 0" still is a valid command (leads to the overview menu)
-                StorageType.BACKPACK -> if (intArg < 0 || intArg > 18) null else intArg
-                StorageType.ENDER_CHEST -> if (intArg < 1 || intArg > 9) null else intArg
-            },
-        )
-        lastStorageType = storageType
+        storageType.lastPage = if (storageType.isValidPage(intArg)) {
+            intArg
+        } else {
+            null
+        }
 
+        lastStorageType = storageType
         return false
     }
 }
