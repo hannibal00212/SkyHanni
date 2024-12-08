@@ -17,9 +17,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object CropAccessoryData {
 
+    /**
+     * REGEX-TEST: Accessory Bag (1/2)
+     */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "data.accessory.bagname.new",
-        "Accessory Bag.*"
+        "Accessory Bag.*",
     )
 
     private var accessoryInBag = CropAccessory.NONE

@@ -19,9 +19,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object InfernoMinionFeatures {
     private val config get() = SkyHanniMod.feature.misc.minions
+
+    /**
+     * REGEX-TEST: Inferno Minion II
+     * REGEX-TEST: Inferno Minion IX
+     */
     private val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
-        "Inferno Minion .*"
+        "Inferno Minion .*",
     )
     private var fuelItemIds = listOf<NEUInternalName>()
     private var inInventory = false

@@ -142,7 +142,7 @@ public class DungeonConfig {
     @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean terminalWaypoints = false;
+    public boolean terminalWaypoints = true;
 
     @Expose
     @ConfigOption(name = "Dungeon Races Guide", desc = "")

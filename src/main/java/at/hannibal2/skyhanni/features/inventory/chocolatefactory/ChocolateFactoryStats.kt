@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -49,9 +50,11 @@ object ChocolateFactoryStats {
 
         val position = ChocolateFactoryAPI.leaderboardPosition
         val positionText = position?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile?.let { "§7Top §a$it%" }.orEmpty()
-        val leaderboard = "#$positionText $percentile"
+        val percentile = ChocolateFactoryAPI.leaderboardPercentile
+        val percentileText = percentile?.let { "§7Top §a$it%" }.orEmpty()
+        val leaderboard = "#$positionText $percentileText"
         ChocolatePositionChange.update(position, leaderboard)
+        HoppityEventSummary.updateCfPosition(position, percentile)
 
         val timeTowerInfo = if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
             "§d§lActive"
@@ -97,6 +100,7 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.EMPTY_2, "")
             put(ChocolateFactoryStat.EMPTY_3, "")
             put(ChocolateFactoryStat.EMPTY_4, "")
+            put(ChocolateFactoryStat.EMPTY_5, "")
 
             put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
             put(
@@ -109,7 +113,6 @@ object ChocolateFactoryStats {
                         "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
                 },
             )
-            put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
@@ -183,6 +186,7 @@ object ChocolateFactoryStats {
         EMPTY_2(""),
         EMPTY_3(""),
         EMPTY_4(""),
+        EMPTY_5(""),
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
         TIME_TOWER_FULL(
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
@@ -195,6 +199,9 @@ object ChocolateFactoryStats {
             "§eBest Upgrade: §b 59m 4s",
             { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
         ),
+        AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §b3"),
+        HITMAN_SLOT_COOLDOWN("§Hitman Slot Cooldown: §b8m 6s"),
+        HITMAN_ALL_SLOTS("§eAll Hitman Slots Cooldown: §b8h 8m 6s"),
         ;
 
         override fun toString(): String {

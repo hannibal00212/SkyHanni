@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -28,7 +28,7 @@ object DungeonArchitectFeatures {
         "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
     )
 
-    private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".asInternalName()
+    private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".toInternalName()
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -42,7 +42,7 @@ object DungeonArchitectFeatures {
         }
     }
 
-    private val architectsFirstDraft = "ARCHITECT_FIRST_DRAFT".asInternalName().makePrimitiveStack()
+    private val architectsFirstDraft = "ARCHITECT_FIRST_DRAFT".toInternalName().makePrimitiveStack()
 
     private fun generateMessage(name: String, event: LorenzChatEvent) {
         val architectItemAmount = architectsFirstDraftItem.getAmountInSacks()
