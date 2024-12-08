@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,11 +12,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object OpenLastStorage {
     private enum class StorageType {
-        ENDER_CHEST, BACKPACK
+        ENDER_CHEST,
+        BACKPACK
     }
 
     private var lastBackpack: Int? = null
     private var lastEnderChest: Int? = null
+
     // Default to Ender Chest as last storage type, since every profile on any
     // account has at least one partial ender chest page unlocked
     private var lastStorageType = StorageType.ENDER_CHEST
@@ -46,15 +50,15 @@ object OpenLastStorage {
         ) {
             handleStorage(event, message, StorageType.ENDER_CHEST)
         }
+    }
 
-        // Non-Hypixel combined "last opened" command for backpack + ender chest.
-        // Cannot use startsWith for the shorthand-form command because of /locraw:
-        if (!message.startsWith("/lastopened") && message != "/lo"
-        ) {
-            return
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shlastopened") {
+            description = "Opens the storage page last accessed by either /ec or /bp"
+            aliases = listOf("shlo")
+            callback { openLastStorage(lastStorageType) }
         }
-        event.isCanceled = true
-        openLastStorage(lastStorageType)
     }
 
     private fun handleStorage(event: MessageSendToServerEvent, message: String, storageType: StorageType) {
@@ -96,7 +100,7 @@ object OpenLastStorage {
                     // "/bp 0" still is a valid command (leads to the overview menu)
                     StorageType.BACKPACK -> if (intArg < 0 || intArg > 18) null else intArg
                     StorageType.ENDER_CHEST -> if (intArg < 1 || intArg > 9) null else intArg
-                }
+                },
             )
             lastStorageType = storageType
         }
