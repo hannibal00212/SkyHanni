@@ -75,7 +75,7 @@ enum class OreBlock(
 
     // END
     END_STONE(Blocks.end_stone, { inEnd }, OreCategory.BLOCK),
-    OBSIDIAN(Blocks.obsidian, { inCrystalHollows || inEnd }, OreCategory.ORE),
+    OBSIDIAN(Blocks.obsidian, { inCrystalHollows || inMineshaft || inEnd }, OreCategory.ORE),
 
     // HARD STONE
     HARD_STONE_HOLLOWS(::isHardStoneHollows, { inCrystalHollows }, OreCategory.BLOCK),
@@ -85,7 +85,7 @@ enum class OreBlock(
     // DWARVEN BLOCKS
     PURE_COAL(Blocks.coal_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     PURE_IRON(Blocks.iron_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
-    PURE_GOLD(Blocks.gold_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_GOLD(Blocks.gold_block, { inDwarvenMines || inCrystalHollows || inMineshaft }, OreCategory.ORE, hasInitSound = false),
     PURE_LAPIS(Blocks.lapis_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
@@ -107,6 +107,7 @@ enum class OreBlock(
 
     // GLACIAL
     LOW_TIER_UMBER(::isLowTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
+    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }),
     HIGH_TIER_UMBER(::isHighTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
 
     LOW_TIER_TUNGSTEN_TUNNELS(::isLowTierTungstenTunnels, { inTunnels }, OreCategory.DWARVEN_METAL),
@@ -192,8 +193,10 @@ private fun isRedSand(state: IBlockState): Boolean =
     (state.block == Blocks.sand && state.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND)
 
 private fun isLowTierUmber(state: IBlockState): Boolean =
-    state.block == Blocks.hardened_clay ||
-        (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
+    state.block == Blocks.hardened_clay
+
+private fun isMidTierUmber(state: IBlockState): Boolean =
+    (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
 
 private fun isHighTierUmber(state: IBlockState): Boolean =
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
