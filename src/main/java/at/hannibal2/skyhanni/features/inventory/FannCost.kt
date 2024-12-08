@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -134,18 +133,14 @@ object FannCost {
                 val totalExp = tooltip.getExpEarned() ?: return
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
-                // ChatUtils.debug("Coins: ${tooltip.getCoins()} | Bits: ${tooltip.getBits()} | Exp: $totalExp")
 
                 tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
                 tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
-
             }
 
             TrainingMode.UNTIL_LEVEL -> {
                 val dailyExp = tooltip.getDailyExp() ?: return
                 val duration = tooltip.getDuration() ?: return
-                ChatUtils.debug("Daily EXP: $dailyExp | Duration: $duration")
-
                 val totalExp = dailyExp * duration
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
@@ -190,9 +185,6 @@ object FannCost {
         return null
     }
 
-    /* todo: can also return <pattern>.firstMatcher(this) { group(1)?.formatDouble() }
-        however, current impl solely depends on the pattern being colorless
-     * */
     private fun List<String>.getCoins(): Double {
         return coinsPattern.read(this, "coin") { it.formatDouble() } ?: 0.0
     }
