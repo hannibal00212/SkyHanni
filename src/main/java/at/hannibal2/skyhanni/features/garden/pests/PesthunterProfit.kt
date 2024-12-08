@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -37,10 +37,11 @@ object PesthunterProfit {
 
     /**
      * REGEX-TEST: §2100 Pests
+     * REGEX-TEST: §21,500 Pests
      */
     private val pestCostPattern by patternGroup.pattern(
-        "garden.pests.inventory.cost",
-        "§2(?<pests>\\d+) Pests"
+        "garden.pests.pesthunter.cost",
+        "§2(?<pests>[\\d,]+) Pests"
     )
 
     @SubscribeEvent
@@ -62,7 +63,6 @@ object PesthunterProfit {
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
                     e, "Error in PesthunterProfit while reading item '${item.itemName}'",
-                    "item" to item,
                     "name" to item.itemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
@@ -99,7 +99,7 @@ object PesthunterProfit {
         val color = if (profitPerPest > 0) "§6" else "§c"
 
         val hover = listOf(
-            itemName.replace("[Lvl {LVL}]", "[Lvl 1]"),
+            itemName.replace("[Lvl 100]", "[Lvl 1]"),
             "",
             "§7Item price: §6${itemPrice.shortFormat()} ",
             "§7Material cost: §6${totalCost.shortFormat()} ",
@@ -109,7 +109,7 @@ object PesthunterProfit {
 
         table.add(
             DisplayTableEntry(
-                itemName.replace("[Lvl {LVL}]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
+                itemName.replace("[Lvl 100]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
                 "$color${profitPerPest.shortFormat()}",
                 profitPerPest,
                 internalName,
@@ -142,7 +142,7 @@ object PesthunterProfit {
                     if (line.isBlank()) {
                         next = false
                     } else {
-                        pestCostPattern.matchMatcher(line.replace(",", "")) { break }
+                        pestCostPattern.matchMatcher(line) { break }
                         items.add(line.replace("§8 ", " §8"))
                     }
                 }
@@ -173,9 +173,8 @@ object PesthunterProfit {
     private fun getPestsCost(item: ItemStack): Int {
         val lore = item.getLore()
         for (line in lore) {
-            val pestCost = line.replace(",", "")
-            pestCostPattern.matchMatcher(pestCost) {
-                return group("pests")?.toInt() ?: 0
+            pestCostPattern.matchMatcher(line) {
+                return group("pests")?.formatDoubleOrNull()?.toInt() ?: 0
             }
         }
         return 0
@@ -190,11 +189,5 @@ object PesthunterProfit {
                 posLabel = "Pesthunter Profit",
             )
         }
-    }
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.pesthunterProfitEnabled", "garden.pests.pesthunterProfitEnabled")
-        event.move(3, "garden.pesthunterProfitPos", "garden.pests.pesthunterProfitPos")
     }
 }
