@@ -16,7 +16,7 @@ object LocationFixData {
     private data class LocationFix(val area: AxisAlignedBB, val realLocation: String)
 
     // priority set to low so that IslandType can load their island names from repo earlier
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<LocationFixJson>("LocationFix")
         locationFixes.clear()
