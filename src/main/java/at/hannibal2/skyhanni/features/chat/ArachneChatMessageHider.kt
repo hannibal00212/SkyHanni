@@ -39,9 +39,10 @@ object ArachneChatMessageHider {
      * REGEX-TEST: §dArachne used §r§2Venom Shot §r§don you hitting you for §r§c58 damage §r§dand infecting you with venom.
      * REGEX-TEST: §dArachne's Brood used §r§2Venom Shot §r§don you hitting you for §r§c19.8 damage §r§dand infecting you with venom.
      */
+    @Suppress("MaxLineLength")
     private val venomShotPattern by patternGroup.pattern(
         "venom",
-        "§dArachne(?:'s (?:Keeper|Brood))? used §r§2Venom Shot §r§don you hitting you for §r§c[\\\\d.,]+ damage §r§dand infecting you with venom\\\\."
+        "§dArachne(?:'s (?:Keeper|Brood))? used §r§2Venom Shot §r§don you hitting you for §r§c[\\d.,]+ damage §r§dand infecting you with venom\\."
     )
 
     @SubscribeEvent
