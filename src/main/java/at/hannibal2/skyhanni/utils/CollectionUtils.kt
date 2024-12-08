@@ -498,7 +498,7 @@ object CollectionUtils {
      * @param pattern the pattern to match
      * @param content the content to insert
      */
-    fun MutableList<T>.insertLineAfter(pattern: Pattern, content: T) {
+    fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
         val iter = this.listIterator()
         while (iter.hasNext()) {
             val line = iter.next().removeColor()
