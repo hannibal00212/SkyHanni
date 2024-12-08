@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.insertLineAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -165,15 +166,6 @@ object FannCost {
 
     }
 
-    private fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
-        val iter = this.listIterator()
-        while (iter.hasNext()) {
-            val line = iter.next().removeColor()
-            if (pattern.matcher(line).find()) {
-                iter.add(content)
-            }
-        }
-    }
 
     private fun <T> Pattern.read(lore: List<String>, name: String, func: (String) -> T): T? {
         for (line in lore) {
