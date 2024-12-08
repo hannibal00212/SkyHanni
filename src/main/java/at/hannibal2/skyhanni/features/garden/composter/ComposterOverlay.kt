@@ -505,6 +505,7 @@ object ComposterOverlay {
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
+                replaceSameMessage = true
             )
             return
         }
