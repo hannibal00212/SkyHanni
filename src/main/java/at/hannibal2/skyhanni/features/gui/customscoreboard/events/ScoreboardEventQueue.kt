@@ -16,5 +16,6 @@ object ScoreboardEventQueue : ScoreboardEvent() {
         ScoreboardPattern.queuePattern,
         ScoreboardPattern.queueTierPattern,
         ScoreboardPattern.queuePositionPattern,
+        ScoreboardPattern.queueWaitingForLeaderPattern,
     )
 }
