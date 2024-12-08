@@ -102,6 +102,12 @@ public class ChatConfig {
     public boolean hideArachneMessages = false;
 
     @Expose
+    @ConfigOption(name = "Venom Shot Hider", desc = "Hide chat messages about being hit with a venom shot from §c§lArachne's Keeper §7or §7§lArachne§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean VenomShotHider = false;
+
+    @Expose
     @ConfigOption(
         name = "Sack Change Hider",
         desc = "Hide the sack change message while allowing mods to continue accessing sack data.\n" +
