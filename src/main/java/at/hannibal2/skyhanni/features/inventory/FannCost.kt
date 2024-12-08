@@ -85,7 +85,7 @@ object FannCost {
      */
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        "^(?<coin>.*) Coins",
+        "(?<coin>\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Coins(?: \\([1-5]% off\\))?",
     )
 
     /**
@@ -95,18 +95,7 @@ object FannCost {
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        "(?<bit>.*) Bits",
-    )
-
-    /**
-     * REGEX-TEST: Desired Level: 200
-     * REGEX-TEST: Desired Level: 100
-     * REGEX-TEST: Desired Level: 99
-     * REGEX-TEST: Desired Level: 4
-     */
-    private val desiredLevelPattern by patternGroup.pattern(
-        "slot24.name.level",
-        "Desired Level: 200|1?[0-9]?[0-9]",
+        "(?<bit>\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Bits",
     )
 
     /**
@@ -145,7 +134,7 @@ object FannCost {
                 val totalExp = tooltip.getExpEarned() ?: return
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
-                ChatUtils.debug("Coins: ${tooltip.getCoins()} | Bits: ${tooltip.getBits()} | Exp: $totalExp")
+                // ChatUtils.debug("Coins: ${tooltip.getCoins()} | Bits: ${tooltip.getBits()} | Exp: $totalExp")
 
                 tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
                 tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
@@ -155,6 +144,8 @@ object FannCost {
             TrainingMode.UNTIL_LEVEL -> {
                 val dailyExp = tooltip.getDailyExp() ?: return
                 val duration = tooltip.getDuration() ?: return
+                ChatUtils.debug("Daily EXP: $dailyExp | Duration: $duration")
+
                 val totalExp = dailyExp * duration
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
@@ -171,10 +162,10 @@ object FannCost {
         val slot24 = event.inventoryItems[24] ?: return
 
         val name = slot24.displayName.removeColor()
-        if (desiredLevelPattern.matches(name)) {
-            trainingMode = TrainingMode.UNTIL_LEVEL
-        } else if (userInputPattern.matches(name)) {
+        if (userInputPattern.matches(name)) {
             trainingMode = TrainingMode.DAY_COUNT
+        } else {
+            trainingMode = TrainingMode.UNTIL_LEVEL
         }
 
     }
@@ -193,7 +184,6 @@ object FannCost {
         for (line in lore) {
             val linePlain = line.removeColor()
             this.matchMatcher(linePlain) {
-                ChatUtils.debug("Reading $name: $linePlain")
                 group(name)?.let { return func(it) }
             }
         }
@@ -204,14 +194,12 @@ object FannCost {
         however, current impl solely depends on the pattern being colorless
      * */
     private fun List<String>.getCoins(): Double {
-        val x = coinsPattern.read(this, "coin") { it }
-        ChatUtils.debug("Coins: $x")
-        return coinsPattern.read(this, "coin") { it.replace(',', '\u0000').formatDouble() } ?: 0.0
+        return coinsPattern.read(this, "coin") { it.formatDouble() } ?: 0.0
     }
 
     // In case of Bits not found, return 1 so the division is not by zero
     private fun List<String>.getBits(): Double {
-        return bitsPattern.read(this, "bit") { it.replace(',', '\u0000').formatDouble() } ?: 1.0
+        return bitsPattern.read(this, "bit") { it.formatDouble() } ?: 1.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
@@ -230,7 +218,7 @@ object FannCost {
 
     private fun List<String>.getDuration(): Double? {
         return durationPattern.read(this, "time") {
-            return@read TimeUtils.getDuration(it).toDouble(DurationUnit.DAYS)
+            TimeUtils.getDuration(it).toDouble(DurationUnit.DAYS)
         }
     }
 
