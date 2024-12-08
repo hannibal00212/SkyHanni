@@ -54,7 +54,7 @@ object FriendAPI {
     )
 
     /**
-     * REGEX-TEST: §eClick here to viaaaaaaew §bThrowpo§e's profile
+     * REGEX-TEST: §eClick here to view §bThrowpo§e's profile
      */
     private val rawNamePattern by patternGroup.pattern(
         "rawname",
