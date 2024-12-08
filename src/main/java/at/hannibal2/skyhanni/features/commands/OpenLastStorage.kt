@@ -12,9 +12,16 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object OpenLastStorage {
-    private enum class StorageType {
-        ENDER_CHEST,
-        BACKPACK
+    private enum class StorageType(val commands: List<String>) {
+        ENDER_CHEST(listOf("/enderchest", "/ec")),
+        BACKPACK(listOf("/backpack", "/bp")),
+        ;
+
+        companion object {
+            fun fromCommand(command: String): StorageType? {
+                return entries.find { command in it.commands }
+            }
+        }
     }
 
     private var lastBackpack: Int? = null
@@ -39,17 +46,11 @@ object OpenLastStorage {
     @SubscribeEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.senderIsSkyhanni()) return
+        val args = event.message.lowercase().split(" ")
+        val storageType = StorageType.fromCommand(args[0]) ?: return
 
-        val message = event.message.lowercase()
-
-        if (message.startsWith("/backpack") ||
-            message.startsWith("/bp")
-        ) {
-            handleStorage(event, message, StorageType.BACKPACK)
-        } else if (message.startsWith("/enderchest") ||
-            message.startsWith("/ec")
-        ) {
-            handleStorage(event, message, StorageType.ENDER_CHEST)
+        if (handleStorage(args, storageType)) {
+            event.cancel()
         }
     }
 
@@ -63,50 +64,35 @@ object OpenLastStorage {
         }
     }
 
-    private fun handleStorage(event: MessageSendToServerEvent, message: String, storageType: StorageType) {
-        val commandPrefix = when (storageType) {
-            StorageType.BACKPACK -> arrayOf("/backpack", "/bp")
-            StorageType.ENDER_CHEST -> arrayOf("/enderchest", "/ec")
-        }
+    private fun handleStorage(args: List<String>, storageType: StorageType): Boolean {
 
-        if (!commandPrefix.any { message.startsWith(it) }) {
-            return
-        }
-
-        if (message.startsWith("${commandPrefix[0]} -") ||
-            message.startsWith("${commandPrefix[1]} -")
-        ) {
-            event.isCanceled = true
-            // Opener function will check whether previous value != null
+        if (args.size > 1 && args[1] == "-") {
             openLastStoragePage(storageType)
-            return
+            return true
         }
-
-        val parts = message.split(" ")
         val lastStorageVariable = when (storageType) {
             StorageType.BACKPACK -> ::lastBackpack
             StorageType.ENDER_CHEST -> ::lastEnderChest
         }
 
-        if (parts.size <= 1) {
+        if (args.size <= 1) {
             // No argument means open the first page of the respective storage
             lastStorageVariable.set(1)
             lastStorageType = storageType
-            return
+            return false
         }
 
-        val intArg = parts[1].toIntOrNull()
-        if (intArg != null) {
-            lastStorageVariable.set(
-                when (storageType) {
-                    // "/bp 0" still is a valid command (leads to the overview menu)
-                    StorageType.BACKPACK -> if (intArg < 0 || intArg > 18) null else intArg
-                    StorageType.ENDER_CHEST -> if (intArg < 1 || intArg > 9) null else intArg
-                },
-            )
-            lastStorageType = storageType
-        }
+        val intArg = args[1].toIntOrNull() ?: return false
 
-        return
+        lastStorageVariable.set(
+            when (storageType) {
+                // "/bp 0" still is a valid command (leads to the overview menu)
+                StorageType.BACKPACK -> if (intArg < 0 || intArg > 18) null else intArg
+                StorageType.ENDER_CHEST -> if (intArg < 1 || intArg > 9) null else intArg
+            },
+        )
+        lastStorageType = storageType
+
+        return false
     }
 }
