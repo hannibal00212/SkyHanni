@@ -8,13 +8,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
+import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object FannCost {
@@ -84,7 +85,7 @@ object FannCost {
      */
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        "(?<coin>.*) Coins",
+        "^(?<coin>.*) Coins",
     )
 
     /**
@@ -103,9 +104,9 @@ object FannCost {
      * REGEX-TEST: Desired Level: 99
      * REGEX-TEST: Desired Level: 4
      */
-    private val desiredLevelPatter by patternGroup.pattern(
+    private val desiredLevelPattern by patternGroup.pattern(
         "slot24.name.level",
-        "Desired Level: (200|1?[0-9]?[0-9])",
+        "Desired Level: 200|1?[0-9]?[0-9]",
     )
 
     /**
@@ -170,7 +171,7 @@ object FannCost {
         val slot24 = event.inventoryItems[24] ?: return
 
         val name = slot24.displayName.removeColor()
-        if (desiredLevelPatter.matches(name)) {
+        if (desiredLevelPattern.matches(name)) {
             trainingMode = TrainingMode.UNTIL_LEVEL
         } else if (userInputPattern.matches(name)) {
             trainingMode = TrainingMode.DAY_COUNT
@@ -203,12 +204,14 @@ object FannCost {
         however, current impl solely depends on the pattern being colorless
      * */
     private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this, "coin") { it.formatDouble() } ?: 0.0
+        val x = coinsPattern.read(this, "coin") { it }
+        ChatUtils.debug("Coins: $x")
+        return coinsPattern.read(this, "coin") { it.replace(',', '\u0000').formatDouble() } ?: 0.0
     }
 
     // In case of Bits not found, return 1 so the division is not by zero
     private fun List<String>.getBits(): Double {
-        return bitsPattern.read(this, "bit") { it.formatDouble() } ?: 1.0
+        return bitsPattern.read(this, "bit") { it.replace(',', '\u0000').formatDouble() } ?: 1.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
@@ -226,21 +229,9 @@ object FannCost {
     }
 
     private fun List<String>.getDuration(): Double? {
-        for (line in this) {
-            val linePlain = line.removeColor()
-            val matcher = durationPattern.matcher(linePlain)
-            if (matcher.find()) {
-                val days = matcher.groupOrNull("day")?.toInt() ?: 0
-                val hours = matcher.groupOrNull("hr")?.toInt() ?: 0
-                val minutes = matcher.groupOrNull("min")?.toInt() ?: 0
-                val seconds = matcher.groupOrNull("sec")?.toInt() ?: 0
-
-                val totalDays = days + hours / 24.0 + minutes / 1440.0 + seconds / 86400.0
-
-                return totalDays
-            }
+        return durationPattern.read(this, "time") {
+            return@read TimeUtils.getDuration(it).toDouble(DurationUnit.DAYS)
         }
-        return null
     }
 
     private enum class TrainingMode {
