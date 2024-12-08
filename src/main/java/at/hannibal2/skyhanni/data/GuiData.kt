@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.enoughupdates.NEURenderEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.NEURenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

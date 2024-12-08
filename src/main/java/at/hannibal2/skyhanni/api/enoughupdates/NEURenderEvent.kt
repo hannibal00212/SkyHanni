@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 
