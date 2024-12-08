@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.IslandType.entries
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -50,18 +49,6 @@ enum class IslandType {
         fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 
         fun getByNameOrNull(name: String) = entries.firstOrNull { it.islandData?.name == name }
-
-        @SubscribeEvent
-        fun onDebug(event: DebugDataCollectEvent) {
-            event.title("IslandType")
-            event.addIrrelevant {
-                add("Max players fallback: ${islandTypesData?.maxPlayers}")
-                add("Max players mega fallback ${islandTypesData?.maxPlayersMega}")
-                islandTypesData?.islands?.forEach {
-                    add("${it.key}: ${it.value.name} - ${it.value.apiName} - ${it.value.maxPlayers}")
-                }
-            }
-        }
 
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) {
