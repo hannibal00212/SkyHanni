@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,7 +51,7 @@ object FannCost {
      */
     private val expEarnedPattern by patternGroup.pattern(
         "exp.total",
-        "Will earn a total of (\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) EXP\\.?",
+        "Will earn a total of (?<expEarned>.*) EXP\\.?",
     )
 
     /**
@@ -60,7 +62,7 @@ object FannCost {
      */
     private val dailyExpPattern by patternGroup.pattern(
         "exp.daily",
-        "EXP Per Day: ([\\d,]+)(?: \\(\\+\\d{1,2}(\\.\\d{1,2})?%\\))?",
+        "EXP Per Day: (?<expDaily>\\d[\\d,]*)",
     )
 
     /**
@@ -71,7 +73,7 @@ object FannCost {
      */
     private val durationPattern by patternGroup.pattern(
         "training.duration.pattern",
-        "Will take: (?<day>\\d+)d (?<hr>\\d{1,2})h (?<min>\\d{1,2})m (?<sec>\\d{1,2})s",
+        "Will take: (?<time>.*)",
     )
 
     /**
@@ -82,7 +84,7 @@ object FannCost {
      */
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Coins(?: \\([1-5]% off\\))?",
+        "(?<coin>.*) Coins",
     )
 
     /**
@@ -92,7 +94,7 @@ object FannCost {
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Bits",
+        "(?<bit>.*) Bits",
     )
 
     /**
@@ -124,7 +126,7 @@ object FannCost {
      */
     private val trainingTypePattern by patternGroup.pattern(
         "training.type",
-        "Type: (Free|Light|Moderate|Expert|Ultra|Turbo!)",
+        "Type: (?<type>.*)",
     )
 
     @SubscribeEvent
@@ -142,6 +144,7 @@ object FannCost {
                 val totalExp = tooltip.getExpEarned() ?: return
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
+                ChatUtils.debug("Coins: ${tooltip.getCoins()} | Bits: ${tooltip.getBits()} | Exp: $totalExp")
 
                 tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
                 tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
@@ -185,14 +188,12 @@ object FannCost {
         }
     }
 
-    // To avoid duplicate code
-    private fun <T> Pattern.read(lore: List<String>, func: (String) -> T): T? {
+    private fun <T> Pattern.read(lore: List<String>, name: String, func: (String) -> T): T? {
         for (line in lore) {
             val linePlain = line.removeColor()
-            val matcher = matcher(linePlain)
-            if (matcher.find()) {
-                val res = matcher.group(1)
-                return func(res)
+            this.matchMatcher(linePlain) {
+                ChatUtils.debug("Reading $name: $linePlain")
+                group(name)?.let { return func(it) }
             }
         }
         return null
@@ -202,24 +203,24 @@ object FannCost {
         however, current impl solely depends on the pattern being colorless
      * */
     private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this) { it.formatDouble() } ?: 0.0
+        return coinsPattern.read(this, "coin") { it.formatDouble() } ?: 0.0
     }
 
     // In case of Bits not found, return 1 so the division is not by zero
     private fun List<String>.getBits(): Double {
-        return bitsPattern.read(this) { it.formatDouble() } ?: 1.0
+        return bitsPattern.read(this, "bit") { it.formatDouble() } ?: 1.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
-        return expEarnedPattern.read(this) { it.formatDouble() }
+        return expEarnedPattern.read(this, "expEarned") { it.formatDouble() }
     }
 
     private fun List<String>.getDailyExp(): Double? {
-        return dailyExpPattern.read(this) { it.formatDouble() }
+        return dailyExpPattern.read(this, "expDaily") { it.formatDouble() }
     }
 
     private fun List<String>.getTrainingType(): TrainingType? {
-        return trainingTypePattern.read(this) { typestr ->
+        return trainingTypePattern.read(this, "type") { typestr ->
             TrainingType.entries.firstOrNull { it.type == typestr }
         }
     }
