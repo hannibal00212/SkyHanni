@@ -85,7 +85,11 @@ enum class OreBlock(
     // DWARVEN BLOCKS
     PURE_COAL(Blocks.coal_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     PURE_IRON(Blocks.iron_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
-    PURE_GOLD(Blocks.gold_block, { inDwarvenMines || inCrystalHollows || inMineshaft }, OreCategory.ORE, hasInitSound = false),
+    PURE_GOLD(
+        Blocks.gold_block,
+        { inDwarvenMines || inCrystalHollows || inMineshaft },
+        OreCategory.ORE, hasInitSound = false,
+    ),
     PURE_LAPIS(Blocks.lapis_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
     PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
@@ -107,7 +111,7 @@ enum class OreBlock(
 
     // GLACIAL
     LOW_TIER_UMBER(::isLowTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
-    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }),
+    MID_TIER_UMBER(::isMidTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
     HIGH_TIER_UMBER(::isHighTierUmber, { inGlacite }, OreCategory.DWARVEN_METAL),
 
     LOW_TIER_TUNGSTEN_TUNNELS(::isLowTierTungstenTunnels, { inTunnels }, OreCategory.DWARVEN_METAL),

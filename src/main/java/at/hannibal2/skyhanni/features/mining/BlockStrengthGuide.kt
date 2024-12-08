@@ -80,6 +80,7 @@ object BlockStrengthGuide {
             { ItemStack(Blocks.clay) },
             setOf(
                 OreBlock.LOW_TIER_UMBER,
+                OreBlock.MID_TIER_UMBER,
                 OreBlock.HIGH_TIER_UMBER,
                 OreBlock.LOW_TIER_TUNGSTEN_MINESHAFT,
                 OreBlock.LOW_TIER_TUNGSTEN_MINESHAFT,
