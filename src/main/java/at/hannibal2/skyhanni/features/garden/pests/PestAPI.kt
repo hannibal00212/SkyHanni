@@ -255,7 +255,7 @@ object PestAPI {
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
-            PestKillEvent().post()
+            PestKillEvent.post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
