@@ -34,17 +34,29 @@ object ArachneChatMessageHider {
         "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"
     )
 
+    /**
+     * REGEX-TEST: §dArachne's Keeper used §r§2Venom Shot §r§don you hitting you for §r§c87.7 damage §r§dand infecting you with venom
+     */
+    private val venomShotPattern by patternGroup.pattern(
+        "venom",
+        "§dArachne('s Keeper)? used §r§2Venom Shot §r§don you hitting you for §r§c\\d*\\.\\d damage §r§dand infecting you with venom\\."
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea == "Arachne's Sanctuary") return
-
         if (shouldHide(event.message)) {
             event.blockedReason = "arachne"
         }
     }
-
     private fun shouldHide(message: String): Boolean {
+
+        venomShotPattern.matchMatcher(message) {
+            return true
+        }
+
+            if (LorenzUtils.skyBlockArea == "Arachne's Sanctuary") return false
+
 
         arachneCallingPattern.matchMatcher(message) {
             return true
@@ -52,7 +64,6 @@ object ArachneChatMessageHider {
         arachneCrystalPattern.matchMatcher(message) {
             return true
         }
-
         arachneSpawnPattern.matchMatcher(message) {
             return true
         }
