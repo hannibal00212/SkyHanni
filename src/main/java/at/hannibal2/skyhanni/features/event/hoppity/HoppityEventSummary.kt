@@ -6,12 +6,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.CURRENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.NEXT_EVENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.PAST_EVENTS
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -377,7 +374,10 @@ object HoppityEventSummary {
 
     private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
         buildList {
-            addString("§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+            addString(
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+            )
             val eventEnd = getEventEndMark(statYear)
             val yearNow = getCurrentSBYear()
             val isHoppity = HoppityAPI.isHoppityEvent()
