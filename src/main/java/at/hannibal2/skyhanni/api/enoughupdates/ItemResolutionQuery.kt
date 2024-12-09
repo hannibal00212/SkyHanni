@@ -9,7 +9,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
+import at.hannibal2.skyhanni.utils.StringUtils.removeAllNonLettersAndNumbers
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -119,7 +121,7 @@ class ItemResolutionQuery {
 
         fun resolveEnchantmentByName(displayName: String): String? =
             UtilsPatterns.enchantmentNamePattern.matchMatcher(displayName) {
-                val name = group("name").cleanString()
+                val name = group("name").removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets()
                 val ultimate = group("format").lowercase().contains("§l")
                 val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
                 val cleanedEnchantName = turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
