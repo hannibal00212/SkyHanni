@@ -444,7 +444,7 @@ object HypixelData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)

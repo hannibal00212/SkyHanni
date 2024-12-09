@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -36,7 +37,7 @@ object MotesSession {
         "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RIFT_INFO)) return
         lifetimeMotesPattern.firstMatcher(event.widget.lines) {

@@ -158,7 +158,7 @@ object EnderNodeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return

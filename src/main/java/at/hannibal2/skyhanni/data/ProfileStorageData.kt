@@ -76,7 +76,7 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PROFILE)) return
         noTabListTime = if (event.isClear()) SimpleTimeMark.now() else SimpleTimeMark.farPast()

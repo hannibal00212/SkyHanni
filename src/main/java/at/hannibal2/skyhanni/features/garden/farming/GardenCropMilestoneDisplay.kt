@@ -107,7 +107,7 @@ object GardenCropMilestoneDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
 

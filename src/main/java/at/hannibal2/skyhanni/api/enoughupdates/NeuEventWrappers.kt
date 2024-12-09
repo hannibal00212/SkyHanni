@@ -73,6 +73,6 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
+        NeuRepositoryReloadEvent.post()
     }
 }

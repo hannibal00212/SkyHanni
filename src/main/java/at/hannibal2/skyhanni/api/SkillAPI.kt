@@ -139,7 +139,7 @@ object SkillAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.readConstant<NeuSkillLevelJson>("leveling")
 

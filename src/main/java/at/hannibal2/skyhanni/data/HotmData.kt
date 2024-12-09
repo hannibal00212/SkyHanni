@@ -727,7 +727,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach {

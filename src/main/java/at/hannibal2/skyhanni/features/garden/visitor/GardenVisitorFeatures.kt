@@ -344,7 +344,7 @@ object GardenVisitorFeatures {
         add(list)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             update()

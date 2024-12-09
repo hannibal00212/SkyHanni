@@ -68,7 +68,7 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.VISITORS)) return

@@ -114,7 +114,7 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) ||

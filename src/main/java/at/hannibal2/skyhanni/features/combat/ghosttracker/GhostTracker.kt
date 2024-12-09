@@ -276,7 +276,7 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !isEnabled()) return

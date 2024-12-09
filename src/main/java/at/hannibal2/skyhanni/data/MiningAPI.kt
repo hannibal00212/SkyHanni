@@ -256,7 +256,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {

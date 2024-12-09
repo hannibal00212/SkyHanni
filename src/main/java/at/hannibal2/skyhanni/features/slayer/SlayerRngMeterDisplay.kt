@@ -196,7 +196,7 @@ object SlayerRngMeterDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rngScore = event.readConstant<NeuRNGScore>("rngscore").slayer
     }
