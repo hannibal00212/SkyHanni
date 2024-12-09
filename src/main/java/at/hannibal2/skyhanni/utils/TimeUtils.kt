@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -153,6 +155,25 @@ object TimeUtils {
             },
         ).orEmpty()
     }
+
+    fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
+        if (SkyHanniMod.feature.event.hoppityEggs.eventSummary.liveDisplay.dateTimeFormat == RELATIVE)
+            Pair(passedSince().absoluteValue.format(maxUnits = 2), false)
+        else {
+            val timeNow = SimpleTimeMark.now().toLocalDateTime()
+            val timeThen = toLocalDateTime()
+
+            val yearDiff = timeThen.year - timeNow.year
+            val monthDiff = timeThen.monthValue - timeNow.monthValue
+            val dayDiff = timeThen.dayOfMonth - timeNow.dayOfMonth
+
+            val dateFormat = when {
+                yearDiff == 0 && monthDiff == 0 && dayDiff == 0 -> "HH:mm:ss"
+                (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
+                else -> "yyyy-MM-dd HH:mm"
+            }
+            Pair(formattedDate(dateFormat), true)
+        }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 

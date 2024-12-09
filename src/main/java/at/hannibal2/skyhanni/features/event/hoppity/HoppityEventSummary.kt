@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.CURRENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.NEXT_EVENT
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.PAST_EVENTS
@@ -56,6 +58,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.formatForHoppity
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -312,7 +315,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = getCurrentSBYear().getEventEndMark()
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSBYear())
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -340,24 +343,6 @@ object HoppityEventSummary {
         lastKnownStatHash = 0
         timerSecondCounter = 0
     }
-
-    private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
-        if (liveDisplayConfig.dateTimeFormat == RELATIVE) Pair(passedSince().absoluteValue.format(maxUnits = 2), false)
-        else {
-            val timeNow = SimpleTimeMark.now().toLocalDateTime()
-            val timeThen = toLocalDateTime()
-
-            val yearDiff = timeThen.year - timeNow.year
-            val monthDiff = timeThen.monthValue - timeNow.monthValue
-            val dayDiff = timeThen.dayOfMonth - timeNow.dayOfMonth
-
-            val dateFormat = when {
-                yearDiff == 0 && monthDiff == 0 && dayDiff == 0 -> "HH:mm:ss"
-                (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
-                else -> "yyyy-MM-dd HH:mm"
-            }
-            Pair(formattedDate(dateFormat), true)
-        }
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
@@ -392,40 +377,39 @@ object HoppityEventSummary {
 
     private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
         buildList {
-            addString(
-                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            )
-            val eventEnd = statYear.getEventEndMark()
+            addString("§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER)
+            val eventEnd = getEventEndMark(statYear)
             val yearNow = getCurrentSBYear()
             val isHoppity = HoppityAPI.isHoppityEvent()
 
             val isCurrentEvent = isHoppity && statYear == yearNow
             val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
-            val isNextEvent = statYear > yearNow
 
-            when {
-                isCurrentEvent && liveDisplayConfig.dateTimeDisplay.contains(CURRENT) -> {
-                    eventEnd.formatForHoppity().let { (str, isAbsolute) ->
-                        val grammarWord = if (isAbsolute) "Ends" else "Ends in"
-                        addCenteredString("§7$grammarWord §f$str")
-                    }
-                }
-                isPastEvent && liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS) -> {
-                    eventEnd.formatForHoppity().let { (str, isAbsolute) ->
-                        val grammarWord = if (isAbsolute) "" else " ago"
-                        addCenteredString("§7Ended §f$str$grammarWord")
-                    }
-                }
-                isNextEvent && liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT) -> {
-                    statYear.getEventStartMark().formatForHoppity().let { (str, isAbsolute) ->
-                        val grammarWord = if (isAbsolute) "Starts" else "Starts in"
-                        addCenteredString("§7$grammarWord §f$str")
-                    }
-                }
-                else -> currentTimerActive = false
+            val configMatches = when {
+                isCurrentEvent -> liveDisplayConfig.dateTimeDisplay.contains(CURRENT)
+                isPastEvent -> liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS)
+                else -> liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
+            }
+            if (!configMatches) return@buildList
+
+            val (timeMarkFormat, timeMarkAbs) = when {
+                isCurrentEvent || isPastEvent -> eventEnd
+                else -> getEventStartMark(statYear)
+            }.formatForHoppity()
+
+            val grammarFormat = when {
+                isCurrentEvent -> if (timeMarkAbs) "Ends" else "Ends in"
+                isPastEvent -> if (timeMarkAbs) "" else " ago"
+                else -> if (timeMarkAbs) "Starts" else "Starts in"
             }
 
+            addCenteredString(
+                when {
+                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
+                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
+                    else -> "§7$grammarFormat §f$timeMarkFormat"
+                }
+            )
         },
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
     )
