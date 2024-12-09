@@ -29,7 +29,7 @@ object StringUtils {
     private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
-    private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9]".toPattern()
+    private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
     fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
 

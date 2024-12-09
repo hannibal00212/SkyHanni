@@ -87,7 +87,7 @@ class ItemResolutionQuery {
                 }
 
                 val isMangledMatch = mayBeMangled && !cleanDisplayName.contains(cleanItemDisplayName)
-                val isExactMatch = !mayBeMangled && cleanItemDisplayName == cleanDisplayName
+                val isExactMatch = !mayBeMangled && cleanItemDisplayName != cleanDisplayName
 
                 if (isMangledMatch || isExactMatch) {
                     continue
@@ -100,8 +100,7 @@ class ItemResolutionQuery {
             return bestMatch
         }
 
-        private fun findInternalNameCandidatesForDisplayName(displayName: String?): Set<String> {
-            if (displayName == null) return emptySet()
+        private fun findInternalNameCandidatesForDisplayName(displayName: String): Set<String> {
             val isPet = displayName.contains("[Lvl ")
             val cleanDisplayName = displayName.cleanString()
             val titleWordMap = EnoughUpdatesManager.titleWordMap
@@ -120,7 +119,7 @@ class ItemResolutionQuery {
 
         fun resolveEnchantmentByName(displayName: String): String? =
             UtilsPatterns.enchantmentNamePattern.matchMatcher(displayName) {
-                val name = group("name").trim { it <= ' ' }
+                val name = group("name").cleanString()
                 val ultimate = group("format").lowercase().contains("§l")
                 val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
                 val cleanedEnchantName = turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
@@ -272,9 +271,13 @@ class ItemResolutionQuery {
         val inventorySlots = chest.inventorySlots as ContainerChest
         val guiName = inventorySlots.lowerChestInventory.displayName.unformattedText
         val isOnBazaar: Boolean = isBazaar(inventorySlots.lowerChestInventory)
-        val displayName: String = ItemUtils.getDisplayName(compound) ?: return null
+        var displayName: String = ItemUtils.getDisplayName(compound) ?: return null
+        displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
         if (itemType === Items.enchanted_book && isOnBazaar && compound != null) {
             return resolveEnchantmentByName(displayName)
+        }
+        if (itemType === Items.skull && displayName.contains("Essence")) {
+            return findInternalNameByDisplayName(displayName, false)
         }
         if (displayName.endsWith("Enchanted Book") && guiName.startsWith("Superpairs")) {
             for (loreLine in compound.getLore()) {
