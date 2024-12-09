@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.EffectDurationChangeType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
-import at.hannibal2.skyhanni.features.misc.effects.EffectAPI.NonGodPotEffect
+import at.hannibal2.skyhanni.api.EffectAPI.NonGodPotEffect
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands

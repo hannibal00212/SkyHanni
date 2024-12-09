@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.effects
+package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.EffectDurationChangeEvent
