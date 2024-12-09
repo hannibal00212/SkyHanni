@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
@@ -73,7 +74,7 @@ object MiningNotifications {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
         if (!inGlaciteArea()) return
         if (!config.enabled) return

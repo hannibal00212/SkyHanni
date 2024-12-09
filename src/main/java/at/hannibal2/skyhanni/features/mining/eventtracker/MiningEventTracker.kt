@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.BossbarData
@@ -85,7 +86,7 @@ object MiningEventTracker {
         lastSentEvent = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
@@ -226,7 +227,8 @@ object MiningEventTracker {
                 if (data.toString() == "{}") {
                     ChatUtils.chat(
                         "§cFailed loading Mining Event data!\n" +
-                            "Please wait until the server problem fixes itself! There is nothing else to do at the moment.",
+                            "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
+                        replaceSameMessage = true,
                     )
                 } else {
                     ErrorManager.logErrorWithData(

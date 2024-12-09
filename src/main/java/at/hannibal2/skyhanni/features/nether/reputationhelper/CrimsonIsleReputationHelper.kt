@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -46,14 +47,13 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     var tabListQuestsMissing = false
 
     /**
-     *  c - Barbarian Not Accepted
-     *  d - Mage Not Accepted
-     *  e - Accepted
-     *  a - Completed
+     * REGEX-TEST:  §r§c✖ Rescue Mission
+     * REGEX-TEST:  §r§a✔ Digested Mushrooms §r§8x20
+     * REGEX-TEST:  §r§c✖ Slugfish §r§8x1
      */
     val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputation.tablist",
-        " §r§[cdea].*",
+        "crimson.reputationhelper.tablist.quest",
+        " (?:§.*)?(?<status>[✖✔]) (?<name>.+?)(?: (?:§.)*?x(?<amount>\\d+))?",
     )
 
     init {
@@ -86,7 +86,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         dirty = true
     }

@@ -73,7 +73,7 @@ object GuiEditManager {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         lastMovedGui?.let {
-            GuiPositionMovedEvent(it).postAndCatch()
+            GuiPositionMovedEvent(it).post()
             lastMovedGui = null
         }
     }

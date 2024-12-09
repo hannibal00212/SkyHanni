@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
-import at.hannibal2.skyhanni.events.TabCompletionEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -114,7 +115,7 @@ object PartyChatCommands {
         command.executable(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabComplete(event: TabCompletionEvent) {
         if (PartyAPI.partyLeader == null) return
         val prefix = event.fullText.firstOrNull() ?: return

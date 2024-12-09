@@ -639,6 +639,11 @@ object ScoreboardPattern {
         "Position: (?:§.)*#\\d+ (?:§.)*Since: .*",
     )
 
+    val queueWaitingForLeaderPattern by miscSb.pattern(
+        "queuewaitingforleader",
+        "§aWaiting on party leader!",
+    )
+
     /**
      * REGEX-TEST: §d5th Anniversary§f 167:59:54
      */

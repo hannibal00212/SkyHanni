@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -254,6 +255,7 @@ object PestAPI {
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
+            PestKillEvent.post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
@@ -278,7 +280,7 @@ object PestAPI {
         firstScoreboardCheck = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.oldItem !in vacuumVariants) return

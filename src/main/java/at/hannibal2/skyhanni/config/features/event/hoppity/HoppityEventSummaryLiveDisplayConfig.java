@@ -75,4 +75,12 @@ public class HoppityEventSummaryLiveDisplayConfig {
     @ConfigOption(name = "Only Holding Egglocator", desc = "§cOnly§r show the card when holding an Egglocator.")
     @ConfigEditorBoolean
     public boolean mustHoldEggLocator = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Only Hoppity Islands",
+        desc = "§cOnly§r show the card while on Islands that spawn Hoppity Eggs (will not show on Garden, Island, Dungeons etc.)."
+    )
+    @ConfigEditorBoolean
+    public boolean onlyHoppityIslands = false;
 }

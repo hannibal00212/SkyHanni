@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -31,7 +32,7 @@ object LimboPlaytime {
      */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a(?<minutes>[\\d.,])+ minutes.*$"
+        "§5§o§a(?<minutes>[\\d.,]+) minutes.*$"
     )
 
     /**
@@ -39,7 +40,7 @@ object LimboPlaytime {
      */
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b(?<hours>[\\d.,])+ hours.*$"
+        "§5§o§b(?<hours>[\\d.,]+) hours.*$"
     )
 
     var tooltipPlaytime = mutableListOf<String>()
@@ -55,7 +56,7 @@ object LimboPlaytime {
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
