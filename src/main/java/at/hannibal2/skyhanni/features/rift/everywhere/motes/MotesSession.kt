@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MotesSession {
@@ -51,7 +50,7 @@ object MotesSession {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.oldIsland == IslandType.THE_RIFT) {
             sendMotesInfo()

@@ -76,7 +76,7 @@ object SeaCreatureTracker {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         needMigration = true
     }

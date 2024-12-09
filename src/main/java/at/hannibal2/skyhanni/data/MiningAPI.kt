@@ -369,7 +369,7 @@ object MiningAPI {
         updateLocation()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
     }

@@ -54,7 +54,7 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         val nextData = nextTeleport ?: return
         if (nextData.island != event.newIsland) return

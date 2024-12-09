@@ -301,7 +301,7 @@ object GhostTracker {
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()

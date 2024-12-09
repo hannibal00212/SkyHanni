@@ -199,7 +199,7 @@ object CustomScoreboard {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.NONE) updateIslandEntries()
     }

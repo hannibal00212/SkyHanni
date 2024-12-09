@@ -155,7 +155,7 @@ object PestProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.GARDEN) {
             tracker.firstUpdate()

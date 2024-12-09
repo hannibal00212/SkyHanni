@@ -172,7 +172,7 @@ object MinionXp {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()

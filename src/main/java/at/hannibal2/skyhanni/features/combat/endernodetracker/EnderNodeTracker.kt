@@ -136,7 +136,7 @@ object EnderNodeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
         miteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {

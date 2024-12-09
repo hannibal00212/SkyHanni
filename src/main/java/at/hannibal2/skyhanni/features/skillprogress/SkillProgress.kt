@@ -135,7 +135,7 @@ object SkillProgress {
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         allDisplay = emptyList()

@@ -781,14 +781,14 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
-        fun onWorldSwitch(event: IslandChangeEvent) {
+        @HandleEvent
+        fun onIslandChange(event: IslandChangeEvent) {
             if (HotmAPI.mineshaftMayhem == null) return
             HotmAPI.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onProfileSwitch(event: ProfileJoinEvent) {
             HotmAPI.PowderType.entries.forEach {
                 if (it.getStorage() == null) {
