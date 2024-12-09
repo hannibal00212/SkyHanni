@@ -282,7 +282,7 @@ object QuiverAPI {
     }
 
     private fun postUpdateEvent(arrowType: ArrowType? = currentArrow) {
-        QuiverUpdateEvent(arrowType, currentAmount).postAndCatch()
+        QuiverUpdateEvent(arrowType, currentAmount).post()
     }
 
     @SubscribeEvent

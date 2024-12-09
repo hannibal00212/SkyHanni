@@ -419,7 +419,7 @@ object HypixelData {
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
-                HypixelJoinEvent().postAndCatch()
+                HypixelJoinEvent.post()
                 SkyHanniMod.repo.displayRepoStatus(true)
             }
         }

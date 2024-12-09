@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.dungeon
 
-import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonBossPhaseChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonFloor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -161,7 +162,7 @@ object DungeonBossAPI {
         bossPhase = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
         bossPhase = null
     }

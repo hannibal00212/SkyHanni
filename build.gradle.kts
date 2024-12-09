@@ -215,7 +215,7 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -312,6 +312,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveAppendix.set("mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -384,6 +385,7 @@ preprocess {
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

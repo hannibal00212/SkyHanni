@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +26,7 @@ object CropSpeedMeter {
     var enabled = false
     private var startCrops = mapOf<CropType, Long>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
