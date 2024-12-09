@@ -190,7 +190,7 @@ object MiningAPI {
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!inCustomMiningIsland()) return
 
@@ -300,7 +300,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
         val oldState = event.oldState

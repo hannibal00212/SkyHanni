@@ -46,7 +46,7 @@ object SeaCreatureTracker {
         var amount: MutableMap<String, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
 

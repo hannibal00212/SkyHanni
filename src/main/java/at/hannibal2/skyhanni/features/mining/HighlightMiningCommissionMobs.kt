@@ -72,7 +72,7 @@ object HighlightMiningCommissionMobs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 

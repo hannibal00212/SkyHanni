@@ -357,7 +357,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItem(event: RenderGuiItemOverlayEvent) {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return

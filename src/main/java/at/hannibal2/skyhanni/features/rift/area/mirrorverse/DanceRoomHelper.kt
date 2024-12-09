@@ -132,7 +132,7 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
         if (config.hideOriginalTitle && inRoom) event.cancel()

@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,7 +41,7 @@ object SlayerQuestWarning {
         var lastSlayerType: SlayerType? = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         val slayerType = event.full.nextAfter("Slayer Quest")
         val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"

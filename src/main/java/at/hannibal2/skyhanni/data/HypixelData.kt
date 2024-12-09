@@ -355,7 +355,7 @@ object HypixelData {
         hasScoreboardUpdated = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         hasScoreboardUpdated = true
     }

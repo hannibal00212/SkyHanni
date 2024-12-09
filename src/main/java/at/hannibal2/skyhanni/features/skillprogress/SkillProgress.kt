@@ -157,7 +157,7 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return

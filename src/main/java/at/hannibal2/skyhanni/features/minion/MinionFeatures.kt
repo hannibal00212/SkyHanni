@@ -181,12 +181,12 @@ object MinionFeatures {
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
                 return
             }
         }
 
-        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).post()
         minionStorageInventoryOpen = true
     }
 
@@ -194,11 +194,11 @@ object MinionFeatures {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
-            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         removeBuggedMinions()
         val minions = minions ?: return
@@ -274,7 +274,7 @@ object MinionFeatures {
                 minions[location]?.lastClicked = 0
             }
         }
-        MinionCloseEvent().postAndCatch()
+        MinionCloseEvent().post()
     }
 
     @SubscribeEvent

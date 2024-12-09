@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -690,7 +691,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
