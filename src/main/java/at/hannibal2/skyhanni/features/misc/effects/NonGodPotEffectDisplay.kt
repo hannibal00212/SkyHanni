@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.effects
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.EffectAPI.NonGodPotEffect
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.api.EffectAPI.NonGodPotEffect
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -67,11 +67,13 @@ object NonGodPotEffectDisplay {
                     effectDuration[event.effect] = Timer(existing + it)
                 }
             }
+
             EffectDurationChangeType.SET -> {
                 event.duration?.let {
                     effectDuration[event.effect] = Timer(it)
                 }
             }
+
             EffectDurationChangeType.REMOVE -> {
                 effectDuration.remove(event.effect)
             }
