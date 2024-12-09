@@ -43,7 +43,16 @@ enum class IslandType(private val nameFallback: String) {
 
     @SkyHanniModule
     companion object {
-        var islandTypesData: IslandTypeJson? = null
+        /**
+         * The maximum amount of players that can be on an island.
+         */
+        var maxPlayers = 24
+            private set
+
+        /**
+         * The maximum amount of players that can be on a mega hub.
+         */
+        var maxPlayersMega = 80
             private set
 
         fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
@@ -63,7 +72,8 @@ enum class IslandType(private val nameFallback: String) {
                 islandType.islandData = islandDataMap[islandType.name]
             }
 
-            islandTypesData = data
+            maxPlayers = data.maxPlayers
+            maxPlayersMega = data.maxPlayersMega
         }
     }
 }

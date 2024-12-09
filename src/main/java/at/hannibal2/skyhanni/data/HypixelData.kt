@@ -288,9 +288,9 @@ object HypixelData {
             return group("maxamount").toInt()
         }
         if (serverId?.startsWith("mega") == true) {
-            return IslandType.islandTypesData?.maxPlayersMega ?: 80
+            return IslandType.maxPlayersMega
         }
-        return skyBlockIsland.islandData?.maxPlayers ?: 24
+        return skyBlockIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
