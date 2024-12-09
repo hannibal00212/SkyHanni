@@ -139,16 +139,6 @@ object Translator {
         return arrayOf(messageToSend, language)
     }
 
-    @Deprecated("Use toNativeLanguage() instead", ReplaceWith("Translator.toNativeLanguage(args)"))
-    fun toEnglish(args: Array<String>) {
-        toNativeLanguage(args)
-    }
-
-    @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
-    fun fromEnglish(args: Array<String>) {
-        fromNativeLanguage(args)
-    }
-
     fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
 
@@ -196,7 +186,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        val translation = getTranslation(message, sourceLanguage, targetLanguage)
+        val translation = getTranslation(message, targetLanguage, sourceLanguage)
         val translatedMessage = translation?.get(0) ?: "Error!"
         val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
 

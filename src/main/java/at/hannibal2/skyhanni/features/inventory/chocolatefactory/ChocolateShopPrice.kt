@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,13 +15,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -37,10 +37,15 @@ object ChocolateShopPrice {
     private var display = emptyList<Renderable>()
     private var products = emptyList<Product>()
 
-    private val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.title",
         "Chocolate Shop",
     )
+
+    /**
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
+     */
     private val itemBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
@@ -93,7 +98,7 @@ object ChocolateShopPrice {
             val lore = item.getLore()
 
             if (slot == MILESTONE_INDEX) {
-                lore.matchFirst(chocolateSpentPattern) {
+                chocolateSpentPattern.firstMatcher(lore) {
                     chocolateSpent = group("amount").formatLong()
                 }
             }

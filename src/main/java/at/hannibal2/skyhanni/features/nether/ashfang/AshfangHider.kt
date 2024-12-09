@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -31,11 +34,10 @@ object AshfangHider {
         event.cancel()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!AshfangManager.active || !config.particles) return
-        val entity = event.entity as? EntityArmorStand ?: return
-        if (entity.inventory.any { it?.name == "Glowstone" }) event.cancel()
+        if (event.entity.getWholeInventory().any { it?.name == "Glowstone" }) event.cancel()
     }
 
     @SubscribeEvent

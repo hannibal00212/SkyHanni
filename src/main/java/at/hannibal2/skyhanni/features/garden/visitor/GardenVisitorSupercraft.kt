@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -31,12 +32,14 @@ object GardenVisitorSupercraft {
     private var lastSuperCraftMaterial = ""
 
     private val superCraftItem by lazy {
-        val neuItem = "GOLD_PICKAXE".asInternalName().getItemStack()
+        val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
             neuItem.item,
-            "§bSuper Craft",
-            "§7You have the items to craft",
-            "§7Click me to open the super crafter!",
+            "§bSupercraft",
+            "§8(From SkyHanni)",
+            "",
+            "§7You have the items to craft.",
+            "§7Click me to open the supercrafter!",
         )
     }
 
@@ -48,7 +51,7 @@ object GardenVisitorSupercraft {
     }
 
     // needs to run later than onVisitorOpen at GardenVisitorFeatures
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         visitor.offer?.offerItem ?: return
@@ -90,7 +93,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!hasIngredients) return
         if (event.inventory is InventoryPlayer) return

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
@@ -35,7 +36,7 @@ object CarnivalZombieShootout {
     private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
 
-    private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
+    private val lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
 
     private var content = Renderable.horizontalContainer(listOf())
     private var drawZombies = mapOf<EntityZombie, ZombieType>()
@@ -81,8 +82,8 @@ object CarnivalZombieShootout {
         if (lastUpdate.zombie.passedSince() >= 0.25.seconds) {
             val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
                 if (zombie.health <= 0) return@mapNotNull null
-                val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-                val type = toType(armor) ?: return@mapNotNull null
+                val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+                val type = toType(helmet) ?: return@mapNotNull null
                 zombie to type
             }.toMap()
 

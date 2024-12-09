@@ -21,6 +21,7 @@ val logger =
     Logger.getInstance("SkyHanni")
 
 val regexTestPrefix = "REGEX-TEST: "
+val regexTestFailPrefix = "REGEX-FAIL: "
 
 class RegexInfo(
     val regex: KtValueArgument,
@@ -50,7 +51,7 @@ class RegexInfo(
     }
 
     fun getExamples(): List<String> {
-        val examples = commentText?.filter { it.startsWith(regexTestPrefix) }
+        val examples = commentText?.filter { it.startsWith(regexTestPrefix) || it.startsWith(regexTestFailPrefix) }
             ?.map { it.substring(regexTestPrefix.length) }
         if (examples == null) return listOf()
         return examples

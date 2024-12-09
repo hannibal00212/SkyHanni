@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(FontRenderer.class)
 public abstract class ExtendedColorPatch {
 
-    @Shadow
+    @Shadow(remap = false)
     protected abstract void setColor(float r, float g, float b, float a2);
 
     @Shadow
@@ -84,7 +84,8 @@ public abstract class ExtendedColorPatch {
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/FontRenderer;setColor(FFFF)V",
             ordinal = 0,
-            shift = At.Shift.AFTER
+            shift = At.Shift.AFTER,
+            remap = false
         ),
         locals = LocalCapture.CAPTURE_FAILHARD
     )

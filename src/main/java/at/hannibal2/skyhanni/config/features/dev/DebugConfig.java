@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.data.Mayor;
+import at.hannibal2.skyhanni.data.ElectionCandidate;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -145,7 +145,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
-    public Property<Mayor> assumeMayor = Property.of(Mayor.DISABLED);
+    public Property<ElectionCandidate> assumeMayor = Property.of(ElectionCandidate.DISABLED);
 
     @Expose
     @ConfigOption(name = "Always April Fools", desc = "Always show April fools jokes.")
@@ -161,6 +161,11 @@ public class DebugConfig {
     @ConfigOption(name = "Always Hoppity's", desc = "Always act as if Hoppity's Hunt is active.")
     @ConfigEditorBoolean
     public boolean alwaysHoppitys = false;
+
+    @Expose
+    @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
+    @ConfigEditorBoolean
+    public Property<Boolean> forceGreatSpook = Property.of(false);
 
     // Does not have a config element!
     @Expose
