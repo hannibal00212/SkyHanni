@@ -7,38 +7,39 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class IslandType {
-    PRIVATE_ISLAND,
-    PRIVATE_ISLAND_GUEST,
-    THE_END,
-    KUUDRA_ARENA,
-    CRIMSON_ISLE,
-    DWARVEN_MINES,
-    DUNGEON_HUB,
-    CATACOMBS,
+enum class IslandType(private val nameFallback: String) {
+    PRIVATE_ISLAND("Private Island"),
+    PRIVATE_ISLAND_GUEST("Private Island Guest"),
+    THE_END("The End"),
+    KUUDRA_ARENA("Kuudra"),
+    CRIMSON_ISLE("Crimson Isle"),
+    DWARVEN_MINES("Dwarven Mines"),
+    DUNGEON_HUB("Dungeon Hub"),
+    CATACOMBS("Catacombs"),
 
-    HUB,
-    DARK_AUCTION,
-    THE_FARMING_ISLANDS,
-    CRYSTAL_HOLLOWS,
-    THE_PARK,
-    DEEP_CAVERNS,
-    GOLD_MINES,
-    GARDEN,
-    GARDEN_GUEST,
-    SPIDER_DEN,
-    WINTER,
-    THE_RIFT,
-    MINESHAFT,
+    HUB("Hub"),
+    DARK_AUCTION("Dark Auction"),
+    THE_FARMING_ISLANDS("The Farming Islands"),
+    CRYSTAL_HOLLOWS("Crystal Hollows"),
+    THE_PARK("The Park"),
+    DEEP_CAVERNS("Deep Caverns"),
+    GOLD_MINES("Gold Mine"),
+    GARDEN("Garden"),
+    GARDEN_GUEST("Garden Guest"),
+    SPIDER_DEN("Spider's Den"),
+    WINTER("Jerry's Workshop"),
+    THE_RIFT("The Rift"),
+    MINESHAFT("Mineshaft"),
 
-    NONE,
-    ANY,
-    UNKNOWN,
+    NONE(""),
+    ANY(""),
+    UNKNOWN("???"),
     ;
 
     var islandData: IslandData? = null
+        private set
 
-    val displayName: String get() = islandData?.name ?: name
+    val displayName: String get() = islandData?.name ?: nameFallback
 
     @SkyHanniModule
     companion object {
