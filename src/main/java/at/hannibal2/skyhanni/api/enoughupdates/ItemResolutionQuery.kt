@@ -121,7 +121,7 @@ class ItemResolutionQuery {
 
         fun resolveEnchantmentByName(displayName: String): String? =
             UtilsPatterns.enchantmentNamePattern.matchMatcher(displayName) {
-                val name = group("name").removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets()
+                val name = group("name").trim().replace("'", "")
                 val ultimate = group("format").lowercase().contains("§l")
                 val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
                 val cleanedEnchantName = turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()

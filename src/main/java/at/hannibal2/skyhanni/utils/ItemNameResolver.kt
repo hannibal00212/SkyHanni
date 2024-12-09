@@ -81,7 +81,7 @@ object ItemNameResolver {
 
     private fun resolveEnchantmentByCleanName(itemName: String): NEUInternalName? {
         UtilsPatterns.cleanEnchantedNamePattern.matchMatcher(itemName) {
-            val name = group("name").cleanString()
+            val name = group("name").replace("'", "")
             val level = group("level").romanToDecimalIfNecessary()
             val rawInternalName = "$name;$level".uppercase()
 
