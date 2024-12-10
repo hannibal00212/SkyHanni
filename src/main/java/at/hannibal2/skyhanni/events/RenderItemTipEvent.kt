@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.item.ItemStack
 
 class RenderItemTipEvent(
     val stack: ItemStack,
     var renderObjects: MutableList<RenderObject>,
-) : LorenzEvent() {
+) : SkyHanniEvent() {
 
     var stackTip = ""
         set(value) {

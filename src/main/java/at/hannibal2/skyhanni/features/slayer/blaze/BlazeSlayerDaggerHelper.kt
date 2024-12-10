@@ -179,10 +179,9 @@ object BlazeSlayerDaggerHelper {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-
 
         for (shield in HellionShield.entries) {
             if (shield.formattedName + "§r" == event.title) {
@@ -218,12 +217,12 @@ object BlazeSlayerDaggerHelper {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
             HellionShield.SPIRIT,
-            HellionShield.CRYSTAL
+            HellionShield.CRYSTAL,
         ),
         FIREDUST(
             listOf("Firedust Dagger", "Kindlebane Dagger", "Pyrochaos Dagger"),
             HellionShield.ASHEN,
-            HellionShield.AURIC
+            HellionShield.AURIC,
         ),
         ;
 
