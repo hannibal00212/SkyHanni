@@ -103,7 +103,7 @@ object SlayerProfitTracker {
         allowedItems = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems").slayers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
@@ -123,7 +123,7 @@ object SlayerProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlayerChange(event: SlayerChangeEvent) {
         val newSlayer = event.newSlayer
         itemLogCategory = newSlayer.removeColor()

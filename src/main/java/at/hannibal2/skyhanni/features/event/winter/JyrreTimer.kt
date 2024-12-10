@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.winter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -29,7 +30,7 @@ object JyrreTimer {
     private var display = emptyList<Any>()
     private var duration = 0.seconds
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         resetDisplay()
     }

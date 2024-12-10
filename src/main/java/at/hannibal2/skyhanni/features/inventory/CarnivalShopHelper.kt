@@ -108,7 +108,7 @@ object CarnivalShopHelper {
         overviewInfoItemStack.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->

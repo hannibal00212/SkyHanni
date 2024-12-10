@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -103,7 +104,7 @@ object LogBookStats {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         display = emptyList()
         loggedVisitors.clear()
