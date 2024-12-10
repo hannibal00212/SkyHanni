@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -60,7 +61,7 @@ object CrownOfAvariceCounter {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() || event.slot != 5) return
         val item = event.itemStack
@@ -86,7 +87,7 @@ object CrownOfAvariceCounter {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
         count = InventoryUtils.getHelmet()?.getCoinsOfAvarice() ?: return
