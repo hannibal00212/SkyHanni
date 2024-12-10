@@ -23,6 +23,7 @@
 + Added Hitman slot tracking to display the most recent rabbits you obtained. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
     + Displays slots with an active cooldown.
 + Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
 
 #### Inventory Features
 
@@ -85,6 +86,11 @@
 + Focus Mode no longer hides the seller information in the Auction House. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2845)
 + Included the minimum bid in the Stonks Auction price calculation. - im-h (https://github.com/hannibal002/SkyHanni/pull/3014)
 + Disabled the Chocolate Factory's open feature without the Mythic Rabbit on Bingo profiles. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3012)
++ Chocolate Factory's "Stray Alerts" and "Screen Flash" can now be filtered by rabbit rarity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2907)
++ The item used to open the Chocolate Factory will now respect Mythic Rabbit and Booster Cookie blocking. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2945)
++ Improved the UI for the Cake Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2939)
+    + Made the Cake Tracker scrollable instead of having a fixed size.
++ Cakes you claim from the baker will now be added to the Cake Tracker automatically. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3008)
 
 #### Chat and Command Improvements
 
@@ -121,6 +127,7 @@
 #### Fishing Improvements
 
 + Added an option to always display the Barn Fishing Timer anywhere. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/2735)
++ Improved the Golden Fish Timer to account for server lag. - Empa (https://github.com/hannibal002/SkyHanni/pull/2823)
 
 #### Hoppity Improvements
 
@@ -153,6 +160,8 @@
 
 + Added an option to exclude Spaceman from the Visitor Shopping List. - Luna (https://github.com/hannibal002/SkyHanni/pull/2588)
 + The optimal speed for Rancher's Boots is now automatically set when clicking on the wrong speed message in chat, eliminating the need to enter it manually. - Luna (https://github.com/hannibal002/SkyHanni/pull/2963)
++ Added an option to send the optimal speed warning even when not wearing Rancher's Boots. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2859)
++ Added a Pest Traps tab widget to the Tab Widget Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/2984)
 
 #### Event Improvements
 
@@ -170,6 +179,10 @@
 + Added the Hot Chocolate Mixin to the Non-God Pot Effects feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2965)
 + Added the Hot Chocolate Mixin to the Non-God Pot Effects feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2965)
 + Added overflow support for personal bests. - Chissl (https://github.com/hannibal002/SkyHanni/pull/2996)
++ Added a config option to disable the search feature in Tracker GUIs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2807)
+    + You can change this option using `/sh tracker search`.
++ Added the Minecraft version to the mod file name. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2941)
++ Added a warning for empty messages left behind by Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
 
 ### Fixes
 
@@ -184,6 +197,7 @@
 + Fixed barn fishing timer getting stuck. - Empa (https://github.com/hannibal002/SkyHanni/pull/2922)
 + Updated Golden Fish Timer from 15-20 minutes to 8-12 minutes, per the Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/3018)
 + Fixed a typo in the Golden Fish Timer. - Luna (https://github.com/hannibal002/SkyHanni/pull/3018)
++ Fixed the visual position of the sulphur skitter box. - appable (https://github.com/hannibal002/SkyHanni/pull/3023)
 
 #### Inventory Fixes
 
@@ -224,6 +238,7 @@
 + Fixed scoreboard flickering when using Apec and Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2892)
 + Fixed Mineshaft RoomId missing in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2946)
 + Potentially fixed Custom Scoreboard sometimes not showing Kuudra Lines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3006)
++ Fixed a Custom Scoreboard error while waiting for the Mineshaft Queue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3036)
 
 #### Hoppity Fixes
 
@@ -269,6 +284,7 @@
 + Fixed the spelling of "Supercraft" in the Garden visitor menu. - Luna (https://github.com/hannibal002/SkyHanni/pull/3005)
 + Fixed Anita's medal display appearing in the Visitor inventory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3007)
 + Specified in visitor config that Maeve's dialogue is not hidden in the "Hide Chat" option. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3002)
++ Fixed the next visitor timer not decreasing on pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3027)
 
 #### Crimson Isle Fixes
 
@@ -359,6 +375,8 @@
 + Fixed Stonks Auction not showing the correct price per Stock of Stonks. - im-h (https://github.com/hannibal002/SkyHanni/pull/3014)
 + Fixed connection error messages spamming the chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3011)
 + Fixed incorrect personal best gain calculations. - Chissl (https://github.com/hannibal002/SkyHanni/pull/2996)
++ Fixed the `/playtimedetailed` breakdown being sorted incorrectly. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3021)
++ Fixed an issue where item and material stashes together would break Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
 
 ### Technical Details
 
@@ -454,6 +472,14 @@
 + Updated the enchant-exclusive regex to restore chat tooltip functionality. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2985)
 + Added directional edge support to Graph Editor. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2970)
 + Added Pyramid drawing. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2970)
++ Added the `ServerTimeMark` class and `ServerTickEvent`. - Empa (https://github.com/hannibal002/SkyHanni/pull/2823)
++ Show a regex101 link when a detekt rule fails on a regex test. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3034)
++ Moved the locations of some events to more specific sub-packages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3030)
++ Added mid-tier Umber and changed brown stained clay from low-tier to mid-tier. - Luna (https://github.com/hannibal002/SkyHanni/pull/3028)
++ Added Mineshafts as possible locations for Obsidian and Pure Gold. - Luna (https://github.com/hannibal002/SkyHanni/pull/3029)
++ Converted some `LorenzEvents` into `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3025)
++ Converted some events to `GenericSkyHanniEvent`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2753)
++ The auto updater now searches for JAR files that include the correct Minecraft version in their names. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2941)
 
 ## Version 0.27
 

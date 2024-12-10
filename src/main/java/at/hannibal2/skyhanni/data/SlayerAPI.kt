@@ -112,12 +112,12 @@ object SlayerAPI {
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
-            SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
+            SlayerChangeEvent(old, latestSlayerCategory).post()
         }
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
         if (latestSlayerProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).post()
             latestSlayerProgress = slayerProgress
         }
 
