@@ -186,7 +186,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        val translation = getTranslation(message, sourceLanguage, targetLanguage)
+        val translation = getTranslation(message, targetLanguage, sourceLanguage)
         val translatedMessage = translation?.get(0) ?: "Error!"
         val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
 
