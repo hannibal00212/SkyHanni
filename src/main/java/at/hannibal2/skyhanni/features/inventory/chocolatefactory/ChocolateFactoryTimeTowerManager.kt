@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -25,7 +26,7 @@ object ChocolateFactoryTimeTowerManager {
     private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         wasTimeTowerRecentlyActive = false
     }
@@ -152,7 +153,7 @@ object ChocolateFactoryTimeTowerManager {
         return endTime - currentTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastTimeTowerWarning = SimpleTimeMark.farPast()
     }

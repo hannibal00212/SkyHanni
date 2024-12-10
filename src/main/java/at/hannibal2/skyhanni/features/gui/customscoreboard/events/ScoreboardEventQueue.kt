@@ -12,6 +12,7 @@ object ScoreboardEventQueue : ScoreboardEvent() {
         ScoreboardPattern.queuePattern,
         ScoreboardPattern.queueTierPattern,
         ScoreboardPattern.queuePositionPattern,
+        ScoreboardPattern.queueWaitingForLeaderPattern,
     )
 
     override fun getDisplay() = patterns.allMatches(getSbLines())
