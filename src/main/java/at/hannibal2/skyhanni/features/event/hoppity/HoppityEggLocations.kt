@@ -75,7 +75,7 @@ object HoppityEggLocations {
 
     private var loadedNeuThisProfile = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         loadedNeuThisProfile = false
     }

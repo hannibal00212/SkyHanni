@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -133,7 +134,7 @@ object HoppityCallWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!HoppityAPI.pickupOutgoingCommandPattern.matches(event.message)) return

@@ -51,7 +51,7 @@ object EstimatedItemValue {
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
@@ -155,7 +155,7 @@ object EstimatedItemValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
