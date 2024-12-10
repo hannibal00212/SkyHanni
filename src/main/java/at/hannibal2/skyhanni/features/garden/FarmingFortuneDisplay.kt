@@ -105,7 +105,7 @@ object FarmingFortuneDisplay {
 
     private val ZORROS_CAPE by lazy { "ZORROS_CAPE".toInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         event.tabList.firstNotNullOfOrNull {

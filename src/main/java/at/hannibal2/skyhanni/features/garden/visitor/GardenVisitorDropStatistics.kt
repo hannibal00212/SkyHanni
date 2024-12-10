@@ -113,7 +113,7 @@ object GardenVisitorDropStatistics {
         return newList
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }

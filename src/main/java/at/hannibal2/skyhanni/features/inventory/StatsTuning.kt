@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -32,7 +33,7 @@ object StatsTuning {
         "§7Stat has: §e(?<amount>\\d+) points?",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         val inventoryName = event.inventoryName
 

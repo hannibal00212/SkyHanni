@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,7 +37,7 @@ object PartyChatCommands {
             requiresPartyLead = true,
             executable = {
                 HypixelCommands.partyTransfer(it.cleanedAuthor)
-            }
+            },
         ),
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
@@ -47,7 +46,7 @@ object PartyChatCommands {
             executable = {
                 lastWarp = SimpleTimeMark.now()
                 HypixelCommands.partyWarp()
-            }
+            },
         ),
         PartyChatCommand(
             listOf("allinv", "allinvite"),
@@ -56,7 +55,7 @@ object PartyChatCommands {
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
                 HypixelCommands.partyAllInvite()
-            }
+            },
         ),
     )
 
@@ -84,7 +83,7 @@ object PartyChatCommands {
         return storage.blacklistedUsers.any { it.equals(name, ignoreCase = true) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyCommand(event: PartyChatEvent) {
         if (event.message.firstOrNull() !in commandPrefixes) return
         val commandLabel = event.message.substring(1).substringBefore(' ')

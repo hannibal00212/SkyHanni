@@ -143,7 +143,7 @@ object IslandGraphs {
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return

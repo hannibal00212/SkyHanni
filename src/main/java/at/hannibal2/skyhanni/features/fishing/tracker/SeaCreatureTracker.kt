@@ -46,7 +46,7 @@ object SeaCreatureTracker {
         var amount: MutableMap<String, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
 
@@ -76,7 +76,7 @@ object SeaCreatureTracker {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         needMigration = true
     }

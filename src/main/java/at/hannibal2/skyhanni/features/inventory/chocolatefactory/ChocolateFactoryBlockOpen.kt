@@ -74,7 +74,7 @@ object ChocolateFactoryBlockOpen {
         if (checkIsBlocked()) event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!commandPattern.matches(event.message)) return

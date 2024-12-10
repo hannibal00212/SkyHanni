@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -52,7 +53,7 @@ object ChocolateFactoryUpgradeWarning {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastUpgradeWarning = SimpleTimeMark.farPast()
     }
