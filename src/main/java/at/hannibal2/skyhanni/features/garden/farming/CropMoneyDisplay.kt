@@ -65,7 +65,7 @@ object CropMoneyDisplay {
     private val SEEDS by lazy { "SEEDS".toInternalName() }
     private val ENCHANTED_SEEDS by lazy { "ENCHANTED_SEEDS".toInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }

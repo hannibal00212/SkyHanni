@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -50,7 +51,7 @@ object MinionXp {
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
 
@@ -117,7 +118,7 @@ object MinionXp {
         return xpTotal
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionStorageOpen(event: MinionStorageOpenEvent) {
         if (!config.xpDisplay) return
 
@@ -171,14 +172,14 @@ object MinionXp {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()
         collectItemXpList.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionClose(event: MinionCloseEvent) {
         xpItemMap.clear()
         collectItemXpList.clear()
