@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -124,7 +125,7 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
@@ -132,7 +133,7 @@ object GetFromSackAPI {
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
-        if (replacedEvent.isCanceled) {
+        if (replacedEvent.isCancelled) {
             event.cancel()
             return
         }
@@ -159,7 +160,7 @@ object GetFromSackAPI {
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {
-        if (event.isCanceled) return
+        if (event.isCancelled) return
         if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
         lastItemStack = commandValidator(event.splitMessage.drop(1)).second
     }

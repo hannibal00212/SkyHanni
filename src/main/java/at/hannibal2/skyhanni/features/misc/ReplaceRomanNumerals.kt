@@ -69,7 +69,7 @@ object ReplaceRomanNumerals {
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!isEnabled()) return
         event.applyIfPossible { it.transformLine() }

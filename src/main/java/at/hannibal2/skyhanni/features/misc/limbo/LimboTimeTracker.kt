@@ -56,10 +56,10 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
-            event.isCanceled
+            event.cancel()
             printStats(true)
         }
     }
