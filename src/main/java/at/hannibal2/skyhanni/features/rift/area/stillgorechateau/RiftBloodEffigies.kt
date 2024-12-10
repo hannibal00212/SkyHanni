@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -79,7 +80,7 @@ object RiftBloodEffigies {
         locations = newLocations
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: RawScoreboardUpdateEvent) {
         if (!isEnabled()) return
 

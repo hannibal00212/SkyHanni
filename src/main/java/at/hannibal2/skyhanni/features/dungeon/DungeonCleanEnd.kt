@@ -125,7 +125,7 @@ object DungeonCleanEnd {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
             event.cancel()

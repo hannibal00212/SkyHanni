@@ -127,8 +127,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: IslandChangeEvent) {
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         DelayedRun.runDelayed(1500.milliseconds) {
             if (playerList.isEmpty()) return@runDelayed
             if (event.newIsland != IslandType.THE_RIFT) return@runDelayed
