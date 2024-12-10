@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.PetUtils.rarityByColorGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
 
@@ -127,7 +127,7 @@ data class PetData(
             )
         }
 
-        fun parsePetName(displayName: String): PetData? {
+        private fun parsePetName(displayName: String): PetData? {
             petNameMenuPattern.matchMatcher(displayName) {
                 val name = group("name").orEmpty()
                 val rarity = rarityByColorGroup(group("rarity"))
@@ -148,7 +148,7 @@ data class PetData(
         }
 
         fun petNameToInternalName(name: String, rarity: LorenzRarity): NEUInternalName =
-            "${name.convertToUnformatted()}${rarity.id}".toInternalName()
+            "${name.removeColor()}${rarity.id}".toInternalName()
 
         fun parsePetAsItem(item: ItemStack): PetData? {
             val lore = item.getLore()
