@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object OpenLastStorage {
@@ -41,7 +40,7 @@ object OpenLastStorage {
         ChatUtils.chat(message)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.senderIsSkyhanni()) return
         val args = event.message.lowercase().split(" ")
