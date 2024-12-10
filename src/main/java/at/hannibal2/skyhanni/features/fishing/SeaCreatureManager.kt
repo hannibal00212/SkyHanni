@@ -50,7 +50,7 @@ object SeaCreatureManager {
         } else if (!doubleHook || !thunderBottleChargedPattern.matches(event.message)) {
             val seaCreature = getSeaCreatureFromMessage(event.message)
             if (seaCreature != null) {
-                SeaCreatureFishEvent(seaCreature, event, doubleHook).postAndCatch()
+                SeaCreatureFishEvent(seaCreature, event, doubleHook).post()
             }
             doubleHook = false
         }

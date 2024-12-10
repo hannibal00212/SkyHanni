@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
@@ -56,7 +57,7 @@ object ChocolateFactoryBlockOpen {
         if (checkIsBlocked()) event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!commandPattern.matches(event.message)) return
