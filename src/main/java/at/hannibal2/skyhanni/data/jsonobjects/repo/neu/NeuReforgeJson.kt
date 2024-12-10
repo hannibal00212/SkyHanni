@@ -44,8 +44,7 @@ data class NeuReforgeJson(
     val itemType: Pair<String, List<NEUInternalName>>
         get() = if (this::itemTypeField.isInitialized) itemTypeField
         else run {
-            val any = this.rawItemTypes
-            return when (any) {
+            return when (val any = this.rawItemTypes) {
                 is String -> {
                     any.replace("/", "_AND_").uppercase() to emptyList()
                 }
@@ -55,7 +54,7 @@ data class NeuReforgeJson(
                     val map = any as? Map<String, List<String>> ?: return type to emptyList()
                     val internalNames = map["internalName"]?.map { it.toInternalName() }.orEmpty()
                     val itemType = map["itemid"]?.map {
-                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
+                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it) ?: return@map emptyList())
                     }?.flatten().orEmpty()
                     type to (internalNames + itemType)
                 }
