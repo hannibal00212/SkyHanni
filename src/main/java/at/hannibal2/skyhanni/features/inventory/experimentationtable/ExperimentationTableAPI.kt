@@ -169,11 +169,12 @@ object ExperimentationTableAPI {
     /**
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
+     * REGEX-TEST: Guardian
      */
     private val petNamePattern by patternGroup.pattern(
         "guardianpet",
-        "§[956d]Guardian.*",
+        "(?:§[956d])?Guardian.*",
     )
 
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet)
+    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet?.rawPetName)
 }
