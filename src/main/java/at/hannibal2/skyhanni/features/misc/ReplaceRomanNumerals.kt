@@ -55,7 +55,7 @@ object ReplaceRomanNumerals {
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!isEnabled() || event.message.isSelectOption()) return
         event.applyIfPossible { it.transformLine() }

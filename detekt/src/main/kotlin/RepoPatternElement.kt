@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtStringTemplateEntryWithExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
+import java.net.URLEncoder
 
 class RepoPatternElement private constructor(
     val variableName: String,
@@ -17,6 +18,12 @@ class RepoPatternElement private constructor(
 ) {
 
     val pattern by lazy { rawPattern.toPattern() }
+
+    val regex101Url: String by lazy {
+        val encodedPattern = URLEncoder.encode(rawPattern, "UTF-8")
+        val encodedTests = regexTests.joinToString("\n") { URLEncoder.encode(it, "UTF-8") }
+        "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests"
+    }
 
     companion object {
         fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {

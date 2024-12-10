@@ -57,7 +57,7 @@ object CollectionAPI {
         "Mushroom" to "RED_MUSHROOM".toInternalName(),
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         collectionValue.clear()
     }

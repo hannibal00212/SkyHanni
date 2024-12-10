@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -11,4 +12,4 @@ class RenderInventoryItemTipEvent(
     var offsetX: Int = 0,
     var offsetY: Int = 0,
     var alignLeft: Boolean = true,
-) : LorenzEvent()
+) : SkyHanniEvent()
