@@ -34,7 +34,7 @@ object QuiverDisplay {
     private var amount = QuiverAPI.currentAmount
     private var hideAmount = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         arrow = QuiverAPI.currentArrow
