@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -22,7 +23,7 @@ object PlayerChatModifier {
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         event.applyIfPossible { cutMessage(it) }
     }
