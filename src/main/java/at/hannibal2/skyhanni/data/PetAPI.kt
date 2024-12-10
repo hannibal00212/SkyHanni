@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.PetData.Companion.parsePetAsItem
+import at.hannibal2.skyhanni.data.PetData.Companion.parsePetData
+import at.hannibal2.skyhanni.data.PetData.Companion.parsePetDataLists
+import at.hannibal2.skyhanni.data.PetData.Companion.petNameToInternalName
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -23,7 +27,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatchGroup
@@ -33,19 +37,18 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.Gson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PetAPI {
     private val config get() = SkyHanniMod.feature.misc.pets
-    private val patternGroup = RepoPattern.group("misc.pet")
     private const val FORGE_BACK_SLOT = 48
+
+    val patternGroup = RepoPattern.group("misc.pet")
 
     private var inPetMenu = false
     private var baseXpLevelReqs: List<Int> = listOf()
@@ -58,35 +61,6 @@ object PetAPI {
         }
 
     // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: §7§7Selected pet: §6Hedgehog
-     */
-    private val inventorySelectedPetPattern by patternGroup.pattern(
-        "inventory.selected",
-        "§7§7Selected pet: §?(?<rarity>.)?(?<pet>.*)"
-    )
-
-    /**
-     * REGEX-TEST: §7Progress to Level 91: §e0%
-     * REGEX-TEST: §7Progress to Level 147: §e37.1%
-     * REGEX-TEST: §b§lMAX LEVEL
-     */
-    private val inventorySelectedProgressPattern by patternGroup.pattern(
-        "inventory.selected.progress",
-        "§b§lMAX LEVEL|§7Progress to Level (?<level>\\d+): §e(?<percentage>[\\d.]+)%"
-    )
-
-    /**
-     * REGEX-TEST: §2§l§m             §f§l§m            §r §e713,241.8§6/§e1.4M
-     * REGEX-TEST: §2§l§m          §f§l§m               §r §e699,742.8§6/§e1.9M
-     * REGEX-TEST: §f§l§m                         §r §e0§6/§e660
-     * REGEX-TEST: §8▸ 30,358,983 XP'
-     */
-    private val inventorySelectedXpPattern by patternGroup.pattern(
-        "inventory.selected.xp",
-        "(?:§8▸ |(?:§.§l§m *)*)(?:§r §e)?(?<current>[\\d,.kM]+)(?:§6\\/§e)?(?<next>[\\d,.kM]+)?"
-    )
-
     /**
      * REGEX-TEST: Pets (1/3)
      * REGEX-TEST: Pets
@@ -117,24 +91,6 @@ object PetAPI {
     )
 
     /**
-     * REGEX-TEST: §e⭐ §7[Lvl 100] §6Ender Dragon
-     * REGEX-TEST: §e⭐ §7[Lvl 100] §dBlack Cat§d ✦
-     * REGEX-TEST: §7[Lvl 100] §6Mole
-     */
-    private val petNameMenuPattern by patternGroup.pattern(
-        "menu.pet.name",
-        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$",
-    )
-
-    /**
-     * REGEX-TEST: §7§cClick to despawn!
-     */
-    private val petDespawnMenuPattern by patternGroup.pattern(
-        "menu.pet.despawn",
-        "§7§cClick to despawn!",
-    )
-
-    /**
      * REGEX-TEST: §7To Select Process (Slot #2)
      * REGEX-TEST: §7To Select Process (Slot #4)
      * REGEX-TEST: §7To Select Process (Slot #7)
@@ -154,27 +110,6 @@ object PetAPI {
     private val petWidgetPattern by patternGroup.pattern(
         "widget.pet",
         "^ §r§7\\[Lvl (?<level>\\d+)](?: (?:§.)+\\[(?:§.)+(?<overflow>\\d+)(?:§.)+✦(?:§.)+])? §r§(?<rarity>.)(?<name>[\\w ]+)(?:§r(?<skin>§. ✦))?\$",
-    )
-
-    /**
-     * REGEX-TEST:  §r§7No pet selected
-     * REGEX-TEST:  §r§6Washed-up Souvenir
-     * REGEX-TEST:  §r§9Dwarf Turtle Shelmet
-     */
-    private val widgetStringPattern by patternGroup.pattern(
-        "widget.string",
-        "^ §r(?<string>§.[\\w -]+)\$",
-    )
-
-    /**
-     * REGEX-TEST:  §r§b§lMAX LEVEL
-     * REGEX-TEST:  §r§6+§r§e21,248,020.7 XP
-     * REGEX-TEST:  §r§e15,986.6§r§6/§r§e29k XP §r§6(53.6%)
-     */
-    @Suppress("MaxLineLength")
-    private val xpWidgetPattern by patternGroup.pattern(
-        "widget.xp",
-        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
     )
 
     /**
@@ -206,11 +141,69 @@ object PetAPI {
     )
 
     /**
+     * REGEX-TEST: §aYour pet is now holding §r§9Bejeweled Collar§r§a.
+     */
+    private val petItemMessagePattern by patternGroup.pattern(
+        "chat.pet.item.equip",
+        "^§aYour pet is now holding §r(?<petItem>§.[\\w -]+)§r§a\\.\$",
+    )
+
+    /**
+     * REGEX-TEST: §7§7Selected pet: §6Hedgehog
+     */
+    private val inventorySelectedPetPattern by PetAPI.patternGroup.pattern(
+        "inventory.selected",
+        "§7§7Selected pet: §?(?<rarity>.)?(?<pet>.*)"
+    )
+
+    /**
+     * REGEX-TEST: §7Progress to Level 91: §e0%
+     * REGEX-TEST: §7Progress to Level 147: §e37.1%
+     * REGEX-TEST: §b§lMAX LEVEL
+     */
+    private val inventorySelectedProgressPattern by PetAPI.patternGroup.pattern(
+        "inventory.selected.progress",
+        "§b§lMAX LEVEL|§7Progress to Level (?<level>\\d+): §e(?<percentage>[\\d.]+)%"
+    )
+
+    /**
+     * REGEX-TEST: §2§l§m             §f§l§m            §r §e713,241.8§6/§e1.4M
+     * REGEX-TEST: §2§l§m          §f§l§m               §r §e699,742.8§6/§e1.9M
+     * REGEX-TEST: §f§l§m                         §r §e0§6/§e660
+     * REGEX-TEST: §8▸ 30,358,983 XP'
+     */
+    private val inventorySelectedXpPattern by PetAPI.patternGroup.pattern(
+        "inventory.selected.xp",
+        "(?:§8▸ |(?:§.§l§m *)*)(?:§r §e)?(?<current>[\\d,.kM]+)(?:§6\\/§e)?(?<next>[\\d,.kM]+)?"
+    )
+
+    /**
+     * REGEX-TEST:  §r§7No pet selected
+     * REGEX-TEST:  §r§6Washed-up Souvenir
+     * REGEX-TEST:  §r§9Dwarf Turtle Shelmet
+     */
+    private val widgetStringPattern by PetAPI.patternGroup.pattern(
+        "widget.string",
+        "^ §r(?<string>§.[\\w -]+)\$",
+    )
+
+    /**
+     * REGEX-TEST:  §r§b§lMAX LEVEL
+     * REGEX-TEST:  §r§6+§r§e21,248,020.7 XP
+     * REGEX-TEST:  §r§e15,986.6§r§6/§r§e29k XP §r§6(53.6%)
+     */
+    @Suppress("MaxLineLength")
+    private val xpWidgetPattern by PetAPI.patternGroup.pattern(
+        "widget.xp",
+        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
+    )
+
+    /**
      * REGEX-TEST: §r, §aEquip: §r, §7[Lvl 99] §r, §6Flying Fish
      * REGEX-TEST: §r, §aEquip: §r, §e⭐ §r, §7[Lvl 100] §r, §dBlack Cat§r, §d ✦
      * REGEX-TEST: §r, §aEquip: §r, §7[Lvl 47] §r, §5Lion
      */
-    private val autopetHoverPetPattern by patternGroup.pattern(
+    private val autopetHoverPetPattern by PetAPI.patternGroup.pattern(
         "chat.autopet.hover.pet",
         "^§r, §aEquip: §r,(?: §e⭐ §r,)? §7\\[Lvl (?<level>\\d+)] §r, §(?<rarity>.)(?<pet>[\\w ]+)(?:§r, (?<skin>§. ✦))?\$",
     )
@@ -220,17 +213,9 @@ object PetAPI {
      * REGEX-TEST: §r, §aHeld Item: §r, §5Lucky Clover§r]
      * REGEX-TEST: §r, §aHeld Item: §r, §5Fishing Exp Boost§r]
      */
-    private val autopetHoverPetItemPattern by patternGroup.pattern(
+    private val autopetHoverPetItemPattern by PetAPI.patternGroup.pattern(
         "chat.autopet.hover.item",
         "^§r, §aHeld Item: §r, (?<item>§.[\\w -]+)§r]\$",
-    )
-
-    /**
-     * REGEX-TEST: §aYour pet is now holding §r§9Bejeweled Collar§r§a.
-     */
-    private val petItemMessagePattern by patternGroup.pattern(
-        "chat.pet.item.equip",
-        "^§aYour pet is now holding §r(?<petItem>§.[\\w -]+)§r§a\\.\$",
     )
     // </editor-fold>
 
@@ -257,14 +242,11 @@ object PetAPI {
         return null
     }
 
-    private fun petNameToInternalName(name: String, rarity: LorenzRarity): NEUInternalName =
-        "${name.convertToUnformatted()}${rarity.id}".asInternalName()
-
     private fun getFakePetLine(level: Int, rarity: LorenzRarity, petName: String, skin: String? = null): String {
         return "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName§r${skin.orEmpty()}"
     }
 
-    private fun rarityByColorGroup(color: String): LorenzRarity = LorenzRarity.getByColorCode(color[0])
+    fun rarityByColorGroup(color: String): LorenzRarity = LorenzRarity.getByColorCode(color[0])
         ?: ErrorManager.skyHanniError(
             "Unknown rarity",
             Pair("rarity", color),
@@ -297,7 +279,7 @@ object PetAPI {
     }
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String): Double? {
-        val newPetName = petName.asInternalName().toString()
+        val newPetName = petName.toInternalName().toString()
 
         val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
         if (!isValidLevel(level, newPetName)) return null
@@ -355,23 +337,6 @@ object PetAPI {
         PetChangeEvent(oldPet, newPet).post()
     }
 
-    @Suppress("DestructuringDeclarationWithTooManyEntries")
-    private fun getPetDataFromItem(item: ItemStack) {
-        val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item)
-        val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName) ?: return
-
-        val newPet = PetData(
-            internalName,
-            name,
-            rarity,
-            petItem,
-            level,
-            petXP,
-            "§r§7[Lvl $level] §r${rarity?.chatColorCode}$name${if (skin != "") "§r$skin" else ""}",
-        )
-        updatePet(newPet)
-    }
-
     private fun handlePetMessageBlock(event: LorenzChatEvent) {
         if (!config.hideAutopet) return
         val spawnMatches = chatSpawnPattern.matches(event.message)
@@ -380,94 +345,6 @@ object PetAPI {
         if (spawnMatches || despawnMatches || autoPetMatches) {
             event.blockedReason = "pets"
         }
-    }
-    // </editor-fold>
-
-    // <editor-fold desc="Pet Data Extractors (General)">
-    private fun parsePetData(
-        lines: List<String>,
-        itemHandler: (String) -> NEUInternalName?,
-        xpHandler: (String) -> Double?,
-        petHandler: (String) -> PetData?
-    ): Pair<PetData, Double>? {
-        return parsePetDataLists(
-            lines,
-            itemHandlerList = { it.firstNotNullOfOrNull(itemHandler) },
-            xpHandlerList = { it.firstNotNullOfOrNull(xpHandler) },
-            petHandlerList = { it.firstNotNullOfOrNull(petHandler) }
-        )
-    }
-
-    private fun parsePetDataLists(
-        lines: List<String>,
-        itemHandlerList: (List<String>) -> NEUInternalName?,
-        xpHandlerList: (List<String>) -> Double?,
-        petHandlerList: (List<String>) -> PetData?
-    ): Pair<PetData, Double>? {
-        val petItem = itemHandlerList(lines) ?: return null
-        val overflowXP = xpHandlerList(lines) ?: 0.0
-
-        val data = petHandlerList(lines) ?: return null
-        val petData = PetData(
-            internalName = data.internalName,
-            cleanName = data.cleanName,
-            rarity = data.rarity,
-            petItem = petItem,
-            level = data.level,
-            xp = data.xp,
-            rawPetName = data.rawPetName,
-        )
-
-        return petData to overflowXP
-    }
-
-    private fun parsePetAsItem(item: ItemStack) {
-        val lore = item.getLore()
-
-        if (lore.any { petDespawnMenuPattern.matches(it) }) {
-            updatePet(null)
-            return
-        }
-
-        getPetDataFromItem(item)
-    }
-
-    private fun parsePetNBT(item: ItemStack): PetData {
-        val petInfo = Gson().fromJson(item.getExtraAttributes()?.getString("petInfo"), PetNBT::class.java)
-
-        return PetData(
-            internalName = NEUInternalName.NONE,
-            cleanName = "",
-            level = 0,
-            rarity = LorenzRarity.getByName(petInfo.tier) ?: ErrorManager.skyHanniError(
-                "Couldn't parse pet rarity.",
-                Pair("petNBT", petInfo),
-                Pair("rarity", petInfo.tier),
-            ),
-            petItem = petInfo.heldItem?.asInternalName(),
-            xp = petInfo.exp,
-            rawPetName = "",
-        )
-    }
-
-    private fun parsePetName(displayName: String): PetData? {
-        petNameMenuPattern.matchMatcher(displayName) {
-            val name = group("name").orEmpty()
-            val rarity = rarityByColorGroup(group("rarity"))
-            val level = group("level").toInt()
-            val skin = group("skin").orEmpty()
-
-            return PetData(
-                internalName = petNameToInternalName(name, rarity),
-                cleanName = name,
-                rarity = rarity,
-                petItem = null,
-                level = level,
-                xp = 0.0,
-                rawPetName = skin,
-            )
-        }
-        return null
     }
     // </editor-fold>
 
@@ -661,7 +538,7 @@ object PetAPI {
         val category = event.item?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.PET) return
 
-        parsePetAsItem(event.item)
+        updatePet(parsePetAsItem(event.item))
     }
 
     @SubscribeEvent
@@ -682,18 +559,3 @@ object PetAPI {
     }
     // </editor-fold>
 }
-
-data class PetNBT(
-    val type: String,
-    val active: Boolean,
-    val exp: Double,
-    val tier: String,
-    val hideInfo: Boolean,
-    val heldItem: String?,
-    val candyUsed: Int,
-    val skin: String?,
-    val uuid: String,
-    val uniqueId: String,
-    val hideRightClick: Boolean,
-    val noMove: Boolean,
-)
