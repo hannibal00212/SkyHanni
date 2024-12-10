@@ -31,7 +31,7 @@ object WikiManager {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return

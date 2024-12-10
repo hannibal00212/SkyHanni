@@ -134,6 +134,7 @@ object UnknownLinesHandler {
         SbPattern.queuePattern,
         SbPattern.queueTierPattern,
         SbPattern.queuePositionPattern,
+        SbPattern.queueWaitingForLeaderPattern,
         SbPattern.fortunateFreezingBonusPattern,
         SbPattern.riftAveikxPattern,
         SbPattern.riftHayEatenPattern,
