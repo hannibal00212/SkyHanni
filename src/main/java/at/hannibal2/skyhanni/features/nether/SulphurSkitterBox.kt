@@ -65,7 +65,7 @@ object SulphurSkitterBox {
         closestBlock?.let {
             if (it.toLorenzVec().distanceToPlayer() >= 50) return
             val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-            val pos2 = it.add(RADIUS, RADIUS, RADIUS)
+            val pos2 = it.add(RADIUS + 1, RADIUS + 1, RADIUS + 1)
             val axis = AxisAlignedBB(pos1, pos2).expandBlock()
 
             drawBox(axis, event.partialTicks)
