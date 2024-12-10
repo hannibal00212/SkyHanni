@@ -333,7 +333,7 @@ object HoppityEventSummary {
     }
 
     @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!currentTimerActive) return
         // Refresh every 5 seconds
         if (timerSecondCounter++ % 5 != 0) return
