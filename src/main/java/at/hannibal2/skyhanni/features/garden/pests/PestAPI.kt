@@ -60,7 +60,7 @@ object PestAPI {
         }
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
-    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
+    var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
     val vacuumVariants = listOf(
