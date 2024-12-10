@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -46,7 +47,7 @@ object CrystalNucleusAPI {
     private val LAPIDARY_I_BOOK_ITEM by lazy { "LAPIDARY;1".asInternalName() }
     private val FORTUNE_IV_BOOK_ITEM by lazy { "FORTUNE;4".asInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
@@ -61,7 +62,7 @@ object CrystalNucleusAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (unCheckedBooks == 0 ||
             event.oldIsland != IslandType.CRYSTAL_HOLLOWS ||
