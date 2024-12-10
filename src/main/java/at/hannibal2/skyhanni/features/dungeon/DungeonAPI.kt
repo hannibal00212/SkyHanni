@@ -183,7 +183,7 @@ object DungeonAPI {
         else -> "§7"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
         floorPattern.firstMatcher(event.added) {
@@ -204,7 +204,7 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
@@ -220,7 +220,7 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         for (line in event.footer.split("\n")) {

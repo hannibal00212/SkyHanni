@@ -89,7 +89,7 @@ object NonGodPotEffectDisplay {
     )
     private var totalEffectsCount = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()

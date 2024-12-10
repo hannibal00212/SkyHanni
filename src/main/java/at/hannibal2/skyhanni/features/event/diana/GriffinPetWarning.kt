@@ -45,7 +45,7 @@ object GriffinPetWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         DelayedRun.runDelayed(5.seconds) {
             wasCorrectPetAlready = false
