@@ -261,6 +261,7 @@ object HoppityEventSummary {
         checkLbUpdateWarning()
         reCheckInventoryState()
         checkEnded()
+        recheckHashClear(event)
         if (!HoppityAPI.isHoppityEvent()) return
         checkAddCfTime()
     }
@@ -272,6 +273,13 @@ object HoppityEventSummary {
 
     private fun isInInventory(): Boolean =
         Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
+
+    private fun recheckHashClear(event: SecondPassedEvent) {
+        if (!currentTimerActive) return
+        // Refresh every 5 seconds
+        if (!event.repeatSeconds(5)) return
+        lastKnownStatHash = 0
+    }
 
     private fun reCheckInventoryState() {
         if (isInInventory() != lastKnownInInvState) {
@@ -329,14 +337,6 @@ object HoppityEventSummary {
                     "update your leaderboard position in Hoppity Event stats.",
             )
         }
-    }
-
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!currentTimerActive) return
-        // Refresh every 5 seconds
-        if (!event.repeatSeconds(5)) return
-        lastKnownStatHash = 0
     }
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
