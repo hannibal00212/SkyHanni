@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.ChatHoverEvent;
-import at.hannibal2.skyhanni.events.TabCompletionEvent;
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
@@ -38,7 +38,7 @@ public class MixinGuiChat {
         String inputFieldText = this.inputField.getText();
         String beforeCursor = inputFieldText.substring(0, this.inputField.getCursorPosition());
         TabCompletionEvent tabCompletionEvent = new TabCompletionEvent(beforeCursor, inputFieldText, Arrays.asList(originalArray));
-        tabCompletionEvent.postAndCatch();
+        tabCompletionEvent.post();
         String[] newSuggestions = tabCompletionEvent.intoSuggestionArray();
         if (newSuggestions == null)
             newSuggestions = originalArray;
