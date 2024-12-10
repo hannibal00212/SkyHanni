@@ -29,7 +29,6 @@ import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -78,7 +77,7 @@ object EnoughUpdatesManager {
                 itemMap.clear()
                 itemMap.putAll(tempItemMap)
             }
-            NeuRepositoryReloadEvent().postAndCatch()
+            NeuRepositoryReloadEvent.post()
             ChatUtils.chat("Reloaded ${itemMap.size} items in the NEU repo")
         }
     }
@@ -364,7 +363,7 @@ object EnoughUpdatesManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.readConstant<NeuPetsJson>("pets")
         neuPetNums = event.readConstant<JsonObject>("petnums")
