@@ -35,7 +35,7 @@ object LivingCaveLivingMetalHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
@@ -91,7 +91,7 @@ object LivingCaveLivingMetalHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
         if (event.title.contains("Living Metal")) {

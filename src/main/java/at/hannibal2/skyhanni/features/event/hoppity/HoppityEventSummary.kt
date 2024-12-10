@@ -162,7 +162,7 @@ object HoppityEventSummary {
         allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         onHoppityIsland = LorenzUtils.inSkyBlock &&
             allowedHoppityIslands.any { it.isInIsland() }
@@ -266,7 +266,7 @@ object HoppityEventSummary {
         checkAddCfTime()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         checkEnded()
     }
