@@ -71,7 +71,7 @@ object GardenVisitorTimer {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
         lastMillis = 0.seconds

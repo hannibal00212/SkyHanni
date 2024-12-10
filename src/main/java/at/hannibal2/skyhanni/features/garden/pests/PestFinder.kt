@@ -96,7 +96,7 @@ object PestFinder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         display = listOf()
         update()

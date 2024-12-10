@@ -28,19 +28,19 @@ object MinecraftData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacket(event: PacketReceivedEvent) {
-        val packet = event.packet
-        when (packet) {
+        when (val packet = event.packet) {
             is S29PacketSoundEffect -> {
                 if (PlaySoundEvent(
                         packet.soundName,
                         LorenzVec(packet.x, packet.y, packet.z),
                         packet.pitch,
-                        packet.volume
-                    ).postAndCatch()
+                        packet.volume,
+                    ).post()
                 ) {
                     event.cancel()
                 }
             }
+
             is S2APacketParticles -> {
                 if (ReceiveParticleEvent(
                         packet.particleType!!,
@@ -55,6 +55,7 @@ object MinecraftData {
                     event.cancel()
                 }
             }
+
             is S32PacketConfirmTransaction -> {
                 totalServerTicks++
                 ServerTickEvent.post()

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -135,8 +136,8 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: IslandChangeEvent) {
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         val currentTime = SimpleTimeMark.now()
         val timeRange = greatSpookTimeRange ?: run {
             isGreatSpookActive = false
