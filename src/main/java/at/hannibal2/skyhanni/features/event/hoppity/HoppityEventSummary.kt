@@ -106,7 +106,6 @@ object HoppityEventSummary {
     private var lastSnapshotServer: String? = null
     private var statYear: Int = getCurrentSBYear()
     private var currentTimerActive = false
-    private var timerSecondCounter = 0
     private var onHoppityIsland = false
 
     private fun inMatchingInventory(): Boolean {
@@ -336,9 +335,8 @@ object HoppityEventSummary {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!currentTimerActive) return
         // Refresh every 5 seconds
-        if (timerSecondCounter++ % 5 != 0) return
+        if (!event.repeatSeconds(5)) return
         lastKnownStatHash = 0
-        timerSecondCounter = 0
     }
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
@@ -425,7 +423,6 @@ object HoppityEventSummary {
         if (predecessorYear == null && successorYear == null) return null
 
         val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
-
 
         return listOfNotNull(
             predecessorYear?.let {
