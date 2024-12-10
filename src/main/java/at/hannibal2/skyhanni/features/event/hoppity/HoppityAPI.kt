@@ -227,7 +227,7 @@ object HoppityAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
