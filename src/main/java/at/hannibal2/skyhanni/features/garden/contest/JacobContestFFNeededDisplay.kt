@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
@@ -29,7 +30,7 @@ object JacobContestFFNeededDisplay {
     private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!isEnabled()) return
 

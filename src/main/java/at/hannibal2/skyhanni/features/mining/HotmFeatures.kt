@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -28,7 +29,7 @@ object HotmFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         handleLevelStackSize(event)

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -688,7 +689,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
@@ -720,7 +721,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
@@ -770,8 +771,8 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
-        fun onWorldSwitch(event: IslandChangeEvent) {
+        @HandleEvent
+        fun onIslandChange(event: IslandChangeEvent) {
             if (HotmAPI.mineshaftMayhem == null) return
             HotmAPI.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
