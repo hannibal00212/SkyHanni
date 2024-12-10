@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.minion
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
@@ -15,7 +16,7 @@ object MinionCollectLogic {
 
     private var oldMap = mapOf<NEUInternalName, Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (oldMap.isNotEmpty()) return
         oldMap = count()

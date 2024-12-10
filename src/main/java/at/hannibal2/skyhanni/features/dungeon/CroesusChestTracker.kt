@@ -205,7 +205,7 @@ object CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
@@ -215,7 +215,7 @@ object CroesusChestTracker {
         event.stackTip = "§a$kismetAmountCache"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return

@@ -512,7 +512,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (closestNode == null) return // Value that must be none null if it was active
         closestNode = null
