@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class SlayerChangeEvent(val oldSlayer: String, val newSlayer: String) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class SlayerChangeEvent(val oldSlayer: String, val newSlayer: String) : SkyHanniEvent()
