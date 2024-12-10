@@ -27,7 +27,7 @@ object SkillExperience {
         ".* §e(?<number>.*)§6/.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         skillExp.clear()
     }

@@ -50,7 +50,7 @@ object TrophyFishDisplay {
 
     private var display = emptyList<Renderable>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
@@ -68,7 +68,7 @@ object TrophyFishDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         update()

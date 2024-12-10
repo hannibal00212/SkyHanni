@@ -38,7 +38,7 @@ object ChocolateFactoryStrayTimer {
         lastTimerSubtraction = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         timer = Duration.ZERO
     }
