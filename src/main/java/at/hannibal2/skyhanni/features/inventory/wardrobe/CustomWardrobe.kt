@@ -273,7 +273,6 @@ object CustomWardrobe {
         //#if MC < 1.12
         fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
         //#else
-        //$$ fakePlayer.inventory.armorInventory.clear()
         //$$ fakePlayer.inventory.armorInventory.addAll(slot.armor.map { it?.copy()?.removeEnchants() }.reversed())
         //#endif
 
