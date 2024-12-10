@@ -56,7 +56,7 @@ object RiftGunthersRace {
         "§3§lRIFT RACING §r§cRace cancelled!.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelper?.reset()
     }

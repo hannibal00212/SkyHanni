@@ -120,7 +120,7 @@ object CustomScoreboard {
         if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         dirty = true
     }
@@ -199,7 +199,7 @@ object CustomScoreboard {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.NONE) updateIslandEntries()
     }

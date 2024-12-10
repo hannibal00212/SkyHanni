@@ -57,7 +57,7 @@ object GardenCropSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         lastBrokenCrop = null
     }

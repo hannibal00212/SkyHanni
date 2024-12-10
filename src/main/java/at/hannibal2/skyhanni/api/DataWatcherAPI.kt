@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
-import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.Entity
 
