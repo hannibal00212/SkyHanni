@@ -42,14 +42,14 @@ object DungeonSecretChime {
     }
 
     @HandleEvent
-    fun onItemPickup(event: EntityRemovedEvent) {
-        if (!isEnabled() || event.entity !is EntityItem) return
+    fun onItemPickup(event: EntityRemovedEvent<EntityItem>) {
+        if (!isEnabled()) return
         val itemName = event.entity.entityItem.displayName
         if (NEUInternalName.fromItemName(itemName) !in dungeonSecretItems) return
         playSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.muteSecretSound.muteChestSound && !config.muteSecretSound.muteLeverSound) return
         if (config.muteSecretSound.muteChestSound && checkChestSound(event)) event.cancel()
