@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
@@ -51,7 +51,6 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -66,8 +65,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
 // TODO cut class into smaller pieces
+@SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
 
@@ -372,7 +371,7 @@ object DamageIndicatorManager {
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 
-                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
+                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).post()
             }
             entityData.lastHealth = health
 
@@ -680,11 +679,12 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
+        val ridingEntity = entity.ridingEntity
         // Laser phase
-        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
+        if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val ticksAlive = ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
@@ -837,13 +837,13 @@ object DamageIndicatorManager {
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
         )
-        DamageIndicatorDetectedEvent(entityData).postAndCatch()
+        DamageIndicatorDetectedEvent(entityData).post()
         return entityData
     }
 
     private fun checkFinalBoss(finalBoss: Boolean, id: Int) {
         if (finalBoss) {
-            DamageIndicatorFinalBossEvent(id).postAndCatch()
+            DamageIndicatorFinalBossEvent(id).post()
         }
     }
 
@@ -856,7 +856,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
@@ -898,13 +898,13 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val data = data[event.entity.uniqueID] ?: return
         if (event.health <= 1) {
             if (!data.firstDeath) {
                 data.firstDeath = true
-                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+                DamageIndicatorDeathEvent(event.entity, data).post()
             }
         }
     }

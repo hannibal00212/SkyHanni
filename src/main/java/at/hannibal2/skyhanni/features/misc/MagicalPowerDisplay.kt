@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -32,8 +33,8 @@ object MagicalPowerDisplay {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
 
-    private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
-    private val riftPrism = "RIFT_PRISM".asInternalName()
+    private val hegemonyArtifact = "HEGEMONY_ARTIFACT".toInternalName()
+    private val riftPrism = "RIFT_PRISM".toInternalName()
 
     /**
      * REGEX-TEST: Accessory Bag
@@ -45,7 +46,7 @@ object MagicalPowerDisplay {
      * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        "^(Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
+        "^(?:Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
@@ -74,7 +75,7 @@ object MagicalPowerDisplay {
         "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return

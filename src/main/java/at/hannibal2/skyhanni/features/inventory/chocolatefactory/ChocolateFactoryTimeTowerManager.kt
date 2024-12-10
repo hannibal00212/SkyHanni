@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -25,7 +26,7 @@ object ChocolateFactoryTimeTowerManager {
     private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         wasTimeTowerRecentlyActive = false
     }
@@ -62,7 +63,7 @@ object ChocolateFactoryTimeTowerManager {
             if (!warnAboutNewCharge) return
             ChatUtils.clickableChat(
                 "Your Time Tower has an available charge §7(${timeTowerCharges()})§e. " +
-                    "Click here to use one.",
+                    "Click here to open the Chocolate Factory menu.",
                 onClick = { HypixelCommands.chocolateFactory() },
                 HOVER_TEXT,
             )
@@ -78,7 +79,8 @@ object ChocolateFactoryTimeTowerManager {
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
             val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
-                "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
+                "§cYour Time Tower just expired and has $charges remaining. " +
+                    "Click here to open the Chocolate Factory Menu.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
@@ -94,12 +96,14 @@ object ChocolateFactoryTimeTowerManager {
         if (!config.timeTowerWarning) return
         if (!timeTowerFull()) return
         if (ReminderUtils.isBusy()) return
+        if (maxCharges() == 0) return
 
         val warningSeparation = if (inInventory) 30.seconds else 5.minutes
         if (lastTimeTowerWarning.passedSince() < warningSeparation) return
 
         ChatUtils.clickToActionOrDisable(
-            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages!",
+            "§cYour Time Tower is full §7(${timeTowerCharges()})§c, Use one to avoid wasting time tower usages! " +
+                "Click here to open the Chocolate Factory menu.",
             config::timeTowerWarning,
             actionName = "open Chocolate Factory",
             action = { HypixelCommands.chocolateFactory() },
@@ -149,7 +153,7 @@ object ChocolateFactoryTimeTowerManager {
         return endTime - currentTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastTimeTowerWarning = SimpleTimeMark.farPast()
     }

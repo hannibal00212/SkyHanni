@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -38,9 +37,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -48,6 +47,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -154,7 +154,7 @@ object TunnelsMaps {
 
     private var clickTranslate = mapOf<Int, String>()
 
-    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
+    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".toInternalName() }
 
     private var isCommission = false
 
@@ -167,7 +167,7 @@ object TunnelsMaps {
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            val type = lore.matchFirst(collectorCommissionPattern) {
+            val type = collectorCommissionPattern.firstMatcher(lore) {
                 group("what")
             } ?: return@mapNotNull null
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
@@ -370,7 +370,7 @@ object TunnelsMaps {
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
-                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
                 ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
@@ -475,7 +475,7 @@ object TunnelsMaps {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toChromaColor()
+    } ?: config.pathColour.toSpecialColor()
 
     @SubscribeEvent
     fun onKeyPress(event: LorenzKeyPressEvent) {
@@ -512,7 +512,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (closestNode == null) return // Value that must be none null if it was active
         closestNode = null

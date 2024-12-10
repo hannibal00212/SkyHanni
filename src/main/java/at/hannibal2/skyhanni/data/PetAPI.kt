@@ -106,6 +106,11 @@ object PetAPI {
         "item.name",
         "(?<favorite>(?:§.)*⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7[Lvl 1➡200] §6Golden Dragon
+     * REGEX-TEST: §7[Lvl {LVL}] §6Golden Dragon
+     */
     private val neuRepoPetItemNamePattern by patternGroup.pattern(
         "item.name.neu.format",
         "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
@@ -587,6 +592,30 @@ object PetAPI {
         }
     }
 
+    @HandleEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PET)) return
+
+        val newPetLine = petWidgetPattern.firstMatches(event.lines)?.trim() ?: return
+        if (newPetLine == currentPet?.rawPetName) return
+
+        val (petData, overflowXP) = parsePetData(
+            event.lines,
+            { handleWidgetStringLine(it) },
+            { handleWidgetXPLine(it) },
+            { handleWidgetPetLine(it, newPetLine) }
+        ) ?: return
+
+        updatePet(petData.copy(xp = petData.xp?.plus(overflowXP)))
+    }
+
+    @HandleEvent
+    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+        val data = event.getConstant<NEUPetsJson>("pets")
+        baseXpLevelReqs = data.petLevels
+        customXpLevelReqs = data.customPetLeveling
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         handlePetMessageBlock(event)
@@ -603,23 +632,6 @@ object PetAPI {
             val newPet = currentPet?.copy(petItem = item) ?: return
             updatePet(newPet)
         }
-    }
-
-    @SubscribeEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PET)) return
-
-        val newPetLine = petWidgetPattern.firstMatches(event.lines)?.trim() ?: return
-        if (newPetLine == currentPet?.rawPetName) return
-
-        val (petData, overflowXP) = parsePetData(
-            event.lines,
-            { handleWidgetStringLine(it) },
-            { handleWidgetXPLine(it) },
-            { handleWidgetPetLine(it, newPetLine) }
-        ) ?: return
-
-        updatePet(petData.copy(xp = petData.xp?.plus(overflowXP)))
     }
 
     @SubscribeEvent
@@ -667,13 +679,6 @@ object PetAPI {
             add("petXP: '${currentPet?.xp ?: 0.0}'")
             add("rawPetLine: '${currentPet?.rawPetName.orEmpty()}'")
         }
-    }
-
-    @SubscribeEvent
-    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant<NEUPetsJson>("pets")
-        baseXpLevelReqs = data.petLevels
-        customXpLevelReqs = data.customPetLeveling
     }
     // </editor-fold>
 }

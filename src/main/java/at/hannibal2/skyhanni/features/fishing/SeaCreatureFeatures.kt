@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -32,8 +33,8 @@ object SeaCreatureFeatures {
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
     private var lastRareCatch = SimpleTimeMark.farPast()
-    private var rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
-    private var entityIds = TimeLimitedSet<Int>(6.minutes)
+    private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
+    private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
     @SubscribeEvent
@@ -73,7 +74,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.alertOwnCatches) return

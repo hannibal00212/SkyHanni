@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -45,12 +45,12 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
-    private var recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
+    private val recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NEUInternalName>()
 
     private var display = emptyList<Renderable>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
@@ -68,7 +68,7 @@ object TrophyFishDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         update()
@@ -244,9 +244,9 @@ object TrophyFishDisplay {
                 return internalName
             }
         }
-        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".asInternalName()
-        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".asInternalName()
-        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".asInternalName()
+        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".toInternalName()
+        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".toInternalName()
+        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".toInternalName()
 
         return null
     }

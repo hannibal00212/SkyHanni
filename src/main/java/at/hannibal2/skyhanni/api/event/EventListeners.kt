@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
 import java.util.function.Consumer
 
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
@@ -14,15 +14,19 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     constructor(event: Class<*>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        GenericSkyHanniEvent::class.java.isAssignableFrom(event)
+        GenericSkyHanniEvent::class.java.isAssignableFrom(event),
     )
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
+        require(method.parameterCount == 1)
         val generic: Class<*>? = if (isGeneric) {
-            method.genericParameterTypes
-                .firstNotNullOfOrNull { it as? ParameterizedType }
-                ?.let { it.actualTypeArguments.firstOrNull() as? Class<*> }
-                ?: throw IllegalArgumentException("Generic event handler must have a generic type")
+            ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
+                method.genericParameterTypes[0],
+                GenericSkyHanniEvent::class.java.typeParameters[0],
+            ) ?: error(
+                "Generic event handler type parameter is not present in " +
+                    "event class hierarchy for type ${method.genericParameterTypes[0]}",
+            )
         } else {
             null
         }
@@ -32,7 +36,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 prefix = "(",
                 postfix = ")",
                 separator = ", ",
-                transform = Class<*>::getTypeName
+                transform = Class<*>::getTypeName,
             )
         }"
         listeners.add(Listener(name, createEventConsumer(name, instance, method), options, generic))
@@ -52,7 +56,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 MethodType.methodType(Consumer::class.java, instance::class.java),
                 MethodType.methodType(Nothing::class.javaPrimitiveType, Object::class.java),
                 handle,
-                MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0])
+                MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
             ).target.bindTo(instance).invokeExact() as Consumer<Any>
         } catch (e: Throwable) {
             throw IllegalArgumentException("Method $name is not a valid consumer", e)

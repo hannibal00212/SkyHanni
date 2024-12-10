@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,7 +58,7 @@ object MobDetection {
 
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
-    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
+    private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
@@ -252,7 +252,7 @@ object MobDetection {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
             event.entity is EntityBat && event.health == 6 -> {

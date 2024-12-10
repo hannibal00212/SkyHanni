@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -332,7 +334,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 } else {
                     val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
                     val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
-                    val time = DungeonAPI.getTime()
+                    val time = DungeonAPI.time
                     "$floor Kills: $amountKills ($time)"
                 }
             }

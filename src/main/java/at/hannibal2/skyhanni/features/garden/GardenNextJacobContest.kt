@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
@@ -74,14 +75,13 @@ object GardenNextJacobContest {
      * REGEX-TEST: Late Summer, Year 351
      * REGEX-TEST: Autumn, Year 351
      */
-
     val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§(e○|6☘) §7(?<crop>.*)"
+        "§(?:e○|6☘) §7(?<crop>.*)"
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
@@ -137,7 +137,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()

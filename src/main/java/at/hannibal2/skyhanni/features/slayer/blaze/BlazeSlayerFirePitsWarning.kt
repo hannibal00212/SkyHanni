@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -36,7 +37,7 @@ object BlazeSlayerFirePitsWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isEnabled()) return
         val entityData = event.entityData

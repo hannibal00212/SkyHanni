@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
@@ -27,9 +27,12 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
+
+    private val config get() = SkyHanniMod.feature.dev
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
@@ -41,7 +44,7 @@ object ChatManager {
             override fun removeEldestEntry(
                 eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
             ): Boolean {
-                return size > 100
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 
@@ -109,7 +112,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
@@ -125,10 +128,13 @@ object ChatManager {
         //#endif
 
         val original = event.message
-        val message = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val message = original.formattedText.stripHypixelMessage()
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
+                event.isCanceled = true
+            }
             return
         }
         val key = IdentityCharacteristics(original)

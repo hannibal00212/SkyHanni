@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
@@ -19,14 +20,18 @@ object GardenWarpCommands {
 
     private val config get() = GardenAPI.config.gardenCommands
 
+    /**
+     * REGEX-TEST: /tp 3
+     * REGEX-TEST: /tp barn
+     */
     private val tpPlotPattern by RepoPattern.pattern(
         "garden.warpcommand.tpplot",
-        "/tp (?<plot>.*)"
+        "/tp (?<plot>.*)",
     )
 
     private var lastWarpTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.warpCommands) return
         if (!GardenAPI.inGarden()) return

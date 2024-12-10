@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -12,4 +13,4 @@ class CropClickEvent(
     val blockState: IBlockState,
     val clickType: ClickType,
     val itemInHand: ItemStack?,
-) : LorenzEvent()
+) : SkyHanniEvent()

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
@@ -34,9 +35,14 @@ object ArmorDropTracker {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
 
+    /**
+     * REGEX-TEST: FERMENTO_CHESTPLATE
+     * REGEX-TEST: CROPIE_BOOTS
+     * REGEX-TEST: SQUASH_HELMET
+     */
     private val armorPattern by RepoPattern.pattern(
         "garden.armordrops.armor",
-        "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)"
+        "(?:FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
     private var hasArmor = false
@@ -62,7 +68,7 @@ object ArmorDropTracker {
         FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         hasArmor = false
     }
@@ -103,7 +109,7 @@ object ArmorDropTracker {
         tracker.renderDisplay(config.pos)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.GARDEN) {
             tracker.firstUpdate()
