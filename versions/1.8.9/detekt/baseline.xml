@@ -91,9 +91,6 @@
     <ID>RepoPatternRegexTest:BasketWaypoints.kt$BasketWaypoints$by patternGroup.pattern( "main.scoreboard.basket", "^Baskets Found: §a\\d+§f/§a\\d+\$" )</ID>
     <ID>RepoPatternRegexTest:BasketWaypoints.kt$BasketWaypoints$by patternGroup.pattern( "main.scoreboard.halloween", "^§6Halloween \\d+$" )</ID>
     <ID>RepoPatternRegexTest:BazaarCancelledBuyOrderClipboard.kt$BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
-    <ID>RepoPatternRegexTest:BazaarOrderHelper.kt$BazaarOrderHelper$by patternGroup.pattern( "filled", "§7Filled: §[a6].*§7/.* §a§l100%!", )</ID>
-    <ID>RepoPatternRegexTest:BazaarOrderHelper.kt$BazaarOrderHelper$by patternGroup.pattern( "itemname", "§.§l(?&lt;type&gt;BUY|SELL) (?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:BazaarOrderHelper.kt$BazaarOrderHelper$by patternGroup.pattern( "price", "§7Price per unit: §6(?&lt;number&gt;.*) coins", )</ID>
     <ID>RepoPatternRegexTest:BeaconPower.kt$BeaconPower$by group.pattern( "stat", "§7Current Stat: (?&lt;stat&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:BeaconPower.kt$BeaconPower$by group.pattern( "time", "§7Power Remaining: §e(?&lt;time&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:BingoAPI.kt$BingoAPI$by RepoPattern.pattern( "bingo.detection.scoreboard", " §.Ⓑ §.Bingo" )</ID>
