@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
@@ -61,7 +62,7 @@ object CarnivalReminder {
         check()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         claimedToday = false
         if (!isEnabled()) return

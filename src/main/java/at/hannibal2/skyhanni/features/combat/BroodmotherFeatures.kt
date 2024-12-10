@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -47,7 +48,7 @@ object BroodmotherFeatures {
     private var broodmotherSpawnTime = SimpleTimeMark.farPast()
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()

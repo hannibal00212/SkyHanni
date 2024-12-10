@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -34,7 +35,7 @@ object ComposterInventoryNumbers {
         "§7§7Compost Available: §a(?<amount>.*)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.composters.inventoryNumbers) return
