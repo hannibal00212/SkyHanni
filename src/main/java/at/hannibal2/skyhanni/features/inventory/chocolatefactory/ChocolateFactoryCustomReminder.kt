@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -71,7 +72,7 @@ object ChocolateFactoryCustomReminder {
         "§cYou must collect (.*) all-time Chocolate!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         if (!isEnabled()) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return

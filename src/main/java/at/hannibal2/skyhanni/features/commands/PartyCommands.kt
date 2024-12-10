@@ -94,7 +94,7 @@ object PartyCommands {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
             return

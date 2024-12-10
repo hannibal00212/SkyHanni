@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -73,7 +74,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.alertOwnCatches) return

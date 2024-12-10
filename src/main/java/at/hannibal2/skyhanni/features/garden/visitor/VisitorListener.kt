@@ -50,7 +50,7 @@ object VisitorListener {
 
     private val logger = LorenzLogger("garden/visitors/listener")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         VisitorAPI.reset()
     }
@@ -68,7 +68,7 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.VISITORS)) return

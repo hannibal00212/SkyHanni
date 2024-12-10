@@ -161,13 +161,16 @@ object ChatUtils {
         }
     }
 
-    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    private fun getUniqueMessageIdForString(string: String): Int {
+        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    }
 
-    var lastUniqueMessageId = 123242
+    private var lastUniqueMessageId = 123242
 
-    fun getUniqueMessageId() = lastUniqueMessageId++
+    private fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
