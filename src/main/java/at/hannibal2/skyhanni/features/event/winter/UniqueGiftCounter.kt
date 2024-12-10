@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.winter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -43,7 +44,7 @@ object UniqueGiftCounter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         update()
     }

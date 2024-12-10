@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -219,7 +220,7 @@ object QuiverAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() && event.slot != 44) return
         val stack = event.itemStack
