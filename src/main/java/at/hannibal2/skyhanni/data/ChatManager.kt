@@ -112,7 +112,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
