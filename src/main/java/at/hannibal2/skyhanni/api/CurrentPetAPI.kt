@@ -49,9 +49,9 @@ object CurrentPetAPI {
     private var inPetMenu = false
 
     var currentPet: PetData?
-        get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isInitialized() }
+        get() = ProfileStorageData.profileSpecific?.currentPetData?.takeIf { it.isInitialized() }
         set(value) {
-            ProfileStorageData.profileSpecific?.currentPet = value
+            ProfileStorageData.profileSpecific?.currentPetData = value
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.cleanName?.contains(petName) ?: false

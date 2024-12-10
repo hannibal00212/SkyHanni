@@ -75,7 +75,7 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
-    public PetData currentPet = new PetData();
+    public PetData currentPetData = new PetData();
 
     @Expose
     public ExperimentationStorage experimentation = new ExperimentationStorage();
