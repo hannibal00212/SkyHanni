@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.FarmingContestEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils

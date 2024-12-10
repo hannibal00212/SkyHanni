@@ -44,7 +44,7 @@ object GardenCropMilestoneInventory {
         average = -1.0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (average == -1.0) return
 
