@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PetUtils.isPetMenu
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -175,7 +175,7 @@ object CaptureFarmingGear {
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
-        if (PetAPI.isPetMenu(event.inventoryName, event.inventoryItems)) {
+        if (isPetMenu(event.inventoryName, event.inventoryItems)) {
             pets(items, outdatedItems)
             return
         }

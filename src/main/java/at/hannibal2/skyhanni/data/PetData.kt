@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.data.PetAPI.rarityByColorGroup
+import at.hannibal2.skyhanni.api.CurrentPetAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PetUtils.rarityByColorGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -21,7 +22,7 @@ import net.minecraft.item.ItemStack
  * REGEX-TEST: §e⭐ §7[Lvl 100] §dBlack Cat§d ✦
  * REGEX-TEST: §7[Lvl 100] §6Mole
  */
-private val petNameMenuPattern by PetAPI.patternGroup.pattern(
+private val petNameMenuPattern by CurrentPetAPI.patternGroup.pattern(
     "menu.pet.name",
     "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$",
 )
@@ -29,7 +30,7 @@ private val petNameMenuPattern by PetAPI.patternGroup.pattern(
 /**
  * REGEX-TEST: §7§cClick to despawn!
  */
-private val petDespawnMenuPattern by PetAPI.patternGroup.pattern(
+private val petDespawnMenuPattern by CurrentPetAPI.patternGroup.pattern(
     "menu.pet.despawn",
     "§7§cClick to despawn!",
 )

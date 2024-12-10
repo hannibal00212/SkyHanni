@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.PetAPI.petItemNamePattern
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject

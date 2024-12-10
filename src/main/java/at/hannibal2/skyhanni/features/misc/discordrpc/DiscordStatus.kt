@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
+import at.hannibal2.skyhanni.api.CurrentPetAPI
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -71,7 +71,7 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-private fun getPetDisplay(): String = PetAPI.currentPet?.rawPetName ?: "No pet equipped"
+private fun getPetDisplay(): String = CurrentPetAPI.currentPet?.rawPetName ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 

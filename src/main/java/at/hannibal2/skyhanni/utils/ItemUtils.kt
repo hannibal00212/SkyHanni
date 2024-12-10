@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.PetAPI
-import at.hannibal2.skyhanni.data.PetAPI.petItemNamePattern
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
@@ -13,6 +11,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PetUtils.getCleanName
+import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -521,7 +521,7 @@ object ItemUtils {
         }
 
         // hide pet level
-        PetAPI.getCleanName(name)?.let {
+        getCleanName(name)?.let {
             return "$it Pet"
         }
         return name

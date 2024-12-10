@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.api.CurrentPetAPI
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -136,7 +136,7 @@ object ExperimentationTableAPI {
      */
     val remainingClicksPattern by patternGroup.pattern(
         "clicks",
-        "Remaining Clicks: (?<clicks>\\d+)"
+        "Remaining Clicks: (?<clicks>\\d+)",
     )
 
     /**
@@ -173,5 +173,5 @@ object ExperimentationTableAPI {
         "(?:§[956d])?Guardian.*",
     )
 
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet?.rawPetName)
+    fun hasGuardianPet(): Boolean = petNamePattern.matches(CurrentPetAPI.currentPet?.rawPetName)
 }
