@@ -123,7 +123,7 @@ object FlowstateHelper {
         hasFlowstate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         streakEndTimer = SimpleTimeMark.farPast()
         attemptClearDisplay()

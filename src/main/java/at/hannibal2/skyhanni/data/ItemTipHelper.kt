@@ -25,7 +25,7 @@ object ItemTipHelper {
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
-        itemTipEvent.postAndCatch()
+        itemTipEvent.post()
 
         if (itemTipEvent.renderObjects.isEmpty()) return
 
@@ -59,7 +59,7 @@ object ItemTipHelper {
             val stack = slot.stack ?: continue
 
             val itemTipEvent = RenderInventoryItemTipEvent(inventoryName, slot, stack)
-            itemTipEvent.postAndCatch()
+            itemTipEvent.post()
             val stackTip = itemTipEvent.stackTip
             if (stackTip.isEmpty()) continue
 
