@@ -44,7 +44,7 @@ object NonGodPotEffectDisplay {
     )
     private var totalEffectsCount = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()
@@ -140,7 +140,7 @@ object NonGodPotEffectDisplay {
         checkFooter = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!LorenzUtils.inSkyBlock || !checkFooter) return
         val lines = event.footer.split("\n")

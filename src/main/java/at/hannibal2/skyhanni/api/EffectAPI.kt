@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.EffectDurationChangeEvent
 import at.hannibal2.skyhanni.events.EffectDurationChangeType
@@ -212,7 +213,7 @@ object EffectAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
         for (line in event.footer.split("\n")) {
