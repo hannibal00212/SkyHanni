@@ -51,6 +51,7 @@ object PestAPI {
 
     val config get() = GardenAPI.config.pests
     val storage get() = GardenAPI.storage
+    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -58,8 +59,8 @@ object PestAPI {
             storage?.scoreboardPests = value
         }
 
-    var lastPestKillTime = SimpleTimeMark.farPast()
-    var lastTimeVacuumHold = SimpleTimeMark.farPast()
+    private var lastPestKillTime = SimpleTimeMark.farPast()
+    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
     val vacuumVariants = listOf(
@@ -71,6 +72,7 @@ object PestAPI {
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+    fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 

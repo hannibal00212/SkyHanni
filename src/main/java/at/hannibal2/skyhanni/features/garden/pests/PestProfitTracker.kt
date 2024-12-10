@@ -142,14 +142,12 @@ object PestProfitTracker {
     }
 
     private fun LorenzChatEvent.checkPestChats() {
-        var pestThisRun: PestType? = null
         PestAPI.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
                 "pest_name" to group("pest"),
                 "full_message" to message,
             )
-            pestThisRun = pest
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
@@ -164,14 +162,12 @@ object PestProfitTracker {
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NEUInternalName.fromItemNameOrNull(itemGroup) ?: return
-            val pest = pestThisRun ?: PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
-            val amount = 1.fixAmount(internalName, pest)
-
-            // If the amount was fixed, edit the chat message to reflect the change
-            if (amount != 1) {
-                chatComponent = ChatComponentText(
-                    message.replace(itemGroup, "§a${amount}x $itemGroup"),
-                )
+            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            val amount = 1.fixAmount(internalName, pest).also {
+                if (it == 1) return@also
+                // If the amount was fixed, edit the chat message to reflect the change
+                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
+                chatComponent = ChatComponentText(fixedString)
             }
 
             tryAddItem(pest, internalName, amount)
@@ -261,7 +257,8 @@ object PestProfitTracker {
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
-        if (allInactive && !PestAPI.hasVacuumInHand()) return
+        val notHoldingTool = !PestAPI.hasVacuumInHand() && !PestAPI.hasSprayonatorInHand()
+        if (allInactive && notHoldingTool) return
 
         tracker.renderDisplay(config.position)
     }
