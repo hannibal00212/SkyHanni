@@ -62,7 +62,7 @@ object ArmorStackDisplay {
         if (config.showArmorStackCount) event.changeActionBar(event.actionBar.replace(stackPattern, ""))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !config.armorStackDecayTimer) return
         if (event.soundName in pistonSounds && event.pitch == 1.0f && event.volume == 3.0f) {
