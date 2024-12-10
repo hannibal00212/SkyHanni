@@ -369,7 +369,7 @@ object BlockStrengthGuide {
         shouldBlockSHMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         shouldBlockSHMenu = false
     }
