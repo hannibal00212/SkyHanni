@@ -25,5 +25,5 @@ fun renderItemOverlayPost(
 
 fun renderItemReturn(stack: ItemStack, x: Int, y: Int) {
     if (!SkyHanniDebugsAndTests.globalRender) return
-    RenderGuiItemOverlayEvent(stack, x, y).postAndCatch()
+    RenderGuiItemOverlayEvent(stack, x, y).post()
 }

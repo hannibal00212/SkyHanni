@@ -65,7 +65,7 @@ object FarmingWeightDisplay {
         resetData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         profileId = ""

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -59,7 +60,7 @@ object PlayerNameFormatter {
         "(?<emblem>(?:§.){0,2}.) (?<author>.*)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
@@ -87,7 +88,7 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCoopChat(event: CoopChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -100,7 +101,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuildChat(event: GuildChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -113,7 +114,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyChat(event: PartyChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -126,7 +127,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -140,7 +141,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
