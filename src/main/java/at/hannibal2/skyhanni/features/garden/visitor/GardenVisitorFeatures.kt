@@ -124,7 +124,7 @@ object GardenVisitorFeatures {
     private var lastFullPrice = 0.0
     private val greenThumb = "GREEN_THUMB;1".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
@@ -344,7 +344,7 @@ object GardenVisitorFeatures {
         add(list)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             update()

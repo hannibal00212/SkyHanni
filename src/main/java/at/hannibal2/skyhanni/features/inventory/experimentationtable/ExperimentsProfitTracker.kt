@@ -246,7 +246,7 @@ object ExperimentsProfitTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.PRIVATE_ISLAND) {
             tracker.firstUpdate()

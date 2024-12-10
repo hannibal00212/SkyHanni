@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -69,7 +70,7 @@ object ArrowTrail {
 
     private fun isEnabled() = config.enabled && (LorenzUtils.inSkyBlock || OutsideSbFeature.ARROW_TRAIL.isSelected())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         listAllArrow.clear()
         listYourArrow.clear()

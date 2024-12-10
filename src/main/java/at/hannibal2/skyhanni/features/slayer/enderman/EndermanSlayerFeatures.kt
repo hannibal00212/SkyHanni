@@ -212,7 +212,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!IslandType.THE_END.isInIsland()) return
         if (!showBeacon()) return

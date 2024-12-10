@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -354,12 +355,12 @@ enum class TabWidget(
         if (lines == this.lines) return
         this.lines = lines
         isActive = true
-        WidgetUpdateEvent(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        WidgetUpdateEvent(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */
@@ -398,7 +399,7 @@ enum class TabWidget(
             ChatUtils.debug("Forcefully Updated Widgets")
         }
 
-        @SubscribeEvent(priority = EventPriority.HIGH)
+        @HandleEvent(priority = HandleEvent.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
