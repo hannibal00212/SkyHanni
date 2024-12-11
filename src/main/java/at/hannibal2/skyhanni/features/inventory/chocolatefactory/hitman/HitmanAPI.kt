@@ -68,7 +68,7 @@ object HitmanAPI {
     private fun getFirstHuntedMeal(): HoppityEggType =
         sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil() }
             ?: sortedEntries.minByOrNull { it.timeUntil() }
-            ?: ErrorManager.skyHanniError("Could not find next meal to hunt")
+            ?: ErrorManager.skyHanniError("Could not find initial meal to hunt")
 
     /**
      * Determine the next meal that would be hunted by Hitman if given an infinite amount of time.
@@ -77,16 +77,14 @@ object HitmanAPI {
         previousMeal: HoppityEggType,
         duration: Duration,
         initialAvailable: MutableList<HoppityEggType>
-    ) = sortedEntries.filter {
-        it.passesNotClaimed(duration, initialAvailable)
-    }.firstOrNull {
-        // Try to find the next meal on the same day
-        (it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay) ||
-            // Try to find the next meal on the next day
-            it.altDay != previousMeal.altDay
-    } ?: orderOrdinalMap[previousMeal] ?: ErrorManager.skyHanniError(
-        "Could not find next meal to hunt after $previousMeal"
-    )
+    ): HoppityEggType = sortedEntries
+        .filter { it.passesNotClaimed(duration, initialAvailable) }
+        .let { passingEggs ->
+            passingEggs.firstOrNull { it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay }
+                ?: passingEggs.firstOrNull { it.altDay != previousMeal.altDay }
+                ?: orderOrdinalMap[previousMeal]
+                ?: ErrorManager.skyHanniError("Could not find next meal to hunt after $previousMeal")
+        }
 
     /**
      * Return the time until the given number of rabbits can be hunted.
@@ -95,25 +93,23 @@ object HitmanAPI {
         // Store the initial meal to hunt
         var nextHuntMeal = getFirstHuntedMeal()
         // Store a list of all the meals that will be available to hunt at their next spawn
-        val initialAvailable = sortedEntries.filter {
-            !it.isClaimed() && it != nextHuntMeal
-        }.toMutableList()
+        val initialAvailable = sortedEntries.filter { !it.isClaimed() && it != nextHuntMeal }.toMutableList()
 
         // Will store the total time until the given number of meals can be hunted
-        var tilSpawnDuration: Duration =
+        var tilSpawnDuration =
             if (nextHuntMeal.isClaimed()) nextHuntMeal.timeUntil() + (MINUTES_PER_DAY * 2).minutes // -next- cycle after spawn
             else nextHuntMeal.timeUntil() // Otherwise, just the time until the next spawn
 
-        // Determine how many hunts we need to perform
-        val huntRange = (1 + (this.availableEggs ?: 0))..targetHuntCount
+        // Determine how many hunts we need to perform - 1 is added to account for the initial meal calculation above
+        val huntsToPerform = targetHuntCount - (1 + (this.availableEggs ?: 0))
         // Loop through the meals until the given number of meals can be hunted
-        for (i in huntRange) {
+        repeat(huntsToPerform) {
             // Determine the next meal to hunt
             val candidate = getNextHuntedMeal(nextHuntMeal, tilSpawnDuration, initialAvailable)
 
             // If the meal was initially available, we don't need to wait for it to spawn
             if (initialAvailable.contains(candidate)) initialAvailable.remove(candidate)
-            // Otherwise we need do, so we add the time until the next spawn
+            // Otherwise we add the time until the next spawn
             else tilSpawnDuration += candidate.timeFromAnother(nextHuntMeal)
 
             // Cycle through
@@ -159,7 +155,7 @@ object HitmanAPI {
         val eventEndMark = HoppityAPI.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
         var slotsToFill = slotsOpenNow
-        for (i in (0..10)) { // Runaway protection
+        for (i in (0..20)) { // Runaway protection
             // Calculate time needed to fill this many slots
             val timeToSlots = this.getTimeToHuntCount(slotsToFill)
 
