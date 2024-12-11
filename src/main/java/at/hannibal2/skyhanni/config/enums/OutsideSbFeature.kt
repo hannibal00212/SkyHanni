@@ -8,6 +8,7 @@ enum class OutsideSbFeature(private val displayName: String) {
     CUSTOM_TEXT_BOX("Custom Text Box"),
     REAL_TIME("Real Time"),
     TPS_DISPLAY("TPS Display"),
+    PING_DISPLAY("Ping Display"),
     MARKED_PLAYERS("Marked Players"),
     FARMING_WEIGHT("Farming Weight"),
     NEXT_JACOB_CONTEST("Next Jacobs's Contest"),
