@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -85,11 +84,5 @@ object GuiData {
         if (preDrawEventCancelled) {
             if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
         }
-    }
-
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Neu Render")
-        event.addData("Pre Draw Event Cancelled: $preDrawEventCancelled")
     }
 }
