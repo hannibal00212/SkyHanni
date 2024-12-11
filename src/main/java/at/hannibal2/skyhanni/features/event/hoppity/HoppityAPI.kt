@@ -163,6 +163,7 @@ object HoppityAPI {
     private fun getBoughtType(): HoppityEggType = if (lastHoppityCallAccept != null) BOUGHT_ABIPHONE else BOUGHT
 
     fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
 
     fun getEventEndMark(year: Int) =
