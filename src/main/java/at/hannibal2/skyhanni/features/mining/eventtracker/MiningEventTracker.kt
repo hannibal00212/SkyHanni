@@ -128,9 +128,9 @@ object MiningEventTracker {
         if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
-
+        // don't send events if the setting is disabled
+        if (!config.enabled) return
         val eventType = MiningEventType.fromEventName(eventName) ?: run {
-            if (!config.enabled) return
             ErrorManager.logErrorWithData(
                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
                 "eventName" to eventName,
