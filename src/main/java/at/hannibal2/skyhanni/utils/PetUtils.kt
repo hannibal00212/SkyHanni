@@ -4,23 +4,29 @@ import at.hannibal2.skyhanni.api.CurrentPetAPI
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.PetData.Companion.internalNameToPetName
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.Gson
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object PetUtils {
     private val patternGroup = RepoPattern.group("misc.pet")
     private const val FORGE_BACK_SLOT = 48
+    // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
+    val petSkins = mutableMapOf<String, MutableMap<String, NeuPetSkinJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NEUPetData>? = null
@@ -65,6 +71,24 @@ object PetUtils {
         "menu.forge.goback",
         "§7To Select Process(?: \\(Slot #\\d\\))?",
     )
+
+    /**
+     * REGEX-TEST: PET_SKIN_ENDERMAN
+     * REGEX-TEST: PET_SKIN_PARROT_TOUCAN
+     * REGEX-TEST: PET_SKIN_PHEONIX_FLAMINGO
+     * REGEX-TEST: PET_SKIN_PHOENIX_ICE
+     * REGEX-TEST: PET_SKIN_PIGMAN_LUNAR_PIG
+     * REGEX-TEST: PET_SKIN_RABBIT
+     * REGEX-TEST: PET_SKIN_RABBIT_AQUAMARINE
+     * REGEX-TEST: PET_SKIN_RABBIT_LUNAR
+     * REGEX-TEST: PET_SKIN_RABBIT_LUNAR_BABY
+     * REGEX-TEST: PET_SKIN_RABBIT_PLUSHIE
+     * REGEX-TEST: PET_SKIN_RABBIT_ROSE
+     */
+    private val petSkinNamePattern by CurrentPetAPI.patternGroup.pattern(
+        "neu.pet",
+        "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
+    )
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
@@ -86,10 +110,6 @@ object PetUtils {
         }
 
         return null
-    }
-
-    fun getFakePetLine(level: Int, rarity: LorenzRarity, petName: String, skin: String? = null): String {
-        return "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName§r${skin.orEmpty()}"
     }
 
     fun rarityByColorGroup(color: String): LorenzRarity = LorenzRarity.getByColorCode(color[0])
@@ -116,7 +136,7 @@ object PetUtils {
         }
 
         val petName = input.slice(2..<input.size).joinToString(" ")
-        val xp: Double = levelToXP(level, rarity, petName) ?: run {
+        val xp: Double = levelToXp(level, rarity, petName) ?: run {
             ChatUtils.userError("Invalid level or rarity.")
             return
         }
@@ -124,7 +144,7 @@ object PetUtils {
         return
     }
 
-    fun levelToXP(level: Int, rarity: LorenzRarity, petName: String): Double? {
+    fun levelToXp(level: Int, rarity: LorenzRarity, petName: String): Double? {
         val newPetName = petName.toInternalName().toString()
 
         val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
@@ -133,6 +153,34 @@ object PetUtils {
         val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
 
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
+    }
+
+    fun xpToLevel(totalXp: Double, petInternalName: NEUInternalName): Int? {
+        val (petName, rarity) = internalNameToPetName(petInternalName) ?: return null
+        return xpToLevel(totalXp, rarity, petName)
+    }
+
+    private fun xpToLevel(totalXp: Double, rarity: LorenzRarity, petName: String): Int? {
+        val newPetName = petName.toInternalName().toString()
+
+        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
+        if (totalXp < 0) return null
+
+        val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
+
+        var xp = totalXp
+        var level = 0
+        for (i in 0 + rarityOffset until xpList.size) {
+            val xpReq = xpList[i]
+            if (xp >= xpReq) {
+                xp -= xpReq
+                level++
+            } else {
+                break
+            }
+        }
+
+        return level
     }
 
     private fun isValidLevel(level: Int, petName: String): Boolean {
@@ -174,10 +222,23 @@ object PetUtils {
     // </editor-fold>
 
     @HandleEvent
-    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NEUPetsJson>("pets")
         baseXpLevelReqs = data.petLevels
         customXpLevelReqs = data.customPetLeveling
+
+        NEUItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
+            petSkinNamePattern.matchMatcher(rawInternalName) {
+                val petName = group("pet") ?: return@matchMatcher
+                // Skin name can be empty, see PET_SKIN_ENDERMAN, PET_SKIN_RABBIT, etc.
+                val skinName = groupOrNull("skin").orEmpty()
+
+                // Use GSON to reflect the JSON into a NeuPetSkinJson object
+                val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
+
+                petSkins.getOrPut(petName) { mutableMapOf() }[skinName] = petItemData
+            }
+        }
     }
 
     @HandleEvent

@@ -23,7 +23,7 @@ object ExperimentationTableAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
 
-    val inTable get() = inventoriesPattern.matches(openInventoryName())
+    private val inTable get() = inventoriesPattern.matches(openInventoryName())
 
     fun inDistanceToTable(vec: LorenzVec, max: Double): Boolean =
         storage?.tablePos?.let { it.distance(vec) <= max } ?: false
@@ -163,15 +163,5 @@ object ExperimentationTableAPI {
         "§9(?<enchant>.*)",
     )
 
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     * REGEX-TEST: Guardian
-     */
-    private val petNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "(?:§[956d])?Guardian.*",
-    )
-
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(CurrentPetAPI.currentPet?.rawPetName)
+    fun guardianPetActive(): Boolean = CurrentPetAPI.currentPet?.cleanName == "Guardian"
 }

@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -17,12 +19,21 @@ object CurrentPetDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (RiftAPI.inRift()) return
+        if (!LorenzUtils.inSkyBlock || RiftAPI.inRift() || !config.display) return
+        val currentPet = CurrentPetAPI.currentPet ?: return
 
-        if (!config.display) return
+        val petItemStack = currentPet.petItem?.getItemStack() ?: return
+        val skinItem = currentPet.skinItem?.getItemStack()
+        // When we have a skin item, we want to display that instead of the pet item
+        val displayStack = skinItem ?: petItemStack
 
-        config.displayPos.renderString(CurrentPetAPI.currentPet?.rawPetName, posLabel = "Current Pet")
+        config.displayPos.renderRenderable(
+            Renderable.itemStack(
+                displayStack,
+                1.0,
+            ),
+            posLabel = "Current Pet"
+        )
     }
 
     @SubscribeEvent

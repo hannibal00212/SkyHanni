@@ -25,9 +25,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.PetUtils.getFakePetLine
 import at.hannibal2.skyhanni.utils.PetUtils.isPetMenu
-import at.hannibal2.skyhanni.utils.PetUtils.levelToXP
+import at.hannibal2.skyhanni.utils.PetUtils.levelToXp
 import at.hannibal2.skyhanni.utils.PetUtils.rarityByColorGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -47,6 +46,7 @@ object CurrentPetAPI {
     val patternGroup = RepoPattern.group("misc.pet")
 
     private var inPetMenu = false
+    private var lastPetLine: String? = null
 
     var currentPet: PetData?
         get() = ProfileStorageData.profileSpecific?.currentPetData?.takeIf { it.isInitialized() }
@@ -160,7 +160,7 @@ object CurrentPetAPI {
      * REGEX-TEST: §aYou despawned your §r§6Golden Dragon§r§a!
      * REGEX-TEST: §aYou despawned your §r§6Silverfish§r§5 ✦§r§a!
      */
-    private val chatDespawnPattern by CurrentPetAPI.patternGroup.pattern(
+    private val chatDespawnPattern by patternGroup.pattern(
         "chat.despawn",
         "§aYou despawned your §r.*§r§a!",
     )
@@ -169,9 +169,27 @@ object CurrentPetAPI {
      * REGEX-TEST: §aYou summoned your §r§6Silverfish§r§5 ✦§r§a!
      * REGEX-TEST: §aYou summoned your §r§6Golden Dragon§r§a!
      */
-    private val chatSpawnPattern by CurrentPetAPI.patternGroup.pattern(
+    private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
         "§aYou summoned your §r(?<pet>.*)§r§a!"
+    )
+
+    /**
+     * REGEX-TEST: §e⭐ §7[Lvl 100] §6Ender Dragon
+     * REGEX-TEST: §e⭐ §7[Lvl 100] §dBlack Cat§d ✦
+     * REGEX-TEST: §7[Lvl 100] §6Mole
+     */
+    val petNameMenuPattern by patternGroup.pattern(
+        "menu.pet.name",
+        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$",
+    )
+
+    /**
+     * REGEX-TEST: §7§cClick to despawn!
+     */
+    val petDespawnMenuPattern by patternGroup.pattern(
+        "menu.pet.despawn",
+        "§7§cClick to despawn!",
     )
     // </editor-fold>
 
@@ -199,20 +217,20 @@ object CurrentPetAPI {
     // </editor-fold>
 
     // <editor-fold desc="Pet Data Extractors (Widget)">
-    private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? = petWidgetPattern.matchMatcher(line) {
+    private fun handleWidgetPetLine(line: String): PetData? = petWidgetPattern.matchMatcher(line) {
         val rarity = rarityByColorGroup(group("rarity"))
         val petName = groupOrNull("name").orEmpty()
         val level = groupOrNull("level")?.toInt() ?: 0
-        val xp = levelToXP(level, rarity, petName) ?: return null
+        val xp = levelToXp(level, rarity, petName) ?: return null
 
         return PetData(
-            petNameToInternalName(petName, rarity),
-            petName,
-            rarity,
-            null,
-            level,
-            xp,
-            newPetLine,
+            petItem = petNameToInternalName(petName, rarity),
+            skinItem = null,
+            heldItem = null,
+            cleanName = petName,
+            rarity = rarity,
+            level = level,
+            xp = xp,
         )
     }
 
@@ -253,12 +271,11 @@ object CurrentPetAPI {
         val skin = groupOrNull("skin").takeIf { it != null }
 
         return PetData(
-            internalName = petNameToInternalName(petName, rarity),
+            petItem = petNameToInternalName(petName, rarity),
             cleanName = petName,
             rarity = rarity,
             level = level,
-            xp = levelToXP(level, rarity, petName) ?: 0.0,
-            rawPetName = getFakePetLine(level, rarity, petName, skin),
+            xp = levelToXp(level, rarity, petName) ?: 0.0,
         )
     }
 
@@ -287,7 +304,7 @@ object CurrentPetAPI {
         // Only have overflow if `next` group is absent
         if (inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null) return 0.0
         val (level, rarity, petName) = extractSelectedPetData(lore) ?: return null
-        val maxXpNeeded = levelToXP(level, rarity, petName)
+        val maxXpNeeded = levelToXp(level, rarity, petName)
         val currentXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         return maxXpNeeded?.minus(currentXp) ?: 0.0
     }
@@ -296,13 +313,12 @@ object CurrentPetAPI {
         val (level, rarity, petName) = extractSelectedPetData(lore) ?: return null
         val partialXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         val nextExists = inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null
-        val totalXp = partialXp + if (nextExists) (levelToXP(level, rarity, petName) ?: return null) else 0.0
+        val totalXp = partialXp + if (nextExists) (levelToXp(level, rarity, petName) ?: return null) else 0.0
         return PetData(
-            internalName = petNameToInternalName(petName, rarity),
+            petItem = petNameToInternalName(petName, rarity),
             cleanName = petName,
             rarity = rarity,
-            petItem = null,
-            rawPetName = getFakePetLine(level, rarity, petName),
+            heldItem = null,
             level = level,
             xp = totalXp,
         )
@@ -315,13 +331,14 @@ object CurrentPetAPI {
         if (!event.isWidget(TabWidget.PET)) return
 
         val newPetLine = petWidgetPattern.firstMatches(event.lines)?.trim() ?: return
-        if (newPetLine == currentPet?.rawPetName) return
+        if (newPetLine == lastPetLine) return
+        lastPetLine = newPetLine
 
         val (petData, overflowXP) = parsePetData(
             event.lines,
             { handleWidgetStringLine(it) },
             { handleWidgetXPLine(it) },
-            { handleWidgetPetLine(it, newPetLine) }
+            { handleWidgetPetLine(it) }
         ) ?: return
 
         updatePet(petData.copy(xp = petData.xp?.plus(overflowXP)))
@@ -340,7 +357,7 @@ object CurrentPetAPI {
                 Pair("message", event.message),
                 Pair("item", group("petItem")),
             )
-            val newPet = currentPet?.copy(petItem = item) ?: return
+            val newPet = currentPet?.copy(heldItem = item) ?: return
             updatePet(newPet)
         }
     }
@@ -383,12 +400,11 @@ object CurrentPetAPI {
             return
         }
         event.addIrrelevant {
-            add("petName: '${currentPet?.internalName ?: ""}'")
+            add("petName: '${currentPet?.petItem ?: ""}'")
             add("petRarity: '${currentPet?.rarity?.rawName.orEmpty()}'")
-            add("petItem: '${currentPet?.petItem ?: ""}'")
+            add("petItem: '${currentPet?.heldItem ?: ""}'")
             add("petLevel: '${currentPet?.level ?: 0}'")
             add("petXP: '${currentPet?.xp ?: 0.0}'")
-            add("rawPetLine: '${currentPet?.rawPetName.orEmpty()}'")
         }
     }
     // </editor-fold>
