@@ -268,7 +268,6 @@ object CurrentPetAPI {
         val level = group("level").toInt()
         val rarity = rarityByColorGroup(group("rarity"))
         val petName = group("pet")
-        val skin = groupOrNull("skin").takeIf { it != null }
 
         return PetData(
             petItem = petNameToInternalName(petName, rarity),
