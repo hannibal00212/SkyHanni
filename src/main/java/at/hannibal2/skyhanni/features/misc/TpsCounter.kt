@@ -73,7 +73,7 @@ object TpsCounter {
     }
 
     private fun tpsCommand() {
-        val tps = tps ?: return ChatUtils.chat("§eTPS: §fCalculating...")
+        val tps = tps ?: return ChatUtils.chat("§eTPS: §fCalculating... (${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)")
         ChatUtils.chat("§eTPS: ${getColor(tps)}$tps")
     }
 
