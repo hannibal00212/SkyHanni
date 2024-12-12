@@ -183,16 +183,18 @@ object HoppityAPI {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filter { (slotNumber, stack) ->
+    fun Map<Int, ItemStack>.filterMayBeStray() = filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
-        slotNumber != 13 && slotNumber in 0..26 &&
-            // Don't process the same slot twice.
-            !processedStraySlots.contains(slotNumber) &&
+        slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
             stack.item != null && stack.item == Items.skull &&
             // All strays are skulls with a display name, and lore.
-            stack.hasDisplayName() && stack.getLore().isNotEmpty()
+            stack.hasDisplayName() && stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
     }
+
+    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterKeys {
+        !processedStraySlots.contains(it) // Don't process the same slot twice.
+    }.filterMayBeStray()
 
 
     private fun Slot.isMiscProcessable() =

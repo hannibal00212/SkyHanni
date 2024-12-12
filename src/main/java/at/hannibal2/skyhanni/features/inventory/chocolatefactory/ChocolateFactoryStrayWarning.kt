@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.filterMayBeStray
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.caughtRabbitPattern
@@ -91,13 +92,8 @@ object ChocolateFactoryStrayWarning {
             flashScreen = false
             return
         }
-        val activeStrays = event.inventoryItems.filter {
-            it.value.hasDisplayName() && it.value.displayName.isNotEmpty()
-                && !caughtRabbitPattern.matches(it.value.getSingleLineLore())
-        }
-        clickableStraySlots = activeStrays.filter {
-            clickMeRabbitPattern.matches(it.value.name) || clickMeGoldenRabbitPattern.matches(it.value.name)
-        }.keys
+        val activeStrays = event.inventoryItems.filterMayBeStray()
+        clickableStraySlots = activeStrays.keys
         flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
