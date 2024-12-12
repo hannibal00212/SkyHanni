@@ -72,8 +72,21 @@ object EnchantedClockHelper {
         "inventory.cooldown",
         "§8Cooldown: §.(?<hours>\\d+) hours",
     )
-
     // </editor-fold>
+
+    enum class SimpleClockBoostType(
+        private val displayString: String
+    ) {
+        MINIONS("§bMinions"),
+        CHOCOLATE_FACTORY("§6Chocolate Factory"),
+        PET_TRAINING("§dPet Training"),
+        PET_SITTER("§bPet Sitter"),
+        AGING_ITEMS("§eAging Items"),
+        FORGE("§6Forge"),
+        ;
+
+        override fun toString(): String = displayString
+    }
 
     data class ClockBoostType(
         val name: String,
@@ -86,9 +99,15 @@ object EnchantedClockHelper {
     ) {
         val formattedName: String = "§${color.chatColorCode}$displayName"
 
-        override fun toString(): String = name
-
         fun getCooldownFromNow() = SimpleTimeMark.now() + cooldown
+
+        fun toSimple(): SimpleClockBoostType? {
+            return try {
+                SimpleClockBoostType.valueOf(name.uppercase())
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
 
         companion object {
             private val entries = mutableListOf<ClockBoostType>()
@@ -129,7 +148,8 @@ object EnchantedClockHelper {
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
         for ((boostType, status) in storage.clockBoosts) {
-            if (!config.enchantedClockReminder.contains(boostType)) continue
+            val simpleType = boostType.toSimple() ?: continue
+            if (!config.enchantedClockReminder.contains(simpleType)) continue
             if (status.state != ClockBoostState.CHARGING) continue
             if (status.availableAt == null || status.availableAt?.isInFuture() == true) continue
 

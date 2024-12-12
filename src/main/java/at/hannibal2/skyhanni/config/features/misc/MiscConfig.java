@@ -351,5 +351,5 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Enchanted Clock Reminder", desc = "Show reminders when an Enchanted Clock charge for a boost type is available.")
     @ConfigEditorDraggableList
-    public List<EnchantedClockHelper.ClockBoostType> enchantedClockReminder = new ArrayList<>();
+    public List<EnchantedClockHelper.SimpleClockBoostType> enchantedClockReminder = new ArrayList<>();
 }
