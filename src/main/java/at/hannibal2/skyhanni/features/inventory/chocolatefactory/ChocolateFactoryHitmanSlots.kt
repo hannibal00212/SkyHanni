@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.hitmanInventoryPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -138,7 +138,7 @@ object ChocolateFactoryHitmanSlots {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
             item.hasDisplayName() && item.getLore().isNotEmpty() &&
-                slotCostPattern.matches(formLoreToSingleLine(item.getLore()))
+                slotCostPattern.matches(item.getSingleLineLore())
         }
         val ownedSlots = ChocolateFactoryAPI.hitmanCosts.size - leftToPurchase
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -18,6 +19,11 @@ public class ChocolateFactoryRabbitWarningConfig {
     @ConfigOption(name = "Rabbit Warning", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorDropdown
     public StrayTypeEntry rabbitWarningLevel = StrayTypeEntry.ALL;
+
+    @Expose
+    @ConfigOption(name = "Highlight Color", desc = "What color the inventory highlight should be.")
+    @ConfigEditorColour
+    public String inventoryHighlightColor = LorenzColor.RED.toConfigColor();
 
     @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +

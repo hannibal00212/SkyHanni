@@ -25,11 +25,11 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
@@ -257,7 +257,7 @@ object HoppityAPI {
                     else -> return@matchMatcher
                 }
             }
-            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(itemStack.getLore())) {
+            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getSingleLineLore()) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
                 if (ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(itemStack.getLore())) return@matchMatcher

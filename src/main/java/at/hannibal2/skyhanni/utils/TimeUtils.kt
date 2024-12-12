@@ -75,7 +75,11 @@ object TimeUtils {
 
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
-    fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
+    private fun String.preFixDurationString() =
+        replace(Regex("(\\d+\\w)"), "$1 ")
+            .replace("  ", " ")
+            .trim()
+    fun getDuration(string: String) = getMillis(string.preFixDurationString())
 
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
