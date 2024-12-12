@@ -76,8 +76,7 @@ object TimeUtils {
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
     private fun String.preFixDurationString() =
-        replace(Regex("(\\d+\\w)"), "$1 ")
-            .replace("  ", " ")
+        replace(Regex("(\\d+)([yMWwdhms])(?!\\s)"), "$1$2 ") // Add a space only after common time units
             .trim()
     fun getDuration(string: String) = getMillis(string.preFixDurationString())
 
