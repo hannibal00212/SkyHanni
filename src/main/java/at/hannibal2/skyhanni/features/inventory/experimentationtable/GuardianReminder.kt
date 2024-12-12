@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -71,7 +72,7 @@ object GuardianReminder {
         GlStateManager.translate(0f, -150f, 500f)
         Renderable.drawInsideRoundedRect(
             Renderable.string("§cWrong Pet equipped!", 1.5),
-            Color.DARK_GRAY,
+            ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 125, width, height)
