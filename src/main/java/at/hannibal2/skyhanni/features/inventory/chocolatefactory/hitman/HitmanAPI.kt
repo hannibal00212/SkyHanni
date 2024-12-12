@@ -144,7 +144,7 @@ object HitmanAPI {
 
         val minutesUntilAll = allSlotsCooldown.timeUntil().inPartialMinutes
         val slotsOnCooldown = ceil(minutesUntilAll / MINUTES_PER_DAY).toInt()
-        return (this.purchasedSlots ?: 0) - slotsOnCooldown
+        return (this.purchasedSlots ?: 0) - slotsOnCooldown - (this.availableEggs ?: 0)
     }
 
     /**
