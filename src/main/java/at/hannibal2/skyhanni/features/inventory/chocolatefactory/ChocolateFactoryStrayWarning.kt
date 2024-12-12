@@ -92,9 +92,12 @@ object ChocolateFactoryStrayWarning {
             return
         }
         val activeStrays = event.inventoryItems.filter {
-            it.value.hasDisplayName() && !caughtRabbitPattern.matches(it.value.getSingleLineLore())
+            it.value.hasDisplayName() && it.value.displayName.isNotEmpty()
+                && !caughtRabbitPattern.matches(it.value.getSingleLineLore())
         }
-        clickableStraySlots = activeStrays.keys
+        clickableStraySlots = activeStrays.filter {
+            clickMeRabbitPattern.matches(it.value.name) || clickMeGoldenRabbitPattern.matches(it.value.name)
+        }.keys
         flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
