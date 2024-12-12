@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage;
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;

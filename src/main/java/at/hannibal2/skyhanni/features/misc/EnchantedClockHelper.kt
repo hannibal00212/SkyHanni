@@ -116,17 +116,19 @@ object EnchantedClockHelper {
 
             fun populateFromJson(json: EnchantedClockJson) {
                 entries.clear()
-                entries.addAll(json.boosts.map { boost ->
-                    ClockBoostType(
-                        name = boost.name,
-                        displayName = boost.displayName,
-                        usageString = boost.usageString ?: boost.displayName,
-                        color = LorenzColor.valueOf(boost.color),
-                        displaySlot = boost.displaySlot,
-                        statusSlot = boost.statusSlot,
-                        cooldown = boost.cooldownHours.hours
-                    )
-                })
+                entries.addAll(
+                    json.boosts.map { boost ->
+                        ClockBoostType(
+                            name = boost.name,
+                            displayName = boost.displayName,
+                            usageString = boost.usageString ?: boost.displayName,
+                            color = LorenzColor.valueOf(boost.color),
+                            displaySlot = boost.displaySlot,
+                            statusSlot = boost.statusSlot,
+                            cooldown = boost.cooldownHours.hours
+                        )
+                    }
+                )
             }
 
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
@@ -148,10 +150,11 @@ object EnchantedClockHelper {
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
         for ((boostType, status) in storage.clockBoosts) {
-            val simpleType = boostType.toSimple() ?: continue
-            if (!config.enchantedClockReminder.contains(simpleType)) continue
-            if (status.state != ClockBoostState.CHARGING) continue
-            if (status.availableAt == null || status.availableAt?.isInFuture() == true) continue
+            val simpleType = boostType.toSimple()
+            val inConfig = simpleType != null && config.enchantedClockReminder.contains(simpleType)
+            val isProperState = status.state == ClockBoostState.CHARGING
+            val inFuture = status.availableAt?.isInFuture() == true
+            if (!inConfig || !isProperState || inFuture) continue
 
             status.state = ClockBoostState.READY
             status.availableAt = null
@@ -198,7 +201,7 @@ object EnchantedClockHelper {
             val currentStatus: ClockBoostState = statusLorePattern.firstMatcher(stack.getLore()) {
                 group("status")?.let { statusStr ->
                     runCatching { ClockBoostState.valueOf(statusStr) }.getOrElse {
-                        ErrorManager.skyHanniError("Invalid status string: $statusStr"); null
+                        ErrorManager.skyHanniError("Invalid status string: $statusStr")
                     }
                 }
             } ?: continue
