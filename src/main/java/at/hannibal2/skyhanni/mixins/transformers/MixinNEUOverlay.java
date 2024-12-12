@@ -19,7 +19,7 @@ public class MixinNEUOverlay {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true, remap = false)
     private void render(boolean hoverInv, CallbackInfo ci) {
         System.out.println("NEUOverlay.render disabled: " + disabled);
-        if (NEURenderEvent.INSTANCE.post()) {
+        if (new NEURenderEvent().post()) {
             System.out.println("NEUOverlay.render cancelled");
             try {
                 new Exception("NEUOverlay.render cancelled").printStackTrace();
