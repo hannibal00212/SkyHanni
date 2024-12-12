@@ -41,6 +41,11 @@ object ChocolateFactoryStrayWarning {
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
 
+    private fun reset() {
+        flashScreen = false
+        activeStraySlots = setOf()
+    }
+
     private fun isRarityOrHigher(stack: ItemStack, rarity: LorenzRarity) =
         stack.getSkullTexture()?.let { skullTexture ->
             HoppityTextureHandler.getRarityBySkullId(skullTexture)?.let { skullRarity ->
@@ -118,7 +123,7 @@ object ChocolateFactoryStrayWarning {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        flashScreen = false
+        reset()
     }
 
     @HandleEvent
