@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -34,6 +35,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     fun isFarPastOrFuture() = isFarPast() || isFarFuture()
 
     fun takeIfInitialized() = if (isFarPastOrFuture()) null else this
+
+    fun absoluteDifference(other: SimpleTimeMark) = abs(millis - other.millis).milliseconds
 
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 

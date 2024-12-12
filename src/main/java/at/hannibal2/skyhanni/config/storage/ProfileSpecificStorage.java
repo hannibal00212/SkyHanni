@@ -39,12 +39,14 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker;
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -879,6 +881,48 @@ public class ProfileSpecificStorage {
                 finalLeaderboardPosition,
                 summarized
             );
+        }
+    }
+
+    @Expose
+    public EnchantedClockStats enchantedClockStats = new EnchantedClockStats();
+
+    public static class EnchantedClockStats {
+        @Expose
+        public Map<EnchantedClockHelper.ClockBoostType, ClockBoostStatus> clockBoosts = new HashMap<>();
+
+        public static class ClockBoostStatus {
+            @Expose
+            public ClockBoostState state;
+
+            @Expose
+            @Nullable
+            public SimpleTimeMark availableAt;
+
+            public enum ClockBoostState {
+                READY("Ready", LorenzColor.GREEN),
+                CHARGING("Charging", LorenzColor.RED),
+                PROBLEM("Problem", LorenzColor.YELLOW),
+                ;
+
+                public final String displayName;
+                public final LorenzColor color;
+
+                ClockBoostState(String displayName, LorenzColor color) {
+                    this.displayName = displayName;
+                    this.color = color;
+                }
+
+                @Override
+                public String toString() {
+                    return "§" + color.getChatColorCode() + displayName;
+                }
+            }
+
+            public ClockBoostStatus(ClockBoostState state, SimpleTimeMark availableAt) {
+                this.state = state;
+                this.availableAt = availableAt;
+            }
         }
     }
 }
