@@ -127,7 +127,7 @@ object HitmanAPI {
             this == another -> (SB_HR_PER_DAY * 2)
             this.altDay != another.altDay -> SB_HR_PER_DAY - another.resetsAt + this.resetsAt
             this.resetsAt > another.resetsAt -> this.resetsAt - another.resetsAt
-            else -> another.resetsAt - this.resetsAt
+            else -> (SB_HR_PER_DAY * 2) - (this.resetsAt - another.resetsAt)
         }
         return (diffInSbHours * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds
     }
