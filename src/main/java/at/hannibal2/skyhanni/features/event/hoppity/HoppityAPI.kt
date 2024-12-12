@@ -188,13 +188,14 @@ object HoppityAPI {
         slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
             stack.item != null && stack.item == Items.skull &&
-            // All strays are skulls with a display name, and lore.
-            stack.hasDisplayName() && stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
+            // All strays have a display name, all the time.
+            stack.hasDisplayName() && stack.displayName.isNotEmpty()
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterKeys {
-        !processedStraySlots.contains(it) // Don't process the same slot twice.
-    }.filterMayBeStray()
+    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray().filter {
+        !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
+            it.value.getLore().isNotEmpty() // All processable strays have lore.
+    }
 
 
     private fun Slot.isMiscProcessable() =

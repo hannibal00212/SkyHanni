@@ -39,7 +39,7 @@ object ChocolateFactoryStrayWarning {
     private val warningConfig get() = config.rabbitWarning
 
     private var flashScreen = false
-    private var clickableStraySlots: Set<Int> = setOf()
+    private var activeStraySlots: Set<Int> = setOf()
 
     private fun isRarityOrHigher(stack: ItemStack, rarity: LorenzRarity) =
         stack.getSkullTexture()?.let { skullTexture ->
@@ -67,20 +67,21 @@ object ChocolateFactoryStrayWarning {
 
     private fun handleRabbitWarnings(item: ItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
-        val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
 
-        if (!clickMeRabbitPattern.matches(item.name) && !isGoldenRabbit) return
-        if (shouldWarnAboutStray(item)) {
-            if (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures) {
-                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
-            } else SoundUtils.playBeepSound()
-        }
+        val clickMeMatches = clickMeRabbitPattern.matches(item.name)
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.name)
+        if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
+
+        val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
+
+        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+        else SoundUtils.playBeepSound()
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         InventoryUtils.getItemsInOpenChest().filter {
-            it.slotNumber in clickableStraySlots
+            it.slotNumber in activeStraySlots
         }.forEach {
             it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
         }
@@ -92,9 +93,10 @@ object ChocolateFactoryStrayWarning {
             flashScreen = false
             return
         }
-        val activeStrays = event.inventoryItems.filterMayBeStray()
-        clickableStraySlots = activeStrays.keys
-        flashScreen = activeStrays.any {
+        val strayStacks = event.inventoryItems.filterMayBeStray()
+        strayStacks.forEach { handleRabbitWarnings(it.value) }
+        activeStraySlots = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }.keys
+        flashScreen = strayStacks.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
                 StrayTypeEntry.SPECIAL -> isSpecial(stack)
@@ -112,7 +114,6 @@ object ChocolateFactoryStrayWarning {
                 else -> false
             }
         }
-        activeStrays.forEach { handleRabbitWarnings(it.value) }
     }
 
     @SubscribeEvent
