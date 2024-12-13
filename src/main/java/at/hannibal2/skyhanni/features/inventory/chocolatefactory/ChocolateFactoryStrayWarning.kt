@@ -98,7 +98,7 @@ object ChocolateFactoryStrayWarning {
             flashScreen = false
             return
         }
-        val strayStacks = event.inventoryItems.filterMayBeStray()
+        val strayStacks = filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
         activeStraySlots = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }.keys
         flashScreen = strayStacks.any {
