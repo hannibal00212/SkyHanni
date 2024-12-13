@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
@@ -91,10 +94,15 @@ object ChocolateFactoryStrayWarning {
         val partyMode = config.partyMode.get()
         val color = if (partyMode) CHROMA_COLOR_ALT else warningConfig.inventoryHighlightColor
 
-        InventoryUtils.getItemsInOpenChest().filter {
-            if (partyMode) true else it.slotNumber in activeStraySlots
-        }.forEach {
-            it highlight color.toSpecialColor()
+        val eventChest = (event.gui.inventorySlots as ContainerChest)
+        val listToUse =
+            if (partyMode) eventChest.getAllItems()
+            else eventChest.getUpperItems()
+
+        listToUse.filter { (slot, _) ->
+            if (partyMode) true else slot.slotNumber in activeStraySlots
+        }.forEach { (slot, _) ->
+            slot highlight color.toSpecialColor()
         }
     }
 
