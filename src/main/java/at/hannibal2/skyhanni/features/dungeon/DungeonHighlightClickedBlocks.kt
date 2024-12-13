@@ -63,7 +63,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toSpecialColor()
+            blocks.values.lastOrNull { it.displayText.contains("Chest") }?.color = config.lockedChestColor.toSpecialColor()
         }
     }
 

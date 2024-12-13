@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
@@ -156,11 +156,6 @@ object ChocolateFactoryStrayTracker {
         var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
     }
 
-    fun formLoreToSingleLine(lore: List<String>): String {
-        val notEmptyLines = lore.filter { it.isNotEmpty() }
-        return notEmptyLines.joinToString(" ")
-    }
-
     private fun incrementRarity(rarity: LorenzRarity, chocAmount: Long = 0) {
         tracker.modify { it.straysCaught.addOrPut(rarity, 1) }
         val extraTime = ChocolateFactoryAPI.timeUntilNeed(chocAmount + 1)
@@ -228,7 +223,7 @@ object ChocolateFactoryStrayTracker {
         if (!isEnabled() || claimedStraysSlots.contains(slotNumber)) return false
 
         claimedStraysSlots.add(slotNumber)
-        val loreLine = formLoreToSingleLine(itemStack.getLore())
+        val loreLine = itemStack.getSingleLineLore()
 
         // "Base" strays - Common -> Epic, raw choc only reward.
         strayLorePattern.matchMatcher(loreLine) {
