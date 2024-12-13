@@ -6,35 +6,61 @@ import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-@Suppress("UnstableApiUsage")
+@Suppress("UnstableApiUsage", "IgnoredReturnValue")
 class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
-    private val removalListener: (K?, V?, RemovalCause) -> Unit = { _, _, _ -> },
-) : Iterable<Map.Entry<K, V>> {
+    private val removalListener: ((K?, V?, RemovalCause) -> Unit)? = null,
+) : MutableMap<K, V> {
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .removalListener { removalListener(it.key, it.value, it.cause) }
+        .apply {
+            removalListener?.let { listener ->
+                removalListener<K?, V?> {
+                    listener(it.key, it.value, it.cause)
+                }
+            }
+        }
         .build<K, V>()
 
-    // TODO IntelliJ cant replace this, find another way?
-//     @Deprecated("outdated", ReplaceWith("[key] = value"))
-    @Deprecated("outdated", ReplaceWith("set(key, value)"))
-    fun put(key: K, value: V) = set(key, value)
+    override val size: Int get() = cache.size().toInt()
 
-    fun getOrNull(key: K): V? = cache.getIfPresent(key)
+    override fun isEmpty(): Boolean = cache.size() == 0L
 
-    fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { set(key, it) }
+    override fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 
-    fun clear() = cache.invalidateAll()
+    override fun containsValue(value: V): Boolean = value in values
 
-    fun remove(key: K) = cache.invalidate(key)
+    override fun get(key: K): V? = cache.getIfPresent(key)
 
-    fun entries(): Set<Map.Entry<K, V>> = getMap().entries
+    operator fun set(key: K, value: V) = cache.put(key, value)
 
-    fun values(): Collection<V> = getMap().values
+    override fun put(key: K, value: V): V? {
+        val previous = get(key)
+        set(key, value)
+        return previous
+    }
 
-    fun keys(): Set<K> = getMap().keys
+    override fun remove(key: K): V? {
+        val value = get(key) ?: return null
+        cache.invalidate(key)
+        return value
+    }
+
+    override fun putAll(from: Map<out K, V>) {
+        from.forEach { (key, value) -> put(key, value) }
+    }
+
+    override fun clear() = cache.invalidateAll()
+
+    override val keys: MutableSet<K> = getMap().keys
+
+    override val values: MutableCollection<V> get() = getMap().values
+
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>> = getMap().entries
+
+    @Deprecated("", ReplaceWith("get(key)"))
+    fun getOrNull(key: K): V? = get(key)
 
     fun isEmpty(): Boolean = cache.size() == 0L
 
@@ -49,7 +75,7 @@ class TimeLimitedCache<K : Any, V : Any>(
      *
      * This returning map and any view into that map via [Map.keys], [Map.values] or [Map.entries],
      * may return [Collection.size] values larger than the elements actually present during iteration.
-     * This can lead to problems with kotlins [Iterable.toSet], [Iterable.toList] (etc.) small collection
+     * This can lead to problems with kotlin's [Iterable.toSet], [Iterable.toList] (etc.) small collection
      * optimizations. Those methods (and similar ones) have optimizations for single element collections.
      * Since the [Collection.size] is checked first those methods will then not make any additional
      * checks when accessing the elements of the collection. This can lead to rare [NoSuchElementException].
@@ -59,12 +85,4 @@ class TimeLimitedCache<K : Any, V : Any>(
      * @return A read-only view of the cache's underlying map.
      */
     private fun getMap(): ConcurrentMap<K, V> = cache.asMap()
-
-    fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
-
-    override fun iterator(): Iterator<Map.Entry<K, V>> = entries().iterator()
-
-    operator fun set(key: K, value: V) {
-        cache.put(key, value)
-    }
 }
