@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -99,7 +98,11 @@ object ChocolateFactoryStrayWarning {
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = (gui.inventorySlots as ContainerChest)
         eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
-        eventChest.inventorySlots.filter { it.slotNumber != it.slotIndex }.forEach { it highlight CHROMA_COLOR_ALT2.toSpecialColor() }
+        eventChest.inventorySlots.filter {
+            it.slotNumber != it.slotIndex
+        }.forEach {
+            it highlight CHROMA_COLOR_ALT2.toSpecialColor()
+        }
     }
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
