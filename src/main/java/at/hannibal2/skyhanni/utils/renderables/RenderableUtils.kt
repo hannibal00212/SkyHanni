@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -125,6 +126,9 @@ internal object RenderableUtils {
             ).toSearchable(),
         )
     }
+
+    fun MutableList<Renderable>.addCenteredString(string: String) =
+        this.add(Renderable.string(string, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {

@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatForHoppity
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -152,9 +153,8 @@ object HoppityEventSummary {
     private data class StatString(val string: String, val headed: Boolean = true)
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
+
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
-    fun MutableList<Renderable>.addCenteredString(string: String) =
-        this.add(Renderable.string(string, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -163,8 +163,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        onHoppityIsland = LorenzUtils.inSkyBlock &&
-            allowedHoppityIslands.any { it.isInIsland() }
+        onHoppityIsland = LorenzUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
     }
 
     @HandleEvent
@@ -374,7 +373,7 @@ object HoppityEventSummary {
         buildList {
             addString(
                 "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
             val eventEnd = getEventEndMark(statYear)
             val yearNow = getCurrentSBYear()
@@ -406,7 +405,7 @@ object HoppityEventSummary {
                     isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
                     isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
                     else -> "§7$grammarFormat §f$timeMarkFormat"
-                }
+                },
             )
         },
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -529,12 +528,10 @@ object HoppityEventSummary {
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
 
     private fun HoppityEventStats.getBoughtCount(): Int =
-        (mealsFound[HoppityEggType.BOUGHT] ?: 0) +
-            (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
+        (mealsFound[HoppityEggType.BOUGHT] ?: 0) + (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
 
     private fun HoppityEventStats.getMealEggCount(): Int =
         mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt()
-
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
