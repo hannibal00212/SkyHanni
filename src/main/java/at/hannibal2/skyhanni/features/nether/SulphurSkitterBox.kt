@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -26,54 +27,63 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object SulphurSkitterBox {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.sulphurSkitterBox
-    private var spongeBlocks = listOf<BlockPos>()
-    private var closestBlock: BlockPos? = null
+    private var spongeLocations = listOf<LorenzVec>()
+    private var closestSponge: LorenzVec? = null
+    private var renderBox: AxisAlignedBB? = null
     private const val RADIUS = 4
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (event.isMod(5)) {
-            closestBlock = getClosestBlockToPlayer()
-        }
         if (event.repeatSeconds(1)) {
-            val location = LocationUtils.playerLocation()
-            val from = location.add(-20, -20, -20).toBlockPos()
-            val to = location.add(20, 20, 20).toBlockPos()
-
-            spongeBlocks = BlockPos.getAllInBox(from, to).filter {
-                val loc = it.toLorenzVec()
-                loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
-            }.filter {
-                val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-                val pos2 = it.add(RADIUS, RADIUS, RADIUS)
-                BlockPos.getAllInBox(pos1, pos2).any { pos ->
-                    pos.toLorenzVec().getBlockAt() in FishingAPI.lavaBlocks
-                }
-            }
+            calculateSpongeLocations()
         }
+        if (event.isMod(5)) {
+            calculateClosestSponge()
+        }
+    }
+
+    private fun calculateClosestSponge() {
+        val location = spongeLocations.minByOrNull { it.distanceToPlayer() }
+        if (location == closestSponge) return
+        closestSponge = location
+        renderBox = location?.let {
+            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
+            val pos2 = it.add(RADIUS + 1, RADIUS + 1, RADIUS + 1)
+            pos1.axisAlignedTo(pos2).expandBlock()
+        }
+    }
+
+    private fun calculateSpongeLocations() {
+        val location = LocationUtils.playerLocation()
+        val from = location.add(-15, -15, -15).toBlockPos()
+        val to = location.add(15, 15, 15).toBlockPos()
+
+        spongeLocations = BlockPos.getAllInBox(from, to).filter {
+            val loc = it.toLorenzVec()
+            loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
+        }.filter {
+            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
+            val pos2 = it.add(RADIUS, RADIUS, RADIUS)
+            BlockPos.getAllInBox(pos1, pos2).any { pos ->
+                pos.toLorenzVec().getBlockAt() in FishingAPI.lavaBlocks
+            }
+        }.map { it.toLorenzVec() }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        spongeBlocks = emptyList()
+        spongeLocations = emptyList()
+        closestSponge = null
+        renderBox = null
     }
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        closestBlock?.let {
-            if (it.toLorenzVec().distanceToPlayer() >= 50) return
-            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-            val pos2 = it.add(RADIUS + 1, RADIUS + 1, RADIUS + 1)
-            val axis = AxisAlignedBB(pos1, pos2).expandBlock()
-
-            drawBox(axis, event.partialTicks)
-        }
-    }
-
-    private fun getClosestBlockToPlayer(): BlockPos? {
-        return spongeBlocks.minByOrNull { it.toLorenzVec().distanceToPlayer() }
+        val location = closestSponge ?: return
+        if (location.distanceToPlayer() >= 50) return
+        renderBox?.let { drawBox(it, event.partialTicks) }
     }
 
     private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
