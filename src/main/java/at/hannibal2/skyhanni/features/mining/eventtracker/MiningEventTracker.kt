@@ -124,15 +124,13 @@ object MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
-        // do not send data if the feature is disabled.
-        if (!config.enabled) return
-
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
         val eventType = MiningEventType.fromEventName(eventName) ?: run {
+            if (!config.enabled) return
             ErrorManager.logErrorWithData(
                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
                 "eventName" to eventName,
@@ -227,6 +225,7 @@ object MiningEventTracker {
 
             if (!miningEventData.success) {
                 if (data.toString() == "{}") {
+                    if (!config.enabled) return@launch
                     ChatUtils.chat(
                         "§cFailed loading Mining Event data!\n" +
                             "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
