@@ -92,7 +92,7 @@ object ChatUtils {
         }
     }
 
-    private var messagesThatAreOnlySentOnce = mutableListOf<String>()
+    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
 
     private fun internalChat(
         message: String,
