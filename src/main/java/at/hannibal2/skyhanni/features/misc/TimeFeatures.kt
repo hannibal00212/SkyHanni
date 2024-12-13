@@ -32,11 +32,14 @@ object TimeFeatures {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.REAL_TIME.isSelected()) return
-        val timeFormat24h = SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds) ":ss" else ""}")
-        val timeFormat12h = SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds) ":ss" else ""} a")
-
         if (config.realTime) {
-            val timeFormat = if (config.realTimeFormatToggle) timeFormat12h else timeFormat24h
+            val timeFormat = if (config.realTimeFormatToggle) {
+                // 12 h format
+                SimpleDateFormat("hh:mm${if (config.realTimeShowSeconds) ":ss" else ""} a")
+            } else {
+                // 24 h format
+                SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds) ":ss" else ""}")
+            }
             val currentTime = timeFormat.format(System.currentTimeMillis())
             config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
