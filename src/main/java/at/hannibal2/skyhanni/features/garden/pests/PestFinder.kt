@@ -111,7 +111,10 @@ object PestFinder {
 
     private fun remindInChat() {
         if (!TabWidget.PESTS.isActive) {
-            ChatUtils.userError("Pest detection requires the tab list widget to be enabled. Enable the 'Pests Widget' via /widget!", replaceSameMessage = true)
+            ChatUtils.userError(
+                "Pest detection requires the tab list widget to be enabled. Enable the 'Pests Widget' via /widget!",
+                replaceSameMessage = true,
+            )
         }
     }
 
@@ -174,12 +177,8 @@ object PestFinder {
         val isInaccurate = plot.isPestCountInaccurate
         val location = playerLocation.copy(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-        val text = "§e" + (
-            if (isInaccurate) "?" else pests
-            ) + " §c$pestsName §7in §b$plotName"
-        event.drawDynamicText(
-            location, text, 1.5,
-        )
+        val number = if (isInaccurate) "?" else pests
+        event.drawDynamicText(location, "§e$number §c$pestsName §7in §b$plotName", 1.5)
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()
