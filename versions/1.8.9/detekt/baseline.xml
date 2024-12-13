@@ -79,8 +79,6 @@
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
     <ID>RepoPatternRegexTest:AdvancedPlayerList.kt$AdvancedPlayerList$by RepoPattern.pattern( "misc.compacttablist.advanced.level", ".*\\[(?&lt;level&gt;.*)] §r(?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "crystal", "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!" )</ID>
-    <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "spawn", "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)" )</ID>
     <ID>RepoPatternRegexTest:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "allowedinventories", "Auctions Browser|Manage Auctions|Auctions: \".*\"?", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "price", "§7(?:Buy it now|Starting bid|Top bid): §6(?&lt;coins&gt;[0-9,]+) coins", )</ID>
