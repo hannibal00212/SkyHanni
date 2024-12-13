@@ -266,6 +266,6 @@ object ChocolateFactoryAPI {
     } ?: false
 
     fun String.partyModeReplace(): String =
-        if (config.partyMode.get()) replace(Regex("§."), "§z")
+        if (config.partyMode.get() && inChocolateFactory) replace(Regex("§."), "§z")
         else this
 }
