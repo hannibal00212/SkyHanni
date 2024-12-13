@@ -162,10 +162,15 @@ object HoppityAPI {
     // If there is a time since lastHoppityCallAccept, we can assume this is an abiphone call
     private fun getBoughtType(): HoppityEggType = if (lastHoppityCallAccept != null) BOUGHT_ABIPHONE else BOUGHT
 
-    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
-        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
-    } else null
+    fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
+
+    fun getEventEndMark(year: Int) =
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
+
+    fun getEventStartMark(year: Int) =
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -183,7 +188,7 @@ object HoppityAPI {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    fun Map<Int, ItemStack>.filterMayBeStray() = filter { (slotIndex, stack) ->
+    fun filterMayBeStray(items: Map<Int, ItemStack>) = items.filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
@@ -192,11 +197,10 @@ object HoppityAPI {
             stack.hasDisplayName() && stack.displayName.isNotEmpty()
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray().filter {
+    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
         !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
-
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
