@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.getAllSlots
+import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -42,6 +42,7 @@ object ChocolateFactoryStrayWarning {
     private val warningConfig get() = config.rabbitWarning
     private const val CHROMA_COLOR = "249:255:255:85:85"
     private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
+    private const val CHROMA_COLOR_ALT2 = "243:255:255:85:85"
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
@@ -91,18 +92,21 @@ object ChocolateFactoryStrayWarning {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        val partyMode = config.partyMode.get()
-        val color = if (partyMode) CHROMA_COLOR_ALT else warningConfig.inventoryHighlightColor
+        if (config.partyMode.get()) event.partyModeHighlight()
+        else event.strayHighlight()
+    }
 
-        val eventChest = (event.gui.inventorySlots as ContainerChest)
-        val listToUse =
-            if (partyMode) eventChest.getAllSlots()
-            else eventChest.getUpperItems()
+    private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
+        val eventChest = (gui.inventorySlots as ContainerChest)
+        eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
+        eventChest.getLowerItems().keys.forEach { it highlight CHROMA_COLOR_ALT2.toSpecialColor() }
+    }
 
-        listToUse.filter { (slot, _) ->
-            if (partyMode) true else slot.slotNumber in activeStraySlots
-        }.forEach { (slot, _) ->
-            slot highlight color.toSpecialColor()
+    private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
+        (gui.inventorySlots as ContainerChest).getUpperItems().keys.filter {
+            it.slotNumber in activeStraySlots
+        }.forEach {
+            it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
         }
     }
 
