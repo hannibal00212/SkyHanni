@@ -102,11 +102,11 @@ object HypixelCommands {
         send("wiki $text")
     }
 
-    fun openBackpack(position: Int) {
+    fun backPack(position: Int) {
         send("bp $position")
     }
 
-    fun openEnderChest(position: Int) {
+    fun enderChest(position: Int) {
         send("ec $position")
     }
 

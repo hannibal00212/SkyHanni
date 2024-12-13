@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
 @SkyHanniModule
 object OpenLastStorage {
-    private enum class StorageType(val commands: List<String>, val validPages: IntRange, val openStorage: (Int) -> Unit) {
-        ENDER_CHEST(listOf("/enderchest", "/ec"), 1..9, { HypixelCommands.openEnderChest(it) }),
-        BACKPACK(listOf("/backpack", "/bp"), 0..18, { HypixelCommands.openBackpack(it) }),
+    private enum class StorageType(val validPages: IntRange, val runCommand: (Int) -> Unit, vararg val commands: String) {
+        ENDER_CHEST(1..9, { HypixelCommands.enderChest(it) }, "/enderchest", "/ec"),
+        BACKPACK(0..18, { HypixelCommands.backPack(it) }, "/backpack", "/bp"),
         ;
 
         val storageName = name.lowercase().replace("_", " ")
@@ -30,13 +31,12 @@ object OpenLastStorage {
     // Default to Ender Chest as last storage type, since every profile on any account has at least one partial ender chest page unlocked
     private var lastStorageType = StorageType.ENDER_CHEST
 
-    private fun openLastStoragePage(storageType: StorageType) {
+    private fun openLastStoragePage(type: StorageType) {
+        type.lastPage?.let { type.runCommand(it) }
 
-        storageType.lastPage?.let { storageType.openStorage(it) }
-
-        val message = storageType.lastPage?.let { page ->
-            "Opened last ${storageType.storageName} $page."
-        } ?: "No last ${storageType.storageName} to open."
+        val message = type.lastPage?.let { page ->
+            "Opened last ${type.storageName} $page."
+        } ?: "No last ${type.storageName} to open."
         ChatUtils.chat(message)
     }
 
@@ -44,9 +44,9 @@ object OpenLastStorage {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.senderIsSkyhanni()) return
         val args = event.message.lowercase().split(" ")
-        val storageType = StorageType.fromCommand(args[0]) ?: return
+        val type = StorageType.fromCommand(args[0]) ?: return
 
-        if (handleStorage(args, storageType)) {
+        if (handleStorage(args, type)) {
             event.cancel()
         }
     }
@@ -61,28 +61,20 @@ object OpenLastStorage {
         }
     }
 
-    private fun handleStorage(args: List<String>, storageType: StorageType): Boolean {
-        if (args.size > 1 && args[1] == "-") {
-            openLastStoragePage(storageType)
+    private fun handleStorage(args: List<String>, type: StorageType): Boolean {
+        if (args.getOrNull(1) == "-") {
+            openLastStoragePage(type)
             return true
         }
 
-        // No argument means open the first page of the respective storage
         if (args.size <= 1) {
-            storageType.lastPage = 1
-            lastStorageType = storageType
-            return false
-        }
-
-        val intArg = args[1].toIntOrNull() ?: return false
-
-        storageType.lastPage = if (storageType.isValidPage(intArg)) {
-            intArg
+            // No argument means open the first page of the respective storage
+            type.lastPage = 1
         } else {
-            null
+            val pageNumber = args[1].formatIntOrUserError() ?: return false
+            type.lastPage = pageNumber.takeIf { type.isValidPage(it) }
         }
-
-        lastStorageType = storageType
+        lastStorageType = type
         return false
     }
 }
