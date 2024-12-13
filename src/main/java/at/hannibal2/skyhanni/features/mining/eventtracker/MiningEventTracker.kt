@@ -228,11 +228,10 @@ object MiningEventTracker {
 
             if (!miningEventData.success) {
                 if (data.toString() == "{}") {
-                    if (!config.enabled) return@launch
                     ChatUtils.chat(
                         "§cFailed loading Mining Event data!\n" +
                             "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
-                        replaceSameMessage = true,
+                        onlySendOnce = true
                     )
                 } else {
                     ErrorManager.logErrorWithData(
