@@ -56,8 +56,8 @@ object SulphurSkitterBox {
 
     private fun calculateSpongeLocations() {
         val location = LocationUtils.playerLocation()
-        val from = location.add(-20, -20, -20).toBlockPos()
-        val to = location.add(20, 20, 20).toBlockPos()
+        val from = location.add(-15, -15, -15).toBlockPos()
+        val to = location.add(15, 15, 15).toBlockPos()
 
         spongeLocations = BlockPos.getAllInBox(from, to).filter {
             val loc = it.toLorenzVec()
