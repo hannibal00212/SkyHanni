@@ -40,7 +40,6 @@ class GuiContainerHook(guiAny: Any) {
         if (GuiContainerEvent.PreDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
             if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCancelled = true
-            println("preDrawEventCancelled")
             ci.cancel()
         } else {
             DelayedRun.runNextTick {
