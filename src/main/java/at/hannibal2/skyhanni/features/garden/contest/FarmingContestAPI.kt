@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -63,7 +63,7 @@ object FarmingContestAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         if (internalContest && startTime.passedSince() > 20.minutes) {
-            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
 
@@ -78,17 +78,17 @@ object FarmingContestAPI {
 
         if (inContest != currentContest) {
             if (currentContest) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).post()
                 startTime = SimpleTimeMark.now()
             } else {
                 if (startTime.passedSince() > 2.minutes) {
-                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
                 }
             }
             internalContest = currentContest
         } else {
             if (currentCrop != contestCrop && currentCrop != null) {
-                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).post()
                 startTime = SimpleTimeMark.now()
             }
         }

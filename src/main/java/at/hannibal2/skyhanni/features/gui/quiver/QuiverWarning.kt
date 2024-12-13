@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.gui.quiver
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ArrowType
 import at.hannibal2.skyhanni.data.QuiverAPI
 import at.hannibal2.skyhanni.data.QuiverAPI.amount
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -32,12 +33,12 @@ object QuiverWarning {
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
     private val arrowsInInstance = mutableSetOf<ArrowType>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         onInstanceComplete()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         onInstanceComplete()
     }
@@ -71,7 +72,7 @@ object QuiverWarning {
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val amount = event.currentAmount
         val arrow = event.currentArrow ?: return

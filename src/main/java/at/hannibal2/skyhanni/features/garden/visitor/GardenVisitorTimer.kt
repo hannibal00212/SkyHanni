@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
@@ -64,12 +66,12 @@ object GardenVisitorTimer {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
         lastMillis = 0.seconds
@@ -203,7 +205,7 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
@@ -211,6 +213,16 @@ object GardenVisitorTimer {
         // We only need manually retracting the time when hypixel shows 6 minutes or above
         if (lastMillis > 5.minutes) {
             lastTimerUpdate -= 100.milliseconds
+        }
+    }
+
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
+        sixthVisitorArrivalTime -= 30.seconds
+
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 30.seconds
         }
     }
 

@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuHoppityJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.RabbitCollectionRarity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HoppityCollectionData {
@@ -38,7 +38,7 @@ object HoppityCollectionData {
         else -> lowercase().replace("[- ]".toRegex(), "_")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rabbitRarities.clear()
         rarityBonuses.clear()

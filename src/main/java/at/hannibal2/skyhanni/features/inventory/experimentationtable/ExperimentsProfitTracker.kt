@@ -99,7 +99,7 @@ object ExperimentsProfitTracker {
         var startCost = 0L
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
 
@@ -246,7 +246,7 @@ object ExperimentsProfitTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.PRIVATE_ISLAND) {
             tracker.firstUpdate()

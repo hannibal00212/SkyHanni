@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -104,7 +105,7 @@ object SkillAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         val actionBar = event.actionBar.removeColor()
         val components = SPACE_SPLITTER.splitToList(actionBar)
@@ -125,7 +126,7 @@ object SkillAPI {
                     skillMultiplierPattern -> handleSkillPatternMultiplier(matcher, skillType, skillInfo)
                 }
 
-                SkillExpGainEvent(skillType, matcher.group("gained").formatDouble()).postAndCatch()
+                SkillExpGainEvent(skillType, matcher.group("gained").formatDouble()).post()
 
                 showDisplay = true
                 lastUpdate = SimpleTimeMark.now()
@@ -138,7 +139,7 @@ object SkillAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.readConstant<NeuSkillLevelJson>("leveling")
 
@@ -273,7 +274,7 @@ object SkillAPI {
             calculateSkillLevel(totalXp, cap)
 
         if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
-            SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
+            SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, levelOverflow).post()
 
         skillInfo.apply {
             this.level = level

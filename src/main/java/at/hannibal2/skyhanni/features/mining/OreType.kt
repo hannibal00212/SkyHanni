@@ -173,7 +173,7 @@ enum class OreType(
     UMBER(
         "Umber",
         "UMBER",
-        OreBlock.LOW_TIER_UMBER, OreBlock.HIGH_TIER_UMBER,
+        OreBlock.LOW_TIER_UMBER, OreBlock.MID_TIER_UMBER, OreBlock.HIGH_TIER_UMBER,
     ),
     TUNGSTEN(
         "Tungsten",

@@ -1,10 +1,12 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.events.chat
+
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 class TabCompletionEvent(
     val leftOfCursor: String,
     val fullText: String,
     val originalCompletions: List<String>,
-) : LorenzEvent() {
+) : SkyHanniEvent() {
     val lastWord = leftOfCursor.substringAfterLast(' ')
     val additionalSuggestions = mutableSetOf<String>()
     val suppressedSuggestions = mutableSetOf<String>()

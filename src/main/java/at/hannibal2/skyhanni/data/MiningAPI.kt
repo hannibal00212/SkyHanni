@@ -190,7 +190,7 @@ object MiningAPI {
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!inCustomMiningIsland()) return
 
@@ -248,7 +248,7 @@ object MiningAPI {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.name == LorenzUtils.getPlayerName()) {
             updateCold(0)
@@ -256,7 +256,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
@@ -300,7 +300,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
         val oldState = event.oldState
@@ -369,7 +369,7 @@ object MiningAPI {
         updateLocation()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
     }
@@ -477,7 +477,7 @@ object MiningAPI {
         // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
-        ColdUpdateEvent(newCold).postAndCatch()
+        ColdUpdateEvent(newCold).post()
         cold = newCold
     }
 

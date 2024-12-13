@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -86,12 +88,12 @@ object CraftRoomHolographicMob {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPlayerRender(event: CheckRenderEntityEvent<*>) {
-        if (!RiftAPI.inRift() || !config.hidePlayers) return
+    @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
+    fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+        if (!config.hidePlayers) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && craftRoomArea.isInside(entity.getLorenzVec())) {
+        if (craftRoomArea.isInside(entity.getLorenzVec())) {
             event.cancel()
         }
     }

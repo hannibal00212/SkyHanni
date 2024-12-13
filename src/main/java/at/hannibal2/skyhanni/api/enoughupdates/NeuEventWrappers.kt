@@ -1,7 +1,9 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
@@ -59,7 +61,7 @@ object NeuEventWrappers {
         val apiData = event.data ?: return
         try {
             val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+            NeuProfileDataLoadedEvent(playerData).post()
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
@@ -71,6 +73,6 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
+        NeuRepositoryReloadEvent.post()
     }
 }
