@@ -124,13 +124,15 @@ object MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // do not send data if the feature is disabled.
+        if (!config.enabled) return
+
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
         val eventType = MiningEventType.fromEventName(eventName) ?: run {
-            if (!config.enabled) return
             ErrorManager.logErrorWithData(
                 Exception("UnknownMiningEvent"), "Unknown mining event detected from string $eventName",
                 "eventName" to eventName,
