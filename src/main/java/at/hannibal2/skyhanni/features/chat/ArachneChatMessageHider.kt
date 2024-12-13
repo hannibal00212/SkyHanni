@@ -23,15 +23,15 @@ object ArachneChatMessageHider {
      */
     val arachneCallingPattern by patternGroup.pattern(
         "calling",
-        "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*"
+        "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*",
     )
     val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
-        "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!"
+        "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!",
     )
     private val arachneSpawnPattern by patternGroup.pattern(
         "spawn",
-        "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"
+        "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)",
     )
 
     /**
@@ -42,7 +42,7 @@ object ArachneChatMessageHider {
     @Suppress("MaxLineLength")
     private val venomShotPattern by patternGroup.pattern(
         "venom",
-        "§dArachne(?:'s (?:Keeper|Brood))? used §r§2Venom Shot §r§don you hitting you for §r§c[\\d.,]+ damage §r§dand infecting you with venom\\."
+        "§dArachne(?:'s (?:Keeper|Brood))? used §r§2Venom Shot §r§don you hitting you for §r§c[\\d.,]+ damage §r§dand infecting you with venom\\.",
     )
 
     @SubscribeEvent
