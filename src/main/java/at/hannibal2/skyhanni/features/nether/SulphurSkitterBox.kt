@@ -38,8 +38,8 @@ object SulphurSkitterBox {
         }
         if (event.repeatSeconds(1)) {
             val location = LocationUtils.playerLocation()
-            val from = location.add(-15, -15, -15).toBlockPos()
-            val to = location.add(15, 15, 15).toBlockPos()
+            val from = location.add(-20, -20, -20).toBlockPos()
+            val to = location.add(20, 20, 20).toBlockPos()
 
             spongeBlocks = BlockPos.getAllInBox(from, to).filter {
                 val loc = it.toLorenzVec()
