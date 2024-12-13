@@ -62,13 +62,6 @@ class TimeLimitedCache<K : Any, V : Any>(
     @Deprecated("", ReplaceWith("get(key)"))
     fun getOrNull(key: K): V? = get(key)
 
-    fun isEmpty(): Boolean = cache.size() == 0L
-
-    fun isNotEmpty(): Boolean = !isEmpty()
-
-    val size: Long
-        get() = cache.size()
-
     /**
      * Modifications to the returned map are not supported and may lead to unexpected behavior.
      * This method is intended for read-only operations such as iteration or retrieval of values.
