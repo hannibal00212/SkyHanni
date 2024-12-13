@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.ultraRarePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -23,7 +24,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -53,7 +53,7 @@ object UltraRareBookAlert {
 
         Renderable.drawInsideRoundedRect(
             Renderable.string("§d§kXX§5 ULTRA-RARE BOOK! §d§kXX", 1.5),
-            Color.DARK_GRAY,
+            ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 125, gui.width, gui.height)

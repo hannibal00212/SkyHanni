@@ -56,14 +56,14 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "")
+    @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
+    public ChocolateFactoryStrayRabbitWarningConfig rabbitWarning = new ChocolateFactoryStrayRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
     @Accordion
-    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
+    public ChocolateFactoryUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateFactoryUpgradeWarningsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
