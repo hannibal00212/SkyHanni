@@ -209,6 +209,15 @@ object ChocolateFactoryDataLoader {
     )
 
     /**
+     * REGEX-TEST: §7Purchased slots: §a28§7/§a28
+     * REGEX-TEST: §7Purchased slots: §e0§7/§a22
+     */
+    private val hitmanPurchasedSlotsPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.purchasedslots",
+        "§7Purchased slots: §.(?<amount>\\d+)§7\\/§a\\d+",
+    )
+
+    /**
      * REGEX-TEST: §7Slot cooldown: §a8m 6s
      */
     private val hitmanSingleSlotCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -450,6 +459,9 @@ object ChocolateFactoryDataLoader {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
                 profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
+            }
+            hitmanPurchasedSlotsPattern.matchMatcher(line) {
+                profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
             }
         }
     }

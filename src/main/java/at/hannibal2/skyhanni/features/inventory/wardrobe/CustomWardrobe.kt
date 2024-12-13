@@ -270,8 +270,11 @@ object CustomWardrobe {
         val fakePlayer = FakePlayer()
         var scale = playerWidth
 
-        fakePlayer.inventory.armorInventory =
-            slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+        //#if MC < 1.12
+        fakePlayer.inventory.armorInventory = slot.armor.map { it?.copy()?.removeEnchants() }.reversed().toTypedArray()
+        //#else
+        //$$ fakePlayer.inventory.armorInventory.addAll(slot.armor.map { it?.copy()?.removeEnchants() }.reversed())
+        //#endif
 
         val playerColor = if (!slot.isInCurrentPage()) {
             scale *= 0.9
