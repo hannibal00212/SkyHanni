@@ -145,7 +145,7 @@ object ChocolateFactoryStats {
             .flatMap { key ->
                 map[key]?.let { value ->
                     listOf(value.partyModeReplace())
-                } ?: emptyList()
+                }.orEmpty()
             }
 
         display = listOf(

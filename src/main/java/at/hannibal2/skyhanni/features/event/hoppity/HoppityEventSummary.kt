@@ -333,7 +333,7 @@ object HoppityEventSummary {
         // Add title renderable with centered alignment
         add(
             Renderable.string(
-                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats".partyModeReplace(),
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             ),
         )
@@ -375,13 +375,13 @@ object HoppityEventSummary {
         return listOfNotNull(
             predecessorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
+                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
+                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
             },
