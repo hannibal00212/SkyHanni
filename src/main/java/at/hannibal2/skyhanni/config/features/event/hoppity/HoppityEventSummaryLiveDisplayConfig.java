@@ -52,7 +52,8 @@ public class HoppityEventSummaryLiveDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Date/Time Display",
-        desc = "Display the date and time of the event in the header, for the current event, past events, or the next event."
+        desc = "Display the date and time of the event in the header, for the current event, past events, or the next event.\n" +
+            "§cNote§7: The Next Event option will only appear if Next Event is added here."
     )
     @ConfigEditorDraggableList
     public List<HoppityDateTimeDisplayType> dateTimeDisplay = new ArrayList<>(Collections.singletonList(
