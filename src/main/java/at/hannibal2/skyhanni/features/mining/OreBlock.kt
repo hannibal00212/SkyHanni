@@ -86,7 +86,7 @@ enum class OreBlock(
     JADE(EnumDyeColor.LIME, { inCrystalHollows || inGlacite }),
     SAPPHIRE(EnumDyeColor.LIGHT_BLUE, { inCrystalHollows || inGlacite }),
     TOPAZ(EnumDyeColor.YELLOW, { inCrystalHollows || inGlacite }),
-    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inGlacite || inMineshaft }),
+    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inGlacite }),
     OPAL(EnumDyeColor.WHITE, { inGlacite || inCrimsonIsle }),
     AQUAMARINE(EnumDyeColor.BLUE, { inGlacite }),
     CITRINE(EnumDyeColor.BROWN, { inGlacite }),
