@@ -39,6 +39,8 @@ object TpsCounter {
     private var display: String? = null
 
     private val timeSinceWorldSwitch get() = LorenzUtils.lastWorldSwitch.passedSince()
+    private val tilCalculated: String get() =
+        "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -73,8 +75,8 @@ object TpsCounter {
     }
 
     private fun tpsCommand() {
-        val tps = tps ?: return ChatUtils.chat("§eTPS: §fCalculating...")
-        ChatUtils.chat("§eTPS: ${getColor(tps)}$tps")
+        val tpsMessage = tps?.let { "${getColor(it)}$it" } ?: tilCalculated
+        ChatUtils.chat("§eTPS: $tpsMessage")
     }
 
     @SubscribeEvent
