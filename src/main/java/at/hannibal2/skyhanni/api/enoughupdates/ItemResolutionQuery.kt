@@ -177,6 +177,7 @@ class ItemResolutionQuery {
                 "PARTY_HAT_SLOTH" -> resolveSlothHatName()
                 "POTION" -> resolvePotionName()
                 "BALLOON_HAT_2024" -> resolveBalloonHatName()
+                "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
                 else -> resolvedName
             }
         }
@@ -251,6 +252,13 @@ class ItemResolutionQuery {
     private fun resolveBalloonHatName(): String {
         val color = getExtraAttributes().getString("party_hat_color")
         return "BALLOON_HAT_2024_" + color.uppercase()
+    }
+
+    private fun resolveAttributeShardName(): String? {
+        val attributes = getExtraAttributes().getCompoundTag("attributes")
+        val attributeName = CollectionUtils.getOnlyElement(attributes.keySet, null)
+        if (attributeName.isNullOrEmpty()) return null
+        return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
     }
 
     private fun resolveItemInCatacombsRngMeter(): String? {
