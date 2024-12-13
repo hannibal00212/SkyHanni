@@ -2,12 +2,10 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -20,19 +18,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CollectionTracker {
@@ -177,17 +167,6 @@ object CollectionTracker {
         )
     }
 
-    private fun renderStupidShit(item: NEUInternalName) {
-        val randX = Random.nextInt(GuiScreenUtils.displayWidth)
-        val randY = Random.nextInt(GuiScreenUtils.displayHeight)
-        val stack = item.getItemStack()
-        stack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
-        GuiRenderUtils.renderItemStack(stack, randX, randY)
-        val randTime = Random.nextInt(1000000).seconds
-        val formattedTime = randTime.format()
-        GuiRenderUtils.drawString("§a$formattedTime", randX + 16, randY + 8)
-    }
-
     private fun countCurrentlyInInventory(): Int {
         val cactus = "CACTUS".toInternalName()
         val cactusGreen = "INK_SACK-2".toInternalName()
@@ -252,13 +231,5 @@ object CollectionTracker {
         if (!LorenzUtils.inSkyBlock) return
 
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
-
-        val enchantedCollection = itemAmount / 160
-
-        internalName?.let { itemNamea ->
-            for (i in 0 until enchantedCollection) {
-                renderStupidShit(itemNamea)
-            }
-        }
     }
 }
