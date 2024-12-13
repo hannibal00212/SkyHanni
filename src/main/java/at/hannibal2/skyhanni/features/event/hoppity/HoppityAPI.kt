@@ -25,11 +25,11 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
@@ -162,10 +162,15 @@ object HoppityAPI {
     // If there is a time since lastHoppityCallAccept, we can assume this is an abiphone call
     private fun getBoughtType(): HoppityEggType = if (lastHoppityCallAccept != null) BOUGHT_ABIPHONE else BOUGHT
 
-    fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) {
-        SkyBlockTime.fromSbYearAndMonth(SkyBlockTime.now().year, 3).asTimeMark()
-    } else null
+    fun isHoppityEvent() = (SkyblockSeason.SPRING.isSeason() || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+
+    fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
+
+    fun getEventEndMark(year: Int) =
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
+
+    fun getEventStartMark(year: Int) =
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -183,15 +188,18 @@ object HoppityAPI {
         return (month % 2 == 1) == (day % 2 == 0)
     }
 
-    private fun Map<Int, ItemStack>.filterStrayProcessable() = filter { (slotNumber, stack) ->
+    fun filterMayBeStray(items: Map<Int, ItemStack>) = items.filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
-        slotNumber != 13 && slotNumber in 0..26 &&
-            // Don't process the same slot twice.
-            !processedStraySlots.contains(slotNumber) &&
+        slotIndex != 13 && slotIndex in 0..26 &&
             // Stack must not be null, and must be a skull.
             stack.item != null && stack.item == Items.skull &&
-            // All strays are skulls with a display name, and lore.
-            stack.hasDisplayName() && stack.getLore().isNotEmpty()
+            // All strays have a display name, all the time.
+            stack.hasDisplayName() && stack.displayName.isNotEmpty()
+    }
+
+    private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
+        !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
+            it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
 
 
@@ -257,7 +265,7 @@ object HoppityAPI {
                     else -> return@matchMatcher
                 }
             }
-            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(itemStack.getLore())) {
+            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getSingleLineLore()) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
                 if (ChocolateFactoryStrayTracker.doradoEscapeStrayPattern.anyMatches(itemStack.getLore())) return@matchMatcher
