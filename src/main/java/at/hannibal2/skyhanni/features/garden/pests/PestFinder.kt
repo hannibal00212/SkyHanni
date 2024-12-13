@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -81,10 +82,11 @@ object PestFinder {
         }
 
         if (PestAPI.getInfestedPlots().isEmpty() && PestAPI.scoreboardPests != 0) {
+            remindInChat()
             add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
             add(
                 Renderable.clickAndHover(
-                    "§cTry opening your plots menu.",
+                    "§cTry opening your plots menu",
                     listOf(
                         "Runs /desk.",
                     ),
@@ -92,6 +94,26 @@ object PestFinder {
                         HypixelCommands.gardenDesk()
                     },
                 ),
+            )
+            add(
+                Renderable.clickAndHover(
+                    "§cor enable Pests Widget in §e/widget.",
+                    listOf(
+                        "Runs /widget.",
+                    ),
+                    onClick = {
+                        HypixelCommands.widget()
+                    },
+                ),
+            )
+        }
+    }
+
+    private fun remindInChat() {
+        if (!TabWidget.PESTS.isActive) {
+            ChatUtils.userError(
+                "Pest detection requires the tab list widget to be enabled. Enable the 'Pests Widget' via /widget!",
+                replaceSameMessage = true,
             )
         }
     }
@@ -155,12 +177,8 @@ object PestFinder {
         val isInaccurate = plot.isPestCountInaccurate
         val location = playerLocation.copy(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-        val text = "§e" + (
-            if (isInaccurate) "?" else pests
-            ) + " §c$pestsName §7in §b$plotName"
-        event.drawDynamicText(
-            location, text, 1.5,
-        )
+        val number = if (isInaccurate) "?" else pests
+        event.drawDynamicText(location, "§e$number §c$pestsName §7in §b$plotName", 1.5)
     }
 
     private var lastKeyPress = SimpleTimeMark.farPast()

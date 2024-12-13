@@ -53,6 +53,7 @@ object ItemUtils {
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()

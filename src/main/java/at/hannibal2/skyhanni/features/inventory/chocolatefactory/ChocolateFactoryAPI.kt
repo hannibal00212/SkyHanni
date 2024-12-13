@@ -37,9 +37,9 @@ object ChocolateFactoryAPI {
 
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
-
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: 46,559,892,200 Chocolate
      */
@@ -76,6 +76,16 @@ object ChocolateFactoryAPI {
         "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*",
     )
 
+    /**
+     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, ...
+     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7
+     */
+    val caughtRabbitPattern by patternGroup.pattern(
+        "rabbit.caught",
+        ".*§7You caught.*"
+    )
+    // </editor-fold>
+
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
     var noPickblockSlots = setOf<Int>()
@@ -105,8 +115,6 @@ object ChocolateFactoryAPI {
     var leaderboardPosition: Int? = null
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
-
-    var clickRabbitSlot: Int? = null
 
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1

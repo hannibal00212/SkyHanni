@@ -223,7 +223,7 @@ public class ProfileSpecificStorage {
         public static class HitmanStatsStorage {
             @Expose
             @Nullable
-            public Integer availableEggs;
+            public Integer availableEggs = null;
 
             @Expose
             @Nullable
@@ -232,6 +232,10 @@ public class ProfileSpecificStorage {
             @Expose
             @Nullable
             public SimpleTimeMark allSlotsCooldown = null;
+
+            @Expose
+            @Nullable
+            public Integer purchasedSlots = null;
         }
 
         @Expose
