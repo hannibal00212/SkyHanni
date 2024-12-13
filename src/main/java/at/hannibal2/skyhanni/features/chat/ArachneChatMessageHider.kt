@@ -25,10 +25,18 @@ object ArachneChatMessageHider {
         "calling",
         "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*",
     )
+
+    /**
+     * REGEX-TEST: §4☄ §r§7SultanHakeem §r§eplaced an Arachne Crystal! Something is awakening!
+     */
     val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
         "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!",
     )
+
+    /**
+     * REGEX-TEST: §c[BOSS] Arachne§r§f: The Era of Spiders begins now.
+     */
     private val arachneSpawnPattern by patternGroup.pattern(
         "spawn",
         "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)",
