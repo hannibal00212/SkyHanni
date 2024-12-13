@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -141,7 +142,11 @@ object HoppityEventSummary {
             isInventoryEnabled
     }
 
-    private data class StatString(val string: String, val headed: Boolean = true)
+    private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
+        if (ChocolateFactoryAPI.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        else this
+
+    private data class StatString(var string: String, val headed: Boolean = true)
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
@@ -241,6 +246,9 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.eventSummary.statDisplayList.afterChange {
+            lastKnownStatHash = 0
+        }
+        ChocolateFactoryAPI.config.partyMode.afterChange {
             lastKnownStatHash = 0
         }
     }
@@ -625,7 +633,7 @@ object HoppityEventSummary {
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
 
-        return statList
+        return statList.chromafyLiveDisplay()
     }
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {

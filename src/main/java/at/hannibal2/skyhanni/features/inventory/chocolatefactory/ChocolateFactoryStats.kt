@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -138,12 +139,19 @@ object ChocolateFactoryStats {
 
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
+
+        val text = config.statsDisplayList
+            .filter { it.shouldDisplay() }
+            .flatMap { key ->
+                map[key]?.let { value ->
+                    listOf(value.partyModeReplace())
+                } ?: emptyList()
+            }
 
         display = listOf(
             Renderable.clickAndHover(
                 Renderable.verticalContainer(text.map(Renderable::string)),
-                tips = listOf("§bCopy to Clipboard!"),
+                tips = listOf("§bCopy to Clipboard!".partyModeReplace()),
                 onClick = {
                     val list = text.toMutableList()
                     list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")

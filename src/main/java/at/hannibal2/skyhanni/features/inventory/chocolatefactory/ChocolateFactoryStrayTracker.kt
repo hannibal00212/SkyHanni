@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -174,8 +175,8 @@ object ChocolateFactoryStrayTracker {
 
         add(
             Renderable.hoverTips(
-                "§6§lStray Tracker",
-                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7"),
+                "§6§lStray Tracker".partyModeReplace(),
+                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7".partyModeReplace()),
             ).toSearchable(),
         )
         HoppityAPI.hoppityRarities.forEach { rarity ->
@@ -192,12 +193,12 @@ object ChocolateFactoryStrayTracker {
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
-        val lineFormat = "$lineHeader$caughtString"
+        val lineFormat = "$lineHeader$caughtString".partyModeReplace()
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.split("\n"))
+            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.partyModeReplace().split("\n"))
         } ?: Renderable.string(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
