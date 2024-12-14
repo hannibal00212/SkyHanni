@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.events.effects
 
 import at.hannibal2.skyhanni.api.EffectAPI
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent

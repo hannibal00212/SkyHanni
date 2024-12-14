@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.EffectAPI.NonGodPotEffect
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.EffectDurationChangeEvent
-import at.hannibal2.skyhanni.events.EffectDurationChangeType
+import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
+import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
