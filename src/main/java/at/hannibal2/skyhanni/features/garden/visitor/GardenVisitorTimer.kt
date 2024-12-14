@@ -236,7 +236,7 @@ object GardenVisitorTimer {
     private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
