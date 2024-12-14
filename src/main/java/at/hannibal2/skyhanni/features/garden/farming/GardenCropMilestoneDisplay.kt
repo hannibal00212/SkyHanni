@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -86,7 +86,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderStringsAndItems(GardenBestCropTime.display, posLabel = "Best Crop Time")
+            config.next.displayPos.renderRenderable(GardenBestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 
@@ -131,7 +131,7 @@ object GardenCropMilestoneDisplay {
     fun update() {
         progressDisplay = emptyList()
         mushroomCowPerkDisplay = emptyList()
-        GardenBestCropTime.display = emptyList()
+        GardenBestCropTime.display = null
         val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it)

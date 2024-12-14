@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIconRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtils
@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.json.toJsonArray
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
@@ -59,7 +60,7 @@ import kotlin.time.Duration.Companion.seconds
 object GardenNextJacobContest {
 
     private val dispatcher = Dispatchers.IO
-    private var display = emptyList<Any>()
+    private var display: Renderable? = null
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
@@ -111,7 +112,7 @@ object GardenNextJacobContest {
             add("Current time: ${SimpleTimeMark.now()}")
             add("")
 
-            val display = display.filterIsInstance<String>().joinToString("")
+            val display = display
             add("Display: '$display'")
             add("")
 
@@ -328,59 +329,53 @@ object GardenNextJacobContest {
         }
 
         display = if (isFetchingContests) {
-            listOf("§cFetching this years jacob contests...")
+            Renderable.string("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
         }
     }
 
-    private fun drawDisplay(): List<Any> {
-        val list = mutableListOf<Any>()
-
+    private fun drawDisplay(): Renderable {
         if (inCalendar) {
             val size = contests.size
             val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
             val formatted = LorenzUtils.formatPercentage(percentage)
-            list.add("§eDetected $formatted of farming contests this year")
-
-            return list
+            return Renderable.string("§eDetected $formatted of farming contests this year")
         }
 
+        val list = mutableListOf<Renderable>()
+
         if (contests.isEmpty()) {
-            if (isCloseToNewYear()) {
-                list.add(CLOSE_TO_NEW_YEAR_TEXT)
-            } else {
-                list.add("§cOpen calendar to read Jacob contest times!")
-            }
-            return list
+            return Renderable.string(missingContestDataString())
         }
 
         val nextContest =
             contests.filter { !it.value.endTime.isInPast() }.toSortedMap()
                 .firstNotNullOfOrNull { it.value }
-        // Show next contest
-        if (nextContest != null) return drawNextContest(nextContest, list)
 
-        if (isCloseToNewYear()) {
-            list.add(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            list.add("§cOpen calendar to read Jacob contest times!")
+        // Show next contest
+        if (nextContest != null) {
+            return Renderable.horizontalContainer(drawNextContest(nextContest, list))
         }
 
+        // if failed to find new contests
         fetchedFromElite = false
         contests.clear()
 
-        return list
+        return Renderable.string(missingContestDataString())
     }
+
+    private fun missingContestDataString(): String =
+        if (isCloseToNewYear()) CLOSE_TO_NEW_YEAR_TEXT else "§cOpen calendar to read Jacob contest times!"
 
     private fun drawNextContest(
         nextContest: FarmingContest,
-        list: MutableList<Any>,
-    ): MutableList<Any> {
+        list: MutableList<Renderable>,
+    ): MutableList<Renderable> {
         var duration = nextContest.endTime.timeUntil()
         if (duration > 4.days) {
-            list.add(CLOSE_TO_NEW_YEAR_TEXT)
+            list.add(Renderable.string(CLOSE_TO_NEW_YEAR_TEXT))
             return list
         }
 
@@ -388,20 +383,20 @@ object GardenNextJacobContest {
 
         val activeContest = duration < contestDuration
         if (activeContest) {
-            list.add("§aActive: ")
+            list.add(Renderable.string("§aActive: "))
         } else {
-            list.add("§eNext: ")
+            list.add(Renderable.string("§eNext: "))
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
+            list.addCropIconRenderable(crop, 1.0, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         if (!activeContest) {
             warn(duration, nextContest.crops, boostedCrop)
         }
         val format = duration.format()
-        list.add("§7(§b$format§7)")
+        list.add(Renderable.string("§7(§b$format§7)"))
 
         return list
     }
@@ -494,10 +489,10 @@ object GardenNextJacobContest {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (display.isEmpty()) {
+        if (display != null) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, posLabel = "Next Jacob Contest")
+            config.pos.renderRenderable(display, posLabel = "Next Jacob Contest")
         }
     }
 
@@ -506,8 +501,8 @@ object GardenNextJacobContest {
         if (!config.display) return
         if (!inCalendar) return
 
-        if (display.isNotEmpty()) {
-            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(
+        if (display != null) {
+            SkyHanniMod.feature.misc.inventoryLoadPos.renderRenderable(
                 display,
                 posLabel = "Load SkyBlock Calendar"
             )
