@@ -101,7 +101,7 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }

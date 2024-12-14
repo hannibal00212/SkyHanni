@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -7,7 +8,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CustomScoreboardConfigFix {
@@ -20,7 +20,7 @@ object CustomScoreboardConfigFix {
     private const val TITLE_AND_FOOTER_KEY = "$DISPLAY_PREFIX.titleAndFooter"
     private const val EVENT_ENTRIES_KEY = "$DISPLAY_PREFIX.events.eventEntries"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         event.move(28, "$DISPLAY_CONFIG_PREFIX.showAllActiveEvents", "$EVENTS_CONFIG_KEY.showAllActiveEvents")
