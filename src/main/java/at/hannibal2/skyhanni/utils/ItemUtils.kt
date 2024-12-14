@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -344,6 +345,11 @@ object ItemUtils {
         return data.itemCategory
     }
 
+    fun ItemStack.getItemBaseRarityOrNull(): LorenzRarity? {
+        val rarity = getItemRarityOrNull() ?: return null
+        return if (isRecombobulated(this)) LorenzRarity.entries.firstOrNull { it.id == rarity.id - 1 } else rarity
+    }
+
     fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
         val data = cachedData
         if (itemRarityLastCheck(data)) {
@@ -460,14 +466,27 @@ object ItemUtils {
             return getInternalNameOrNull()?.itemName ?: "<null>"
         }
 
-    val ItemStack.itemNameRarityAware: String
+    /**
+     * Returns the item name with its base color, i.e. before recombobulation
+     */
+    val ItemStack.itemNameBaseRarityAware: String
         get() {
-            val rarity = getItemRarityOrNull()
-            return if (rarity == null) itemName
-            else if (itemName.startsWith("§")) {
-                itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
-            } else itemName
+            return getRarityName(getItemBaseRarityOrNull())
         }
+
+    /**
+     * Returns the item name with its full color, i.e. after recombobulation
+     */
+    val ItemStack.itemNameFullyRarityAware: String
+        get() {
+            return getRarityName(getItemRarityOrNull())
+        }
+
+    private fun ItemStack.getRarityName(rarity: LorenzRarity?): String =
+        if (rarity == null) itemName
+        else if (itemName.startsWith("§")) {
+            itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.color.getChatColor())
+        } else itemName
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
         if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null

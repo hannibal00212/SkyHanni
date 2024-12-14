@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameRarityAware
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameBaseRarityAware
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -700,7 +700,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        val name = stack.itemNameRarityAware
+        val name = stack.itemNameBaseRarityAware
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0
