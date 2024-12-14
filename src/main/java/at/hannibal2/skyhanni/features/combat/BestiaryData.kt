@@ -11,13 +11,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -27,7 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -78,7 +77,7 @@ object BestiaryData {
         "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$"
     )
 
-    private var display = emptyList<List<Any>>()
+    private var display: Renderable? = null
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val catList = mutableListOf<Category>()
@@ -96,9 +95,7 @@ object BestiaryData {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            config.position.renderStringsAndItems(
-                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data"
-            )
+            config.position.renderRenderable(display, posLabel = "Bestiary Data")
         }
     }
 
@@ -243,27 +240,23 @@ object BestiaryData {
         }
     }
 
-    private fun drawDisplay(): List<List<Any>> {
-        val newDisplay = mutableListOf<List<Any>>()
+    private fun drawDisplay(): Renderable {
+        val display = mutableListOf<Renderable>()
 
         if (!overallProgressEnabled) {
-            newDisplay.addAsSingletonList("§7Bestiary Data")
-            newDisplay.addAsSingletonList(" §cPlease enable Overall Progress")
-            newDisplay.addAsSingletonList(" §cUsing the Eye of Ender highlighted in red.")
-            return newDisplay
+            display.add(Renderable.string("§7Bestiary Data"))
+            display.add(Renderable.string(" §cPlease enable Overall Progress"))
+            display.add(Renderable.string(" §cUsing the Eye of Ender highlighted in red."))
+        } else {
+            init()
+            addCategories(display)
+            if (mobList.isNotEmpty()) {
+                addList(display)
+                addButtons(display)
+            }
         }
 
-        init()
-
-        addCategories(newDisplay)
-
-        if (mobList.isEmpty()) return newDisplay
-
-        addList(newDisplay)
-
-        addButtons(newDisplay)
-
-        return newDisplay
+        return Renderable.verticalContainer(display)
     }
 
     private fun sortMobList(): MutableList<BestiaryMob> {
@@ -281,26 +274,21 @@ object BestiaryData {
         return sortedMobList
     }
 
-    private fun addList(newDisplay: MutableList<List<Any>>) {
+    private fun addList(newDisplay: MutableList<Renderable>) {
         val sortedMobList = sortMobList()
 
-        newDisplay.addAsSingletonList("§7Bestiary Data")
+        newDisplay.add(Renderable.string("§7Bestiary Data"))
         for (mob in sortedMobList) {
             val isUnlocked = mob.actualRealTotalKill != 0.toLong()
             val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
-                newDisplay.add(
-                    buildList {
-                        add(" §7- ")
-                        add("${mob.name}: §cNot unlocked!")
-                    }
-                )
+                newDisplay.add(Renderable.string(" §7- ${mob.name}: §cNot unlocked!"))
                 continue
             }
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.addAsSingletonList(Renderable.hoverTips(text, tips) { true })
+            newDisplay.add(Renderable.hoverTips(text, tips) { true })
         }
     }
 
@@ -362,7 +350,7 @@ object BestiaryData {
         return text
     }
 
-    private fun addButtons(newDisplay: MutableList<List<Any>>) {
+    private fun addButtons(newDisplay: MutableList<Renderable>) {
         newDisplay.addButton(
             prefix = "§7Number Format: ",
             getName = FormatType.entries[config.numberFormat.ordinal].type, // todo: avoid ordinal
@@ -402,27 +390,27 @@ object BestiaryData {
         )
     }
 
-    private fun addCategories(newDisplay: MutableList<List<Any>>) {
+    private fun addCategories(newDisplay: MutableList<Renderable>) {
         if (catList.isNotEmpty()) {
-            newDisplay.addAsSingletonList("§7Category")
-            for (cat in catList) {
-                newDisplay.add(
-                    buildList {
-                        add(" §7- ${cat.name}§7: ")
-                        val element = when {
-                            cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
-                            cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                            cat.familiesFound < cat.totalFamilies ->
-                                "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
-                                    "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-
-                            else -> continue
-                        }
-                        add(element)
-                    }
-                )
-            }
+            newDisplay.add(Renderable.string("§7Category"))
+            newDisplay += catList.mapNotNull { buildCategoryLine(it) }
         }
+    }
+
+    private fun buildCategoryLine(cat: Category): Renderable? {
+        val list = buildList {
+            add(Renderable.string(" §7- ${cat.name}§7: "))
+            val element = when {
+                cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                cat.familiesFound < cat.totalFamilies ->
+                    "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
+                        "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                else -> return null
+            }
+            add(Renderable.string(element))
+        }
+        return Renderable.horizontalContainer(list)
     }
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {

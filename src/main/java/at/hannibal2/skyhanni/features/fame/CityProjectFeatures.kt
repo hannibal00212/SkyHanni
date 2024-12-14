@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -34,7 +33,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,7 +51,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<List<Any>>()
+    private var display: Renderable? = null
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -152,22 +151,23 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NEUInternalName, Int>) = buildList<List<Any>> {
-        addAsSingletonList("§7City Project Materials")
+    private fun buildList(materials: MutableMap<NEUInternalName, Int>): Renderable? {
+        val lines = mutableListOf<Renderable>()
+        lines.add(Renderable.string("§7City Project Materials"))
 
         if (materials.isEmpty()) {
-            addAsSingletonList("§cNo Materials to contribute.")
-            return@buildList
+            lines.add(Renderable.string("§cNo Materials to contribute."))
+            return Renderable.verticalContainer(lines)
         }
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
             val name = internalName.itemName
-            val list = mutableListOf<Any>()
-            list.add(" §7- ")
-            list.add(stack)
+            val line = mutableListOf<Renderable>()
+            line.add(Renderable.string(" §7- "))
+            line.add(Renderable.itemStack(stack))
 
-            list.add(
+            line.add(
                 Renderable.optionalLink(
                     "$name §ex${amount.addSeparators()}",
                     {
@@ -182,9 +182,11 @@ object CityProjectFeatures {
 
             val price = internalName.getPrice() * amount
             val format = price.shortFormat()
-            list.add(" §7(§6$format§7)")
-            add(list)
+            line.add(Renderable.string(" §7(§6$format§7)"))
+            lines.add(Renderable.horizontalContainer(line))
         }
+
+        return Renderable.verticalContainer(lines)
     }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NEUInternalName, Int>) {
@@ -215,7 +217,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
+        config.pos.renderRenderable(display, posLabel = "City Project Materials")
     }
 
     @SubscribeEvent
