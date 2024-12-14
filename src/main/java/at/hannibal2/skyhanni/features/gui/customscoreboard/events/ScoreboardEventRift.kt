@@ -20,6 +20,8 @@ object ScoreboardEventRift : ScoreboardEvent() {
         ScoreboardPattern.cluesPattern,
         ScoreboardPattern.barryProtestorsQuestlinePattern,
         ScoreboardPattern.barryProtestorsHandledPattern,
+        ScoreboardPattern.timeSlicedPattern,
+        ScoreboardPattern.bigDamagePattern,
     )
 
     override fun getDisplay() = patterns.allMatches(getSbLines())

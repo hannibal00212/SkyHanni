@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,10 +10,11 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.hitmanInventoryPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -24,7 +25,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object ChocolateFactoryHitmanSlots {
+object HitmanSlots {
 
     // <editor-fold desc="Patterns">
     /**
@@ -32,7 +33,7 @@ object ChocolateFactoryHitmanSlots {
      */
     private val slotOnCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hitman.slotoncooldown",
-        "§cEgg Slot"
+        "§cEgg Slot",
     )
 
     /**
@@ -40,7 +41,7 @@ object ChocolateFactoryHitmanSlots {
      */
     private val slotCostPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hitman.slotcost",
-        ".*§7Cost §6(?<cost>[\\d,]+) Coins.*"
+        ".*§7Cost §6(?<cost>[\\d,]+) Coins.*",
     )
 
     // </editor-fold>
@@ -57,7 +58,7 @@ object ChocolateFactoryHitmanSlots {
         val rabbitName: String,
         val claimedAt: SimpleTimeMark,
         var expiresAt: SimpleTimeMark? = null,
-        var claimedBySlot: Boolean = false
+        var claimedBySlot: Boolean = false,
     )
 
     @HandleEvent
@@ -121,7 +122,7 @@ object ChocolateFactoryHitmanSlots {
         if (!inInventory) return
         config.hitmanCostsPosition.renderRenderable(
             getSlotPriceRenderable(),
-            posLabel = "Hitman Slot Costs"
+            posLabel = "Hitman Slot Costs",
         )
     }
 
@@ -138,7 +139,7 @@ object ChocolateFactoryHitmanSlots {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
             item.hasDisplayName() && item.getLore().isNotEmpty() &&
-                slotCostPattern.matches(formLoreToSingleLine(item.getLore()))
+                slotCostPattern.matches(item.getSingleLineLore())
         }
         val ownedSlots = ChocolateFactoryAPI.hitmanCosts.size - leftToPurchase
 
@@ -159,8 +160,8 @@ object ChocolateFactoryHitmanSlots {
                 add(
                     Renderable.hoverTips(
                         "§aPurchased Slots§7: §a${slotPricesPaid.size}",
-                        listOf("§7Total Paid: §6${slotPricesPaid.sum().addSeparators()} Coins")
-                    )
+                        listOf("§7Total Paid: §6${slotPricesPaid.sum().addSeparators()} Coins"),
+                    ),
                 )
             }
 
@@ -177,9 +178,9 @@ object ChocolateFactoryHitmanSlots {
             add(
                 Renderable.hoverTips(
                     "§cRemaining Slots§7: §c${slotPricesLeft.size}",
-                    remainingSlotsText
-                )
+                    remainingSlotsText,
+                ),
             )
-        }
+        },
     )
 }

@@ -58,7 +58,7 @@ object RngMeterInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.rngMeterFloorName", "inventory.rngMeter.floorName")
         event.move(3, "inventory.rngMeterNoDrop", "inventory.rngMeter.noDrop")

@@ -349,7 +349,7 @@ object GhostTracker {
         override fun toString(): String = display
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
@@ -368,7 +368,7 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         fun migrateItem(oldData: JsonElement): JsonElement {

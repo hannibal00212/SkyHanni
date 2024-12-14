@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -49,15 +50,15 @@ object Translator {
         editedComponent.setChatStyle(clickStyle)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(55, "chat.translator", "chat.translator.translateOnClick")
     }
 
     var lastUserChange = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.languageCode.onToggle {
             if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle
             lastUserChange = SimpleTimeMark.now()
