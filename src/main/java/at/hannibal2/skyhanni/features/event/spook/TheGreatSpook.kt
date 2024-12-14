@@ -116,7 +116,7 @@ object TheGreatSpook {
         displayGreatSpookEnd = Renderable.string(timeLeftString)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
@@ -241,7 +241,7 @@ object TheGreatSpook {
         greatSpookEndTime = if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Great Spook")
 

@@ -56,7 +56,7 @@ object PocketSackInASackDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.pocketSackInASack", "inventory.pocketSackInASack")
     }
