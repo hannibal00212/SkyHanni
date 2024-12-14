@@ -84,30 +84,25 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val island = LorenzUtils.skyBlockIsland
 
             if (location == "Your Island") location = "Private Island"
-            when {
-                island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
-                    "${getVisitingName()}'s Island"
+            lastKnownDisplayStrings[LOCATION] = when (island) {
+                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
 
-                island == IslandType.GARDEN -> {
-                    if (location.startsWith("Plot: ")) {
-                        lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
-                    } else {
-                        lastKnownDisplayStrings[LOCATION] = "Personal Garden"
-                    }
+                IslandType.GARDEN -> {
+                    if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
+                    else "Personal Garden"
                 }
 
-                island == IslandType.GARDEN_GUEST -> {
-                    lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
-                    if (location.startsWith("Plot: ")) {
-                        lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
-                    } // "MelonKingDe's Garden (Plot: 8)"
+                IslandType.GARDEN_GUEST -> {
+                    // Ensure getVisitingName() is used to generate the full string
+                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
+                    else "${getVisitingName()}'s Garden"
                 }
 
-                location != "None" && location != "invalid" -> {
-                    lastKnownDisplayStrings[LOCATION] = location
-                }
+                else -> location.takeIf { it != "None" && it != "invalid" }
+                    ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
-            lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
+            // Only display None if we don't have a last known area
+            lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
         },
     ),
 
@@ -193,7 +188,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             if (fruit == "") profile =
                 lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
             else profile += fruit
-
+            
             lastKnownDisplayStrings[PROFILE] = profile
             profile
         },
@@ -269,19 +264,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     // Dynamic-only
     STACKING(
         {
-            // Logic for getting the currently held stacking enchant is from Skytils, except for getExtraAttributes() which they got from BiscuitDevelopment
-
-            fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
-                return if (item == null || !item.hasTagCompound()) {
-                    null
-                } else item.getSubCompound("ExtraAttributes", false)
-            }
-
+            // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
             val itemName = itemInHand?.displayName?.removeColor().orEmpty()
-
-            val extraAttributes = getExtraAttributes(itemInHand)
-
+            val extraAttributes = itemInHand?.extraAttributes
+          
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
                 for (level in levels.indices) {
