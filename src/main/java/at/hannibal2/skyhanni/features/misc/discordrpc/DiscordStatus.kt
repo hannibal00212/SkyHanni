@@ -91,30 +91,26 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val island = LorenzUtils.skyBlockIsland
 
             if (location == "Your Island") location = "Private Island"
-            when (island) {
-                IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
-                    "${getVisitingName()}'s Island"
+            lastKnownDisplayStrings[LOCATION] = when (island) {
+                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
 
                 IslandType.GARDEN -> {
-                    if (location.startsWith("Plot: ")) {
-                        lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
-                    } else {
-                        lastKnownDisplayStrings[LOCATION] = "Personal Garden"
-                    }
+                    if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
+                    else "Personal Garden"
                 }
 
                 IslandType.GARDEN_GUEST -> {
-                    lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
-                    if (location.startsWith("Plot: ")) {
-                        lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
-                    } // "MelonKingDe's Garden (Plot: 8)"
+                    // Ensure getVisitingName() is used to generate the full string
+                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
+                    else "${getVisitingName()}'s Garden"
                 }
 
-                else -> if (location != "None" && location != "invalid") {
-                    lastKnownDisplayStrings[LOCATION] = location
-                }
+                else -> location.takeIf { it != "None" && it != "invalid" }
+                    ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
-            lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
+
+            // Only display None if we don't have a last known area
+            lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true }?: "None"
         },
     ),
 
