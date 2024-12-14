@@ -15,20 +15,33 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
 
+/**
+ * TODO: Skins still need to be loaded from the API.
+ *
+ */
 data class PetData(
     val petItem: NEUInternalName? = null, // The internal name of the pet, e.g., `RABBIT;5`
     val skinItem: NEUInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
     val heldItem: NEUInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     val cleanName: String? = null, // The clean name of the pet, e.g., `Rabbit`
+    val skinSymbol: String? = null, // The symbol of the skin of the pet, e.g., §d ✦
     val rarity: LorenzRarity? = null, // The rarity of the pet, e.g., `COMMON`
     val level: Int? = null, // The current level of the pet as an integer, e.g., `100`
     val xp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
 ) {
     val displayName = petItem?.itemName
+    val formattedName = "${rarity?.chatColorCode}$cleanName"
+    // private val skinName = skinItem?.itemName?.takeIf { it.isNotEmpty() }?.let { " §r$it" }.orEmpty()
 
     // Please god only use this for UI, not for comparisons
-    private val skinName = skinItem?.itemName?.takeIf { it.isNotEmpty() }?.let { " §r$it" }.orEmpty()
-    val userFriendlyName = if (this.isInitialized()) "§r§7[Lvl $level] §r${rarity?.chatColorCode}$cleanName$skinName" else ""
+    fun getUserFriendlyName(
+        includeLevel: Boolean = true,
+        includeSkin: Boolean = true,
+    ): String {
+        val levelString = if (includeLevel) "§7[Lvl $level] §r" else ""
+        val skinString = if (includeSkin) (skinSymbol.orEmpty()) else ""
+        return "§r$levelString$formattedName$cleanName$skinString"
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other !is PetData) return false
@@ -36,6 +49,7 @@ data class PetData(
             this.skinItem == other.skinItem &&
             this.heldItem == other.heldItem &&
             this.cleanName == other.cleanName &&
+            this.skinSymbol == other.skinSymbol &&
             this.rarity == other.rarity &&
             this.level == other.level &&
             this.xp == other.xp

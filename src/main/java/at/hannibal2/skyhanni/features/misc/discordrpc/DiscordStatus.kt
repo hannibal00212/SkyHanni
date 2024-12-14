@@ -71,7 +71,8 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-private fun getPetDisplay(): String = CurrentPetAPI.currentPet?.userFriendlyName ?: "No pet equipped"
+private fun getPetDisplay(): String = CurrentPetAPI.currentPet?.getUserFriendlyName()
+    ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
