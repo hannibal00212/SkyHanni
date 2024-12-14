@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -63,7 +64,7 @@ object RenderData {
     }
 
     // TODO find better spot for this
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(17, "chroma.chromaDirection") { element ->
             ConfigUtils.migrateIntToEnum(element, ChromaConfig.Direction::class.java)

@@ -119,6 +119,10 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Coop (?:§.)*.*",
     ),
+    ISLAND(
+        // language=RegExp
+        "(?:§.)*Island",
+    ),
     MINION(
         // language=RegExp
         "(?:§.)*Minions: (?:§.)*(?<used>\\d+)(?:§.)*/(?:§.)*(?<max>\\d+)",

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -35,8 +36,8 @@ object HypixelBazaarFetcher {
     private var failedAttempts = 0
     private var nextFetchIsManual = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bazaar Data Fetcher from API")
 
         val data = listOf(
