@@ -383,8 +383,8 @@ object PestAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenAPI.inGarden()) {

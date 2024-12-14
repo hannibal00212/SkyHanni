@@ -91,8 +91,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
-    fun onToggle(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.highlight,
             config.color,

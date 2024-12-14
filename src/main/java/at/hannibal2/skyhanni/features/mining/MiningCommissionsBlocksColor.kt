@@ -130,8 +130,8 @@ object MiningCommissionsBlocksColor {
         }
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
@@ -152,8 +152,8 @@ object MiningCommissionsBlocksColor {
         replaceBlocksMapCache = mutableMapOf()
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")

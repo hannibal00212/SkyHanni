@@ -74,8 +74,8 @@ object TrophyFishDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
                 enabled,
