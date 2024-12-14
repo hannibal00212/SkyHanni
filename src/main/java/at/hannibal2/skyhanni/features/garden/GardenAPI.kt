@@ -207,7 +207,7 @@ object GardenAPI {
         ChatUtils.chat("Manually reset all crop speed data!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         GardenBestCropTime.reset()
     }

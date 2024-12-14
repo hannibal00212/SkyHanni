@@ -254,7 +254,7 @@ object BlazeSlayerDaggerHelper {
         config.positionBottom.renderString(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeDaggers", "slayer.blazes.hellion.daggers")
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")

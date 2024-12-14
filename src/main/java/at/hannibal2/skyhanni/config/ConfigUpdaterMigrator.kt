@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
@@ -30,7 +30,7 @@ object ConfigUpdaterMigrator {
         val oldVersion: Int,
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
-    ) : LorenzEvent() {
+    ) : SkyHanniEvent() {
 
         init {
             dynamicPrefix.entries
@@ -177,7 +177,7 @@ object ConfigUpdaterMigrator {
                     it.add("lastVersion", JsonPrimitive(i + 1))
                 },
                 i, 0, dynamicPrefix
-            ).also { it.postAndCatch() }
+            ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
             logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")

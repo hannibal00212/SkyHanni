@@ -20,7 +20,7 @@ object TrackerManager {
     var dirty = false
     var commandEditTrackerSuccess = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.misc.tracker.hideCheapItems
         ConditionalUtils.onToggle(config.alwaysShowBest, config.minPrice, config.enabled) {

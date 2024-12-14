@@ -621,7 +621,7 @@ object ComposterOverlay {
         DAY("Day", 60 * 60 * 24),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
@@ -634,8 +634,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {
