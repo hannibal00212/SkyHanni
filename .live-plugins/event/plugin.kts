@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 val skyhanniEvent = "at.hannibal2.skyhanni.api.event.SkyHanniEvent"
 val handleEvent = "HandleEvent"
+val eventType = "eventType"
 
 registerInspection(HandleEventInspectionKotlin())
 
@@ -30,6 +31,12 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 val hasEventAnnotation = function.annotationEntries.any { it.shortName!!.asString() == handleEvent }
                 val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
                     ?.any { it.fqName?.asString() == skyhanniEvent } ?: false
+                val hasEventType = function.annotationEntries
+                    .find { it.shortName!!.asString() == handleEvent }
+                    ?.valueArguments
+                    ?.find { it.getArgumentName()?.asName?.asString() == eventType }
+                    ?.getArgumentExpression()
+                    ?.text != null
 
                 if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
                     holder.registerProblem(
@@ -37,7 +44,7 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                         "Event handler function should be annotated with @HandleEvent",
                         HandleEventQuickFix()
                     )
-                } else if (!isEvent && hasEventAnnotation) {
+                } else if (!isEvent && !hasEventType && hasEventAnnotation) {
                     holder.registerProblem(
                         function,
                         "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent",

@@ -38,12 +38,25 @@ object SkyHanniEvents {
 
     @Suppress("UNCHECKED_CAST")
     private fun registerMethod(method: Method, instance: Any) {
-        if (method.parameterCount != 1) return
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        val event = method.parameterTypes[0]
-        if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
-        listeners.getOrPut(event as Class<SkyHanniEvent>) { EventListeners(event) }
-            .addListener(method, instance, options)
+        val parameterTypes = method.parameterTypes
+
+        // Check if the method has no parameters and an eventType is provided
+        if (parameterTypes.isEmpty()) {
+            val eventType = options.eventType.java
+            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+                .addListener(method, instance, options)
+            return
+        }
+
+        // Handle methods with parameters (original behavior)
+        if (parameterTypes.size == 1) {
+            val eventType = parameterTypes[0]
+            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+                .addListener(method, instance, options)
+        }
     }
 
     @SubscribeEvent

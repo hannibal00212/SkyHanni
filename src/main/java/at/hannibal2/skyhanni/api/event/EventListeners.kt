@@ -18,18 +18,6 @@ class EventListeners private constructor(val name: String, private val isGeneric
     )
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
-        require(method.parameterCount == 1)
-        val generic: Class<*>? = if (isGeneric) {
-            ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
-                method.genericParameterTypes[0],
-                GenericSkyHanniEvent::class.java.typeParameters[0],
-            ) ?: error(
-                "Generic event handler type parameter is not present in " +
-                    "event class hierarchy for type ${method.genericParameterTypes[0]}",
-            )
-        } else {
-            null
-        }
         val name = "${method.declaringClass.name}.${method.name}${
             method.parameterTypes.joinTo(
                 StringBuilder(),
@@ -39,7 +27,44 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 transform = Class<*>::getTypeName,
             )
         }"
-        listeners.add(Listener(name, createEventConsumer(name, instance, method), options, generic))
+
+        val eventConsumer: (Any) -> Unit = when (method.parameterCount) {
+            0 -> {
+                // Handle methods with no parameters
+                if (options.eventType == SkyHanniEvent::class) {
+                    throw IllegalArgumentException("Method ${method.name} has no parameters but no eventType was provided in the annotation.")
+                }
+                // Verify the provided eventType
+                val eventType = options.eventType.java
+                if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+                    throw IllegalArgumentException("eventType in @HandleEvent must extend SkyHanniEvent. Provided: $eventType")
+                }
+                { method.invoke(instance) }
+            }
+            1 -> {
+                // Handle methods with a single parameter (original behavior)
+                if (!SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
+                    throw IllegalArgumentException("Method ${method.name} parameter must be a subclass of SkyHanniEvent.")
+                }
+                { event -> method.invoke(instance, event) }
+            }
+            else -> {
+                throw IllegalArgumentException("Method ${method.name} must have either 0 or 1 parameters.")
+            }
+        }
+
+        val generic: Class<*>? = if (isGeneric) {
+            val genericType = method.genericParameterTypes.getOrNull(0)
+                ?: error("Method ${method.name} does not have a generic parameter type.")
+            ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
+                genericType,
+                GenericSkyHanniEvent::class.java.typeParameters[0],
+            ) ?: error(
+                "Generic event handler type parameter is not present in " +
+                    "event class hierarchy for type $genericType",
+            )
+        } else null
+        listeners.add(Listener(name, eventConsumer, options, generic))
     }
 
     /**

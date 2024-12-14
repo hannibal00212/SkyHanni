@@ -68,8 +68,13 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             }
 
             if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
-                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
-                if (!skyHanniEvent!!.isAssignableFrom(firstParameter)) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
+                val handleEventAnnotation = function.annotations.find { it.shortName.asString() == "HandleEvent" }
+                val eventType = handleEventAnnotation?.arguments?.find { it.name?.asString() == "eventType" }?.value
+                val isFirstParameterProblem = firstParameter == null && eventType == null
+                val notAssignable = firstParameter != null && !skyHanniEvent!!.isAssignableFrom(firstParameter)
+
+                if (isFirstParameterProblem || notAssignable) {
                     warnings.add("Function in $className must have an event assignable from $skyHanniEvent because it is annotated with @HandleEvent")
                 }
             }
