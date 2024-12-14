@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,8 +26,8 @@ object ParkourWaypointSaver {
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return

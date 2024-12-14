@@ -80,7 +80,7 @@ object DeepCavernsGuide {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -170,7 +170,7 @@ object DeepCavernsGuide {
 
     fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(38, "mining.deepCavernsParkour", "mining.deepCavernsGuide")
     }

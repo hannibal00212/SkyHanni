@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -129,7 +130,7 @@ object CruxTalismanDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.showBonuses) { update() }
     }
