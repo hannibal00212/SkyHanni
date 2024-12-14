@@ -93,7 +93,7 @@ object QuiverWarning {
 
     private fun inInstance() = DungeonAPI.inDungeon() || KuudraAPI.inKuudra()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
     }
