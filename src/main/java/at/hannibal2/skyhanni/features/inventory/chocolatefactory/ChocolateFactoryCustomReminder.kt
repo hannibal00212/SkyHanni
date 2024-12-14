@@ -148,7 +148,7 @@ object ChocolateFactoryCustomReminder {
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(70, "inventory.chocolateFactory.customReminder.position", Position::migrate)
     }
