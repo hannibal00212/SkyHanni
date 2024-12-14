@@ -463,7 +463,7 @@ object ItemUtils {
     val ItemStack.itemNameRarityAware: String
         get() {
             val rarity = getItemRarityOrNull()
-            return if (rarity == null) return itemName
+            return if (rarity == null) itemName
             else if (itemName.startsWith("§")) {
                 itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
             } else itemName
