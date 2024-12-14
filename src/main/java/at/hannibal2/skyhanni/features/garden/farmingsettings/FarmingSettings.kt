@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farmingsettings
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -52,7 +53,7 @@ object FarmingSettings {
 
     private fun isShortcutGUIEnabled() = GardenAPI.inGarden() && config.shortcutGUI
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
         event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")
