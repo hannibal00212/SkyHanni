@@ -60,7 +60,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
@@ -359,7 +358,7 @@ object ItemDisplayOverlayFeatures {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)

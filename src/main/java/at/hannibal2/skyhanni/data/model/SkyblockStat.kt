@@ -182,7 +182,7 @@ enum class SkyblockStat(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
         }

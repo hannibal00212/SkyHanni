@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.SkyHanniNotification
@@ -31,7 +32,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
@@ -53,6 +53,7 @@ object ItemUtils {
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()
@@ -551,8 +552,8 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
         if (missingRepoItems.isNotEmpty()) {

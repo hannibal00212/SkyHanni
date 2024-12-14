@@ -30,6 +30,7 @@ net.minecraft.network.play.server.SPacketBlockChange net.minecraft.network.play.
 net.minecraft.network.play.server.SPacketChat net.minecraft.network.play.server.S02PacketChat
 net.minecraft.network.play.server.SPacketCloseWindow net.minecraft.network.play.server.S2EPacketCloseWindow
 net.minecraft.network.play.server.SPacketCollectItem net.minecraft.network.play.server.S0DPacketCollectItem
+net.minecraft.network.play.server.SPacketConfirmTransaction net.minecraft.network.play.server.S32PacketConfirmTransaction
 net.minecraft.network.play.server.SPacketDestroyEntities net.minecraft.network.play.server.S13PacketDestroyEntities
 net.minecraft.network.play.server.SPacketEffect net.minecraft.network.play.server.S28PacketEffect
 net.minecraft.network.play.server.SPacketEntity net.minecraft.network.play.server.S14PacketEntity
