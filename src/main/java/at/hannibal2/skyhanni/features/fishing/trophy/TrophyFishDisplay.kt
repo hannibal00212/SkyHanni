@@ -74,8 +74,8 @@ object TrophyFishDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
                 enabled,
@@ -143,7 +143,7 @@ object TrophyFishDisplay {
         val internalName = getInternalName(rawName)
         row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
 
-        val recentlyDroppedRarity = recentlyDroppedTrophies.getOrNull(internalName).takeIf { config.highlightNew.get() }
+        val recentlyDroppedRarity = recentlyDroppedTrophies[internalName]?.takeIf { config.highlightNew.get() }
 
         for (rarity in TrophyRarity.entries) {
             val amount = data[rarity] ?: 0
@@ -177,7 +177,7 @@ object TrophyFishDisplay {
         HideCaught.DIAMOND -> TrophyRarity.DIAMOND
     }
 
-    private fun getOrder(trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
+    private fun getOrder(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
         if (config.reverseOrder.get()) it.reversed() else it
     }
 

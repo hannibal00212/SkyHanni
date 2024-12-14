@@ -436,8 +436,8 @@ object MiningAPI {
         pickobulusWaitingForBlock = false
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!inCustomMiningIsland()) {
             event.addIrrelevant("not in a mining island")

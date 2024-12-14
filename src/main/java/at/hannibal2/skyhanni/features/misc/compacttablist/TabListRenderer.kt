@@ -220,7 +220,7 @@ object TabListRenderer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }
