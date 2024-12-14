@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.EssenceItemUtils
-import at.hannibal2.skyhanni.utils.EssenceItemUtils.getEssencePrices
+import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -479,7 +479,7 @@ object EstimatedItemValueCalculator {
     private fun calculateStarPrice(
         internalName: NEUInternalName,
         inputStars: Int,
-    ): Pair<EssenceItemUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
+    ): Pair<EssenceUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
             val tier = (internalName.getKuudraTier() ?: 0) - 1
@@ -489,17 +489,17 @@ object EstimatedItemValueCalculator {
 
             val removed = internalName.removeKuudraTier().asString()
             var maxStars = 0
-            var finalPrice: EssenceItemUtils.EssenceUpgradePrice? = null
+            var finalPrice: EssenceUtils.EssenceUpgradePrice? = null
 
             val tiers = mutableMapOf<NEUInternalName, Int>()
 
-            for ((id, _) in EssenceItemUtils.itemPrices) {
+            for ((id, _) in EssenceUtils.itemPrices) {
                 if (!id.contains(removed)) continue
                 tiers[id] = (id.getKuudraTier() ?: 0) - 1
 
             }
             for ((id, _) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id].orEmpty()
+                val prices = EssenceUtils.itemPrices[id].orEmpty()
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 
@@ -511,9 +511,8 @@ object EstimatedItemValueCalculator {
 
             finalPrice to maxStars
         } else {
-            if (totalStars == 0) return null
-
-            val prices = internalName.getEssencePrices() ?: return null
+            val prices = internalName.getEssencePrices()
+            if (totalStars == 0 || prices == null) return null
 
             (getPriceFor(prices, totalStars) ?: return null) to prices.size
         }
@@ -523,10 +522,10 @@ object EstimatedItemValueCalculator {
     }
 
     private fun getPriceFor(
-        prices: Map<Int, EssenceItemUtils.EssenceUpgradePrice>,
+        prices: Map<Int, EssenceUtils.EssenceUpgradePrice>,
         totalStars: Int,
-    ): EssenceItemUtils.EssenceUpgradePrice? {
-        var totalEssencePrice: EssenceItemUtils.EssencePrice? = null
+    ): EssenceUtils.EssenceUpgradePrice? {
+        var totalEssencePrice: EssenceUtils.EssencePrice? = null
         var totalCoinPrice = 0L
         val totalItemPrice = mutableMapOf<NEUInternalName, Int>()
 
@@ -543,7 +542,7 @@ object EstimatedItemValueCalculator {
             }
         }
         totalEssencePrice ?: return null
-        return EssenceItemUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
+        return EssenceUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
     }
 
     private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
@@ -575,12 +574,12 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
-        val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
-
+    private fun getMapAndTotalFromExtra(
+        extraList: List<NEUInternalName>
+    ): Pair<Double, MutableMap<String, Double>> {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
-        for (internalName in drillUpgrades) {
+        for (internalName in extraList) {
             val name = internalName.itemName
             val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
 
@@ -588,6 +587,14 @@ object EstimatedItemValueCalculator {
             val format = price.shortFormat()
             map[" $name §7(§6$format§7)"] = price
         }
+        return totalPrice to map
+    }
+
+
+    private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+        val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
+
+        val (totalPrice, map) = getMapAndTotalFromExtra(drillUpgrades)
         if (map.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
@@ -655,16 +662,7 @@ object EstimatedItemValueCalculator {
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
-        var totalPrice = 0.0
-        val map = mutableMapOf<String, Double>()
-        for (internalName in abilityScrolls) {
-            val name = internalName.itemName
-            val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
-
-            totalPrice += price
-            val format = price.shortFormat()
-            map[" $name §7(§6$format§7)"] = price
-        }
+        val (totalPrice, map) = getMapAndTotalFromExtra(abilityScrolls)
         if (map.isNotEmpty()) {
             list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
