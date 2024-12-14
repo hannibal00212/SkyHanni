@@ -155,7 +155,7 @@ object ArmorStackDisplay {
         stackSymbol = newStackSymbol
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(65, "combat.stackDisplayConfig", "combat.armorStackDisplay")
     }
