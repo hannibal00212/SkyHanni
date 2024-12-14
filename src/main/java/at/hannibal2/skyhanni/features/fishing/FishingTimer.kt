@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -130,7 +130,7 @@ object FishingTimer {
     private fun handle() {
         if (lastSeaCreatureFished.passedSince() > 2.seconds) return
         val name = lastNameFished ?: return
-        val mobs = recentMobs.toSet().filter { it.name == name && it !in mobDespawnTime }
+        val mobs = recentMobs.filter { it.name == name && it !in mobDespawnTime }
             .sortedBy { it.baseEntity.distanceToPlayer() }
             .take(mobsToFind)
         if (mobs.isEmpty()) return
@@ -160,8 +160,8 @@ object FishingTimer {
         updateInfo()
     }
 
-    @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (config.manualResetTimer.isKeyClicked()) {
@@ -229,7 +229,7 @@ object FishingTimer {
         return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Barn Fishing Timer")
         event.addIrrelevant {
@@ -263,7 +263,7 @@ object FishingTimer {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "fishing.barnTimer", "fishing.barnTimer.enabled")
         event.move(3, "fishing.barnTimerAlertTime", "fishing.barnTimer.alertTime")

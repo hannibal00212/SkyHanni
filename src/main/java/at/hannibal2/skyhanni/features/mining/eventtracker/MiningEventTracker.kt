@@ -124,6 +124,9 @@ object MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // Option to opt out of data sending
+        if (!config.allowDataSharing) return
+
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
@@ -228,7 +231,7 @@ object MiningEventTracker {
                     ChatUtils.chat(
                         "§cFailed loading Mining Event data!\n" +
                             "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
-                        replaceSameMessage = true,
+                        onlySendOnce = true
                     )
                 } else {
                     ErrorManager.logErrorWithData(
@@ -248,7 +251,7 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(29, "mining.miningEvent.showType") { element ->
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element
