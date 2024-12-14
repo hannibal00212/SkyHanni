@@ -91,11 +91,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val island = LorenzUtils.skyBlockIsland
 
             if (location == "Your Island") location = "Private Island"
-            when {
-                island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
+            when (island) {
+                IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
                     "${getVisitingName()}'s Island"
 
-                island == IslandType.GARDEN -> {
+                IslandType.GARDEN -> {
                     if (location.startsWith("Plot: ")) {
                         lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
                     } else {
@@ -103,14 +103,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     }
                 }
 
-                island == IslandType.GARDEN_GUEST -> {
+                IslandType.GARDEN_GUEST -> {
                     lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
                     if (location.startsWith("Plot: ")) {
                         lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
                     } // "MelonKingDe's Garden (Plot: 8)"
                 }
 
-                location != "None" && location != "invalid" -> {
+                else -> if (location != "None" && location != "invalid") {
                     lastKnownDisplayStrings[LOCATION] = location
                 }
             }
