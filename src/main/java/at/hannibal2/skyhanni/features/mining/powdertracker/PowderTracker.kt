@@ -223,7 +223,7 @@ object PowderTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
             tracker.update()
@@ -256,7 +256,7 @@ object PowderTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.powderTrackerConfig", "mining.powderTracker")
         event.transform(8, "#profile.powderTracker") { old -> old.asJsonObject.get("0") }

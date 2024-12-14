@@ -63,7 +63,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toSpecialColor()
+            blocks.values.lastOrNull { it.displayText.contains("Chest") }?.color = config.lockedChestColor.toSpecialColor()
         }
     }
 
@@ -101,7 +101,7 @@ object DungeonHighlightClickedBlocks {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
