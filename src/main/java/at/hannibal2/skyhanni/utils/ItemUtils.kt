@@ -460,14 +460,12 @@ object ItemUtils {
             return getInternalNameOrNull()?.itemName ?: "<null>"
         }
 
-    val ItemStack.itemNameRecombobulatorAware: String
+    val ItemStack.itemNameRarityAware: String
         get() {
-            return if (isRecombobulated()) {
-                val rarity = getItemRarityOrNull()
-                if (rarity == null) itemName
-                else if (itemName.startsWith("§")) {
-                    itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
-                } else itemName
+            val rarity = getItemRarityOrNull()
+            return if (rarity == null) return itemName
+            else if (itemName.startsWith("§")) {
+                itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
             } else itemName
         }
 
