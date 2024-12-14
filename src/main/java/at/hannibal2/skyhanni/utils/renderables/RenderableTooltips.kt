@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.drawGradientRect
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -77,38 +77,38 @@ object RenderableTooltips {
         val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = -4,
             right = tooltipTextWidth + 2,
             bottom = -3,
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 3,
             right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 4,
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -4,
             top = -3,
             right = -3,
             bottom = tooltipHeight + 3,
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = tooltipTextWidth + 2,
             top = -3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 3,
         )
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = -3 + 1,
             right = -3 + 1,
@@ -116,7 +116,7 @@ object RenderableTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = tooltipTextWidth + 1,
             top = -3 + 1,
             right = tooltipTextWidth + 2,
@@ -124,7 +124,7 @@ object RenderableTooltips {
             startColor = borderColorStart,
             endColor = borderColorEnd
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = -3,
             right = tooltipTextWidth + 2,
@@ -132,7 +132,7 @@ object RenderableTooltips {
             startColor = borderColorStart,
             endColor = borderColorStart
         )
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 2,
             right = tooltipTextWidth + 2,
