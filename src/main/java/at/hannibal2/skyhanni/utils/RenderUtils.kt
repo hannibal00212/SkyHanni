@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
-import at.hannibal2.skyhanni.utils.RenderUtils.drawRoundRect
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
