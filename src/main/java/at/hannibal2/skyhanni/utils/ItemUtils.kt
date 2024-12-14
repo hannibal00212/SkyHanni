@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -460,6 +458,17 @@ object ItemUtils {
                 return it.getAttributeName()
             }
             return getInternalNameOrNull()?.itemName ?: "<null>"
+        }
+
+    val ItemStack.itemNameRecombobulatorAware: String
+        get() {
+            return if (isRecombobulated()) {
+                val rarity = getItemRarityOrNull()
+                if (rarity == null) itemName
+                else if (itemName.startsWith("§")) {
+                    itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
+                } else itemName
+            } else itemName
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {

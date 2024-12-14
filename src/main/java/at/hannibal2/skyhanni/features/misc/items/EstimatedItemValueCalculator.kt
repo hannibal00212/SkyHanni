@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameRecombobulatorAware
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -700,13 +701,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        val name = if (stack.isRecombobulated()) {
-            val rarity = stack.getItemRarityOrNull()
-            if (rarity == null) stack.itemName
-            else if (stack.itemName.startsWith("§")) {
-                stack.itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
-            } else stack.itemName
-        } else stack.itemName
+        val name = stack.itemNameRecombobulatorAware
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0
