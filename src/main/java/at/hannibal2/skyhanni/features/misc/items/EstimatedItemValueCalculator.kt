@@ -121,18 +121,16 @@ object EstimatedItemValueCalculator {
         ::addEnchantments,
     )
 
-    val farmingForDummies = "FARMING_FOR_DUMMIES".toInternalName()
-    val etherwarpConduit = "ETHERWARP_CONDUIT".toInternalName()
-    val etherwarpMerger = "ETHERWARP_MERGER".toInternalName()
-    val fumingPotatoBook = "FUMING_POTATO_BOOK".toInternalName()
-    val hotPotatoBook = "HOT_POTATO_BOOK".toInternalName()
-    val silex = "SIL_EX".toInternalName()
-    val transmissionTuner = "TRANSMISSION_TUNER".toInternalName()
-    val manaDisintegrator = "MANA_DISINTEGRATOR".toInternalName()
+    private val farmingForDummies = "FARMING_FOR_DUMMIES".toInternalName()
+    private val etherwarpConduit = "ETHERWARP_CONDUIT".toInternalName()
+    private val etherwarpMerger = "ETHERWARP_MERGER".toInternalName()
+    private val fumingPotatoBook = "FUMING_POTATO_BOOK".toInternalName()
+    private val hotPotatoBook = "HOT_POTATO_BOOK".toInternalName()
+    private val silex = "SIL_EX".toInternalName()
+    private val transmissionTuner = "TRANSMISSION_TUNER".toInternalName()
+    private val manaDisintegrator = "MANA_DISINTEGRATOR".toInternalName()
 
-    val kuudraUpgradeTiers = listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")
-
-    fun getTotalPrice(stack: ItemStack): Double = EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first
+    fun getTotalPrice(stack: ItemStack): Double = calculate(stack, mutableListOf()).first
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
@@ -711,52 +709,25 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    // TODO repo
-    private val hasAlwaysScavenger = listOf(
-        "CRYPT_DREADLORD_SWORD".toInternalName(),
-        "ZOMBIE_SOLDIER_CUTLASS".toInternalName(),
-        "CONJURING_SWORD".toInternalName(),
-        "EARTH_SHARD".toInternalName(),
-        "ZOMBIE_KNIGHT_SWORD".toInternalName(),
-        "SILENT_DEATH".toInternalName(),
-        "ZOMBIE_COMMANDER_WHIP".toInternalName(),
-        "ICE_SPRAY_WAND".toInternalName(),
-    )
-
-    private val hasAlwaysReplenish = listOf(
-        "ADVANCED_GARDENING_HOE".toInternalName(),
-        "ADVANCED_GARDENING_AXE".toInternalName(),
-    )
-
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
-        // todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-
-        @Suppress("PropertyWrapping")
-        val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
-        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
-
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
-                continue
+            val isAlwaysActive = EstimatedItemValue.itemValueCalculationData.alwaysActiveEnchants.entries.any {
+                it.key == rawName && it.value.level == rawLevel && it.value.internalNames.contains(internalName)
             }
-
-            if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
-                continue
-            }
+            if (isAlwaysActive) continue
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName in onlyTierOnePrices) {
+            if (rawName in EstimatedItemValue.itemValueCalculationData.onlyTierOnePrices) {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
@@ -766,7 +737,7 @@ object EstimatedItemValueCalculator {
                 }
                 level = 1
             }
-            if (rawName in onlyTierFivePrices) {
+            if (rawName in EstimatedItemValue.itemValueCalculationData.onlyTierFivePrices) {
                 when (rawLevel) {
                     6 -> multiplier = 2
                     7 -> multiplier = 4
@@ -781,7 +752,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in tieredEnchants) level = 1
+            if (rawName in EstimatedItemValue.itemValueCalculationData.tieredEnchants) level = 1
 
             val enchantmentName = "$rawName;$level".uppercase().toInternalName()
             val itemStack = enchantmentName.getItemStackOrNull() ?: continue
