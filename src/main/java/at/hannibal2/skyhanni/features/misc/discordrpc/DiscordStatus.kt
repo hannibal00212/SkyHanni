@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,8 +29,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -259,18 +258,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     // Dynamic-only
     STACKING({
-        // Logic for getting the currently held stacking enchant is from Skytils, except for getExtraAttributes() which they got from BiscuitDevelopment
-
-        fun getExtraAttributes(item: ItemStack?): NBTTagCompound? {
-            return if (item == null || !item.hasTagCompound()) {
-                null
-            } else item.getSubCompound("ExtraAttributes", false)
-        }
+        // Logic for getting the currently held stacking enchant is from Skytils
 
         val itemInHand = InventoryUtils.getItemInHand()
         val itemName = itemInHand?.displayName?.removeColor().orEmpty()
-
-        val extraAttributes = getExtraAttributes(itemInHand)
 
         fun getProgressPercent(amount: Int, levels: List<Int>): String {
             var percent = "MAXED"
@@ -287,6 +278,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             }
             return percent
         }
+
+        val extraAttributes = itemInHand?.extraAttributes
 
         var stackingReturn = AutoStatus.STACKING.placeholderText
         if (extraAttributes != null) {

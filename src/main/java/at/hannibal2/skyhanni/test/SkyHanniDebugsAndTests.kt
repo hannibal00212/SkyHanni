@@ -634,7 +634,7 @@ object SkyHanniDebugsAndTests {
 //        println("offset: $offset")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")

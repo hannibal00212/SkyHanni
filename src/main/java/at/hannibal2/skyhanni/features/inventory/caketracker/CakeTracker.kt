@@ -168,7 +168,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.maxHeight) {
             lastKnownCakeDataHash = 0
