@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradePrice
@@ -86,7 +87,7 @@ object AnitaExtraFarmingFortune {
         levelPrice = data.levelPrice
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
     }

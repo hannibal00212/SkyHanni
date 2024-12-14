@@ -391,7 +391,7 @@ object BitsAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && profileStorage != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "#profile.bits.bitsToClaim", "#profile.bits.bitsAvailable")
     }
