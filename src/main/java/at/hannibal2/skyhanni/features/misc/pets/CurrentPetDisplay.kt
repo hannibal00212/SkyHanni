@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -90,7 +91,7 @@ object CurrentPetDisplay {
         config.displayPos.renderString(PetAPI.currentPet, posLabel = "Current Pet")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")

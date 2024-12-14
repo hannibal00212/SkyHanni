@@ -18,7 +18,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.InputStreamReader
 import java.io.Reader
 
@@ -71,7 +70,7 @@ object TestExportTools {
         return fromJson(category, reader)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
         event.move(4, "dev.debug.copyNBTData", "dev.debug.copyItemData")
