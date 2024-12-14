@@ -123,6 +123,11 @@ public class GUIConfig {
     public boolean realTimeFormatToggle = false;
 
     @Expose
+    @ConfigOption(name = "Real Time Show Seconds", desc = "Include the current seconds in the Real Time display.")
+    @ConfigEditorBoolean
+    public boolean realTimeShowSeconds = true;
+
+    @Expose
     @ConfigLink(owner = GUIConfig.class, field = "realTime")
     public Position realTimePosition = new Position(10, 10, false, true);
 

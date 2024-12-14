@@ -195,7 +195,7 @@ object SkillProgress {
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.enabled,

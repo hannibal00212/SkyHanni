@@ -182,7 +182,7 @@ object EnderNodeTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
             tracker.update()
@@ -190,7 +190,7 @@ object EnderNodeTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
         event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
