@@ -647,43 +647,6 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    /**
-     * Accepts a single line to print.
-     * This line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<Renderable>", ReplaceWith(""))
-    fun Position.renderSingleLineWithItems(
-        list: List<Any?>,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-        renderRenderable(
-            Renderable.horizontalContainer(
-                list.mapNotNull { Renderable.fromAny(it) },
-            ),
-            posLabel = posLabel,
-        )
-        // TODO Future write that better
-    }
-
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
-        GlStateManager.translate(0f, offsetY.toFloat(), 0F)
-        var offsetX = 0
-        Renderable.withMousePosition(x, y) {
-            for (any in line) {
-                val renderable = Renderable.fromAny(any, itemScale = itemScale)
-                    ?: throw RuntimeException("Unknown render object: $any")
-                renderable.render(offsetX, offsetY)
-                offsetX += renderable.width
-                GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
-            }
-        }
-        GlStateManager.popMatrix()
-        return offsetX
-    }
-
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
