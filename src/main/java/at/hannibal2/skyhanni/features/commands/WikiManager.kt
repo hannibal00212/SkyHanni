@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -26,7 +25,7 @@ object WikiManager {
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
     }

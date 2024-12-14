@@ -306,8 +306,8 @@ object HoppityEggLocator {
         return distToLine / disMultiplierSquared
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
 
         if (!isEnabled()) {
