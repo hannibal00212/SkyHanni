@@ -82,7 +82,7 @@ object FishingHookDisplay {
         config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(70, "fishing.fishingHookDisplay.position", Position::migrate)
     }
