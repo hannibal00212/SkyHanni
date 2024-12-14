@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -10,14 +10,18 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
-import org.jetbrains.annotations.NotNull;
 
-public class ChocolateFactoryRabbitWarningConfig {
+public class ChocolateFactoryStrayRabbitWarningConfig {
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "Warn when stray rabbits of a certain tier appear.")
+    @ConfigOption(name = "Warning Level", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorDropdown
     public StrayTypeEntry rabbitWarningLevel = StrayTypeEntry.ALL;
+
+    @Expose
+    @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
+    @ConfigEditorColour
+    public String inventoryHighlightColor = LorenzColor.RED.toConfigColor();
 
     @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +

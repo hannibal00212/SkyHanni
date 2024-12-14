@@ -91,7 +91,7 @@ object EnchantParser {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
