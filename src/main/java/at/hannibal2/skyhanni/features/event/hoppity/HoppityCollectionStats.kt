@@ -804,7 +804,7 @@ object HoppityCollectionStats {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val bp = "inventory.chocolateFactory"
         mapOf(

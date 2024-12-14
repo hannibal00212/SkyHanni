@@ -505,6 +505,7 @@ object ComposterOverlay {
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
+                replaceSameMessage = true
             )
             return
         }
@@ -620,7 +621,7 @@ object ComposterOverlay {
         DAY("Day", 60 * 60 * 24),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
@@ -633,8 +634,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {
