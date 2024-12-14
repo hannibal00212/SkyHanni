@@ -51,7 +51,7 @@ object ProfileStorageData {
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
@@ -72,7 +72,7 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     @HandleEvent
@@ -122,7 +122,7 @@ object ProfileStorageData {
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     @HandleEvent
@@ -130,7 +130,7 @@ object ProfileStorageData {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     @SubscribeEvent

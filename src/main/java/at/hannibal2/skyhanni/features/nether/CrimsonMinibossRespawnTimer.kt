@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -186,7 +187,7 @@ object CrimsonMinibossRespawnTimer {
         currentAreaBoss = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Crimson Isle Miniboss")
         event.addIrrelevant {
