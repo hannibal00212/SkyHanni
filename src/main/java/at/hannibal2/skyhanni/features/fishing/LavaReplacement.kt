@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LavaReplacement {
@@ -31,7 +30,7 @@ object LavaReplacement {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled, config.everywhere, config.islands) {
             update()
@@ -62,7 +61,7 @@ object LavaReplacement {
         fun inIsland() = island.isInIsland()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(65, "fishing.lavaReplacement.onlyInCrimsonIsle", "fishing.lavaReplacement.everywhere") { element ->
             JsonPrimitive(!element.asBoolean)

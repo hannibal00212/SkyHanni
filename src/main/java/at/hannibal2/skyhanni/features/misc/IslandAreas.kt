@@ -254,7 +254,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.pathfinder.color) {
             targetNode?.let {

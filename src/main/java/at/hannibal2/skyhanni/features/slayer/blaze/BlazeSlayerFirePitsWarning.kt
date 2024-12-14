@@ -70,7 +70,7 @@ object BlazeSlayerFirePitsWarning {
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
         )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.firePitsWarning", "slayer.blazes.firePitsWarning")
     }

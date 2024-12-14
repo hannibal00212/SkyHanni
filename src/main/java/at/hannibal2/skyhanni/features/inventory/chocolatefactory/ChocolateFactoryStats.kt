@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -203,7 +204,7 @@ object ChocolateFactoryStats {
         put(ChocolateFactoryStat.PER_DAY, "§ePer Day: §6${perDay.addSeparators()}")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(42, "event.chocolateFactory.statsDisplayList") { element ->
             addToDisplayList(element, "TIME_TOWER", "TIME_TO_PRESTIGE")
