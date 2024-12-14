@@ -17,7 +17,6 @@ data class ItemsJson(
 
 data class ItemValueCalculationDataJson(
     @Expose @SerializedName("always_active_enchants") val alwaysActiveEnchants: Map<String, AlwaysActiveEnchantJson>,
-    @Expose @SerializedName("tiered_enchants") val tieredEnchants: List<String>,
     @Expose @SerializedName("only_tier_one_prices") val onlyTierOnePrices: List<String>,
     @Expose @SerializedName("only_tier_five_prices") val onlyTierFivePrices: List<String>,
 )

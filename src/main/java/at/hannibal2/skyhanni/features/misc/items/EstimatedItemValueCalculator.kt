@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
@@ -752,7 +753,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in EstimatedItemValue.itemValueCalculationData.tieredEnchants) level = 1
+            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".uppercase().toInternalName()
             val itemStack = enchantmentName.getItemStackOrNull() ?: continue
