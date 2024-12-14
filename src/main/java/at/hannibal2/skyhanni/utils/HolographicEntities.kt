@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
+import at.hannibal2.skyhanni.utils.compat.createWitherSkeleton
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.entity.RendererLivingEntity
@@ -131,7 +132,7 @@ object HolographicEntities {
     val wither = HolographicBase(EntityWither(null))
     val enderman = HolographicBase(EntityEnderman(null))
     val mooshroom = HolographicBase(EntityMooshroom(null))
-    val witherSkeleton = HolographicBase(EntitySkeleton(null).also { it.skeletonType = 1 })
+    val witherSkeleton = HolographicBase(createWitherSkeleton(null))
     val cow = HolographicBase(EntityCow(null))
     val pig = HolographicBase(EntityPig(null))
     val giant = HolographicBase(EntityGiantZombie(null))

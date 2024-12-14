@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class ConfigLoadEvent : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+object ConfigLoadEvent : SkyHanniEvent()

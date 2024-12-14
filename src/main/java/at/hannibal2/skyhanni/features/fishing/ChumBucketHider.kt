@@ -54,7 +54,7 @@ object ChumBucketHider {
         // Second text line
         if (name.contains("/10 §aChums")) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity.toSet()) {
+            for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.cancel()
@@ -70,7 +70,7 @@ object ChumBucketHider {
             }
         ) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity.toSet()) {
+            for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.cancel()
@@ -80,7 +80,7 @@ object ChumBucketHider {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }

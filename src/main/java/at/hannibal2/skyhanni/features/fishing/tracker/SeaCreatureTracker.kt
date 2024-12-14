@@ -168,7 +168,7 @@ object SeaCreatureTracker {
         return { it in items }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
