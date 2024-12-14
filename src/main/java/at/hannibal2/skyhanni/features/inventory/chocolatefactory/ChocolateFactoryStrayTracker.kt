@@ -327,7 +327,7 @@ object ChocolateFactoryStrayTracker {
         return newElement
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(58, "chocolateFactory.strayTracker.straysCaught") { element ->
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)
