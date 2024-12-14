@@ -29,15 +29,26 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
         val visitor = object : KtVisitorVoid() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val hasEventAnnotation = function.annotationEntries.any { it.shortName!!.asString() == handleEvent }
+
+                // Check if the function's parameter is a SkyHanniEvent or its subtype
                 val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
                     ?.any { it.fqName?.asString() == skyhanniEvent } ?: false
-                val hasEventType = function.annotationEntries
-                    .find { it.shortName!!.asString() == handleEvent }
-                    ?.valueArguments
-                    ?.find { it.getArgumentName()?.asName?.asString() == eventType }
-                    ?.getArgumentExpression()
-                    ?.text != null
 
+                // Find the annotation entry
+                val annotationEntry = function.annotationEntries
+                    .find { it.shortName!!.asString() == handleEvent }
+
+                // Check if the annotation specifies the eventType explicitly or as a positional parameter
+                val hasEventType = annotationEntry?.valueArguments
+                    ?.any { argument ->
+                        // Check if it is a named parameter for `eventType`
+                        argument.getArgumentName()?.asName?.asString() == "eventType" ||
+                            // Check if it is a positional argument (first argument)
+                            (annotationEntry.valueArguments.indexOf(argument) == 0 &&
+                                argument.getArgumentExpression()?.text != null)
+                    } ?: false
+
+                // Validate function annotation and parameters
                 if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
                     holder.registerProblem(
                         function,

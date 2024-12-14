@@ -7,6 +7,11 @@ import kotlin.reflect.KClass
 @Target(AnnotationTarget.FUNCTION)
 annotation class HandleEvent(
     /**
+     * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
+     */
+    val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
+
+    /**
      * If the event should only be received while on SkyBlock.
      */
     val onlyOnSkyblock: Boolean = false,
@@ -32,13 +37,7 @@ annotation class HandleEvent(
      * If the event is cancelled & receiveCancelled is true, then the method will still invoke.
      */
     val receiveCancelled: Boolean = false,
-
-    /**
-     * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
-     */
-    val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class
 ) {
-
     companion object {
         const val HIGHEST = -2
         const val HIGH = -1
