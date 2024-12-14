@@ -489,7 +489,7 @@ object GardenNextJacobContest {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (display != null) {
+        if (display == null) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
             config.pos.renderRenderable(display, posLabel = "Next Jacob Contest")
