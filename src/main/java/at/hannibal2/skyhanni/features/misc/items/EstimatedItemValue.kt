@@ -138,7 +138,7 @@ object EstimatedItemValue {
         cache.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
@@ -247,7 +247,7 @@ object EstimatedItemValue {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")

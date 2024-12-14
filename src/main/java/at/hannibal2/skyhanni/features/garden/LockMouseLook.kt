@@ -146,8 +146,8 @@ object LockMouseLook {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mouse Lock")
 
         if (!lockedMouse) {

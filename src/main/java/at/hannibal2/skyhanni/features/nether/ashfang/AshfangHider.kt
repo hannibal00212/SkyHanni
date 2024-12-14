@@ -40,7 +40,7 @@ object AshfangHider {
         if (event.entity.getWholeInventory().any { it?.name == "Glowstone" }) event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ashfang.hideDamageSplash", "crimsonIsle.ashfang.hide.damageSplash")
         event.move(2, "ashfang.hideParticles", "crimsonIsle.ashfang.hide.particles")

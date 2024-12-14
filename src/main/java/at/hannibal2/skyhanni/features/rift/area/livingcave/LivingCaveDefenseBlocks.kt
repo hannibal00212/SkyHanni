@@ -174,7 +174,7 @@ object LivingCaveDefenseBlocks {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
     }
