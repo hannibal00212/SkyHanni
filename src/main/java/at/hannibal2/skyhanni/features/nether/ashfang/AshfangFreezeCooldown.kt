@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -45,7 +46,7 @@ object AshfangFreezeCooldown {
 
     fun isCurrentlyFrozen() = unfrozenTime.isInFuture()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ashfang.freezeCooldown", "crimsonIsle.ashfang.freezeCooldown")
         event.move(2, "ashfang.freezeCooldownPos", "crimsonIsle.ashfang.freezeCooldownPos")

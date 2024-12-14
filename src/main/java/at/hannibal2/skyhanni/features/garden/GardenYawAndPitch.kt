@@ -66,7 +66,7 @@ object GardenYawAndPitch {
                 (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
             )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(18, "garden.yawPitchDisplay.showEverywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }

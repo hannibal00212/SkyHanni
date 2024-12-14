@@ -192,7 +192,7 @@ object HarpFeatures {
         event.stackTip = KeyboardManager.getKeyName(keyCode).take(3)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")

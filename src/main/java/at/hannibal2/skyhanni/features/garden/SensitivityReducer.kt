@@ -79,7 +79,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
@@ -182,8 +182,8 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Sensitivity Reducer")
 
         if (!GardenAPI.inGarden()) {
