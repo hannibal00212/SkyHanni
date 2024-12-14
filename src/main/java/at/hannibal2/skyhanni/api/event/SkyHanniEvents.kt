@@ -53,7 +53,7 @@ object SkyHanniEvents {
         disabledHandlerInvokers = data.disabledInvokers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {

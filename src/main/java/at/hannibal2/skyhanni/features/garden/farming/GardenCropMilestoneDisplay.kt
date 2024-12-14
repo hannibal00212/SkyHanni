@@ -59,7 +59,7 @@ object GardenCropMilestoneDisplay {
     private var lastMushWarnedLevel = -1
     private var previousMushNext = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.bestShowMaxedNeeded,
@@ -338,7 +338,7 @@ object GardenCropMilestoneDisplay {
 
     private fun isEnabled() = GardenAPI.inGarden() && config.progress
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.cropMilestoneProgress", "garden.cropMilestones.progress")
         event.move(3, "garden.cropMilestoneWarnClose", "garden.cropMilestones.warnClose")
