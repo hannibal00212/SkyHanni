@@ -30,22 +30,21 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         val eventConsumer: (Any) -> Unit = when (method.parameterCount) {
             0 -> {
-                // Handle methods with no parameters
-                if (options.eventType == SkyHanniEvent::class) {
-                    throw IllegalArgumentException("Method ${method.name} has no parameters but no eventType was provided in the annotation.")
+                require(options.eventType != SkyHanniEvent::class) {
+                    "Method ${method.name} has no parameters but no eventType was provided in the annotation."
                 }
-                // Verify the provided eventType
                 val eventType = options.eventType.java
-                if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-                    throw IllegalArgumentException("eventType in @HandleEvent must extend SkyHanniEvent. Provided: $eventType")
+                require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+                    "eventType in @HandleEvent must extend SkyHanniEvent. Provided: $eventType"
                 }
-                { method.invoke(instance) }
+                ;
+                { _: Any -> method.invoke(instance) }
             }
             1 -> {
-                // Handle methods with a single parameter (original behavior)
-                if (!SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
-                    throw IllegalArgumentException("Method ${method.name} parameter must be a subclass of SkyHanniEvent.")
+                require(SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
+                    "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
                 }
+                ;
                 { event -> method.invoke(instance, event) }
             }
             else -> {
