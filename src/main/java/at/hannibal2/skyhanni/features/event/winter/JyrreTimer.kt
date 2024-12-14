@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -27,7 +28,7 @@ object JyrreTimer {
         "event.winter.drank.jyrre",
         "§aYou drank a §r§6Refined Bottle of Jyrre §r§aand gained §r§b\\+300✎ Intelligence §r§afor §r§b60 minutes§r§a!"
     )
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private var duration = 0.seconds
 
     @HandleEvent
@@ -36,8 +37,8 @@ object JyrreTimer {
     }
 
     private fun resetDisplay() {
-        if (display.isEmpty()) return
-        display = if (config.showInactive) drawDisplay() else emptyList()
+        if (display == null) return
+        display = if (config.showInactive) drawDisplay() else null
         duration = 0.seconds
     }
 
@@ -50,14 +51,14 @@ object JyrreTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.pos.renderRenderables(display, posLabel = "Refined Jyrre Timer")
+        config.pos.renderRenderable(display, posLabel = "Refined Jyrre Timer")
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        if (display.isNotEmpty() && !config.showInactive && duration <= 0.seconds) {
+        if (display != null && !config.showInactive && duration <= 0.seconds) {
             resetDisplay()
             return
         }
@@ -67,10 +68,10 @@ object JyrreTimer {
 
     private val displayIcon by lazy { "REFINED_BOTTLE_OF_JYRRE".toInternalName().getItemStack() }
 
-    fun drawDisplay(): MutableList<Renderable> {
+    fun drawDisplay(): Renderable {
         duration -= 1.seconds
 
-        return mutableListOf<Renderable>().apply {
+        val list = mutableListOf<Renderable>().apply {
             add(Renderable.itemStack(displayIcon))
             add(Renderable.string("§aJyrre Boost: "))
 
@@ -81,6 +82,8 @@ object JyrreTimer {
                 add(Renderable.string("§b$format"))
             }
         }
+
+        return Renderable.horizontalContainer(list)
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
