@@ -24,6 +24,8 @@
     + Displays slots with an active cooldown.
 + Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 + Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
++ Added Hitman statistics to Chocolate Factory stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2991)
+    + Allows to view remaining time for full and 28 claimable slots.
 
 #### Inventory Features
 
@@ -112,12 +114,17 @@
     +  Added a setting to adjust the expiration warning time.
 + Improved Slayer Miniboss features. - Empa (https://github.com/hannibal002/SkyHanni/pull/2081)
 + Added the ability to remove people from the Carry Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/2829)
++ Added Venom Shot attacks to the Arachne chat filter. - BearySuperior (https://github.com/hannibal002/SkyHanni/pull/3032)
 
 #### Mining Improvements
 
 + Made the "You need a stronger tool to mine ..." chat filter hide every such message, not just Crystal Hollows gemstones. - Luna (https://github.com/hannibal002/SkyHanni/pull/2724)
 + Added an option to draw a line to your golden or diamond goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2717)
 + Added the Mining Event Display to Outside Skyblock Features. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2947)
++ Added an option to disable sharing mining event data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3055)
+    + Improved accuracy when more users share mining event data.
+    + Data shared includes current event type, start, and end times.
++ Limited the "Mining Event Data can't be loaded from the server" error message to once in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3055)
 
 #### Diana Improvements
 
@@ -162,6 +169,7 @@
 + The optimal speed for Rancher's Boots is now automatically set when clicking on the wrong speed message in chat, eliminating the need to enter it manually. - Luna (https://github.com/hannibal002/SkyHanni/pull/2963)
 + Added an option to send the optimal speed warning even when not wearing Rancher's Boots. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2859)
 + Added a Pest Traps tab widget to the Tab Widget Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/2984)
++ Updated Pest chat and GUI to indicate Pests Widget is disabled when displaying pests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3022)
 
 #### Event Improvements
 
@@ -183,6 +191,7 @@
     + You can change this option using `/sh tracker search`.
 + Added the Minecraft version to the mod file name. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2941)
 + Added a warning for empty messages left behind by Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
++ Added option to hide seconds in the Real Time GUI. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2979)
 
 ### Fixes
 
@@ -217,6 +226,7 @@
 + Fixed an error in the Personal Compactor Overlay. - Empa (https://github.com/hannibal002/SkyHanni/pull/2888)
 + Fixed AH Price Website feature not URL encoding the search. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2952)
 + Fixed the Fisherman Attribute abbreviation being incorrect. - Empa (https://github.com/hannibal002/SkyHanni/pull/2950)
++ Fixed background colors for UltraRareBook & Guardian Reminder. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3050)
 
 #### Combat Fixes
 
@@ -239,6 +249,8 @@
 + Fixed Mineshaft RoomId missing in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2946)
 + Potentially fixed Custom Scoreboard sometimes not showing Kuudra Lines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3006)
 + Fixed a Custom Scoreboard error while waiting for the Mineshaft Queue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3036)
++ Fixed Custom Scoreboard errors from the new Rift update. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3046)
++ Fixed Custom Scoreboard's player count to exclude offline players in co-ops and guest islands. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3026)
 
 #### Hoppity Fixes
 
@@ -285,6 +297,7 @@
 + Fixed Anita's medal display appearing in the Visitor inventory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3007)
 + Specified in visitor config that Maeve's dialogue is not hidden in the "Hide Chat" option. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3002)
 + Fixed the next visitor timer not decreasing on pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3027)
++ Fixed chat error spam from Garden Composter Overlay. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3037)
 
 #### Crimson Isle Fixes
 
@@ -377,6 +390,8 @@
 + Fixed incorrect personal best gain calculations. - Chissl (https://github.com/hannibal002/SkyHanni/pull/2996)
 + Fixed the `/playtimedetailed` breakdown being sorted incorrectly. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3021)
 + Fixed an issue where item and material stashes together would break Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
++ Fixed intermittent NEU rendering issues. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3053)
++ Fixed collection tracker to recognize the current collection. - nopo (https://github.com/hannibal002/SkyHanni/pull/3049)
 
 ### Technical Details
 
@@ -480,6 +495,14 @@
 + Converted some `LorenzEvents` into `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3025)
 + Converted some events to `GenericSkyHanniEvent`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2753)
 + The auto updater now searches for JAR files that include the correct Minecraft version in their names. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2941)
++ Changed `TimeLimitedCache` to extend `MutableMap` instead of `Iterator`. - Empa (https://github.com/hannibal002/SkyHanni/pull/2729)
++ Optimized sulphur skitter performance by caching `AxisAlignedBB` calculations and using more `LorenzVec`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3038)
++ Added option to send a chat message only once. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3055)
++ Introduced "Island" widget type. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3026)
++ Added more preprocessing for version 1.12. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3043)
++ Enhanced `InventoryUtils.clickSlot` to support click type and mode. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2962)
++ Relocated some events to specific sub-packages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3041)
++ Converted additional `LorenzEvents` to `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3039)
 
 ## Version 0.27
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -179,8 +180,8 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
             for (slot in slots) {

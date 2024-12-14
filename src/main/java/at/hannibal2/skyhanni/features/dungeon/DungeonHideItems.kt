@@ -194,7 +194,7 @@ object DungeonHideItems {
         movingSkeletonSkulls.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
         event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")

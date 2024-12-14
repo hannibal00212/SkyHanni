@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerChatModifier {
@@ -64,7 +63,7 @@ object PlayerChatModifier {
         return string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")

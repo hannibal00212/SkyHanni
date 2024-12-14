@@ -79,8 +79,6 @@
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
     <ID>RepoPatternRegexTest:AdvancedPlayerList.kt$AdvancedPlayerList$by RepoPattern.pattern( "misc.compacttablist.advanced.level", ".*\\[(?&lt;level&gt;.*)] §r(?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "crystal", "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!" )</ID>
-    <ID>RepoPatternRegexTest:ArachneChatMessageHider.kt$ArachneChatMessageHider$by patternGroup.pattern( "spawn", "§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)" )</ID>
     <ID>RepoPatternRegexTest:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "allowedinventories", "Auctions Browser|Manage Auctions|Auctions: \".*\"?", )</ID>
     <ID>RepoPatternRegexTest:AuctionHouseCopyUnderbidPrice.kt$AuctionHouseCopyUnderbidPrice$by patternGroup.pattern( "price", "§7(?:Buy it now|Starting bid|Top bid): §6(?&lt;coins&gt;[0-9,]+) coins", )</ID>
@@ -122,7 +120,6 @@
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "border", "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" )</ID>
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "health", " {3}§r§7§8\\+§a.* §c❤ Health" )</ID>
     <ID>RepoPatternRegexTest:CompactBingoChat.kt$CompactBingoChat$by patternGroup.pattern( "strength", " {3}§r§7§8\\+§a. §c❁ Strength" )</ID>
-    <ID>RepoPatternRegexTest:CrimsonIsleReputationHelper.kt$CrimsonIsleReputationHelper$by RepoPattern.pattern( "crimson.reputation.tablist", " §r§[cdea].*", )</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.floor", "§7Tier: §eFloor (?&lt;floor&gt;[IV]+)")</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.master", ".*Master.*")</ID>
     <ID>RepoPatternRegexTest:CroesusChestTracker.kt$CroesusChestTracker$by patternGroup.pattern("chest.state.opened", "§8Opened Chest:.*")</ID>
@@ -282,6 +279,7 @@
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
     <ID>RepoPatternRegexTest:VisitorListener.kt$VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
     <ID>ReturnCount:AnitaMedalProfit.kt$AnitaMedalProfit$private fun readItem(slot: Int, item: ItemStack, table: MutableList&lt;DisplayTableEntry&gt;)</ID>
+    <ID>ReturnCount:ArachneChatMessageHider.kt$ArachneChatMessageHider$private fun shouldHide(message: String): Boolean</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt$BingoNextStepHelper$private fun readDescription(description: String): NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
     <ID>ReturnCount:ChatPeek.kt$ChatPeek$@JvmStatic fun peek(): Boolean</ID>

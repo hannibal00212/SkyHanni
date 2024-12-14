@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.compat.getUsedItem
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -24,7 +25,7 @@ object ItemClickData {
             packet is C08PacketPlayerBlockPlacement -> {
                 if (packet.placedBlockDirection != 255) {
                     val position = packet.position.toLorenzVec()
-                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.stack).post()
+                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post()
                 } else {
                     ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
                 }

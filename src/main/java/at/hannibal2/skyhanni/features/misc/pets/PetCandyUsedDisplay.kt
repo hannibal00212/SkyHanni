@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetCandyUsed
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PetCandyUsedDisplay {
@@ -37,7 +36,7 @@ object PetCandyUsedDisplay {
         event.drawSlotText(x, y, stackTip, .9f)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(22, "misc.petCandyUsed", "misc.petCandy.showCandy")
     }

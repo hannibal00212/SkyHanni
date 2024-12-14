@@ -415,7 +415,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }
