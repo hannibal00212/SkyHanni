@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -26,8 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -188,7 +187,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             if (fruit == "") profile =
                 lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
             else profile += fruit
-            
+
             lastKnownDisplayStrings[PROFILE] = profile
             profile
         },
@@ -268,7 +267,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             val itemInHand = InventoryUtils.getItemInHand()
             val itemName = itemInHand?.displayName?.removeColor().orEmpty()
             val extraAttributes = itemInHand?.extraAttributes
-          
+
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"
                 for (level in levels.indices) {
