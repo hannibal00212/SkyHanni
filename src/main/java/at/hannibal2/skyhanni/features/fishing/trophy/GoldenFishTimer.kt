@@ -305,8 +305,8 @@ object GoldenFishTimer {
         removeGoldenFish()
     }
 
-    @SubscribeEvent
-    fun onDebugData(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Golden Fish Timer")
         if (!isEnabled()) {
             event.addIrrelevant("Not Enabled")

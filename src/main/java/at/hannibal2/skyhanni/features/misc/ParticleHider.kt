@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -45,7 +46,7 @@ object ParticleHider {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.hideBlazeParticles", "misc.particleHiders.hideBlazeParticles")
         event.move(3, "misc.hideEndermanParticles", "misc.particleHiders.hideEndermanParticles")
