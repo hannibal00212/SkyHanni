@@ -700,7 +700,13 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        val name = internalName.itemName
+        val name = if (stack.isRecombobulated()) {
+            val rarity = stack.getItemRarityOrNull()
+            if (rarity == null) stack.itemName
+            else if (stack.itemName.startsWith("§")) {
+                stack.itemName.replaceFirst(Regex("§[0-9a-f]"), rarity.chatColorCode)
+            } else stack.itemName
+        } else stack.itemName
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0
