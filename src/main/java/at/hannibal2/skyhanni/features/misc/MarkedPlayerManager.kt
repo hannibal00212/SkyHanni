@@ -156,7 +156,7 @@ object MarkedPlayerManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTablistUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
