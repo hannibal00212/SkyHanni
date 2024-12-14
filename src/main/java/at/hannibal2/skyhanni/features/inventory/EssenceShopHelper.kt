@@ -113,7 +113,7 @@ object EssenceShopHelper {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
         if (!essenceShopPattern.matches(event.inventory.name)) return
-        infoItemStack.let { event.replace(it) }
+        infoItemStack?.let { event.replace(it) }
     }
 
     @SubscribeEvent

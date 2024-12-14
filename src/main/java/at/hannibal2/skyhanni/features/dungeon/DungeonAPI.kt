@@ -341,8 +341,8 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {

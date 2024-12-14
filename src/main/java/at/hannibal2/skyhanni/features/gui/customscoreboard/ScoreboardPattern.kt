@@ -823,6 +823,19 @@ object ScoreboardPattern {
         "Protestors handled: §b\\d+\\/\\d+",
     )
 
+    val timeSlicedPattern by riftSb.pattern(
+        "timesliced",
+        "§c§lTIME SLICED!",
+    )
+
+    /**
+     * REGEX-TEST:  Big damage in: §d2m 59s
+     */
+    val bigDamagePattern by riftSb.pattern(
+        "bigdamage",
+        "\\s*Big damage in: §d[\\w\\s]+",
+    )
+
     private val carnivalSb = scoreboardGroup.group("carnival")
 
     /**

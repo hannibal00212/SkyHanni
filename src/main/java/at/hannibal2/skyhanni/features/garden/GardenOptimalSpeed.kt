@@ -130,7 +130,7 @@ object GardenOptimalSpeed {
         optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
             ConditionalUtils.onToggle(value.getConfig()) {
@@ -217,7 +217,7 @@ object GardenOptimalSpeed {
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
         event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")

@@ -155,7 +155,7 @@ object DungeonCopilot {
         config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
         event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")
