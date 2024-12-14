@@ -111,7 +111,7 @@ object RiftTimer {
         changes[System.currentTimeMillis()] = diffFormat
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.percentage,

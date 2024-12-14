@@ -800,7 +800,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {

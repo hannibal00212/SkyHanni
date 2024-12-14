@@ -55,8 +55,8 @@ object RiftBloodEffigies {
 
     private fun cleanMap() = (0..5).associateWith { SimpleTimeMark.farPast() }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Rift Blood Effigies")
 
         if (!isEnabled()) {
@@ -164,7 +164,7 @@ object RiftBloodEffigies {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inStillgoreChateau()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
     }
