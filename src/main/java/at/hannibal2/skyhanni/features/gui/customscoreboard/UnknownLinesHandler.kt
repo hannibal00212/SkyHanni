@@ -142,6 +142,8 @@ object UnknownLinesHandler {
         SbPattern.cluesPattern,
         SbPattern.barryProtestorsQuestlinePattern,
         SbPattern.barryProtestorsHandledPattern,
+        SbPattern.timeSlicedPattern,
+        SbPattern.bigDamagePattern,
         SbPattern.carnivalPattern,
         SbPattern.carnivalTasksPattern,
         SbPattern.carnivalTokensPattern,

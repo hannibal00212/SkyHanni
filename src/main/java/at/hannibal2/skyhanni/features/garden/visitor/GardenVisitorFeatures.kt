@@ -679,8 +679,8 @@ object GardenVisitorFeatures {
         return false
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Visitor Stats")
 
         if (!GardenAPI.inGarden()) {
@@ -707,7 +707,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
         event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")
