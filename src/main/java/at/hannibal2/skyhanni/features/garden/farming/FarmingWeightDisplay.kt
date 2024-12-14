@@ -86,7 +86,7 @@ object FarmingWeightDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
         event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")

@@ -151,7 +151,7 @@ object BasketWaypoints {
         isActive = newIsActive
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.pathfind.onToggle {
             if (config.pathfind.get() && isActive && isEnabled()) startPathfind()
@@ -189,7 +189,7 @@ object BasketWaypoints {
 
     private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(13, "event.halloweenBasket", "event.lobbyWaypoints.halloweenBasket")
     }
