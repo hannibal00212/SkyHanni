@@ -396,7 +396,7 @@ object FarmingFortuneDisplay {
 
     fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")

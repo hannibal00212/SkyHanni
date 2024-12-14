@@ -61,7 +61,7 @@ object HideMobNames {
 
         val name = entity.name
         val id = entity.entityId
-        if (lastMobName.getOrNull(id) == name) {
+        if (lastMobName[id] == name) {
             if (id in mobNamesHidden) {
                 event.cancel()
             }

@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
-public class ChocolateUpgradeWarningsConfig {
+public class ChocolateFactoryUpgradeWarningsConfig {
     @Expose
     @ConfigOption(name = "Upgrade Warning", desc = "Chat notification when you have a chocolate factory upgrade available to purchase.")
     @ConfigEditorBoolean

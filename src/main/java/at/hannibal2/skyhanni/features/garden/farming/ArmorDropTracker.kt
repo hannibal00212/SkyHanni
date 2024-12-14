@@ -163,7 +163,7 @@ object ArmorDropTracker {
         return currentArmorDropChance
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingArmorDropsEnabled", "garden.farmingArmorDrop.enabled")
         event.move(3, "garden.farmingArmorDropsHideChat", "garden.farmingArmorDrop.hideChat")

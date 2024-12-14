@@ -104,7 +104,7 @@ object UserLuckBreakdown {
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
 
-            in validItemSlots -> event.replace(null)
+            in validItemSlots -> event.remove()
 
             in invalidItemSlots -> {
                 if (event.originalItem.item == limboID.getItemStack().item) return

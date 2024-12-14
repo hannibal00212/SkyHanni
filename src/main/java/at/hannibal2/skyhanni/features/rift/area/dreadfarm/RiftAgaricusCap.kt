@@ -92,7 +92,7 @@ object RiftAgaricusCap {
 
     fun isEnabled() = RiftAPI.inRift() && inArea && config.agaricusCap
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.dreadfarmConfig", "rift.area.dreadfarm")
     }
