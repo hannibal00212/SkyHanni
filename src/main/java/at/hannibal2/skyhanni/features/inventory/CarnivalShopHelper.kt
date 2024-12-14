@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
@@ -44,8 +45,8 @@ object CarnivalShopHelper {
     private var shopSpecificInfoItemStack: ItemStack? = null
 
     /**
-     * REGEX-TEST: Your Tokens: §a1,234,567
-     * REGEX-TEST: Your Tokens: §a0
+     * REGEX-TEST: §7Your Tokens: §a1,234,567
+     * REGEX-TEST: §7Your Tokens: §a0
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",
@@ -86,7 +87,7 @@ object CarnivalShopHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || repoEventShops.isEmpty() || event.slot != CUSTOM_STACK_LOCATION) return
         tryReplaceShopSpecificStack(event)
@@ -107,7 +108,7 @@ object CarnivalShopHelper {
         overviewInfoItemStack.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->

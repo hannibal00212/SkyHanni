@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -37,7 +39,7 @@ enum class SkyblockStat(
     HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>.*)", " §c❣ Health Regen §f(?<value>.*)"),
     VITALITY("§4♨", " Vitality: §r§4♨(?<value>.*)", " §4♨ Vitality §f(?<value>.*)"),
     MENDING("§a☄", " Mending: §r§a☄(?<value>.*)", " §a☄ Mending §f(?<value>.*)"),
-    TRUE_DEFENCE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
+    TRUE_DEFENSE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>.*)", " §eⓈ Swing Range §f(?<value>.*)"),
     SPEED("§f✦", " Speed: §r§f✦(?<value>.*)", " §f✦ Speed §f(?<value>.*)"), // TODO add the way sba did get it (be careful with 500+ Speed)
     SEA_CREATURE_CHANCE("§3α", " Sea Creature Chance: §r§3α(?<value>.*)", " §3α Sea Creature Chance §f(?<value>.*)"),
@@ -154,7 +156,7 @@ enum class SkyblockStat(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onTabList(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
             val type = if (event.isWidget(TabWidget.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST
@@ -170,6 +172,11 @@ enum class SkyblockStat(
                 entry.lastSource = type
                 break // Exit the inner loop once a match is found
             }
+        }
+
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.move(69, "#profile.stats.TRUE_DEFENCE", "#profile.stats.TRUE_DEFENSE")
         }
     }
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
@@ -74,14 +75,13 @@ object GardenNextJacobContest {
      * REGEX-TEST: Late Summer, Year 351
      * REGEX-TEST: Autumn, Year 351
      */
-
     val monthPattern by patternGroup.pattern(
         "month",
         "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§(e○|6☘) §7(?<crop>.*)"
+        "§(?:e○|6☘) §7(?<crop>.*)"
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
@@ -98,8 +98,8 @@ object GardenNextJacobContest {
     var fetchedFromElite = false
     private var isSendingContests = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
         if (!GardenAPI.inGarden()) {
@@ -137,7 +137,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()
@@ -278,7 +278,7 @@ object GardenNextJacobContest {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val savedContests = SkyHanniMod.jacobContestsData.contestTimes
         val year = savedContests.firstNotNullOfOrNull {
@@ -641,7 +641,7 @@ object GardenNextJacobContest {
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
         event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")

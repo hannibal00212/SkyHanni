@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
@@ -69,6 +70,16 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    /**
+     * REGEX-TEST: SEEDS
+     * REGEX-TEST: CARROT_ITEM
+     * REGEX-TEST: POTATO_ITEM
+     * REGEX-TEST: PUMPKIN_SEEDS
+     * REGEX-TEST: SUGAR_CANE
+     * REGEX-TEST: MELON_SEEDS
+     * REGEX-TEST: CACTUS
+     * REGEX-TEST: INK_SACK-3
+     */
     private val seedsPattern by RepoPattern.pattern(
         "inventory.hidenotclickable.seeds",
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
@@ -607,7 +618,7 @@ object HideNotClickableItems {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.items
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
         event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")

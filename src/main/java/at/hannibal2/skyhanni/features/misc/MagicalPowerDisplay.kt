@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -45,7 +46,7 @@ object MagicalPowerDisplay {
      * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        "^(Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
+        "^(?:Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
@@ -74,7 +75,7 @@ object MagicalPowerDisplay {
         "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return

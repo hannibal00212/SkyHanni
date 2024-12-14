@@ -52,7 +52,7 @@ object RepoPatternManager {
     /**
      * Map containing the exclusive owner of a regex key
      */
-    private var exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
+    private val exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
 
     /**
      * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
@@ -167,7 +167,7 @@ object RepoPatternManager {
         reloadPatterns()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }

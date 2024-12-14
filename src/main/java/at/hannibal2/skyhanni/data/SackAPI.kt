@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -15,17 +16,17 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -45,15 +46,31 @@ object SackAPI {
     var inSackInventory = false
 
     private val patternGroup = RepoPattern.group("data.sacks")
+
+    /**
+     * REGEX-TEST: Fishing Sack
+     * REGEX-TEST: Enchanted Agronomy Sack
+     */
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$",
+        "^(?:.* Sack|Enchanted .* Sack)\$",
     )
+
+    /**
+     * REGEX-TEST: §7Stored: §e28,183§7/60.5k
+     * REGEX-TEST: §7Stored: §80§7/60.5k
+     */
     @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+
+    /**
+     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
+     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
+     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
+     */
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
@@ -132,7 +149,7 @@ object SackAPI {
 
             if (isGemstoneSack) {
                 val gem = SackGemstone()
-                lore.matchAll(gemstonePattern) {
+                gemstonePattern.matchAll(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
@@ -193,7 +210,7 @@ object SackAPI {
                 }
             } else {
                 // normal sack
-                lore.matchFirst(numPattern) {
+                numPattern.firstMatcher(lore) {
                     val item = SackOtherItem()
                     val stored = group("stored").formatInt()
                     val internalName = stack.getInternalName()
@@ -257,13 +274,13 @@ object SackAPI {
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
-        sackEvent.postAndCatch()
+        sackEvent.post()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()

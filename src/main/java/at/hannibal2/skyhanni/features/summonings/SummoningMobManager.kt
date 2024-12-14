@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -42,7 +43,7 @@ object SummoningMobManager {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
+        "§aYou have spawned your .+ §r§asoul! §r§d\\(\\d+ Mana\\)",
     )
 
     /**
@@ -60,7 +61,7 @@ object SummoningMobManager {
      */
     private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d+) summoned allies!",
+        "§cThe Seraph recalled your \\d+ summoned allies!",
     )
 
     private val despawnPatterns = listOf(
@@ -132,7 +133,7 @@ object SummoningMobManager {
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "summonings", "combat.summonings")
     }

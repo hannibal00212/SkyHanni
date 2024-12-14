@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
@@ -123,7 +124,7 @@ object TabListData {
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(LorenzUtils.stripVanillaMessage(name))
+            result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
         return result.dropLast(1)
@@ -146,7 +147,7 @@ object TabListData {
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(getTabList()).post()
             if (!LorenzUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
@@ -157,7 +158,7 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
@@ -166,7 +167,7 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (LorenzUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
         }
     }

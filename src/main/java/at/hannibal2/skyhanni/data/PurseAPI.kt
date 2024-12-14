@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -17,10 +18,19 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     * REGEX-TEST: Purse: §6423,085,776 §e(+5)
+     */
     val coinsPattern by patternGroup.pattern(
         "coins",
         "(?:§.)*(?:Piggy|Purse): §6(?<coins>[\\d,.]+)(?: ?(?:§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     */
     val piggyPattern by patternGroup.pattern(
         "piggy",
         "Piggy: (?<coins>.*)",
@@ -35,7 +45,7 @@ object PurseAPI {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         coinsPattern.firstMatcher(event.added) {
             val newPurse = group("coins").formatDouble()
@@ -43,7 +53,7 @@ object PurseAPI {
             if (diff == 0.0) return
             currentPurse = newPurse
 
-            PurseChangeEvent(diff, currentPurse, getCause(diff)).postAndCatch()
+            PurseChangeEvent(diff, currentPurse, getCause(diff)).post()
         }
     }
 

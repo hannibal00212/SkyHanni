@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import kotlin.concurrent.thread
@@ -45,7 +45,7 @@ object ComputerTimeOffset {
     private fun checkOffset() {
         val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.coroutineScope.launch {
-            offsetMillis = getNtpOffset("time.google.com")
+            offsetMillis = getNtpOffset(SkyHanniMod.feature.dev.ntpServer)
             offsetMillis?.let {
                 tryDisplayOffset(wasOffsetBefore)
             }
@@ -53,9 +53,10 @@ object ComputerTimeOffset {
     }
 
     private fun getNtpOffset(ntpServer: String): Duration? = try {
-        val client = NTPUDPClient()
-        val address = InetAddress.getByName(ntpServer)
-        val timeInfo = client.getTime(address)
+        val timeInfo = NTPUDPClient().use { client ->
+            val address = InetAddress.getByName(ntpServer)
+            client.getTime(address)
+        }
 
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds
@@ -86,7 +87,7 @@ object ComputerTimeOffset {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         DelayedRun.runDelayed(5.seconds) {
             checkOffset()
@@ -112,8 +113,8 @@ object ComputerTimeOffset {
         )
     }
 
-    @SubscribeEvent
-    fun onDebugCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Time Offset")
         val offset = offsetMillis ?: run {
             event.addIrrelevant("not calculated yet")

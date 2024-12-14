@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
@@ -91,7 +92,7 @@ object PartyCommands {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
             return
@@ -116,7 +117,7 @@ object PartyCommands {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
 

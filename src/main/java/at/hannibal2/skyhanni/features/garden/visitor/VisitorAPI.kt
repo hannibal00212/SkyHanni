@@ -34,10 +34,20 @@ object VisitorAPI {
     const val REFUSE_SLOT = 33
 
     val patternGroup = RepoPattern.group("garden.visitor.api")
+
+    /**
+     * REGEX-TEST: §b§lVisitors: §r§f(5)
+     */
     val visitorCountPattern by patternGroup.pattern(
         "visitor.count",
         "§b§lVisitors: §r§f\\((?<info>.*)\\)",
     )
+
+    /**
+     * REGEX-TEST:  §r§aEmissary Carlton
+     * REGEX-TEST:  §r§6Madame Eleanor Q. Goldsworth III
+     * REGEX-TEST:  §r§9Lazy Miner
+     */
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
         " (?:§.)+(?<name>§.[^§]+).*",
@@ -60,11 +70,11 @@ object VisitorAPI {
 
         when (newStatus) {
             VisitorStatus.ACCEPTED -> {
-                VisitorAcceptedEvent(visitor).postAndCatch()
+                VisitorAcceptedEvent(visitor).post()
             }
 
             VisitorStatus.REFUSED -> {
-                VisitorRefusedEvent(visitor).postAndCatch()
+                VisitorRefusedEvent(visitor).post()
             }
 
             else -> {}
@@ -95,7 +105,7 @@ object VisitorAPI {
         if (!visitors.containsKey(name)) return false
         val visitor = visitors[name] ?: return false
         visitors = visitors.editCopy { remove(name) }
-        VisitorLeftEvent(visitor).postAndCatch()
+        VisitorLeftEvent(visitor).post()
         return true
     }
 
@@ -103,7 +113,7 @@ object VisitorAPI {
         if (visitors.containsKey(name)) return false
         val visitor = Visitor(name, status = VisitorStatus.NEW)
         visitors = visitors.editCopy { this[name] = visitor }
-        VisitorArrivalEvent(visitor).postAndCatch()
+        VisitorArrivalEvent(visitor).post()
         return true
     }
 

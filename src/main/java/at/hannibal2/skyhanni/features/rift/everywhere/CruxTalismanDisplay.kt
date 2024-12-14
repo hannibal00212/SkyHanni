@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -23,10 +24,15 @@ object CruxTalismanDisplay {
 
     private val config get() = RiftAPI.config.cruxTalisman
 
+    /**
+     * REGEX-TEST:   §23 §2Shy§7: §e88§7/§a100 §7kills
+     * REGEX-TEST:   §82 §8Shadow§7: §e42§7/§a50 §7kills
+     * REGEX-TEST:   §e- §eVolt§7: §e6§7/§a10 §7kills
+     */
     @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(
         "rift.everywhere.crux.progress",
-        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*"
+        ".*(?<tier>§[0-9a-z][IV1-4-]+)\\s+(?<name>§[0-9a-z]\\w+)§[0-9a-z]:\\s*(?<progress>§[0-9a-z](?:§[0-9a-z])?MAXED|§[0-9a-z]\\d+§[0-9a-z]/§[0-9a-z]\\d+).*",
     )
 
     private const val PARTIAL_NAME = "CRUX_TALISMAN"
@@ -41,7 +47,7 @@ object CruxTalismanDisplay {
         if (!isEnabled()) return
         config.position.renderStringsAndItems(
             display,
-            posLabel = "Crux Talisman Display"
+            posLabel = "Crux Talisman Display",
         )
     }
 
@@ -124,7 +130,7 @@ object CruxTalismanDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.showBonuses) { update() }
     }

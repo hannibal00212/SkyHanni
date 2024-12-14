@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
@@ -46,7 +47,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
@@ -59,20 +60,28 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
+
+    /**
+     * REGEX-TEST: MASTER_SKULL_TIER_1
+     * REGEX-TEST: MASTER_SKULL_TIER_6
+     */
     private val masterSkullIDPattern by patternGroup.pattern(
         "masterskull.id",
         "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
+    /**
+     * REGEX-TEST: §7Vacuum Bag: §21 Pest
+     * REGEX-TEST: §7Vacuum Bag: §2444 Pests
+     */
     private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
-        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?",
+        "§7Vacuum Bag: §2(?<amount>\\d*) Pests?",
     )
     private val harvestPattern by patternGroup.pattern(
         "harvest",
@@ -89,7 +98,7 @@ object ItemDisplayOverlayFeatures {
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to",
+        "(?:§.)*You were the (?:§.)*(?<rank>\\w+)(?<ordinal>st|nd|rd|th) (?:§.)*to",
     )
 
     /**
@@ -114,7 +123,7 @@ object ItemDisplayOverlayFeatures {
         "(?<exp>.*)k Enchanting Exp",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         event.stackTip = getStackTip(event.stack) ?: return
     }
@@ -235,7 +244,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (LARVA_HOOK.isSelected() && internalName == "LARVA_HOOK".toInternalName()) {
-            lore.matchFirst(harvestPattern) {
+            harvestPattern.firstMatcher(lore) {
                 val amount = group("amount").toInt()
                 return when {
                     amount > 4 -> "§a$amount"
@@ -257,7 +266,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
-            lore.matchFirst(gardenVacuumPattern) {
+            gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
@@ -291,14 +300,14 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
-            lore.matchFirst(bingoGoalRankPattern) {
+            bingoGoalRankPattern.firstMatcher(lore) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${rank.shortFormat()}"
             }
         }
 
         if (SKYBLOCK_LEVEL.isSelected() && chestName == "SkyBlock Menu" && itemName == "SkyBlock Leveling") {
-            lore.matchFirst(skyblockLevelPattern) {
+            skyblockLevelPattern.firstMatcher(lore) {
                 return group("level")
             }
         }
@@ -310,7 +319,7 @@ object ItemDisplayOverlayFeatures {
                 it.contains("Deaths: ")
             }
         ) {
-            lore.matchFirst(bestiaryStackPattern) {
+            bestiaryStackPattern.firstMatcher(lore) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {
@@ -349,7 +358,7 @@ object ItemDisplayOverlayFeatures {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "inventory.itemNumberAsStackSize") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, ItemNumberEntry::class.java)

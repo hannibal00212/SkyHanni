@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -31,15 +31,15 @@ object FarmingContestAPI {
     private val patternGroup = RepoPattern.group("garden.farming.contest")
     private val timePattern by patternGroup.pattern(
         "time",
-        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)"
+        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)",
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§8(?<crop>.*) Contest"
+        "§8(?<crop>.*) Contest",
     )
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
-        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*"
+        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*",
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
@@ -48,7 +48,7 @@ object FarmingContestAPI {
         get() = internalContest && LorenzUtils.skyBlockIsland.isAnyOf(
             IslandType.GARDEN,
             IslandType.HUB,
-            IslandType.THE_FARMING_ISLANDS
+            IslandType.THE_FARMING_ISLANDS,
         )
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
@@ -63,7 +63,7 @@ object FarmingContestAPI {
         if (!LorenzUtils.inSkyBlock) return
 
         if (internalContest && startTime.passedSince() > 20.minutes) {
-            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
 
@@ -78,17 +78,17 @@ object FarmingContestAPI {
 
         if (inContest != currentContest) {
             if (currentContest) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).post()
                 startTime = SimpleTimeMark.now()
             } else {
                 if (startTime.passedSince() > 2.minutes) {
-                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
                 }
             }
             internalContest = currentContest
         } else {
             if (currentCrop != contestCrop && currentCrop != null) {
-                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).post()
                 startTime = SimpleTimeMark.now()
             }
         }
@@ -132,13 +132,13 @@ object FarmingContestAPI {
     private fun createContest(time: Long, item: ItemStack): FarmingContest {
         val lore = item.getLore()
 
-        val crop = lore.matchFirst(cropPattern) {
+        val crop = cropPattern.firstMatcher(lore) {
             CropType.getByName(group("crop"))
         } ?: error("Crop not found in lore!")
 
         val brackets = buildMap {
             for (bracket in ContestBracket.entries) {
-                val amount = lore.matchFirst(bracket.bracketPattern) {
+                val amount = bracket.bracketPattern.firstMatcher(lore) {
                     group("amount").formatInt()
                 } ?: continue
                 put(bracket, amount)

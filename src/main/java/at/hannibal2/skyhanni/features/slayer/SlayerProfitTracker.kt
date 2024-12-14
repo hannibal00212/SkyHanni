@@ -103,7 +103,7 @@ object SlayerProfitTracker {
         allowedItems = event.getConstant<SlayerProfitTrackerItemsJson>("SlayerProfitTrackerItems").slayers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
@@ -123,7 +123,7 @@ object SlayerProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlayerChange(event: SlayerChangeEvent) {
         val newSlayer = event.newSlayer
         itemLogCategory = newSlayer.removeColor()
@@ -151,7 +151,7 @@ object SlayerProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return
@@ -223,7 +223,7 @@ object SlayerProfitTracker {
         getTracker()?.renderDisplay(config.pos)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(10, "#profile.slayerProfitData") { old ->
             for (data in old.asJsonObject.entrySet().map { it.value.asJsonObject }) {

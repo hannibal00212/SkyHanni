@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -36,7 +37,7 @@ object CarnivalZombieShootout {
     private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
 
-    private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
+    private val lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
 
     private var content = Renderable.horizontalContainer(listOf())
     private var drawZombies = mapOf<EntityZombie, ZombieType>()
@@ -143,7 +144,7 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 

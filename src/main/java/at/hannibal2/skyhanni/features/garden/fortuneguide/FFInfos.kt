@@ -21,7 +21,7 @@ internal enum class FFInfos(
         },
     ),
     FARMING_LEVEL(UNIVERSAL, { FFStats.baseFF }, FFTypes.FARMING_LVL, 240),
-    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 60),
+    BESTIARY(UNIVERSAL, { FFStats.baseFF }, FFTypes.BESTIARY, 66),
     GARDEN_PLOTS(UNIVERSAL, { FFStats.baseFF }, FFTypes.PLOTS, 72),
     ANITA_BUFF(UNIVERSAL, { FFStats.baseFF }, FFTypes.ANITA, 60),
     COMMUNITY_SHOP(UNIVERSAL, { FFStats.baseFF }, FFTypes.COMMUNITY_SHOP, 40),
@@ -63,7 +63,7 @@ internal enum class FFInfos(
         from = { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF },
         what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentArmor == null },
-        max = 5,
+        max = 12,
     ),
     GEMSTONE_ARMOR(
         TOTAL_ARMOR, { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.GEMSTONE,
