@@ -391,7 +391,7 @@ object CurrentPetAPI {
         updatePet(parsePetAsItem(event.item))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("PetAPI")
         if (currentPet?.isInitialized() == false) {
