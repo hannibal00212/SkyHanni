@@ -82,6 +82,7 @@ net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.networ
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.SPacketBlockChange
+net.minecraft.network.protocol.game.ClientboundContainerAckPacket net.minecraft.network.play.server.SPacketConfirmTransaction
 net.minecraft.network.protocol.game.ClientboundContainerClosePacket net.minecraft.network.play.server.SPacketCloseWindow
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.SPacketSetSlot
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
