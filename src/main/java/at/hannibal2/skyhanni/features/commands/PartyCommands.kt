@@ -119,7 +119,7 @@ object PartyCommands {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
 

@@ -377,8 +377,8 @@ object MobDetection {
         shouldClear.set(true)
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
         if (forceReset) {
             event.addData("Mob Detection is manually disabled!")
