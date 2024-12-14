@@ -349,7 +349,7 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }

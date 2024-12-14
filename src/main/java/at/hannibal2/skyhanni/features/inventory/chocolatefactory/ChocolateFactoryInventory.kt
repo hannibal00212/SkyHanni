@@ -65,9 +65,6 @@ object ChocolateFactoryInventory {
             if (slotIndex == ChocolateFactoryAPI.barnIndex && ChocolateFactoryBarnManager.barnFull) {
                 slot highlight LorenzColor.RED
             }
-            if (slotIndex == ChocolateFactoryAPI.clickRabbitSlot) {
-                slot highlight LorenzColor.RED
-            }
             if (slotIndex == ChocolateFactoryAPI.milestoneIndex) {
                 unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
                     slot highlight LorenzColor.RED

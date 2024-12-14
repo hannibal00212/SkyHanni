@@ -35,7 +35,6 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.
@@ -280,7 +279,7 @@ object PlayerNameFormatter {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(41, "chat.PlayerMessagesConfig.partsOrder") { element ->
             val newList = JsonArray()

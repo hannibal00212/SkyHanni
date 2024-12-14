@@ -66,4 +66,9 @@ public class MiningEventConfig {
     @Expose
     @ConfigLink(owner = MiningEventConfig.class, field = "enabled")
     public Position position = new Position(200, 60, false, true);
+
+    @Expose
+    @ConfigOption(name = "Sharing Event Data", desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!")
+    @ConfigEditorBoolean
+    public boolean allowDataSharing = true;
 }

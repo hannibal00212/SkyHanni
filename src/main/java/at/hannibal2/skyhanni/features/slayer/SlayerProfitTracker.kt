@@ -223,7 +223,7 @@ object SlayerProfitTracker {
         getTracker()?.renderDisplay(config.pos)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(10, "#profile.slayerProfitData") { old ->
             for (data in old.asJsonObject.entrySet().map { it.value.asJsonObject }) {
