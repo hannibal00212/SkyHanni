@@ -49,6 +49,7 @@ object DiscordRPCManager : IPCListener {
     private var started = false
     private var nextUpdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
+    // TODO move into item utils/api class
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
     fun start(fromCommand: Boolean = false) {
