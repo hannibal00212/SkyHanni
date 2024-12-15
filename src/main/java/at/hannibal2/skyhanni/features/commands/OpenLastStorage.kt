@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 @SkyHanniModule
 object OpenLastStorage {
 
+    private val config get() = SkyHanniMod.feature.misc
+
     private enum class StorageType(val validPages: IntRange, val runCommand: (Int) -> Unit, vararg val commands: String) {
         ENDER_CHEST(1..9, { HypixelCommands.enderChest(it) }, "/enderchest", "/ec"),
         BACKPACK(0..18, { HypixelCommands.backPack(it) }, "/backpack", "/bp"),
@@ -64,7 +66,10 @@ object OpenLastStorage {
                 if (isEnabled()) {
                     openLastStoragePage(lastStorageType)
                 } else {
-                    ChatUtils.chat("This feature is disabled, enable it in the config if you want to use it.")
+                    ChatUtils.chatAndOpenConfig(
+                        "This feature is disabled, enable it in the config if you want to use it.",
+                        config::openLastStorage,
+                    )
                 }
             }
         }
@@ -87,5 +92,5 @@ object OpenLastStorage {
         return false
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.misc.openLastStorage
+    private fun isEnabled() = config.openLastStorage
 }
