@@ -53,14 +53,6 @@ private fun getVisitingName(): String {
 
 var beenAfkFor = SimpleTimeMark.now()
 
-fun getPetDisplay(): String = PetAPI.currentPet?.let {
-    val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2).removeColor()
-    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
-
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
-} ?: "No pet equipped"
-
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getCounter()
@@ -80,91 +72,105 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
+fun getPetDisplay(): String = PetAPI.currentPet?.let {
+    val colorCode = it.substring(1..2).first()
+    val petName = it.substring(2).removeColor()
+    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
+
+    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+} ?: "No pet equipped"
+
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     NONE({ null }),
 
-    LOCATION({
-        var location = LorenzUtils.skyBlockArea ?: "invalid"
-        val island = LorenzUtils.skyBlockIsland
+    LOCATION(
+        {
+            var location = LorenzUtils.skyBlockArea ?: "invalid"
+            val island = LorenzUtils.skyBlockIsland
 
-        if (location == "Your Island") location = "Private Island"
-        when {
-            island == IslandType.PRIVATE_ISLAND_GUEST -> lastKnownDisplayStrings[LOCATION] =
-                "${getVisitingName()}'s Island"
+            if (location == "Your Island") location = "Private Island"
+            lastKnownDisplayStrings[LOCATION] = when (island) {
+                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
 
-            island == IslandType.GARDEN -> {
-                if (location.startsWith("Plot: ")) {
-                    lastKnownDisplayStrings[LOCATION] = "Personal Garden ($location)" // Personal Garden (Plot: 8)
-                } else {
-                    lastKnownDisplayStrings[LOCATION] = "Personal Garden"
+                IslandType.GARDEN -> {
+                    if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
+                    else "Personal Garden"
                 }
+
+                IslandType.GARDEN_GUEST -> {
+                    // Ensure getVisitingName() is used to generate the full string
+                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
+                    else "${getVisitingName()}'s Garden"
+                }
+
+                else -> location.takeIf { it != "None" && it != "invalid" }
+                    ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
 
-            island == IslandType.GARDEN_GUEST -> {
-                lastKnownDisplayStrings[LOCATION] = "${getVisitingName()}'s Garden"
-                if (location.startsWith("Plot: ")) {
-                    lastKnownDisplayStrings[LOCATION] = "${lastKnownDisplayStrings[LOCATION]} ($location)"
-                } // "MelonKingDe's Garden (Plot: 8)"
+            // Only display None if we don't have a last known area
+            lastKnownDisplayStrings[LOCATION].takeIf { it?.isNotEmpty() == true } ?: "None"
+        },
+    ),
+
+    PURSE(
+        {
+            val scoreboard = ScoreboardData.sidebarLinesFormatted
+            // Matches coins amount in purse or piggy, with optional decimal points
+            val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
+                purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            }
+            val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
+                motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            }
+            lastKnownDisplayStrings[PURSE] = when {
+                coins == "1" -> "1 Coin"
+                coins != "" && coins != null -> "$coins Coins"
+                motes == "1" -> "1 Mote"
+                motes != "" && motes != null -> "$motes Motes"
+
+                else -> lastKnownDisplayStrings[PURSE].orEmpty()
+            }
+            lastKnownDisplayStrings[PURSE].orEmpty()
+        },
+    ),
+
+    BITS(
+        {
+            val scoreboard = ScoreboardData.sidebarLinesFormatted
+            val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
+                bitsRegex.find(it.removeColor())?.groupValues?.get(1)
             }
 
-            location != "None" && location != "invalid" -> {
-                lastKnownDisplayStrings[LOCATION] = location
+            when (bits) {
+                "1" -> "1 Bit"
+                null -> "0 Bits"
+                else -> "$bits Bits"
             }
-        }
-        lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
-    }),
+        },
+    ),
 
-    PURSE({
-        val scoreboard = ScoreboardData.sidebarLinesFormatted
-        // Matches coins amount in purse or piggy, with optional decimal points
-        val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
-        }
-        val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-            motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
-        }
-        lastKnownDisplayStrings[PURSE] = when {
-            coins == "1" -> "1 Coin"
-            coins != "" && coins != null -> "$coins Coins"
-            motes == "1" -> "1 Mote"
-            motes != "" && motes != null -> "$motes Motes"
+    STATS(
+        {
+            val statString = if (!RiftAPI.inRift()) {
+                "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
+            } else {
+                "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
+            }
+            if (ActionBarStatsData.MANA.value != "") {
+                lastKnownDisplayStrings[STATS] = statString
+            }
+            lastKnownDisplayStrings[STATS].orEmpty()
+        },
+    ),
 
-            else -> lastKnownDisplayStrings[PURSE].orEmpty()
-        }
-        lastKnownDisplayStrings[PURSE].orEmpty()
-    }),
-
-    BITS({
-        val scoreboard = ScoreboardData.sidebarLinesFormatted
-        val bits = scoreboard.firstOrNull { bitsRegex.matches(it.removeColor()) }?.let {
-            bitsRegex.find(it.removeColor())?.groupValues?.get(1)
-        }
-
-        when (bits) {
-            "1" -> "1 Bit"
-            null -> "0 Bits"
-            else -> "$bits Bits"
-        }
-    }),
-
-    STATS({
-        val statString = if (!RiftAPI.inRift()) {
-            "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
-        } else {
-            "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
-        }
-        if (ActionBarStatsData.MANA.value != "") {
-            lastKnownDisplayStrings[STATS] = statString
-        }
-        lastKnownDisplayStrings[STATS].orEmpty()
-    }),
-
-    ITEM({
-        InventoryUtils.getItemInHand()?.let {
-            String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
-        } ?: "No item in hand"
-    }),
+    ITEM(
+        {
+            InventoryUtils.getItemInHand()?.let {
+                String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
+            } ?: "No item in hand"
+        },
+    ),
 
     TIME(
         {
@@ -172,60 +178,66 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         },
     ),
 
-    PROFILE({
-        val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
-        var profile = "SkyBlock Level: [$sbLevel] on "
+    PROFILE(
+        {
+            val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
+            var profile = "SkyBlock Level: [$sbLevel] on "
 
-        profile += when {
+            profile += when {
 
-            LorenzUtils.isIronmanProfile -> "♲"
-            LorenzUtils.isBingoProfile -> "Ⓑ"
-            LorenzUtils.isStrandedProfile -> "☀"
-            else -> ""
-        }
-
-        val fruit = HypixelData.profileName.firstLetterUppercase()
-        if (fruit == "") profile =
-            lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
-        else profile += fruit
-
-        lastKnownDisplayStrings[PROFILE] = profile
-        profile
-    }),
-
-    SLAYER({
-        var slayerName = ""
-        var slayerLevel = ""
-        var bossAlive = "spawning"
-        val slayerRegex =
-            Pattern.compile("(?<name>(?:\\w| )*) (?<level>[IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            val noColorLine = line.removeColor()
-            val match = slayerRegex.matcher(noColorLine)
-            when {
-                match.matches() -> {
-                    slayerName = match.group("name")
-                    slayerLevel = match.group("level")
-                }
-
-                noColorLine == "Slay the boss!" -> bossAlive = "slaying"
-                noColorLine == "Boss slain!" -> bossAlive = "slain"
+                LorenzUtils.isIronmanProfile -> "♲"
+                LorenzUtils.isBingoProfile -> "Ⓑ"
+                LorenzUtils.isStrandedProfile -> "☀"
+                else -> ""
             }
-        }
 
-        when {
-            slayerLevel == "" -> AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
-            bossAlive == "spawning" -> "Spawning a $slayerName $slayerLevel boss."
-            bossAlive == "slaying" -> "Slaying a $slayerName $slayerLevel boss."
-            bossAlive == "slain" -> "Finished slaying a $slayerName $slayerLevel boss."
-            else -> "Something went wrong with slayer detection!"
-        }
-    }),
+            val fruit = HypixelData.profileName.firstLetterUppercase()
+            if (fruit == "") profile =
+                lastKnownDisplayStrings[PROFILE] ?: "SkyBlock Level: [$sbLevel]" // profile fruit hasn't loaded in yet
+            else profile += fruit
 
-    CUSTOM({
-        DiscordRPCManager.config.customText.get() // custom field in the config
-    }),
+            lastKnownDisplayStrings[PROFILE] = profile
+            profile
+        },
+    ),
+
+    SLAYER(
+        {
+            var slayerName = ""
+            var slayerLevel = ""
+            var bossAlive = "spawning"
+            val slayerRegex =
+                Pattern.compile("(?<name>(?:\\w| )*) (?<level>[IV]+)") // Samples: Revenant Horror I; Tarantula Broodfather IV
+
+            for (line in ScoreboardData.sidebarLinesFormatted) {
+                val noColorLine = line.removeColor()
+                val match = slayerRegex.matcher(noColorLine)
+                when {
+                    match.matches() -> {
+                        slayerName = match.group("name")
+                        slayerLevel = match.group("level")
+                    }
+
+                    noColorLine == "Slay the boss!" -> bossAlive = "slaying"
+                    noColorLine == "Boss slain!" -> bossAlive = "slain"
+                }
+            }
+
+            when {
+                slayerLevel == "" -> AutoStatus.SLAYER.placeholderText // selected slayer in rpc but hasn't started a quest
+                bossAlive == "spawning" -> "Spawning a $slayerName $slayerLevel boss."
+                bossAlive == "slaying" -> "Slaying a $slayerName $slayerLevel boss."
+                bossAlive == "slain" -> "Finished slaying a $slayerName $slayerLevel boss."
+                else -> "Something went wrong with slayer detection!"
+            }
+        },
+    ),
+
+    CUSTOM(
+        {
+            DiscordRPCManager.config.customText.get() // custom field in the config
+        },
+    ),
 
     AUTO(
         {
@@ -257,75 +269,79 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     PETS({ getPetDisplay() }),
 
     // Dynamic-only
-    STACKING({
-        // Logic for getting the currently held stacking enchant is from Skytils
+    STACKING(
+        {
+            // Logic for getting the currently held stacking enchant is from Skytils
+            val itemInHand = InventoryUtils.getItemInHand()
+            val itemName = itemInHand?.displayName?.removeColor().orEmpty()
 
-        val itemInHand = InventoryUtils.getItemInHand()
-        val itemName = itemInHand?.displayName?.removeColor().orEmpty()
-
-        fun getProgressPercent(amount: Int, levels: List<Int>): String {
-            var percent = "MAXED"
-            for (level in levels.indices) {
-                if (amount > levels[level]) {
-                    continue
-                }
-                percent = if (amount.toDouble() == 0.0) {
-                    ""
-                } else {
-                    LorenzUtils.formatPercentage((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1]))
-                }
-                break
-            }
-            return percent
-        }
-
-        val extraAttributes = itemInHand?.extraAttributes
-
-        var stackingReturn = AutoStatus.STACKING.placeholderText
-        if (extraAttributes != null) {
-            val enchantments = extraAttributes.getCompoundTag("enchantments")
-            var stackingEnchant = ""
-            for (enchant in DiscordRPCManager.stackingEnchants) {
-                if (extraAttributes.hasKey(enchant.value.statName)) {
-                    stackingEnchant = enchant.key
+            fun getProgressPercent(amount: Int, levels: List<Int>): String {
+                var percent = "MAXED"
+                for (level in levels.indices) {
+                    if (amount > levels[level]) {
+                        continue
+                    }
+                    percent = if (amount.toDouble() == 0.0) {
+                        ""
+                    } else {
+                        LorenzUtils.formatPercentage((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1]))
+                    }
                     break
                 }
+                return percent
             }
-            val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
-            val level = enchantments.getInteger(stackingEnchant)
-            val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
-            val stackingPercent = getProgressPercent(amount, levels)
 
-            stackingReturn =
-                if (stackingPercent == "" || amount == 0) AutoStatus.STACKING.placeholderText // outdated info is useless for AUTO
-                else "$itemName: ${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
-        }
-        stackingReturn
+            val extraAttributes = itemInHand?.extraAttributes
+            var stackingReturn = AutoStatus.STACKING.placeholderText
+            if (extraAttributes != null) {
+                val enchantments = extraAttributes.getCompoundTag("enchantments")
+                var stackingEnchant = ""
+                for (enchant in DiscordRPCManager.stackingEnchants) {
+                    if (extraAttributes.hasKey(enchant.value.statName)) {
+                        stackingEnchant = enchant.key
+                        break
+                    }
+                }
+                val levels = DiscordRPCManager.stackingEnchants[stackingEnchant]?.levels ?: listOf(0)
+                val level = enchantments.getInteger(stackingEnchant)
+                val amount = extraAttributes.getInteger(DiscordRPCManager.stackingEnchants[stackingEnchant]?.statName)
+                val stackingPercent = getProgressPercent(amount, levels)
 
-    }),
+                stackingReturn =
+                    if (stackingPercent == "" || amount == 0) AutoStatus.STACKING.placeholderText // outdated info is useless for AUTO
+                    else "$itemName: ${stackingEnchant.firstLetterUppercase()} $level ($stackingPercent)" // Hecatomb 100: (55.55%)
+            }
+            stackingReturn
 
-    DUNGEONS({
-        if (!DungeonAPI.inDungeon()) {
-            AutoStatus.DUNGEONS.placeholderText
-        } else {
-            val boss = DungeonAPI.getCurrentBoss()
-            if (boss == null) {
-                "Unknown dungeon boss"
+        },
+    ),
+
+    DUNGEONS(
+        {
+            if (!DungeonAPI.inDungeon()) {
+                AutoStatus.DUNGEONS.placeholderText
             } else {
-                val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
-                val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
-                val time = DungeonAPI.time
-                "$floor Kills: $amountKills ($time)"
+                val boss = DungeonAPI.getCurrentBoss()
+                if (boss == null) {
+                    "Unknown dungeon boss"
+                } else {
+                    val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
+                    val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+                    val time = DungeonAPI.time
+                    "$floor Kills: $amountKills ($time)"
+                }
             }
-        }
-    }),
+        },
+    ),
 
-    AFK({
-        if (beenAfkFor.passedSince() > 5.minutes) {
-            val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
-            "AFK for $format"
-        } else AutoStatus.AFK.placeholderText
-    })
+    AFK(
+        {
+            if (beenAfkFor.passedSince() > 5.minutes) {
+                val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+                "AFK for $format"
+            } else AutoStatus.AFK.placeholderText
+        },
+    )
     ;
 
     fun getDisplayString(): String = displayMessageSupplier().orEmpty()
