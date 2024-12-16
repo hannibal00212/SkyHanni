@@ -67,6 +67,11 @@ object GardenNextJacobContest {
     private var inCalendar = false
 
     private val patternGroup = RepoPattern.group("garden.nextcontest")
+
+    /**
+     * REGEX-TEST: Day 1
+     * REGEX-TEST: Day 31
+     */
     val dayPattern by patternGroup.pattern(
         "day",
         "§aDay (?<day>.*)",
@@ -81,6 +86,12 @@ object GardenNextJacobContest {
         "month",
         "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §e○ §7Cactus
+     * REGEX-TEST: §6☘ §7Carrot
+     * REGEX-TEST: §e○ §7Melon
+     */
     private val cropPattern by patternGroup.pattern(
         "crop",
         "§(?:e○|6☘) §7(?<crop>.*)",
