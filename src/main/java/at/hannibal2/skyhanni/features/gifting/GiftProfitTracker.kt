@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
@@ -46,7 +47,7 @@ object GiftProfitTracker {
      */
     private val giftRewardRarityPattern by patternGroup.pattern(
         "reward.rarity",
-        "§.§l(?<rarity>[^§!]+?)(?: TIER)?!.*"
+        "§.§l(?<rarity>COMMON|RARE|SWEET|SANTA)(?: TIER)?!.*"
     )
 
     /**
@@ -73,10 +74,11 @@ object GiftProfitTracker {
     /**
      * REGEX-TEST: §5§lEXTRA! §d+5 North Stars
      * REGEX-TEST: §5§lEXTRA! §d+4 North Stars
+     * REGEX-TEST: §5§lEXTRA! §d+1 North Star
      */
     val northStarsPattern by patternGroup.pattern(
         "reward.northstars",
-        "§5§lEXTRA! §d\\+(?<amount>[\\d,]+) North Stars"
+        "§5§lEXTRA! §d\\+(?<amount>[\\d,]+) North Stars?"
     )
 
     /**
@@ -87,6 +89,16 @@ object GiftProfitTracker {
     val boostPotionPattern by patternGroup.pattern(
         "reward.boostpotion",
         "§.§l.*! §r§.(?<skill>[\\w ]+) XP Boost (?<tier>[IVXLCDM]+) Potion §r§egift with §r.*"
+    )
+
+    /**
+     * REGEX-TEST: §9§lRARE! §r§9Scavenger IV §r§egift with ...
+     * REGEX-TEST: §9§lRARE! §r§9Looting IV §r§egift with ...
+     * REGEX-TEST: §9§lRARE! §r§9Luck VI §r§egift with ...
+     */
+    val enchantmentBookPattern by patternGroup.pattern(
+        "reward.enchantmentbook",
+        "§9§lRARE! §r§9(?<enchantment>.+) (?<tier>[IVXLCDM]+) §r§egift with .*"
     )
 
     /**
@@ -120,10 +132,12 @@ object GiftProfitTracker {
         override fun resetItems() {
             giftsUsed.clear()
             rarityRewardTypesGained.clear()
+            northStarsGained = 0
+            skillXpGained.clear()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / (giftsUsed.sumAllValues().takeIf { it != 0.0 } ?: 1.0)
+            val percentage = timesGained.toDouble() / (rarityRewardTypesGained.sumAllValues().takeIf { it != 0.0 } ?: 1.0)
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -229,6 +243,14 @@ object GiftProfitTracker {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
+        northStarsPattern.matchMatcher(event.message) {
+            val amount = group("amount").formatInt()
+            tracker.modify {
+                it.northStarsGained += amount
+            }
+            return // Don't continue to other patterns
+        }
+
         giftRewardRarityPattern.matchMatcher(event.message) {
             val rewardRarity = GiftRewardRarityType.getByNameOrNull(group("rarity")) ?: return
             tracker.modify {
@@ -251,14 +273,6 @@ object GiftProfitTracker {
             return // Don't continue to other patterns
         }
 
-        northStarsPattern.matchMatcher(event.message) {
-            val amount = group("amount").formatInt()
-            tracker.modify {
-                it.northStarsGained += amount
-            }
-            return // Don't continue to other patterns
-        }
-
         boostPotionPattern.matchMatcher(event.message) {
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return
             val tier = group("tier").romanToDecimal()
@@ -267,9 +281,24 @@ object GiftProfitTracker {
             return // Don't continue to other patterns
         }
 
-        genericRewardPattern.matchMatcher(event.message) {
-            val item = group("item").toInternalName()
+        enchantmentBookPattern.matchMatcher(event.message) {
+            val enchantment = group("enchantment")
+            val tier = group("tier").romanToDecimal()
+            val item = "${enchantment.uppercase()};$tier".toInternalName()
             tracker.addItem(item, 1, false)
+            return // Don't continue to other patterns
+        }
+
+        genericRewardPattern.matchMatcher(event.message) {
+            val (itemName, amount) = when (group("item")) {
+                "◆ Ice Rune" -> "ICE_RUNE;1" to 1
+                else -> ItemUtils.readItemAmount(group("item")) ?: return
+            }
+            NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
+                tracker.modify {
+                    it.addItem(item, amount, false)
+                }
+            }
         }
     }
 
@@ -337,15 +366,23 @@ object GiftProfitTracker {
         }
 
         // Breakdown of rewards by rarity
-        val rarityRewardTypesGained = data.rarityRewardTypesGained
-        val applicableRarities = rarityRewardTypesGained.filter { it.value > 0 }
-        applicableRarities.forEach { (rarity, count) ->
+        val totalRewards = data.rarityRewardTypesGained.sumAllValues().toLong()
+        val applicableRarities = data.rarityRewardTypesGained.filter { it.value > 0 }
+        val rewardHoverTips = buildList {
+            applicableRarities.forEach { (rarity, count) ->
+                add("§7${count.addSeparators()}x ${rarity.displayName}§7")
+            }
+        }
+        totalRewards.takeIf { it > 0 }?.let {
             add(
-                Renderable.string("§7${count}x ${rarity.displayName}§7").toSearchable(),
+                Renderable.hoverTips(
+                    "§eTotal Rewards§7: ${it.shortFormat()}",
+                    rewardHoverTips,
+                ).toSearchable(),
             )
         }
 
-        add(tracker.addTotalProfit(profit, giftsUsed.sumAllValues().toLong(), "gift"))
+        add(tracker.addTotalProfit(profit, totalRewards, "gift"))
         tracker.addPriceFromButton(this)
     }
 

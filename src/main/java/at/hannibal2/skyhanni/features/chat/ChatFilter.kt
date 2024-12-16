@@ -319,6 +319,7 @@ object ChatFilter {
                 coinsGainedPattern,
                 northStarsPattern,
                 boostPotionPattern,
+                enchantmentBookPattern,
                 genericRewardPattern
             ).forEach { add(it) }
         }
