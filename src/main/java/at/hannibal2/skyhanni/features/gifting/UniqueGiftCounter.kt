@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event.winter
+package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object UniqueGiftCounter {
 
-    private val config get() = SkyHanniMod.feature.event.winter.uniqueGiftCounter
+    private val config get() = SkyHanniMod.feature.event.gifting.uniqueGiftCounter
     private val storage get() = ProfileStorageData.playerSpecific?.winter
 
     private val giftedAmountPattern by RepoPattern.pattern(
