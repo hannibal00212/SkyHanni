@@ -44,10 +44,11 @@ object GiftProfitTracker {
      * REGEX-TEST: §9§lRARE!
      * REGEX-TEST: §e§lSWEET!
      * REGEX-TEST: §c§lSANTA TIER!
+     * REGEX-TEST: §c§lPARTY TIER!
      */
     private val giftRewardRarityPattern by patternGroup.pattern(
         "reward.rarity",
-        "§.§l(?<rarity>COMMON|RARE|SWEET|SANTA)(?: TIER)?!.*"
+        "§.§l(?<rarity>COMMON|RARE|SWEET|SANTA|PARTY)(?: TIER)?!.*"
     )
 
     /**
@@ -191,7 +192,8 @@ object GiftProfitTracker {
         COMMON("§f§lCOMMON"),
         RARE("§9§lRARE"),
         SWEET("§e§lSWEET"),
-        SANTA("§c§lSANTA"),
+        SANTA("§c§lSANTA TIER"),
+        PARTY("§c§lPARTY TIER"),
         ;
 
         override fun toString() = displayName
