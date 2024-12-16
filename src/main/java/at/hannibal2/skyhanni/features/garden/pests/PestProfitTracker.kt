@@ -151,7 +151,7 @@ object PestProfitTracker {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
-            tryAddItem(pest, internalName, amount)
+            tracker.addItem(pest, internalName, amount)
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
@@ -170,8 +170,8 @@ object PestProfitTracker {
                 chatComponent = ChatComponentText(fixedString)
             }
 
-            tryAddItem(pest, internalName, amount)
-            // pests always have guaranteed loot, therefore there's no need to add kill here
+            tracker.addItem(pest, internalName, amount)
+            // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
 
@@ -186,13 +186,8 @@ object PestProfitTracker {
         adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
     }
 
-    private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType): Int {
-        return adjustmentMap[pestType]?.get(internalName) ?: this
-    }
-
-    private fun tryAddItem(type: PestType, internalName: NEUInternalName, amount: Int) {
-        tracker.addItem(type, internalName, amount)
-    }
+    private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType) =
+        adjustmentMap.takeIf { it.isNotEmpty() }?.get(pestType)?.get(internalName) ?: this
 
     private fun addKill(type: PestType) {
         tracker.modify {
