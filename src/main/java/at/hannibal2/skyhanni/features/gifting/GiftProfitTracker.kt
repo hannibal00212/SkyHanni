@@ -137,7 +137,8 @@ object GiftProfitTracker {
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / (rarityRewardTypesGained.sumAllValues().takeIf { it != 0.0 } ?: 1.0)
+            val totalRewards = rarityRewardTypesGained.sumAllValues().toLong().takeIf { it > 0 } ?: 1
+            val percentage = timesGained.toDouble() / totalRewards
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -178,6 +179,10 @@ object GiftProfitTracker {
         ;
 
         fun toInternalName() = "${name}_GIFT".toInternalName()
+
+        companion object {
+            fun byUserInput(name: String) = entries.firstOrNull { it.name.equals(name, true) }
+        }
     }
 
     enum class GiftRewardRarityType(
@@ -203,18 +208,20 @@ object GiftProfitTracker {
         "POTION_${skill.name.uppercase()}_XP_BOOST;$tier".toInternalName()
     }
 
-    private const val ADD_GIFT_USAGE = "§eUsage: §6/shaddusedgifts §e<§6giftType: §7white,red,green,party§e> <§6amount§e>\n" +
+    private const val ADD_GIFT_USAGE = "§eUsage:\n§6/shaddusedgifts §e<§6giftType§7: white,red,green§e> <§6amount§e>\n" +
         "§eExample: §6/shaddusedgifts white 10\n§eIf no amount is specified, 1 is assumed."
 
     private fun tryAddUsedGift(args: Array<String>): String {
         if (args.isEmpty()) return ADD_GIFT_USAGE
-        val giftName = args[1]
-        val gift = GiftType.entries.firstOrNull { it.name.equals(giftName, true) } ?: return ADD_GIFT_USAGE
-        val amount = args.getOrNull(2)?.toLongOrNull() ?: 1L
+        val giftName = args[0]
+        val gift = GiftType.byUserInput(giftName) ?: return ADD_GIFT_USAGE
+        val amountArg = args.getOrNull(1) ?: "1"
+        val amount = amountArg.toLongOrNull() ?: return "§cInvalid amount (§4${args[1]}§c) specified.\n$ADD_GIFT_USAGE"
         tracker.modify {
             it.giftsUsed.addOrPut(gift, amount)
         }
-        return "§aAdded §6${amount.addSeparators()}x §7${gift.displayName}§a to used gifts."
+        val pluralization = if (amount == 1L) "" else "s"
+        return "§aAdded §2${amount.addSeparators()}§8x §7${gift.displayName}$pluralization §ato used gifts."
     }
 
     @HandleEvent
