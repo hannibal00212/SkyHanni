@@ -56,13 +56,8 @@ object CruxTalismanDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        var maxedKill = 0
         var percent = 0
-        for (crux in displayLine)
-            if (crux.maxed)
-                maxedKill++
-        if (maxedKill == 6)
-            maxed = true
+        maxed = displayLine.all { it.maxed }
 
         if (!config.compactWhenMaxed && maxed) maxed = false
 
