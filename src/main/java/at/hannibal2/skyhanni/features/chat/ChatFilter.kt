@@ -315,7 +315,6 @@ object ChatFilter {
     private val winterGiftPatterns = buildList {
         GiftProfitTracker.run {
             listOf(
-                giftRewardRarityPattern,
                 xpGainedPattern,
                 coinsGainedPattern,
                 northStarsPattern,

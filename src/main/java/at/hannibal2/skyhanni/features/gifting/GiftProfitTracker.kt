@@ -42,10 +42,11 @@ object GiftProfitTracker {
      * REGEX-TEST: §f§lCOMMON!
      * REGEX-TEST: §9§lRARE!
      * REGEX-TEST: §e§lSWEET!
+     * REGEX-TEST: §c§lSANTA TIER!
      */
-    val giftRewardRarityPattern by patternGroup.pattern(
+    private val giftRewardRarityPattern by patternGroup.pattern(
         "reward.rarity",
-        "§.§l(?<rarity>[^§! ]+)!"
+        "§.§l(?<rarity>[^§!]+?)(?: TIER)?!.*"
     )
 
     /**
@@ -92,6 +93,7 @@ object GiftProfitTracker {
      * REGEX-TEST: §e§lSWEET! §r§5Snow Suit Helmet §r§egift with §r§b[MVP§r§4+§r§b] FearNotMyName§r§f§r§e!
      * REGEX-TEST: §9§lRARE! §r§f◆ Ice Rune §r§egift with §r§b[MVP§r§2+§r§b] TravisScotties§r§f§r§e!
      * REGEX-TEST: §e§lSWEET! §r§5Snow Suit Chestplate §r§egift with §r§7Sanstin21§r§7§r§e!
+     * REGEX-TEST: §c§lSANTA TIER! §r§6Cryopowder Shard §r§egift with §r§7MicrosoftDotInc§r§7§r§e!
      */
     val genericRewardPattern by patternGroup.pattern(
         "reward.generic",
