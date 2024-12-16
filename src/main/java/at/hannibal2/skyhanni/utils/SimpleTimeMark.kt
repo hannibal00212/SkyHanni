@@ -56,6 +56,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         return localDateTime.format(formatter)
     }
 
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
+
     fun toMillis() = millis
 
     fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
