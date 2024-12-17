@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -78,13 +79,12 @@ object HoppityEggsCompactChat {
         val summaryMessage = buildString {
             appendLine("§c§lHitman Summary")
             appendLine()
-            appendLine("§7${hitmanCompactDataSets.size} Eggs Claimed")
             // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
             val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets
                 .mapNotNull { it.lastRarity }
                 .groupingBy { it }
                 .eachCount()
-            getRabbitsFormat(rarityMap, "Hitman").forEach { appendLine(it) }
+            getRabbitsFormat(rarityMap, "Total Hitman").forEach { appendLine(it) }
             hitmanCompactDataSets.filter { !it.duplicate }.takeIfNotEmpty()?.let { sets ->
                 appendLine()
                 appendLine("§d§lNEW Rabbits")
@@ -95,6 +95,7 @@ object HoppityEggsCompactChat {
                 }
             }
             hitmanCompactDataSets.filter { it.duplicate }.takeIfNotEmpty()?.let { sets ->
+                appendLine()
                 // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
                 val dupeRarityMap: Map<LorenzRarity, Int> = sets
                     .mapNotNull { it.lastRarity }
@@ -103,7 +104,7 @@ object HoppityEggsCompactChat {
                 getRabbitsFormat(dupeRarityMap, "Duplicate").forEach { appendLine(it) }
                 val dupeChocolateAmount = sets.sumOf { it.lastDuplicateAmount ?: 0 }
                 val timeFormat = dupeChocolateAmount.getChocExtraTimeString()
-                appendLine(" §6+$dupeChocolateAmount §6Chocolate§7$timeFormat")
+                appendLine(" §6+${dupeChocolateAmount.addSeparators()} §6Chocolate§7$timeFormat")
             }
         }
         ChatUtils.chat(summaryMessage, prefix = false)
