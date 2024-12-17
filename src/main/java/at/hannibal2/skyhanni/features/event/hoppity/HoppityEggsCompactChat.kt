@@ -71,8 +71,7 @@ object HoppityEggsCompactChat {
             if (hitmanCompactDataSets.size == 1) {
                 hoppityDataSet = hitmanCompactDataSets.first() // Pop back out the stored data
                 sendNonHitman()
-            }
-            else sendHitmanSummary()
+            } else sendHitmanSummary()
         }
 
     }
