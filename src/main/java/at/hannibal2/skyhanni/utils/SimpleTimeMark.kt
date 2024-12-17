@@ -9,7 +9,6 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-@Suppress("TooManyMethods")
 @JvmInline
 value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark> {
 
@@ -33,13 +32,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis == Long.MAX_VALUE
 
-    fun isFarPastOrFuture() = isFarPast() || isFarFuture()
-
-    fun takeIfInitialized() = if (isFarPastOrFuture()) null else this
+    fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
     fun absoluteDifference(other: SimpleTimeMark) = abs(millis - other.millis).milliseconds
-
-    fun takeIfFuture() = if (isInFuture()) this else null
 
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
@@ -67,8 +62,6 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     fun toMillis() = millis
 
     fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
-
-    fun elapsedMinutes() = passedSince().inWholeMinutes
 
     companion object {
 
