@@ -100,8 +100,9 @@ object ChocolateFactoryStrayWarning {
         }
         val strayStacks = HoppityAPI.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
-        activeStraySlots = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }.keys
-        flashScreen = strayStacks.any {
+        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
+        activeStraySlots = activeStrays.keys
+        flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
                 StrayTypeEntry.SPECIAL -> isSpecial(stack)
