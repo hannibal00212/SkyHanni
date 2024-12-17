@@ -64,7 +64,7 @@ object HoppityEggsCompactChat {
             it.reset()
         }
         val sizeNow = hitmanCompactDataSets.size
-        DelayedRun.runDelayed(2.seconds) {
+        DelayedRun.runDelayed(1.seconds) {
             if (hitmanCompactDataSets.size != sizeNow) return@runDelayed
 
             if (hitmanCompactDataSets.size == 1) sendNonHitman()
