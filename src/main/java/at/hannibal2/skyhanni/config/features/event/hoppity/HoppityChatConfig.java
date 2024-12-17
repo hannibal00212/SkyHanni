@@ -41,7 +41,7 @@ public class HoppityChatConfig {
     @Expose
     @ConfigOption(
         name = "Compact Hitman",
-        desc = "Show a summary message instead of individual messages for mass (>1) Hitman claims." +
+        desc = "Show a summary message instead of individual messages for Hitman \"Claim All\" menu." +
             "\n§cRequires Compact Chat enabled to work."
     )
     @ConfigEditorBoolean
