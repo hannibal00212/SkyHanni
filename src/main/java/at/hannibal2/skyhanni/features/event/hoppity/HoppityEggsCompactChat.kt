@@ -59,8 +59,10 @@ object HoppityEggsCompactChat {
             return
         }
 
-        hitmanCompactDataSets.add(hoppityDataSet)
-        hoppityDataSet.reset()
+        hoppityDataSet.let {
+            hitmanCompactDataSets.add(it.copy())
+            it.reset()
+        }
         val sizeNow = hitmanCompactDataSets.size
         DelayedRun.runDelayed(2.seconds) {
             if (hitmanCompactDataSets.size != sizeNow) return@runDelayed
