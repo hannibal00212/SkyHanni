@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -182,7 +183,7 @@ object ChocolateFactoryCustomReminder {
             return "§aGoal Reached! §eBuy §f$targetName"
         }
         val format = duration.format(maxUnits = 2)
-        return "§f$targetName §ein §b$format"
+        return "§f$targetName §ein §b$format".partyModeReplace()
     }
 
     private fun warn() {

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getAvailableEggs
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getHitmanTimeToAll
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
@@ -89,7 +90,11 @@ object ChocolateFactoryStats {
 
             addHitman()
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
+        val text = config.statsDisplayList.filter {
+            it.shouldDisplay()
+        }.flatMap {
+            map[it]?.partyModeReplace()?.split("\n").orEmpty()
+        }
         display = createDisplay(text)
     }
 
