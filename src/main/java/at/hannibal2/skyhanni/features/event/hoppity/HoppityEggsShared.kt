@@ -59,5 +59,5 @@ object HoppityEggsShared {
         HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && config.sharedWaypoints
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints.enabled && config.sharedWaypoints
 }

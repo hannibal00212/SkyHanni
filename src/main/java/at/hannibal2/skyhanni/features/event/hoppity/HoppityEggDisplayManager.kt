@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11
 object HoppityEggDisplayManager {
 
     private val config get() = HoppityEggsManager.config
+    private val unclaimedEggsConfig get() = config.unclaimedEggs
     private var shouldHidePlayer: Boolean = false
 
     var display = listOf<Renderable>()
@@ -74,19 +75,19 @@ object HoppityEggDisplayManager {
 
     private fun updateDisplay(): List<Renderable> {
         if (!HoppityEggsManager.isActive()) return emptyList()
-        if (!config.showClaimedEggs) return emptyList()
-        if (ReminderUtils.isBusy() && !config.showWhileBusy) return emptyList()
+        if (!unclaimedEggsConfig.enabled) return emptyList()
+        if (ReminderUtils.isBusy() && !unclaimedEggsConfig.showWhileBusy) return emptyList()
 
         val displayList: List<String> = buildList {
             add("§bUnclaimed Eggs:")
             HoppityEggType.resettingEntries.filter {
                 it.hasRemainingSpawns() // Only show eggs that have future spawns
             }.let { entries ->
-                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
+                if (unclaimedEggsConfig.displayOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
             }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
 
-            if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+            if (!unclaimedEggsConfig.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
@@ -100,10 +101,10 @@ object HoppityEggDisplayManager {
 
         val container = Renderable.verticalContainer(displayList.map(Renderable::string))
         return listOf(
-            if (config.warpUnclaimedEggs) Renderable.clickAndHover(
+            if (unclaimedEggsConfig.warpClickEnabled) Renderable.clickAndHover(
                 container,
-                tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
-                onClick = { HypixelCommands.warp(config.warpDestination) },
+                tips = listOf("§eClick to ${"/warp ${unclaimedEggsConfig.warpClickDestination}".trim()}!"),
+                onClick = { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) },
             ) else container
         )
     }
