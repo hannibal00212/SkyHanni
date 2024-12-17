@@ -288,7 +288,7 @@ object HoppityEggsManager {
             "showOutsideSkyblock" to "unclaimedEggs.showOutsideSkyblock",
 
             "timeInChat" to "chat.eggLocatorTimeInChat",
-            "compact" to "chat.compact",
+            "compactChat" to "chat.compact",
             "rarityInCompact" to "chat.rarityInCompact",
             "showDuplicateNumber" to "chat.showDuplicateNumber",
             "recolorTTChocolate" to "chat.recolorTTChocolate",
