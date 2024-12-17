@@ -75,7 +75,7 @@ object EnchantedClockHelper {
     // </editor-fold>
 
     enum class SimpleClockBoostType(
-        private val displayString: String
+        val displayString: String
     ) {
         MINIONS("§bMinions"),
         CHOCOLATE_FACTORY("§6Chocolate Factory"),
@@ -135,6 +135,8 @@ object EnchantedClockHelper {
 
             fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
 
+            fun fromSimple(simple: SimpleClockBoostType) = entries.firstOrNull { it.displayName == simple.displayString }
+
             fun Map<Int, ItemStack>.filterStatusSlots() = filterKeys { key ->
                 ClockBoostType.entries.any { entry ->
                     entry.statusSlot == key
@@ -150,15 +152,16 @@ object EnchantedClockHelper {
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
         for ((boostType, status) in storage.clockBoosts) {
-            val simpleType = boostType.toSimple()
-            val inConfig = simpleType != null && config.enchantedClockReminder.contains(simpleType)
+            val inConfig = boostType != null && config.enchantedClockReminder.contains(boostType)
             val isProperState = status.state == ClockBoostState.CHARGING
             val inFuture = status.availableAt?.isInFuture() == true
             if (!inConfig || !isProperState || inFuture) continue
 
+            val complexType = ClockBoostType.fromSimple(boostType) ?: continue
+
             status.state = ClockBoostState.READY
             status.availableAt = null
-            readyNowBoosts.add(boostType)
+            readyNowBoosts.add(complexType)
         }
 
         if (readyNowBoosts.isEmpty()) return
@@ -179,8 +182,9 @@ object EnchantedClockHelper {
         boostUsedChatPattern.matchMatcher(event.message) {
             val usageString = group("usagestring") ?: return@matchMatcher
             val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return@matchMatcher
+            val simpleType = boostType.toSimple() ?: return@matchMatcher
             val storage = storage ?: return@matchMatcher
-            storage.clockBoosts.getOrPut(boostType) {
+            storage.clockBoosts.getOrPut(simpleType) {
                 ProfileSpecificStorage.EnchantedClockStats.ClockBoostStatus(
                     ClockBoostState.CHARGING,
                     boostType.getCooldownFromNow()
@@ -197,6 +201,7 @@ object EnchantedClockHelper {
         val statusStacks = event.inventoryItems.filterStatusSlots()
         for ((_, stack) in statusStacks) {
             val boostType = ClockBoostType.byItemStackOrNull(stack) ?: continue
+            val simpleType = boostType.toSimple() ?: continue
 
             val currentStatus: ClockBoostState = statusLorePattern.firstMatcher(stack.getLore()) {
                 group("status")?.let { statusStr ->
@@ -212,13 +217,13 @@ object EnchantedClockHelper {
 
             // Because the times provided by the clock UI suck ass (we only get hour count)
             //  We only want to set it if the current time is horribly incorrect.
-            storage.clockBoosts[boostType]?.availableAt?.let { existing ->
+            storage.clockBoosts[simpleType]?.availableAt?.let { existing ->
                 parsedCooldown?.let { parsed ->
                     if (existing.absoluteDifference(parsed) < 2.hours) return
                 }
             }
 
-            storage.clockBoosts.getOrPut(boostType) {
+            storage.clockBoosts.getOrPut(simpleType) {
                 ProfileSpecificStorage.EnchantedClockStats.ClockBoostStatus(
                     currentStatus,
                     parsedCooldown
