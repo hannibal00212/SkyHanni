@@ -228,11 +228,11 @@ public class ProfileSpecificStorage {
 
             @Expose
             @Nullable
-            public SimpleTimeMark slotCooldown = null;
+            public SimpleTimeMark singleSlotCooldownMark = null;
 
             @Expose
             @Nullable
-            public SimpleTimeMark allSlotsCooldown = null;
+            public SimpleTimeMark allSlotsCooldownMark = null;
 
             @Expose
             @Nullable
