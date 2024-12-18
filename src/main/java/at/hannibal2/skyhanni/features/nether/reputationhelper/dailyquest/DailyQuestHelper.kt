@@ -65,10 +65,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
      * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
      * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
      * REGEX-TEST: §7miniboss §a1 §7time!
+     * REGEX-TEST: §7Kill the §cBarbarian Duke X §7miniboss §a2
      */
     val minibossAmountPattern by patternGroup.pattern(
         "minibossamount",
-        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d)(?: §7times?!)?",
     )
 
     /**

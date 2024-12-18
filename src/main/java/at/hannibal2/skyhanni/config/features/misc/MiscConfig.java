@@ -320,6 +320,15 @@ public class MiscConfig {
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 
     @Expose
+    @ConfigOption(
+        name = "Open Last Storage",
+        desc = "Allows running §e/shlastopened §7as a command to open the last storage you opened. " +
+            "Also allows §e/ec - §7and §e/bp - §7to open the last Ender Chest and Backpack you opened.")
+    @FeatureToggle
+    @ConfigEditorBoolean
+    public boolean openLastStorage = true;
+
+    @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -340,7 +349,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Computer Time Offset Warning",
         desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
-        "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
+            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
     )
     @ConfigEditorBoolean
     @FeatureToggle

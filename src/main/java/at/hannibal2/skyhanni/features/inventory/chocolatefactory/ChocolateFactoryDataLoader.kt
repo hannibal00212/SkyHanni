@@ -441,12 +441,12 @@ object ChocolateFactoryDataLoader {
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
                 val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
-                profileStorage.hitmanStats.slotCooldown = nextSlot
+                profileStorage.hitmanStats.singleSlotCooldownMark = nextSlot
             }
             hitmanAllSlotsCooldownPattern.matchMatcher(line) {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
-                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
+                profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
             }
             hitmanPurchasedSlotsPattern.matchMatcher(line) {
                 profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
