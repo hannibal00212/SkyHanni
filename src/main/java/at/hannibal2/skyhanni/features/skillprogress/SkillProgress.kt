@@ -135,7 +135,7 @@ object SkillProgress {
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         allDisplay = emptyList()
@@ -157,7 +157,7 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
@@ -195,7 +195,7 @@ object SkillProgress {
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.enabled,
@@ -465,7 +465,7 @@ object SkillProgress {
                     if (config.showActionLeft.get() && percent != 100f) {
                         append(" - ")
                         val gain = skill.lastGain.formatDouble()
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
+                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
                         if (skill.lastGain != "" && !actionLeft.contains("-")) {
                             append("§6$actionLeft Left")
                         } else {

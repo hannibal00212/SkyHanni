@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,14 +57,14 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Rabbit Warning", desc = "")
+    @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    public ChocolateFactoryRabbitWarningConfig rabbitWarning = new ChocolateFactoryRabbitWarningConfig();
+    public ChocolateFactoryStrayRabbitWarningConfig rabbitWarning = new ChocolateFactoryStrayRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
     @Accordion
-    public ChocolateUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateUpgradeWarningsConfig();
+    public ChocolateFactoryUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateFactoryUpgradeWarningsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
@@ -228,4 +229,13 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hitmanCosts")
     public Position hitmanCostsPosition = new Position(300, 300, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "§6CF §zParty Mode",
+        desc = "Don't turn this on."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public Property<Boolean> partyMode = Property.of(false);
 }

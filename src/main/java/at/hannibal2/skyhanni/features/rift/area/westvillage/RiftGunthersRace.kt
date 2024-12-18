@@ -56,7 +56,7 @@ object RiftGunthersRace {
         "§3§lRIFT RACING §r§cRace cancelled!.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelper?.reset()
     }
@@ -78,7 +78,7 @@ object RiftGunthersRace {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()

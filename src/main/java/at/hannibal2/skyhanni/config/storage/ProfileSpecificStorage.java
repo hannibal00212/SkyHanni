@@ -222,15 +222,19 @@ public class ProfileSpecificStorage {
         public static class HitmanStatsStorage {
             @Expose
             @Nullable
-            public Integer availableEggs;
+            public Integer availableEggs = null;
 
             @Expose
             @Nullable
-            public SimpleTimeMark slotCooldown = null;
+            public SimpleTimeMark singleSlotCooldownMark = null;
 
             @Expose
             @Nullable
-            public SimpleTimeMark allSlotsCooldown = null;
+            public SimpleTimeMark allSlotsCooldownMark = null;
+
+            @Expose
+            @Nullable
+            public Integer purchasedSlots = null;
         }
 
         @Expose

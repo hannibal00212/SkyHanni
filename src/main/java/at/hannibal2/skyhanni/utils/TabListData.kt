@@ -147,7 +147,7 @@ object TabListData {
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(getTabList()).post()
             if (!LorenzUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
@@ -158,7 +158,7 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
@@ -167,7 +167,7 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (LorenzUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
         }
     }
