@@ -104,4 +104,6 @@ object ReplaceRomanNumerals {
     private fun String.removeFormatting() = removeColor().replace(",", "")
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals
+
+    fun replaceRomanNumerals(string: String): String = string.transformLine()
 }
