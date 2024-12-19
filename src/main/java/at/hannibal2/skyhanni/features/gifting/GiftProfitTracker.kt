@@ -347,7 +347,7 @@ object GiftProfitTracker {
             val northStarsFormat = it.shortFormat()
             add(
                 Renderable.hoverTips(
-                    "§d$northStarsFormat§7x §5North Stars§7",
+                    "§d$northStarsFormat §5North Stars§7",
                     listOf("§7You gained §d${it.addSeparators()} §5North Stars."),
                 ).toSearchable(),
             )
