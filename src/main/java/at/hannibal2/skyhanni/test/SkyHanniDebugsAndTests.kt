@@ -495,10 +495,11 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf") if (false) {
+        if (false) {
             itemRenderDebug()
         }
 
@@ -531,9 +532,10 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
+    @Suppress("ConstantConditionIf")
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf") if (false) {
+        if (false) {
             dragAbleTest()
         }
     }
