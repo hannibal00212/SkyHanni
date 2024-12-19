@@ -2,20 +2,23 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -30,10 +33,11 @@ object PestWarning {
 
     private const val BASE_PEST_COOLDOWN = 300.0
 
+    var repellentMultiplier: Int = 1
     private var sprayMultiplier: Double = 1.0
     private var cooldown: Double? = null
-    private var lastPestSpawnTime = SimpleTimeMark.farPast()
     private var warningShown = false
+    private var equipmentOpen = false
 
     private val storage get() = GardenAPI.storage
 
@@ -74,21 +78,26 @@ object PestWarning {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName == "Your Equipment and Stats" && LorenzUtils.inSkyBlock) {
-            equipmentPestCooldown = checkEquipment(event.inventoryItems)
+        if (!LorenzUtils.inSkyBlock) return
+
+        when (event.inventoryName) {
+            "Your Equipment and Stats" -> equipmentPestCooldown = checkEquipment(event.inventoryItems)
+            "Wardrobe" -> equipmentOpen = true
         }
     }
 
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        equipmentOpen = false
+    }
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         sprayMultiplier = checkSpray()
-        cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0))
+        cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier
     }
 
     @HandleEvent
     fun onPestSpawn(event: PestSpawnEvent) {
-        lastPestSpawnTime = SimpleTimeMark.now()
         warningShown = false
     }
 
@@ -120,13 +129,55 @@ object PestWarning {
         if (cooldown == null) return
         if (warningShown) return
 
-        val timeSinceLastPest = lastPestSpawnTime.passedSince().inWholeSeconds
+        val timeSinceLastPest = PestSpawnTimer.lastSpawnTime.passedSince().inWholeSeconds
         val cooldownValue = cooldown ?: return
         if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
-            SoundUtils.createSound("random.orb", 0.5f).playSound()
             LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
-            ChatUtils.chat("§cPests cooldown has expired")
+
+            ChatUtils.clickableChat("§cPest spawn cooldown has expired",
+                onClick = {
+                    HypixelCommands.wardrobe()
+                },
+                "§eClick to open your wardrobe!"
+            )
+
             warningShown = true
+
+            if (config.sound.repeatSound) {
+                if (!equipmentOpen && warningShown) {
+                    playUserSound()
+                    Thread.sleep(config.sound.repeatDuration * 50L)
+                }
+            } else {
+                playUserSound()
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
+        if (!warningShown) return
+
+        if (event.keyCode == config.keyBindWardrobe) {
+            HypixelCommands.wardrobe()
+        }
+    }
+
+    @JvmStatic
+    fun playUserSound() {
+        with(config.sound) {
+            SoundUtils.createSound(name, pitch).playSound()
+        }
+    }
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Pest Warning")
+        event.addIrrelevant {
+            add("Repellent Multiplier: $repellentMultiplier")
+            add("Spray Multiplier: $sprayMultiplier")
+            add("Equipment Pest Cooldown: $equipmentPestCooldown")
+            add("Cooldown: ${cooldown ?: "Unknown"}")
+            add("Warning Shown: $warningShown")
         }
     }
 
