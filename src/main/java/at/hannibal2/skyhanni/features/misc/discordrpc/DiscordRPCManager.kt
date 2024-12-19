@@ -51,21 +51,21 @@ object DiscordRPCManager : IPCListener {
 
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
-    var debugError = false
-    var debugStatusMessage = ""
+    private var debugError = false
+    private var debugStatusMessage = "nothing"
 
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
             try {
                 if (isConnected()) return@launch
 
-                updateDebugStatus("trying to start")
+                updateDebugStatus("Starting...")
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(APPLICATION_ID)
                 client?.setup(fromCommand)
-            } catch (ex: Throwable) {
-                updateDebugStatus("unexpected error", error = true)
-                ErrorManager.logErrorWithData(ex, "Discord RPC has thrown an unexpected error while trying to start")
+            } catch (e: Throwable) {
+                updateDebugStatus("Unexpected error: ${e.message}", error = true)
+                ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
 
             }
         }
@@ -74,6 +74,7 @@ object DiscordRPCManager : IPCListener {
     private fun stop() {
         coroutineScope.launch {
             if (isConnected()) {
+                updateDebugStatus("Stopped")
                 client?.close()
                 started = false
             }
@@ -89,10 +90,10 @@ object DiscordRPCManager : IPCListener {
 
             // confirm that /shrpcstart worked
             ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
-            updateDebugStatus("Successfully started Rich Presence!")
+            updateDebugStatus("Successfully started")
             status
-        } catch (ex: Exception) {
-            updateDebugStatus("Failed to connect (discord not started yet?)", error = true)
+        } catch (e: Exception) {
+            updateDebugStatus("Failed to connect: ${e.message} (discord not started yet?)", error = true)
             ChatUtils.clickableChat(
                 "Discord Rich Presence was unable to start! " + "This usually happens when you join SkyBlock when Discord is not started. " + "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = { startCommand() },
@@ -211,9 +212,9 @@ object DiscordRPCManager : IPCListener {
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
-            updateDebugStatus("successfully started")
+            updateDebugStatus("Successfully started")
         } catch (e: Exception) {
-            updateDebugStatus("Unable to start", error = true)
+            updateDebugStatus("Unable to start: ${e.message}", error = true)
             ErrorManager.logErrorWithData(
                 e,
                 "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.",
