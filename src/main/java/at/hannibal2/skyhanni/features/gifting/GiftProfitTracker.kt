@@ -304,9 +304,7 @@ object GiftProfitTracker {
                 else -> ItemUtils.readItemAmount(group("item")) ?: return
             }
             NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.modify {
-                    it.addItem(item, amount, false)
-                }
+                tracker.addItem(item, amount, false)
             }
         }
     }
