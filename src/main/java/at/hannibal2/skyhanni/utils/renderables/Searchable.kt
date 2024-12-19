@@ -40,7 +40,7 @@ fun List<Searchable>.buildSearchableScrollable(
             velocity = velocity,
         ),
         SEARCH_PREFIX,
-        onUpdateSize = { println("onUpdateSize") },
+        onUpdateSize = {},
         textInput = textInput,
         key = key,
     )
