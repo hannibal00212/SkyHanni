@@ -833,32 +833,37 @@ object EstimatedItemValueCalculator {
     private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
         ?: "no tag compound"
 
-    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName()
-
+    private fun ItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
 
         // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
 
-        val slotNames = mutableListOf<String>()
-        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return 0.0
+        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return null
 
+        val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for ${stack.name}",
+                "Could not find gemstone slot price for $name",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to stack.name,
-                "item nbt" to stack.readNbtDump(),
+                "item name" to name,
+                "item nbt" to readNbtDump(),
             )
-            return 0.0
+            return null
         }
 
+        return unlockedSlots
+    }
+
+    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+        val unlockedSlots = stack.readUnlockedSlots() ?: return 0.0
+
         val materials = mutableMapOf<NEUInternalName, Int>()
-        val slots = EstimatedItemValue.gemstoneUnlockCosts[internalName] ?: return 0.0
+        val slots = EstimatedItemValue.gemstoneUnlockCosts[stack.getInternalName()] ?: return 0.0
+        val slotNames = mutableListOf<String>()
         for ((key, value) in slots) {
             if (!unlockedSlots.contains(key)) continue
 
