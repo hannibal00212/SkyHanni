@@ -532,8 +532,8 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
-    @Suppress("ConstantConditionIf")
     @SubscribeEvent
+    @Suppress("ConstantConditionIf")
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (false) {
             dragAbleTest()
