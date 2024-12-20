@@ -30,12 +30,12 @@ public class HideNotClickableConfig {
     )
     public int opacity = 180;
     @Expose
-    @ConfigOption(name = "Bypass With Key", desc = "Adds the ability to bypass not clickable items when holding the control/command key.")
+    @ConfigOption(name = "Bypass With Key", desc = "Add the ability to bypass not clickable items when holding the control/command key.")
     @ConfigEditorBoolean
     public boolean itemsBypass = true;
 
     @Expose
-    @ConfigOption(name = "Green Line", desc = "Adds green line around items that are clickable.")
+    @ConfigOption(name = "Green Line", desc = "Add green line around items that are clickable.")
     @ConfigEditorBoolean
     public boolean itemsGreenLine = true;
 

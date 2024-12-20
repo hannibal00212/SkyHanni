@@ -13,22 +13,22 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class About {
 
-    @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are running currently")
+    @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     public transient Void currentVersion = null;
 
-    @ConfigOption(name = "Auto Updates", desc = "Automatically check for updates on each startup")
+    @ConfigOption(name = "Check for Updates", desc = "Automatically check for updates on each startup")
     @Expose
     @ConfigEditorBoolean
     public boolean autoUpdates = true;
 
-    @ConfigOption(name = "Full Auto Updates", desc = "Automatically downloads new version on each startup.")
+    @ConfigOption(name = "Auto Updates", desc = "Automatically download new version on each startup")
     @Expose
     @FeatureToggle
     @ConfigEditorBoolean
     public boolean fullAutoUpdates = false;
 
-    @ConfigOption(name = "Update Stream", desc = "How frequently do you want updates for SkyHanni")
+    @ConfigOption(name = "Update Stream", desc = "How frequently you want updates for SkyHanni")
     @Expose
     @ConfigEditorDropdown
     public Property<UpdateStream> updateStream = Property.of(UpdateStream.RELEASES);

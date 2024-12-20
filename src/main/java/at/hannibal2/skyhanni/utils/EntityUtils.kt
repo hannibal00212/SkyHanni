@@ -11,16 +11,24 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityLevel
+import at.hannibal2.skyhanni.utils.compat.getHandItem
+import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
+import at.hannibal2.skyhanni.utils.compat.getNameAsString
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
+import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraft.potion.Potion
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.Event
@@ -29,19 +37,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object EntityUtils {
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
-    ): Boolean {
-        return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
-    }
+    ): Boolean = getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
             if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -49,13 +56,15 @@ object EntityUtils {
         return list
     }
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
-        it.name.contains(contains)
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
+        it.getNameAsString().contains(contains)
     }
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -64,6 +73,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -71,9 +81,9 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
+        val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.name.contains(contains)
+            val result = it.getNameAsString().contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
@@ -91,13 +101,14 @@ object EntityUtils {
         val b = center.add(radius, radius + 3, radius).toBlockPos()
         val alignedBB = AxisAlignedBB(a, b)
         val clazz = EntityArmorStand::class.java
-        val worldObj = Minecraft.getMinecraft()?.theWorld ?: return emptyList()
+        val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
         return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    // TODO remove baseMaxHealth
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
@@ -120,8 +131,7 @@ object EntityUtils {
         return gameProfile.properties.entries()
             .filter { it.key == "textures" }
             .map { it.value }
-            .firstOrNull { it.name == "textures" }
-            ?.value
+            .firstOrNull { it.name == "textures" }?.value
     }
 
     inline fun <reified T : Entity> getEntitiesNextToPlayer(radius: Double): Sequence<T> =
@@ -135,32 +145,56 @@ object EntityUtils {
 
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
+    @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
-        if (inventory == null) return false
+        val inventory = this.getWholeInventory() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
+    fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
+    fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
+
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
-    fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
-
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
-        if (this is EntityPlayer) inventory.armorInventory else null
+        if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
+    private fun WorldClient.getAllEntities(): Iterable<Entity> =
+        //#if MC < 1.14
+        loadedEntityList
+    //#else
+    //$$ entitiesForRendering()
+    //#endif
+
+    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
+        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
+        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        //  but *does* make crashes because of it rarer.
+        else it.toMutableList()
+    }?.asSequence().orEmpty()
+
+    fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft().theWorld?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+    }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
 
     @SubscribeEvent
-    fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
+    fun onEntityRenderPre(
+        event:
+        //#if MC < 1.14
+        RenderLivingEvent.Pre<*>,
+        //#else
+        //$$ RenderLivingEvent.Pre<*, *>
+        //#endif
+
+    ) {
         val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
             event.cancel()
@@ -168,12 +202,23 @@ object EntityUtils {
     }
 
     @SubscribeEvent
-    fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
+    fun onEntityRenderPost(
+        event:
+        //#if MC < 11400
+        RenderLivingEvent.Post<*>,
+        //#else
+        //$$ RenderLivingEvent.Post<*, *>
+        //#endif
+
+    ) {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
+    //#if MC < 11400
     @SubscribeEvent
-    fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
+    fun onEntityRenderSpecialsPre(
+        event: RenderLivingEvent.Specials.Pre<*>,
+    ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
             event.cancel()
@@ -181,17 +226,22 @@ object EntityUtils {
     }
 
     @SubscribeEvent
-    fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
+    fun onEntityRenderSpecialsPost(
+        event: RenderLivingEvent.Specials.Post<*>,
+    ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
+    //#endif
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.removeColor()
+    fun Entity.cleanName() = this.getNameAsString().removeColor()
 }
 
+//#if FORGE
 private fun Event.cancel() {
     isCanceled = true
 }
+//#endif

@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.enchantment.Enchantment
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
@@ -13,28 +15,22 @@ import kotlin.math.ceil
 object CollectionUtils {
 
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
-        while (true)
-            action(this.poll() ?: break)
+        while (true) action(this.poll() ?: break)
         return this
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount)
-            this.poll() ?: break
+        repeat(amount) { this.poll() ?: return this }
         return this
     }
 
-    inline fun <reified E, reified K, reified L : MutableCollection<K>>
-        Queue<E>.drainTo(list: L, action: (E) -> K): L {
-        while (true)
-            list.add(action(this.poll() ?: break))
+    inline fun <reified E, reified K, reified L : MutableCollection<K>> Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true) list.add(action(this.poll() ?: break))
         return list
     }
 
-    inline fun <reified E, reified L : MutableCollection<E>>
-        Queue<E>.drainTo(list: L): L {
-        while (true)
-            list.add(this.poll() ?: break)
+    inline fun <reified E, reified L : MutableCollection<E>> Queue<E>.drainTo(list: L): L {
+        while (true) list.add(this.poll() ?: break)
         return list
     }
 
@@ -92,6 +88,16 @@ object CollectionUtils {
         }
     }
 
+    /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
+    inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
+        val map = mutableMapOf<K, Int>()
+        for (item in this) {
+            val key = selector(item)
+            map.addOrPut(key, 1)
+        }
+        return map
+    }
+
     fun List<String>.nextAfter(after: String, skip: Int = 1) = nextAfter({ it == after }, skip)
 
     fun List<String>.nextAfter(after: (String) -> Boolean, skip: Int = 1): String? {
@@ -109,6 +115,22 @@ object CollectionUtils {
             }
         }
         return null
+    }
+
+    /**
+     * Returns a sublist of this list, starting after the first occurrence of the specified element.
+     *
+     * @param after The element after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
+    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+        val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
     }
 
     fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
@@ -133,13 +155,16 @@ object CollectionUtils {
         return newList
     }
 
-    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+    inline fun <reified T, reified K : MutableList<T>> K.transformAt(index: Int, transform: T.() -> T): K {
+        this[index] = transform(this[index])
+        return this
+    }
 
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
-        toMutableMap().also { function(it) }.toMap()
+    fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
-        toMutableList().also { function(it) }.toList()
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
+
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
         val entry = entries.find(matcher)
@@ -151,13 +176,13 @@ object CollectionUtils {
         return this
     }
 
-    operator fun IntRange.contains(range: IntRange): Boolean =
-        range.first in this && range.last in this
+    operator fun IntRange.contains(range: IntRange): Boolean = range.first in this && range.last in this
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
 
+    // TODO move to RenderableUtils
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
         add(Collections.singletonList(Renderable.string(text)))
     }
@@ -184,6 +209,55 @@ object CollectionUtils {
         }
     }
 
+    inline fun <T, R> Iterator<T>.consumeWhile(block: (T) -> R): R? {
+        while (hasNext()) {
+            return block(next()) ?: continue
+        }
+        return null
+    }
+
+    inline fun <T> Iterator<T>.collectWhile(block: (T) -> Boolean): List<T> {
+        return collectWhileTo(mutableListOf(), block)
+    }
+
+    inline fun <T, C : MutableCollection<T>> Iterator<T>.collectWhileTo(collection: C, block: (T) -> Boolean): C {
+        while (hasNext()) {
+            val element = next()
+            if (block(element)) {
+                collection.add(element)
+            } else {
+                break
+            }
+        }
+        return collection
+    }
+
+    /** Removes the first element that matches the given [predicate] in the list. */
+    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
+        val mutableList = this.toMutableList()
+        val iterator = mutableList.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableList.toList()
+    }
+
+    /** Removes the first element that matches the given [predicate] in the map. */
+    fun <K, V> Map<K, V>.removeFirst(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
+        val mutableMap = this.toMutableMap()
+        val iterator = mutableMap.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+                break
+            }
+        }
+        return mutableMap.toMap()
+    }
+
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)
@@ -192,12 +266,19 @@ object CollectionUtils {
     } else false
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? =
-        takeIf { null !in this } as? Iterable<T>
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = takeIf { null !in this } as? Iterable<T>
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
-        takeIf { null !in this } as? List<T>
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
+
+    fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
     // TODO add cache
     fun MutableList<Renderable>.addString(
@@ -208,6 +289,16 @@ object CollectionUtils {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
+    // TODO add cache
+    fun MutableList<Searchable>.addSearchString(
+        text: String,
+        searchText: String? = null,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
+    }
+
     // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
@@ -216,7 +307,7 @@ object CollectionUtils {
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(Enchantment.protection, 0)
+            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
     }
@@ -225,6 +316,12 @@ object CollectionUtils {
         addItemStack(internalName.getItemStack())
     }
 
+    fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
+        generateSequence(start) { it + 1 }.map {
+            (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
+        }.takeWhile { it <= end }
+
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -234,28 +331,49 @@ object CollectionUtils {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
     }
 
+    inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
+    }
+
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
-    ) = buildList {
+    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
+
+    inline fun <T> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+        universe: Array<T>,
+    ) = buildList<Renderable> {
         addString(prefix)
-        for (entry in enumValues<T>()) {
+        for (entry in universe) {
             val display = getName(entry)
             if (isCurrent(entry)) {
-                addString("§a[$display]")
+                addString("§a[$display§a]")
             } else {
                 addString("§e[")
-                add(Renderable.link("§e$display") {
-                    onChange(entry)
-                })
+                add(
+                    Renderable.link("§e$display") {
+                        onChange(entry)
+                    },
+                )
                 addString("§e]")
             }
             addString(" ")
         }
     }
 
+    // TODO move to RenderableUtils
     inline fun MutableList<Renderable>.addButton(
         prefix: String,
         getName: String,
@@ -269,18 +387,23 @@ object CollectionUtils {
                 ChatUtils.lastButtonClicked = System.currentTimeMillis()
             }
         }
-        add(Renderable.horizontalContainer(buildList {
-            addString(prefix)
-            addString("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            addString("§a]")
-        }))
+        add(
+            Renderable.horizontalContainer(
+                buildList {
+                    addString(prefix)
+                    addString("§a[")
+                    if (tips.isEmpty()) {
+                        add(Renderable.link("§e$getName", false, onClick))
+                    } else {
+                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                    }
+                    addString("§a]")
+                },
+            ),
+        )
     }
 
+    // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
         val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
@@ -355,5 +478,15 @@ object CollectionUtils {
 
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
+    }
+
+    /**
+     * Inserts the element at the index or appends it to the end if out of bounds of the list.
+     *
+     * @param index index to insert at, or append if >= size
+     * @param element element to insert or add
+     */
+    fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
+        if (index < size) add(index, element) else add(element)
     }
 }

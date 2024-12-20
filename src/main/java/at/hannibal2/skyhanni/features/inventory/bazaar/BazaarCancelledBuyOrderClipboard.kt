@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,15 +34,15 @@ object BazaarCancelledBuyOrderClipboard {
      */
     private val lastAmountPattern by patternGroup.pattern(
         "lastamount",
-        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\."
+        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\.",
     )
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage",
-        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!"
+        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!",
     )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
-        "Order options"
+        "Order options",
     )
 
     /**
@@ -50,7 +50,7 @@ object BazaarCancelledBuyOrderClipboard {
      */
     private val lastItemClickedPattern by patternGroup.pattern(
         "lastitemclicked",
-        "§a§lBUY (?<name>.*)"
+        "§a§lBUY (?<name>.*)",
     )
 
     private var latestAmount: Int? = null
@@ -64,7 +64,7 @@ object BazaarCancelledBuyOrderClipboard {
         if (!stack.name.contains("Cancel Order")) return
 
         val lore = stack.getLore()
-        lore.matchFirst(lastAmountPattern) {
+        lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
         }
@@ -83,7 +83,7 @@ object BazaarCancelledBuyOrderClipboard {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!BazaarOrderHelper.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
+        if (!BazaarApi.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
         val item = event.slot?.stack ?: return
 
         val name = lastItemClickedPattern.matchMatcher(item.name) {
@@ -95,6 +95,7 @@ object BazaarCancelledBuyOrderClipboard {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+        @Suppress("UnusedPrivateProperty")
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
             group("coins").formatInt().addSeparators()
         } ?: return
@@ -103,11 +104,14 @@ object BazaarCancelledBuyOrderClipboard {
         event.blockedReason = "bazaar cancelled buy order clipboard"
         val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
 
-        val message = "Bazaar buy order cancelled. Click to reorder. " +
+        val message = "Bazaar buy order cancelled. Click to re-order. " +
             "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
-        ChatUtils.clickableChat(message, onClick = {
-            BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
-        })
+        ChatUtils.clickableChat(
+            message,
+            onClick = {
+                BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
+            },
+        )
         OSUtils.copyToClipboard(latestAmount.toString())
         this.latestAmount = null
     }

@@ -122,7 +122,8 @@ select new installation, under version you need to find Forge for 1.8.9 (most li
 <summary>10. Recommended additional mods (optional)</summary>
 
 [OptiFine](https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar)
-and [Patcher](https://sk1er.club/mods/patcher).
+and either [Sk1erLLC's Patcher](https://sk1er.club/mods/patcher) or [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes, including fixed cactus hitboxes)
+
 Those two mods help you get more FPS in game and let you change many more performance
 settings.
 

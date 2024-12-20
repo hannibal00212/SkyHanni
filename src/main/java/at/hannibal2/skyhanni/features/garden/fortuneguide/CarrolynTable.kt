@@ -10,27 +10,36 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
         CropType.CARROT,
         "Exportable Carrots",
         "CARROTS EXPORTATION COMPLETE!",
-        "[NPC] Carrolyn: Thank you for the carrots."
+        "[NPC] Carrolyn: Thank you for the carrots.",
     ),
     EXPIRED_PUMPKIN(
         CropType.PUMPKIN,
         "Expired Pumpkin",
         "PUMPKINS EXPORTATION COMPLETE!",
-        "[NPC] Carrolyn: Thank you for the pumpkins."
+        "[NPC] Carrolyn: Thank you for the pumpkins.",
     ),
     SUPREME_CHOCOLATE_BAR(
         CropType.COCOA_BEANS,
         "Supreme Chocolate Bar",
-        "CHOCOLATE BARS EXPORTATION COMPLETE!",
-        "[NPC] Carrolyn: Thank you for the chocolate."
+        "COCOA BEANSS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the chocolate.",
+    ),
+    FINE_FLOUR(
+        CropType.WHEAT,
+        "Fine Flour",
+        "FINE FLOURS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the flour.",
     ),
     ;
 
+    /** Pattern without color codes */
     val completeMessagePattern by RepoPattern.pattern(
-        "garden.ff.carrolyn.complete.${crop.patternKeyName}", completeMessage
+        "garden.ff.carrolyn.complete.${crop.patternKeyName}", completeMessage,
     )
+
+    /** Pattern without color codes */
     val thxMessagePattern by RepoPattern.pattern(
-        "garden.ff.carrolyn.thx.${crop.patternKeyName}", thxMessage
+        "garden.ff.carrolyn.thx.${crop.patternKeyName}", thxMessage,
     )
 
     val thxResponse = "§aYou have already given Carrolyn enough $label."

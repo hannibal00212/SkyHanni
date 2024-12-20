@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -124,10 +124,10 @@ object VisitorRewardWarning {
         }
 
         blockedToolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
+        val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
-        val formattedLoss = NumberUtil.format(loss.absoluteValue)
+        val formattedLoss = loss.absoluteValue.shortFormat()
         blockedToolTip.add(blockDescription(blockReason, pricePerCopper, loss, formattedLoss))
         blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 

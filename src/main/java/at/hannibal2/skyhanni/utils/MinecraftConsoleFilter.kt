@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Marker
@@ -14,6 +14,7 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.filter.AbstractFilter
 import org.apache.logging.log4j.message.Message
 
+@Suppress("CommentWrapping")
 class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFilter(
     /* onMatch = */ Filter.Result.ACCEPT,
     /* onMismatch = */ Filter.Result.DENY,
@@ -236,7 +237,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         return Filter.Result.ACCEPT
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
         event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")

@@ -4,17 +4,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
-import java.awt.Color
 
 @SkyHanniModule
 object RenderableTooltips {
@@ -35,8 +33,9 @@ object RenderableTooltips {
         stack: ItemStack? = null,
         borderColor: LorenzColor? = null,
         snapsToTopIfToLong: Boolean = true,
+        spacedTitle: Boolean = false
     ) {
-        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong)
+        tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong, spacedTitle)
     }
 
     private fun drawHoveringText() {
@@ -44,29 +43,29 @@ object RenderableTooltips {
         val tips = tooltip.tips
         if (tips.isEmpty()) return
 
-        val x = Utils.getMouseX() + 12
-        val y = Utils.getMouseY() - if (tips.size > 1) 2 else -7
-        val borderColorStart = Color(tooltip.getBorderColor()).darker().rgb and 0x00FFFFFF or (200 shl 24)
-        val scaled = ScaledResolution(Minecraft.getMinecraft())
+        val x = GuiScreenUtils.mouseX + 12
+        val y = GuiScreenUtils.mouseY - if (tips.size > 1) 1 else -7
+        val borderColorStart = tooltip.getBorderColor()
+        val isSpacedTitle = tooltip.isSpacedTitle()
 
         val tooltipTextWidth = tips.maxOf { it.width }
         val tooltipHeight = tips.sumOf { it.height }
 
         val tooltipY = when {
             y < 16 -> 4 // Limit Top
-            y + tooltipHeight > scaled.scaledHeight -> {
-                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > scaled.scaledHeight)
+            y + tooltipHeight > GuiScreenUtils.scaledWindowHeight -> {
+                if (tooltip.snapsToTopIfToLong && tooltipHeight + 8 > GuiScreenUtils.scaledWindowHeight)
                     4 // Snap to Top if to Long
                 else
-                    scaled.scaledHeight - tooltipHeight - 4 // Limit Bottom
+                    GuiScreenUtils.scaledWindowHeight - tooltipHeight - 6 // Limit Bottom
             }
 
             else -> {
-                y - 12 // normal
+                y - 10 // normal
             }
         }
-        val tooltipX = if (x + tooltipTextWidth + 4 > scaled.scaledWidth) {
-            scaled.scaledWidth - tooltipTextWidth - 4 // Limit Right
+        val tooltipX = if (x + tooltipTextWidth + 4 > GuiScreenUtils.scaledWindowWidth) {
+            GuiScreenUtils.scaledWindowWidth - tooltipTextWidth - 4 // Limit Right
         } else {
             x // normal
         }
@@ -75,25 +74,25 @@ object RenderableTooltips {
         RenderHelper.disableStandardItemLighting()
         GlStateManager.enableDepth()
 
-        val zLevel = 300f
+        val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
         RenderUtils.drawGradientRect(
             left = -3,
             top = -4,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = -3,
         )
         RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 3,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 4,
         )
         RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 3,
         )
         RenderUtils.drawGradientRect(
@@ -103,9 +102,9 @@ object RenderableTooltips {
             bottom = tooltipHeight + 3,
         )
         RenderUtils.drawGradientRect(
-            left = tooltipTextWidth + 3,
+            left = tooltipTextWidth + 2,
             top = -3,
-            right = tooltipTextWidth + 4,
+            right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 3,
         )
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
@@ -118,9 +117,9 @@ object RenderableTooltips {
             endColor = borderColorEnd
         )
         RenderUtils.drawGradientRect(
-            left = tooltipTextWidth + 2,
+            left = tooltipTextWidth + 1,
             top = -3 + 1,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 3 - 1,
             startColor = borderColorStart,
             endColor = borderColorEnd
@@ -128,7 +127,7 @@ object RenderableTooltips {
         RenderUtils.drawGradientRect(
             left = -3,
             top = -3,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = -3 + 1,
             startColor = borderColorStart,
             endColor = borderColorStart
@@ -136,25 +135,24 @@ object RenderableTooltips {
         RenderUtils.drawGradientRect(
             left = -3,
             top = tooltipHeight + 2,
-            right = tooltipTextWidth + 3,
+            right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 3,
             startColor = borderColorEnd,
             endColor = borderColorEnd
         )
-        GlStateManager.disableDepth()
-        GlStateManager.translate(0f, 0f, -zLevel)
+        GlStateManager.translate(-1f, -1f, 0f)
 
         var yTranslateSum = 0
-        for (line in tips) {
+        tips.forEachIndexed { index, line ->
             line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
-            val yShift = line.height
+            var yShift = line.height
+            if (index == 0 && isSpacedTitle) yShift += 2
             GlStateManager.translate(0f, yShift.toFloat(), 0f)
             yTranslateSum += yShift
         }
 
-        GlStateManager.translate(-tooltipX.toFloat(), -tooltipY.toFloat() + yTranslateSum.toFloat(), 0f)
+        GlStateManager.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
         GlStateManager.enableLighting()
-        GlStateManager.enableDepth()
         RenderHelper.enableStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
@@ -164,13 +162,17 @@ object RenderableTooltips {
 private data class DeferredTooltip(
     val tips: List<Renderable>,
     val stack: ItemStack? = null,
-    val borderColor: LorenzColor? = null,
+    private val borderColor: LorenzColor? = null,
     val snapsToTopIfToLong: Boolean = true,
+    private val spacedTitle: Boolean = false,
 ) {
 
-    fun getBorderColor(): Int {
-        return Minecraft.getMinecraft().fontRendererObj.getColorCode(
-            borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1) ?: 'f'
-        )
+    fun getBorderColor(): Int =
+        (borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1))
+            ?.let { Minecraft.getMinecraft().fontRendererObj.getColorCode(it) }
+            ?: 0x505000FF
+
+    fun isSpacedTitle(): Boolean {
+        return spacedTitle
     }
 }

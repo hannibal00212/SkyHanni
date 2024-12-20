@@ -22,18 +22,28 @@ public class CrimsonIsleConfig {
     public ReputationHelperConfig reputationHelper = new ReputationHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Matriach Helper", desc = "Helper for Heavy Pearls")
+    @ConfigOption(name = "Matriarch Helper", desc = "Helper for Heavy Pearls")
     @Accordion
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Pablo NPC Helper", desc = "Shows a clickable message that grabs the flower needed from your sacks.")
+    @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minibossRespawnTimer = false;
+
+    @Expose
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossRespawnTimer")
+    public Position minibossTimerPosition = new Position(20, 50);
+
+    @Expose
+    @ConfigOption(name = "Pablo NPC Helper", desc = "Show a clickable message that grabs the flower needed from your sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean pabloHelper = false;
 
     @Expose
-    @ConfigOption(name = "Volcano Explosivity", desc = "Shows a HUD of the current volcano explosivity level.")
+    @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
     @ConfigEditorBoolean
     public boolean volcanoExplosivity = false;
 
@@ -42,9 +52,7 @@ public class CrimsonIsleConfig {
     public Position positionVolcano = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt\n" +
-        "and points needed for the next belt in the Challenges inventory\n" +
-        "on the Crimson Isles.")
+    @ConfigOption(name = "Dojo Rank Display", desc = "Display your rank, score, actual belt, and points needed for the next belt in the Challenges inventory on the Crimson Isles.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showDojoRankDisplay = false;

@@ -13,10 +13,16 @@ public class EndermanConfig {
     public EndermanBeaconConfig beacon = new EndermanBeaconConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
+    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlight the Enderman Slayer Nukekubi Skulls (Eyes).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightNukekebi = false;
+
+    @Expose
+    @ConfigOption(name = "Line to Nukekubi Skulls", desc = "Draw a line to the Enderman Slayer Nukekubi Skulls.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean drawLineToNukekebi = false;
 
     @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indicator.")

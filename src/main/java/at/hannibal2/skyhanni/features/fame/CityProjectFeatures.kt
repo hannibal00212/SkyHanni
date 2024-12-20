@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -12,20 +16,22 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -53,17 +59,12 @@ object CityProjectFeatures {
     private val patternGroup = RepoPattern.group("fame.projects")
     private val contributeAgainPattern by patternGroup.pattern(
         "contribute",
-        "§7Contribute again: §e(?<time>.*)"
+        "§7Contribute again: §e(?<time>.*)",
     )
     private val completedPattern by patternGroup.pattern(
         "completed",
-        "§aProject is (?:being built|released)!"
+        "§aProject is (?:being built|released)!",
     )
-
-    fun disable() {
-        config.dailyReminder = false
-        ChatUtils.chat("Disabled city project reminder messages!")
-    }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -73,17 +74,26 @@ object CityProjectFeatures {
 
         if (LorenzUtils.skyBlockArea == "Community Center") return
 
-        if (playerSpecific.nextCityProjectParticipationTime == 0L) return
-        if (System.currentTimeMillis() <= playerSpecific.nextCityProjectParticipationTime) return
+        playerSpecific.nextCityProjectParticipationTime.let {
+            if (it.isFarPast() || it.isInFuture()) return
+        }
         if (lastReminderSend.passedSince() < 30.seconds) return
         lastReminderSend = SimpleTimeMark.now()
 
-        ChatUtils.clickableChat(
-            "Daily City Project Reminder! (Click here to disable this reminder)",
-            onClick = {
-                disable()
+        ChatUtils.clickToActionOrDisable(
+            "Daily City Project Reminder!",
+            config::dailyReminder,
+            actionName = "warp to Hub",
+            action = {
+                HypixelCommands.warp("hub")
+                EntityMovementData.onNextTeleport(IslandType.HUB) {
+                    IslandGraphs.pathFind(
+                        LorenzVec(9.3, 72.0, -103.4),
+                        "§aCity Project",
+                        condition = { config.dailyReminder },
+                    )
+                }
             },
-            oneTimeClick = true
         )
     }
 
@@ -119,9 +129,9 @@ object CityProjectFeatures {
                 val lore = item.getLore()
                 val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
                 if (completed) continue
-                lore.matchFirst(contributeAgainPattern) {
+                contributeAgainPattern.firstMatcher(lore) {
                     val rawTime = group("time")
-                    if (!rawTime.contains("Soon!")) return@matchFirst
+                    if (!rawTime.contains("Soon!")) return
                     val duration = TimeUtils.getDuration(rawTime)
                     val endTime = now + duration
                     if (endTime < nextTime) {
@@ -131,7 +141,7 @@ object CityProjectFeatures {
                 if (item.name != "§eContribute this component!") continue
                 nextTime = now
             }
-            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime.toMillis()
+            ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
         }
     }
 
@@ -157,16 +167,21 @@ object CityProjectFeatures {
             list.add(" §7- ")
             list.add(stack)
 
-            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
-                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                    LorenzUtils.setTextIntoSign("$amount")
-                } else {
-                    BazaarApi.searchForBazaarItem(name, amount)
-                }
-            }) { inInventory && !NEUItems.neuHasFocus() })
+            list.add(
+                Renderable.optionalLink(
+                    "$name §ex${amount.addSeparators()}",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$amount")
+                        } else {
+                            BazaarApi.searchForBazaarItem(name, amount)
+                        }
+                    },
+                ) { inInventory && !NEUItems.neuHasFocus() },
+            )
 
-            val price = internalName.getPrice(false) * amount
-            val format = NumberUtil.format(price)
+            val price = internalName.getPrice() * amount
+            val format = price.shortFormat()
             list.add(" §7(§6$format§7)")
             add(list)
         }
@@ -177,14 +192,15 @@ object CityProjectFeatures {
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
+        // TODO: Refactor this loop to not have so many jumps
+        @Suppress("LoopWithTooManyJumpStatements")
         for (line in lore) {
             if (line == "§7Cost") {
                 next = true
                 continue
             }
             if (!next) continue
-            if (line == "") break
-            if (line.contains("Bits")) break
+            if (line == "" || line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
             val internalName = NEUInternalName.fromItemName(name)
@@ -223,7 +239,7 @@ object CityProjectFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.cityProject", "event.cityProject")
     }

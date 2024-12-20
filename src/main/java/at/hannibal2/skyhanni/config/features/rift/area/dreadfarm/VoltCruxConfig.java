@@ -9,13 +9,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class VoltCruxConfig {
 
     @Expose
-    @ConfigOption(name = "Volt Warning", desc = "Shows a warning while a Volt is discharging lightning.")
+    @ConfigOption(name = "Volt Warning", desc = "Show a warning while a Volt is discharging lightning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean voltWarning = true;
 
     @Expose
-    @ConfigOption(name = "Volt Range Highlighter", desc = "Shows the area in which a Volt might strike lightning.")
+    @ConfigOption(name = "Volt Range Highlighter", desc = "Show the area in which a Volt might strike lightning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean voltRange = true;
@@ -23,6 +23,7 @@ public class VoltCruxConfig {
     @Expose
     @ConfigOption(name = "Volt Range Highlighter Color", desc = "In which color should the Volt range be highlighted?")
     @ConfigEditorColour
+    // TODO rename to voltColor
     public String voltColour = "0:60:0:0:255";
 
     @Expose

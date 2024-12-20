@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -40,7 +40,7 @@ object GardenNextPlotPrice {
                     val (itemName, amount) = it
                     val lowestBin = NEUInternalName.fromItemName(itemName).getPrice()
                     val price = lowestBin * amount
-                    val format = NumberUtil.format(price)
+                    val format = price.shortFormat()
                     list[i] = list[i] + " §7(§6$format§7)"
                 } ?: run {
                     ErrorManager.logErrorStateWithData(

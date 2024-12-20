@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -9,14 +10,15 @@ import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -25,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerAPI {
 
-    private var nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
+    private val nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
     var isInCorrectArea = false
@@ -46,14 +48,18 @@ object SlayerAPI {
             val maxPrice = npcPrice.coerceAtLeast(price)
             val totalPrice = maxPrice * amount
 
-            val format = NumberUtil.format(totalPrice)
-            val priceFormat = " §7(§6$format coins§7)"
+            val format = totalPrice.shortFormat()
 
-            "$amountFormat$displayName$priceFormat" to totalPrice
+            if (internalName == NEUInternalName.SKYBLOCK_COIN) {
+                "§6$format coins" to totalPrice
+            } else {
+                val priceFormat = " §7(§6$format coins§7)"
+                "$amountFormat$displayName$priceFormat" to totalPrice
+            }
         }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Slayer")
 
         if (!hasActiveSlayerQuest()) {
@@ -62,10 +68,10 @@ object SlayerAPI {
         }
 
         event.addData {
-            add("activeSlayer: ${getActiveSlayer()}")
+            add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
             add("isInAnyArea: $isInAnyArea")
-            add("latestSlayerProgress: $latestSlayerProgress")
+            add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
     }
 
@@ -78,13 +84,11 @@ object SlayerAPI {
         }
 
         if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
-            SlayerQuestCompleteEvent().postAndCatch()
+            SlayerQuestCompleteEvent.post()
         }
     }
 
-    fun getActiveSlayer() = activeSlayer.getValue()
-
-    private val activeSlayer = RecalculatingValue(1.seconds) {
+    val activeSlayer by RecalculatingValue(1.seconds) {
         grabActiveSlayer()
     }
 
@@ -105,16 +109,16 @@ object SlayerAPI {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest") ?: ""
+        val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest").orEmpty()
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
-            SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
+            SlayerChangeEvent(old, latestSlayerCategory).post()
         }
 
-        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2) ?: ""
+        val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
         if (latestSlayerProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).post()
             latestSlayerProgress = slayerProgress
         }
 
@@ -125,7 +129,7 @@ object SlayerAPI {
             } else {
                 val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
                 isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
+                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
             }
         }
     }

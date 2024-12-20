@@ -26,7 +26,8 @@ fun tryToReplaceScoreboardLine(text: String): String? {
         return tryToReplaceScoreboardLineHarder(text)
     } catch (t: Throwable) {
         ErrorManager.logErrorWithData(
-            t, "Error while changing the scoreboard text.",
+            t,
+            "Error while changing the scoreboard text.",
             "text" to text
         )
         return text

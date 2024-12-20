@@ -18,6 +18,11 @@ public class ChestValueConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "Enabled in own Inventory", desc = "Enable the feature for your own inventory.")
+    @ConfigEditorBoolean
+    public boolean enableInOwnInventory = false;
+
+    @Expose
     @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
     @ConfigEditorBoolean
     public boolean enableInDungeons = false;

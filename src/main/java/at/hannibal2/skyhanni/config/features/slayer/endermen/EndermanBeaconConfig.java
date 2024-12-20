@@ -11,7 +11,7 @@ public class EndermanBeaconConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Beacon",
-        desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes. " +
+        desc = "Highlight the Enderman Slayer Yang Glyph (beacon) in red color and added a timer for when he explodes.\n" +
             "Supports beacon in hand and beacon flying.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -23,7 +23,7 @@ public class EndermanBeaconConfig {
     public String beaconColor = "0:255:255:0:88";
 
     @Expose
-    @ConfigOption(name = "Show Warning", desc = "Displays a warning mid-screen when the Enderman Slayer throws a Yang Glyph (beacon).")
+    @ConfigOption(name = "Show Warning", desc = "Display a warning mid-screen when the Enderman Slayer throws a Yang Glyph (beacon).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showWarning = false;

@@ -56,11 +56,19 @@ public class BackgroundConfig {
 
     @Expose
     @ConfigOption(
-        name = "Use Custom Background Image",
+        name = "Custom Background Image",
         desc = "Put that image into a resource pack, using the path \"skyhanni/scoreboard.png\"."
     )
     @ConfigEditorBoolean
     public boolean useCustomBackgroundImage = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Background Image Opacity",
+        desc = "The opacity of the custom background image."
+    )
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int customBackgroundImageOpacity = 100;
 
     @Expose
     @ConfigOption(

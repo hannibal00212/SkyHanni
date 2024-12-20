@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
@@ -32,17 +32,19 @@ object MobDebug {
 
     private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
-    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) =
-        this.filter { it.isNotInvisible() }.forEach {
-            event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.invoke(it).toColor(), 0.3f)
+    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
+        for (mob in filter { it.isNotInvisible() }) {
+            event.drawFilledBoundingBoxNea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
+    }
 
-    private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) =
-        this.filter { it.canBeSeen() && it.isNotInvisible() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
-            event.drawString(
-                it.first.add(y = 0.5), "§5" + it.second, seeThroughBlocks = true
-            )
+    private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) {
+        val map = filter { it.canBeSeen() && it.isNotInvisible() }
+            .map { it.boundingBox.getTopCenter() to it.name }
+        for ((location, text) in map) {
+            event.drawString(location.up(0.5), "§5$text", seeThroughBlocks = true)
         }
+    }
 
     @SubscribeEvent
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {
@@ -80,7 +82,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
     }

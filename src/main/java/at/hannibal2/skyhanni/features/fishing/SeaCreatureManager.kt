@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -18,23 +20,37 @@ object SeaCreatureManager {
     var allFishingMobs = mapOf<String, SeaCreature>()
     var allVariants = mapOf<String, List<String>>()
 
-    private val doubleHookMessages = setOf(
-        "§eIt's a §r§aDouble Hook§r§e! Woot woot!",
-        "§eIt's a §r§aDouble Hook§r§e!"
+    private val patternGroup = RepoPattern.group("fishing.seacreature")
+
+    /**
+     * REGEX-TEST: §eIt's a §r§aDouble Hook§r§e! Woot woot!
+     * REGEX-TEST: §eIt's a §r§aDouble Hook§r§e!
+     */
+    private val doubleHookPattern by patternGroup.pattern(
+        "doublehook",
+        "§eIt's a §r§aDouble Hook§r§e!(?: Woot woot!)?"
+    )
+
+    /**
+     * REGEX-TEST: §e> Your bottle of thunder has fully charged!
+     */
+    private val thunderBottleChargedPattern by patternGroup.pattern(
+        "thundercharged",
+        "§e> Your bottle of thunder has fully charged!"
     )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (doubleHookMessages.contains(event.message)) {
+        if (doubleHookPattern.matches(event.message)) {
             if (SkyHanniMod.feature.fishing.compactDoubleHook) {
                 event.blockedReason = "double_hook"
             }
             doubleHook = true
-        } else {
+        } else if (!doubleHook || !thunderBottleChargedPattern.matches(event.message)) {
             val seaCreature = getSeaCreatureFromMessage(event.message)
             if (seaCreature != null) {
-                SeaCreatureFishEvent(seaCreature, event, doubleHook).postAndCatch()
+                SeaCreatureFishEvent(seaCreature, event, doubleHook).post()
             }
             doubleHook = false
         }

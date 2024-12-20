@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -18,9 +20,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
@@ -38,7 +39,6 @@ object AnitaMedalProfit {
         GOLD("§6Gold medal", 8),
         SILVER("§fSilver medal", 2),
         BRONZE("§cBronze medal", 1),
-        ;
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
@@ -77,7 +77,7 @@ object AnitaMedalProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
-        val itemName = getItemName(item) ?: return
+        val itemName = getItemName(item)
         if (itemName == " ") return
         if (itemName == "§cClose") return
         if (itemName == "§eUnique Gold Medals") return
@@ -97,16 +97,16 @@ object AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val profitFormat = NumberUtil.format(profit)
+        val profitFormat = profit.shortFormat()
         val color = if (profit > 0) "§6" else "§c"
 
         val hover = listOf(
             itemName,
             "",
-            "§7Item price: §6${NumberUtil.format(itemPrice)} ",
+            "§7Item price: §6${itemPrice.shortFormat()} ",
             // TODO add more exact material cost breakdown
-            "§7Material cost: §6${NumberUtil.format(fullCost)} ",
-            "§7Final profit: §6${profitFormat} ",
+            "§7Material cost: §6${fullCost.shortFormat()} ",
+            "§7Final profit: §6$profitFormat ",
         )
         table.add(
             DisplayTableEntry(
@@ -115,8 +115,8 @@ object AnitaMedalProfit {
                 profit,
                 internalName,
                 hover,
-                highlightsOnHoverSlots = listOf(slot)
-            )
+                highlightsOnHoverSlots = listOf(slot),
+            ),
         )
     }
 
@@ -129,7 +129,7 @@ object AnitaMedalProfit {
     }
 
     private fun getFullCost(requiredItems: MutableList<String>): Double {
-        val jacobTicketPrice = "JACOBS_TICKET".asInternalName().getPrice()
+        val jacobTicketPrice = "JACOBS_TICKET".toInternalName().getPrice()
         var otherItemsPrice = 0.0
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
@@ -175,16 +175,15 @@ object AnitaMedalProfit {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (inInventory) {
-            config.medalProfitPos.renderRenderables(
-                display,
-                extraSpace = 5,
-                posLabel = "Anita Medal Profit"
-            )
-        }
+        if (!inInventory || VisitorAPI.inInventory) return
+        config.medalProfitPos.renderRenderables(
+            display,
+            extraSpace = 5,
+            posLabel = "Anita Medal Profit",
+        )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
         event.move(3, "garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")

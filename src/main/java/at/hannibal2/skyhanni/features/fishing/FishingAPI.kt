@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -35,9 +35,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object FishingAPI {
 
+    /**
+     * REGEX-TEST: BRONZE_HUNTER_HELMET
+     * REGEX-TEST: SILVER_HUNTER_CHESTPLATE
+     * REGEX-TEST: GOLD_HUNTER_LEGGINGS
+     * REGEX-TEST: DIAMOND_HUNTER_BOOTS
+     */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
@@ -52,7 +58,7 @@ object FishingAPI {
     private var waterRods = listOf<NEUInternalName>()
 
     var bobber: EntityFishHook? = null
-    var bobberHasTouchedWater = false
+    var bobberHasTouchedLiquid = false
 
     var wearingTrophyArmor = false
 
@@ -63,13 +69,13 @@ object FishingAPI {
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
-        bobberHasTouchedWater = false
-        FishingBobberCastEvent(event.entity).postAndCatch()
+        bobberHasTouchedLiquid = false
+        FishingBobberCastEvent(event.entity).post()
     }
 
     private fun resetBobber() {
         bobber = null
-        bobberHasTouchedWater = false
+        bobberHasTouchedLiquid = false
     }
 
     @SubscribeEvent
@@ -89,12 +95,15 @@ object FishingAPI {
         if (bobber.isDead) {
             resetBobber()
         } else {
-            if (!bobberHasTouchedWater) {
-                val block = bobber.getLorenzVec().getBlockAt()
-                if (block in getAllowedBlocks()) {
-                    bobberHasTouchedWater = true
-                    FishingBobberInWaterEvent().postAndCatch()
+            if (!bobberHasTouchedLiquid) {
+                val isWater = when {
+                    bobber.isInLava && holdingLavaRod -> false
+                    bobber.isInWater && holdingWaterRod -> true
+                    else -> return
                 }
+
+                bobberHasTouchedLiquid = true
+                FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
     }
@@ -106,9 +115,9 @@ object FishingAPI {
 
     fun NEUInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
@@ -135,7 +144,8 @@ object FishingAPI {
         return info?.getFilletValue(rarity) ?: 0
     }
 
-    fun isFishing(checkRodInHand: Boolean = true) = IsFishingDetection.isFishing || (checkRodInHand && holdingRod)
+    fun isFishing(checkRodInHand: Boolean = true) =
+        (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonAPI.inDungeon()
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         val name = entity.name

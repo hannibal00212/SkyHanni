@@ -87,7 +87,7 @@ public class EnchantParsingConfig {
     public Property<Boolean> hideVanillaEnchants = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Hide Enchant Description", desc = "Hides the enchant description after each enchant if available.")
+    @ConfigOption(name = "Hide Enchant Description", desc = "Hide the enchant description after each enchant if available.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);

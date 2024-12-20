@@ -16,6 +16,7 @@ import java.util.List;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.ACCEPTED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COINS_SPENT;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER;
+import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.COPPER_DYE;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DEDICATION_IV;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.DENIED;
 import static at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry.FARMING_EXP;
@@ -31,7 +32,7 @@ public class DropsStatisticsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tallies up statistic about visitors and the rewards you have received from them."
+        desc = "Tally statistics about visitors and the rewards you have received from them."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -55,7 +56,8 @@ public class DropsStatisticsConfig {
         COINS_SPENT,
         OVERGROWN_GRASS,
         GREEN_BANDANA,
-        DEDICATION_IV
+        DEDICATION_IV,
+        COPPER_DYE
     ));
 
     /**
@@ -89,6 +91,7 @@ public class DropsStatisticsConfig {
         CULTIVATING_I("§b1 §9Cultivating I", 15),
         REPLENISH_I("§b1 §9Replenish I", 16),
         DELICATE("§b1 §9Delicate V"),
+        COPPER_DYE("§b1 §8Copper Dye"),
         ;
 
         private final String str;
@@ -116,19 +119,19 @@ public class DropsStatisticsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+    @ConfigOption(name = "Display Numbers First", desc = "Whether the number or drop name displays first.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = true;
 
     @Expose
-    @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+    @ConfigOption(name = "Display Icons", desc = "Replace the drop names with icons.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayIcons = false;
 
     @Expose
-    @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+    @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     public boolean onlyOnBarn = true;
 

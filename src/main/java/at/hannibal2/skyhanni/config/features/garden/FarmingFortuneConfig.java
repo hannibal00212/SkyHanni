@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.commands.Commands;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -13,15 +13,15 @@ public class FarmingFortuneConfig {
     @Expose
     @ConfigOption(
         name = "FF Display",
-        desc = "Displays the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
+        desc = "Display the true Farming Fortune for the current crop, including all crop-specific and hidden bonuses."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean display = false;
 
-    @ConfigOption(name = "Farming Fortune Guide", desc = "Opens a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
+    @ConfigOption(name = "Farming Fortune Guide", desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable open = Commands::openFortuneGuide;
+    public Runnable open = FFGuideGUI::onCommand;
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig.class, field = "display")

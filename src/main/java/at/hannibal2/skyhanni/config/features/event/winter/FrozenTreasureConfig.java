@@ -32,7 +32,7 @@ public class FrozenTreasureConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tracks all of your drops from Frozen Treasure in the Glacial Caves.\n" +
+        desc = "Track all of your drops from Frozen Treasure in the Glacial Caves.\n" +
             "§eIce calculations are an estimate but are relatively accurate."
     )
     @ConfigEditorBoolean
@@ -107,18 +107,18 @@ public class FrozenTreasureConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Only in Glacial Cave", desc = "Only shows the overlay while in the Glacial Cave.")
+    @ConfigOption(name = "Only in Glacial Cave", desc = "Only show the overlay while in the Glacial Cave.")
     @ConfigEditorBoolean
     public boolean onlyInCave = true;
 
     @Expose
-    @ConfigOption(name = "Show as Drops", desc = "Multiplies the numbers on the display by the base drop. \n" +
+    @ConfigOption(name = "Show as Drops", desc = "Multiply the numbers on the display by the base drop.\n" +
         "E.g. 3 Ice Bait -> 48 Ice Bait")
     @ConfigEditorBoolean
     public boolean showAsDrops = false;
 
     @Expose
-    @ConfigOption(name = "Hide Chat Messages", desc = "Hides the chat messages from Frozen Treasures.")
+    @ConfigOption(name = "Hide Chat Messages", desc = "Hide the chat messages from Frozen Treasures.")
     @ConfigEditorBoolean
     public boolean hideMessages = false;
 

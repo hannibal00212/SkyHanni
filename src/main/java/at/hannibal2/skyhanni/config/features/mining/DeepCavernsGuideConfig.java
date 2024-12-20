@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class DeepCavernsGuideConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a guide to the bottom of the Deep Caverns and to Rhys.")
+    @ConfigOption(name = "Enabled", desc = "Show a guide to the bottom of the Deep Caverns and to Rhys.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

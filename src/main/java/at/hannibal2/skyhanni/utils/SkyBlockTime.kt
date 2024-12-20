@@ -28,14 +28,28 @@ data class SkyBlockTime(
     companion object {
         private const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
         const val SKYBLOCK_YEAR_MILLIS = 124 * 60 * 60 * 1000L
+        const val SKYBLOCK_SEASON_MILLIS = SKYBLOCK_YEAR_MILLIS / 4
         private const val SKYBLOCK_MONTH_MILLIS = SKYBLOCK_YEAR_MILLIS / 12
-        private const val SKYBLOCK_DAY_MILLIS = SKYBLOCK_MONTH_MILLIS / 31
-        private const val SKYBLOCK_HOUR_MILLIS = SKYBLOCK_DAY_MILLIS / 24
+        const val SKYBLOCK_DAY_MILLIS = SKYBLOCK_MONTH_MILLIS / 31
+        const val SKYBLOCK_HOUR_MILLIS = SKYBLOCK_DAY_MILLIS / 24
         private const val SKYBLOCK_MINUTE_MILLIS = SKYBLOCK_HOUR_MILLIS / 60
         private const val SKYBLOCK_SECOND_MILLIS = SKYBLOCK_MINUTE_MILLIS / 60
 
         fun fromInstant(instant: Instant): SkyBlockTime =
             calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
+
+        fun fromSbYear(year: Int): SkyBlockTime =
+            fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
+
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
+            return fromInstant(
+                Instant.ofEpochMilli(
+                    SKYBLOCK_EPOCH_START_MILLIS +
+                        (SKYBLOCK_YEAR_MILLIS * year) +
+                        (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier)))
+                )
+            )
+        }
 
         fun now(): SkyBlockTime = fromInstant(Instant.now())
 
@@ -103,6 +117,11 @@ data class SkyBlockTime(
                 3 -> "rd"
                 else -> "th"
             }
+        }
+
+        operator fun SkyBlockTime.plus(duration: kotlin.time.Duration): SkyBlockTime {
+            val millis = toMillis() + duration.inWholeMilliseconds
+            return fromInstant(Instant.ofEpochMilli(millis))
         }
     }
 }

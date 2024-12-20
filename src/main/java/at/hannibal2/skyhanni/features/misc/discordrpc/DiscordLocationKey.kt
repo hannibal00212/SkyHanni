@@ -159,7 +159,7 @@ object DiscordLocationKey {
 
         "Dwarven Base Camp" to "glacite-tunnels",
         "Fossil Research Center" to "glacite-tunnels",
-        "Glacite Lake" to "glacite-tunnels",
+        "Great Glacite Lake" to "glacite-tunnels",
         "Glacite Mineshafts" to "glacite-tunnels",
     ) // maps sublocations to their broader image
 
@@ -206,7 +206,7 @@ object DiscordLocationKey {
         "The Wasteland",
         "Throne Room"
     )
-    // list of nether locations because there are sooo many (truncated some according to scoreboard)
+    // list of nether locations because there are soo many (truncated some according to scoreboard)
 
     private val specialRiftRPC = mapOf(
         "Enigma's Crib" to "wyld-woods",
@@ -298,16 +298,12 @@ object DiscordLocationKey {
     fun getDiscordIconKey(location: String): String {
         val keyIfNormal = location.lowercase().replace(' ', '-')
 
-        return if (normalRPC.contains(keyIfNormal)) {
-            keyIfNormal
-        } else if (specialRPC.containsKey(location)) {
-            specialRPC[location]!!
-        } else if (specialNetherRPC.contains(location)) {
-            "crimson-isle"
-        } else if (specialRiftRPC.containsKey(location)) {
-            specialRiftRPC[location]!!
-        } else {
-            getAmbiguousKey(location) // will return skyblock-logo if not found
+        return when {
+            normalRPC.contains(keyIfNormal) -> keyIfNormal
+            specialRPC.containsKey(location) -> specialRPC[location] ?: getAmbiguousKey(location)
+            specialNetherRPC.contains(location) -> "crimson-isle"
+            specialRiftRPC.containsKey(location) -> specialRiftRPC[location] ?: getAmbiguousKey(location)
+            else -> getAmbiguousKey(location) // will return skyblock-logo if not found
         }
     }
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -17,9 +18,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -70,7 +71,7 @@ object GardenLevelDisplay {
 
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         update()
     }
@@ -98,9 +99,8 @@ object GardenLevelDisplay {
             ChatUtils.clickableChat(
                 " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                     " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                onClick = {
-                    HypixelCommands.gardenLevels()
-                },
+                onClick = { HypixelCommands.gardenLevels() },
+                "§eClick to view your Garden Level progress and rewards!",
                 prefix = false
             )
 
@@ -173,7 +173,7 @@ object GardenLevelDisplay {
             if (next && line.contains("                    ")) {
                 val progress = overflow / needForOnlyNextLvl
                 val progressBar = StringUtils.progressBar(progress, 20)
-                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${format(needForOnlyNextLvl)}")
+                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.shortFormat()}")
                 iterator.add("")
                 iterator.add("§b§lOVERFLOW XP:")
                 iterator.add("§7▸ ${overflowTotal.addSeparators()}")
@@ -214,14 +214,14 @@ object GardenLevelDisplay {
         config.pos.renderString(display, posLabel = "Garden Level")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.overflow) { update() }
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.display
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevels.display")
         event.move(3, "garden.gardenLevelPos", "garden.gardenLevels.pos")

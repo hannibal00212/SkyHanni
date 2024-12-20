@@ -16,7 +16,7 @@ public class TotemOfCorruptionConfig {
     @Expose
     @ConfigOption(name = "Show Overlay", desc = "Show the Totem of Corruption overlay." +
         "\nShows the totem, in which effective area you are in, with the longest time left." +
-        "\n§cThis needs to be enabled for the other options to work.")
+        "\n§eThis needs to be enabled for the other options to work.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> showOverlay = Property.of(true);
@@ -29,7 +29,8 @@ public class TotemOfCorruptionConfig {
     public int distanceThreshold = 16;
 
     @Expose
-    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.")
+    @ConfigOption(name = "Hide Particles", desc = "Hide the particles of the Totem of Corruption.\n" +
+        "§eRequires the Overlay to be active.")
     @ConfigEditorBoolean
     public boolean hideParticles = true;
 

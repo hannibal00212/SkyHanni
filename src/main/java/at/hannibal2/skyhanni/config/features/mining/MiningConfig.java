@@ -69,7 +69,22 @@ public class MiningConfig {
     public MineshaftConfig mineshaft = new MineshaftConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
+    @ConfigOption(name = "Mineshaft Pity Display", desc = "")
+    @Accordion
+    public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Crystal Nucleus Crystal Highlights", desc = "")
+    @Accordion
+    public CrystalHighlighterConfig crystalHighlighter = new CrystalHighlighterConfig();
+
+    @Expose
+    @ConfigOption(name = "Flowstate Helper", desc = "")
+    @Accordion
+    public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
+
+    @Expose
+    @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightCommissionMobs = false;
@@ -81,14 +96,25 @@ public class MiningConfig {
     public boolean crystalHollowsNamesInCore = false;
 
     @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Blocks the mining ability when on private island.")
+    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean privateIslandNoPickaxeAbility = false;
+    public boolean privateIslandNoPickaxeAbility = true;
 
     @Expose
-    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightYourGoldenGoblin = true;
+
+    @Expose
+    @ConfigOption(name = "Line to your Golden Goblin", desc = "Also makes a line to your goblin. §eNeeds the option above to work.")
+    @ConfigEditorBoolean
+    public boolean lineToYourGoldenGoblin = false;
+
+    @Expose
+    @ConfigOption(name = "Precision Mining Helper", desc = "Draws a box over the Precision Mining particles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightPrecisionMiningParticles = false;
 }

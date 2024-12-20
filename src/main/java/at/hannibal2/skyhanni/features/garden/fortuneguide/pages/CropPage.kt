@@ -12,10 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
     GuideTablePage(
-        sizeX,
-        sizeY,
-        paddingX,
-        paddingY
+        sizeX, sizeY, paddingX, paddingY,
     ) {
 
     val crop get() = crop0()
@@ -33,19 +30,15 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
                     toolLines[0],
                     equipDisplay(),
                     toolLines[1],
-                )
+                ),
             ),
-            emptyList()
+            emptyList(),
         )
     }
 
     private fun header(): List<Renderable> = buildList {
         add(FortuneStats.BASE.getFarmingBar())
-
-        add(
-            FortuneStats.CROP_TOTAL.getFarmingBar(110)
-        )
-
+        add(FortuneStats.CROP_TOTAL.getFarmingBar(110))
         add(FortuneStats.CROP_UPGRADE.getFarmingBar())
     }
 
@@ -53,32 +46,33 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
         width: Int = 90,
     ) = Renderable.clickable(
         GuiRenderUtils.getFarmingBar(label(crop), tooltip(crop), current, max, width),
-        { onClick(crop) })
+        { onClick(crop) },
+    )
 
     private fun toolLines(): List<Renderable> =
         FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }
 
     private fun equipDisplay(): Renderable =
-        Renderable.fixedSizeCollum(
+        Renderable.fixedSizeColumn(
             Renderable.verticalContainer(
                 listOf(
                     crop.farmingItem.getDisplay(),
                     Renderable.horizontalContainer(
                         listOf(
                             Renderable.verticalContainer(FarmingItems.getArmorDisplay(), 2),
-                            Renderable.verticalContainer(FarmingItems.getEquipmentDisplay(), 2)
+                            Renderable.verticalContainer(FarmingItems.getEquipmentDisplay(), 2),
                         ),
                         2,
-                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     ),
-                    Renderable.horizontalContainer(FarmingItems.getPetsDisplay(true), 2)
+                    Renderable.horizontalContainer(FarmingItems.getPetsDisplay(true), 2),
                 ),
                 2,
-                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ),
-            144,
+            164,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+            verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
         )
 
     companion object {

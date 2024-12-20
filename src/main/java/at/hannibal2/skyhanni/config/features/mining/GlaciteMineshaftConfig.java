@@ -18,7 +18,12 @@ public class GlaciteMineshaftConfig {
     public CorpseLocatorConfig corpseLocator = new CorpseLocatorConfig();
 
     @Expose
-    @ConfigOption(name = "Share Waypoint Location", desc = "Shares the location of the nearest waypoint upon key press.\n" +
+    @ConfigOption(name = "Corpse Tracker", desc = "")
+    @Accordion
+    public CorpseTrackerConfig corpseTracker = new CorpseTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Share Waypoint Location", desc = "Share the location of the nearest waypoint upon key press.\n" +
         "§eYou can share the location even if it has already been shared!")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int shareWaypointLocation = Keyboard.KEY_NONE;

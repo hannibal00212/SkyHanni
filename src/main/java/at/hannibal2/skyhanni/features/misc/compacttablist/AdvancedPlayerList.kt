@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
@@ -36,12 +36,12 @@ object AdvancedPlayerList {
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)"
+        ".*\\[(?<level>.*)] §r(?<name>.*)",
     )
 
-    private var playerDatas = mutableMapOf<String, PlayerData>()
+    private var playerData = mutableMapOf<String, PlayerData>()
 
-    fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
+    fun createTabLine(text: String, type: TabStringType) = playerData[text]?.let {
         TabLine(text, type, createCustomName(it))
     } ?: TabLine(text, type)
 
@@ -90,7 +90,7 @@ object AdvancedPlayerList {
                 currentData[line] = it
             }
         }
-        playerDatas = currentData
+        playerData = currentData
         val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
@@ -127,7 +127,7 @@ object AdvancedPlayerList {
         }
         newList.addAll(newPlayerList)
 
-        val rest = original.drop(playerDatas.size + extraTitles + 1)
+        val rest = original.drop(playerData.size + extraTitles + 1)
         newList.addAll(rest)
         return newList
     }
@@ -193,7 +193,9 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let {
+                BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
+            }.orEmpty()
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -204,13 +206,13 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
-            suffix += data.faction.icon ?: ""
+            suffix += data.faction.icon.orEmpty()
         }
 
         return "$level $playerName ${suffix.trim()}"
     }
 
-    private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
+    private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
     private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
         (Random.nextDouble() * 500).toInt()
@@ -220,7 +222,7 @@ object AdvancedPlayerList {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
         MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
         PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.getAllFriends().any { it.name.contains(name) } -> SocialIcon.FRIEND
+        FriendAPI.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
         GuildAPI.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }
@@ -254,7 +256,7 @@ object AdvancedPlayerList {
         constructor(icon: String, score: Int) : this({ icon }, score)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
             ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)

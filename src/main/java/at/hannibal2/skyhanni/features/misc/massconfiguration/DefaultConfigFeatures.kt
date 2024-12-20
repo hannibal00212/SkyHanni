@@ -38,9 +38,8 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like this is the first time you are using SkyHanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
-                onClick = {
-                    onCommand("null", "null")
-                }
+                onClick = { onCommand("null", "null") },
+                "§eClick to run /shdefaultoptions!"
             )
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
@@ -48,11 +47,17 @@ object DefaultConfigFeatures {
             ChatUtils.clickableChat(
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
-                onClick = {
-                    onCommand(lastVersion, SkyHanniMod.version)
-                }
+                onClick = { onCommand(lastVersion, SkyHanniMod.version) },
+                "§eClick to run /shdefaultoptions!"
             )
         }
+    }
+
+    fun onCommand(args: Array<String>) {
+        onCommand(
+            args.getOrNull(0) ?: "null",
+            args.getOrNull(1) ?: "null",
+        )
     }
 
     fun onCommand(old: String, new: String) {
@@ -71,8 +76,8 @@ object DefaultConfigFeatures {
             return
         }
         optionList = optionList
-            .mapValues { it ->
-                it.value.filter {
+            .mapValues { option ->
+                option.value.filter {
                     (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
                         (togglesInOldVersion == null || it.path !in togglesInOldVersion)
                 }
@@ -89,7 +94,7 @@ object DefaultConfigFeatures {
         resetSuggestionState: MutableMap<Category, ResetSuggestionState>,
         orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     ) {
-        orderedOptions.forEach { (cat, options) ->
+        for ((cat, options) in orderedOptions) {
             for (option in options) {
                 val resetState = option.toggleOverride ?: resetSuggestionState[cat]!!
                 if (resetState == ResetSuggestionState.LEAVE_DEFAULTS) continue
@@ -108,7 +113,7 @@ object DefaultConfigFeatures {
         if (strings.size <= 2)
             return CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null")
+                SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
             )
         return listOf()
     }

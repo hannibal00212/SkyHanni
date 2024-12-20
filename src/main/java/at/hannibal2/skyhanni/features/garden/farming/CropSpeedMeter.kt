@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -25,7 +26,7 @@ object CropSpeedMeter {
     var enabled = false
     private var startCrops = mapOf<CropType, Long>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (startCrops.isEmpty()) return
@@ -76,7 +77,7 @@ object CropSpeedMeter {
         return list
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
         if (!isEnabled()) return
         val counters = mutableMapOf<CropType, Long>()
@@ -89,9 +90,9 @@ object CropSpeedMeter {
             snapshot = emptyList()
         } else {
             currentCrop?.let {
-                val crops = it.getCounter() - startCrops[it]!!
+                val crops = it.getCounter() - (startCrops[it] ?: 0L)
                 val blocks = currentBlocks
-                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).round(3)
+                val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 
                 val list = mutableListOf<String>()
                 list.add("")
@@ -101,7 +102,7 @@ object CropSpeedMeter {
                 list.add(" §7Crops per Block: " + cropsPerBlocks.addSeparators())
 
                 val baseDrops = it.baseDrops
-                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).round(3)
+                val farmingFortune = (cropsPerBlocks * 100 / baseDrops).roundTo(3)
 
                 list.add(" §7Calculated farming Fortune: §e" + farmingFortune.addSeparators())
                 list.add("§cOpen /cropmilestones again to recalculate!")

@@ -13,7 +13,7 @@ public class PetCandyDisplayConfig {
     public boolean showCandy = true;
 
     @Expose
-    @ConfigOption(name = "Hide On Maxed", desc = "Hides the candy count on pets that are max level.")
+    @ConfigOption(name = "Hide On Maxed", desc = "Hide the candy count on pets that are max level.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideOnMaxed = false;

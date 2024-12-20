@@ -1,26 +1,35 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -33,17 +42,23 @@ object DianaProfitTracker {
     private val patternGroup = RepoPattern.group("diana.chat")
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*"
+        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
     )
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
-        "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!"
+        "§6§lWow! §r§eYou dug out §r§6(?<coins>.*) coins§r§e!",
     )
 
     private val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
         { Data() },
-        { it.diana.dianaProfitTracker }) { drawDisplay(it) }
+        { it.diana.dianaProfitTracker },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.dianaProfitTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
+    ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
 
@@ -67,44 +82,46 @@ object DianaProfitTracker {
         override fun getCoinName(item: TrackedItem) = "§6Dug Out Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val burrowDugCoinsFormat = NumberUtil.format(item.totalAmount)
+            val burrowDugCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Digging treasures gave you",
-                "§6$burrowDugCoinsFormat coins §7in total."
+                "§6$burrowDugCoinsFormat coins §7in total.",
             )
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lDiana Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lDiana Profit Tracker")
 
         val profit = tracker.drawItems(data, { true }, this)
 
         val treasureCoins = data.burrowsDug
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Burrows dug: §e${treasureCoins.addSeparators()}",
-                listOf("§7You dug out griffin burrows §e${treasureCoins.addSeparators()} §7times.")
-            )
+                listOf("§7You dug out griffin burrows §e${treasureCoins.addSeparators()} §7times."),
+            ).toSearchable(),
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
+        add(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
 
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled()) return
+        if (!(DianaAPI.isDoingDiana() && config.enabled)) return
 
-        val internalName = event.internalName
+        tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+    }
 
-        if (!isAllowedItem(internalName)) {
+    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+        if (!isAllowedItem(internalName) && internalName != NEUInternalName.SKYBLOCK_COIN) {
             ChatUtils.debug("Ignored non-diana item pickup: '$internalName'")
             return
         }
 
-        tracker.addItem(internalName, event.amount)
+        tracker.addItem(internalName, amount, command)
     }
 
     @SubscribeEvent
@@ -119,7 +136,7 @@ object DianaProfitTracker {
         }
         chatDugOutCoinsPattern.matchMatcher(message) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-            tracker.addCoins(group("coins").formatInt())
+            tryAddItem(NEUInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
             tryHide(event)
         }
 
@@ -139,7 +156,13 @@ object DianaProfitTracker {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
+        if (spadeInHand) {
+            tracker.firstUpdate()
+        }
 
         tracker.renderDisplay(config.position)
     }
@@ -154,6 +177,4 @@ object DianaProfitTracker {
     fun resetCommand() {
         tracker.resetCommand()
     }
-
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 }

@@ -13,7 +13,7 @@ public class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Compact Descriptions",
-        desc = "Hides redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
+        desc = "Hide redundant parts of reforge descriptions, generic counter description, and Farmhand perk explanation."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -68,7 +68,7 @@ public class TooltipTweaksConfig {
     @Expose
     @ConfigOption(
         name = "Total Crop Milestone",
-        desc = "Shows the progress bar till maxed crop milestone in the crop milestone inventory."
+        desc = "Show the progress bar till maxed crop milestone in the crop milestone inventory."
     )
     @ConfigEditorBoolean
     @FeatureToggle

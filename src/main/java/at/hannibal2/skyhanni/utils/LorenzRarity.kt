@@ -27,7 +27,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
                 "Trying to get an item rarity below common",
-                "ordinal" to ordinal
+                "ordinal" to ordinal,
             )
         }
         return rarityBelow
@@ -39,7 +39,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
                 "Trying to get an item rarity above special",
-                "ordinal" to ordinal
+                "ordinal" to ordinal,
             )
         }
         return rarityBelow
@@ -50,6 +50,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     companion object {
 
         fun getById(id: Int) = if (entries.size > id) entries[id] else null
-        fun getByName(name: String) = entries.firstOrNull { it.name == name }
+
+        fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
     }
 }

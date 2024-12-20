@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
@@ -19,7 +19,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container)
 
     @Cancelable
-    data class BeforeDraw(
+    data class PreDraw(
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -29,6 +29,14 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         fun drawDefaultBackground() =
             GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
     }
+
+    data class PostDraw(
+        override val gui: GuiContainer,
+        override val container: Container,
+        val mouseX: Int,
+        val mouseY: Int,
+        val partialTicks: Float,
+    ) : GuiContainerEvent(gui, container)
 
     @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
@@ -77,9 +85,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         fun makePickblock() {
             if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
-                Minecraft.getMinecraft().playerController.windowClick(
-                    container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
-                )
+                InventoryUtils.clickSlot(slotNumber, container.windowId, 2, 3)
                 isCanceled = true
             }
         }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
@@ -80,7 +81,7 @@ object SlayerRngMeterDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlayerChange(event: SlayerChangeEvent) {
         update()
     }
@@ -123,7 +124,7 @@ object SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
                 lastItemDroppedTime = SimpleTimeMark.now()
             }
             if (blockChat) {
@@ -145,11 +146,11 @@ object SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        readRngmeterInventory(event)
+        readRngMeterInventory(event)
         readSlayerInventory(event)
     }
 
-    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
+    private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return
@@ -195,7 +196,7 @@ object SlayerRngMeterDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rngScore = event.readConstant<NeuRNGScore>("rngscore").slayer
     }
@@ -205,16 +206,20 @@ object SlayerRngMeterDisplay {
     }
 
     private fun makeLink(text: String) =
-        Renderable.clickAndHover(text, listOf("§eClick to open RNG Meter Inventory."), onClick = {
-            HypixelCommands.showRng("slayer", SlayerAPI.getActiveSlayer()?.rngName)
-        })
+        Renderable.clickAndHover(
+            text, listOf("§eClick to open RNG Meter Inventory."),
+            onClick = {
+                HypixelCommands.showRng("slayer", SlayerAPI.activeSlayer?.rngName)
+            },
+        )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
         if (SlayerAPI.latestSlayerCategory.let {
                 it.endsWith(" I") || it.endsWith(" II")
-            }) {
+            }
+        ) {
             return ""
         }
         val latestSlayerCategory = SlayerAPI.latestSlayerCategory

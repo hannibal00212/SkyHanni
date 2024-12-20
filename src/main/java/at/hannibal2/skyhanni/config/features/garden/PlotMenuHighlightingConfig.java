@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PlotMenuHighlightingConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Highlights plots based on their status.")
+    @ConfigOption(name = "Enabled", desc = "Highlight plots based on their status.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

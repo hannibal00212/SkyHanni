@@ -13,5 +13,5 @@ data class HideNotClickableItemsJson(
 
 data class SalvageFilter(
     @Expose val armor: List<String>,
-    @Expose val items: List<String>
+    @Expose val items: List<String>,
 )

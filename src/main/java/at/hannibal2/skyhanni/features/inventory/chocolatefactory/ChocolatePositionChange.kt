@@ -14,7 +14,7 @@ object ChocolatePositionChange {
     fun update(position: Int?, leaderboard: String) {
         position ?: return
         val storage = storage ?: return
-        val lastTime = storage.lastTime?.let { SimpleTimeMark(it) }
+        val lastTime = storage.lastTime
         val lastPosition = storage.lastPosition
         val lastLeaderboard = storage.lastLeaderboard
 
@@ -34,7 +34,7 @@ object ChocolatePositionChange {
             }
         }
 
-        storage.lastTime = SimpleTimeMark.now().toMillis()
+        storage.lastTime = SimpleTimeMark.now()
         storage.lastLeaderboard = leaderboard
         storage.lastPosition = position
     }

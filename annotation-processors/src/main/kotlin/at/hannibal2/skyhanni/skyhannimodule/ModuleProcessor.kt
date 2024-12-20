@@ -25,8 +25,10 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
 
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
+
         minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
             ?.asStarProjectedType()
+                ?: return emptyList()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
@@ -76,6 +78,17 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         return symbol
     }
 
+    //TODO remove when KMixins added as it contains KSP annotation helpers.
+    private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
+        val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
+        return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
+    }
+
+    private fun isNEUAnnotation(klass: KSClassDeclaration): Boolean {
+        val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
+        return annotation.arguments.find { it.name?.asString() == "neuRequired" }?.value as? Boolean ?: false
+    }
+
     // TODO use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
 
@@ -84,21 +97,29 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             error("${warnings.size} errors related to event annotations found, please fix them before continuing. Click on the kspKotlin build log for more information.")
         }
 
-        val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
-        val deps = Dependencies(true, *dependencies)
+        val sources = symbols.mapNotNull { it.containingFile }.toTypedArray()
+        val dependencies = Dependencies(true, *sources)
 
-        val file = codeGenerator.createNewFile(deps, "at.hannibal2.skyhanni.skyhannimodule", "LoadedModules")
+        val file = codeGenerator.createNewFile(dependencies, "at.hannibal2.skyhanni.skyhannimodule", "LoadedModules")
 
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
             it.write("object LoadedModules {\n")
-            it.write("    val modules: List<Any> = listOf(\n")
+            it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
+            it.write("    val hasNeu: Boolean get() = at.hannibal2.skyhanni.utils.system.PlatformUtils.isNeuLoaded()\n")
+            it.write("    val modules: List<Any> = buildList {\n")
 
             symbols.forEach { symbol ->
-                it.write("        ${symbol.qualifiedName!!.asString()},\n")
+                if (isDevAnnotation(symbol)) {
+                    it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
+                } else if (isNEUAnnotation(symbol)) {
+                    it.write("        if (hasNeu) add(${symbol.qualifiedName!!.asString()})\n")
+                } else {
+                    it.write("        add(${symbol.qualifiedName!!.asString()})\n")
+                }
             }
 
-            it.write("    )\n")
+            it.write("    }\n")
             it.write("}\n")
         }
 

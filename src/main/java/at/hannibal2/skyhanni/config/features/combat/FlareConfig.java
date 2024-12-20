@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -42,7 +43,27 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Type", desc = "Where to show the timer, as GUI element or in the world")
+    @ConfigOption(name = "Expire Sound", desc = "Makes a sound when a flare is about to expire.")
+    @ConfigEditorBoolean
+    public boolean expireSound = false;
+
+    @Expose
+    @ConfigOption(name = "Warn when about to expire", desc = "Select the time in seconds when a flare is about to expire to warn you.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 60, minStep = 1)
+    public int warnWhenAboutToExpire = 5;
+
+    @Expose
+    @ConfigOption(name = "Flash Screen", desc = "Flashes the screen when a flare is about to expire.")
+    @ConfigEditorBoolean
+    public boolean flashScreen = false;
+
+    @Expose
+    @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
+    @ConfigEditorColour
+    public String flashColor = "0:153:159:0:5";
+
+    @Expose
+    @ConfigOption(name = "Display Type", desc = "Where to show the timer.")
     @ConfigEditorDropdown
     public DisplayType displayType = DisplayType.GUI;
 
@@ -65,7 +86,7 @@ public class FlareConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the Flare.")
+    @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the flare.")
     @ConfigEditorDropdown
     public OutlineType outlineType = OutlineType.NONE;
 

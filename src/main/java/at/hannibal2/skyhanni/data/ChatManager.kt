@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -27,9 +27,12 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.ReflectionHelper
 import java.lang.invoke.MethodHandles
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
+
+    private val config get() = SkyHanniMod.feature.dev
 
     private val loggerAll = LorenzLogger("chat/all")
     private val loggerFiltered = LorenzLogger("chat/blocked")
@@ -38,8 +41,10 @@ object ChatManager {
     private val loggerFilteredTypes = mutableMapOf<String, LorenzLogger>()
     private val messageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
-            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?): Boolean {
-                return size > 100
+            override fun removeEldestEntry(
+                eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
+            ): Boolean {
+                return size > config.chatHistoryLength.coerceAtLeast(0)
             }
         }
 
@@ -84,10 +89,10 @@ object ChatManager {
         val message = packet.message
         val component = ChatComponentText(message)
         val originatingModCall = event.findOriginatingModCall()
-        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
-            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod id: §a${originatingModContainer?.id}",
             "§7Mod name: §a${originatingModContainer?.name}"
         )
         val stackTrace =
@@ -107,7 +112,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
@@ -116,13 +121,20 @@ object ChatManager {
 
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
+        //#if MC<1.12
         if (event.type.toInt() == 2) return
+        //#else
+        //$$ if (event.type.id.toInt() == 2) return
+        //#endif
 
         val original = event.message
-        val message = LorenzUtils.stripVanillaMessage(original.formattedText)
+        val message = original.formattedText.stripHypixelMessage()
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
+                event.isCanceled = true
+            }
             return
         }
         val key = IdentityCharacteristics(original)

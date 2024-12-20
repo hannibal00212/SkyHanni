@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -78,7 +79,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
@@ -126,7 +127,7 @@ object SensitivityReducer {
 
     fun manualToggle() {
         if (isToggled) {
-            ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
+            ChatUtils.userError("This command is disabled while the Sensitivity is lowered!")
             return
         }
         isManualToggle = !isManualToggle
@@ -142,7 +143,7 @@ object SensitivityReducer {
         if (!LockMouseLook.lockedMouse) {
             storage.savedMouseloweredSensitivity = gameSettings.mouseSensitivity
             val newSens = doTheMath(storage.savedMouseloweredSensitivity)
-            gameSettings?.mouseSensitivity = newSens
+            gameSettings.mouseSensitivity = newSens
         } else {
             storage.savedMouseloweredSensitivity = storage.savedMouselockedSensitivity
         }
@@ -150,7 +151,7 @@ object SensitivityReducer {
     }
 
     private fun restoreSensitivity(showMessage: Boolean = false) {
-        if (!LockMouseLook.lockedMouse) gameSettings?.mouseSensitivity = storage.savedMouseloweredSensitivity
+        if (!LockMouseLook.lockedMouse) gameSettings.mouseSensitivity = storage.savedMouseloweredSensitivity
         if (showMessage) ChatUtils.chat("§bMouse sensitivity is now restored.")
     }
 
@@ -169,7 +170,7 @@ object SensitivityReducer {
         else (divisor * (input - LOCKED)) + LOCKED
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
@@ -181,8 +182,8 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Sensitivity Reducer")
 
         if (!GardenAPI.inGarden()) {

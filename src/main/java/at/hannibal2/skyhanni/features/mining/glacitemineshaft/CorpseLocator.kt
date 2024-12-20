@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -36,7 +38,7 @@ object CorpseLocator {
      */
     private val mineshaftCoordsPattern by RepoPattern.pattern(
         "mineshaft.corpse.coords",
-        "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?"
+        "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
@@ -48,18 +50,20 @@ object CorpseLocator {
                 entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
             }
             .forEach { entity ->
-                val helmetName = entity.getCurrentArmor(3).getInternalName()
+                val helmetName = entity.getStandHelmet()?.getInternalName() ?: return
                 val corpseType = MineshaftWaypointType.getByHelmetOrNull(helmetName) ?: return
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
                 if (canSee) {
-                    ChatUtils.chat("Located a ${corpseType.displayText} and marked its location with a waypoint.")
+                    val article = if (corpseType.displayText == "Umber Corpse") "an" else "a"
+                    ChatUtils.chat("Located $article ${corpseType.displayText} and marked its location with a waypoint.")
+
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
-                            location = entity.getLorenzVec().add(y = 1),
-                            isCorpse = true
-                        )
+                            location = entity.getLorenzVec().up(),
+                            isCorpse = true,
+                        ),
                     )
                 }
             }
@@ -70,7 +74,7 @@ object CorpseLocator {
             .filterNot { corpse ->
                 sharedWaypoints.any { corpse.location.distance(it) <= 5 }
             }
-            .filter { it.location.distanceToPlayer() <= 5}
+            .filter { it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val (x, y, z) = closestCorpse.location.toDoubleArray().map { it.toInt() }
@@ -83,7 +87,7 @@ object CorpseLocator {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (sharedWaypoints.isNotEmpty()) sharedWaypoints.clear()
+        sharedWaypoints.clear()
     }
 
     @SubscribeEvent
@@ -98,12 +102,12 @@ object CorpseLocator {
         shareCorpse()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyChat(event: PartyChatEvent) {
         handleChatEvent(event.author, event.message)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onAllChat(event: PlayerAllChatEvent) {
         handleChatEvent(event.author, event.message)
     }

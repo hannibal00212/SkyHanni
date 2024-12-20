@@ -22,7 +22,7 @@ public class WinterConfig {
 
     @Accordion
     @Expose
-    @ConfigOption(name = "Unique Gift Counter", desc = "Keep track how many unique players you have given gifts to.")
+    @ConfigOption(name = "Unique Gift Counter", desc = "Keep track of how many unique players you have given gifts to.")
     public UniqueGiftConfig uniqueGiftCounter = new UniqueGiftConfig();
 
     @Accordion
@@ -41,9 +41,15 @@ public class WinterConfig {
     public Position islandCloseTimePosition = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "New Year Cake Reminder", desc = "Reminds while the new year cake can be collected in the hub.")
+    @ConfigOption(name = "New Year Cake Reminder", desc = "Send a reminder while the New Year Cake can be collected in the hub.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean newYearCakeReminder = true;
+
+    @Expose
+    @ConfigOption(name = "Reindrake Warp Helper", desc = "Sends a clickable message in chat to warp to the Winter Island spawn when a Reindrake spawns.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean reindrakeWarpHelper = true;
 
 }

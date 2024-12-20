@@ -21,7 +21,7 @@ import static at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.Cu
 public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(name = "Show Money per Hour",
-        desc = "Displays the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar. " +
+        desc = "Display the money per hour YOU get with YOUR crop/minute value when selling the item to bazaar.\n" +
             "Supports Bountiful, Mushroom Cow Perk, Armor Crops and Dicer Drops. Their toggles are below.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -124,35 +124,35 @@ public class MoneyPerHourConfig {
     @Expose
     @ConfigOption(
         name = "Include Bountiful",
-        desc = "Includes the coins from Bountiful in the calculation.")
+        desc = "Include the coins from Bountiful in the calculation.")
     @ConfigEditorBoolean
     public boolean bountiful = true;
 
     @Expose
     @ConfigOption(
         name = "Include Mooshroom Cow",
-        desc = "Includes the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
+        desc = "Include the coins you get from selling the mushrooms from your Mooshroom Cow pet.")
     @ConfigEditorBoolean
     public boolean mooshroom = true;
 
     @Expose
     @ConfigOption(
         name = "Include Armor Drops",
-        desc = "Includes the average coins/hr from your armor.")
+        desc = "Include the average coins/hr from your armor.")
     @ConfigEditorBoolean
     public boolean armor = true;
 
     @Expose
     @ConfigOption(
         name = "Include Dicer Drops",
-        desc = "Includes the average coins/hr from your melon or pumpkin dicer.")
+        desc = "Include the average coins/hr from your melon or pumpkin dicer.")
     @ConfigEditorBoolean
     public boolean dicer = true;
 
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the first line of 'Money Per Hour' entirely.")
+        desc = "Hide the first line of 'Money Per Hour' entirely.")
     @ConfigEditorBoolean
     public boolean hideTitle = false;
 

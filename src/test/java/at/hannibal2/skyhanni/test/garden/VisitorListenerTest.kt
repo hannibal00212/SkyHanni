@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
@@ -33,7 +34,7 @@ class VisitorListenerTest {
     @Test
     fun `onTablistUpdate it should add new visitors to the list`() {
         listener.onTabListUpdate(
-            TabListUpdateEvent(
+            fakeTabWidget(
                 mutableListOf(
                     "§b§lVisitors: §r§f(3)",
                     " §r§cSpaceman",
@@ -41,8 +42,8 @@ class VisitorListenerTest {
                     " §r§fJacob",
                     "ThePlayerName",
                     "",
-                )
-            )
+                ),
+            ),
         )
 
         verify { VisitorAPI.addVisitor("§fJacob") }
@@ -57,9 +58,9 @@ class VisitorListenerTest {
         )
 
         listener.onTabListUpdate(
-            TabListUpdateEvent(
-                mutableListOf("§b§lVisitors: §r§f(0)", "")
-            )
+            fakeTabWidget(
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify { VisitorAPI.removeVisitor("§fJacob") }
@@ -74,11 +75,15 @@ class VisitorListenerTest {
         every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
         listener.onTabListUpdate(
-            TabListUpdateEvent(
-                mutableListOf("§b§lVisitors: §r§f(0)", "")
-            )
+            fakeTabWidget(
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify(exactly = 0) { VisitorAPI.removeVisitor("§fJacob") }
+    }
+
+    private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
+        return WidgetUpdateEvent(TabWidget.VISITORS, lines)
     }
 }

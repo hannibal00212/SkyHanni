@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -38,7 +39,7 @@ public class SackDisplayConfig {
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
     @Expose
-    @ConfigOption(name = "Alignment", desc = "Channge the alignment for numbers and money.")
+    @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 
@@ -170,37 +171,9 @@ public class SackDisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public PriceFrom priceFrom = PriceFrom.BAZAAR;
-
-    public enum PriceFrom implements HasLegacyId {
-        BAZAAR("Bazaar", 0),
-        NPC("NPC", 1);
-
-        private final String str;
-        private final int legacyId;
-
-        PriceFrom(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        PriceFrom(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
     @Expose
     @ConfigLink(owner = SackDisplayConfig.class, field = "enabled")

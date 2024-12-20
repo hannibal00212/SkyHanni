@@ -32,7 +32,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Enable Data Tracker",
-        desc = "Tracks all of your data from doing Trevor Quests.\n" +
+        desc = "Track all of your data from doing Trevor Quests.\n" +
             "Shows based on the setting below."
     )
     @ConfigEditorBoolean
@@ -42,7 +42,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Show Between Quests",
-        desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+        desc = "Show the tracker during and between quests otherwise it will only show during them.\n" +
             "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
     )
     @ConfigEditorBoolean
@@ -112,7 +112,8 @@ public class TrevorTheTrapperConfig {
     public Position position = new Position(10, 80, false, true);
 
     @Expose
-    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
+    @ConfigOption(name = "Trapper Solver", desc = "Assist in finding Trevor's mobs.\n" +
+        "§eNote: May not always work as expected.\n" +
         "§cWill not help you to find rabbits or sheep in the Oasis!")
     @ConfigEditorBoolean
     @FeatureToggle

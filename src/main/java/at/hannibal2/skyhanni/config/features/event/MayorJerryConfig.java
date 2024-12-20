@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MayorJerryConfig {
 
     @Expose
-    @ConfigOption(name = "Highlight Jerries", desc = "Highlights Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.")
+    @ConfigOption(name = "Highlight Jerries", desc = "Highlight Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightJerries = true;

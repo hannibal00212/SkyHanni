@@ -28,8 +28,8 @@ object RepoUtils {
     /**
      * Modified from https://www.journaldev.com/960/java-unzip-file-example
      */
-    fun unzipIgnoreFirstFolder(zipFilePath: String, destDir: String) {
-        val dir = File(destDir)
+    fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
+        val dir = File(destinationDirectory)
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs()
         val fis: FileInputStream
@@ -43,12 +43,13 @@ object RepoUtils {
                 if (!ze.isDirectory) {
                     var fileName = ze.name
                     fileName = fileName.substring(fileName.split("/").toTypedArray()[0].length + 1)
-                    val newFile = File(destDir + File.separator + fileName)
+                    val newFile = File(destinationDirectory + File.separator + fileName)
                     // create directories for sub directories in zip
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, please report this on the SkyHanni discord."
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
                         )
                     }
                     val fos = FileOutputStream(newFile)
@@ -71,7 +72,7 @@ object RepoUtils {
                 e,
                 "unzipIgnoreFirstFolder failed",
                 "zipFilePath" to zipFilePath,
-                "destDir" to destDir,
+                "destinationDirectory" to destinationDirectory,
             )
         }
     }

@@ -1,20 +1,23 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,9 +26,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+
+    /**
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
+     * REGEX-TEST: §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor II
+     */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+        "(?:§f)? *§r§c(?:Master Mode )?The Catacombs §r§8- §r§eFloor .*",
     )
 
     private var bossDone = false
@@ -60,7 +69,7 @@ object DungeonCleanEnd {
         lastBossId = -1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
@@ -70,7 +79,7 @@ object DungeonCleanEnd {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
@@ -85,19 +94,19 @@ object DungeonCleanEnd {
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!shouldBlock()) return
 
         val entity = event.entity
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (config.F3IgnoreGuardians
-            && DungeonAPI.isOneOf("F3", "M3")
-            && entity is EntityGuardian
-            && entity.entityId != lastBossId
-            && Minecraft.getMinecraft().thePlayer.isSneaking
+        if (config.F3IgnoreGuardians &&
+            DungeonAPI.isOneOf("F3", "M3") &&
+            entity is EntityGuardian &&
+            entity.entityId != lastBossId &&
+            Minecraft.getMinecraft().thePlayer.isSneaking
         ) {
             return
         }
@@ -116,14 +125,14 @@ object DungeonCleanEnd {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")

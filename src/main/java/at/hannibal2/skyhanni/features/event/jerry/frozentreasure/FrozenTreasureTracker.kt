@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.jerry.frozentreasure
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.FrozenTreasureDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -11,15 +12,16 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -41,8 +43,9 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
-    { formatDisplay(drawDisplay(it)) }
+    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker }) {
+        formatDisplay(drawDisplay(it))
+    }
 
     init {
         FrozenTreasure.entries.forEach { it.chatPattern }
@@ -104,8 +107,8 @@ object FrozenTreasureTracker {
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
+    private fun formatDisplay(map: List<Searchable>): List<Searchable> {
+        val newList = mutableListOf<Searchable>()
         for (index in config.textFormat) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
@@ -136,25 +139,25 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<Searchable> {
         calculateIce(data)
-        addAsSingletonList("§e§lFrozen Treasure Tracker")
-        addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
-        addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
-        addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§8${formatNumber(data.compactProcs)} Compact Procs")
-        addAsSingletonList("")
+        addSearchString("§e§lFrozen Treasure Tracker")
+        addSearchString("§6${formatNumber(data.treasuresMined)} Treasures Mined")
+        addSearchString("§3${formatNumber(estimatedIce)} Total Ice")
+        addSearchString("§3${formatNumber(icePerHour)} Ice/hr")
+        addSearchString("§8${formatNumber(data.compactProcs)} Compact Procs")
+        addSearchString("")
 
         for (treasure in FrozenTreasure.entries) {
             val count = (data.treasureCount[treasure] ?: 0) * if (config.showAsDrops) treasure.defaultAmount else 1
-            addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
+            addSearchString("§b${formatNumber(count)} ${treasure.displayName}", treasure.displayName)
         }
-        addAsSingletonList("")
+        addSearchString("")
     }
 
     fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
-        if (amount is Long) return NumberUtil.format(amount)
+        if (amount is Long) return amount.shortFormat()
         return "$amount"
     }
 
@@ -175,7 +178,7 @@ object FrozenTreasureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.frozenTreasureTracker", "event.winter.frozenTreasureTracker")
         event.move(

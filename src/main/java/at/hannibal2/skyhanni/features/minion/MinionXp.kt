@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -16,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -50,7 +51,7 @@ object MinionXp {
     private fun toPrimitiveItemStack(itemStack: ItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.stackSize)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
 
@@ -82,7 +83,7 @@ object MinionXp {
         }
 
         return if (storage != null) {
-            storage.xpList.forEach { (type, amount) ->
+            for ((type, amount) in storage.xpList) {
                 xpTotal.compute(type) { _, currentAmount -> (currentAmount ?: 0.0) + amount }
             }
             false
@@ -96,12 +97,14 @@ object MinionXp {
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = EnumMap<SkillType, Double>(SkillType::class.java)
-        inventoryItems.filter {
-            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listWithMissingName.flatten())
-        }.forEach { (_, itemStack) ->
-            val item = toPrimitiveItemStack(itemStack)
+        val list = inventoryItems.filter {
+            it.value.getLore().isNotEmpty() &&
+                (!isMinion || it.key in listWithMissingName.flatten())
+        }.values
+            .map { toPrimitiveItemStack(it) }
+        for (item in list) {
             val name = item.internalName
-            val xp = xpInfoMap[name] ?: return@forEach
+            val xp = xpInfoMap[name] ?: continue
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.amount
@@ -115,7 +118,7 @@ object MinionXp {
         return xpTotal
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionStorageOpen(event: MinionStorageOpenEvent) {
         if (!config.xpDisplay) return
 
@@ -150,8 +153,8 @@ object MinionXp {
             MinionFeatures.minionInventoryOpen -> {
                 addXpInfoToTooltip(event)
                 if (collectItem == event.itemStack.item) {
-                    collectItemXpList.forEachIndexed { i, it ->
-                        event.toolTip.add(i + 1, it)
+                    collectItemXpList.forEachIndexed { i, item ->
+                        event.toolTip.add(i + 1, item)
                     }
                 }
             }
@@ -169,14 +172,14 @@ object MinionXp {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         minionStorages.clear()
         xpItemMap.clear()
         collectItemXpList.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionClose(event: MinionCloseEvent) {
         xpItemMap.clear()
         collectItemXpList.clear()
@@ -185,7 +188,7 @@ object MinionXp {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
-            xpType.value.mapNotNull { it.key.asInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
+            xpType.value.mapNotNull { it.key.toInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()
     }
 }

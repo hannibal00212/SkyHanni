@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -58,15 +59,35 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     val quests = mutableListOf<Quest>()
     var greatSpook = false
 
+    val patternGroup = RepoPattern.group("crimson.reputationhelper.quest")
+
     /**
      * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
      * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
      * REGEX-TEST: §7miniboss §a1 §7time!
+     * REGEX-TEST: §7Kill the §cBarbarian Duke X §7miniboss §a2
      */
-    val minibossAmountPattern by RepoPattern.pattern(
-        "crimson.reputationhelper.quest.minibossamount",
-        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+    val minibossAmountPattern by patternGroup.pattern(
+        "minibossamount",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d)(?: §7times?!)?",
     )
+
+    /**
+     * REGEX-TEST: §eClick to start!
+     */
+    val clickToStartPattern by patternGroup.pattern(
+        "clicktostart",
+        "(?:§.)*Click to start!",
+    )
+
+    /**
+     * REGEX-TEST: §a§lCOMPLETE
+     */
+    val completedPattern by patternGroup.pattern(
+        "complete",
+        "(?:§.)*COMPLETE",
+    )
+
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
@@ -77,7 +98,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.checkInventory(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
@@ -86,12 +107,12 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    @SubscribeEvent
-    fun onTabListWidgetUpdate(event: WidgetUpdateEvent) {
-        if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-            if (!isEnabled()) return
-            questLoader.loadFromTabList()
-        }
+    @HandleEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
+        if (!isEnabled()) return
+
+        questLoader.loadFromTabList()
     }
 
     @SubscribeEvent
@@ -211,7 +232,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+        state == QuestState.READY_TO_COLLECT ||
+            state == QuestState.NOT_ACCEPTED ||
             (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 

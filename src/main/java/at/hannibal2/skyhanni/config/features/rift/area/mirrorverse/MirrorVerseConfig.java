@@ -7,15 +7,24 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MirrorVerseConfig {
 
+    // Four Levers
+
     @ConfigOption(name = "Lava Maze", desc = "")
     @Accordion
     @Expose
     public LavaMazeConfig lavaMazeConfig = new LavaMazeConfig();
 
-    @ConfigOption(name = "Upside Down Parkour", desc = "")
+    @ConfigOption(name = "Crafting Room", desc = "")
+    @Accordion
+    @Expose
+    public CraftingRoomConfig craftingRoom = new CraftingRoomConfig();
+
+    @ConfigOption(name = "Upside-Down Parkour", desc = "")
     @Accordion
     @Expose
     public UpsideDownParkourConfig upsideDownParkour = new UpsideDownParkourConfig();
+
+    // Red-Green Puzzle
 
     @ConfigOption(name = "Dance Room Helper", desc = "")
     @Accordion

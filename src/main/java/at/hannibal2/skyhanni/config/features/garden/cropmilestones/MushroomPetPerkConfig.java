@@ -44,7 +44,8 @@ public class MushroomPetPerkConfig {
 
     public enum MushroomTextEntry implements HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
-        MUSHROOM_TIER("§7Mushroom Tier 8", 1),
+        // TODO change to mushroom milestone
+        MUSHROOM_TIER("§7Mushroom Milestone 8", 1),
         NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
         TIME("§7In §b12m 34s", 3),
         PERCENTAGE("§7Percentage: §e12.34%", 4),

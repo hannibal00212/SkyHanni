@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -35,7 +38,9 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
+import kotlin.reflect.KMutableProperty0
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
@@ -53,19 +58,19 @@ class ConfigManager {
         var configDirectory = File("config/skyhanni")
     }
 
-    val features get() = jsonHolder[ConfigFileType.FEATURES] as Features
-    val sackData get() = jsonHolder[ConfigFileType.SACKS] as SackData
-    val friendsData get() = jsonHolder[ConfigFileType.FRIENDS] as FriendsJson
-    val knownFeaturesData get() = jsonHolder[ConfigFileType.KNOWN_FEATURES] as KnownFeaturesJson
-    val jacobContestData get() = jsonHolder[ConfigFileType.JACOB_CONTESTS] as JacobContestsJson
-    val visualWordsData get() = jsonHolder[ConfigFileType.VISUAL_WORDS] as VisualWordsJson
-
     private val logger = LorenzLogger("config_manager")
 
-    private val jsonHolder = mutableMapOf<ConfigFileType, Any>()
+    private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
+
+    private fun setConfigHolder(type: ConfigFileType, value: Any) {
+        require(value.javaClass == type.clazz)
+        @Suppress("UNCHECKED_CAST")
+        (type.property as KMutableProperty0<Any>).set(value)
+        (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
+    }
 
     fun firstLoad() {
         if (jsonHolder.isNotEmpty()) {
@@ -75,7 +80,7 @@ class ConfigManager {
 
 
         for (fileType in ConfigFileType.entries) {
-            jsonHolder[fileType] = firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance())
+            setConfigHolder(fileType, firstLoadFile(fileType.file, fileType, fileType.clazz.newInstance()))
         }
 
         // TODO use SecondPassedEvent
@@ -92,8 +97,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler)
-                throw e
+            if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) throw e
         }
     }
 
@@ -102,6 +106,7 @@ class ConfigManager {
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
         "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
 
         // debug features
@@ -121,13 +126,13 @@ class ConfigManager {
         var missingConfigLink = false
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
-            if (field.type != Position::class.java) {
+            if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
             val configLink = field.getAnnotation(ConfigLink::class.java)
             if (configLink == null) {
-                if (LorenzUtils.isInDevEnvironment()) {
+                if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"
                     name = name.replace("at.hannibal2.skyhanni.config.", "")
                     if (name !in ignoredMissingConfigLinks) {
@@ -137,12 +142,20 @@ class ConfigManager {
                 }
                 continue
             }
-            val position = field.get(obj) as Position
-            position.setLink(configLink)
+            if (field.type == Position::class.java) {
+                val position = field.get(obj) as Position
+                position.setLink(configLink)
+            } else if (field.type == PositionList::class.java) {
+                val list = field.get(obj) as PositionList
+                list.setLink(configLink)
+            }
         }
         if (missingConfigLink) {
             println("")
-            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println(
+                "This crash is here to remind you to fix the missing " +
+                    "@ConfigLink annotation over your new config position config element."
+            )
             println("")
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
@@ -156,7 +169,7 @@ class ConfigManager {
     private fun firstLoadFile(file: File?, fileType: ConfigFileType, defaultValue: Any): Any {
         val fileName = fileType.fileName
         logger.log("Trying to load $fileName from $file")
-        var output: Any = defaultValue
+        var output: Any? = defaultValue
 
         if (file!!.exists()) {
             try {
@@ -170,11 +183,11 @@ class ConfigManager {
                     val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
-                    if (LorenzUtils.isInDevEnvironment()) {
+                    if (PlatformUtils.isDevEnvironment) {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            e.printStackTrace()
+                            logger.log(e.stackTraceToString())
                             LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
@@ -186,7 +199,7 @@ class ConfigManager {
 
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
-                e.printStackTrace()
+                logger.log(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
@@ -194,13 +207,17 @@ class ConfigManager {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
                     logger.log("Could not create backup for $fileName file")
-                    e.printStackTrace()
+                    logger.log(e.stackTraceToString())
                 }
             }
         }
 
         if (output == defaultValue) {
             logger.log("Setting $fileName to be blank as it did not exist. It will be saved once something is written to it")
+        }
+        if (output == null) {
+            logger.log("Setting $fileName to be blank as it was null. It will be saved once something is written to it")
+            output = defaultValue
         }
 
         return output
@@ -227,7 +244,7 @@ class ConfigManager {
             move(unit, file, reason)
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
-            e.printStackTrace()
+            logger.log(e.stackTraceToString())
         }
     }
 
@@ -237,7 +254,7 @@ class ConfigManager {
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE
+                StandardCopyOption.ATOMIC_MOVE,
             )
         } catch (e: AccessDeniedException) {
             if (loop == 5) {
@@ -260,13 +277,13 @@ class ConfigManager {
     }
 }
 
-enum class ConfigFileType(val fileName: String, val clazz: Class<*>) {
-    FEATURES("config", Features::class.java),
-    SACKS("sacks", SackData::class.java),
-    FRIENDS("friends", FriendsJson::class.java),
-    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java),
-    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java),
-    VISUAL_WORDS("visual_words", VisualWordsJson::class.java),
+enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
+    FEATURES("config", Features::class.java, SkyHanniMod::feature),
+    SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
+    FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
+    KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
+    JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
+    VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

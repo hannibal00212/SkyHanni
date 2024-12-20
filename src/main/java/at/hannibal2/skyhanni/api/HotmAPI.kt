@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -19,7 +21,7 @@ object HotmAPI {
 
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
-    private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".asInternalName()
+    private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
 
     private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
     val isBlueEggActive
@@ -30,22 +32,20 @@ object HotmAPI {
             }
         } == true
 
-    enum class Powder() {
-        MITHRIL,
-        GEMSTONE,
-        GLACITE,
+    enum class PowderType(val displayName: String, val color: String) {
+        MITHRIL("Mithril", "§2"),
+        GEMSTONE("Gemstone", "§d"),
+        GLACITE("Glacite", "§b"),
 
         ;
 
-        val lowName = name.lowercase().firstLetterUppercase()
-
         val heartPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.heart",
-            "§7$lowName Powder: §a§.(?<powder>[\\d,]+)"
+            "§7$displayName Powder: §a§.(?<powder>[\\d,]+)"
         )
         val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
-            "\\s+§8- §.(?<powder>[\\d,]+) $lowName Powder"
+            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder"
         )
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
@@ -73,9 +73,11 @@ object HotmAPI {
         }
 
         /** Use when new powder gets collected*/
-        fun gain(value: Long) {
-            addTotal(value)
-            addCurrent(value)
+        fun gain(difference: Long) {
+            ChatUtils.debug("Gained §a${difference.addSeparators()} $color$displayName Powder")
+            addTotal(difference)
+            addCurrent(difference)
+            PowderGainEvent(this, difference).post()
         }
 
         fun reset() {
@@ -89,10 +91,10 @@ object HotmAPI {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(chat: String, itemString: String) {
-        MINING_SPEED("Gain §r§a\\+100 §r§6⸕ Mining Speed§r§f\\.", "Gain §a\\+100 §6⸕ Mining Speed§7\\."),
-        MINING_FORTUNE("Gain §r§a\\+50 §r§6☘ Mining Fortune§r§f\\.", "Gain §a\\+50 §6☘ Mining Fortune§7\\."),
+        MINING_SPEED("Gain §r§6\\+100⸕ Mining Speed§r§f\\.", "Gain §6\\+100⸕ Mining Speed§7\\."),
+        MINING_FORTUNE("Gain §r§6\\+50☘ Mining Fortune§r§f\\.", "Gain §6\\+50☘ Mining Fortune§7\\."),
         EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
-        ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f\\.", "Reduce Pickaxe Ability cooldown by"),
+        ABILITY_COOLDOWN("§r§a-20%§r§f Pickaxe Ability cooldowns\\.", "§a-20%§7 Pickaxe Ability cooldowns\\."),
         GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
         TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\.")
         ;

@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class DungeonsRaceGuideConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows a guide for each of the Dungeon Hub races. " +
+    @ConfigOption(name = "Enabled", desc = "Show a guide for each of the Dungeon Hub races.\n" +
         "§eCurrently only works with No Return; Nothing at all races.")
     @ConfigEditorBoolean
     @FeatureToggle

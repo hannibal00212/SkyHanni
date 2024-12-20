@@ -9,42 +9,42 @@ public class SkyblockGuideConfig {
 
     @Expose
     @ConfigOption(name = "Menu Highlight",
-        desc = "Highlights the toplevel of not completed task in the skyblock guide.")
+        desc = "Highlight the top level of non-completed task in the SkyBlock guide.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean menuGuide = true;
 
     @Expose
     @ConfigOption(name = "Collection Highlight",
-        desc = "Highlights missing collections.")
+        desc = "Highlight missing collections.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean collectionGuide = false;
 
     @Expose
     @ConfigOption(name = "Abiphone Highlight",
-        desc = "Highlights missing abiphone contacts.")
+        desc = "Highlight missing Abiphone contacts.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean abiphoneGuide = true;
 
     @Expose
     @ConfigOption(name = "Minion Highlight",
-        desc = "Highlights not maxed minions.")
+        desc = "Highlight non-maxed minions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean minionGuide = true;
 
     @Expose
     @ConfigOption(name = "Essence Shop Highlight",
-        desc = "Highlights missing essence shop upgrades.")
+        desc = "Highlight missing essence shop upgrades.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceGuide = false;
 
     @Expose
     @ConfigOption(name = "Consumable Highlight",
-        desc = "Highlight not fully consumed consumables.")
+        desc = "Highlight non-fully consumed consumables.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean consumableGuide = true;
@@ -58,14 +58,14 @@ public class SkyblockGuideConfig {
 
     @Expose
     @ConfigOption(name = "Story Highlight",
-        desc = "Highlights uncompleted story lines, missing fast travel scrolls and not 100% completed harp songs.")
+        desc = "Highlight uncompleted storylines, missing fast travel scrolls and non-100% completed harp songs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean storyGuide = true;
 
     @Expose
     @ConfigOption(name = "One Time Completion Highlights",
-        desc = "Highlights missing kuudra defeats, dungeon floors completions, spooky ranks, bank upgrades, rock/dolphin rarities, undefeated dragons, unobtained dojo belts.")
+        desc = "Highlight missing Kuudra defeats, Dungeon floor completions, spooky ranks, bank upgrades, rock/dolphin rarities, undefeated dragons, unobtained dojo belts.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean oneTimeCompletion = true;

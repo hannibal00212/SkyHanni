@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LividFinderConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps find the correct livid in F5 and in M5.")
+    @ConfigOption(name = "Enabled", desc = "Help find the correct livid in F5 and in M5.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

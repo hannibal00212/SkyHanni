@@ -93,7 +93,7 @@ public class DiscordRPCConfig {
     public Property<LineEntry> auto = Property.of(NOTHING);
 
     @Expose
-    @ConfigOption(name = "Show Button for SkyCrypt", desc = "Adds a button to the RPC that opens your SkyCrypt profile.")
+    @ConfigOption(name = "Show Button for SkyCrypt", desc = "Add a button to the RPC that opens your SkyCrypt profile.")
     @ConfigEditorBoolean
     public Property<Boolean> showSkyCryptButton = Property.of(true);
 

@@ -66,12 +66,12 @@ object GlowingDroppedItems {
         return rarity?.color?.toColor()?.rgb
     }
 
-    private val isShowcaseArea = RecalculatingValue(1.seconds) {
-        showcaseItemIslands.contains(LorenzUtils.skyBlockIsland) || showcaseItemLocations.contains(LorenzUtils.skyBlockArea)
+    private val isShowcaseArea by RecalculatingValue(1.seconds) {
+        LorenzUtils.skyBlockIsland in showcaseItemIslands || LorenzUtils.skyBlockArea in showcaseItemLocations
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {
-        if (!isShowcaseArea.getValue() || config.highlightShowcase) return false
+        if (!isShowcaseArea || config.highlightShowcase) return false
 
         for (entityArmorStand in entity.worldObj.getEntitiesWithinAABB(
             EntityArmorStand::class.java,

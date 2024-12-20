@@ -87,7 +87,7 @@ public class NextJacobContestConfig {
     public int warnTime = 60 * 2;
 
     @Expose
-    @ConfigOption(name = "Popup Warning", desc = "Opens a popup when the warning time is reached and Minecraft is not in focus.")
+    @ConfigOption(name = "Popup Warning", desc = "Create a popup when the warning time is reached and Minecraft is not in focus.")
     @ConfigEditorBoolean
     public boolean warnPopup = false;
 

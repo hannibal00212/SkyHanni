@@ -11,7 +11,7 @@ public class GeyserFishingConfig {
     @Expose
     @ConfigOption(
         name = "Hide Geyser Particles",
-        desc = "Stops the white geyser smoke particles from rendering if your bobber is near the geyser.")
+        desc = "Stop the white geyser smoke particles from rendering if your bobber is near the geyser.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideParticles = true;
@@ -19,7 +19,7 @@ public class GeyserFishingConfig {
     @Expose
     @ConfigOption(
         name = "Draw Geyser Box",
-        desc = "Draws a box around the effective area of the geyser.")
+        desc = "Draw a box around the effective area of the geyser.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean drawBox = true;

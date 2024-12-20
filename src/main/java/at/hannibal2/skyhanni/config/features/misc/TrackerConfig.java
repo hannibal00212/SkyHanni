@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -19,37 +19,9 @@ public class TrackerConfig {
     public boolean hideInEstimatedItemValue = true;
 
     @Expose
-    @ConfigOption(name = "Show Price From", desc = "Show price from Bazaar or NPC.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public PriceFromEntry priceFrom = PriceFromEntry.SELL_OFFER;
-
-    public enum PriceFromEntry implements HasLegacyId {
-        INSTANT_SELL("Instant Sell", 0),
-        SELL_OFFER("Sell Offer", 1),
-        NPC("NPC", 2);
-        private final String str;
-        private final int legacyId;
-
-        PriceFromEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        PriceFromEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
@@ -124,4 +96,9 @@ public class TrackerConfig {
     @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")
     @ConfigEditorBoolean
     public boolean hideItemTrackersOutsideInventory = false;
+
+    @Expose
+    @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
+    @ConfigEditorBoolean
+    public Property<Boolean> trackerSearchEnabled = Property.of(true);
 }

@@ -8,19 +8,19 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PowerStoneGuideFeatures {
 
-    private var missing = mutableMapOf<Int, NEUInternalName>()
+    private val missing = mutableMapOf<Int, NEUInternalName>()
     private var inInventory = false
 
     @SubscribeEvent
@@ -71,7 +71,7 @@ object PowerStoneGuideFeatures {
 
         val internalName = missing[event.slot.slotNumber] ?: return
         val totalPrice = internalName.getPrice() * 9
-        event.toolTip.add(5, "9x from Bazaar: §6${NumberUtil.format(totalPrice)}")
+        event.toolTip.add(5, "9x from Bazaar: §6${totalPrice.shortFormat()}")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.powerStoneGuide

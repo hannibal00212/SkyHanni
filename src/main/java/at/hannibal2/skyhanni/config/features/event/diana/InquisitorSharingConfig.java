@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 public class InquisitorSharingConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shares your Inquisitor and receiving other Inquisitors via Party Chat.")
+    @ConfigOption(name = "Enabled", desc = "Share your Inquisitor and receiving other Inquisitors via Party Chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

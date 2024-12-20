@@ -100,9 +100,9 @@ object FossilSolver {
             }
         }
 
-        possibleClickPositions.filter { it.key in foundPositions }.forEach {
-            possibleClickPositions.remove(it.key)
-        }
+        possibleClickPositions
+            .filter { it.key in foundPositions }.keys
+            .forEach { possibleClickPositions.remove(it) }
 
         val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
             if (fossilLocations.isNotEmpty()) {
@@ -125,7 +125,7 @@ object FossilSolver {
     private fun isValidFossilPosition(
         fossil: FossilShape,
         invalidPositions: Set<FossilTile>,
-        foundPositions: Set<FossilTile>
+        foundPositions: Set<FossilTile>,
     ): Boolean {
         if (fossil.tiles.any { !isValidPosition(it, invalidPositions) }) {
             return false

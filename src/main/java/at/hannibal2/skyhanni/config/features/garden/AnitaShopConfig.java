@@ -11,8 +11,7 @@ public class AnitaShopConfig {
     @Expose
     @ConfigOption(
         name = "Medal Prices",
-        desc = "Helps to identify profitable items to buy at the Anita item shop " +
-            "and potential profit from selling the item in the Auction House."
+        desc = "Help to identify profitable items to buy at the Anita item shop and potential profit from selling the item in the Auction House."
     )
     @ConfigEditorBoolean
     @FeatureToggle

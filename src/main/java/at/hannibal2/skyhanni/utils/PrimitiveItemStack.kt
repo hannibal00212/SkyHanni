@@ -9,9 +9,13 @@ data class PrimitiveItemStack(val internalName: NEUInternalName, val amount: Int
 
     fun createItem(): ItemStack = internalName.getItemStack().apply { stackSize = amount }
 
-    fun multiply(multiplier: Int): PrimitiveItemStack = PrimitiveItemStack(internalName, amount * multiplier)
+    operator fun times(multiplier: Int): PrimitiveItemStack = PrimitiveItemStack(internalName, amount * multiplier)
+
+    operator fun plus(amount: Int): PrimitiveItemStack = PrimitiveItemStack(internalName, this.amount + amount)
 
     val itemName by lazy { internalName.itemName }
+
+    fun toPair() = Pair(internalName, amount)
 
     companion object {
 

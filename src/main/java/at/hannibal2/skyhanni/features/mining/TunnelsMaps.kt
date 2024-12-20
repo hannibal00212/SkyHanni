@@ -1,29 +1,34 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.findShortestDistance
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -32,9 +37,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -42,6 +47,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -67,7 +73,7 @@ object TunnelsMaps {
             field = value
         }
 
-    private var closedNote: GraphNode? = null
+    private var closestNode: GraphNode? = null
     private var path: Pair<Graph, Double>? = null
 
     private var possibleLocations = mapOf<String, List<GraphNode>>()
@@ -75,6 +81,8 @@ object TunnelsMaps {
     private var active: String = ""
 
     private lateinit var fairySouls: Map<String, GraphNode>
+
+    // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
@@ -87,11 +95,11 @@ object TunnelsMaps {
             return it
         }
 
-        val closed = closedNote ?: return null
+        val closest = closestNode ?: return null
         val list = possibleLocations[name] ?: return null
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
-        val best = offCooldown.minByOrNull { graph.findShortestDistance(closed, it) } ?: list.minBy {
+        val best = offCooldown.minByOrNull { GraphUtils.findShortestDistance(closest, it) } ?: list.minBy {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
         if (cooldowns[best]?.isInPast() != false) {
@@ -107,13 +115,13 @@ object TunnelsMaps {
     }
 
     private val oldGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*"
+        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*",
     )
     private val newGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*"
+        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*",
     )
     private val commissionInvPattern by RepoPattern.pattern(
-        "mining.commission.inventory", "Commissions"
+        "mining.commission.inventory", "Commissions",
     )
 
     /**
@@ -122,29 +130,33 @@ object TunnelsMaps {
      */
     private val glacitePattern by RepoPattern.pattern(
         "mining.commisson.reward.glacite",
-        "§7- §b[\\d,]+ Glacite Powder"
+        "§7- §b[\\d,]+ Glacite Powder",
     )
     private val collectorCommissionPattern by RepoPattern.pattern(
         "mining.commisson.collector",
-        "§9(?<what>\\w+(?: \\w+)?) Collector"
+        "§9(?<what>\\w+(?: \\w+)?) Collector",
     )
     private val invalidGoalPattern by RepoPattern.pattern(
         "mining.commisson.collector.invalid",
-        "Glacite|Scrap"
+        "Glacite|Scrap",
     )
     private val completedPattern by RepoPattern.pattern(
         "mining.commisson.completed",
-        "§a§lCOMPLETED"
+        "§a§lCOMPLETED",
     )
 
     private val translateTable = mutableMapOf<String, String>()
 
     /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.firstOrNull() { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
+        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) }.orEmpty()
     }
 
     private var clickTranslate = mapOf<Int, String>()
+
+    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".toInternalName() }
+
+    private var isCommission = false
 
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -155,7 +167,7 @@ object TunnelsMaps {
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            val type = lore.matchFirst(collectorCommissionPattern) {
+            val type = collectorCommissionPattern.firstMatcher(lore) {
                 group("what")
             } ?: return@mapNotNull null
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
@@ -165,7 +177,7 @@ object TunnelsMaps {
                     "Unknown Collection Commission: $type", "$type can't be found in the graph.",
                     "type" to type,
                     "graphNames" to possibleLocations.keys,
-                    "lore" to lore
+                    "lore" to lore,
                 )
                 null
             } else {
@@ -174,9 +186,21 @@ object TunnelsMaps {
         }.toMap()
         if (config.autoCommission) {
             clickTranslate.values.firstOrNull()?.let {
+                isCommission = true
                 setActiveAndGoal(it)
+            } ?: run {
+                if (isCommission) {
+                    active = ""
+                    clearPath()
+                    isCommission = false
+                }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        clickTranslate = mapOf()
     }
 
     @SubscribeEvent
@@ -192,13 +216,14 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
+            isCommission = true
             setActiveAndGoal(it)
         }
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -212,7 +237,12 @@ object TunnelsMaps {
                 key.contains("Fairy") -> fairy[key] = value.first()
                 newGemstonePattern.matches(key) -> newGemstone[key] = value
                 oldGemstonePattern.matches(key) -> oldGemstone[key] = value
-                else -> other[key] = value
+                else -> {
+                    // ignore node names without color codes
+                    if (key.removeColor() != key) {
+                        other[key] = value
+                    }
+                }
             }
         }
         fairySouls = fairy
@@ -220,16 +250,17 @@ object TunnelsMaps {
         this.oldGemstones = oldGemstone
         normalLocations = other
         translateTable.clear()
-        DelayedRun.runNextTick { // Needs to be delayed since the config may not be loaded
+        DelayedRun.runNextTick {
+            // Needs to be delayed since the config may not be loaded
             locationDisplay = generateLocationsDisplay()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.compactGemstone,
-            config.excludeFairy
+            config.excludeFairy,
         ) {
             locationDisplay = generateLocationsDisplay()
         }
@@ -242,77 +273,106 @@ object TunnelsMaps {
             if (active.isNotEmpty()) {
                 if (goal == campfire && active != campfire.name) {
                     add(Renderable.string("§6Override for ${campfire.name}"))
-                    add(Renderable.clickable(Renderable.string("§eMake §f$active §eactive"), onClick = {
-                        goal = getNext()
-                    }))
+                    add(
+                        Renderable.clickable(
+                            Renderable.string("§eMake §f$active §eactive"),
+                            onClick = {
+                                goal = getNext()
+                            },
+                        ),
+                    )
                 } else {
                     add(
                         Renderable.clickAndHover(
                             Renderable.string("§6Active: §f$active"),
                             listOf("§eClick to disable current Waypoint"),
-                            onClick = ::clearPath
-                        )
+                            onClick = ::clearPath,
+                        ),
                     )
                     if (hasNext()) {
-                        add(Renderable.clickable(Renderable.string("§eNext Spot"), onClick = {
-                            goal = getNext()
-                        }))
+                        add(
+                            Renderable.clickable(
+                                Renderable.string("§eNext Spot"),
+                                onClick = {
+                                    goal = getNext()
+                                },
+                            ),
+                        )
                     } else {
-                        add(Renderable.string(""))
+                        addString("")
                     }
                 }
             } else {
-                add(Renderable.string(""))
-                add(Renderable.string(""))
+                addString("")
+                addString("")
             }
             addAll(locationDisplay)
         }
-        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+        config.position.renderRenderables(display, posLabel = "Tunnels Maps")
+
     }
 
     private fun generateLocationsDisplay() = buildList {
         add(Renderable.string("§6Locations:"))
         add(
             Renderable.multiClickAndHover(
-                campfire.name!!, listOf(
-                    "§eLeft Click to set active", "§eRight Click for override"
-                ), click = mapOf(
-                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride
-                )
-            )
+                campfire.name!!,
+                listOf(
+                    "§eLeft Click to set active", "§eRight Click for override",
+                ),
+                click = mapOf(
+                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride,
+                ),
+            ),
         )
         if (!config.excludeFairy.get()) {
-            add(Renderable.hoverable(Renderable.horizontalContainer(listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
-                val name = it.key.removePrefix("§dFairy Soul ")
-                Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
-            }), Renderable.string("§dFairy Souls")))
+            add(
+                Renderable.hoverable(
+                    Renderable.horizontalContainer(
+                        listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
+                            val name = it.key.removePrefix("§dFairy Soul ")
+                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                        },
+                    ),
+                    Renderable.string("§dFairy Souls"),
+                ),
+            )
         }
         if (config.compactGemstone.get()) {
             add(
                 Renderable.table(
                     listOf(
-                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName)
-                    )
-                )
+                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName),
+                    ),
+                ),
             )
         } else {
-            addAll(newGemstones.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-            })
-            addAll(oldGemstones.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-            })
+            addAll(
+                newGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                },
+            )
+            addAll(
+                oldGemstones.map {
+                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                },
+            )
         }
-        addAll(normalLocations.map {
-            Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-        })
+        addAll(
+            normalLocations.map {
+                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+            },
+        )
     }
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
-        Renderable.string((it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
-            it.key.removeColor().removeSuffix("stone")
-        ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+        Renderable.string(
+            (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
+                "ROUGH_".plus(
+                    it.key.removeColor().removeSuffix("stone"),
+                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ),
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
         onClick = guiSetActive(it.key),
@@ -329,6 +389,7 @@ object TunnelsMaps {
     }
 
     private fun guiSetActive(it: String): () -> Unit = {
+        isCommission = false
         setActiveAndGoal(it)
     }
 
@@ -336,12 +397,12 @@ object TunnelsMaps {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
-        val prevClosed = closedNote
-        closedNote = graph.minBy { it.position.distanceSqToPlayer() }
-        val closest = closedNote ?: return
+        val prevclosest = closestNode
+        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        val closest = closestNode ?: return
         val goal = goal ?: return
-        if (closest == prevClosed && goal == prevGoal) return
-        val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
+        if (closest == prevclosest && goal == prevGoal) return
+        val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
@@ -395,7 +456,8 @@ object TunnelsMaps {
             config.pathWidth.toInt(),
             true,
             bezierPoint = 2.0,
-            textSize = config.textSize.toDouble()
+            textSize = config.textSize.toDouble(),
+            showNodeNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -405,7 +467,7 @@ object TunnelsMaps {
             }.position,
             "§e${path.second.roundToInt()}m",
             config.textSize.toDouble(),
-            yOff = 10f
+            yOff = 10f,
         )
     }
 
@@ -413,17 +475,25 @@ object TunnelsMaps {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toChromaColor()
+    } ?: config.pathColour.toSpecialColor()
 
-    @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }
 
-    private fun campfireKey(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onItemClick(event: ItemClickEvent) {
+        if (!isEnabled() || !config.leftClickPigeon) return
+        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
+        nextSpot()
+    }
+
+    private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
             HypixelCommands.warp("basecamp")
@@ -432,8 +502,8 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
-    fun onLorenzWarp(event: LorenzWarpEvent) {
+    @HandleEvent
+    fun onWarp(event: SkyHanniWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {
             DelayedRun.runNextTick {
@@ -442,19 +512,29 @@ object TunnelsMaps {
         }
     }
 
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (closestNode == null) return // Value that must be none null if it was active
+        closestNode = null
+        clearPath()
+        cooldowns.clear()
+        goalReached = false
+    }
+
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(event: LorenzKeyPressEvent) {
+    private fun nextSpotKey(event: KeyPressEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
+        nextSpot()
+    }
+
+    private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return
         nextSpotDelay = 0.5.seconds.fromNow()
         goal = getNext()
     }
 
-    val areas = setOf(
-        "Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center"
-    )
+    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && config.enable && areas.contains(LorenzUtils.skyBlockArea)
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }

@@ -31,11 +31,18 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis == Long.MAX_VALUE
 
+    fun isFarPastOrFuture() = isFarPast() || isFarFuture()
+
+    fun takeIfInitialized() = if (isFarPastOrFuture()) null else this
+
+    fun takeIfFuture() = if (isInFuture()) this else null
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
-    override fun toString(): String {
-        if (millis == 0L) return "The Far Past"
-        return Instant.ofEpochMilli(millis).toString()
+    override fun toString(): String = when (this) {
+        farPast() -> "The Far Past"
+        farFuture() -> "The Far Future"
+        else -> Instant.ofEpochMilli(millis).toString()
     }
 
     fun formattedDate(pattern: String): String {
@@ -51,6 +58,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         return localDateTime.format(formatter)
     }
 
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
+
     fun toMillis() = millis
 
     fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
@@ -60,6 +69,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     companion object {
 
         fun now() = SimpleTimeMark(System.currentTimeMillis())
+
+        @JvmStatic
+        @JvmName("farPast")
         fun farPast() = SimpleTimeMark(0)
         fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
 

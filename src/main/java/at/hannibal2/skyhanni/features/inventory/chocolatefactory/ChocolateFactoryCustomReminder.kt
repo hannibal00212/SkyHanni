@@ -1,24 +1,32 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -43,11 +51,34 @@ object ChocolateFactoryCustomReminder {
 
     private var lastUpgradeWarning = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    private val patternGroup = RepoPattern.group("inventory.chocolate.factory")
+
+    /**
+     * REGEX-TEST: §cRequires 400B all-time Chocolate!
+     */
+    private val milestoneCostLorePattern by patternGroup.pattern(
+        "milestone.cost",
+        "§cRequires (?<amount>.*) all-time Chocolate!",
+    )
+
+    /**
+     * REGEX-TEST: §cYou don't have enough Chocolate!
+     * REGEX-TEST: §cYou don't have the required items!
+     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
+     */
+    private val chatMessagePattern by patternGroup.list(
+        "chat.hide",
+        "§cYou don't have enough Chocolate!",
+        "§cYou don't have the required items!",
+        "§cYou must collect (.*) all-time Chocolate!",
+    )
+
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         if (!isEnabled()) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (configReminder.hideChat) {
-            if (event.message == "§cYou don't have enough Chocolate!") {
+            if (chatMessagePattern.matches(event.message)) {
                 event.blockedReason = "custom_reminder"
             }
         }
@@ -63,8 +94,8 @@ object ChocolateFactoryCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return
-        // TODO add support for prestige and for Chocolate Milestone
-        val cost = ChocolateFactoryAPI.getChocolateBuyCost(item.getLore()) ?: return
+        if (event.clickedButton != 0) return
+        val (cost, name) = getCostAndName(item) ?: return
         val duration = ChocolateAmount.CURRENT.timeUntilGoal(cost)
 
         // the user has enough chocolate, and just bought something
@@ -72,7 +103,29 @@ object ChocolateFactoryCustomReminder {
             reset()
             return
         }
-        setReminder(cost, item.name)
+        setReminder(cost, name)
+    }
+
+    // TODO add support for prestige
+    private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
+        val list = item.getLore()
+        val cost = ChocolateFactoryAPI.getChocolateBuyCost(list)
+        if (cost == null) {
+            milestoneCostLorePattern.matchAll(list) {
+                // math needed to get from "time until current chocolate" to "time until all time chocolate"
+                val amount = group("amount").formatLong()
+                val allTime = ChocolateAmount.ALL_TIME.chocolate()
+                val missingAllTime = amount - allTime
+                val current = ChocolateAmount.CURRENT.chocolate()
+                val missing = missingAllTime + current
+
+                return missing to "§6${amount.shortFormat()} Chocolate Milestone"
+            }
+            return null
+        }
+
+        val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: item.name
+        return cost to nextLevelName
     }
 
     @SubscribeEvent
@@ -110,9 +163,14 @@ object ChocolateFactoryCustomReminder {
     private fun update() {
         display = mutableListOf<Renderable>().also { list ->
             getTargetDescription()?.let {
-                list.add(Renderable.clickAndHover(it, listOf("§eClick to remove the goal!"), onClick = {
-                    reset()
-                }))
+                list.add(
+                    Renderable.clickAndHover(
+                        it, listOf("§eClick to remove the goal!"),
+                        onClick = {
+                            reset()
+                        },
+                    ),
+                )
             }
         }
     }
@@ -125,7 +183,7 @@ object ChocolateFactoryCustomReminder {
             return "§aGoal Reached! §eBuy §f$targetName"
         }
         val format = duration.format(maxUnits = 2)
-        return "§f$targetName §ein §b$format"
+        return "§f$targetName §ein §b$format".partyModeReplace()
     }
 
     private fun warn() {
@@ -138,10 +196,12 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.clickableChat("You can now purchase §f$targetName §ein Chocolate factory!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            })
+        ChatUtils.clickToActionOrDisable(
+            "You can now purchase §f$targetName §ein Chocolate factory!",
+            configReminder::enabled,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
+        )
     }
 
     private fun reset() {

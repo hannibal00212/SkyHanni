@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrade
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
@@ -86,14 +86,14 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
         ) // TODO cleaner formating
         add(
             Renderable.string(
-                "§6" + costPerFF?.let { NumberUtil.format(it) },
+                "§6" + costPerFF?.let { it.shortFormat() },
                 horizontalAlign = HorizontalAlignment.CENTER,
                 verticalAlign = VerticalAlignment.CENTER
             )
         )
         add(
             Renderable.string(
-                "§6" + cost?.let { NumberUtil.format(it) },
+                "§6" + cost?.let { it.shortFormat() },
                 horizontalAlign = HorizontalAlignment.CENTER,
                 verticalAlign = VerticalAlignment.CENTER
             )

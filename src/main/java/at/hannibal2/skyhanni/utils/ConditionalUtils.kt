@@ -30,4 +30,30 @@ object ConditionalUtils {
         whenChanged { _, new -> observer(new) }
     }
 
+    fun <T : Comparable<T>, K> comparatorFirst(pair1: Pair<T?, K>, pair2: Pair<T?, K>): Int {
+        val first1 = pair1.first
+        val first2 = pair2.first
+
+        // Handle null cases
+        if (first1 == null && first2 == null) return 0
+        if (first1 == null) return -1
+        if (first2 == null) return 1
+
+        // Compare the non-null first values
+        return first1.compareTo(first2)
+    }
+
+    fun <T, K : Comparable<K>> comparatorSecond(pair1: Pair<T, K?>, pair2: Pair<T, K?>): Int {
+        val second1 = pair1.second
+        val second2 = pair2.second
+
+        // Handle null cases
+        if (second1 == null && second2 == null) return 0
+        if (second1 == null) return 1
+        if (second2 == null) return -1
+
+        // Compare the non-null second values
+        return second1.compareTo(second2)
+    }
+
 }

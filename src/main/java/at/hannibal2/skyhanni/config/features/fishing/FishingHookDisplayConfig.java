@@ -19,8 +19,7 @@ public class FishingHookDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Custom Alert",
-        desc = "Replaces the default §c§l!!!§r Hypixel\n" +
-            "§7alert with your own custom one."
+        desc = "Replaces the default §c§l!!! §7Hypixel alert with your own custom one."
     )
     @ConfigEditorText
     public String customAlertText = "&c&l!!!";

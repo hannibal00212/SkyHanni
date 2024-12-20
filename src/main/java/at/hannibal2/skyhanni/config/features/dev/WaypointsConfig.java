@@ -24,7 +24,7 @@ public class WaypointsConfig {
     public boolean showPlatformNumber = false;
 
     @Expose
-    @ConfigOption(name = "Show Outside SB", desc = "Make parkour waypoints outside of SkyBlock too.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Make parkour waypoints outside of SkyBlock too.")
     @ConfigEditorBoolean
     public boolean parkourOutsideSB = false;
 }

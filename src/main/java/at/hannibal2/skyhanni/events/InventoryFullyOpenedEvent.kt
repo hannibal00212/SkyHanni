@@ -26,6 +26,17 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
     val fullyOpenedOnce: Boolean get() = inventory.fullyOpenedOnce
 }
 
+/**
+ * This event is getting fired after every slot in the newly opened inventory has item data.
+ *
+ * New inventory data gets first sent as an empty inventory from the server.
+ * Item stack slot information is sent afterwards, sometimes with a short delay.
+ *
+ * This approach is faster than to wait a fix duration after the inventory open packet is detected.
+ *
+ * Since this logic only works via packets, and the player inventory (pressing E) is client side,
+ * this event does not get fired when opening the invenotory via pressingE.
+ */
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)

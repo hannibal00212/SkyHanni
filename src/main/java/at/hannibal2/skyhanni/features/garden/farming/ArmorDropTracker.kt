@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
@@ -13,13 +14,14 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -33,15 +35,21 @@ object ArmorDropTracker {
 
     private val config get() = GardenAPI.config.farmingArmorDrop
 
+    /**
+     * REGEX-TEST: FERMENTO_CHESTPLATE
+     * REGEX-TEST: CROPIE_BOOTS
+     * REGEX-TEST: SQUASH_HELMET
+     */
     private val armorPattern by RepoPattern.pattern(
         "garden.armordrops.armor",
-        "(FERMENTO|CROPIE|SQUASH|MELON)_(LEGGINGS|CHESTPLATE|BOOTS|HELMET)"
+        "(?:FERMENTO|CROPIE|SQUASH|MELON)_(?:LEGGINGS|CHESTPLATE|BOOTS|HELMET)",
     )
 
     private var hasArmor = false
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
 
@@ -60,7 +68,7 @@ object ArmorDropTracker {
         FERMENTO("§6Fermento", "§6§lRARE CROP! §r§f§r§6Fermento §r§b(Armor Set Bonus)"),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         hasArmor = false
     }
@@ -83,11 +91,11 @@ object ArmorDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Armor Drop Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Armor Drop Tracker:")
         for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
-            addAsSingletonList(" §7- §e${amount.addSeparators()}x $dropName")
+            addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
     }
 
@@ -101,7 +109,7 @@ object ArmorDropTracker {
         tracker.renderDisplay(config.pos)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.GARDEN) {
             tracker.firstUpdate()
@@ -155,7 +163,7 @@ object ArmorDropTracker {
         return currentArmorDropChance
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingArmorDropsEnabled", "garden.farmingArmorDrop.enabled")
         event.move(3, "garden.farmingArmorDropsHideChat", "garden.farmingArmorDrop.hideChat")

@@ -18,28 +18,44 @@ public class CommandsConfig {
     @Expose
     public BetterWikiCommandConfig betterWiki = new BetterWikiCommandConfig();
 
+    @ConfigOption(name = "Reverse Party Transfer", desc = "")
+    @Accordion
+    @Expose
+    public ReversePartyTransferConfig reversePT = new ReversePartyTransferConfig();
+
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
-        "\n§eCommands: /pt /pp /pko /pk /pd §7SkyBlock command §e/pt §7to check the play time still works.")
+        "\n§eCommands: /pt, /pp, /pko, /pk, /pd §7(SkyBlock command §e/pt §7to check your play time will still work)")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortCommands = true;
 
-    @ConfigOption(name = "Party Kick Reason", desc = "Kick people while sending a reason when using §e/pk lrg89 Dupe Archer§7 or §e/party kick nea89o Low Cata Level§7.")
+    @ConfigOption(name = "Party Kick Reason", desc = "Send a reason when kicking people using §e/pk lrg89 Dupe Archer §7or §e/party kick nea89o Low Cata Level§7.")
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean partyKickReason = true;
 
     @Expose
-    @ConfigOption(name = "Replace Warp Is", desc = "Adds §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
+    @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceWarpIs = false;
 
     @Expose
-    @ConfigOption(name = "/viewrecipe Lower Case", desc = "Adds support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
+    @ConfigOption(name = "Lower Case §e/viewrecipe", desc = "Add support for lower case item IDs to the Hypixel command §e/viewrecipe§7.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean viewRecipeLowerCase = true;
+
+    @Expose
+    @ConfigOption(name = "Fix Transfer Cooldown", desc = "Waits for the transfer cooldown to complete if you try to warp.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean transferCooldown = false;
+
+    @Expose
+    @ConfigOption(name = "Transfer Cooldown Message", desc = "Sends a message in chat when the transfer cooldown ends.")
+    @ConfigEditorBoolean
+    public boolean transferCooldownMessage = false;
 }

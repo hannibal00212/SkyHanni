@@ -21,19 +21,20 @@ object CrystalHollowsWalls {
 
     private val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
 
-    private enum class Areas(val color: Color) {
+    private enum class Area(val color: Color) {
         MITHRIL(LorenzColor.GREEN.addOpacity(60)),
         PRECURSOR(LorenzColor.BLUE.addOpacity(60)),
         JUNGLE(LorenzColor.LIGHT_PURPLE.addOpacity(60)),
         GOBLIN(LorenzColor.GOLD.addOpacity(60)),
         HEAT(LorenzColor.RED.addOpacity(60)),
-        NUCLEUS(LorenzColor.WHITE.addOpacity(60))
-        ;
+        NUCLEUS(LorenzColor.WHITE.addOpacity(60)),
     }
 
     private const val EXPAND_TIMES = 20
 
-    private const val HEAT_HEIGHT = 64.0
+    // Heat is active at Y=64.0 and below as of SkyBlock 0.20.1. We draw the line
+    // one above to accurately show whether the player is inside the Magma Fields.
+    private const val HEAT_HEIGHT = 65.0
     private const val MAX_HEIGHT = 190.0
 
     private const val MIN_X = 0.0
@@ -49,7 +50,7 @@ object CrystalHollowsWalls {
     // Yes Hypixel has misaligned the nucleus
     private val nucleusBB = AxisAlignedBB(
         463.0, HEAT_HEIGHT, 460.0,
-        560.0, MAX_HEIGHT, 563.0
+        560.0, MAX_HEIGHT, 563.0,
     )
 
     private val nucleusBBInflate = nucleusBB.inflateBlock(EXPAND_TIMES)
@@ -70,40 +71,43 @@ object CrystalHollowsWalls {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val position = RenderUtils.getViewerPos(event.partialTicks)
-        if (position.y < HEAT_HEIGHT + yViewOffset) {
-            drawHeat(event)
-        } else if (nucleusBBOffsetY.isVecInside(position.toVec3())) {
-            if (!config.nucleus) return
-            drawNucleus(event)
-        } else if (position.x > MIDDLE_X) {
-            if (position.z > MIDDLE_Z) {
-                drawPrecursor(event)
-            } else {
-                drawMithril((event))
+        when {
+            position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
+            nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
+                if (!config.nucleus) return
+                drawNucleus(event)
             }
-        } else {
-            if (position.z > MIDDLE_Z) {
-                drawGoblin(event)
-            } else {
-                drawJungle(event)
+            position.x > MIDDLE_X -> {
+                if (position.z > MIDDLE_Z) {
+                    drawPrecursor(event)
+                } else {
+                    drawMithril((event))
+                }
+            }
+            else -> {
+                if (position.z > MIDDLE_Z) {
+                    drawGoblin(event)
+                } else {
+                    drawJungle(event)
+                }
             }
         }
     }
 
     private fun drawGoblin(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(true, false, Areas.JUNGLE.color, Areas.PRECURSOR.color)
+        drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
     private fun drawJungle(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(true, true, Areas.GOBLIN.color, Areas.MITHRIL.color)
+        drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
     private fun drawPrecursor(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(false, false, Areas.MITHRIL.color, Areas.GOBLIN.color)
+        drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
     private fun drawMithril(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(false, true, Areas.PRECURSOR.color, Areas.JUNGLE.color)
+        drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
     private fun drawHeat(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
@@ -112,75 +116,74 @@ object CrystalHollowsWalls {
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.maxX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.maxZ),
-            Areas.NUCLEUS.color
+            Area.NUCLEUS.color,
         )
 
-        drawHeatAreaForHeat(false, false, Areas.PRECURSOR.color, heatHeight)
-        drawHeatAreaForHeat(false, true, Areas.MITHRIL.color, heatHeight)
-        drawHeatAreaForHeat(true, false, Areas.GOBLIN.color, heatHeight)
-        drawHeatAreaForHeat(true, true, Areas.JUNGLE.color, heatHeight)
+        drawHeatAreaForHeat(false, false, Area.PRECURSOR.color, heatHeight)
+        drawHeatAreaForHeat(false, true, Area.MITHRIL.color, heatHeight)
+        drawHeatAreaForHeat(true, false, Area.GOBLIN.color, heatHeight)
+        drawHeatAreaForHeat(true, true, Area.JUNGLE.color, heatHeight)
     }
 
     private fun drawNucleus(event: LorenzRenderWorldEvent) {
-        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate
-            .getCorners(nucleusBBInflate.minY)
-        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) = nucleusBBInflate
-            .getCorners(nucleusBBInflate.maxY)
+        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate.getCorners(nucleusBBInflate.minY)
+        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
+            nucleusBBInflate.getCorners(nucleusBBInflate.maxY)
 
         RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
             draw(
                 southEastCorner,
                 southWestCorner,
                 northEastCorner,
-                Areas.HEAT.color
+                Area.HEAT.color,
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.JUNGLE.color
+                Area.JUNGLE.color,
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Areas.JUNGLE.color
+                Area.JUNGLE.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.PRECURSOR.color
+                Area.PRECURSOR.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Areas.PRECURSOR.color
+                Area.PRECURSOR.color,
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
                 LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.GOBLIN.color,
+                Area.GOBLIN.color,
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Areas.GOBLIN.color
+                Area.GOBLIN.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.MITHRIL.color
+                Area.MITHRIL.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Areas.MITHRIL.color
+                Area.MITHRIL.color,
             )
         }
     }
@@ -207,14 +210,14 @@ object CrystalHollowsWalls {
         val nucleusXSideBase = LorenzVec(nucleusX, heatHeight, middleZ)
 
         drawHeatArea(
-            Areas.HEAT.color,
+            Area.HEAT.color,
             heatHeight,
             nucleusX,
             middleX,
             x,
             nucleusZ,
             middleZ,
-            z
+            z,
         )
         draw(
             nucleusXSideBase,
@@ -232,13 +235,13 @@ object CrystalHollowsWalls {
             nucleusXSideBase,
             nucleusBase,
             LorenzVec(nucleusX, MAX_HEIGHT, middleZ),
-            Areas.NUCLEUS.color,
+            Area.NUCLEUS.color,
         )
         draw(
             nucleusZSideBase,
             nucleusBase,
             LorenzVec(middleX, MAX_HEIGHT, nucleusZ),
-            Areas.NUCLEUS.color,
+            Area.NUCLEUS.color,
         )
     }
 
@@ -251,10 +254,10 @@ object CrystalHollowsWalls {
         color,
         heatHeight,
         nucleusX = if (isMinXEsleMaxX) nucleusBB.minX else nucleusBB.maxX,
-        middleX = if (isMinXEsleMaxX) MIDDLE_X else MIDDLE_X,
+        middleX = MIDDLE_X,
         x = if (isMinXEsleMaxX) MIN_X else MAX_X,
         nucleusZ = if (isMinZElseMaxZ) nucleusBB.minZ else nucleusBB.maxZ,
-        middleZ = if (isMinZElseMaxZ) MIDDLE_X else MIDDLE_X,
+        middleZ = MIDDLE_X,
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,
     )
 

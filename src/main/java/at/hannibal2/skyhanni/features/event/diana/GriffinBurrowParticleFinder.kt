@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,8 +36,8 @@ object GriffinBurrowParticleFinder {
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Particle Finder")
 
         if (!DianaAPI.isDoingDiana()) {
@@ -83,7 +83,7 @@ object GriffinBurrowParticleFinder {
 
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
                     if (!burrow.found) {
-                        BurrowDetectEvent(burrow.location, burrow.getType()).postAndCatch()
+                        BurrowDetectEvent(burrow.location, burrow.getType()).post()
                         burrow.found = true
                     }
                 }
@@ -93,20 +93,25 @@ object GriffinBurrowParticleFinder {
 
     private enum class ParticleType(val check: S2APacketParticles.() -> Boolean) {
         EMPTY({
-            particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC && particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC &&
+                particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
         }),
         MOB({
-            particleType == net.minecraft.util.EnumParticleTypes.CRIT && particleCount == 3 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.CRIT &&
+                particleCount == 3 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
 
         }),
         TREASURE({
-            particleType == net.minecraft.util.EnumParticleTypes.DRIP_LAVA && particleCount == 2 && particleSpeed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
+            particleType == net.minecraft.util.EnumParticleTypes.DRIP_LAVA &&
+                particleCount == 2 && particleSpeed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
         }),
         FOOTSTEP({
-            particleType == net.minecraft.util.EnumParticleTypes.FOOTSTEP && particleCount == 1 && particleSpeed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
+            particleType == net.minecraft.util.EnumParticleTypes.FOOTSTEP &&
+                particleCount == 1 && particleSpeed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
         }),
         ENCHANT({
-            particleType == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE && particleCount == 5 && particleSpeed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
+            particleType == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE &&
+                particleCount == 5 && particleSpeed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
         });
 
         companion object {
@@ -161,11 +166,11 @@ object GriffinBurrowParticleFinder {
         recentlyDugParticleBurrows.add(location)
         lastDugParticleBurrow = null
 
-        BurrowDugEvent(burrow.location).postAndCatch()
+        BurrowDugEvent(burrow.location).post()
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return

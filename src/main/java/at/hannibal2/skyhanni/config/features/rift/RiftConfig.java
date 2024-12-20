@@ -31,13 +31,18 @@ public class RiftConfig {
     public RiftAreasConfig area = new RiftAreasConfig();
 
     @Expose
-    @Category(name = "Motes", desc = "Motes Sell Price")
+    @Category(name = "Motes", desc = "")
     public MotesConfig motes = new MotesConfig();
 
     @Expose
     @ConfigOption(name = "Motes Orbs", desc = "")
     @Accordion
     public MotesOrbsConfig motesOrbs = new MotesOrbsConfig();
+
+    @Expose
+    @ConfigOption(name = "Punchcard Artifact", desc = "")
+    @Accordion
+    public PunchcardConfig punchcard = new PunchcardConfig();
 
     @Expose
     @ConfigOption(name = "Highlight Guide", desc = "Highlight things to do in the Rift Guide.")

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -10,12 +11,15 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -28,8 +32,9 @@ object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
     private val config get() = GardenAPI.config.dicerCounters
-    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
 
@@ -44,37 +49,37 @@ object DicerRngDropTracker {
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
     private val melonUncommonDropPattern by melonPatternGroup.pattern(
         "uncommon",
-        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!"
+        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!",
     )
     private val melonRareDropPattern by melonPatternGroup.pattern(
         "rare",
-        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!"
+        "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Melon§r§e!",
     )
     private val melonCrazyRareDropPattern by melonPatternGroup.pattern(
         "crazyrare",
-        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!"
+        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§[a|9]Enchanted Melon(?: Block)?§r§e!",
     )
     private val melonRngesusDropPattern by melonPatternGroup.pattern(
         "rngesus",
-        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9(\\d+)x §r§9Enchanted Melon Block§r§e!"
+        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9\\d+x §r§9Enchanted Melon Block§r§e!",
     )
 
     private val pumpkinPatternGroup = RepoPattern.group("garden.dicer.pumpkin")
     private val pumpkinUncommonDropPattern by pumpkinPatternGroup.pattern(
         "uncommon",
-        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinRareDropPattern by pumpkinPatternGroup.pattern(
         "rare",
-        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§9§lRARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinCrazyRareDropPattern by pumpkinPatternGroup.pattern(
         "crazyrare",
-        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinRngesusDropPattern by pumpkinPatternGroup.pattern(
         "rngesus",
-        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§(aEnchanted|9Polished) Pumpkin§r§e!"
+        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9]\\d+x §r§(?:aEnchanted|9Polished) Pumpkin§r§e!",
     )
 
     init {
@@ -113,45 +118,41 @@ object DicerRngDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.compact) {
             tracker.update()
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList {
+    private fun drawDisplay(data: Data) = buildList<Searchable> {
         val cropInHand = cropInHand ?: return@buildList
-        val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
-        val list = mutableListOf<Renderable>()
-        val topLine = mutableListOf<Renderable>()
 
+        val topLine = mutableListOf<Renderable>()
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
-        add(listOf(Renderable.horizontalContainer(topLine)))
-        if (config.compact.get()) {
+        add(Renderable.horizontalContainer(topLine).toSearchable())
 
+        val items = data.drops[cropInHand] ?: return@buildList
+        if (config.compact.get()) {
             val compactLine = items.sortedDesc().map { (rarity, amount) ->
                 "§${rarity.colorCode}${amount.addSeparators()}"
             }.joinToString("§7/")
-            list.add(Renderable.string(compactLine))
-            add(listOf(Renderable.verticalContainer(list)))
+            addSearchString(compactLine)
 
         } else {
             for ((rarity, amount) in items.sortedDesc()) {
                 val colorCode = rarity.colorCode
                 val displayName = rarity.displayName
-                list.add(Renderable.string(" §7- §e${amount.addSeparators()}x §$colorCode$displayName"))
+                addSearchString(" §7- §e${amount.addSeparators()}x §$colorCode$displayName", displayName)
             }
-            add(listOf(Renderable.verticalContainer(list)))
         }
-
     }
 
     private var cropInHand: CropType? = null
     private var toolName = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
@@ -171,6 +172,7 @@ object DicerRngDropTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (cropInHand == null) return
 
         tracker.renderDisplay(config.pos)
     }
@@ -179,7 +181,7 @@ object DicerRngDropTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.display
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounters.display")
         event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounters.hideChat")

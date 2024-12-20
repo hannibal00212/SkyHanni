@@ -1,22 +1,32 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
@@ -24,19 +34,30 @@ import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.INFINITE
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
+
+    private val missingRepoItems = mutableSetOf<String>()
+    private var lastRepoWarning = SimpleTimeMark.farPast()
+
+    private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    fun ItemStack.getLore(): List<String> {
-        val tagCompound = this.tagCompound ?: return emptyList()
-        val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
+    fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
+
+    fun NBTTagCompound?.getLore(): List<String> {
+        this ?: return emptyList()
+        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {
             list.add(tagList.getStringTagAt(i))
@@ -44,15 +65,65 @@ object ItemUtils {
         return list
     }
 
-    // TODO change else janni is sad
-    fun isCoopSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any {
-            it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
+        this ?: return emptyList()
+        val tagList = mutableListOf<String>()
+        for (s in this.keySet) {
+            if (s == "Lore" && !includeLore) continue
+            val tag = this.getTag(s)
+
+            if (tag !is NBTTagCompound) {
+                tagList.add("$initSeparator$s: $tag")
+            } else {
+                val element = this.getCompoundTag(s)
+                tagList.add("$initSeparator$s:")
+                tagList.addAll(element.getReadableNBTDump("$initSeparator  ", includeLore))
+            }
+        }
+        return tagList
+    }
+
+    fun getDisplayName(compound: NBTTagCompound?): String? {
+        compound ?: return null
+        val name = compound.getCompoundTag("display").getString("Name")
+        if (name == null || name.isEmpty()) return null
+        return name
+    }
+
+    fun ItemStack.setLore(lore: List<String>): ItemStack {
+        val tagCompound = this.tagCompound ?: NBTTagCompound()
+        val display = tagCompound.getCompoundTag("display")
+        val tagList = NBTTagList()
+        for (line in lore) {
+            tagList.appendTag(NBTTagString(line))
+        }
+        display.setTag("Lore", tagList)
+        tagCompound.setTag("display", display)
+        this.tagCompound = tagCompound
+        return this
+    }
+
+    var ItemStack.extraAttributes: NBTTagCompound
+        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
+        set(value) {
+            val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
+            tag.setTag("ExtraAttributes", value)
         }
 
+    val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
+
+    fun ItemStack.overrideId(id: String): ItemStack {
+        extraAttributes = extraAttributes.apply { setString("id", id) }
+        return this
+    }
+
     // TODO change else janni is sad
-    fun isSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
+        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    }
+
+    // TODO change else janni is sad
+    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
@@ -60,11 +131,8 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
-            return list
-        }
+        val player = Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
                 list.add(slot.stack)
@@ -75,23 +143,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun hasAttributes(stack: ItemStack): Boolean {
-        if (stack.hasTagCompound()) {
-            val tagCompound = stack.tagCompound
-            if (tagCompound.hasKey("ExtraAttributes")) {
-                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                try {
-                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-                    if (json.has("attributes")) {
-                        return true
-                    }
-                } catch (_: Exception) {
-                }
-            }
-        }
-        return false
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -112,7 +163,7 @@ object ItemUtils {
             return NEUInternalName.WISP_POTION
         }
         val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
-        return internalName?.asInternalName()
+        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
@@ -123,19 +174,24 @@ object ItemUtils {
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
 
+    fun ItemStack.removeEnchants(): ItemStack = apply {
+        val tempTag = tagCompound ?: NBTTagCompound()
+        tempTag.removeTag("ench")
+        tempTag.removeTag("StoredEnchantments")
+        tagCompound = tempTag
+    }
+
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
-        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
+            .getCompoundTagAt(0).getString("Value")
     }
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
-        if (tagCompound == null) return null
-        val nbt = tagCompound
+        val nbt = tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
@@ -164,6 +220,23 @@ object ItemUtils {
         return render
     }
 
+    fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
+        return createItemStack(item, displayName, lore.toList())
+    }
+
+    // Overload to avoid spread operators
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount, damage)
+    // Taken from NEU
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+        val stack = ItemStack(item, amount, damage)
+        val tag = NBTTagCompound()
+        addNameAndLore(tag, displayName, *lore.toTypedArray())
+        tag.setInteger("HideFlags", 254)
+        stack.tagCompound = tag
+        return stack
+    }
+
     // Taken from NEU
     private fun addNameAndLore(tag: NBTTagCompound, displayName: String, vararg lore: String) {
         val display = NBTTagCompound()
@@ -180,6 +253,15 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
+    private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
+        "itemcategory.repocheck",
+        ItemCategory.entries.joinToString(separator = "|") { it.name },
+    )
+    private val rarityCategoryRepoCheckPattern by RepoPattern.pattern(
+        "rarity.repocheck",
+        LorenzRarity.entries.joinToString(separator = "|") { it.name },
+    )
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
@@ -189,8 +271,7 @@ object ItemUtils {
 
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to
-                    group("rarity").replace(" ", "_")
+                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
             val itemCategory = getItemCategory(category, name, cleanName)
@@ -205,6 +286,8 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             }
             if (itemRarity == null) {
@@ -214,7 +297,10 @@ object ItemUtils {
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
 
@@ -266,8 +352,7 @@ object ItemUtils {
         return data.itemRarity
     }
 
-    private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.passedSince() > 10.seconds
+    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
@@ -275,7 +360,7 @@ object ItemUtils {
      */
     var ItemStack.name: String
         get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name if ItemStack",
+            "Could not get name of ItemStack",
             "itemStack" to this,
             "displayName" to displayName,
             "internal name" to getInternalNameOrNull(),
@@ -284,15 +369,37 @@ object ItemUtils {
             setStackDisplayName(value)
         }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
+    // Taken from NEU
+    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+        val tag = this.tagCompound ?: NBTTagCompound()
+        val display = tag.getCompoundTag("display")
+        val loreList = NBTTagList()
+        for (line in lore) {
+            loreList.appendTag(NBTTagString(line))
+        }
+
+        display.setString("Name", displayName)
+        display.setTag("Lore", loreList)
+
+        tag.setTag("display", display)
+        tag.setInteger("HideFlags", 254)
+        if (disableNeuTooltips) {
+            tag.setBoolean("disableNeuTooltip", true)
+        }
+
+        this.tagCompound = tag
+        return this
+    }
+
+    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == SKYBLOCK_MENU
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
+    private val bookPattern = "(?<name>.* [IVX]+) Book".toPattern()
+
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
-        // This workaround fixes 'Tubto Cacti I Book'
-        val input = (if (originalInput.endsWith(" Book")) {
-            originalInput.replace(" Book", "")
-        } else originalInput).removeResets()
+        // This workaround fixes 'Turbo Cacti I Book'
+        val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -336,7 +443,7 @@ object ItemUtils {
                 "internal name" to pet.getInternalName(),
                 "item name" to name,
                 "rarity id" to rarityId,
-                "inventory name" to InventoryUtils.openInventoryName()
+                "inventory name" to InventoryUtils.openInventoryName(),
             )
         }
         return rarity
@@ -346,7 +453,18 @@ object ItemUtils {
 
     // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
-        get() = getInternalName().itemName
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalNameOrNull()?.itemName ?: "<null>"
+        }
+
+    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        val attributes = getAttributes() ?: return null
+        return attributes.firstOrNull()
+    }
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
@@ -355,6 +473,9 @@ object ItemUtils {
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     val NEUInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+
+    val NEUInternalName.readableInternalName: String
+        get() = asString().replace("_", " ").lowercase()
 
     private fun NEUInternalName.grabItemName(): String {
         if (this == NEUInternalName.WISP_POTION) {
@@ -371,7 +492,11 @@ object ItemUtils {
         }
 
         val itemStack = getItemStackOrNull()
-        val name = itemStack?.name ?: error("Could not find item name for $this")
+        val name = itemStack?.name ?: run {
+            val name = toString()
+            addMissingRepoItem(name, "Could not find item name for $name")
+            return "§c$name"
+        }
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
@@ -379,6 +504,11 @@ object ItemUtils {
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+        }
+
+        // obfuscated trophy fish
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
         }
 
         // hide pet level
@@ -405,5 +535,56 @@ object ItemUtils {
             }
         }
         return list
+    }
+
+    fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
+        val neededItems = mutableMapOf<NEUInternalName, Int>()
+        for ((material, amount) in recipe.ingredients.toPrimitiveItemStacks()) {
+            neededItems.addOrPut(material, amount)
+        }
+        return neededItems
+    }
+
+    fun PrimitiveRecipe.getRecipePrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
+    ): Double = neededItems(this).map {
+        it.key.getPrice(priceSource, pastRecipes) * it.value
+    }.sum()
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Missing Repo Items")
+
+        if (missingRepoItems.isNotEmpty()) {
+            event.addData {
+                add("Detected ${missingRepoItems.size} missing items:")
+                for (itemName in missingRepoItems) {
+                    add(" - $itemName")
+                }
+            }
+        } else {
+            event.addIrrelevant("No Repo Item fails detected.")
+        }
+    }
+
+    fun addMissingRepoItem(name: String, message: String) {
+        if (!missingRepoItems.add(name)) return
+        ChatUtils.debug(message)
+        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
+
+        if (lastRepoWarning.passedSince() < 3.minutes) return
+        lastRepoWarning = SimpleTimeMark.now()
+        showRepoWarning(name)
+    }
+
+    private fun showRepoWarning(item: String) {
+        val text = listOf(
+            "§c§lMissing repo data for item: $item",
+            "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
+            "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+            "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
+        )
+        NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
     }
 }

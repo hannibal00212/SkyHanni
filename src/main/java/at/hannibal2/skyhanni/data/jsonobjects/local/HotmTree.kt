@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.local;
+package at.hannibal2.skyhanni.data.jsonobjects.local
 
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
@@ -7,11 +7,11 @@ import com.google.gson.annotations.Expose
 class HotmTree {
 
     @Expose
-    val perks = mutableMapOf<String, HotmPerk>();
+    val perks = mutableMapOf<String, HotmPerk>()
 
     fun deepCopy(): HotmTree {
-        val gson = Gson();
-        val json = gson.toJson(this);
+        val gson = Gson()
+        val json = gson.toJson(this)
         return gson.fromJson<HotmTree>(json)
     }
 

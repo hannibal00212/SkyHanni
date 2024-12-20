@@ -15,7 +15,7 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Best Crop Time",
-        desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
+        desc = "List all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean bestDisplay = false;
@@ -87,7 +87,7 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the 'Best Crop Time' line entirely.")
+        desc = "Hide the 'Best Crop Time' line entirely.")
     @ConfigEditorBoolean
     public boolean bestHideTitle = false;
 

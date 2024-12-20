@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LaneSwitchNotificationConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Sends a notification when approaching the end of a lane and you should switch lanes.")
+    @ConfigOption(name = "Enabled", desc = "Send a notification when approaching the end of a lane and you should switch lanes.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

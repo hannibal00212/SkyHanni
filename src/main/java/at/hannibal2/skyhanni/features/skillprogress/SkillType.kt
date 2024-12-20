@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -21,7 +21,7 @@ enum class SkillType(val displayName: String, icon: Item) {
 
     constructor(displayName: String, block: Block) : this(displayName, Item.getItemFromBlock(block))
 
-    val item: ItemStack by lazy { Utils.createItemStack(icon, displayName) }
+    val item: ItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
     val lowercaseName = displayName.lowercase()
     val uppercaseName = displayName.uppercase()
 

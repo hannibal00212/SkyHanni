@@ -2,14 +2,13 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 
 enum class VisitorReward(
     private val rawInternalName: String,
     val displayName: String,
-    private val legacyId:
-    Int = -1
+    private val legacyId: Int = -1,
 ) : HasLegacyId {
     FLOWERING_BOUQUET("FLOWERING_BOUQUET", "§9Flowering Bouquet", legacyId = 0),
     OVERGROWN_GRASS("OVERGROWN_GRASS", "§9Overgrown Grass", legacyId = 1),
@@ -20,9 +19,10 @@ enum class VisitorReward(
     CULTIVATING("CULTIVATING;1", "§9Cultivating I", legacyId = 6),
     REPLENISH("REPLENISH;1", "§9Replenish I", legacyId = 7),
     DELICATE("DELICATE;5", "§9Delicate V"),
+    COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     ;
 
-    private val internalName by lazy { rawInternalName.asInternalName() }
+    private val internalName by lazy { rawInternalName.toInternalName() }
     val itemStack by lazy { internalName.getItemStack() }
     // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }

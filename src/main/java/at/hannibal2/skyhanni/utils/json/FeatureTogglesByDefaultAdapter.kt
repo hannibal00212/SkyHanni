@@ -38,13 +38,13 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
             val obj = clazz.newInstance()
 
             // Overwrite the default with true (or false) for feature toggles
-            clazz.fields.forEach {
-                val featureToggle = it.getAnnotation(FeatureToggle::class.java)
-                val adapt = gson.getAdapter(TypeToken.get(getType(type, it)))
+            for (field in clazz.fields) {
+                val featureToggle = field.getAnnotation(FeatureToggle::class.java)
+                val adapt = gson.getAdapter(TypeToken.get(getType(type, field)))
                 if (featureToggle != null)
-                    it.set(obj, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))
+                    field.set(obj, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))
                 if (adapt is Adapter) {
-                    it.set(obj, adapt.read(JsonTreeReader(JsonObject())))
+                    field.set(obj, adapt.read(JsonTreeReader(JsonObject())))
                 }
             }
 
@@ -81,7 +81,8 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
         if (t.fields.none {
                 it.isAnnotationPresent(FeatureToggle::class.java) ||
                     gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
-            }) return null
+            }
+        ) return null
 
         val originalWrite = gson.getDelegateAdapter(this, type)
         return Adapter(originalWrite, t as Class<T>, gson, type)

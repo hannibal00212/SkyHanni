@@ -1,22 +1,22 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
-import io.github.moulberry.notenoughupdates.util.ApiUtil
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
-import moe.nea.libautoupdate.UpdateSource
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
@@ -44,7 +44,7 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.about.updateStream.onToggle {
             reset()
@@ -113,7 +113,7 @@ object UpdateManager {
                 } else if (forceDownload) {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
-            }, MinecraftExecutor.OnThread)
+            }, DelayedRun.onThread)
     }
 
     fun queueUpdate() {
@@ -130,11 +130,11 @@ object UpdateManager {
             potentialUpdate!!.executePreparedUpdate()
             ChatUtils.chat("Download of update complete. ")
             ChatUtils.chat("§aThe update will be installed after your next restart.")
-        }, MinecraftExecutor.OnThread)
+        }, DelayedRun.onThread)
     }
 
     private val context = UpdateContext(
-        UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
+        CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
             val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
@@ -161,7 +161,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                ApiUtil.patchHttpsRequest(it)
+                APIUtils.patchHttpsRequest(it)
             }
         }
     }
@@ -174,4 +174,28 @@ object UpdateManager {
     }
 
     private var potentialUpdate: PotentialUpdate? = null
+
+    fun updateCommand(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        if (switchingToBeta) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    UpdateManager.checkUpdate(true, updateStream)
+                },
+                "§eClick to confirm!",
+                oneTimeClick = true,
+            )
+        } else {
+            UpdateManager.checkUpdate(true, updateStream)
+        }
+    }
 }

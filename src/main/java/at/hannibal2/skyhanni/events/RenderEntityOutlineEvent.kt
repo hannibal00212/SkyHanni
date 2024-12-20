@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItemFrame
-import java.util.function.Consumer
 
 class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) :
     LorenzEvent() {
@@ -97,11 +96,11 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         // Only render outlines around non-null entities within the camera frustum
         entitiesToChooseFrom = HashSet(entities.size)
         // Only consider entities that aren't invisible armorstands to increase FPS significantly
-        entities.forEach(Consumer<Entity> { e: Entity? ->
-            if (e != null && !(e is EntityArmorStand && e.isInvisible()) && e !is EntityItemFrame) {
-                entitiesToChooseFrom!!.add(e)
+        for (entity in entities) {
+            if (!(entity is EntityArmorStand && entity.isInvisible()) && entity !is EntityItemFrame) {
+                entitiesToChooseFrom!!.add(entity)
             }
-        })
+        }
         entitiesToOutline = HashMap(entitiesToChooseFrom!!.size)
     }
 

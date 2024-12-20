@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.Cancelable
 
@@ -21,12 +21,12 @@ class ReceiveParticleEvent(
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
     override fun toString(): String {
-        return "ReceiveParticleEvent(type='$type', location=${location.round(1)}, count=$count, speed=$speed, offset=${
-            offset.round(
+        return "ReceiveParticleEvent(type='$type', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
+            offset.roundTo(
                 1
             )
         }, longDistance=$longDistance, particleArgs=${particleArgs.contentToString()}, distanceToPlayer=${
-            distanceToPlayer.round(
+            distanceToPlayer.roundTo(
                 1
             )
         })"

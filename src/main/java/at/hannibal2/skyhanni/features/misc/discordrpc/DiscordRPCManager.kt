@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -90,16 +90,15 @@ object DiscordRPCManager : IPCListener {
                 "Discord Rich Presence was unable to start! " +
                     "This usually happens when you join SkyBlock when Discord is not started. " +
                     "Please run /shrpcstart to retry once you have launched Discord.",
-                onClick = {
-                    startCommand()
-                }
+                onClick = { startCommand() },
+                "§eClick to run /shrpcstart!"
             )
         }
     }
 
     private fun isConnected() = client?.status == PipeStatus.CONNECTED
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             if (isConnected()) {
@@ -121,21 +120,23 @@ object DiscordRPCManager : IPCListener {
     private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
-        client?.sendRichPresence(RichPresence.Builder().apply {
-            setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
-            setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
-            setStartTimestamp(startTimestamp)
-            setLargeImage(discordIconKey, location)
+        client?.sendRichPresence(
+            RichPresence.Builder().apply {
+                setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
+                setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
+                setStartTimestamp(startTimestamp)
+                setLargeImage(discordIconKey, location)
 
-            if (config.showSkyCryptButton.get()) {
-                addButton(
-                    RichPresenceButton(
-                        "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                        "Open SkyCrypt"
+                if (config.showSkyCryptButton.get()) {
+                    addButton(
+                        RichPresenceButton(
+                            "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                            "Open SkyCrypt"
+                        )
                     )
-                )
-            }
-        }.build())
+                }
+            }.build()
+        )
     }
 
     override fun onReady(client: IPCClient) {
@@ -215,13 +216,13 @@ object DiscordRPCManager : IPCListener {
     }
 
     // Events that change things in DiscordStatus
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "misc.discordRPC.firstLine") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)

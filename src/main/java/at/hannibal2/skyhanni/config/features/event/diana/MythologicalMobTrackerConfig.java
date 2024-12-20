@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class MythologicalMobTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Counts the different mythological mobs you have dug up.")
+    @ConfigOption(name = "Enabled", desc = "Count the different mythological mobs you have dug up.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

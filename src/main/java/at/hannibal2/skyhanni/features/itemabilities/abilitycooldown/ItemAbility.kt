@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
 
 enum class ItemAbility(
@@ -29,6 +29,8 @@ enum class ItemAbility(
     ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA", ignoreMageCooldownReduction = true),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
+    SOS_FLARE(10),
+    ALERT_FLARE(20, "WARNING_FLARE"),
 
     GOLEM_SWORD(3),
     END_STONE_SWORD(5),
@@ -49,6 +51,9 @@ enum class ItemAbility(
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
     ROYAL_PIGEON(5),
     WAND_OF_STRENGTH(10),
+    TACTICAL_INSERTION(20),
+    TOTEM_OF_CORRUPTION(20),
+    ENRAGER(20),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 5, "Ender Bow"),
@@ -74,13 +79,13 @@ enum class ItemAbility(
         cooldownInSeconds,
         actionBarDetection = false,
         alternativePosition = alternativePosition,
-        ignoreMageCooldownReduction = ignoreMageCooldownReduction
+        ignoreMageCooldownReduction = ignoreMageCooldownReduction,
     ) {
         newVariant = true
         alternateInternalNames.forEach {
-            internalNames.add(it.asInternalName())
+            internalNames.add(it.toInternalName())
         }
-        internalNames.add(name.asInternalName())
+        internalNames.add(name.toInternalName())
     }
 
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
@@ -105,7 +110,7 @@ enum class ItemAbility(
             duration /= 100
             var d = duration.toDouble()
             d /= 10.0
-            d.round(1).addSeparators()
+            d.roundTo(1).addSeparators()
         } else {
             duration /= 1000
             duration++

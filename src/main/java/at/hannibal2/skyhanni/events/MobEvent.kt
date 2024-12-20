@@ -20,4 +20,13 @@ open class MobEvent(val mob: Mob) : LorenzEvent() {
         class Special(mob: Mob) : DeSpawn(mob)
         class Projectile(mob: Mob) : DeSpawn(mob)
     }
+
+    open class FirstSeen(mob: Mob) : MobEvent(mob) {
+        class SkyblockMob(mob: Mob) : FirstSeen(mob)
+        class Summon(mob: Mob) : FirstSeen(mob)
+        class Player(mob: Mob) : FirstSeen(mob)
+        class DisplayNPC(mob: Mob) : FirstSeen(mob)
+        class Special(mob: Mob) : FirstSeen(mob)
+        class Projectile(mob: Mob) : FirstSeen(mob)
+    }
 }

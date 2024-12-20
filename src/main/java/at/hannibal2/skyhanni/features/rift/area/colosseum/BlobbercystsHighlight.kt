@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -26,10 +27,11 @@ object BlobbercystsHighlight {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
-            if (it.name == BLOBBER_NAME) {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, Color.RED.withAlpha(80)) { isEnabled() }
-                entityList.add(it)
+        val color = Color.RED.addAlpha(80)
+        for (player in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+            if (player.name == BLOBBER_NAME) {
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(player, color) { isEnabled() }
+                entityList.add(player)
             }
         }
     }
@@ -50,7 +52,7 @@ object BlobbercystsHighlight {
 
     fun isEnabled() = RiftAPI.inRift() && config.highlightBlobbercysts && LorenzUtils.skyBlockArea == "Colosseum"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.colosseumConfig", "rift.area.colosseum")
     }

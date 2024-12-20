@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -10,15 +13,17 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object HoppityNpc {
@@ -32,7 +37,7 @@ object HoppityNpc {
             ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened = value
         }
 
-    private var slotsToHighlight = mutableSetOf<Int>()
+    private val slotsToHighlight = mutableSetOf<Int>()
     private var inShop = false
 
     @SubscribeEvent
@@ -50,16 +55,23 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
-        if (lastReminderSent.passedSince() <= 30.seconds) return
+        if (!HoppityAPI.isHoppityEvent()) return
+        if (lastReminderSent.passedSince() <= 2.minutes) return
 
-        ChatUtils.clickableChat(
-            "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable this reminder)",
-            onClick = {
-                disableReminder()
-                ChatUtils.chat("§eHoppity's Shop reminder disabled.")
+        ChatUtils.clickToActionOrDisable(
+            "New rabbits are available at §aHoppity's Shop§e!",
+            config::hoppityShopReminder,
+            actionName = "warp to hub",
+            action = {
+                HypixelCommands.warp("hub")
+                EntityMovementData.onNextTeleport(IslandType.HUB) {
+                    IslandGraphs.pathFind(
+                        LorenzVec(6.4, 70.0, 7.4),
+                        "§aHoppity's Shop",
+                        condition = { config.hoppityShopReminder }
+                    )
+                }
             },
-            oneTimeClick = true
         )
 
         lastReminderSent = SimpleTimeMark.now()
@@ -103,9 +115,5 @@ object HoppityNpc {
     private fun clear() {
         inShop = false
         slotsToHighlight.clear()
-    }
-
-    private fun disableReminder() {
-        config.hoppityShopReminder = false
     }
 }

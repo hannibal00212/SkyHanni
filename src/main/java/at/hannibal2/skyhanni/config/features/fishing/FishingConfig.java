@@ -67,6 +67,11 @@ public class FishingConfig {
     public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Lava Replacement", desc = "")
+    @Accordion
+    public LavaReplacementConfig lavaReplacement = new LavaReplacementConfig();
+
+    @Expose
     @ConfigOption(
         name = "Shark Fish Counter",
         desc = "Counts how many Sharks have been caught."
@@ -80,13 +85,13 @@ public class FishingConfig {
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of Sea Creature you have fished.")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the chat message that says what type of Sea Creature you have fished.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortenFishingMessage = false;
 
     @Expose
-    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the Sea Creature chat message instead of in a previous line.")
+    @ConfigOption(name = "Compact Double Hook", desc = "Add Double Hook to the Sea Creature chat message instead of in a previous line.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactDoubleHook = true;

@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
@@ -29,7 +29,7 @@ object TrophyFishManager {
 
     private var loadedNeu = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeu || !config.loadFromNeuPV) return
 
@@ -55,17 +55,18 @@ object TrophyFishManager {
         }
         if (changed) {
             ChatUtils.clickableChat(
-                "Click here to load data from NEU PV!", onClick = {
+                "Click here to load Trophy Fishing data from NEU PV!", onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
+                "§eClick to load!",
                 oneTimeClick = true
             )
         }
     }
 
     private fun updateFromNeuPv(
-        savedFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>,
-        neuData: MutableList<Triple<String, TrophyRarity, Int>>,
+        savedFishes: Map<String, MutableMap<TrophyRarity, Int>>,
+        neuData: List<Triple<String, TrophyRarity, Int>>,
     ) {
         for ((name, rarity, newValue) in neuData) {
             val saved = savedFishes[name] ?: continue

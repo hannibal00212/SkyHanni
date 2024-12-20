@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.DungeonStartEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -19,6 +20,10 @@ object DungeonMilestonesDisplay {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
+    /**
+     * REGEX-TEST: §e§lMage Milestone §r§e❷§r§7: You have dealt §r§c300,000§r§7 Total Damage so far! §r§a07s
+     * REGEX-TEST: §e§lTank Milestone §r§e❷§r§7: You have tanked and dealt §r§c180,000§r§7 Total Damage so far! §r§a16s
+     */
     private val milestonePattern by RepoPattern.pattern(
         "dungeon.milestone",
         "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
@@ -27,7 +32,7 @@ object DungeonMilestonesDisplay {
     private var display = ""
     private var currentMilestone = 0
     private var timeReached = SimpleTimeMark.farPast()
-    var colour = ""
+    var color = ""
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -54,7 +59,7 @@ object DungeonMilestonesDisplay {
             timeReached = SimpleTimeMark.now()
         }
 
-        colour = when (currentMilestone) {
+        color = when (currentMilestone) {
             0, 1 -> "§c"
             2 -> "§e"
             else -> "§a"
@@ -68,7 +73,7 @@ object DungeonMilestonesDisplay {
         currentMilestone = 0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         currentMilestone = 0
         update()
@@ -79,7 +84,7 @@ object DungeonMilestonesDisplay {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
-            colour + display,
+            color + display,
             posLabel = "Dungeon Milestone"
         )
     }

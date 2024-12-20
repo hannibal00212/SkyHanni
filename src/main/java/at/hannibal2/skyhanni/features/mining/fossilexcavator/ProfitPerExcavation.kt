@@ -1,22 +1,22 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 
 @SkyHanniModule
 object ProfitPerExcavation {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!config.profitPerExcavation) return
         val loot = event.loot
@@ -29,7 +29,7 @@ object ProfitPerExcavation {
                 val pricePer = it.getPrice()
                 if (pricePer == -1.0) continue
                 val profit = amount * pricePer
-                val text = "§eFound $name §8${amount.addSeparators()}x §7(§6${NumberUtil.format(profit)}§7)"
+                val text = "§eFound $name §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
                 map[text] = profit
                 totalProfit += profit
             }
@@ -38,12 +38,12 @@ object ProfitPerExcavation {
         val scrapItem = FossilExcavatorAPI.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
-        map["${scrapItem.itemName}: §c-${NumberUtil.format(scrapPrice)}"] = -scrapPrice
+        map["${scrapItem.itemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
         totalProfit -= scrapPrice
 
         val hover = map.sortedDesc().keys.toMutableList()
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
-        val totalMessage = "Profit this excavation: $profitPrefix${NumberUtil.format(totalProfit)}"
+        val totalMessage = "Profit this excavation: $profitPrefix${totalProfit.shortFormat()}"
         hover.add("")
         hover.add("§e$totalMessage")
         ChatUtils.hoverableChat(totalMessage, hover)

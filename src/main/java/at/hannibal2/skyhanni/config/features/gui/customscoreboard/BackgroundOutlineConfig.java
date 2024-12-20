@@ -11,7 +11,7 @@ public class BackgroundOutlineConfig {
     @Expose
     @ConfigOption(
         name = "Outline",
-        desc = "Shows an outline around the scoreboard."
+        desc = "Show an outline around the scoreboard."
     )
     @ConfigEditorBoolean
     public boolean enabled = false;

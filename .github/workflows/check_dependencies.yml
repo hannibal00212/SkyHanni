@@ -1,0 +1,27 @@
+name: Check PR Dependencies
+
+# TODO: Run when other pr gets merged
+on:
+    pull_request_target:
+        types: [ opened, edited ]
+
+jobs:
+    check-dependencies:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Check out the repository
+                uses: actions/checkout@v3
+
+            -   name: Set up Node.js
+                uses: actions/setup-node@v3
+                with:
+                    node-version: '16'
+
+            -   name: Install dependencies
+                run: npm install @octokit/rest node-fetch
+
+            -   name: Run dependency check script
+                run: node .github/scripts/checkDependencies.mjs
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_CONTEXT: ${{ toJson(github) }}

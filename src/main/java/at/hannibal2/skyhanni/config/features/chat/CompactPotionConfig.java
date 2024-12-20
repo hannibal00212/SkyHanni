@@ -14,7 +14,7 @@ public class CompactPotionConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Clickable Chat Message", desc = "Makes the Compact Potion message open the Potion effects menu on click.")
+    @ConfigOption(name = "Clickable Chat Message", desc = "Make the Compact Potion message open the Potion effects menu on click.")
     @ConfigEditorBoolean
     public boolean clickableChatMessage = true;
 }

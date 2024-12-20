@@ -21,7 +21,7 @@ object AtmosphericFilterDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!GardenAPI.inGarden() && !config.outsideGarden) return
-        display = drawDisplay(SkyblockSeason.getCurrentSeason() ?: return)
+        display = drawDisplay(SkyblockSeason.currentSeason ?: return)
     }
 
     @SubscribeEvent

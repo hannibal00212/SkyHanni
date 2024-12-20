@@ -20,7 +20,7 @@ public class ChumBucketHiderConfig {
     public Property<Boolean> hideBucket = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Hide Own", desc = "Hides your own Chum/Chumcap Bucket.")
+    @ConfigOption(name = "Hide Own", desc = "Hide your own Chum/Chumcap Bucket.")
     @ConfigEditorBoolean
     public Property<Boolean> hideOwn = Property.of(false);
 }

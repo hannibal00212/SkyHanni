@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class UpsideDownParkourConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps solving the upside down parkour in the Mirrorverse by showing the correct way.")
+    @ConfigOption(name = "Enabled", desc = "Help solve the upside down parkour in the Mirrorverse by showing the correct way.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -22,7 +22,7 @@ public class UpsideDownParkourConfig {
     public Property<Integer> lookAhead = Property.of(3);
 
     @Expose
-    @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
+    @ConfigOption(name = "Outline", desc = "Outline the top edge of the platforms.")
     @ConfigEditorBoolean
     public boolean outline = true;
 

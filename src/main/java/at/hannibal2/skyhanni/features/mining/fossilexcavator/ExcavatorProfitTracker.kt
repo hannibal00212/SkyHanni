@@ -1,22 +1,27 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -32,7 +37,8 @@ object ExcavatorProfitTracker {
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
         { Data() },
-        { it.mining.fossilExcavatorProfitTracker }) { drawDisplay(it) }
+        { it.mining.fossilExcavatorProfitTracker },
+    ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -46,7 +52,7 @@ object ExcavatorProfitTracker {
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate."
+                "§7Your drop rate: §c$dropRate.",
             )
         }
 
@@ -54,7 +60,7 @@ object ExcavatorProfitTracker {
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
             return listOf(
-                "<no coins>"
+                "<no coins>",
             )
         }
 
@@ -70,16 +76,16 @@ object ExcavatorProfitTracker {
 
     private val scrapItem get() = FossilExcavatorAPI.scrapItem
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lFossil Excavation Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lFossil Excavation Profit Tracker")
         var profit = tracker.drawItems(data, { true }, this)
 
         val timesExcavated = data.timesExcavated
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Times excavated: §e${timesExcavated.addSeparators()}",
-                listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times.")
-            )
+                listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
+            ).toSearchable(),
         )
 
         profit = addScrap(timesExcavated, profit)
@@ -90,12 +96,12 @@ object ExcavatorProfitTracker {
             addGlacitePowder(data)
         }
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
+        add(tracker.addTotalProfit(profit, data.timesExcavated, "excavation"))
 
         tracker.addPriceFromButton(this)
     }
 
-    private fun MutableList<List<Any>>.addFossilDust(
+    private fun MutableList<Searchable>.addFossilDust(
         fossilDustGained: Long,
         profit: Double,
     ): Double {
@@ -103,36 +109,36 @@ object ExcavatorProfitTracker {
         // TODO use same price source as profit tracker
         val pricePer = scrapItem.getPrice() / 500
         val fossilDustPrice = pricePer * fossilDustGained
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
-                "§7${NumberUtil.format(fossilDustGained)}x §fFossil Dust§7: §6${NumberUtil.format(fossilDustPrice)}",
+                "§7${fossilDustGained.shortFormat()}x §fFossil Dust§7: §6${fossilDustPrice.shortFormat()}",
                 listOf(
-                    "§7You gained §6${NumberUtil.format(fossilDustPrice)} coins §7in total",
+                    "§7You gained §6${fossilDustPrice.shortFormat()} coins §7in total",
                     "§7for all §e$fossilDustGained §fFossil Dust",
                     "§7you have collected.",
                     "",
-                    "§7Price Per Fossil Dust: §6${NumberUtil.format(pricePer)}"
-                )
-            )
+                    "§7Price Per Fossil Dust: §6${pricePer.shortFormat()}",
+                ),
+            ).toSearchable("Fossil Dust"),
         )
         return profit + fossilDustPrice
     }
 
-    private fun MutableList<List<Any>>.addGlacitePowder(data: Data) {
+    private fun MutableList<Searchable>.addGlacitePowder(data: Data) {
         val glacitePowderGained = data.glacitePowderGained
         if (glacitePowderGained <= 0) return
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§bGlacite Powder§7: §e${glacitePowderGained.addSeparators()}",
                 listOf(
                     "§7No real profit,",
                     "§7but still nice to see! Right?",
-                )
-            )
+                ),
+            ).toSearchable("Glacite Powder"),
         )
     }
 
-    private fun MutableList<List<Any>>.addScrap(
+    private fun MutableList<Searchable>.addScrap(
         timesExcavated: Long,
         profit: Double,
     ): Double {
@@ -140,20 +146,34 @@ object ExcavatorProfitTracker {
         // TODO use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
-                "$name §7price: §c-${NumberUtil.format(scrapPrice)}",
+                "$name §7price: §c-${scrapPrice.shortFormat()}",
                 listOf(
-                    "§7You paid §c${NumberUtil.format(scrapPrice)} coins §7in total",
+                    "§7You paid §c${scrapPrice.shortFormat()} coins §7in total",
                     "§7for all §e$timesExcavated $name",
-                    "§7you have used."
-                )
-            )
+                    "§7you have used.",
+                ),
+            ).toSearchable("Scrap"),
         )
         return profit - scrapPrice
     }
 
-    @SubscribeEvent
+    @HandleEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled()) return
+
+        val internalName = event.internalName
+        if (event.source == ItemAddManager.Source.COMMAND) {
+            tryAddItem(internalName, event.amount, command = true)
+        }
+    }
+
+    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+        tracker.addItem(internalName, amount, command)
+    }
+
+    @HandleEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!isEnabled()) return
         for ((name, amount) in event.loot) {
@@ -184,11 +204,11 @@ object ExcavatorProfitTracker {
 
         val internalName = NEUInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
-            ChatUtils.debug("no price for exavator profit: '$name'")
+            ChatUtils.debug("no price for excavator profit: '$name'")
             return
         }
         // TODO use primitive item stacks in trackers
-        tracker.addItem(internalName, amount)
+        tryAddItem(internalName, amount, command = false)
     }
 
     @SubscribeEvent
@@ -205,13 +225,18 @@ object ExcavatorProfitTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
-        && LorenzUtils.skyBlockArea == "Fossil Research Center"
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
+        LorenzUtils.skyBlockArea == "Fossil Research Center"
+
+    fun resetCommand() {
+        tracker.resetCommand()
+    }
+
 }

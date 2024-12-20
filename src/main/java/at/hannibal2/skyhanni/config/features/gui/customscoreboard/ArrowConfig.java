@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArrowConfig {
     @Expose
-    @ConfigOption(name = "Arrow Amount Display", desc = "Determines how the arrow amount is displayed.")
+    @ConfigOption(name = "Arrow Amount Display", desc = "Determine how the arrow amount is displayed.")
     @ConfigEditorDropdown
     public ArrowAmountDisplay arrowAmountDisplay = ArrowAmountDisplay.NUMBER;
 

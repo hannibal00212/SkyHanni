@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import io.github.moulberry.notenoughupdates.util.Utils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
@@ -42,7 +43,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         GlStateManager.translate(l + 0.0, t + 0.0, 0.0)
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
         GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
-        var mouseX = originalMouseX - l
+        val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && Mouse.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
         val sr = ScaledResolution(mc)
@@ -59,7 +60,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 drawString(
                     mc.fontRendererObj,
                     "§e§lNEW TEXT",
-                    0, 0, -1
+                    0, 0, -1,
                 )
                 size += drawMultiLineText(
                     msg.modified,
@@ -86,8 +87,8 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         GlScissorStack.pop(sr)
         wasMouseButtonDown = isMouseButtonDown
         GlStateManager.popMatrix()
-        if (queuedTooltip != null) {
-            Utils.drawHoveringText(queuedTooltip, originalMouseX, originalMouseY, width, height, -1, mc.fontRendererObj)
+        queuedTooltip?.let { tooltip ->
+            RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
         GlStateManager.color(1f, 1f, 1f, 1f)
     }
@@ -98,7 +99,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
             w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10),
             mc.fontRendererObj,
             false,
-            true
+            true,
         )
     }
 
@@ -121,7 +122,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 line.formattedText,
                 xPos,
                 0,
-                -1
+                -1,
             )
             GlStateManager.translate(0F, 10F, 0F)
         }

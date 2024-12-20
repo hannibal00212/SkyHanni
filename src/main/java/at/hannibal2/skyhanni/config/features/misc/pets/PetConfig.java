@@ -31,14 +31,19 @@ public class PetConfig {
     public PetExperienceToolTipConfig petExperienceToolTip = new PetExperienceToolTipConfig();
 
     @Expose
-    @ConfigOption(name = "Hide Autopet Messages", desc = "Hides the autopet messages from chat. §eRequires the " +
-        "display to be enabled.")
+    @ConfigOption(name = "Pet Nametag", desc = "")
+    @Accordion
+    public PetNametagConfig nametag = new PetNametagConfig();
+
+    @Expose
+    @ConfigOption(name = "Hide Autopet Messages", desc = "Hide the autopet messages from chat.\n" +
+        "§eRequires the display to be enabled.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideAutopet = false;
 
     @Expose
-    @ConfigOption(name = "Show Pet Item", desc = "Specifies the pet items for which icons should be displayed next to pets.")
+    @ConfigOption(name = "Show Pet Item", desc = "Specify the pet items for which icons should be displayed next to pets.")
     @ConfigEditorDraggableList
     public List<PetItemsDisplay> petItemDisplay = new ArrayList<>(Arrays.asList(
         PetItemsDisplay.XP_SHARE,

@@ -30,7 +30,7 @@ public class BetterWikiCommandConfig {
     @ConfigOption(
         name = "Use Fandom Wiki",
         desc = "Use Fandom Wiki (§ehypixel-skyblock.fandom.com§7) instead of " +
-            "the Hypixel wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages."
+            "the Hypixel Wiki (§ewiki.hypixel.net§7) in most wiki-related chat messages."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -39,7 +39,7 @@ public class BetterWikiCommandConfig {
     @Expose
     @ConfigOption(
         name = "Auto Open",
-        desc = "Directly opens the Wiki when running the command instead of having to click a message in chat."
+        desc = "Directly open the Wiki when running the command instead of having to click a message in chat."
     )
     @ConfigEditorBoolean
     public boolean autoOpenWiki = false;
@@ -47,14 +47,14 @@ public class BetterWikiCommandConfig {
     @Expose
     @ConfigOption(
         name = "Open from Menus",
-        desc = "Directly opens the Wiki from menus instead of having to click a message in chat."
+        desc = "Directly open the Wiki from menus instead of having to click a message in chat."
     )
     @ConfigEditorBoolean
     public boolean menuOpenWiki = false;
 
     @Expose
-    @ConfigOption(name = "Fandom Wiki Key", desc = "Search for an item on Wiki with this keybind.\n" +
-        "§4For optimal experiences, do §lNOT§r §4bind this to a mouse button.")
+    @ConfigOption(name = "Wiki Key", desc = "Search for an item's wiki page with this keybind.\n" +
+        "§cFor an optimal experience, do §lNOT §cbind this to a mouse button.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int wikiKeybind = Keyboard.KEY_NONE;
 }

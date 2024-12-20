@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -23,4 +25,9 @@ public class SkyMartConfig {
     @Expose
     @ConfigLink(owner = SkyMartConfig.class, field = "copperPrice")
     public Position copperPricePos = new Position(211, 132, false, true);
+
+    @Expose
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
+    @ConfigEditorDropdown
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_SELL;
 }

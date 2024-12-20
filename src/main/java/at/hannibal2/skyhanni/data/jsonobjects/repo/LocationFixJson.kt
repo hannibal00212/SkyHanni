@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class LocationFixJson(
-    @Expose val locationFixes: Map<String, LocationFix>
+    @Expose val locationFixes: Map<String, LocationFix>,
 )
 
 data class LocationFix(

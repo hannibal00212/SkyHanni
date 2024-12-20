@@ -9,8 +9,8 @@ import net.minecraft.util.BlockPos
 import net.minecraft.world.IBlockAccess
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-
 // Taken and modified from Skytils
+@Suppress("UnusedParameter")
 fun modifyGetModelFromBlockState(
     blockRendererDispatcher: BlockRendererDispatcher,
     state: IBlockState?,
@@ -18,20 +18,13 @@ fun modifyGetModelFromBlockState(
     pos: BlockPos?,
     cir: CallbackInfoReturnable<IBakedModel>,
 ) {
-    if (state == null || pos == null) return
-    var returnState: IBlockState = state
+    if (pos == null) return
 
     if (!LorenzUtils.inSkyBlock) return
 
-    if (MiningCommissionsBlocksColor.enabled && MiningCommissionsBlocksColor.active) {
-        for (block in MiningCommissionsBlocksColor.MiningBlock.entries) {
-            if (block.checkIsland() && block.onCheck(state)) {
-                returnState = block.onColor(state, block.highlight)
-            }
-        }
-    }
+    val returnState = MiningCommissionsBlocksColor.processState(state)
 
-    if (returnState !== state) {
+    if (returnState != state) {
         cir.returnValue = blockRendererDispatcher.blockModelShapes.getModelForState(returnState)
     }
 }

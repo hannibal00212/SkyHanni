@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.DungeonStartEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -77,7 +78,7 @@ object DungeonDeathCounter {
         display = color + "Deaths: $deaths"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         deaths = 0
         update()
@@ -94,7 +95,7 @@ object DungeonDeathCounter {
         if (!isEnabled()) return
 
         config.deathCounterPos.renderString(
-            DungeonMilestonesDisplay.colour + display,
+            DungeonMilestonesDisplay.color + display,
             posLabel = "Dungeon Death Counter"
         )
     }

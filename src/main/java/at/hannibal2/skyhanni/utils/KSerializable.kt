@@ -47,7 +47,9 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
         val extraDataParam = primaryConstructor.parameters
             .find { it.findAnnotation<ExtraData>() != null && typeOf<MutableMap<String, JsonElement>>().isSubtypeOf(it.type) }
             ?.let { param ->
-                param to kotlinClass.memberProperties.find { it.name == param.name && it.returnType.isSubtypeOf(typeOf<Map<String, JsonElement>>()) } as KProperty1<Any, Map<String, JsonElement>>
+                param to kotlinClass.memberProperties.find {
+                    it.name == param.name && it.returnType.isSubtypeOf(typeOf<Map<String, JsonElement>>())
+                } as KProperty1<Any, Map<String, JsonElement>>
             }
         val parameterInfos = params.map { param ->
             ParameterInfo(
@@ -68,13 +70,13 @@ class KotlinTypeAdapterFactory : TypeAdapterFactory {
                     return
                 }
                 out.beginObject()
-                parameterInfos.forEach { (name, paramInfo) ->
+                for ((name, paramInfo) in parameterInfos) {
                     out.name(name)
                     paramInfo.adapter.write(out, paramInfo.field.get(value))
                 }
                 if (extraDataParam != null) {
                     val extraData = extraDataParam.second.get(value)
-                    extraData.forEach { (extraName, extraValue) ->
+                    for ((extraName, extraValue) in extraData) {
                         out.name(extraName)
                         jsonElementAdapter.write(out, extraValue)
                     }

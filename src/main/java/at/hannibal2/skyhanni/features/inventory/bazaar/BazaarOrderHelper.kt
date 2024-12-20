@@ -23,24 +23,30 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object BazaarOrderHelper {
     private val patternGroup = RepoPattern.group("bazaar.orderhelper")
+
+    /**
+     * REGEX-TEST: §a§lBUY §fWheat
+     */
     private val bazaarItemNamePattern by patternGroup.pattern(
         "itemname",
-        "§.§l(?<type>BUY|SELL) (?<name>.*)"
-    )
-    private val filledPattern by patternGroup.pattern(
-        "filled",
-        "§7Filled: §[a6].*§7/.* §a§l100%!"
-    )
-    private val pricePattern by patternGroup.pattern(
-        "price",
-        "§7Price per unit: §6(?<number>.*) coins"
+        "§.§l(?<type>BUY|SELL) (?<name>.*)",
     )
 
-    fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
-        "Your Bazaar Orders" -> true
-        "Co-op Bazaar Orders" -> true
-        else -> false
-    }
+    /**
+     * REGEX-TEST: §7Filled: §a200§7/200 §a§l100%!
+     */
+    private val filledPattern by patternGroup.pattern(
+        "filled",
+        "§7Filled: §[a6].*§7/.* §a§l100%!",
+    )
+
+    /**
+     * REGEX-TEST: §7Price per unit: §63.1 coins
+     */
+    private val pricePattern by patternGroup.pattern(
+        "price",
+        "§7Price per unit: §6(?<number>.*) coins",
+    )
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -51,7 +57,7 @@ object BazaarOrderHelper {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         val inventoryName = chest.getInventoryName()
-        if (!isBazaarOrderInventory(inventoryName)) return
+        if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
             bazaarItemNamePattern.matchMatcher(stack.name) {

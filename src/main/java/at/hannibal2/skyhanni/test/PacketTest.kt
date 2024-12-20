@@ -7,10 +7,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -59,9 +60,7 @@ object PacketTest {
 
     private fun sendEntityPacketData(id: Int) {
         ChatUtils.chat("Packet Entity Data: $id")
-        entityMap[id]?.forEach {
-            it.print()
-        }
+        entityMap[id]?.forEach { it.print() }
         println("End of Data")
     }
 
@@ -189,7 +188,7 @@ object PacketTest {
     }
 
     private fun getDistance(location: LorenzVec?): Double {
-        return location?.distanceToPlayer()?.round(1) ?: 0.0
+        return location?.distanceToPlayer()?.roundTo(1) ?: 0.0
     }
 
     private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {
@@ -203,7 +202,7 @@ object PacketTest {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
         if (packet is C03PacketPlayer) {
-            return LorenzVec(packet.positionX, packet.positionY, packet.positionZ)
+            return packet.getLocation()
         }
 
         if (packet is S0FPacketSpawnMob) {

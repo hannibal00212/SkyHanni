@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,8 +20,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -72,7 +73,10 @@ object ShowMotesNpcSellPrice {
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
-            event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes §7($size x §d${(baseMotes / size).addSeparators()} Motes§7)")
+            event.toolTip.add(
+                "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
+                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)"
+            )
         } else {
             event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes")
         }
@@ -134,29 +138,31 @@ object ShowMotesNpcSellPrice {
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
-            newDisplay.add(buildList {
-                val (index, value) = pair
-                add("  §7- ")
-                val stack = internalName.getItemStack()
-                add(stack)
-                val price = value.formatPrice()
-                val valuePer = stack.motesNpcPrice() ?: continue
-                val tips = buildList {
-                    add("§6Item: ${stack.displayName}")
-                    add("§6Value per: §d$valuePer Motes")
-                    add("§6Total in chest: §d${(value / valuePer).toInt()}")
-                    add("")
-                    add("§6Total value: §d$price coins")
-                }
-                add(
-                    Renderable.hoverTips(
-                        "§6${stack.displayName}: §b$price",
-                        tips,
-                        highlightsOnHoverSlots = index,
-                        stack = stack
+            newDisplay.add(
+                buildList {
+                    val (index, value) = pair
+                    add("  §7- ")
+                    val stack = internalName.getItemStack()
+                    add(stack)
+                    val price = value.formatPrice()
+                    val valuePer = stack.motesNpcPrice() ?: continue
+                    val tips = buildList {
+                        add("§6Item: ${stack.displayName}")
+                        add("§6Value per: §d$valuePer Motes")
+                        add("§6Total in chest: §d${(value / valuePer).toInt()}")
+                        add("")
+                        add("§6Total value: §d$price coins")
+                    }
+                    add(
+                        Renderable.hoverTips(
+                            "§6${stack.displayName}: §b$price",
+                            tips,
+                            highlightsOnHoverSlots = index,
+                            stack = stack
+                        )
                     )
-                )
-            })
+                }
+            )
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         newDisplay.addAsSingletonList("§7Total price: §b$total")
@@ -180,7 +186,7 @@ object ShowMotesNpcSellPrice {
     }
 
     private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
-        NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        NumberFormatEntry.SHORT -> this.shortFormat()
         NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
@@ -189,7 +195,7 @@ object ShowMotesNpcSellPrice {
 
     private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

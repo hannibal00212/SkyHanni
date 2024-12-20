@@ -79,6 +79,11 @@ public class PestFinderConfig {
     public Position position = new Position(-350, 200, 1.3f);
 
     @Expose
+    @ConfigOption(name = "No Pests Title", desc = "Show a Title in case of No pests. Useful if you are using the §eGarden Pest Chat Filter")
+    @ConfigEditorBoolean
+    public boolean noPestTitle = false;
+
+    @Expose
     @ConfigOption(name = "Teleport Hotkey", desc = "Press this key to warp to the nearest plot with pests on it.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int teleportHotkey = Keyboard.KEY_NONE;

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
@@ -36,8 +37,8 @@ object BingoAPI {
         " §.Ⓑ §.Bingo"
     )
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bingo Card")
 
         if (!LorenzUtils.isBingoProfile) {
@@ -111,7 +112,7 @@ object BingoAPI {
     } + LorenzUtils.formatPercentage(percentage)
 
     fun getBingoIcon(rank: Int): String {
-        val rankIcon = getIcon(rank) ?: ""
+        val rankIcon = getIcon(rank).orEmpty()
         return if (rank != -1) {
             "$rankIcon $rank"
         } else {

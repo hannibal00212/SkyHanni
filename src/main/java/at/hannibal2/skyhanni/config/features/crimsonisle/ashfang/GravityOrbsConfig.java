@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class GravityOrbsConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows the Gravity Orbs more clearly.")
+    @ConfigOption(name = "Enabled", desc = "Show the Gravity Orbs more clearly.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

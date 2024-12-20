@@ -14,7 +14,7 @@ public class AreaWallsConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "In Nucleus", desc = "Shows the walls also when inside the Nucleus.")
+    @ConfigOption(name = "In Nucleus", desc = "Also show the walls when inside the Nucleus.")
     @ConfigEditorBoolean
     public boolean nucleus = false;
 }

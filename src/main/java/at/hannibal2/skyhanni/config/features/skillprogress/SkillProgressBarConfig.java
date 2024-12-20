@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SkillProgressBarConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable/Disable the progress bar.")
+    @ConfigOption(name = "Enabled", desc = "Enable or disable the progress bar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);

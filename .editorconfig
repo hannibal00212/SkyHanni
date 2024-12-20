@@ -16,18 +16,46 @@ ij_any_block_comment_add_space = true
 ij_any_line_comment_add_space = true
 
 # Max line length
-max_line_length = 120
+max_line_length = 140
 
 # Java Files
 [*.java]
 # Java files should not use wildcard imports
-ij_java_names_count_to_use_import_on_demand = 999
-ij_java_class_count_to_use_import_on_demand = 999
-ij_java_packages_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 2147483647
+ij_java_class_count_to_use_import_on_demand = 2147483647
+ij_java_packages_to_use_import_on_demand = 2147483647
 
 [*.kt]
+ktlint_code_style = intellij_idea
+
 # Kotlin files should not use wildcard imports
-ij_kotlin_name_count_to_use_star_import = 999
-ij_kotlin_name_count_to_use_star_import_for_members = 999
-ij_kotlin_packages_to_use_import_on_demand = 999
+ij_kotlin_name_count_to_use_star_import = 2147483647
+ij_kotlin_name_count_to_use_star_import_for_members = 2147483647
 ij_kotlin_enum_constants_wrap = split_into_lines
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_packages_to_use_import_on_demand = unset
+ktlint_standard_chain-wrapping = always
+
+ktlint_standard_multiline-if-else = disabled
+ktlint_standard_no-empty-first-line-in-class-body = disabled
+ktlint_standard_no-single-line-block-comment = disabled
+ktlint_standard_no-blank-line-before-rbrace = disabled
+ktlint_standard_no-consecutive-blank-lines = disabled
+ktlint_standard_no-empty-first-line-in-method-block = disabled
+ktlint_standard_comment-spacing = disabled
+ktlint_standard_string-template = disabled
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+ktlint_standard_context-receiver-wrapping = disabled
+ktlint_standard_multiline-expression-wrapping = false
+ktlint_standard_string-template-indent = disabled
+ktlint_standard_no-trailing-spaces = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_wrapping = disabled
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_final-newline = disabled
+
+ktlint_standard_no-wildcard-imports = enabled
+ktlint_standard_function-expression-body = disabled

@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
@@ -35,13 +37,20 @@ class GuiContainerHook(guiAny: Any) {
         ci: CallbackInfo,
     ) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiContainerEvent.BeforeDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
-            NEUApi.setInventoryButtonsToDisabled()
+        if (GuiContainerEvent.PreDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
+            if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCancelled = true
             ci.cancel()
         } else {
-            GuiData.preDrawEventCancelled = false
+            DelayedRun.runNextTick {
+                GuiData.preDrawEventCancelled = false
+            }
         }
+    }
+
+    fun postDraw(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
+        GuiContainerEvent.PostDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -68,7 +77,7 @@ class GuiContainerHook(guiAny: Any) {
         mouseY: Int,
         ci: CallbackInfo,
     ) {
-        if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
+        if (DrawScreenAfterEvent(mouseX, mouseY, ci).post()) ci.cancel()
     }
 
 }

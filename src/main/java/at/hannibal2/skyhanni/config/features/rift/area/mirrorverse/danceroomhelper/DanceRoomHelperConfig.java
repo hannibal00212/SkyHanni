@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class DanceRoomHelperConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
+    @ConfigOption(name = "Enabled", desc = "Help to solve the dance room in the Mirrorverse by showing multiple tasks at once.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

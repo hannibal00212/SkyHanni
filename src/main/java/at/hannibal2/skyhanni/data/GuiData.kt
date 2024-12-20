@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.NEURenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -23,7 +25,7 @@ object GuiData {
 
     var preDrawEventCancelled = false
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onNeuRenderEvent(event: NEURenderEvent) {
         if (preDrawEventCancelled) event.cancel()
     }
@@ -35,15 +37,26 @@ object GuiData {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
+
+        if (CustomWardrobeKeybinds.allowMouseClick()) return
+
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiKeyPress(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val (escKey, invKey) = Minecraft.getMinecraft().gameSettings.let {
-            Keyboard.KEY_ESCAPE to it.keyBindInventory.keyCode
+        val allowedKeys = Minecraft.getMinecraft().gameSettings.let {
+            listOf(
+                Keyboard.KEY_ESCAPE,
+                it.keyBindInventory.keyCode,
+                it.keyBindScreenshot.keyCode,
+                it.keyBindFullscreen.keyCode,
+            )
         }
-        if (escKey.isKeyHeld() || invKey.isKeyHeld()) return
+        if (allowedKeys.any { it.isKeyHeld() }) return
+
+        if (CustomWardrobeKeybinds.allowKeyboardClick()) return
+
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
@@ -69,7 +82,7 @@ object GuiData {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onGuiOpen(event: GuiOpenEvent) {
         if (preDrawEventCancelled) {
-            NEUApi.setInventoryButtonsToDisabled()
+            if (PlatformUtils.isNeuLoaded()) NEUApi.setInventoryButtonsToDisabled()
         }
     }
 }

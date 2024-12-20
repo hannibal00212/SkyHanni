@@ -14,5 +14,5 @@ data class CrimsonIsleReputationJson(
 
 data class ReputationQuest(
     @Expose val item: NEUInternalName,
-    @Expose val location: List<Double>
+    @Expose val location: List<Double>,
 )

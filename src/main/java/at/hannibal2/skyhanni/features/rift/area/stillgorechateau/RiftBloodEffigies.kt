@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -44,7 +45,7 @@ object RiftBloodEffigies {
     )
     val heartsPattern by patternGroup.pattern(
         "heart",
-        "Effigies: (?<hearts>((§[7c])?⧯)*)"
+        "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)"
     )
 
     @SubscribeEvent
@@ -54,8 +55,8 @@ object RiftBloodEffigies {
 
     private fun cleanMap() = (0..5).associateWith { SimpleTimeMark.farPast() }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Rift Blood Effigies")
 
         if (!isEnabled()) {
@@ -74,23 +75,23 @@ object RiftBloodEffigies {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
         if (newLocations.size != 6) {
-            error("Invalid rift effigies size: ${newLocations.size} (expeced 6)")
+            error("Invalid rift effigies size: ${newLocations.size} (expected 6)")
         }
         locations = newLocations
     }
 
-    @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardRawChangeEvent) {
+    @HandleEvent
+    fun onScoreboardChange(event: RawScoreboardUpdateEvent) {
         if (!isEnabled()) return
 
-        val line = event.newList.firstOrNull { it.startsWith("Effigies:") } ?: return
+        val line = event.rawScoreboard.firstOrNull { it.startsWith("Effigies:") } ?: return
         val hearts = heartsPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 
         val split = hearts.split("§").drop(1)
         for ((index, s) in split.withIndex()) {
-            val time = effigiesTimes[index]!!
+            val time = effigiesTimes[index] ?: continue
 
             if (time.isInPast()) {
                 if (s == "7") {
@@ -131,7 +132,7 @@ object RiftBloodEffigies {
 
         for ((index, location) in locations.withIndex()) {
             val name = "Effigy #${index + 1}"
-            val duration = effigiesTimes[index]!!
+            val duration = effigiesTimes[index] ?: continue
 
             if (duration.isFarPast()) {
                 if (config.unknownTime) {
@@ -163,7 +164,7 @@ object RiftBloodEffigies {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inStillgoreChateau()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
     }

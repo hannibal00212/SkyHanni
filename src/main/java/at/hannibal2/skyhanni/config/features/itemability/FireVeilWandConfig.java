@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FireVeilWandConfig {
     @Expose
-    @ConfigOption(name = "Fire Veil Design", desc = "Changes the flame particles of the Fire Veil Wand ability.")
+    @ConfigOption(name = "Fire Veil Design", desc = "Change the flame particles of the Fire Veil Wand ability.")
     @ConfigEditorDropdown
     public DisplayEntry display = DisplayEntry.PARTICLES;
 
@@ -44,7 +44,7 @@ public class FireVeilWandConfig {
     @Expose
     @ConfigOption(
         name = "Line Color",
-        desc = "Changes the color of the Fire Veil Wand line."
+        desc = "Change the color of the Fire Veil Wand line."
     )
     @ConfigEditorColour
     public String displayColor = "0:245:255:85:85";

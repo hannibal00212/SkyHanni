@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -7,17 +8,17 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -28,9 +29,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyMartCopperPrice {
 
+    /**
+     * REGEX-TEST: §c250 Copper
+     */
     private val copperPattern by RepoPattern.pattern(
         "garden.inventory.skymart.copper",
-        "§c(?<amount>.*) Copper"
+        "§c(?<amount>.*) Copper",
     )
 
     private var display = emptyList<Renderable>()
@@ -55,24 +59,24 @@ object SkyMartCopperPrice {
                 } ?: continue
 
                 val internalName = item.getInternalName()
-                val itemPrice = internalName.getPriceOrNull() ?: continue
+                val itemPrice = internalName.getPriceOrNull(config.priceSource) ?: continue
                 val profit = itemPrice - (otherItemsPrice ?: 0.0)
 
                 val factor = profit / copper
-                val perFormat = NumberUtil.format(factor)
+                val perFormat = factor.shortFormat()
 
                 val itemName = item.itemName
                 val hover = buildList {
                     add(itemName)
                     add("")
-                    add("§7Item price: §6${NumberUtil.format(itemPrice)} ")
+                    add("§7Item price: §6${itemPrice.shortFormat()} ")
                     otherItemsPrice?.let {
-                        add("§7Additional cost: §6${NumberUtil.format(it)} ")
+                        add("§7Additional cost: §6${it.shortFormat()} ")
                     }
-                    add("§7Profit per purchase: §6${NumberUtil.format(profit)} ")
+                    add("§7Profit per purchase: §6${profit.shortFormat()} ")
                     add("")
                     add("§7Copper amount: §c${copper.addSeparators()} ")
-                    add("§7Profit per copper: §6${perFormat} ")
+                    add("§7Profit per copper: §6$perFormat ")
                 }
                 table.add(
                     DisplayTableEntry(
@@ -81,8 +85,8 @@ object SkyMartCopperPrice {
                         factor,
                         internalName,
                         hover,
-                        highlightsOnHoverSlots = listOf(slot)
-                    )
+                        highlightsOnHoverSlots = listOf(slot),
+                    ),
                 )
             }
         }
@@ -104,18 +108,18 @@ object SkyMartCopperPrice {
             config.copperPricePos.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "SkyMart Copper Price"
+                posLabel = "SkyMart Copper Price",
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
         event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")
         event.move(3, "garden.skyMartCopperPricePos", "garden.skyMart.copperPricePos")
         event.transform(32, "garden.skyMart.itemScale") {
-            JsonPrimitive((it.asDouble / 1.851).round(1))
+            JsonPrimitive((it.asDouble / 1.851).roundTo(1))
         }
     }
 

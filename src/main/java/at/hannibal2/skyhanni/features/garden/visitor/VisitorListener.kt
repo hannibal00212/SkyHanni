@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
@@ -42,14 +43,14 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
-        "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
+        "§7Offers Accepted: §a(?<offersAccepted>\\d+)",
     )
 
     private val config get() = VisitorAPI.config
 
     private val logger = LorenzLogger("garden/visitors/listener")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         VisitorAPI.reset()
     }
@@ -67,18 +68,19 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    @HandleEvent
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
+        if (!event.isWidget(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
+        val hasVisitorInfo = event.lines.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
-        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.lines)
 
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
-            VisitorAPI.getVisitors().forEach {
-                val name = it.visitorName
+            for (visitor in VisitorAPI.getVisitors()) {
+                val name = visitor.visitorName
                 val removed = name !in visitorsInTab
                 if (removed) {
                     logger.log("Removed old visitor: '$name'")
@@ -116,7 +118,7 @@ object VisitorListener {
         visitor.offersAccepted = offersAcceptedPattern.matchMatcher(lore[3]) { group("offersAccepted").toInt() }
         visitor.entityId = lastClickedNpc
         visitor.offer = visitorOffer
-        VisitorOpenEvent(visitor).postAndCatch()
+        VisitorOpenEvent(visitor).post()
     }
 
     @SubscribeEvent
@@ -124,7 +126,7 @@ object VisitorListener {
         VisitorAPI.inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
@@ -142,14 +144,13 @@ object VisitorListener {
         GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+        if (entity.name == "§e§lCLICK") {
             event.cancel()
         }
     }
@@ -163,7 +164,7 @@ object VisitorListener {
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
                 if (it.distanceToPlayer() > 15) return@let
-                VisitorRenderEvent(visitor, event.exactLocation(it), event).postAndCatch()
+                VisitorRenderEvent(visitor, event.exactLocation(it), event).post()
             }
         }
     }

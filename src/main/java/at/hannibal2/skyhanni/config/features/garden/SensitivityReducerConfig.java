@@ -15,7 +15,7 @@ public class SensitivityReducerConfig {
     @Expose
     @ConfigOption(
         name = "Mode",
-        desc = "Lowers mouse sensitivity while in the garden.")
+        desc = "Lower mouse sensitivity while in the garden.")
     @ConfigEditorDropdown
     public Mode mode = Mode.OFF;
 
@@ -41,14 +41,14 @@ public class SensitivityReducerConfig {
     public int keybind = Keyboard.KEY_N;
 
     @Expose
-    @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
+    @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 50, minStep = 1)
     public Property<Float> reducingFactor = Property.of(15.0F);
 
     @Expose
     @ConfigOption(
         name = "Show GUI",
-        desc = "Shows the GUI element while the feature is enabled.")
+        desc = "Show the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
     public boolean showGUI = true;
 

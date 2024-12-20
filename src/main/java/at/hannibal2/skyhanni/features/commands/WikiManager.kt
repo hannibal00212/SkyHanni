@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
@@ -8,13 +9,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -26,12 +25,12 @@ object WikiManager {
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
@@ -50,7 +49,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
@@ -58,7 +57,7 @@ object WikiManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (NEUItems.neuHasFocus()) return
@@ -70,7 +69,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
         val itemDisplayName =
-            item.itemName.replace("§a✔ ", "").replace("§c✖ ", "")
+            item.displayName.replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 
@@ -79,16 +78,16 @@ object WikiManager {
 
     fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
         if (wikithis && !LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§cYou must be in SkyBlock to do this!")
+            ChatUtils.userError("You must be in SkyBlock to do this!")
             return
         }
 
         var search = ""
-        for (arg in args) search = "$search${arg}"
+        for (arg in args) search = "$search$arg"
 
         if (wikithis) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, false, useFandom = useFandom)
@@ -102,8 +101,10 @@ object WikiManager {
     }
 
     fun sendWikiMessage(
-        search: String = "", displaySearch: String = search,
-        autoOpen: Boolean = config.autoOpenWiki, useFandom: Boolean = config.useFandom
+        search: String = "",
+        displaySearch: String = search,
+        autoOpen: Boolean = config.autoOpenWiki,
+        useFandom: Boolean = config.useFandom,
     ) {
         val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
         val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX
