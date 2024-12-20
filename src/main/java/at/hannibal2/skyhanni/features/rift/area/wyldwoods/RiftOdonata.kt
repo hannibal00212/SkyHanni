@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.wyldwoods
 
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,15 +25,13 @@ object RiftOdonata {
     private val emptyBottle by lazy { "EMPTY_ODONATA_BOTTLE".toInternalName() }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         checkHand()
         if (!hasBottleInHand) return
 
-        if (event.repeatSeconds(1)) {
-            findOdonatas()
-        }
+        findOdonatas()
     }
 
     private fun checkHand() {
