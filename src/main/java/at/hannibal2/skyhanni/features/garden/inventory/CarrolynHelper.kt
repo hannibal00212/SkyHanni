@@ -55,7 +55,7 @@ object CarrolynHelper {
             startPathfind()
         } else {
             ChatUtils.clickableChat(
-                "Carrolyn is on Crimson Isle. Click here to warp there!",
+                "Carrolyn is on the Crimson Isle. Click here to warp there!",
                 onClick = {
                     HypixelCommands.warp("crimson")
                     EntityMovementData.onNextTeleport(IslandType.CRIMSON_ISLE) {
