@@ -21,7 +21,7 @@ import net.minecraft.item.ItemStack
 object CarrolynHelper {
     private val config get() = GardenAPI.config
 
-    val location = LorenzVec(0.5, 103.1, -803.7)
+    private val carrolynLocation = LorenzVec(0.5, 103.1, -803.7)
 
     private val patternGroup = RepoPattern.group("garden.carrolyn")
 
@@ -68,7 +68,7 @@ object CarrolynHelper {
     }
 
     private fun startPathfind() {
-        IslandGraphs.pathFind(location, "§5Carrolyn", condition = { isEnabled() })
+        IslandGraphs.pathFind(carrolynLocation, "§5Carrolyn", condition = { isEnabled() })
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.helpCarrolyn
