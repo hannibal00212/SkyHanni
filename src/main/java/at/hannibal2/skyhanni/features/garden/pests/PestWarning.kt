@@ -21,36 +21,33 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestWarning {
+
     private val config get() = PestAPI.config.pestTimer
+    private val storage get() = GardenAPI.storage
 
     private const val BASE_PEST_COOLDOWN = 300.0
 
-    var repellentMultiplier: Int = 1
-    private var sprayMultiplier: Double = 1.0
-    private var cooldown: Double? = null
     private var warningShown = false
-
     private var wardrobeOpened = false
-
-    private val storage get() = GardenAPI.storage
 
     private var equipmentPestCooldown: Int
         get() = storage?.equipmentPestCooldown ?: 0
         set(value) {
             storage?.equipmentPestCooldown = value
         }
+    var repellentMultiplier: Int = 1
+    private var sprayMultiplier: Double = 1.0
+    private var cooldown: Double? = null
 
     // TODO : move to EquipmentAPI
     /**
@@ -191,9 +188,15 @@ object PestWarning {
             add("Repellent Multiplier: $repellentMultiplier")
             add("Spray Multiplier: $sprayMultiplier")
             add("Equipment Pest Cooldown: $equipmentPestCooldown")
+            add("")
             add("Cooldown: ${cooldown ?: "Unknown"}")
+            add("Last Pest Spawn: ${PestSpawnTimer.lastSpawnTime}")
+            add("")
             add("Warning Shown: $warningShown")
             add("Wardrobe Open: $wardrobeOpened")
+            add("")
+            add("Plot Spray Expired: ${GardenPlotAPI.getCurrentPlot()?.isSprayExpired}")
+            add("Pest eradicator Active: ${Perk.PEST_ERADICATOR.isActive}")
         }
     }
 

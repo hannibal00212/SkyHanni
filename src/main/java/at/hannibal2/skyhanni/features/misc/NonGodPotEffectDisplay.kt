@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestWarning.repellentMultiplier
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -99,56 +100,58 @@ object NonGodPotEffectDisplay {
     @SubscribeEvent
     @Suppress("MaxLineLength")
     fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§aYou cleared all of your active effects!") {
-            effectDuration.clear()
-            update()
-        }
-
-        if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
-            effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
-            update()
-        }
-
-        if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
-            update()
-        }
-
-        if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
-            update()
-        }
-
-        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
-            effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
-            update()
-        }
-
-        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
-            update()
-        }
-
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
-        }
-
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
-        }
-
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
-            effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
-            update()
-        }
-
-        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
-            effectDuration.remove(NonGodPotEffect.GOBLIN)
-            update()
+        when (event.message) {
+            "§aYou cleared all of your active effects!" -> {
+                effectDuration.clear()
+                update()
+            }
+            "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
+                effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
+                update()
+            }
+            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
+                update()
+            }
+            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
+                update()
+            }
+            "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
+                effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
+                update()
+            }
+            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
+                update()
+            }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+                repellentMultiplier = 2
+                update()
+            }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+                repellentMultiplier = 4
+                update()
+            }
+            "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain." -> {
+                effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
+                update()
+            }
+            "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
+                effectDuration.remove(NonGodPotEffect.GOBLIN)
+                update()
+            }
         }
     }
 
     private fun update() {
+        if (effectDuration[NonGodPotEffect.PEST_REPELLENT]?.ended == true ||
+            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX]?.ended == true) {
+            repellentMultiplier = 1
+        }
+
         if (effectDuration.values.removeIf { it.ended }) {
             // to fetch the real amount of active pots
             totalEffectsCount = 0
