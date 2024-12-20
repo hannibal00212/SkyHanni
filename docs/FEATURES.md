@@ -239,6 +239,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added New Year Cake Tracker. - Daveed. (https://github.com/hannibal002/SkyHanni/pull/2237)
     +  Highlights unowned cakes in AH.
     +  Displays a list of missing cake years.
++ Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
 
 </details>
 <details open><summary>
@@ -1046,6 +1047,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
 + Added Hitman statistics to Chocolate Factory stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2991)
     + Allows to view remaining time for full and 28 claimable slots.
++ Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
+    + Using it is not recommended.
 
 ### The Carnival
 
