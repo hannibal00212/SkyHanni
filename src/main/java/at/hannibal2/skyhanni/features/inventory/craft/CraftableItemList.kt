@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.inventory.craft
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -25,6 +27,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
@@ -35,6 +40,7 @@ object CraftableItemList {
 
     private var display = listOf<Renderable>()
     private var inInventory = false
+    private val textInput = TextInput()
     private val craftItemPattern by RepoPattern.pattern(
         "craftableitemlist.craftitem",
         "Craft Item",
@@ -47,23 +53,30 @@ object CraftableItemList {
         inInventory = true
 
         val pricePer = mutableMapOf<NEUInternalName, Double>()
-        val lines = mutableMapOf<NEUInternalName, Renderable>()
+        val lines = mutableMapOf<NEUInternalName, Searchable>()
         loadItems(pricePer, lines)
 
         display = if (lines.isEmpty()) {
-            listOf(Renderable.string("§7No Items to craft"))
+            Renderable.hoverTips(
+                "§7No Items to craft",
+                tips = listOf(
+                    "§7No items found in your Inventory",
+                    "or sacks that can be used as",
+                    "material in crafting recipes.",
+                ),
+            ).toSingletonListOrEmpty()
         } else {
-            val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
-            listOf(
-                Renderable.string("§eCraftable items (${items.size})"),
-                Renderable.scrollList(items, height = 250, velocity = 20.0),
-            )
+            buildList<Renderable> {
+                val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
+                add(Renderable.string("§e§lCraftable Items §7(${items.size})"))
+                add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
+            }
         }
     }
 
     private fun loadItems(
         pricePer: MutableMap<NEUInternalName, Double>,
-        lines: MutableMap<NEUInternalName, Renderable>,
+        lines: MutableMap<NEUInternalName, Searchable>,
     ) {
         val availableMaterial = readItems()
         for (internalName in NEUItems.allInternalNames) {
@@ -83,7 +96,7 @@ object CraftableItemList {
         availableMaterial: Map<NEUInternalName, Long>,
         pricePer: MutableMap<NEUInternalName, Double>,
         internalName: NEUInternalName,
-    ): Renderable? {
+    ): Searchable? {
         val neededItems = ItemUtils.neededItems(recipe)
         // Just a fail save, should not happen normally
         if (neededItems.isEmpty()) return null
@@ -94,8 +107,9 @@ object CraftableItemList {
         val amountFormat = canCraftAmount.addSeparators()
         val totalPrice = pricePer(neededItems)
         pricePer[internalName] = totalPrice
-        val tooltip = buildList<String> {
-            add(internalName.itemName)
+        val itemName = internalName.itemName
+        val tooltip = buildList {
+            add(itemName)
             add("")
             add("§7Craft cost: §6${totalPrice.shortFormat()}")
             for ((item, amount) in neededItems) {
@@ -106,17 +120,17 @@ object CraftableItemList {
             add("")
             add("§7You have enough materials")
             val timeName = StringUtils.pluralize(canCraftAmount, "time", "times")
-            add("§7to craft this item $amountFormat $timeName!")
+            add("§7to craft this item §e$amountFormat §7$timeName!")
             add("")
             add("§eClick to craft!")
         }
         return Renderable.clickAndHover(
-            "§8x$amountFormat ${internalName.itemName}",
+            "§8x$amountFormat $itemName",
             tips = tooltip,
             onClick = {
                 HypixelCommands.viewRecipe(internalName.asString())
             },
-        )
+        ).toSearchable(itemName)
     }
 
     @SubscribeEvent
@@ -134,9 +148,7 @@ object CraftableItemList {
     ): Int {
         val canCraftTotal = mutableListOf<Int>()
         for ((name, neededAmount) in need) {
-            val inventory = available[name] ?: 0
-            val sacks = if (config.includeSacks) name.getAmountInSacks() else 0
-            val having = inventory + sacks
+            val having = available[name] ?: 0
             val canCraft = floor(having.toDouble() / neededAmount).toInt()
             canCraftTotal.add(canCraft)
         }
@@ -149,6 +161,11 @@ object CraftableItemList {
             val item = stack.toPrimitiveStackOrNull() ?: continue
             materials.addOrPut(item.internalName, item.amount.toLong())
         }
+        if (config.includeSacks) {
+            for ((internalName, item) in SackAPI.sackData) {
+                materials.addOrPut(internalName, item.amount.toLong())
+            }
+        }
         return materials
     }
 
@@ -157,7 +174,7 @@ object CraftableItemList {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        config.position.renderRenderables(display, posLabel = "Craft Materials From Bazaar")
+        config.position.renderRenderables(display, posLabel = "Craftable Item List")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
