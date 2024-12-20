@@ -244,7 +244,7 @@ public class GardenConfig {
     public Position logBookStatsPos = new Position(427, 92, false, true);
 
     @Expose
-    @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permament buffs.")
+    @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")
     @SearchTag("Expired Pumpkin, Exportable Carrots, Supreme Chocolate Bar, Fine Flour")
     @ConfigEditorBoolean
     @FeatureToggle
