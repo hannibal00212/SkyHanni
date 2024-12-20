@@ -146,7 +146,7 @@ object ChocolateShopPrice {
 
                 if (!product.canBeBought) {
                     add("")
-                    add("§cCan not be bought!")
+                    add("§cCannot be bought!")
                 }
             }
             table.add(
