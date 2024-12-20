@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ChatMessageStep
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 @SkyHanniModule
 object BingoNextStepHelper {
@@ -142,7 +142,7 @@ object BingoNextStepHelper {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(event: TickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {
