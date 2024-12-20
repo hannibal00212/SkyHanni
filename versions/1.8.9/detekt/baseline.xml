@@ -15,7 +15,6 @@
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$private fun checkThorn(realHealth: Long, realMaxHealth: Long): String?</ID>
     <ID>CyclomaticComplexMethod:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun addEnchantments(stack: ItemStack, list: MutableList&lt;String&gt;): Double</ID>
-    <ID>CyclomaticComplexMethod:GardenBestCropTime.kt$GardenBestCropTime$fun drawBestDisplay(currentCrop: CropType?): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
@@ -168,8 +167,7 @@
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.name", "Garden (?:Desk|Level (?&lt;currentLevel&gt;.*))" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.nextxp", ".* §e(?&lt;nextLevelExp&gt;.*)§6/.*" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.overflow", ".*§r §6(?&lt;overflow&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "crop", "§(?:e○|6☘) §7(?&lt;crop&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)" )</ID>
+    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:GardenPlotAPI.kt$GardenPlotAPI$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!" )</ID>
     <ID>RepoPatternRegexTest:GlacitePowderFeatures.kt$GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
@@ -417,7 +415,6 @@
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$lastParticlePoint2?.distance(particlePoint!!)!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$particlePoint?.let { it - lastParticlePoint2!! }!!</ID>
-    <ID>UnsafeCallOnNullableType:SummoningSoulsName.kt$SummoningSoulsName$mobsName.getOrNull(nearestMob)!!</ID>
     <ID>UnsafeCallOnNullableType:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:TiaRelayWaypoints.kt$TiaRelayWaypoints$waypointName!!</ID>
     <ID>UnsafeCallOnNullableType:Translator.kt$Translator$messageContentRegex.find(message)!!</ID>
