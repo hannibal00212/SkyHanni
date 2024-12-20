@@ -455,7 +455,7 @@ object HoppityEventSummary {
                 )
             } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
                 Renderable.optionalLink(
-                    "§d[ §7Next Hunt §r§f§l-> §r§d]",
+                    "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
                     onClick = { statYear = getCurrentSBYear() + 1 },
                 )
             } else null,

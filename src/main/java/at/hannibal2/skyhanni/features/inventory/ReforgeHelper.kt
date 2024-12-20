@@ -417,8 +417,8 @@ object ReforgeHelper {
         if (slot != null) {
             slot highlight color
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
         }
     }
 
