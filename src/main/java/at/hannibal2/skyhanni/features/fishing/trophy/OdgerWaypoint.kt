@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object OdgerWaypoint {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
-    private val location = LorenzVec(-373, 207, -808)
+    private val odgerLocation = LorenzVec(-373, 207, -808)
 
     private var trophyFishInInventory = false
 
@@ -39,8 +39,8 @@ object OdgerWaypoint {
         if (FishingAPI.holdingLavaRod) return
         if (!trophyFishInInventory) return
 
-        event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
-        event.drawDynamicText(location, "Odger", 1.5)
+        event.drawWaypointFilled(odgerLocation, LorenzColor.WHITE.toColor())
+        event.drawDynamicText(odgerLocation, "Odger", 1.5)
     }
 
     @HandleEvent

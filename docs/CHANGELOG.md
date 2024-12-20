@@ -39,6 +39,8 @@
 + Added New Year Cake Tracker. - Daveed. (https://github.com/hannibal002/SkyHanni/pull/2237)
     +  Highlights unowned cakes in AH.
     +  Displays a list of missing cake years.
++ Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
+    + Using it is not recommended.
 
 #### Fishing Features
 
@@ -62,6 +64,7 @@
 #### Chat Features
 
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
++ Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
 
 #### Combat Features
 
@@ -104,6 +107,7 @@
 + Added Spirit Sceptre message to block annoying messages. - phoebe (https://github.com/hannibal002/SkyHanni/pull/2863)
 + Added `/boo` support for tab completion. - Empa (https://github.com/hannibal002/SkyHanni/pull/2885)****
 + Command aliases are now visible in `/shcommands`. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2993)
++ Added colors to aliases in the `/shcommand` list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3070)
 
 #### Combat Improvements
 
@@ -145,6 +149,7 @@
     +  The leaderboard can optionally set reminders to switch servers to update this stat.
 + Added more granular control over when the Hoppity Live Display is shown. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2919)
 + The Hoppity Unclaimed Eggs display is now more accurate at the end of events. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2986)
++ Added option to display Date/Time on Hoppity Event Live Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2973)
 
 
 #### Great Spook Improvements
@@ -227,6 +232,9 @@
 + Fixed AH Price Website feature not URL encoding the search. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2952)
 + Fixed the Fisherman Attribute abbreviation being incorrect. - Empa (https://github.com/hannibal002/SkyHanni/pull/2950)
 + Fixed background colors for UltraRareBook & Guardian Reminder. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3050)
++ Fixed edge case causing error when acquiring a power-up on first click in SuperPairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3080)
++ Fixed Experiments Profit Tracker not counting exp bottles splashed after using the Experimentation Table. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3066)
++ Fixed items from the previous menu leaking into the SkyHanni User Luck stat breakdown submenu. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3057)
 
 #### Combat Fixes
 
@@ -270,6 +278,7 @@
 + Fixed an issue where Meal Eggs were incorrectly marked as available on Day 1. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2986)
 + Fixed issue with Stampede/Golden Click not counting in Stray Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3013)
 + Fixed stray timer not activating from Hitman Eggs outside of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3015)
++ Fixed Hitman Full Time calculation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3075)
 
 #### Garden Fixes
 
@@ -303,6 +312,7 @@
 
 + Fixed Replace Lava not working with OptiFine. - CalMWolfs + nopo (https://github.com/hannibal002/SkyHanni/pull/2727)
 + Fixed detection of Crimson Isle daily quests after the Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/3016)
++ Fixed Crimson Isle Reputation Helper showing incorrect miniboss count in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/3073)
 
 #### Diana Fixes
 
@@ -329,6 +339,7 @@
 + Fixed malfunctioning Chocolate Factory/Hoppity features due to an update. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2925)
 + Fixed Time Tower warnings showing up on new profiles (e.g. Bingo). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3012)
     + You can open `/cf` once to make the message disappear without changing settings if a new profile was created before applying the fix for the first time.
++ Fixed stray flash overlaying other Chocolate Factory information. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
 
 #### Event Fixes
 
@@ -351,6 +362,7 @@
 + Fixed incorrect health format for holographic mobs in Rift's Crafting Room. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2846)
 + Fixed Agaricus Cap timer not being reset when switching servers. - Empa (https://github.com/hannibal002/SkyHanni/pull/2924)
 + Fixed some Rift mobs, such as Oubliette Guards, sometimes incorrectly getting detected as corrupted and/or runic. - Luna (https://github.com/hannibal002/SkyHanni/pull/2936)
++ Fixed Crux Display exceeding 100% by not accounting for Puff Crux. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3074)
 
 #### Chat Fixes
 
@@ -392,6 +404,7 @@
 + Fixed an issue where item and material stashes together would break Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
 + Fixed intermittent NEU rendering issues. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3053)
 + Fixed collection tracker to recognize the current collection. - nopo (https://github.com/hannibal002/SkyHanni/pull/3049)
++ Fixed skill level. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3068)
 
 ### Technical Details
 
@@ -503,6 +516,13 @@
 + Enhanced `InventoryUtils.clickSlot` to support click type and mode. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2962)
 + Relocated some events to specific sub-packages. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3041)
 + Converted additional `LorenzEvents` to `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3039)
++ Cleaned up code in ChocolateFactoryStats. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3056)
++ Added support for removing items with ReplaceItemEvent. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3057)
++ Converted additional `LorenzEvents` to `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3058)
+
+### Removed Features
+
++ Removed "Hitman Replace" feature due to issues. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3078)
 
 ## Version 0.27
 
