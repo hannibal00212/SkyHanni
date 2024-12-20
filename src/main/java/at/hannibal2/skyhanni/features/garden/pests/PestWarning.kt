@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -42,7 +43,6 @@ object PestWarning {
     private var warningShown = false
 
     private var wardrobeOpened = false
-    private var lastOpened = SimpleTimeMark.farPast()
 
     private val storage get() = GardenAPI.storage
 
@@ -91,6 +91,7 @@ object PestWarning {
         }
 
         WardrobeAPI.inventoryPattern.matchMatcher(event.inventoryName) {
+            if (!warningShown) return
             wardrobeOpened = true
         }
     }
@@ -169,11 +170,10 @@ object PestWarning {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!warningShown) return
-        if (lastOpened.passedSince() < 200.milliseconds) return
+        if (InventoryUtils.inInventory()) return
 
         if (event.keyCode == config.keyBindWardrobe) {
             HypixelCommands.wardrobe()
-            lastOpened = SimpleTimeMark.now()
         }
     }
 
