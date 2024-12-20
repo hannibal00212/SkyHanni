@@ -47,6 +47,7 @@ object PestWarning {
             storage?.equipmentPestCooldown = value
         }
 
+    // TODO : move to EquipmentAPI
     /**
      * REGEX-TEST: §aYou equipped a §r§5Rooted Pest Vest§r§a!
      * REGEX-TEST: §aYou equipped a §r§5Rooted Lotus Necklace§r§a!
@@ -89,9 +90,11 @@ object PestWarning {
     fun onInventoryClose(event: InventoryCloseEvent) {
         equipmentOpen = false
     }
+
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+
         sprayMultiplier = checkSpray()
         cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier
     }
@@ -134,7 +137,8 @@ object PestWarning {
         if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
             LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
 
-            ChatUtils.clickableChat("§cPest spawn cooldown has expired",
+            ChatUtils.clickableChat(
+                "§cPest spawn cooldown has expired",
                 onClick = {
                     HypixelCommands.wardrobe()
                 },
@@ -144,10 +148,12 @@ object PestWarning {
             warningShown = true
 
             if (config.sound.repeatSound) {
-                if (!equipmentOpen && warningShown) {
-                    playUserSound()
-                    Thread.sleep(config.sound.repeatDuration * 50L)
-                }
+                Thread {
+                    while (!equipmentOpen && warningShown) {
+                        playUserSound()
+                        Thread.sleep(config.sound.repeatDuration * 50L)
+                    }
+                }.start()
             } else {
                 playUserSound()
             }
@@ -169,6 +175,7 @@ object PestWarning {
             SoundUtils.createSound(name, pitch).playSound()
         }
     }
+
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Pest Warning")
