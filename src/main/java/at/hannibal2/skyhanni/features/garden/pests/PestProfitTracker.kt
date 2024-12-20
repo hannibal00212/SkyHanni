@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
@@ -46,7 +48,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PestProfitTracker {
-    val config get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
+    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
@@ -200,7 +202,7 @@ object PestProfitTracker {
         addSearchString("§e§lPest Profit Tracker")
         tracker.addBucketSelector(this, bucketData, "Pest Type")
 
-        val profit = tracker.drawItems(bucketData, { true }, this)
+        var profit = tracker.drawItems(bucketData, { true }, this)
 
         val selectedBucket = bucketData.selectedBucket
         val pestCount = selectedBucket?.let { bucketData.pestKills[it] } ?: bucketData.getTotalPestCount()
@@ -226,16 +228,27 @@ object PestProfitTracker {
         if (selectedBucket == null || selectedBucket.spray != null) {
             val applicableSprays = SprayType.getByPestTypeOrAll(selectedBucket)
             val applicableSpraysUsed = bucketData.spraysUsed.filterKeys { it in applicableSprays }
-            val spraysUsedFormat = "§7Sprays used: §a${applicableSpraysUsed.values.sum().addSeparators()}"
 
+            var sprayCosts = 0.0
+            val hoverTips = buildList {
+                applicableSpraysUsed.forEach { (spray, count) ->
+                    val sprayString = spray.toInternalName().getPriceOrNull()?.let { price ->
+                        val sprayCost = price * count
+                        sprayCosts += sprayCost
+                        "§7${spray.displayName}: §a${count.shortFormat()} §7(§c-${sprayCost.shortFormat()}§7)"
+                    } ?: add("§7${spray.displayName}: §a${count.addSeparators()}")
+                    add(sprayString)
+                }
+                add("")
+                add("§7Total spray cost: §6${sprayCosts.addSeparators()} coins")
+            }
+            profit -= sprayCosts
+
+            val sumSpraysUsed = applicableSpraysUsed.values.sum()
             add(
                 Renderable.hoverTips(
-                    spraysUsedFormat,
-                    buildList {
-                        applicableSpraysUsed.forEach { (spray, count) ->
-                            add("§7${spray.displayName}: §a${count.addSeparators()}")
-                        }
-                    }
+                    "§aSprays used: §a$sumSpraysUsed §7(§c-${sprayCosts.shortFormat()}§7)",
+                    hoverTips
                 ).toSearchable()
             )
         }

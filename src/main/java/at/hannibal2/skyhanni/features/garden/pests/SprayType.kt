@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+
 enum class SprayType(val displayName: String) {
     COMPOST("Compost"),
     PLANT_MATTER("Plant Matter"),
@@ -8,6 +11,8 @@ enum class SprayType(val displayName: String) {
     TASTY_CHEESE("Tasty Cheese"),
     FINE_FLOUR("Fine Flour"),
     ;
+
+    fun toInternalName(): NEUInternalName = name.toInternalName()
 
     companion object {
 
