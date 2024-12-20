@@ -353,7 +353,11 @@ object SkillAPI {
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
         val currentXp = matcher.group("current").formatLong()
         val maxXp = matcher.group("needed").formatLong()
-        val level = getLevelExact(maxXp) - 1
+
+        // when at overflow, we dont need to subtract one level in the logic below
+        val minus = if (maxXp == 0L) 0 else 1
+        val level = getLevelExact(maxXp) - minus
+
         val levelXp = calculateLevelXp(level - 1).toLong() + currentXp
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXp, defaultSkillCap[skillType.lowercaseName] ?: 60)
