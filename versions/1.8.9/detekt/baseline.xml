@@ -168,8 +168,8 @@
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.name", "Garden (?:Desk|Level (?&lt;currentLevel&gt;.*))" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.nextxp", ".* §e(?&lt;nextLevelExp&gt;.*)§6/.*" )</ID>
     <ID>RepoPatternRegexTest:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.overflow", ".*§r §6(?&lt;overflow&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "crop", "§(?:e○|6☘) §7(?&lt;crop&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)" )</ID>
+    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "crop", "§(?:e○|6☘) §7(?&lt;crop&gt;.*)", )</ID>
+    <ID>RepoPatternRegexTest:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)", )</ID>
     <ID>RepoPatternRegexTest:GardenPlotAPI.kt$GardenPlotAPI$by patternGroup.pattern( "spray.target", "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?&lt;plot&gt;.*) §r§7with §r§a(?&lt;spray&gt;.*)§r§7!" )</ID>
     <ID>RepoPatternRegexTest:GlacitePowderFeatures.kt$GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:HighlightPlaceableNpcs.kt$HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
