@@ -95,7 +95,9 @@ object DiscordRPCManager : IPCListener {
         } catch (e: Exception) {
             updateDebugStatus("Failed to connect: ${e.message} (discord not started yet?)", error = true)
             ChatUtils.clickableChat(
-                "Discord Rich Presence was unable to start! " + "This usually happens when you join SkyBlock when Discord is not started. " + "Please run /shrpcstart to retry once you have launched Discord.",
+                "Discord Rich Presence was unable to start! " +
+                    "This usually happens when you join SkyBlock when Discord is not started. " +
+                    "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = { startCommand() },
                 "§eClick to run /shrpcstart!",
             )
@@ -167,7 +169,9 @@ object DiscordRPCManager : IPCListener {
         this.client = null
     }
 
-    private fun getStatusByConfigId(entry: LineEntry) = DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
+    private fun getStatusByConfigId(entry: LineEntry): DiscordStatus {
+        return DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
+    }
 
     private fun isEnabled() = config.enabled.get()
 
