@@ -227,21 +227,9 @@ object GraphEditor {
     }
 
     private fun calculateNewAllNodeFind(): LorenzVec {
-//         val playerNode = GraphUtils.nearestNodeOnCurrentIsland(LocationUtils.playerLocation())
-//         val map = mutableMapOf<Graph, Double>()
-//         for (node in nodesToFind) {
-//             val (a, b) = GraphUtils.findShortestPathAsGraphWithDistance(playerNode, node)
-//             map[a] = b
-//         }
-//         val next = map.minBy { it.value }.key.first()
-//         nodesToFind.find { it.position == a. }
-
-//         val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(
-//             LocationUtils.playerLocation(),
-//             bailout = { it !in nodesToFind },
-//         ).distances.keys.first()
-
-        val next = nodesToFind.minBy { it.distanceSqToPlayer() }
+        val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(
+            LocationUtils.playerLocation(),
+        ).distances.keys.first { it.position in nodesToFind }.position
 
         val max = IslandGraphs.currentIslandGraph?.nodes?.size ?: -1
         val todo = nodesToFind.size
