@@ -38,6 +38,10 @@ object SunGeckoHelper {
     var modifiers: MutableSet<MODIFIERS> = mutableSetOf()
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sungecko")
 
+    /**
+     * REGEX-TEST: §a﴾ §8[§7Lv20§8] §c§l§eSun Gecko§r§r §e45§f/§a250§c❤ §a﴿
+     * REGEX-TEST: §a﴾ §8[§7Lv20§8] §c§l§eSun Gecko§r§r §a250§f/§a250§c❤ §a﴿
+     */
 
     private val sunGeckoName by patternGroup.pattern(
         "name",
