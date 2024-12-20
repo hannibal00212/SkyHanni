@@ -4,27 +4,30 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -37,7 +40,9 @@ object PestWarning {
     private var sprayMultiplier: Double = 1.0
     private var cooldown: Double? = null
     private var warningShown = false
-    private var equipmentOpen = false
+
+    private var wardrobeOpened = false
+    private var lastOpened = SimpleTimeMark.farPast()
 
     private val storage get() = GardenAPI.storage
 
@@ -81,14 +86,13 @@ object PestWarning {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        when (event.inventoryName) {
-            "Your Equipment and Stats" -> equipmentPestCooldown = checkEquipment(event.inventoryItems)
-            "Wardrobe" -> equipmentOpen = true
+        if (event.inventoryName == "Your Equipment and Stats") {
+            equipmentPestCooldown = checkEquipment(event.inventoryItems)
         }
-    }
 
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        equipmentOpen = false
+        WardrobeAPI.inventoryPattern.matchMatcher(event.inventoryName) {
+            wardrobeOpened = true
+        }
     }
 
     @SubscribeEvent
@@ -102,6 +106,7 @@ object PestWarning {
     @HandleEvent
     fun onPestSpawn(event: PestSpawnEvent) {
         warningShown = false
+        wardrobeOpened = false
     }
 
     private fun checkEquipment(equippedItems: Map<Int, ItemStack>): Int {
@@ -145,27 +150,30 @@ object PestWarning {
                 "§eClick to open your wardrobe!"
             )
 
-            warningShown = true
+            playUserSound()
 
-            if (config.sound.repeatSound) {
-                Thread {
-                    while (!equipmentOpen && warningShown) {
-                        playUserSound()
-                        Thread.sleep(config.sound.repeatDuration * 50L)
-                    }
-                }.start()
-            } else {
-                playUserSound()
-            }
+            warningShown = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!config.sound.repeatSound) return
+        if (!event.isMod(config.sound.repeatDuration)) return
+
+        if (!wardrobeOpened && warningShown) {
+            playUserSound()
         }
     }
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!warningShown) return
+        if (lastOpened.passedSince() < 200.milliseconds) return
 
         if (event.keyCode == config.keyBindWardrobe) {
             HypixelCommands.wardrobe()
+            lastOpened = SimpleTimeMark.now()
         }
     }
 
@@ -185,6 +193,7 @@ object PestWarning {
             add("Equipment Pest Cooldown: $equipmentPestCooldown")
             add("Cooldown: ${cooldown ?: "Unknown"}")
             add("Warning Shown: $warningShown")
+            add("Wardrobe Open: $wardrobeOpened")
         }
     }
 

@@ -37,7 +37,7 @@ object WardrobeAPI {
     /**
      * REGEX-TEST: Wardrobe (2/2)
      */
-    private val inventoryPattern by repoGroup.pattern(
+    val inventoryPattern by repoGroup.pattern(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
     )
