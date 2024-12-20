@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -107,8 +108,9 @@ object ChocolateShopPrice {
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
             val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
+            val canBeBought = lore.any { it == "§eClick to trade!" }
 
-            newProducts.add(Product(slot, item.itemName, internalName, chocolate, itemPrice, otherItemsPrice))
+            newProducts.add(Product(slot, item.itemName, internalName, chocolate, itemPrice, otherItemsPrice, canBeBought))
         }
         products = newProducts
     }
@@ -141,10 +143,15 @@ object ChocolateShopPrice {
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(product.chocolate)
                 add("§7Time until affordable: §6$formattedTimeUntilGoal ")
+
+                if (!product.canBeBought) {
+                    add("")
+                    add("§cCannot be bought!")
+                }
             }
             table.add(
                 DisplayTableEntry(
-                    "${product.name}§f:",
+                    product.name.addStrikethorugh(!product.canBeBought),
                     "§6§l$perFormat",
                     factor,
                     product.item,
@@ -205,5 +212,6 @@ object ChocolateShopPrice {
         val chocolate: Long,
         val itemPrice: Double,
         val otherItemPrice: Double?,
+        val canBeBought: Boolean,
     )
 }

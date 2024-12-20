@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -33,6 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityCallWarning {
 
+    // <editor-fold desc="Patterns">
     /**
      * Test messages (and the real ones from Hypixel) have a space at the end of
      * them that the IDE kills. So it's "§r§e ✆ "
@@ -63,6 +65,7 @@ object HoppityCallWarning {
         "hoppity.call.pickup",
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
+    // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
     private var warningSound = SoundUtils.createSound("note.pling", 1f)
@@ -150,6 +153,12 @@ object HoppityCallWarning {
             // TODO if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
             action = { HypixelCommands.bank() },
         )
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        acceptUUID = null
+        stopWarningUser()
     }
 
     private fun readPickupUuid(event: LorenzChatEvent) {

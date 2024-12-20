@@ -4,38 +4,51 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.patternGroup
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ReplaceRomanNumerals {
-    // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
-    private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
+    private val patternGroup = RepoPattern.group("replace.roman")
 
-    //
     /**
-     * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
+     * REGEX-TEST: §9Dedication IV
+     * REGEX-FAIL: §cD§6y§ee§as
      */
-    private val isSelectOptionPattern by patternGroup.pattern(
-        "string.isselectoption",
-        "§eSelect an option: .*"
+    private val findRomanNumeralPattern by patternGroup.pattern(
+        "findroman",
+        "[ ➜](?=[MDCLXVI])(?<roman>M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3}))(?<extra>.?)"
     )
 
-    // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    /**
+     * REGEX-TEST: K
+     */
+    private val isWordPattern by patternGroup.pattern(
+        "findword",
+        "^[\\w-']"
+    )
+
+    /**
+     * REGEX-TEST: ➜
+     */
+    private val allowedCharactersAfter by patternGroup.pattern(
+        "allowedcharactersafter",
+        "[➜):]?"
+    )
+
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: ItemHoverEvent) {
         if (!isEnabled()) return
 
         event.toolTip.replaceAll { it.transformLine() }
@@ -57,23 +70,38 @@ object ReplaceRomanNumerals {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
-        if (!isEnabled() || event.message.isSelectOption()) return
+        if (!isEnabled()) return
         event.applyIfPossible { it.transformLine() }
     }
 
-    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+    /**
+     * Transforms a line with a roman numeral to a line with a decimal numeral.
+     * Override block one is to be used for tablist or other places where there is no need to check for normal text containing
+     * the word "I".
+     *
+     * Currently not replaced:
+     * - "§7Bonzo I Reward:" in the collection rewards when hovering on the collection
+     */
+    private fun String.transformLine(overrideBlockOne: Boolean = false): String {
+        val (romanNumeral, rest) = findRomanNumeralPattern.findMatcher(this.removeFormatting()) {
+            group("roman") to group("extra")
+        } ?: return this
 
-    private fun String.transformLine() = splitRegex.findAll(this).map { it.value }.joinToString("") {
-        it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it
+        if (romanNumeral.isNullOrEmpty() || !romanNumeral.isRoman() || isWordPattern.matches(rest)) {
+            return recursiveSplit(romanNumeral)
+        }
+
+        val parsedRomanNumeral = romanNumeral.romanToDecimal()
+
+        return takeIf { parsedRomanNumeral != 1 || overrideBlockOne || rest.isEmpty() || allowedCharactersAfter.matches(rest) }
+            ?.replaceFirst(romanNumeral, parsedRomanNumeral.toString())?.transformLine()
+            ?: recursiveSplit(romanNumeral)
     }
 
+    private fun String.recursiveSplit(romanNumeral: String) =
+        this.split(romanNumeral, limit = 2).let { it[0] + romanNumeral + it[1].transformLine() }
+
     private fun String.removeFormatting() = removeColor().replace(",", "")
-
-    private fun String.isValidRomanNumeral() = removeFormatting()
-        .let { it.isRoman() && it.isNotEmpty() }
-
-    private fun String.coloredRomanToDecimal() = removeFormatting()
-        .let { replace(it, it.romanToDecimal().toString()) }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals
 }

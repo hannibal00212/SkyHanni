@@ -27,7 +27,7 @@ object HelpCommand {
         return Text.text("§7 - $color${command.name}") {
             this.hover = Text.multiline(
                 "§e/${command.name}",
-                if (aliases.isNotEmpty()) "§7Aliases: ${aliases.joinToString(", ")}" else null,
+                if (aliases.isNotEmpty()) "§7Aliases: §e/${aliases.joinToString("§7, §e/")}" else null,
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
                 "",
                 "$color§l${category.categoryName}",
