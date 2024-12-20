@@ -76,17 +76,8 @@ object ChocolateFactoryStats {
             put(ChocolateFactoryStat.EMPTY_4, "")
             put(ChocolateFactoryStat.EMPTY_5, "")
 
-            put(ChocolateFactoryStat.TIME_TOWER, "§eTime Tower: §6$timeTowerInfo")
-            put(
-                ChocolateFactoryStat.TIME_TOWER_FULL,
-                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
-                    "§eFull Tower Charges: §a§lNow\n" +
-                        "§eHappens at: §a§lNow"
-                } else {
-                    "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                        "§eHappens at: §b${timeTowerFull.formattedDate()}"
-                },
-            )
+            addTimeTower()
+
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
