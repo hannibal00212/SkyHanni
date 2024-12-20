@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,4 +229,13 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hitmanCosts")
     public Position hitmanCostsPosition = new Position(300, 300, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "§6CF §zParty Mode",
+        desc = "Don't turn this on."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public Property<Boolean> partyMode = Property.of(false);
 }

@@ -6,15 +6,19 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getAvailableEggs
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getHitmanTimeToAll
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getHitmanTimeToFull
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getPurchasedSlots
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToFull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -86,7 +90,11 @@ object ChocolateFactoryStats {
 
             addHitman()
         }
-        val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n").orEmpty() }
+        val text = config.statsDisplayList.filter {
+            it.shouldDisplay()
+        }.flatMap {
+            map[it]?.partyModeReplace()?.split("\n").orEmpty()
+        }
         display = createDisplay(text)
     }
 
@@ -101,21 +109,23 @@ object ChocolateFactoryStats {
         put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
     }
 
+    private fun SimpleTimeMark?.formatIfFuture(): String? = this?.takeIfFuture()?.timeUntil()?.format()
+
     private fun MutableMap<ChocolateFactoryStat, String>.addHitman() {
         val profileStorage = ChocolateFactoryStats.profileStorage ?: return
 
         val hitmanStats = profileStorage.hitmanStats
-        val availableHitmanEggs = hitmanStats.availableEggs?.takeIf { it > 0 }?.toString() ?: "§7None"
-        val hitmanSingleSlotCd = hitmanStats.slotCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
-        val hitmanAllSlotsCd = hitmanStats.allSlotsCooldown?.takeIf { it.isInFuture() }?.timeUntil()?.format() ?: "§aAll Ready"
+        val availableHitmanEggs = hitmanStats.getAvailableEggs().takeIf { it > 0 }?.toString() ?: "§7None"
+        val hitmanSingleSlotCd = hitmanStats.singleSlotCooldownMark.formatIfFuture() ?: "§aAll Ready"
+        val hitmanAllSlotsCd = hitmanStats.allSlotsCooldownMark.formatIfFuture() ?: "§aAll Ready"
         val openSlotsNow = hitmanStats.getOpenSlots()
-        val purchasedSlots = hitmanStats.purchasedSlots ?: 0
+        val purchasedSlots = hitmanStats.getPurchasedSlots()
 
         val (hitmanAllSlotsTime, allSlotsEventInhibited) = hitmanStats.getHitmanTimeToAll()
         val hitmanAllClaimString = hitmanAllSlotsTime.takeIf { it > Duration.ZERO }?.format() ?: "§aAll Ready"
         val hitmanAllClaimReady = "${if (allSlotsEventInhibited) "§c" else "§b"}$hitmanAllClaimString"
 
-        val (hitmanFullTime, hitmanFullEventInhibited) = hitmanStats.getHitmanTimeToFull()
+        val (hitmanFullTime, hitmanFullEventInhibited) = hitmanStats.getTimeToFull()
         val hitmanFullString = if (openSlotsNow == 0) "§7Cooldown..."
         else hitmanFullTime.takeIf { it > Duration.ZERO }?.format() ?: "§cFull Now"
         val hitmanSlotsFull = "${if (hitmanFullEventInhibited) "§c" else "§b"}$hitmanFullString"
