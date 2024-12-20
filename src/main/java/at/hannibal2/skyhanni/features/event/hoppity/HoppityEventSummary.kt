@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventEndMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventStartMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -151,7 +152,11 @@ object HoppityEventSummary {
             isInventoryEnabled
     }
 
-    private data class StatString(val string: String, val headed: Boolean = true)
+    private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
+        if (ChocolateFactoryAPI.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        else this
+
+    private data class StatString(var string: String, val headed: Boolean = true)
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
 
@@ -253,6 +258,9 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
+        ChocolateFactoryAPI.config.partyMode.afterChange {
+            lastKnownStatHash = 0
+        }
     }
 
     @SubscribeEvent
@@ -268,6 +276,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
+        lastSnapshotServer = null
         checkEnded()
     }
 
@@ -381,7 +390,7 @@ object HoppityEventSummary {
     private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
         buildList {
             addString(
-                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats".partyModeReplace(),
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
             val eventEnd = getEventEndMark(statYear)
@@ -414,7 +423,7 @@ object HoppityEventSummary {
                     isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
                     isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
                     else -> "§7$grammarFormat §f$timeMarkFormat"
-                },
+                }.partyModeReplace(),
             )
         },
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -435,18 +444,18 @@ object HoppityEventSummary {
         return listOfNotNull(
             predecessorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
+                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
+                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
             } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
                 Renderable.optionalLink(
-                    "§d[ §7Next Hunt §r§f§l-> §r§d]",
+                    "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
                     onClick = { statYear = getCurrentSBYear() + 1 },
                 )
             } else null,
@@ -694,7 +703,7 @@ object HoppityEventSummary {
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
 
-        return statList
+        return statList.chromafyLiveDisplay()
     }
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {
