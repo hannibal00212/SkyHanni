@@ -52,8 +52,9 @@ object RiftAPI {
     fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
     fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
-    fun inMountainTop() = LorenzUtils.skyBlockArea.let {
-        it == "Continuum" || it == "The Mountaintop" || it == "Trial Grounds" || it == "Time-Torn Isles" ||
-            it == "Wizardman Bureau" || it == "Wizard Brawl" || it == "Walk of Fame" || it == "Time Chamber"
+    fun inMountainTop() = when (LorenzUtils.skyBlockArea) {
+        "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
+        "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber" -> true
+        else -> false
     }
 }
