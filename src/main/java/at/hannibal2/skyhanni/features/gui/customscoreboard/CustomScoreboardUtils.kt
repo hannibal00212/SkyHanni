@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -21,11 +22,18 @@ import java.util.regex.Pattern
 @Suppress("TooManyFunctions")
 object CustomScoreboardUtils {
 
-    fun formatScoreboardNumberDisplayDisplay(text: String, number: String, color: String) = when (displayConfig.numberDisplayFormat) {
-        ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$number"
-        ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $number"
-        ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$number $color$text"
-        ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$number §f$text"
+    fun formatScoreboardNumberDisplayDisplay(text: String, number: String, color: String): String {
+        val formattedNumber = if (LorenzUtils.isAprilFoolsDay) {
+            "-$number"
+        } else {
+            number
+        }
+        return when (displayConfig.numberDisplayFormat) {
+            ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$number"
+            ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $number"
+            ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$number $color$text"
+            ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$number §f$text"
+        }
     }
 
     enum class ScoreboardNumberDisplayFormat(val config: String) {
