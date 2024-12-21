@@ -112,6 +112,9 @@ object SunGeckoHelper {
 
         if (config.showModifiers) {
             display.add("§6Modifiers:")
+            if (modifiers.isEmpty()) {
+                display.add("§eNone")
+            }
             for (modifier in modifiers) {
                 display.add("§e${modifier.name.allLettersFirstUppercase()}")
             }
