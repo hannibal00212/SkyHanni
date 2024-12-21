@@ -166,7 +166,6 @@ object SunGeckoHelper {
         healthLeft = health
         totalHealth = currentBoss?.maxHealth ?: 250
 
-        updateDisplay()
     }
 
 
@@ -174,6 +173,8 @@ object SunGeckoHelper {
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inTimeChamber) return
+
+        updateDisplay()
 
         pos.renderStrings(display, 0, "Sun Gecko Helper")
     }
