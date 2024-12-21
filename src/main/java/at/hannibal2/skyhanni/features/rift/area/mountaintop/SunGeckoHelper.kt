@@ -99,8 +99,8 @@ object SunGeckoHelper {
         display.add("§eSun Gecko $health")
         display.add("$actionBarFormatted §e§lCombo: x$combo")
 
-        //this is just a total guess but it looks right enough
-        //i think its inconsistent because of how often the action bar updates
+        // this is just a total guess but it looks right enough
+        // i think its inconsistent because of how often the action bar updates
         var expiryTime = 5.seconds + 200.milliseconds
         if (modifiers.contains(MODIFIERS.COLLECTIVE)) {
             expiryTime += (modifiers.count() * 200).milliseconds
