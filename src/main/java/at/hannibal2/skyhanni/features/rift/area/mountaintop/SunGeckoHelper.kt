@@ -6,11 +6,14 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.rift.area.mountaintop.SunGeckoConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -23,17 +26,16 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.Entity
-import net.minecraft.init.Blocks
-import net.minecraft.item.Item
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SunGeckoHelper {
-    val config: SunGeckoConfig = SkyHanniMod.feature.rift.area.mountaintop.sunGecko
-    val pos: Position = config.pos
+    val config: SunGeckoConfig get() = SkyHanniMod.feature.rift.area.mountaintop.sunGecko
+    val pos: Position get() = config.pos
     var display: ArrayList<String> = ArrayList()
     var modifiers: MutableSet<MODIFIERS> = mutableSetOf()
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sungecko")
@@ -42,10 +44,9 @@ object SunGeckoHelper {
      * REGEX-TEST: §a﴾ §8[§7Lv20§8] §c§l§eSun Gecko§r§r §e45§f/§a250§c❤ §a﴿
      * REGEX-TEST: §a﴾ §8[§7Lv20§8] §c§l§eSun Gecko§r§r §a250§f/§a250§c❤ §a﴿
      */
-
     private val sunGeckoName by patternGroup.pattern(
         "name",
-        "§a﴾ §8\\[§7Lv20§8] §c§l§eSun Gecko§r§r (?<healthColour>§[aec])(?<healthLeft>\\d+)§f/§a(?<totalHealth>\\d+)§c❤ §a﴿"
+        "§a﴾ §8\\[§7Lv20§8] §c§l§eSun Gecko§r§r (?<healthColor>§[aec])(?<healthLeft>\\d+)§f/§a(?<totalHealth>\\d+)§c❤ §a﴿"
     )
 
     /**
@@ -58,27 +59,31 @@ object SunGeckoHelper {
      */
     private val sunGeckoActionBar by patternGroup.pattern(
         "actionbar",
-        "(?<firstHalf>§(?<firstColour>[ac])\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§(?<lastColour>[ac]).*)]"
+        "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]"
     )
 
     private var healthLeft = 250
     private var totalHealth = 250
     private var actionBarFormatted: String = ""
-    private var healthColour: String = "§a"
+    private var healthColor: String = "§a"
     private var onFirstPhase = true
     private var timeSliceDuration = Duration.ZERO
     private var timeSinceLastHit = SimpleTimeMark.farPast()
     private var combo = 1
+    private var scanningChat = false
+    private var inTimeChamber = false
 
     fun reset() {
         healthLeft = 250
         totalHealth = 250
         actionBarFormatted = ""
-        healthColour = "§a"
+        healthColor = "§a"
         onFirstPhase = true
         timeSliceDuration = Duration.ZERO
         timeSinceLastHit = SimpleTimeMark.farPast()
         combo = 1
+        scanningChat = false
+        inTimeChamber = false
     }
 
     fun updateDisplay() {
@@ -90,7 +95,7 @@ object SunGeckoHelper {
             displayTotalHealth *= 2
         }
 
-        val health = "$healthColour$displayHealthLeft§f/§a$displayTotalHealth§c❤"
+        val health = "$healthColor$displayHealthLeft§f/§a$displayTotalHealth§c❤"
         display.add("§eSun Gecko $health")
         display.add("$actionBarFormatted §e§lCombo: x$combo")
         //this is just a total guess but it looks right enough
@@ -100,7 +105,8 @@ object SunGeckoHelper {
             expiryTime += (modifiers.count() * 200).milliseconds
         }
         val timeLeft = timeSinceLastHit + expiryTime
-        if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 300.milliseconds.inWholeMilliseconds) {
+        if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 800.milliseconds.inWholeMilliseconds
+            || timeLeft.isInPast()) {
             display.add("§aCombo Timer: ${expiryTime.format()}/${expiryTime.format()}")
         } else {
             display.add("§aCombo Timer: ${timeLeft.timeUntil().format(showMilliSeconds = true)}/${expiryTime.format()}")
@@ -114,10 +120,22 @@ object SunGeckoHelper {
         }
     }
 
+    @SubscribeEvent
+    fun onMobSpawn(event: MobEvent.Spawn) {
+        if (!event.mob.name.contains("Sun Gecko")) return
+        if (event.mob.name.contains("?") && config.highlightFakeBoss) {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(event.mob.baseEntity, Color.RED.addAlpha(80)) { config.highlightFakeBoss }
+        } else if (config.highlightRealBoss) {
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(event.mob.baseEntity, Color.GREEN.addAlpha(80)) { config.highlightRealBoss }
+        }
+
+    }
+
 
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (!inTimeChamber) return
 
         var nearestEntityDistance = 100.0
         var nearestEntity: Entity? = null
@@ -140,28 +158,12 @@ object SunGeckoHelper {
             }
             healthLeft = health
             totalHealth = group("totalHealth")?.toIntOrNull() ?: 250
-            healthColour = group("healthColour")?.toString() ?: "§a"
+            healthColor = group("healthColor")?.toString() ?: "§a"
         }
 
         updateDisplay()
 
         pos.renderStrings(display, 0, "Sun Gecko Helper")
-    }
-
-    @SubscribeEvent
-    fun onInventoryFullyOpened(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
-        if (event.inventoryName != "Modifiers") return
-        modifiers.clear()
-
-        for (modifier in MODIFIERS.entries) {
-            val slot = modifier.slot
-            val item = event.inventoryItems[slot] ?: continue
-            if (item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)) continue
-            if (item.itemDamage != 5) continue
-            modifiers.add(modifier)
-        }
-
     }
 
     @HandleEvent
@@ -171,8 +173,6 @@ object SunGeckoHelper {
             val firstHalf = groupOrNull("firstHalf") ?: return
             val secondHalf = groupOrNull("secondHalf") ?: return
             combo = groupOrNull("combo")?.toIntOrNull() ?: return
-            val firstColour = groupOrNull("firstColour") ?: return
-            val lastColour = groupOrNull("lastColour") ?: return
 
             val firstHalfFull = firstHalf.count { it == '⬛' }
             val secondHalfFull = secondHalf.count { it == '⬛' }
@@ -214,22 +214,44 @@ object SunGeckoHelper {
         }
     }
 
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+        if (event.message == "§f                           §r§c§lACTIVE MODIFIERS!") {
+            scanningChat = true
+        } else if (event.message == "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
+            scanningChat = false
+        }
+
+        if (scanningChat) {
+            for (modifier in MODIFIERS.entries) {
+                if (event.message.contains(modifier.name.allLettersFirstUppercase())) {
+                    modifiers.add(modifier)
+                }
+            }
+        }
+    }
+
     @HandleEvent
     fun onAreaChanged(event: ScoreboardAreaChangeEvent) {
         if (!isEnabled()) return
         reset()
+        if (event.area == "Time Chamber") {
+            inTimeChamber = true
+        }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.rift.area.mountaintop.sunGecko.enabled && RiftAPI.inRift() && RiftAPI.inMountainTop()
+    fun isEnabled() = config.enabled && RiftAPI.inRift() && RiftAPI.inMountainTop()
 
-    enum class MODIFIERS(val slot: Int) {
-        REVIVAL(19), /* spawns a second dude*/
-        COMBO_MANIAC(20),
-        TIME_SLICED(21), /* reduces combo lvl up by 1 for 30 seconds only*/
-        BUFFANTICS(22),
-        COLLECTIVE(23), /* increase time for combo by 0.2 per modifier */
-        BRAND_NEW_DANCE(24),
-        CULMINATION(25), /* reduces combo lvl up by 1*/
+    enum class MODIFIERS{
+        REVIVAL, /* spawns a second dude*/
+        COMBO_MANIC,
+        TIME_SLICED, /* reduces combo lvl up by 1 for 30 seconds only*/
+        BUFFANTICS,
+        COLLECTIVE, /* increase time for combo by 0.2 per modifier */
+        BRAND_NEW_DANCE,
+        CULMINATION, /* reduces combo lvl up by 1*/
     }
 
 

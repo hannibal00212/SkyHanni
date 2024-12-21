@@ -22,6 +22,20 @@ public class SunGeckoConfig {
     public boolean showModifiers = false;
 
     @Expose
+    @ConfigOption(name = "Highlight Real Boss", desc = "Highlights the real boss in green.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightRealBoss = false;
+
+    @Expose
+    @ConfigOption(name = "Highlight Clones", desc = "Highlights the fakes bosses in red.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightFakeBoss = true;
+
+
+
+    @Expose
     @ConfigLink(owner = SunGeckoConfig.class, field = "enabled")
     public Position pos = new Position(-256, 140, false, true);
 
