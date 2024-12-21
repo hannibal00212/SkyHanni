@@ -125,12 +125,15 @@ object SunGeckoHelper {
     fun onMobSpawn(event: MobEvent.Spawn) {
         if (!event.mob.name.contains("Sun Gecko")) return
         if (event.mob.name.contains("?") && config.highlightFakeBoss) {
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(event.mob.baseEntity, Color.RED.addAlpha(80)) { config.highlightFakeBoss }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                event.mob.baseEntity,
+                Color.RED.addAlpha(80),
+            ) { config.highlightFakeBoss }
         } else if (config.highlightRealBoss) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 event.mob.baseEntity,
-                Color.GREEN.addAlpha(80))
-            { config.highlightRealBoss }
+                Color.GREEN.addAlpha(80),
+            ) { config.highlightRealBoss }
         }
 
     }
@@ -198,10 +201,10 @@ object SunGeckoHelper {
 
             if (comboHitCount == 9 && totalHits == 8) {
 
-                //this is a hypixel bug
-                //it goes from 8/8 to 9/8 to 2/8
-                //the combo does not go up at 9/8
-                //so i guess the overlay is wrong but whatever
+                // this is a hypixel bug
+                // it goes from 8/8 to 9/8 to 2/8
+                // the combo does not go up at 9/8
+                // so i guess the overlay is wrong but whatever
                 comboHitCount = 1
             }
             actionBarFormatted = "§a$comboHitCount/$totalHits"
@@ -249,7 +252,7 @@ object SunGeckoHelper {
 
     fun isEnabled() = config.enabled && RiftAPI.inRift() && RiftAPI.inMountainTop()
 
-    enum class MODIFIERS{
+    enum class MODIFIERS {
         REVIVAL, // spawns a second dude
         COMBO_MANIC,
         TIME_SLICED, // reduces combo lvl up by 1 for 30 seconds only
