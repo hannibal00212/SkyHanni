@@ -31,6 +31,7 @@ object BossbarData {
     fun onTick(event: LorenzTickEvent) {
         val bossbarLine = BossStatus.bossName ?: return
         //#else
+        //$$ @SubscribeEvent
         //$$ fun onRenderGameOverlay(event: RenderGameOverlayEvent.BossInfo) {
         //$$ val bossbarLine = event.bossInfo.name.formattedText
         //#endif
