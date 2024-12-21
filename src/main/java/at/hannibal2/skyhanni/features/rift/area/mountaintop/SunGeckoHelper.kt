@@ -35,7 +35,7 @@ object SunGeckoHelper {
     private val config: SunGeckoConfig get() = SkyHanniMod.feature.rift.area.mountaintop.sunGecko
     private val pos: Position get() = config.pos
     private val display = mutableListOf<String>()
-    private var modifiers: MutableSet<Modifiers> = mutableSetOf()
+    private val modifiers: MutableSet<Modifiers> = mutableSetOf()
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sungecko")
 
     /**
