@@ -151,6 +151,8 @@ object SunGeckoHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
+        updateDisplay()
+
         if (currentBoss?.baseEntity?.isEntityAlive == false) {
             currentBoss = null
         }
@@ -170,10 +172,7 @@ object SunGeckoHelper {
 
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!inTimeChamber) return
-
-        updateDisplay()
+        if (!isEnabled() || !inTimeChamber) return
 
         pos.renderStrings(display, 0, "Sun Gecko Helper")
     }
