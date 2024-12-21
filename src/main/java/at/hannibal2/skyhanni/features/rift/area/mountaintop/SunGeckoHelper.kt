@@ -150,7 +150,7 @@ object SunGeckoHelper {
 
         if (nearestEntity == null) return
 
-        sunGeckoName.matchMatcher(nearestEntity?.name ?: "") {
+        sunGeckoName.matchMatcher(nearestEntity?.name.orEmpty()) {
             val health = group("healthLeft")?.toIntOrNull() ?: -1
             if (health > healthLeft) {
                 onFirstPhase = false
