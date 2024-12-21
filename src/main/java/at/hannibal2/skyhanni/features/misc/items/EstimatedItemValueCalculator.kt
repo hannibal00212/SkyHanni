@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
@@ -230,8 +231,8 @@ object EstimatedItemValueCalculator {
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
-        list.add("  §7Stone: $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
-        list.add("  §7Apply cost: (§6" + applyCost.shortFormat() + "§7)")
+        list.add(" §7Stone: $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
+        list.add(" §7Apply cost: (§6" + applyCost.shortFormat() + "§7)")
         return reforgeStonePrice + applyCost
     }
 
@@ -461,13 +462,9 @@ object EstimatedItemValueCalculator {
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
-            val itemPrice = materialInternalName.getPriceOrNull(config.priceSource.get())?.let { it * amount }
-            if (itemPrice != null) {
-                map["  §8${amount.addSeparators()}x ${materialInternalName.itemName} §7(§6${itemPrice.shortFormat()}§7)"] = itemPrice
-            } else {
-                map["  §8${amount.addSeparators()}x ${materialInternalName.itemName}"] = 0.0
-            }
-            totalPrice += itemPrice ?: 0.0
+            val itemPrice = materialInternalName.getPrice()
+            map[materialInternalName.getPriceName(amount)] = itemPrice
+            totalPrice += itemPrice
         }
 
         list.add("§7Stars: §e$havingStars§7/§e$maxStars §7(§6" + totalPrice.shortFormat() + "§7)")
@@ -578,16 +575,15 @@ object EstimatedItemValueCalculator {
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
-        var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
         for (internalName in drillUpgrades) {
             val name = internalName.itemName
             val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
 
-            totalPrice += price
             val format = price.shortFormat()
             map[" $name §7(§6$format§7)"] = price
         }
+        val totalPrice = map.values.sum()
         if (map.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
@@ -655,16 +651,15 @@ object EstimatedItemValueCalculator {
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
-        var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
         for (internalName in abilityScrolls) {
             val name = internalName.itemName
             val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
 
-            totalPrice += price
             val format = price.shortFormat()
             map[" $name §7(§6$format§7)"] = price
         }
+        val totalPrice = map.values.sum()
         if (map.isNotEmpty()) {
             list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
@@ -730,7 +725,6 @@ object EstimatedItemValueCalculator {
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
-        var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
         // todo use repo
@@ -787,30 +781,28 @@ object EstimatedItemValueCalculator {
             val singlePrice = enchantmentName.getPriceOrNull(config.priceSource.get()) ?: continue
 
             var name = itemStack.getLore()[0]
+            // TODO find a way to use this here "".toInternalName().getPriceName(multiplier)
             if (multiplier > 1) {
                 name = "§8${multiplier}x $name"
             }
             val price = singlePrice * multiplier
-
-            totalPrice += price
             val format = price.shortFormat()
-
 
             map[" $name §7(§6$format§7)"] = price
         }
         val enchantmentsCap: Int = config.enchantmentsCap.get()
-        if (map.isNotEmpty()) {
-            list.add("§7Enchantments: §6" + totalPrice.shortFormat())
-            var i = 0
-            for (entry in map.sortedDesc().keys) {
-                if (i == enchantmentsCap) {
-                    val missing = map.size - enchantmentsCap
-                    list.add(" §7§o$missing more enchantments..")
-                    break
-                }
-                list.add(entry)
-                i++
+        if (map.isEmpty()) return 0.0
+        val totalPrice = map.values.sum()
+        list.add("§7Enchantments: §6" + totalPrice.shortFormat())
+        var i = 0
+        for (entry in map.sortedDesc().keys) {
+            if (i == enchantmentsCap) {
+                val missing = map.size - enchantmentsCap
+                list.add(" §7§o$missing more enchantments..")
+                break
             }
+            list.add(entry)
+            i++
         }
         return totalPrice
     }
@@ -818,7 +810,6 @@ object EstimatedItemValueCalculator {
     private fun addGemstones(stack: ItemStack, list: MutableList<String>): Double {
         val gemstones = stack.getGemstones() ?: return 0.0
 
-        var totalPrice = 0.0
         val counterMap = mutableMapOf<NEUInternalName, Int>()
         for (gemstone in gemstones) {
             val internalName = gemstone.getInternalName()
@@ -828,23 +819,12 @@ object EstimatedItemValueCalculator {
 
         val priceMap = mutableMapOf<String, Double>()
         for ((internalName, amount) in counterMap) {
-
-            val name = internalName.itemName
-            val price = internalName.getPrice() * amount
-
-            totalPrice += price
-            val format = price.shortFormat()
-
-            val text = if (amount == 1) {
-                " $name §7(§6$format§7)"
-            } else {
-                " §8${amount}x $name §7(§6$format§7)"
-            }
-            priceMap[text] = price
+            val text = internalName.getPriceName(amount)
+            priceMap[text] = internalName.getPrice() * amount
         }
-
+        val totalPrice = priceMap.values.sum()
         if (priceMap.isNotEmpty()) {
-            list.add("§7Gemstones: §6" + totalPrice.shortFormat())
+            list.add("§7Gemstones Applied: §6" + totalPrice.shortFormat())
             list += priceMap.sortedDesc().keys
         }
         return totalPrice
@@ -853,64 +833,84 @@ object EstimatedItemValueCalculator {
     private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
         ?: "no tag compound"
 
-    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName()
-
+    private fun ItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = stack.getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return 0.0
+        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
 
         // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
 
-        val priceMap = mutableMapOf<String, Double>()
-        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return 0.0
+        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return null
 
+        val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for ${stack.name}",
+                "Could not find gemstone slot price for $name",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to stack.name,
-                "item nbt" to stack.readNbtDump(),
+                "item name" to name,
+                "item nbt" to readNbtDump(),
             )
-            return 0.0
+            return null
         }
 
-        var totalPrice = 0.0
-        val slots = EstimatedItemValue.gemstoneUnlockCosts[internalName] ?: return 0.0
-        for (slot in slots) {
-            if (!unlockedSlots.contains(slot.key)) continue
+        return unlockedSlots
+    }
 
-            val previousTotal = totalPrice
-            for (ingredients in slot.value) {
+    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+        val unlockedSlots = stack.readUnlockedSlots() ?: return 0.0
+
+        val materials = mutableMapOf<NEUInternalName, Int>()
+        val slots = EstimatedItemValue.gemstoneUnlockCosts[stack.getInternalName()] ?: return 0.0
+        val slotNames = mutableListOf<String>()
+        for ((key, value) in slots) {
+            if (!unlockedSlots.contains(key)) continue
+
+            for (ingredients in value) {
                 val ingredient = PrimitiveIngredient(ingredients)
-
-                totalPrice += if (ingredient.isCoin()) {
-                    ingredient.count
-                } else {
-                    ingredient.internalName.getPrice() * ingredient.count
-                }
+                val amount = ingredient.count.toInt()
+                materials.addOrPut(ingredient.internalName, amount)
             }
 
-            val splitSlot = slot.key.split("_") // eg. SAPPHIRE_1
+            val splitSlot = key.split("_") // eg. SAPPHIRE_1
             val colorCode = SkyBlockItemModifierUtils.GemstoneSlotType.getColorCode(splitSlot[0])
-            val formattedPrice = (totalPrice - previousTotal).shortFormat()
 
             // eg. SAPPHIRE_1 -> Sapphire Slot 2
             val displayName = splitSlot[0].lowercase(Locale.ENGLISH).replaceFirstChar(Char::uppercase) + " Slot" +
                 // If the slot index is 0, we don't need to specify
                 if (splitSlot[1] != "0") " " + (splitSlot[1].toInt() + 1) else ""
 
-            priceMap[" §$colorCode $displayName §7(§6$formattedPrice§7)"] = totalPrice - previousTotal
+            slotNames.add("§$colorCode$displayName")
         }
 
+        if (slotNames.isEmpty()) return 0.0
+
+        val priceMap = mutableMapOf<String, Double>()
+        for ((material, amount) in materials) {
+            val price = material.getPrice() * amount
+            priceMap[material.getPriceName(amount)] = price
+        }
+        val totalPrice = priceMap.values.sum()
         list.add("§7Gemstone Slot Unlock Cost: §6" + totalPrice.shortFormat())
+
         list += priceMap.sortedDesc().keys
+
+        // TODO add toggle that is default enabled "show unlocked gemstone slot name
+        list.add(" §7Unlocked slots: " + slotNames.joinToString("§7, "))
+
         return totalPrice
     }
 
-    private fun NEUInternalName.getPrice(): Double = getPriceOrNull(config.priceSource.get()) ?: -1.0
+    private fun NEUInternalName.getPriceName(amount: Int): String {
+        val price = getPrice() * amount
+        if (this == SKYBLOCK_COIN) return " §6${price.shortFormat()} coins"
+
+        val prefix = if (amount == 1) "" else "§8${amount.addSeparators()}x "
+        return " $prefix§r$itemName §7(§6${price.shortFormat()}§7)"
+    }
+
+    private fun NEUInternalName.getPrice(): Double = getPriceOrNull(config.priceSource.get()) ?: 0.0
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
