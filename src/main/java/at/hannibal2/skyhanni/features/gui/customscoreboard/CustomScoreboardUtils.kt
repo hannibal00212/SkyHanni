@@ -29,10 +29,10 @@ object CustomScoreboardUtils {
             number
         }
         return when (displayConfig.numberDisplayFormat) {
-            ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$number"
-            ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $number"
-            ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$number $color$text"
-            ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$number §f$text"
+            ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$formattedNumber"
+            ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $formattedNumber"
+            ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$formattedNumber $color$text"
+            ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$formattedNumber §f$text"
         }
     }
 
