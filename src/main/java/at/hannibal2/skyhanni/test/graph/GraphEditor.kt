@@ -43,6 +43,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object GraphEditor {
 
@@ -236,7 +237,10 @@ object GraphEditor {
         val done = max - todo
         val percentage = (done.toDouble() / max.toDouble()) * 100
         val node = GraphUtils.nearestNodeOnCurrentIsland(next)
-        node.pathFind("Progress: ${done.addSeparators()}/${max.addSeparators()} (${percentage.roundTo(2)}%)", condition = { active })
+        node.pathFind(
+            "Progress: ${done.addSeparators()}/${max.addSeparators()} (${percentage.roundTo(2)}%)",
+            condition = { active },
+        )
         currentNodeToFind = next
         return next
     }
@@ -709,8 +713,10 @@ object GraphEditor {
         }.flatten()
 
         val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
-            if ((element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
-                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)) {
+            if (
+                (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
+            ) {
                 accumulator.direction = EdgeDirection.BOTH
             }
             accumulator
