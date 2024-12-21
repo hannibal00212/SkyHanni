@@ -44,7 +44,7 @@ enum class ItemAbility(
     WEIRDER_TUBA(30),
     FIRE_FREEZE_STAFF(10),
     SWORD_OF_BAD_HEALTH(5),
-    WITHER_CLOAK(10, ignoreMageCooldownReduction = true),
+    WITHER_CLOAK(10),
     HOLY_ICE(4),
     VOODOO_DOLL_WILTED(3),
     FIRE_FURY_STAFF(20),
