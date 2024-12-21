@@ -51,7 +51,7 @@ object SunGeckoHelper {
      */
     private val sunGeckoActionBar by patternGroup.pattern(
         "actionbar",
-        "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]"
+        "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]",
     )
 
     private var healthLeft = 250
@@ -133,7 +133,14 @@ object SunGeckoHelper {
                     Color.GREEN.addAlpha(80),
                 ) { config.highlightRealBoss }
             }
-            currentBoss = event.mob
+            if (currentBoss == null) {
+                currentBoss = event.mob
+            } else {
+                if (currentBoss?.baseEntity?.isEntityAlive == false ||
+                    (currentBoss?.health?.toInt() ?: 0) < 20) {
+                    currentBoss = event.mob
+                }
+            }
         }
 
     }
