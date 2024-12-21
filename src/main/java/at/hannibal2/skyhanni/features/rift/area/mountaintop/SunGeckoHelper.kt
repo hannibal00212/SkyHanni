@@ -98,6 +98,7 @@ object SunGeckoHelper {
         val health = "$healthColor$displayHealthLeft§f/§a$displayTotalHealth§c❤"
         display.add("§eSun Gecko $health")
         display.add("$actionBarFormatted §e§lCombo: x$combo")
+
         //this is just a total guess but it looks right enough
         //i think its inconsistent because of how often the action bar updates
         var expiryTime = 5.seconds + 200.milliseconds
@@ -105,8 +106,8 @@ object SunGeckoHelper {
             expiryTime += (modifiers.count() * 200).milliseconds
         }
         val timeLeft = timeSinceLastHit + expiryTime
-        if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 800.milliseconds.inWholeMilliseconds
-            || timeLeft.isInPast()) {
+        if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 800.milliseconds.inWholeMilliseconds ||
+            timeLeft.isInPast()) {
             display.add("§aCombo Timer: ${expiryTime.format()}/${expiryTime.format()}")
         } else {
             display.add("§aCombo Timer: ${timeLeft.timeUntil().format(showMilliSeconds = true)}/${expiryTime.format()}")
@@ -126,7 +127,10 @@ object SunGeckoHelper {
         if (event.mob.name.contains("?") && config.highlightFakeBoss) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(event.mob.baseEntity, Color.RED.addAlpha(80)) { config.highlightFakeBoss }
         } else if (config.highlightRealBoss) {
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(event.mob.baseEntity, Color.GREEN.addAlpha(80)) { config.highlightRealBoss }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                event.mob.baseEntity,
+                Color.GREEN.addAlpha(80))
+            { config.highlightRealBoss }
         }
 
     }
@@ -193,6 +197,7 @@ object SunGeckoHelper {
             }
 
             if (comboHitCount == 9 && totalHits == 8) {
+
                 //this is a hypixel bug
                 //it goes from 8/8 to 9/8 to 2/8
                 //the combo does not go up at 9/8
@@ -245,13 +250,13 @@ object SunGeckoHelper {
     fun isEnabled() = config.enabled && RiftAPI.inRift() && RiftAPI.inMountainTop()
 
     enum class MODIFIERS{
-        REVIVAL, /* spawns a second dude*/
+        REVIVAL, // spawns a second dude
         COMBO_MANIC,
-        TIME_SLICED, /* reduces combo lvl up by 1 for 30 seconds only*/
+        TIME_SLICED, // reduces combo lvl up by 1 for 30 seconds only
         BUFFANTICS,
-        COLLECTIVE, /* increase time for combo by 0.2 per modifier */
+        COLLECTIVE, // increase time for combo by 0.2 per modifier
         BRAND_NEW_DANCE,
-        CULMINATION, /* reduces combo lvl up by 1*/
+        CULMINATION, // reduces combo lvl up by 1
     }
 
 
