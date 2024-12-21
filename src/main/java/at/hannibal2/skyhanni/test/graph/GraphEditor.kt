@@ -103,7 +103,7 @@ object GraphEditor {
 
     private val nodesAlreadyFound = mutableListOf<LorenzVec>()
     private val nodesToFind: List<LorenzVec>
-        get() = IslandGraphs.currentIslandGraph?.nodes?.map { it.position }?.filter { it !in nodesAlreadyFound } ?: emptyList()
+        get() = IslandGraphs.currentIslandGraph?.nodes?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
     private var currentNodeToFind: LorenzVec? = null
     private var active = false
 
@@ -674,7 +674,8 @@ object GraphEditor {
                 val otherNode = if (node == edge.node1) edge.node2
                 else edge.node1
                 // TODO: Fix this to not use a bang bang
-                @Suppress("MapGetWithNotNullAssertionOperator") nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
+                @Suppress("MapGetWithNotNullAssertionOperator")
+                nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
         nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
@@ -697,7 +698,8 @@ object GraphEditor {
 
         val neighbors = graph.map { node ->
             // TODO: Fix this to not use bang bangs
-            @Suppress("MapGetWithNotNullAssertionOperator") node.neighbours.map {
+            @Suppress("MapGetWithNotNullAssertionOperator")
+            node.neighbours.map {
                 GraphingEdge(
                     translation[node]!!,
                     translation[it.key]!!,
@@ -706,14 +708,13 @@ object GraphEditor {
             }
         }.flatten()
 
-        val reduced = neighbors.groupingBy { it }.reduce(
-            { _, accumulator, element ->
-                if ((element.node1 == accumulator.node1 && accumulator.direction != element.direction) || (element.node1 == accumulator.node2 && accumulator.direction == element.direction)) {
-                    accumulator.direction = EdgeDirection.BOTH
-                }
-                accumulator
-            },
-        )
+        val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
+            if ((element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)) {
+                accumulator.direction = EdgeDirection.BOTH
+            }
+            accumulator
+        }
 
         edges.addAll(reduced.values)
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
@@ -761,7 +762,9 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun LorenzVec.distanceSqToPlayer(): Double = ghostPosition?.let { distanceSq(it) } ?: distanceSq(LocationUtils.playerLocation())
+    fun LorenzVec.distanceSqToPlayer(): Double {
+        return ghostPosition?.let { distanceSq(it) } ?: distanceSq(LocationUtils.playerLocation())
+    }
 }
 
 // The node object the graph editor is working with
