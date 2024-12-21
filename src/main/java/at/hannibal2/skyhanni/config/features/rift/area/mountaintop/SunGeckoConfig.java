@@ -18,22 +18,17 @@ public class SunGeckoConfig {
     @Expose
     @ConfigOption(name = "Show Modifiers", desc = "Show a list of modifiers in the overlay.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean showModifiers = false;
 
     @Expose
     @ConfigOption(name = "Highlight Real Boss", desc = "Highlights the real boss in green.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean highlightRealBoss = false;
 
     @Expose
     @ConfigOption(name = "Highlight Clones", desc = "Highlights the fakes bosses in red.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean highlightFakeBoss = true;
-
-
 
     @Expose
     @ConfigLink(owner = SunGeckoConfig.class, field = "enabled")

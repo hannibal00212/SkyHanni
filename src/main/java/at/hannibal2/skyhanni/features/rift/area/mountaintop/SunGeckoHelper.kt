@@ -157,15 +157,15 @@ object SunGeckoHelper {
             currentBoss = null
         }
 
-        if (currentBoss == null) return
+        val boss = currentBoss ?: return
 
-        val health = currentBoss?.health?.toInt() ?: -1
+        val health = boss.health.toInt()
         if (health > healthLeft) {
             onFirstPhase = false
             modifiers.add(Modifiers.REVIVAL)
         }
         healthLeft = health
-        totalHealth = currentBoss?.maxHealth ?: 250
+        totalHealth = boss.maxHealth
 
     }
 
