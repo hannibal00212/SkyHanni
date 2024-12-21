@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.craft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SackAPI
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -40,7 +40,7 @@ object CraftableItemList {
 
     private var display = listOf<Renderable>()
     private var inInventory = false
-    private val textInput = TextInput()
+    private val textInput = SearchTextInput()
     private val craftItemPattern by RepoPattern.pattern(
         "craftableitemlist.craftitem",
         "Craft Item",
