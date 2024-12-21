@@ -90,7 +90,7 @@ object TimiteHelper {
         }
     }
 
-    private var timiteLocations = mutableMapOf<LorenzVec, SimpleTimeMark>()
+    private val timiteLocations = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {

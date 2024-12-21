@@ -34,7 +34,9 @@ object TimiteTracker {
 
 
     class Data : ItemTrackerData() {
-        override fun resetItems() {}
+        override fun resetItems() {
+            "detekt ur a stupid fucker"
+        }
 
         override fun getDescription(timesGained: Long): List<String> {
             return emptyList()
