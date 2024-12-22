@@ -30,7 +30,7 @@ object HoppityEggsCompactChat {
     private val config get() = ChocolateFactoryAPI.config
     private val chatConfig get() = HoppityEggsManager.config.chat
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
-    private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
+    val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
 
     fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
         if (!chatConfig.compact) return
@@ -49,10 +49,12 @@ object HoppityEggsCompactChat {
             DelayedRun.runDelayed(5.milliseconds) {
                 createWaypointShareCompactMessage(HoppityEggsManager.getAndDisposeWaypointOnclick())
                 hoppityDataSet.reset()
+                hitmanCompactDataSets.clear()
             }
         } else {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityDataSet.hoppityMessages, prefix = false)
             hoppityDataSet.reset()
+            hitmanCompactDataSets.clear()
         }
     }
 
