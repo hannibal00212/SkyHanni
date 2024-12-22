@@ -8,32 +8,17 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.lang.reflect.ParameterizedType
-import java.lang.reflect.WildcardType
 
 object ListEnumSkippingTypeAdapterFactory : TypeAdapterFactory {
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-        // Safely cast to ParameterizedType
-        val parameterizedType = type.type as? ParameterizedType ?: return null
-
-        // Check if it's actually List<...>
-        if (parameterizedType.rawType != List::class.java) {
-            return null
+        val rawType = type.rawType
+        if (rawType == List::class.java) {
+            val actualType = (type.type as ParameterizedType).actualTypeArguments[0]
+            if (actualType is Class<*> && actualType.isEnum) {
+                @Suppress("UNCHECKED_CAST")
+                return ListEnumSkippingTypeAdapter(actualType as Class<out Enum<*>>) as TypeAdapter<T>
+            }
         }
-
-        // Pull out the actual type argument
-        var actualTypeArg = parameterizedType.actualTypeArguments.firstOrNull() ?: return null
-
-        // If it's a wildcard, get its upper bound
-        if (actualTypeArg is WildcardType) {
-            actualTypeArg = actualTypeArg.upperBounds.firstOrNull() ?: return null
-        }
-
-        // Now check if that is an enum
-        if (actualTypeArg is Class<*> && actualTypeArg.isEnum) {
-            @Suppress("UNCHECKED_CAST")
-            return ListEnumSkippingTypeAdapter(actualTypeArg as Class<out Enum<*>>) as TypeAdapter<T>
-        }
-
         return null
     }
 }

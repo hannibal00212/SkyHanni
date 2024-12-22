@@ -710,7 +710,7 @@ object HoppityCollectionStats {
             }
             hotspotRabbitData?.let { storage ->
                 storage.hotspotRabbits.entries.firstOrNull { (_, hotspotMap) ->
-                    hotspotMap.any { it.key == rabbit && (!it.value) }
+                    hotspotMap.any { it.key == rabbit && (it.value == false || it.value == null) }
                 }?.also { (_, hotspotMap) ->
                     hotspotMap[rabbit] = true
                 }

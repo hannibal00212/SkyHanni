@@ -36,11 +36,11 @@ object BitsAPI {
         private set(value) {
             profileStorage?.bits = value
         }
-    private var currentFameRank: FameRank?
-        get() = getFameRankByNameOrNull(playerStorage.currentFameRank)
+    var currentFameRank: FameRank?
+        get() = playerStorage?.currentFameRank?.let { getFameRankByNameOrNull(it) }
         private set(value) {
             if (value != null) {
-                playerStorage.currentFameRank = value.name
+                playerStorage?.currentFameRank = value.name
             }
         }
     var bitsAvailable: Int

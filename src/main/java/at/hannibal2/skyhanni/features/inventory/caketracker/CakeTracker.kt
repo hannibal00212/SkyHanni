@@ -278,7 +278,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.missingCakes = ((1..currentYear).toSet() - storage.ownedCakes).toMutableSet()
+        storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
     }
 
     private fun getCakePrice(year: Int): Double {
