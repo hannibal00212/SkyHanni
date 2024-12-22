@@ -773,6 +773,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Removed the chat message "There are no Pests on your Garden!".
 + Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
     + Shows a title when you use the Pest Tracker without any pests to clear.
++ Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
 
 </details>
 <details open><summary>

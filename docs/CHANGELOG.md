@@ -78,6 +78,10 @@
 + Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
     +  Added solvers for Math and Public Speaking Primal Fears.
 
+#### Garden Features
+
++ Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
+
 ### Improvements
 
 #### Inventory Improvements
@@ -96,6 +100,11 @@
 + Improved the UI for the Cake Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2939)
     + Made the Cake Tracker scrollable instead of having a fixed size.
 + Cakes you claim from the baker will now be added to the Cake Tracker automatically. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3008)
++ Made the Craftable Item List searchable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3094)
++ Added an option to reset search on close. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3090)
+    + Reset search terms in GUIs after closing inventory (Profit Trackers, Area Navigation list, etc.).
+    + Enabled by default to reduce confusion caused by the search feature.
++ The Estimated Item Value now displays material names used to unlock gemstone slots. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3089)
 
 #### Chat and Command Improvements
 
@@ -150,6 +159,7 @@
 + Added more granular control over when the Hoppity Live Display is shown. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2919)
 + The Hoppity Unclaimed Eggs display is now more accurate at the end of events. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2986)
 + Added option to display Date/Time on Hoppity Event Live Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2973)
++ Marked non-purchasable items in CF Shop. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3095)
 
 
 #### Great Spook Improvements
@@ -197,6 +207,7 @@
 + Added the Minecraft version to the mod file name. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2941)
 + Added a warning for empty messages left behind by Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
 + Added option to hide seconds in the Real Time GUI. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2979)
++ Improved graph navigation performance. - hannibal2 & Thunderblade (https://github.com/hannibal002/SkyHanni/pull/3083)
 
 ### Fixes
 
@@ -235,6 +246,10 @@
 + Fixed edge case causing error when acquiring a power-up on first click in SuperPairs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3080)
 + Fixed Experiments Profit Tracker not counting exp bottles splashed after using the Experimentation Table. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3066)
 + Fixed items from the previous menu leaking into the SkyHanni User Luck stat breakdown submenu. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3057)
++ Fixed hover text being off by one in the Craftable Item List. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3094)
++ Fixed a rare error with Reforge Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3093)
++ Fixed skill overflow detection for values slightly above the maximum. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3084)
++ Fixed /shtrackcollection not tracking Youngite and Obsolite. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3082)
 
 #### Combat Fixes
 
@@ -244,6 +259,7 @@
 + Fixed Millennia-Aged Blaze not being highlighted by the Area Boss Highlight feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2707)
 + Fixed a small typo in Bestiary Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2748)
 + Fixed `Line to Slayer Miniboss` not checking for walls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2788)
++ Fixed Special Zealots not highlighted after a recent Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/3099)
 
 #### Custom Scoreboard Fixes
 
@@ -279,6 +295,7 @@
 + Fixed issue with Stampede/Golden Click not counting in Stray Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3013)
 + Fixed stray timer not activating from Hitman Eggs outside of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3015)
 + Fixed Hitman Full Time calculation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3075)
++ Fixed edge case where Hoppity Call warning wouldn't disappear. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3086)
 
 #### Garden Fixes
 
@@ -307,6 +324,7 @@
 + Specified in visitor config that Maeve's dialogue is not hidden in the "Hide Chat" option. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3002)
 + Fixed the next visitor timer not decreasing on pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3027)
 + Fixed chat error spam from Garden Composter Overlay. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3037)
++ Fixed Vacuum Item Stack Size not showing with over 1k Pests. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3088)
 
 #### Crimson Isle Fixes
 
@@ -405,6 +423,7 @@
 + Fixed intermittent NEU rendering issues. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3053)
 + Fixed collection tracker to recognize the current collection. - nopo (https://github.com/hannibal002/SkyHanni/pull/3049)
 + Fixed skill level. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3068)
++ Fixed Replace Roman Numerals replacing random letters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/3003)
 
 ### Technical Details
 
@@ -519,6 +538,10 @@
 + Cleaned up code in ChocolateFactoryStats. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3056)
 + Added support for removing items with ReplaceItemEvent. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3057)
 + Converted additional `LorenzEvents` to `SkyHanniEvents`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3058)
++ Discord RPC now shows in /shdebug when there's an issue or current status. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3092)
++ Moved Next Jacobs Contest, Best Crop Milestone & Jyrre Timer to Renderable. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3004)
++ Added /shtestactionbar command: set your clipboard as a fake Action Bar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3085)
++ Added /shdebug support for SkyBlock island, Bingo, and Tab List data tests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3085)
 
 ### Removed Features
 
