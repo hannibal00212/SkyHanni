@@ -7,38 +7,52 @@ import org.junit.jupiter.api.Test
 class ReplaceRomanNumeralsTest {
 
     @Test
-    fun testTransformLine() {
-        // Simple case with no Roman numerals
+    fun `Regular words shouldn't be modified`() {
         Assertions.assertEquals("hello", "hello".transformLine())
+    }
 
-        // I should never be converted
+    @Test
+    fun `'I' should never be converted`() {
         Assertions.assertEquals("I", "I".transformLine())
+    }
 
-        // Single Roman numeral should be converted
+    @Test
+    fun `Single Roman numeral should be converted`() {
         Assertions.assertEquals("5", "V".transformLine())
+    }
 
-        // Multiple Roman numerals separated by spaces
+    @Test
+    fun `Multiple Roman numerals separated by spaces should be converted`() {
         Assertions.assertEquals("5 10 world", "V X world".transformLine())
+    }
 
-        // Roman numeral next to punctuation
+    @Test
+    fun `Roman numeral next to punctuation should be converted`() {
         Assertions.assertEquals("5!", "V!".transformLine())
         Assertions.assertEquals("hello 14 you?", "hello XIV you?".transformLine())
+    }
 
-        // Mixed with color codes
+    @Test
+    fun `Mixed with color codes should be converted`() {
         Assertions.assertEquals("§c5!", "§cV!".transformLine())
         Assertions.assertEquals("hello 2 is this 5 you?", "hello II is this V you?".transformLine())
+    }
 
-        // If invalid Roman numeral sequences are left unchanged
-        // Assuming "IIII" is invalid, it remains as is
+    @Test
+    fun `Invalid Roman numeral sequences are left unchanged`() {
         Assertions.assertEquals("IIII", "IIII".transformLine())
+    }
 
-        // Check sequences with punctuation and color codes interspersed
+    @Test
+    fun `Sequences with punctuation and color codes interspersed should be converted`() {
         Assertions.assertEquals("§d5 world", "§dV world".transformLine())
         Assertions.assertEquals("hello 10 and then 1 more", "hello X and then I more".transformLine())
+    }
 
-        // Mixed complexity
+    @Test
+    fun `Mixed complexity should be converted`() {
         Assertions.assertEquals("Today 2023 was great!", "Today MMXXIII was great!".transformLine())
     }
 
-    fun String.transformLine(): String = ReplaceRomanNumerals.replaceRomanNumerals(this)
+    private fun String.transformLine(): String = ReplaceRomanNumerals.replaceRomanNumerals(this)
 }
