@@ -65,12 +65,11 @@ object EnchantedClockHelper {
     )
 
     /**
-     * REGEX-TEST: §8Cooldown: §a48 hours
-     * REGEX-TEST: §8Cooldown: §a47 hours
+     * REGEX-TEST: §7§cOn cooldown: 20 hours
      */
     private val cooldownLorePattern by patternGroup.pattern(
         "inventory.cooldown",
-        "§8Cooldown: §.(?<hours>\\d+) hours",
+        "(?:§.)*On cooldown: (?<hours>\\d+) hours?",
     )
     // </editor-fold>
 
@@ -211,8 +210,11 @@ object EnchantedClockHelper {
                 }
             } ?: continue
 
-            val parsedCooldown: SimpleTimeMark? = cooldownLorePattern.firstMatcher(stack.getLore()) {
-                group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
+            val parsedCooldown: SimpleTimeMark? = when (currentStatus) {
+                ClockBoostState.READY, ClockBoostState.PROBLEM -> null
+                else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
+                    group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
+                }
             }
 
             // Because the times provided by the clock UI suck ass (we only get hour count)
