@@ -150,7 +150,7 @@ object NonGodPotEffectDisplay {
     private fun update() {
         if (effectDuration[NonGodPotEffect.PEST_REPELLENT]?.ended == true ||
             effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX]?.ended == true
-            ) {
+        ) {
             PestWarning.repellentMultiplier = 1
         }
 

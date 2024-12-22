@@ -95,8 +95,6 @@ object PestWarning {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
         sprayMultiplier = checkSpray()
         cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier
     }
