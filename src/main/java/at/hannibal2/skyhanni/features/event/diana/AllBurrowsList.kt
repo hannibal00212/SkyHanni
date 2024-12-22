@@ -21,9 +21,9 @@ object AllBurrowsList {
     private var list = listOf<LorenzVec>()
     private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
     private var burrowLocations
-        get() = SkyHanniMod.feature.storage?.foundDianaBurrowLocations
+        get() = SkyHanniMod.feature.storage.foundDianaBurrowLocations
         set(value) {
-            SkyHanniMod.feature.storage?.foundDianaBurrowLocations = value
+            SkyHanniMod.feature.storage.foundDianaBurrowLocations = value
         }
 
     @HandleEvent

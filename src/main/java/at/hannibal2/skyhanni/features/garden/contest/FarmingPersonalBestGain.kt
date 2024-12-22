@@ -83,7 +83,7 @@ object FarmingPersonalBestGain {
             crop = cropName
             cropType = CropType.getByName(cropName)
             GardenAPI.storage?.let {
-                it.personalBestFF[cropType] = newFF
+                it.personalBestFF[CropType.getByName(cropName)] = group("ff").formatDouble()
             }
             checkDelayed()
         }
