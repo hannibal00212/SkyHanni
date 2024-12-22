@@ -14,6 +14,12 @@ public class HoppityWaypointsConfig {
     public boolean enabled = true;
 
     @Expose
+    @ConfigOption(name = "Shared Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shared = true;
+
+    @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
         desc = "Show an estimated waypoint immediately after clicking.\n" +

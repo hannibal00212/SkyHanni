@@ -34,6 +34,7 @@ object HoppityEggsManager {
     val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val chatConfig get() = config.chat
     private val unclaimedEggsConfig get() = config.unclaimedEggs
+    private val waypointsConfig get() = config.waypoints
 
     // <editor-fold desc="Patterns">
     /**
@@ -194,7 +195,7 @@ object HoppityEggsManager {
     }
 
     fun shareWaypointPrompt() {
-        if (!config.sharedWaypoints) return
+        if (!waypointsConfig.shared) return
         val meal = lastMeal ?: return
         val note = lastNote ?: return
         lastMeal = null
@@ -272,12 +273,14 @@ object HoppityEggsManager {
             "showPathFinder" to "waypoints.showPathFinder",
             "showAllWaypoints" to "waypoints.showAll",
             "hideDuplicateWaypoints" to "waypoints.hideDuplicates",
+            "sharedWaypoints" to "waypoints.shared",
 
             "highlightDuplicateEggLocations" to "locations.highlightDuplicates",
             "showNearbyDuplicateEggLocations" to "locations.showNearbyDuplicates",
             "loadFromNeuPv" to "locations.loadFromNeuPv",
 
             "showClaimedEggs" to "unclaimedEggs.enabled",
+            "position" to "unclaimedEggs.position",
             "unclaimedEggsOrder" to "unclaimeddEggs.displayOrder",
             "warnUnclaimedEggs" to "unclaimedEggs.warningsEnabled",
             "showCollectedLocationCount" to "unclaimedEggs.showCollectedLocationCount",

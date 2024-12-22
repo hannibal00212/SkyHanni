@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
-    private val waypointConfig get() = config.waypoints
+    private val waypointsConfig get() = config.waypoints
     private val locationConfig get() = config.locations
     val locatorItem = "EGGLOCATOR".toInternalName()
 
@@ -97,7 +97,7 @@ object HoppityEggLocator {
         }
 
         sharedEggLocation?.let {
-            if (config.sharedWaypoints) {
+            if (waypointsConfig.shared) {
                 event.drawEggWaypoint(it, "§aShared Egg")
                 return
             }
@@ -106,7 +106,7 @@ object HoppityEggLocator {
         var islandEggsLocations = HoppityEggLocations.islandLocations
 
         if (shouldShowAllEggs()) {
-            if (waypointConfig.hideDuplicates) {
+            if (waypointsConfig.hideDuplicates) {
                 islandEggsLocations = islandEggsLocations.filter {
                     !HoppityEggLocations.hasCollectedEgg(it)
                 }.toSet()
@@ -123,7 +123,7 @@ object HoppityEggLocator {
     private fun LorenzRenderWorldEvent.drawGuessLocations() {
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
             drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
-            if (waypointConfig.showLine) {
+            if (waypointsConfig.showLine) {
                 drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
             }
         }
@@ -142,19 +142,19 @@ object HoppityEggLocator {
     }
 
     private fun LorenzRenderWorldEvent.drawGuessImmediately() {
-        if (waypointConfig.showImmediately && lastClick.passedSince() < 5.seconds) {
+        if (waypointsConfig.showImmediately && lastClick.passedSince() < 5.seconds) {
             lastParticlePositionForever?.let {
                 if (lastChange.passedSince() < 300.milliseconds) {
                     val eyeLocation = exactPlayerEyeLocation()
                     if (eyeLocation.distance(it) > 2) {
                         drawWaypointFilled(
                             it,
-                            waypointConfig.color.toSpecialColor(),
+                            waypointsConfig.color.toSpecialColor(),
                             seeThroughBlocks = true,
                         )
                         drawDynamicText(it.up(), "§aGuess", 1.5)
                     }
-                    if (!drawLocations && waypointConfig.showLine) {
+                    if (!drawLocations && waypointsConfig.showLine) {
                         drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
                     }
                 }
@@ -166,14 +166,14 @@ object HoppityEggLocator {
         val shouldMarkDuplicate = locationConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
-            drawWaypointFilled(location, waypointConfig.color.toSpecialColor(), seeThroughBlocks = true)
+            drawWaypointFilled(location, waypointsConfig.color.toSpecialColor(), seeThroughBlocks = true)
         } else {
             drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() = waypointConfig.showAll && !locatorInHotbar && HoppityEggType.eggsRemaining()
+    private fun shouldShowAllEggs() = waypointsConfig.showAll && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -275,12 +275,12 @@ object HoppityEggLocator {
     }
 
     private fun trySendingGraph() {
-        if (!waypointConfig.showPathFinder) return
+        if (!waypointsConfig.showPathFinder) return
         val location = possibleEggLocations.firstOrNull() ?: return
 
-        val color = waypointConfig.color.toSpecialColor()
+        val color = waypointsConfig.color.toSpecialColor()
 
-        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointConfig.showPathFinder })
+        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointsConfig.showPathFinder })
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any {

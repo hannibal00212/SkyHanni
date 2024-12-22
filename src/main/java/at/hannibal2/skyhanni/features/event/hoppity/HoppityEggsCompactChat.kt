@@ -28,8 +28,8 @@ object HoppityEggsCompactChat {
 
     private var hoppityDataSet = HoppityStateDataSet()
     private val config get() = ChocolateFactoryAPI.config
-    private val eventConfig get() = HoppityEggsManager.config
     private val chatConfig get() = HoppityEggsManager.config.chat
+    private val waypointsConfig get() = HoppityEggsManager.config.waypoints
     private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
 
     fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
@@ -45,7 +45,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendNonHitman() {
-        if (HoppityEggType.resettingEntries.contains(hoppityDataSet.lastMeal) && eventConfig.sharedWaypoints) {
+        if (HoppityEggType.resettingEntries.contains(hoppityDataSet.lastMeal) && waypointsConfig.shared) {
             DelayedRun.runDelayed(5.milliseconds) {
                 createWaypointShareCompactMessage(HoppityEggsManager.getAndDisposeWaypointOnclick())
                 hoppityDataSet.reset()

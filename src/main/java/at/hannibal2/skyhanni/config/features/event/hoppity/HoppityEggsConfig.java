@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HoppityEggsConfig {
@@ -32,17 +30,17 @@ public class HoppityEggsConfig {
     public HoppityStrayTimerConfig strayTimer = new HoppityStrayTimerConfig();
 
     @Expose
-    @ConfigOption(name = "Hoppity Chat Messages", desc = "")
+    @ConfigOption(name = "Chat Messages", desc = "")
     @Accordion
     public HoppityChatConfig chat = new HoppityChatConfig();
 
     @Expose
-    @ConfigOption(name = "Hoppity Waypoints", desc = "")
+    @ConfigOption(name = "Egg Waypoints", desc = "")
     @Accordion
     public HoppityWaypointsConfig waypoints = new HoppityWaypointsConfig();
 
     @Expose
-    @ConfigOption(name = "Hoppity Egg Locations", desc = "")
+    @ConfigOption(name = "Egg Locations", desc = "")
     @Accordion
     public HoppityLocationConfig locations = new HoppityLocationConfig();
 
@@ -52,19 +50,9 @@ public class HoppityEggsConfig {
     public HoppityUnclaimedEggsConfig unclaimedEggs = new HoppityUnclaimedEggsConfig();
 
     @Expose
-    @ConfigOption(name = "Shared Hoppity Waypoints", desc = "Enable being able to share and receive egg waypoints in your lobby.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean sharedWaypoints = true;
-
-    @Expose
     @ConfigOption(name = "Adjust player opacity", desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)")
     @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
     public int playerOpacity = 40;
-
-    @Expose
-    @ConfigLink(owner = HoppityEggsConfig.class, field = "showClaimedEggs")
-    public Position position = new Position(200, 120, false, true);
 
     @Expose
     @ConfigOption(name = "Highlight Hoppity Shop", desc = "Highlight items that haven't been bought from the Hoppity shop yet.")

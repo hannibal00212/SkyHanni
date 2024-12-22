@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object HoppityEggsShared {
 
-    private val config get() = HoppityEggsManager.config
+    private val waypointsConfig get() = HoppityEggsManager.config.waypoints
 
     /**
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
@@ -59,5 +59,5 @@ object HoppityEggsShared {
         HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints.enabled && config.sharedWaypoints
+    fun isEnabled() = LorenzUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
 }

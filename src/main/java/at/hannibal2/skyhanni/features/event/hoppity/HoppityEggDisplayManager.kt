@@ -114,7 +114,7 @@ object HoppityEggDisplayManager {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!HoppityEggsManager.isActive()) return
-        config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+        unclaimedEggsConfig.position.renderRenderables(display, posLabel = "Hoppity Eggs")
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =

@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HoppityUnclaimedEggsConfig {
@@ -13,6 +15,10 @@ public class HoppityUnclaimedEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigLink(owner = HoppityUnclaimedEggsConfig.class, field = "enabled")
+    public Position position = new Position(200, 120, false, true);
 
     @Expose
     @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")
