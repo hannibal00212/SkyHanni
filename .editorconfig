@@ -25,6 +25,7 @@ ij_java_names_count_to_use_import_on_demand = 2147483647
 ij_java_class_count_to_use_import_on_demand = 2147483647
 ij_java_packages_to_use_import_on_demand = 2147483647
 
+# Kotlin Files
 [*.kt]
 ktlint_code_style = intellij_idea
 
@@ -59,3 +60,9 @@ ktlint_standard_final-newline = disabled
 
 ktlint_standard_no-wildcard-imports = enabled
 ktlint_standard_function-expression-body = disabled
+
+# Additional Kotlin-specific formatting for conditions and continuation
+ij_kotlin_continuation_indent_size = 8
+ij_kotlin_binary_expression_wrap = if_long
+ij_kotlin_keep_line_breaks = true
+ij_kotlin_annotations_new_line_after_suppress = true
