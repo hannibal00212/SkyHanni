@@ -85,11 +85,8 @@ formatting:
         active: false
     ImportOrdering: # handled by custom rule
         active: false
-    AnnotationSpacing: # enabled to ensure proper annotation placement
-        active: true
-        includeAnnotations: ["Suppress"] # Only enforce for @Suppress
-        excludeAnnotations: [] # Do not exclude any other annotations
-        newLineBeforeAnnotation: true # Place annotation on its own line
+    AnnotationSpacing: # handled by custom rule
+        active: false
 
 complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
