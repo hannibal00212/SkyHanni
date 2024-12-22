@@ -150,7 +150,7 @@ object EnchantedClockHelper {
 
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
-        for ((boostType, status) in storage.clockBoosts) {
+        for ((boostType, status) in storage.clockBoosts.filter { !it.value.warned }) {
             val inConfig = boostType != null && config.enchantedClockReminder.contains(boostType)
             val isProperState = status.state == ClockBoostState.CHARGING
             val inFuture = status.availableAt?.isInFuture() == true
@@ -160,6 +160,7 @@ object EnchantedClockHelper {
 
             status.state = ClockBoostState.READY
             status.availableAt = null
+            status.warned = true
             readyNowBoosts.add(complexType)
         }
 

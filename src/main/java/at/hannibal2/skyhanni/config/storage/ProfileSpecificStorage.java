@@ -903,6 +903,9 @@ public class ProfileSpecificStorage {
             @Nullable
             public SimpleTimeMark availableAt;
 
+            @Expose
+            public boolean warned = false;
+
             public enum ClockBoostState {
                 READY("Ready", LorenzColor.GREEN),
                 CHARGING("Charging", LorenzColor.RED),
@@ -923,7 +926,7 @@ public class ProfileSpecificStorage {
                 }
             }
 
-            public ClockBoostStatus(ClockBoostState state, SimpleTimeMark availableAt) {
+            public ClockBoostStatus(ClockBoostState state, @Nullable SimpleTimeMark availableAt) {
                 this.state = state;
                 this.availableAt = availableAt;
             }
