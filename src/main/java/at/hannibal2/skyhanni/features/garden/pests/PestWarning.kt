@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
+import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -124,7 +124,7 @@ object PestWarning {
 
     private fun checkSpray(): Double {
         val plot = GardenPlotAPI.getCurrentPlot() ?: return 1.0
-        return if (plot.isSprayExpired) 1.0 else if (Perk.PEST_ERADICATOR.isActive) 0.25 else 0.5
+        return if (plot.currentSpray == null) 1.0 else if (Perk.PEST_ERADICATOR.isActive) 0.25 else 0.5
     }
 
     @SubscribeEvent
@@ -187,14 +187,14 @@ object PestWarning {
             add("Spray Multiplier: $sprayMultiplier")
             add("Equipment Pest Cooldown: $equipmentPestCooldown")
             add("")
+            add("Is plot sprayed: ${GardenPlotAPI.getCurrentPlot()?.currentSpray != null}")
+            add("Pest eradicator Active: ${Perk.PEST_ERADICATOR.isActive}")
+            add("")
             add("Cooldown: ${cooldown ?: "Unknown"}")
             add("Last Pest Spawn: ${PestSpawnTimer.lastSpawnTime}")
             add("")
             add("Warning Shown: $warningShown")
             add("Wardrobe Open: $wardrobeOpened")
-            add("")
-            add("Plot Spray Expired: ${GardenPlotAPI.getCurrentPlot()?.isSprayExpired}")
-            add("Pest eradicator Active: ${Perk.PEST_ERADICATOR.isActive}")
         }
     }
 
