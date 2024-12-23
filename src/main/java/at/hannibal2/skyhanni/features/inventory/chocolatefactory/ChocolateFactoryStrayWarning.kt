@@ -95,11 +95,8 @@ object ChocolateFactoryStrayWarning {
         else event.strayHighlight()
     }
 
-    private fun GuiContainerEvent.getEventChest(): ContainerChest? = try {
+    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
         gui.inventorySlots as? ContainerChest
-    } catch (e: ClassCastException) {
-        null
-    }
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
