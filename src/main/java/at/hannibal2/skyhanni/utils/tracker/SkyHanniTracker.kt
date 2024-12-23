@@ -203,6 +203,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         TOTAL("Total"),
         SESSION("This Session"),
         MAYOR("This Mayor"),
+        WEEK("This Week"),
+        DAY("Today")
     }
 
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
