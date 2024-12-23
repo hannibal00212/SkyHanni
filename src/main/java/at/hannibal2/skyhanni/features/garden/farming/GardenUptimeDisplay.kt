@@ -35,8 +35,11 @@ object GardenUptimeDisplay {
         { Data() },
         { it.garden.gardenUptimeStorage.tracker },
         DisplayMode.WEEK to { it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data) },
-        DisplayMode.DAY to { it.garden.gardenUptimeStorage.day.getOrPut(getDayString(LocalDate.now()), ::Data) }) {
-            drawDisplay(it)
+        DisplayMode.DAY to {
+            it.garden.gardenUptimeStorage.day.getOrPut(getDayString(LocalDate.now()), ::Data)
+        }
+    ) {
+        drawDisplay(it)
     }
 
     class Data : TrackerData() {
@@ -62,7 +65,7 @@ object GardenUptimeDisplay {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isAFK || !isEnabled() || activityType == null ) return
+        if (isAFK || !isEnabled() || activityType == null) return
 
         tracker.modify {
             when (activityType) {
@@ -176,7 +179,7 @@ object GardenUptimeDisplay {
     }
 
     private fun getWeekString(date: LocalDate): String {
-        return "${date.dayOfYear/7}.${date.year}"
+        return "${date.dayOfYear / 7}.${date.year}"
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.showDisplay
