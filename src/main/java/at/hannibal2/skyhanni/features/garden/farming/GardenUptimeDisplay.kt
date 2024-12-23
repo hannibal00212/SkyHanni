@@ -1,40 +1,31 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig.MilestoneTextEntry
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay.needsInventory
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
-import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeDisplay {
@@ -50,14 +41,13 @@ object GardenUptimeDisplay {
 
     class Data : TrackerData() {
         override fun reset() {
-            activeTime = 0
+            cropBreakTime = 0
             visitorTime = 0
             pestTime = 0
-            farmingTime = 0
             blocksBroken = 0
         }
         @Expose
-        var activeTime: Int = 0
+        var cropBreakTime: Int = 0
 
         @Expose
         var visitorTime: Int = 0
@@ -66,88 +56,113 @@ object GardenUptimeDisplay {
         var pestTime: Int = 0
 
         @Expose
-        var farmingTime: Int = 0
-
-        @Expose
         var blocksBroken: Int = 0
 
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isAFK || !isEnabled() ) return
+        if (isAFK || !isEnabled() || activityType == null ) return
 
-        if (!pauseTimer) {
-            tracker.modify { it.activeTime += 1 }
+        tracker.modify {
+            when (activityType) {
+                ActivityType.VISITOR -> it.visitorTime++
+                ActivityType.PEST -> it.pestTime++
+                ActivityType.CROP_BREAK -> it.cropBreakTime++
+                null -> {}
+            }
         }
 
-        secondsActive += 1
-        secondsAFK += 1
-        secondsSinceLastMove += 1
-
+        secondsAFK++
+        ChatUtils.debug("Seconds afk: $secondsAFK")
         if (secondsAFK >= config.afkTimeout) {
             isAFK = true
-            tracker.modify { it.activeTime -= secondsAFK }
+            tracker.modify {
+                when (activityType) {
+                    ActivityType.VISITOR -> it.visitorTime -= secondsAFK
+                    ActivityType.PEST -> it.pestTime -= secondsAFK
+                    ActivityType.CROP_BREAK -> it.cropBreakTime -= secondsAFK
+                    null -> {}
+                }
+            }
             secondsAFK = 0
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onIslandChange(event: IslandChangeEvent) {
+        tracker.update()
     }
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK || !GardenAPI.inGarden()) return
+        activityType = ActivityType.CROP_BREAK
+        tracker.modify { it.blocksBroken++ }
         resetAFK()
     }
 
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
-        tracker.modify { it.pestTime += secondsAFK }
+        activityType = ActivityType.PEST
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorOpen(event: VisitorOpenEvent) {
-        tracker.modify { it.visitorTime += secondsAFK }
+        activityType = ActivityType.VISITOR
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorAccepted(event: VisitorAcceptedEvent) {
-        tracker.modify { it.visitorTime += secondsAFK }
+        activityType = ActivityType.VISITOR
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorRefused(event: VisitorRefusedEvent) {
         tracker.modify { it.visitorTime += secondsAFK }
+        activityType = ActivityType.VISITOR
         resetAFK()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (isEnabled()) return
+        if (!isEnabled()) return
         tracker.renderDisplay(config.pos)
     }
 
     var storage = GardenAPI.storage
-    var secondsActive = 0
 
-    var pauseTimer = false
     var isAFK = false
-    var secondsSinceLastMove = 0
     var secondsAFK = 0
+    var activityType: ActivityType? = null
 
     private fun drawDisplay(data: Data) = buildList<Searchable> {
-        val topLine = mutableListOf<Renderable>()
-        topLine.add(Renderable.string("§7Farming Uptime Tracker"))
-        add(Renderable.horizontalContainer(topLine).toSearchable())
+        val lineMap = mutableMapOf<FarmingUptimeDisplayText, Searchable>()
+        lineMap[FarmingUptimeDisplayText.TITLE] = Renderable.string("§6Farming Uptime").toSearchable()
 
+        var uptime = data.cropBreakTime
+        if (config.includeVisitors) uptime += data.visitorTime
+        if (config.includePests) uptime += data.pestTime
+        lineMap[FarmingUptimeDisplayText.UPTIME] =
+            Renderable.string("§7Uptime: §e${if (uptime > 0) uptime.seconds else "none!"}${if (isAFK) " §cPaused!" else ""}").toSearchable()
 
+        var bps = 0.0
+        if (uptime > 0) bps = data.blocksBroken.toDouble() / uptime
+        if (bps > 0) {
+            lineMap[FarmingUptimeDisplayText.BPS] = Renderable.string("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
+        }
+
+        lineMap[FarmingUptimeDisplayText.BLOCKS_BROKEN] = Renderable.string("§7Blocks Broken: §e${data.blocksBroken}").toSearchable()
+
+        return formatDisplay(lineMap)
     }
 
-    private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
-        val newList = mutableListOf<Renderable>()
-        newList.addAll(GardenCropMilestoneDisplay.config.text.mapNotNull { lineMap[it] })
-
+    private fun formatDisplay(lineMap: MutableMap<FarmingUptimeDisplayText, Searchable>): List<Searchable> {
+        val newList = mutableListOf<Searchable>()
+        newList.addAll(config.uptimeDisplayText.mapNotNull { lineMap[it] })
         return newList
     }
 
@@ -164,5 +179,12 @@ object GardenUptimeDisplay {
         return "${date.dayOfYear/7}.${date.year}"
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.display
+    private fun isEnabled() = GardenAPI.inGarden() && config.showDisplay
+
+    enum class ActivityType(val displayName: String) {
+        CROP_BREAK("Crop Break"),
+        VISITOR("Visitor"),
+        PEST("Pest"),
+    }
+
 }
