@@ -228,9 +228,10 @@ object PestProfitTracker {
         if (selectedBucket == null || selectedBucket.spray != null) {
             val applicableSprays = SprayType.getByPestTypeOrAll(selectedBucket)
             val applicableSpraysUsed = bucketData.spraysUsed.filterKeys { it in applicableSprays }
+            val sumSpraysUsed = applicableSpraysUsed.values.sum()
 
             var sprayCosts = 0.0
-            val hoverTips = buildList {
+            val hoverTips = if (sumSpraysUsed > 0) buildList {
                 applicableSpraysUsed.forEach { (spray, count) ->
                     val sprayString = spray.toInternalName().getPriceOrNull()?.let { price ->
                         val sprayCost = price * count
@@ -241,13 +242,13 @@ object PestProfitTracker {
                 }
                 add("")
                 add("§7Total spray cost: §6${sprayCosts.addSeparators()} coins")
-            }
+            } else emptyList()
             profit -= sprayCosts
 
-            val sumSpraysUsed = applicableSpraysUsed.values.sum()
+            val sprayCostString = if (sumSpraysUsed > 0) " §7(§c-${sprayCosts.shortFormat()}§7)" else ""
             add(
                 Renderable.hoverTips(
-                    "§aSprays used: §a$sumSpraysUsed §7(§c-${sprayCosts.shortFormat()}§7)",
+                    "§aSprays used: §a$sumSpraysUsed$sprayCostString",
                     hoverTips
                 ).toSearchable()
             )
