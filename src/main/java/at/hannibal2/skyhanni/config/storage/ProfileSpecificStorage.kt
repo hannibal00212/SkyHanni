@@ -702,19 +702,17 @@ class ProfileSpecificStorage {
     var diana: DianaStorage = DianaStorage()
 
     class DianaStorage {
-        // TODO rename to 'profitTracker'
         @Expose
-        var dianaProfitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
+        var profitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
 
         @Expose
-        var dianaProfitTrackerPerElectionSeason: MutableMap<Int, DianaProfitTracker.Data> = HashMap()
+        var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = HashMap()
 
-        // TODO rename
         @Expose
         var mythologicalMobTracker: MythologicalCreatureTracker.Data = MythologicalCreatureTracker.Data()
 
         @Expose
-        var mythologicalMobTrackerPerElectionSeason: MutableMap<Int, MythologicalCreatureTracker.Data> = HashMap()
+        var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = HashMap()
     }
 
     @Expose
