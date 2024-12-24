@@ -44,7 +44,7 @@ object ReplaceHoppityWithContributor {
 
         val newNames = CircularList(contributors.toList())
         for (internalName in rabbits.map { it.key }.shuffled()) {
-            val realName = internalName.replace("_", " ").allLettersFirstUppercase()
+            val realName = internalName.allLettersFirstUppercase()
             val newName = newNames.next()
             replaceMap[realName] = newName
         }
@@ -67,15 +67,15 @@ object ReplaceHoppityWithContributor {
         val newName = event.toolTip[0].replace(cleanName, fakeName)
         event.toolTip[0] = newName
 
+        event.toolTip.add(" ")
+        event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
+
         // TODO find a way to handle non containing entries in a kotlin nullable way instead of checking for -1
         val index = event.toolTip.indexOfFirst { it.contains(" a duplicate") }
         if (index == -1) return
         val oldLine = event.toolTip[index]
         val newLine = oldLine.replace(cleanName, fakeName)
         event.toolTip[index] = newLine
-
-        event.toolTip.add(" ")
-        event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.contributorRabbitName
