@@ -20,7 +20,7 @@ public class FarmingFortuneConfig {
     public boolean display = false;
 
     @Expose
-    @ConfigOption(name = "Compact Format", desc = "Compact the farming fortune display")
+    @ConfigOption(name = "Compact Format", desc = "Compact the farming fortune display.")
     @ConfigEditorBoolean
     public boolean compactFormat = false;
 
