@@ -3,3 +3,4 @@ defaultAccount = "main"
 
 [accounts.main]
 type = "microsoft"
+
