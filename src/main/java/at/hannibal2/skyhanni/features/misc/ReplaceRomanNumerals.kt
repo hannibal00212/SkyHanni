@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RomanNumeralReplaceListJson
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,11 +17,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -31,7 +29,25 @@ object ReplaceRomanNumerals {
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
-    private var allowedPatterns = emptyList<Pattern>()
+
+    private val patternGroup = RepoPattern.group("replace-roman-numerals")
+
+    @Suppress("MaxLineLength")
+    private val allowedPatterns by patternGroup.list(
+        "allowed-patterns",
+        "§o§a(?:Combat|Farming|Fishing|Mining|Foraging|Enchanting|Alchemy|Carpentry|Runecrafting|Taming|Social|)( Level)? (?<roman>[IVXLCDM]+)§r",
+        "(?:§5§o)?§7Progress to (?:Collection|Level|Tier|Floor|Milestone|Chocolate Factory) (?<roman>[IVXLCDM]+): §.(?:.*)%",
+        "§5§o  §e(?:\\w+) (?<roman>[IVXLCDM]+)",
+        "(?:§.)*Abiphone (?<roman>[IVXLCDM]+) .*",
+        "§o§a§a(?:§c§lMM§c )?The Catacombs §8- §eFloor (?<roman>[IVXLCDM]+)§r",
+        ".*Extra Farming Fortune (?<roman>[IVXLCDM]+)",
+        ".*(?:Collection|Level|Tier|Floor|Milestone) (?<roman>[IVXLCDM]+)(?: ?§(?:7|r).*)?",
+        "(?:§5§o§a ✔|§5§o§c ✖) §.* (?<roman>[IVXLCDM]+)",
+        "§o§a✔ §.* (?<roman>[IVXLCDM]+)§r",
+        "§5§o§7Purchase §a.* (?<roman>[IVXLCDM]+) §7.*",
+        "§5§o(?:§7)§.(?<roman>[IVXLCDM]+).*",
+        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*"
+    )
 
     /**
      * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
@@ -71,8 +87,6 @@ object ReplaceRomanNumerals {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedPatterns = event.getConstant<RomanNumeralReplaceListJson>("RomanNumeralReplacePatterns").list
-            .map { it.toPattern() }
         cachedStrings.clear()
     }
 
