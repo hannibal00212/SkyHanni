@@ -73,22 +73,23 @@ object GardenUptimeDisplay {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (isAFK || !isEnabled() || activityType == null) return
-
-        tracker.modify {
-            when (activityType) {
-                ActivityType.VISITOR -> it.visitorTime++
-                ActivityType.PEST -> it.pestTime++
-                ActivityType.CROP_BREAK -> it.cropBreakTime++
-                null -> {}
-            }
-        }
-
         secondsLastMove++
         secondsAFK++
 
         if (checkAFKTimeout()) {
             markAFK()
         }
+
+        tracker.modify {
+            when (activityType) {
+                ActivityType.VISITOR -> it.visitorTime++
+                ActivityType.PEST -> it.pestTime++
+                ActivityType.CROP_BREAK -> if (!justRemovedAFK) it.cropBreakTime++
+                null -> {}
+            }
+        }
+        blockBreaksLastSecond = 0
+        justRemovedAFK = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -101,8 +102,14 @@ object GardenUptimeDisplay {
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK || !isEnabled()) return
+        if (isAFK) {
+            justRemovedAFK = true
+        }
+        if (!justRemovedAFK) {
+            tracker.modify { it.blocksBroken++ }
+            blockBreaksLastSecond++
+        }
         activityType = ActivityType.CROP_BREAK
-        tracker.modify { it.blocksBroken++ }
         resetAFK()
     }
 
@@ -147,8 +154,9 @@ object GardenUptimeDisplay {
         secondsLastMove = 0
     }
 
+    var blockBreaksLastSecond = 0
     var storage = GardenAPI.storage
-
+    var justRemovedAFK = false
     var isAFK = false
     var secondsAFK = 0
     var secondsLastMove = 0
@@ -165,7 +173,8 @@ object GardenUptimeDisplay {
             Renderable.string("§7Uptime: §e${if (uptime > 0) uptime.seconds else "none!"}${if (isAFK) " §cPaused!" else ""}").toSearchable()
 
         var bps = 0.0
-        if (uptime > 0) bps = data.blocksBroken.toDouble() / uptime
+        if (uptime > 0) bps =
+            (data.blocksBroken.toDouble() - blockBreaksLastSecond) / uptime
         if (bps > 0) {
             lineMap[FarmingUptimeDisplayText.BPS] =
                 Renderable.string("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
@@ -183,7 +192,7 @@ object GardenUptimeDisplay {
             when (activityType) {
                 ActivityType.VISITOR -> it.visitorTime -= secondsAFK
                 ActivityType.PEST -> it.pestTime -= secondsAFK
-                ActivityType.CROP_BREAK -> it.cropBreakTime -= secondsAFK
+                ActivityType.CROP_BREAK -> it.cropBreakTime -= secondsAFK - 1
                 null -> {}
             }
         }
