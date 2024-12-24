@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -141,7 +140,7 @@ object GardenUptimeDisplay {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<EntityPlayer>) {
         if (!isEnabled()) return
-            secondsLastMove = 0
+        secondsLastMove = 0
     }
 
     var storage = GardenAPI.storage
