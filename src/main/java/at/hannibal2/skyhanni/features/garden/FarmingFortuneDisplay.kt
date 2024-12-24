@@ -163,6 +163,7 @@ object FarmingFortuneDisplay {
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val wrongTabCrop = GardenAPI.cropInHand != null && GardenAPI.cropInHand != currentCrop
+        val ffReduction = getPestFFReduction()
 
         val farmingFortune = if (wrongTabCrop) {
             (displayCrop.getLatestTrueFarmingFortune() ?: -1.0).also {
@@ -172,28 +173,38 @@ object FarmingFortuneDisplay {
 
         list.add(
             Renderable.string(
-                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                (if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: ") + (if (ffReduction > 0) "§c" else "§e") +
+                        if (!recentlySwitchedTool && farmingFortune != -1.0) {
                     farmingFortune.roundTo(0).addSeparators()
                 } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
             ),
         )
         add(Renderable.horizontalContainer(list))
 
-        val ffReduction = getPestFFReduction()
         if (ffReduction > 0) {
-            add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+            add(Renderable.string(if (config.compactFormat) "§cPests: §7-§e$ffReduction%"
+            else "§cPests are reducing your fortune by §e$ffReduction%§c!"))
         }
 
-        if (wrongTabCrop) {
-            var text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
-            if (farmingFortune != -1.0) text += " latest"
-            text += " fortune!"
-
+        if (wrongTabCrop && !config.hideMissingFortuneWarnings) {
+            var text = ""
+            if (config.compactFormat) {
+                text = "§cInaccurate!"
+            } else {
+                text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
+                if (farmingFortune != -1.0) text += " latest"
+                text += " fortune!"
+            }
             add(Renderable.string(text))
         }
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
+        if (config.hideMissingFortuneWarnings) return@buildList
+        if (config.compactFormat) {
+            add(Renderable.string("§cInaccurate!"))
+            return@buildList
+        }
         if (cropFortune) {
             add(
                 Renderable.clickAndHover(
