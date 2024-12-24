@@ -38,7 +38,8 @@ object GardenUptimeDisplay {
         { Data() },
         { it.garden.gardenUptimeStorage.tracker },
         DisplayMode.WEEK to {
-            it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data) },
+            it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data)
+        },
         DisplayMode.DAY to {
             it.garden.gardenUptimeStorage.day.getOrPut(getDayString(LocalDate.now()), ::Data)
         }
