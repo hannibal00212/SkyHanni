@@ -222,7 +222,7 @@ object GardenUptimeDisplay {
     }
 
     private fun getDayString(date: LocalDate): String {
-        return ".${date.year}.${date.monthValue}.${date.dayOfMonth}"
+        return "${date.year}.${date.monthValue}.${date.dayOfMonth}"
     }
 
     private fun getWeekString(date: LocalDate): String {
