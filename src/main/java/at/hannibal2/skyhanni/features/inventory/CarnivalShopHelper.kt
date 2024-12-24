@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -43,6 +44,8 @@ object CarnivalShopHelper {
     private var tokensNeeded: Int = 0
     private var overviewInfoItemStack: ItemStack? = null
     private var shopSpecificInfoItemStack: ItemStack? = null
+
+    private val patternGroup = RepoPattern.group("inventory.carnival-shop-helper")
 
     /**
      * REGEX-TEST: §7Your Tokens: §a1,234,567
