@@ -171,14 +171,14 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(
-            Renderable.string(
-                (if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: ") + (if (ffReduction > 0) "§c" else "§e") +
-                    if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                        farmingFortune.roundTo(0).addSeparators()
-                    } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
-            ),
-        )
+        val farmingFortuneText = if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: "
+        val fortuneColorCode = if (ffReduction > 0) "§c" else "§e"
+        val fortuneAmount = if (!recentlySwitchedTool && farmingFortune != -1.0) {
+            farmingFortune.roundTo(0).addSeparators()
+        } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
+
+        list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+
         add(Renderable.horizontalContainer(list))
 
         if (ffReduction > 0) {
@@ -191,13 +191,12 @@ object FarmingFortuneDisplay {
         }
 
         if (wrongTabCrop && !config.hideMissingFortuneWarnings) {
-            var text = ""
-            if (config.compactFormat) {
-                text = "§cInaccurate!"
-            } else {
-                text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
-                if (farmingFortune != -1.0) text += " latest"
-                text += " fortune!"
+            val latest = if (farmingFortune != -1.0) " latest" else ""
+            val text = when {
+                config.compactFormat -> "§cInaccurate!"
+                else -> {
+                    "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!"
+                }
             }
             add(Renderable.string(text))
         }
