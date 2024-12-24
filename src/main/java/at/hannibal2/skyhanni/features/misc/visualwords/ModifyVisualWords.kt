@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.minutes
 object ModifyVisualWords {
 
     private val config get() = SkyHanniMod.feature.gui.modifyWords
-    private var textCache = TimeLimitedCache<String, String>(5.minutes)
+    private val textCache = TimeLimitedCache<String, String>(5.minutes)
 
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWord>()
