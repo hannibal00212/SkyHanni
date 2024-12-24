@@ -30,7 +30,7 @@ object ReplaceRomanNumerals {
     private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
-    private val patternGroup = RepoPattern.group("replace-roman-numerals")
+    private val patternGroup = RepoPattern.group("replace.roman.numerals")
 
     @Suppress("MaxLineLength")
     private val allowedPatterns by patternGroup.list(
