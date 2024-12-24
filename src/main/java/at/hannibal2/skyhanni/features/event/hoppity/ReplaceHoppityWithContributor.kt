@@ -21,7 +21,7 @@ object ReplaceHoppityWithContributor {
 
     private val config get() = ChocolateFactoryAPI.config
 
-    private var replaceMap = mutableMapOf<String, String>()
+    private val replaceMap = mutableMapOf<String, String>()
 
     @HandleEvent(priority = 5)
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
