@@ -36,13 +36,27 @@ public class GardenUptimeConfig {
     public boolean includePests = true;
 
     @Expose
-    @ConfigOption(name = "AFK Timeout", desc = "Stop tracking player uptime after this amount of time afk")
+    @ConfigOption(name = "Tracker Timeout", desc = "Set duration before timer pauses when not farming")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 60,
         minStep = 1
     )
-    public double afkTimeout = 15;
+    public double timeout = 10;
+
+    @Expose
+    @ConfigOption(name = "Movement Timeout", desc = "Custom timeout duration if player moves but isn't farming")
+    @ConfigEditorBoolean
+    public boolean movementTimeout = true;
+
+    @Expose
+    @ConfigOption(name = "Movement Timeout", desc = "Set duration before timer pauses when player is moving but not farming")
+    @ConfigEditorSlider(
+        minValue = 5,
+        maxValue = 60,
+        minStep = 1
+    )
+    public double movementTimeoutDuration = 20;
 
     @Expose
     @ConfigOption(

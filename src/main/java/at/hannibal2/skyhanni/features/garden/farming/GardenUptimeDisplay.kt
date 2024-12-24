@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -15,6 +16,8 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
@@ -76,30 +80,24 @@ object GardenUptimeDisplay {
             }
         }
 
+        secondsLastMove++
         secondsAFK++
-        ChatUtils.debug("Seconds afk: $secondsAFK")
-        if (secondsAFK >= config.afkTimeout) {
-            isAFK = true
-            tracker.modify {
-                when (activityType) {
-                    ActivityType.VISITOR -> it.visitorTime -= secondsAFK
-                    ActivityType.PEST -> it.pestTime -= secondsAFK
-                    ActivityType.CROP_BREAK -> it.cropBreakTime -= secondsAFK
-                    null -> {}
-                }
-            }
-            secondsAFK = 0
+
+        if (checkAFKTimeout()) {
+            markAFK()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandChange(event: IslandChangeEvent) {
-        tracker.update()
+        if (!config.showDisplay) return
+        if (event.oldIsland.isAnyOf(IslandType.GARDEN)) markAFK()
+        if (event.newIsland.isAnyOf(IslandType.GARDEN)) tracker.update()
     }
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK || !GardenAPI.inGarden()) return
+        if (event.clickType != ClickType.LEFT_CLICK || !isEnabled()) return
         activityType = ActivityType.CROP_BREAK
         tracker.modify { it.blocksBroken++ }
         resetAFK()
@@ -107,24 +105,28 @@ object GardenUptimeDisplay {
 
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
         activityType = ActivityType.PEST
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorOpen(event: VisitorOpenEvent) {
+        if (!isEnabled()) return
         activityType = ActivityType.VISITOR
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorAccepted(event: VisitorAcceptedEvent) {
+        if (!isEnabled()) return
         activityType = ActivityType.VISITOR
         resetAFK()
     }
 
     @HandleEvent
     fun onVistorRefused(event: VisitorRefusedEvent) {
+        if (!isEnabled()) return
         tracker.modify { it.visitorTime += secondsAFK }
         activityType = ActivityType.VISITOR
         resetAFK()
@@ -136,10 +138,17 @@ object GardenUptimeDisplay {
         tracker.renderDisplay(config.pos)
     }
 
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayer>) {
+        if (!isEnabled()) return
+            secondsLastMove = 0
+    }
+
     var storage = GardenAPI.storage
 
     var isAFK = false
     var secondsAFK = 0
+    var secondsLastMove = 0
     var activityType: ActivityType? = null
 
     private fun drawDisplay(data: Data) = buildList<Searchable> {
@@ -155,12 +164,28 @@ object GardenUptimeDisplay {
         var bps = 0.0
         if (uptime > 0) bps = data.blocksBroken.toDouble() / uptime
         if (bps > 0) {
-            lineMap[FarmingUptimeDisplayText.BPS] = Renderable.string("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
+            lineMap[FarmingUptimeDisplayText.BPS] =
+                Renderable.string("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
         }
 
-        lineMap[FarmingUptimeDisplayText.BLOCKS_BROKEN] = Renderable.string("§7Blocks Broken: §e${data.blocksBroken}").toSearchable()
+        lineMap[FarmingUptimeDisplayText.BLOCKS_BROKEN] =
+            Renderable.string("§7Blocks Broken: §e${data.blocksBroken.addSeparators()}").toSearchable()
 
         return formatDisplay(lineMap)
+    }
+
+    private fun markAFK() {
+        isAFK = true
+        tracker.modify {
+            when (activityType) {
+                ActivityType.VISITOR -> it.visitorTime -= secondsAFK
+                ActivityType.PEST -> it.pestTime -= secondsAFK
+                ActivityType.CROP_BREAK -> it.cropBreakTime -= secondsAFK
+                null -> {}
+            }
+        }
+        secondsAFK = 0
+        secondsLastMove = 0
     }
 
     private fun formatDisplay(lineMap: MutableMap<FarmingUptimeDisplayText, Searchable>): List<Searchable> {
@@ -172,6 +197,16 @@ object GardenUptimeDisplay {
     private fun resetAFK() {
         isAFK = false
         secondsAFK = 0
+    }
+
+    private fun checkAFKTimeout(): Boolean {
+        if (secondsAFK < config.timeout) return false
+        if (config.movementTimeout) {
+            if (secondsLastMove < config.movementTimeoutDuration) {
+                return false
+            }
+        }
+        return true
     }
 
     private fun getDayString(date: LocalDate): String {
