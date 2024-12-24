@@ -64,7 +64,7 @@ class ItemResolutionQuery {
             if (isPet) {
                 val matcher: Matcher = petPattern.matcher(itemName)
                 if (matcher.matches()) {
-                    itemName = itemName.replace(matcher.group(1), "")
+                    itemName = itemName.replace(matcher.group(1), "").replace("✦", "").trim()
                     petRarity = matcher.group(2)
                 }
             }
