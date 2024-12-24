@@ -28,6 +28,8 @@ import com.google.gson.annotations.Expose
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalDate
+import java.time.temporal.WeekFields
+import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -211,11 +213,14 @@ object GardenUptimeDisplay {
     }
 
     private fun getDayString(date: LocalDate): String {
-        return "${date.dayOfMonth}.${date.monthValue}.${date.year}"
+        return ".${date.year}.${date.monthValue}.${date.dayOfMonth}"
     }
 
     private fun getWeekString(date: LocalDate): String {
-        return "${date.dayOfYear / 7}.${date.year}"
+        val weekFields = WeekFields.of(Locale.getDefault())
+        val weekOfYear = date.get(weekFields.weekOfWeekBasedYear())
+        val year = date.get(weekFields.weekBasedYear())
+        return "$year.$weekOfYear"
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.showDisplay
