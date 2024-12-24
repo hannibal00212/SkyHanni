@@ -25,7 +25,7 @@ public class FarmingFortuneConfig {
     public boolean compactFormat = false;
 
     @Expose
-    @ConfigOption(name = "Hide Missing Fortune Warnings", desc = "Hide missing fortune warnings from the display")
+    @ConfigOption(name = "Hide Missing Fortune Warnings", desc = "Hide missing fortune warnings from the display.")
     @ConfigEditorBoolean
     public boolean hideMissingFortuneWarnings = false;
 
