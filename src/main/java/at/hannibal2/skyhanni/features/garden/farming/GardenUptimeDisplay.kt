@@ -32,12 +32,13 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeDisplay {
-    private val config = GardenAPI.config.gardenUptime
+    private val config get() = GardenAPI.config.gardenUptime
     private val tracker = SkyHanniTracker<Data>(
         "Garden Uptime Tracker",
         { Data() },
         { it.garden.gardenUptimeStorage.tracker },
-        DisplayMode.WEEK to { it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data) },
+        DisplayMode.WEEK to {
+            it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data) },
         DisplayMode.DAY to {
             it.garden.gardenUptimeStorage.day.getOrPut(getDayString(LocalDate.now()), ::Data)
         }
@@ -201,7 +202,7 @@ object GardenUptimeDisplay {
     private fun checkAFKTimeout(): Boolean {
         if (secondsAFK < config.timeout) return false
         if (config.movementTimeout) {
-            if (secondsLastMove < config.movementTimeoutDuration) {
+            if (secondsLastMove < config.timeout && secondsAFK < config.movementTimeoutDuration) {
                 return false
             }
         }
