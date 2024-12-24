@@ -174,16 +174,20 @@ object FarmingFortuneDisplay {
         list.add(
             Renderable.string(
                 (if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: ") + (if (ffReduction > 0) "§c" else "§e") +
-                        if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                    farmingFortune.roundTo(0).addSeparators()
-                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
+                    if (!recentlySwitchedTool && farmingFortune != -1.0) {
+                        farmingFortune.roundTo(0).addSeparators()
+                    } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
             ),
         )
         add(Renderable.horizontalContainer(list))
 
         if (ffReduction > 0) {
-            add(Renderable.string(if (config.compactFormat) "§cPests: §7-§e$ffReduction%"
-            else "§cPests are reducing your fortune by §e$ffReduction%§c!"))
+            add(
+                Renderable.string(
+                    if (config.compactFormat) "§cPests: §7-§e$ffReduction%"
+                    else "§cPests are reducing your fortune by §e$ffReduction%§c!"
+                )
+            )
         }
 
         if (wrongTabCrop && !config.hideMissingFortuneWarnings) {
