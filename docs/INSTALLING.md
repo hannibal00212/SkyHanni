@@ -30,8 +30,8 @@ Double-click the file to install it.
 
 Forge is the system that loads your mods into the game.
 You need Java to run Forge.
-Download [Forge for 1.8.9](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.8.9.html).
-Click installer, when you double-click the file, install as client.
+Download [Forge for 1.8.9](https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar).
+When you double-click the file, install as client.
 If Forge does not open with Java, download [Jarfix](https://johann.loefflmann.net/en/software/jarfix/index.html),
 double click it, then try running Forge again.
 
@@ -43,7 +43,7 @@ double click it, then try running Forge again.
 
 Neu is NotEnoughUpdates, another Forge mod that contains files that SkyHanni depends on to function.
 You can install it from [Moulberry's Bush Discord Server](https://discord.gg/moulberry) in the
-channel [#🧪neu-alphas](https://discord.com/channels/516977525906341928/1028896920346841118) or
+channel [#🚀neu-download](https://discord.com/channels/516977525906341928/693586404256645231) or
 from [SkyHanni Discord](https://discord.com/invite/skyhanni-997079228510117908) in the
 channel [#neu-updates](https://discord.com/channels/997079228510117908/1123201092193366027)
 
@@ -70,8 +70,9 @@ has new features earlier, but also may contain more bugs.
 <summary>6. Find .minecraft</summary>
 
 Once you have downloaded both NEU and SkyHanni, you need to navigate to your `.minecraft` folder.
-On Windows, open file explorer, in the file location bar at the top type in `%appdata%` and open `.minecraft`.
-On Mac, go to `~/Library/Application Support/minecraft`.
+- On Windows, open file explorer, in the file location bar at the top type in `%appdata%` and open `.minecraft`.
+- On Mac, open finder, click on "Go" at the top of your screen and then "Go to Folder" and type in `~/Library/Application Support/Minecraft`.
+- On Linux, `.minecraft` is located in your home folder. `~/.minecraft`
 
 </details>
 
@@ -101,10 +102,9 @@ To allocate ram, go to installation, press the 3 dots next to the installation y
 click edit, press more options.
 In JVM arguments, look for something that says -Xmx2G or some other number followed by G.
 That number is the amount you have allocated for Minecraft to use.
-If you have 2G of ram on your computer, you might struggle to play Minecraft.
-Try to allocate 1G. If you have 4G, allocate 2G. If you
-have 8 or more G, allocate 4G.
-You should never need more than 4G, unless you have more mods, than you know what to do.
+If you have 4GB, allocate 2GB. If you
+have 8 or more GB, allocate 4GB.
+You should never need more than 4GB, unless you have more mods, than you know what to do.
 
 </details>
 
