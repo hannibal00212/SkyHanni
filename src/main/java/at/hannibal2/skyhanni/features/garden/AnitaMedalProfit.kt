@@ -78,10 +78,7 @@ object AnitaMedalProfit {
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
-        if (itemName == " ") return
-        if (itemName == "§cClose") return
-        if (itemName == "§eUnique Gold Medals") return
-        if (itemName == "§aMedal Trades") return
+        if (isInvalidItemName(itemName)) return
 
         val requiredItems = getRequiredItems(item)
         val additionalMaterials = getAdditionalMaterials(requiredItems)
@@ -116,11 +113,7 @@ object AnitaMedalProfit {
 
             // TODO add more exact material cost breakdown
             add("§7Additional cost: §6${additionalCost.shortFormat()}")
-
-            for ((internalName, amount) in additionalMaterials) {
-                val pricePer = internalName.getPrice() * amount
-                add(" " + internalName.itemName + " §8${amount}x §7(§6${pricePer.shortFormat()}§7)")
-            }
+            addAdditionalMaterials(additionalMaterials)
 
             add("§7Profit per sell: §6$profitPerSellFormat")
             add("")
@@ -137,6 +130,23 @@ object AnitaMedalProfit {
                 highlightsOnHoverSlots = listOf(slot),
             ),
         )
+    }
+
+    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NEUInternalName, Int>) {
+        for ((internalName, amount) in additionalMaterials) {
+            val pricePer = internalName.getPrice() * amount
+            add(" " + internalName.itemName + " §8${amount}x §7(§6${pricePer.shortFormat()}§7)")
+        }
+    }
+
+    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
+        " ",
+        "§cClose",
+        "§eUnique Gold Medals",
+        "§aMedal Trades",
+        -> true
+
+        else -> false
     }
 
     private fun getItemName(item: ItemStack): String {
