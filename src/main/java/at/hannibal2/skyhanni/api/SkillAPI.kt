@@ -414,7 +414,7 @@ object SkillAPI {
                     val (overflowLevel, current, needed, _) = calculateSkillLevel(xp, 60)
                     ChatUtils.chat(
                         "With §b${xp.addSeparators()} §eXP you would be level §b$overflowLevel " +
-                                "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP",
+                            "§ewith progress (§b${current.addSeparators()}§e/§b${needed.addSeparators()}§e) XP",
                     )
                     return
                 }
