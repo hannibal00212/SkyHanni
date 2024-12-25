@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,6 +90,11 @@ public class ChocolateFactoryConfig {
     @ConfigOption(name = "Show Stack Sizes", desc = "Show additional info as many items in the chocolate menu as the stack size.")
     @ConfigEditorBoolean
     public boolean showStackSizes = true;
+
+    @Expose
+    @ConfigOption(name = "Contributor Rabbit Name", desc = "Replaces the rabbit names in the rabbit collection menu with SkyHanni contributor names.")
+    @ConfigEditorBoolean
+    public boolean contributorRabbitName = false;
 
     @Expose
     @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.\n" +
@@ -211,15 +217,6 @@ public class ChocolateFactoryConfig {
     public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
 
     @Expose
-    @ConfigOption(
-        name = "Hitman Slot Rabbit",
-        desc = "Show the last rabbit found in hitman slots that are on cooldown."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hitmanSlotInfo = false;
-
-    @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -228,4 +225,13 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hitmanCosts")
     public Position hitmanCostsPosition = new Position(300, 300, false, true);
+
+    @Expose
+    @ConfigOption(
+        name = "§6CF §zParty Mode",
+        desc = "Don't turn this on."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public Property<Boolean> partyMode = Property.of(false);
 }
