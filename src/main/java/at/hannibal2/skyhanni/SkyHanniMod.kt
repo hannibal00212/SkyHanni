@@ -112,7 +112,7 @@ class SkyHanniMod {
         private val forgeModVersion
             get() = run {
                 val a = Loader.instance().indexedModList[MODID]!!.version
-                println("Forge mod version: $a")
+                println("Forge mod version 2: $a")
                 a
             }
 
@@ -120,7 +120,11 @@ class SkyHanniMod {
 
         @JvmStatic
         val version: String
-            get() = modVersion.asString
+            get() = run {
+                val a = Loader.instance().indexedModList[MODID]!!.version
+                println("Forge mod version 2: $a")
+                a
+            }
 
         val isBetaVersion: Boolean
             get() = modVersion.isBeta
