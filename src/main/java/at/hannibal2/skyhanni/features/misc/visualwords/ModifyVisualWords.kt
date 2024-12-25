@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.features.misc.visualwords
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -15,9 +17,10 @@ import kotlin.time.Duration.Companion.minutes
 object ModifyVisualWords {
 
     private val config get() = SkyHanniMod.feature.gui.modifyWords
-    var textCache = TimeLimitedCache<String, String>(5.minutes)
+    private val textCache = TimeLimitedCache<String, String>(5.minutes)
 
-    var modifiedWords = mutableListOf<VisualWord>()
+    // Replacements the user added manually via /shwords
+    var userModifiedWords = mutableListOf<VisualWord>()
 
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
@@ -25,23 +28,29 @@ object ModifyVisualWords {
         if (!config.enabled) return originalText
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
 
-        if (modifiedWords.isEmpty()) {
-            modifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
+        if (userModifiedWords.isEmpty()) {
+            userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)
+            update()
         }
 
         return textCache.getOrPut(originalText) {
             if (originalText.startsWith("§§")) {
                 modifiedText = modifiedText.removePrefix("§§")
             } else {
-                for (modifiedWord in modifiedWords) {
+                for (modifiedWord in finalWordsList) {
                     if (!modifiedWord.enabled) continue
                     val phrase = modifiedWord.phrase.convertToFormatted()
 
                     if (phrase.isEmpty()) continue
 
+                    val original = modifiedText
+                    val replacement = modifiedWord.replacement.convertToFormatted()
                     modifiedText = modifiedText.replace(
-                        phrase, modifiedWord.replacement.convertToFormatted(), modifiedWord.isCaseSensitive()
+                        phrase, replacement, modifiedWord.isCaseSensitive(),
                     )
+                    if (debug && original != modifiedText) {
+                        println("Visual words Change debug: '$original' -> `$modifiedText` (`$phrase` -> `$replacement`)")
+                    }
                 }
             }
 

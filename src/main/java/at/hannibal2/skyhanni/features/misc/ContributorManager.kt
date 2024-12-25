@@ -16,11 +16,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object ContributorManager {
     private val config get() = SkyHanniMod.feature.dev
 
+    // Key is the lowercase contributor name
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
+
+    // Just the names of the contributors including their proper case
+    var contributorNames = emptyList<String>()
+        private set
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
+        val map = event.getConstant<ContributorsJson>("Contributors").contributors
+        contributors = map.mapKeys { it.key.lowercase() }
+        contributorNames = map.map { it.key }
     }
 
     @HandleEvent
