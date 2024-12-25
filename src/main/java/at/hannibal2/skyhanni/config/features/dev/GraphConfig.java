@@ -98,7 +98,7 @@ public class GraphConfig {
     public int dissolveKey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Edge Cycle", desc = "Cycles the direction of the edge.")
+    @ConfigOption(name = "Edge Cycle", desc = "Cycles the direction of the edge that is between the active and the closed node. (Used to make one-directional ways)")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_H)
     public int edgeCycle = Keyboard.KEY_H;
 

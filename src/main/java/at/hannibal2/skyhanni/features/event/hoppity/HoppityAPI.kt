@@ -202,7 +202,6 @@ object HoppityAPI {
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
 
-
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
         stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
