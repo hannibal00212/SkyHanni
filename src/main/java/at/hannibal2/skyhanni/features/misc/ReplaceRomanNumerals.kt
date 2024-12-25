@@ -34,7 +34,7 @@ object ReplaceRomanNumerals {
 
     @Suppress("MaxLineLength")
     private val allowedPatterns by patternGroup.list(
-        "allowed-patterns",
+        "allowed.patterns",
         "§o§a(?:Combat|Farming|Fishing|Mining|Foraging|Enchanting|Alchemy|Carpentry|Runecrafting|Taming|Social|)( Level)? (?<roman>[IVXLCDM]+)§r",
         "(?:§5§o)?§7Progress to (?:Collection|Level|Tier|Floor|Milestone|Chocolate Factory) (?<roman>[IVXLCDM]+): §.(?:.*)%",
         "§5§o  §e(?:\\w+) (?<roman>[IVXLCDM]+)",
