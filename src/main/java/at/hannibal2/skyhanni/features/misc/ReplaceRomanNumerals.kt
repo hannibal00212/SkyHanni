@@ -46,7 +46,7 @@ object ReplaceRomanNumerals {
         "§o§a✔ §.* (?<roman>[IVXLCDM]+)§r",
         "§5§o§7Purchase §a.* (?<roman>[IVXLCDM]+) §7.*",
         "§5§o(?:§7)§.(?<roman>[IVXLCDM]+).*",
-        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*"
+        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*",
     )
 
     /**
@@ -104,9 +104,12 @@ object ReplaceRomanNumerals {
         }
     }
 
-    private fun String.replace() = splitRegex.findAll(this).map { it.value }.joinToString("") {
-        it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it
-    }
+    private fun String.replace() = splitRegex
+        .findAll(this)
+        .map { it.value }
+        .joinToString("") { part ->
+            part.takeIf { it.isValidRomanNumeral() }?.coloredRomanToDecimal() ?: part
+        }
 
     private fun String.removeFormatting() = removeColor().replace(",", "")
 
