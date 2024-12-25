@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -723,20 +722,20 @@ object EstimatedItemValueCalculator {
 
     // TODO repo
     private val hasAlwaysScavenger = listOf(
-        "CRYPT_DREADLORD_SWORD",
-        "ZOMBIE_SOLDIER_CUTLASS",
-        "CONJURING_SWORD",
-        "EARTH_SHARD",
-        "ZOMBIE_KNIGHT_SWORD",
-        "SILENT_DEATH",
-        "ZOMBIE_COMMANDER_WHIP",
-        "ICE_SPRAY_WAND",
-    ).toInternalNames()
+        "CRYPT_DREADLORD_SWORD".toInternalName(),
+        "ZOMBIE_SOLDIER_CUTLASS".toInternalName(),
+        "CONJURING_SWORD".toInternalName(),
+        "EARTH_SHARD".toInternalName(),
+        "ZOMBIE_KNIGHT_SWORD".toInternalName(),
+        "SILENT_DEATH".toInternalName(),
+        "ZOMBIE_COMMANDER_WHIP".toInternalName(),
+        "ICE_SPRAY_WAND".toInternalName(),
+    )
 
     private val hasAlwaysReplenish = listOf(
-        "ADVANCED_GARDENING_HOE",
-        "ADVANCED_GARDENING_AXE",
-    ).toInternalNames()
+        "ADVANCED_GARDENING_HOE".toInternalName(),
+        "ADVANCED_GARDENING_AXE".toInternalName()
+    )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
