@@ -206,7 +206,13 @@ object CustomScoreboard {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) updateIslandEntries()
+        if (event.newIsland != IslandType.NONE) {
+            updateIslandEntries()
+
+            runDelayed(3.seconds) {
+                updateIslandEntries()
+            }
+        }
     }
 
     private fun updateIslandEntries() {

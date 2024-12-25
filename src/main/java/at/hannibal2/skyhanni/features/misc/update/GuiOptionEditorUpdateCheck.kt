@@ -13,7 +13,7 @@ import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    val button = GuiElementButton("", -1) { }
+    val button = GuiElementButton("", -1) {}
 
     override fun render(x: Int, y: Int, width: Int) {
         val fr = Minecraft.getMinecraft().fontRendererObj
@@ -55,7 +55,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             10F,
             true,
             widthRemaining / 2,
-            -1
+            -1,
         )
 
         GlStateManager.popMatrix()

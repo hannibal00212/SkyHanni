@@ -23,6 +23,9 @@ class NEUInternalName private constructor(private val internalName: String) {
             internalNameMap.getOrPut(it) { NEUInternalName(it) }
         }
 
+        fun Set<String>.toInternalNames(): Set<NEUInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
+        fun List<String>.toInternalNames(): List<NEUInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
+
         private val itemNameCache = mutableMapOf<String, NEUInternalName?>()
 
         fun fromItemNameOrNull(itemName: String): NEUInternalName? = itemNameCache.getOrPut(itemName) {

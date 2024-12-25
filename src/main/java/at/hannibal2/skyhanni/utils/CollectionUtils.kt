@@ -312,14 +312,14 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
+    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+        addItemStack(internalName.getItemStack())
+    }
+
     fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
         generateSequence(start) { it + 1 }.map {
             (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
         }.takeWhile { it <= end }
-
-    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
-        addItemStack(internalName.getItemStack())
-    }
 
     // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
@@ -488,5 +488,9 @@ object CollectionUtils {
      */
     fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
         if (index < size) add(index, element) else add(element)
+    }
+
+    fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
+        this[pair.first] = pair.second
     }
 }

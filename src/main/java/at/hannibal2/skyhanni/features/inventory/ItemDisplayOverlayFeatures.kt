@@ -78,10 +78,11 @@ object ItemDisplayOverlayFeatures {
     /**
      * REGEX-TEST: §7Vacuum Bag: §21 Pest
      * REGEX-TEST: §7Vacuum Bag: §2444 Pests
+     * REGEX-TEST: §7Vacuum Bag: §21,652 Pests
      */
     private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
-        "§7Vacuum Bag: §2(?<amount>\\d*) Pests?",
+        "§7Vacuum Bag: §2(?<amount>[\\d.,]*) Pests?",
     )
     private val harvestPattern by patternGroup.pattern(
         "harvest",

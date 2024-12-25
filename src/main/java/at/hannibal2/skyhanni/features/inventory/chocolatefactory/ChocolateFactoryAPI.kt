@@ -265,4 +265,8 @@ object ChocolateFactoryAPI {
     fun isMax(): Boolean = profileStorage?.let {
         it.maxChocolate == it.currentChocolate
     } ?: false
+
+    fun String.partyModeReplace(): String =
+        if (config.partyMode.get() && inChocolateFactory) replace(Regex("§[a-fA-F0-9]"), "§z")
+        else this
 }
