@@ -71,7 +71,7 @@ object AnitaMedalProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eProfit per Medal"))
+        newList.add(Renderable.string("§eProfit per Bronze Medal"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
