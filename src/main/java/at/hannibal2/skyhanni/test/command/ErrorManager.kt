@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -129,7 +128,7 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
-        if (betaOnly && !LorenzUtils.isBetaVersion()) return
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
