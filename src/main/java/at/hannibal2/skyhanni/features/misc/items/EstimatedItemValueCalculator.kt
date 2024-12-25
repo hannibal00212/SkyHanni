@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -777,10 +776,9 @@ object EstimatedItemValueCalculator {
             if (rawName in tieredEnchants) level = 1
 
             val enchantmentName = "$rawName;$level".uppercase().toInternalName()
-            val itemStack = enchantmentName.getItemStackOrNull() ?: continue
             val singlePrice = enchantmentName.getPriceOrNull(config.priceSource.get()) ?: continue
 
-            var name = itemStack.getLore()[0]
+            var name = enchantmentName.itemName
             // TODO find a way to use this here "".toInternalName().getPriceName(multiplier)
             if (multiplier > 1) {
                 name = "§8${multiplier}x $name"
