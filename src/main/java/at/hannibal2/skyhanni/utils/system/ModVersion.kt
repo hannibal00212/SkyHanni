@@ -4,6 +4,8 @@ data class ModVersion(val major: Int, val minor: Int, val patch: Int) {
 
     companion object {
         fun fromString(version: String): ModVersion {
+            println("Attempting to get mod version from string: $version")
+
             val parts = version.split('.')
             return ModVersion(
                 parts.getOrNull(0)?.toIntOrNull() ?: 0,
@@ -13,7 +15,7 @@ data class ModVersion(val major: Int, val minor: Int, val patch: Int) {
         }
     }
 
-    val isBeta = patch == 0
+    val isBeta = patch != 0
 
     val asString: String
         get() = toString()
