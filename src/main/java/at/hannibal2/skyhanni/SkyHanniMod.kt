@@ -110,7 +110,11 @@ class SkyHanniMod {
         const val MODID = "skyhanni"
 
         private val forgeModVersion
-            get() = Loader.instance().indexedModList[MODID]!!.version
+            get() = run {
+                val a = Loader.instance().indexedModList[MODID]!!.version
+                println("Forge mod version: $a")
+                a
+            }
 
         private val modVersion = ModVersion.fromString(forgeModVersion)
 
