@@ -19,7 +19,7 @@ allprojects {
      * The version of the project.
      * Major version
      * Minor version
-     * Patch version
+     * Beta version
      */
     version = "1.0.0"
 

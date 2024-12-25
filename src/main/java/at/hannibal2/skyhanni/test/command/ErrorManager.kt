@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -205,10 +205,10 @@ object ErrorManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<RepoErrorJson>("ChangedChatErrors")
-        val version = SkyHanniMod.version
+        val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
+        val version = SkyHanniMod.modVersion
 
-        repoErrors = data.changedErrorMessages.filter { version in it.affectedVersions }
+        repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }
 
     private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {

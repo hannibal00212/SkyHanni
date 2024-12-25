@@ -109,7 +109,7 @@ class SkyHanniMod {
 
         const val MODID = "skyhanni"
 
-        private val modVersion: ModVersion by lazy {
+        val modVersion: ModVersion by lazy {
             ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
         }
 

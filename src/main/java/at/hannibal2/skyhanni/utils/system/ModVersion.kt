@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.system
 
-data class ModVersion(val major: Int, val minor: Int, val patch: Int) {
+data class ModVersion(val major: Int, val minor: Int, val beta: Int) {
 
     companion object {
         fun fromString(version: String): ModVersion {
@@ -14,20 +14,20 @@ data class ModVersion(val major: Int, val minor: Int, val patch: Int) {
         }
     }
 
-    val isBeta = patch != 0
+    val isBeta = beta != 0
 
     val asString: String
         get() = toString()
 
     override fun toString(): String {
-        return "$major.$minor.$patch"
+        return "$major.$minor.$beta"
     }
 
     operator fun compareTo(other: ModVersion): Int {
         return when {
             major != other.major -> major.compareTo(other.major)
             minor != other.minor -> minor.compareTo(other.minor)
-            else -> patch.compareTo(other.patch)
+            else -> beta.compareTo(other.beta)
         }
     }
 }
