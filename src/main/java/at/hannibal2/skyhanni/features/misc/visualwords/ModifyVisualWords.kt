@@ -22,6 +22,32 @@ object ModifyVisualWords {
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWord>()
 
+    // Replacements the mod added automatically for some features, april jokes, etc
+    var modModifiedWords = mutableListOf<VisualWord>()
+    private var finalWordsList = listOf<VisualWord>()
+    private var debug = false
+
+    fun update() {
+        finalWordsList = modModifiedWords + userModifiedWords
+        textCache.clear()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shdebugvisualwords") {
+            description = "Prints in the console all replaced words by /shwords"
+            callback { toggleDebug() }
+        }
+    }
+
+    private fun toggleDebug() {
+        debug = !debug
+        ChatUtils.chat("Visual Words debug ${if (debug) "enabled" else "disabled"}")
+        if (debug) {
+            update()
+        }
+    }
+
     fun modifyText(originalText: String?): String? {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
