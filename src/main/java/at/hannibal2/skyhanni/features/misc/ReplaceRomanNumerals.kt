@@ -96,8 +96,8 @@ object ReplaceRomanNumerals {
         if (allowedPatterns.matches(this)) replace() else this
     }
 
-    fun replaceLine(line: String): String {
-        if (!isEnabled()) return line
+    fun replaceLine(line: String, checkIfEnabled: Boolean = true): String {
+        if (checkIfEnabled && !isEnabled()) return line
 
         return cachedStrings.getOrPut(line) {
             line.replace()

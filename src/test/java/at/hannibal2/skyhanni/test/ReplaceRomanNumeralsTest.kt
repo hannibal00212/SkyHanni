@@ -54,5 +54,5 @@ class ReplaceRomanNumeralsTest {
         Assertions.assertEquals("Today 2023 was great!", "Today MMXXIII was great!".transformLine())
     }
 
-    private fun String.transformLine(): String = ReplaceRomanNumerals.replaceRomanNumerals(this)
+    private fun String.transformLine(): String = ReplaceRomanNumerals.replaceLine(this, checkIfEnabled = false)
 }
