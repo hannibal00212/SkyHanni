@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object HoppityCollectionData {
-    private val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
+    val rabbitRarities = mutableMapOf<String, RabbitCollectionRarity>()
     private val rarityBonuses = mutableMapOf<RabbitCollectionRarity, ChocolateBonuses>()
     private val specialBonuses = mutableMapOf<String, ChocolateBonuses>()
 
