@@ -109,8 +109,9 @@ class SkyHanniMod {
 
         const val MODID = "skyhanni"
 
-        private val modVersion
-            get() = ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
+        private val modVersion: ModVersion by lazy {
+            ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
+        }
 
         @JvmStatic
         val version: String
