@@ -55,4 +55,10 @@ public class RiftConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean horsezookaHider = false;
+
+    @Expose
+    @ConfigOption(name = "Ubik's cube reminder", desc = "Reminder for Ubik's cube in the rift")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ubikReminder = true;
 }
