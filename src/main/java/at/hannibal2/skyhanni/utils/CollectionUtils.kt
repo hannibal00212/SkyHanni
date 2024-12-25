@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -10,6 +11,7 @@ import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.Queue
 import java.util.WeakHashMap
+import java.util.regex.Pattern
 import kotlin.math.ceil
 
 object CollectionUtils {
@@ -488,5 +490,21 @@ object CollectionUtils {
      */
     fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
         if (index < size) add(index, element) else add(element)
+    }
+
+    /**
+     * Insert content after a line that matches the given pattern.
+     *
+     * @param pattern the pattern to match
+     * @param content the content to insert
+     */
+    fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
+        val iter = this.listIterator()
+        while (iter.hasNext()) {
+            val line = iter.next().removeColor()
+            if (pattern.matcher(line).find()) {
+                iter.add(content)
+            }
+        }
     }
 }
