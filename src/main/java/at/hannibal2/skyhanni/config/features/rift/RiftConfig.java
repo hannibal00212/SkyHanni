@@ -60,5 +60,5 @@ public class RiftConfig {
     @ConfigOption(name = "Ubik's cube reminder", desc = "Reminder for Ubik's cube in the rift")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean ubikReminder = true;
+    public boolean ubikReminder = false;
 }
