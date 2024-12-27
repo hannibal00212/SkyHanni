@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,9 +9,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object Ubikreminder {
-    private val config get() = SkyHanniMod.feature.rift.ubikReminder
-    class UbikReminderConfig {
-        var enabled: Boolean = true
+
+    var enabled: Boolean = true
     private var isTimerRunning = false
     private val messageRegex = Regex("ROUND [1-8] \\(FINAL\\):")
 
@@ -32,4 +30,4 @@ object Ubikreminder {
             isTimerRunning = false
         }
     }
-}}
+}
