@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
 object Ubikreminder {
@@ -28,7 +28,7 @@ object Ubikreminder {
     private fun startTimer() {
         isTimerRunning = true
 
-        DelayedRun.runDelayed(2.seconds) { // 2 hours as a Duration
+        DelayedRun.runDelayed(2.hours) { // 2 hours as a Duration
             ChatUtils.chat("§aUbik's cube is ready in the rift!")
             isTimerRunning = false
 
