@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object SkyHanniMod {
+object Ubikreminder {
     private val config get() = SkyHanniMod.feature.rift.ubikReminder
     class UbikReminderConfig {
         var enabled: Boolean = true
