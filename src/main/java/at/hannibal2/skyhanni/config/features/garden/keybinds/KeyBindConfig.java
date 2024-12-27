@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.garden;
+package at.hannibal2.skyhanni.config.features.garden.keybinds;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
