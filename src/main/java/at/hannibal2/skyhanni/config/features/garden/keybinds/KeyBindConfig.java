@@ -42,7 +42,7 @@ public class KeyBindConfig {
     @Expose
     @ConfigOption(name = "Profile Selection For Crops", desc = "")
     @Accordion
-    public LayoutSelection layoutSelectionForCrops = new LayoutSelection();
+    public LayoutSelection cropLayoutSelection = new LayoutSelection();
 
     public static class LayoutSelection {
         @Expose
@@ -99,25 +99,25 @@ public class KeyBindConfig {
     @Expose
     @ConfigOption(name = "Layout 1", desc = "")
     @Accordion
-    public KeyBindProfile layout1 = new KeyBindProfile();
+    public KeyBindLayout layout1 = new KeyBindLayout();
 
     @Expose
     @ConfigOption(name = "Layout 2", desc = "")
     @Accordion
-    public KeyBindProfile layout2 = new KeyBindProfile();
+    public KeyBindLayout layout2 = new KeyBindLayout();
 
     @Expose
     @ConfigOption(name = "Layout 3", desc = "")
     @Accordion
-    public KeyBindProfile layout3 = new KeyBindProfile();
+    public KeyBindLayout layout3 = new KeyBindLayout();
 
     @Expose
     @ConfigOption(name = "Layout 4", desc = "")
     @Accordion
-    public KeyBindProfile layout4 = new KeyBindProfile();
+    public KeyBindLayout layout4 = new KeyBindLayout();
 
     @Expose
     @ConfigOption(name = "Layout 5", desc = "")
     @Accordion
-    public KeyBindProfile layout5 = new KeyBindProfile();
+    public KeyBindLayout layout5 = new KeyBindLayout();
 }

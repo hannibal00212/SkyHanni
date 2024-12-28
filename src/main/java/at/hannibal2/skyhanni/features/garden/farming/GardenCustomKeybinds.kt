@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindProfile
+import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindLayout
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,12 +32,27 @@ object GardenCustomKeybinds {
     private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-    private var map: Map<KeyBinding, Int> = emptyMap()
+//     private var map: Map<KeyBinding, Int> = emptyMap()
+
     private var layout1: Map<KeyBinding, Int> = emptyMap()
     private var layout2: Map<KeyBinding, Int> = emptyMap()
     private var layout3: Map<KeyBinding, Int> = emptyMap()
     private var layout4: Map<KeyBinding, Int> = emptyMap()
     private var layout5: Map<KeyBinding, Int> = emptyMap()
+
+    private var layouts: Map<String, Map<KeyBinding, Int>> = mapOf(
+        "Layout 1" to layout1,
+        "Layout 2" to layout2,
+        "Layout 3" to layout3,
+        "Layout 4" to layout4,
+        "Layout 5" to layout5
+    )
+
+    private var cropLayoutSelection: Map<CropType?, String> = emptyMap()
+    private var cropInHand: CropType? = null
+    private var lastCrop: CropType? = null
+    private var lastToolSwitch = SimpleTimeMark.farPast()
+    private var currentLayout: Map<KeyBinding, Int>? = null
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var isDuplicate = false
@@ -43,23 +60,23 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-//         val override = map[keyBinding] ?: return
-//         cir.returnValue = override.isKeyHeld()
+        val override = currentLayout?.get(keyBinding) ?: return
+        cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-//         val override = map[keyBinding] ?: return
-//         cir.returnValue = override.isKeyClicked()
+        val override = currentLayout?.get(keyBinding) ?: return
+        cir.returnValue = override.isKeyClicked()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-//         val screen = Minecraft.getMinecraft().currentScreen ?: return
-//         if (screen !is GuiEditSign) return
-//         lastWindowOpenTime = SimpleTimeMark.now()
+        val screen = Minecraft.getMinecraft().currentScreen ?: return
+        if (screen !is GuiEditSign) return
+        lastWindowOpenTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -73,38 +90,81 @@ object GardenCustomKeybinds {
 //         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
-//     @HandleEvent
-//     fun onConfigLoad(event: ConfigLoadEvent) {
-//         with(config) {
-//             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
-//                 update()
-//             }
-//             update()
-//         }
-//     }
+    @HandleEvent
+    fun onGardenToolChange(event: GardenToolChangeEvent) {
+        lastToolSwitch = SimpleTimeMark.now()
+        cropInHand = event.crop
+        event.crop?.let { lastCrop = it }
+        currentLayout = layouts[cropLayoutSelection[cropInHand]]
+    }
 
-//     private fun update() {
-//         with(config) {
-//             with(mcSettings) {
-//                 map = buildMap {
-//                     fun add(keyBinding: KeyBinding, property: Property<Int>) {
-//                         put(keyBinding, property.get())
-//                     }
-//                     add(keyBindAttack, attack)
-//                     add(keyBindUseItem, useItem)
-//                     add(keyBindLeft, left)
-//                     add(keyBindRight, right)
-//                     add(keyBindForward, forward)
-//                     add(keyBindBack, back)
-//                     add(keyBindJump, jump)
-//                     add(keyBindSneak, sneak)
-//                 }
-//             }
-//         }
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        var allKeybindings = listOf(
+            config.layout1.attack, config.layout1.useItem, config.layout1.left, config.layout1.right,
+            config.layout1.forward, config.layout1.back, config.layout1.jump, config.layout1.sneak,
+            config.layout2.attack, config.layout2.useItem, config.layout2.left, config.layout2.right,
+            config.layout2.forward, config.layout2.back, config.layout2.jump, config.layout2.sneak,
+            config.layout3.attack, config.layout3.useItem, config.layout3.left, config.layout3.right,
+            config.layout3.forward, config.layout3.back, config.layout3.jump, config.layout3.sneak,
+            config.layout4.attack, config.layout4.useItem, config.layout4.left, config.layout4.right,
+            config.layout4.forward, config.layout4.back, config.layout4.jump, config.layout4.sneak,
+            config.layout5.attack, config.layout5.useItem, config.layout5.left, config.layout5.right,
+            config.layout5.forward, config.layout5.back, config.layout5.jump, config.layout5.sneak
+        )
+
+        ConditionalUtils.onToggle(*allKeybindings.toTypedArray()) {
+            update()
+        }
+        update()
+    }
+
+    private fun update() {
+        fun buildKeybindLayoutMap(
+            layout: KeyBindLayout
+        ): Map<KeyBinding, Int> {
+            with(mcSettings) {
+                val keyBindings = listOf(
+                    keyBindAttack, keyBindUseItem, keyBindLeft, keyBindRight,
+                    keyBindForward, keyBindBack, keyBindJump, keyBindSneak
+                )
+
+                return buildMap {
+                    keyBindings.zip(
+                        listOf(
+                            layout.attack, layout.useItem, layout.left, layout.right,
+                            layout.forward, layout.back, layout.jump, layout.sneak
+                        )
+                    ) { keyBinding, setKeyProperty ->
+                        put(keyBinding, setKeyProperty.get())  // Add key-value pair
+                    }
+                }
+            }
+        }
+
+        layout1 = buildKeybindLayoutMap(config.layout1)
+        layout2 = buildKeybindLayoutMap(config.layout2)
+        layout3 = buildKeybindLayoutMap(config.layout3)
+        layout4 = buildKeybindLayoutMap(config.layout4)
+        layout5 = buildKeybindLayoutMap(config.layout5)
+
+        cropLayoutSelection = mapOf(
+            CropType.WHEAT to config.cropLayoutSelection.wheat.toString(),
+            CropType.CARROT to config.cropLayoutSelection.carrot.toString(),
+            CropType.POTATO to config.cropLayoutSelection.potato.toString(),
+            CropType.NETHER_WART to  config.cropLayoutSelection.netherWart.toString(),
+            CropType.PUMPKIN to config.cropLayoutSelection.pumpkin.toString(),
+            CropType.MELON to config.cropLayoutSelection.melon.toString(),
+            CropType.COCOA_BEANS to config.cropLayoutSelection.cocoaBeans.toString(),
+            CropType.SUGAR_CANE to config.cropLayoutSelection.sugarCane.toString(),
+            CropType.CACTUS to config.cropLayoutSelection.cactus.toString(),
+            CropType.MUSHROOM to config.cropLayoutSelection.mushroom.toString(),
+        )
+
 //         calculateDuplicates()
-//         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-//         KeyBinding.unPressAllKeys()
-//     }
+        lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
+        KeyBinding.unPressAllKeys()
+    }
 
 //     private fun calculateDuplicates() {
 //         isDuplicate = map.values
@@ -120,7 +180,7 @@ object GardenCustomKeybinds {
     private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
     @JvmStatic
-    fun disableAll(layout: KeyBindProfile) {
+    fun disableAll(layout: KeyBindLayout) {
         with(layout) {
             attack.set(Keyboard.KEY_NONE)
             useItem.set(Keyboard.KEY_NONE)
@@ -134,7 +194,7 @@ object GardenCustomKeybinds {
     }
 
     @JvmStatic
-    fun defaultAll(layout: KeyBindProfile) {
+    fun defaultAll(layout: KeyBindLayout) {
         with(layout) {
             attack.set(KeyboardManager.LEFT_MOUSE)
             useItem.set(KeyboardManager.RIGHT_MOUSE)

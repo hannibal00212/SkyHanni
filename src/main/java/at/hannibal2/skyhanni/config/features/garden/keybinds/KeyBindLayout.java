@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
-public class KeyBindProfile {
+public class KeyBindLayout {
         @ConfigOption(name = "Disable All", desc = "Disable all keys.")
         @ConfigEditorButton(buttonText = "Disable")
         public Runnable presetDisable = () -> GardenCustomKeybinds.disableAll(this);
