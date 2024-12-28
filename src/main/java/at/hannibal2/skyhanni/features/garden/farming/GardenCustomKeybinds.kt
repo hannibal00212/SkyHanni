@@ -30,6 +30,11 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private var map: Map<KeyBinding, Int> = emptyMap()
+    private var layout1: Map<KeyBinding, Int> = emptyMap()
+    private var layout2: Map<KeyBinding, Int> = emptyMap()
+    private var layout3: Map<KeyBinding, Int> = emptyMap()
+    private var layout4: Map<KeyBinding, Int> = emptyMap()
+    private var layout5: Map<KeyBinding, Int> = emptyMap()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var isDuplicate = false
@@ -37,74 +42,74 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
-        cir.returnValue = override.isKeyHeld()
+//         val override = map[keyBinding] ?: return
+//         cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
-        cir.returnValue = override.isKeyClicked()
+//         val override = map[keyBinding] ?: return
+//         cir.returnValue = override.isKeyClicked()
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        val screen = Minecraft.getMinecraft().currentScreen ?: return
-        if (screen !is GuiEditSign) return
-        lastWindowOpenTime = SimpleTimeMark.now()
+//         val screen = Minecraft.getMinecraft().currentScreen ?: return
+//         if (screen !is GuiEditSign) return
+//         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
-        ChatUtils.chatAndOpenConfig(
-            "Duplicate Custom Keybinds aren't allowed!",
-            GardenAPI.config::keyBind,
-        )
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
+//         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
+//         ChatUtils.chatAndOpenConfig(
+//             "Duplicate Custom Keybinds aren't allowed!",
+//             GardenAPI.config::keyBind,
+//         )
+//         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        with(config) {
-            ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
-                update()
-            }
-            update()
-        }
-    }
+//     @HandleEvent
+//     fun onConfigLoad(event: ConfigLoadEvent) {
+//         with(config) {
+//             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
+//                 update()
+//             }
+//             update()
+//         }
+//     }
 
-    private fun update() {
-        with(config) {
-            with(mcSettings) {
-                map = buildMap {
-                    fun add(keyBinding: KeyBinding, property: Property<Int>) {
-                        put(keyBinding, property.get())
-                    }
-                    add(keyBindAttack, attack)
-                    add(keyBindUseItem, useItem)
-                    add(keyBindLeft, left)
-                    add(keyBindRight, right)
-                    add(keyBindForward, forward)
-                    add(keyBindBack, back)
-                    add(keyBindJump, jump)
-                    add(keyBindSneak, sneak)
-                }
-            }
-        }
-        calculateDuplicates()
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
-        KeyBinding.unPressAllKeys()
-    }
+//     private fun update() {
+//         with(config) {
+//             with(mcSettings) {
+//                 map = buildMap {
+//                     fun add(keyBinding: KeyBinding, property: Property<Int>) {
+//                         put(keyBinding, property.get())
+//                     }
+//                     add(keyBindAttack, attack)
+//                     add(keyBindUseItem, useItem)
+//                     add(keyBindLeft, left)
+//                     add(keyBindRight, right)
+//                     add(keyBindForward, forward)
+//                     add(keyBindBack, back)
+//                     add(keyBindJump, jump)
+//                     add(keyBindSneak, sneak)
+//                 }
+//             }
+//         }
+//         calculateDuplicates()
+//         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
+//         KeyBinding.unPressAllKeys()
+//     }
 
-    private fun calculateDuplicates() {
-        isDuplicate = map.values
-            .filter { it != Keyboard.KEY_NONE }
-            .let { values -> values.size != values.toSet().size }
-    }
+//     private fun calculateDuplicates() {
+//         isDuplicate = map.values
+//             .filter { it != Keyboard.KEY_NONE }
+//             .let { values -> values.size != values.toSet().size }
+//     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
@@ -113,33 +118,33 @@ object GardenCustomKeybinds {
 
     private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
-    @JvmStatic
-    fun disableAll() {
-        with(config) {
-            attack.set(Keyboard.KEY_NONE)
-            useItem.set(Keyboard.KEY_NONE)
-            left.set(Keyboard.KEY_NONE)
-            right.set(Keyboard.KEY_NONE)
-            forward.set(Keyboard.KEY_NONE)
-            back.set(Keyboard.KEY_NONE)
-            jump.set(Keyboard.KEY_NONE)
-            sneak.set(Keyboard.KEY_NONE)
-        }
-    }
+//     @JvmStatic
+//     fun disableAll() {
+//         with(config) {
+//             attack.set(Keyboard.KEY_NONE)
+//             useItem.set(Keyboard.KEY_NONE)
+//             left.set(Keyboard.KEY_NONE)
+//             right.set(Keyboard.KEY_NONE)
+//             forward.set(Keyboard.KEY_NONE)
+//             back.set(Keyboard.KEY_NONE)
+//             jump.set(Keyboard.KEY_NONE)
+//             sneak.set(Keyboard.KEY_NONE)
+//         }
+//     }
 
-    @JvmStatic
-    fun defaultAll() {
-        with(config) {
-            attack.set(KeyboardManager.LEFT_MOUSE)
-            useItem.set(KeyboardManager.RIGHT_MOUSE)
-            left.set(Keyboard.KEY_A)
-            right.set(Keyboard.KEY_D)
-            forward.set(Keyboard.KEY_W)
-            back.set(Keyboard.KEY_S)
-            jump.set(Keyboard.KEY_SPACE)
-            sneak.set(Keyboard.KEY_LSHIFT)
-        }
-    }
+//     @JvmStatic
+//     fun defaultAll() {
+//         with(config) {
+//             attack.set(KeyboardManager.LEFT_MOUSE)
+//             useItem.set(KeyboardManager.RIGHT_MOUSE)
+//             left.set(Keyboard.KEY_A)
+//             right.set(Keyboard.KEY_D)
+//             forward.set(Keyboard.KEY_W)
+//             back.set(Keyboard.KEY_S)
+//             jump.set(Keyboard.KEY_SPACE)
+//             sneak.set(Keyboard.KEY_LSHIFT)
+//         }
+//     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

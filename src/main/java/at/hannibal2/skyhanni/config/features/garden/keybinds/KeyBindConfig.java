@@ -1,15 +1,11 @@
 package at.hannibal2.skyhanni.config.features.garden.keybinds;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
-import at.hannibal2.skyhanni.utils.KeyboardManager;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
-import org.lwjgl.input.Keyboard;
 
 public class KeyBindConfig {
     @Expose
@@ -23,51 +19,105 @@ public class KeyBindConfig {
     @ConfigEditorBoolean
     public boolean excludeBarn = false;
 
-    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
-    @ConfigEditorButton(buttonText = "Disable")
-    public Runnable presetDisable = GardenCustomKeybinds::disableAll;
+    public enum Layouts {
+        LAYOUT_1("Layout 1"),
+        LAYOUT_2("Layout 2"),
+        LAYOUT_3("Layout 3"),
+        LAYOUT_4("Layout 4"),
+        LAYOUT_5("Layout 5"),
+        ;
 
-    @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
-    @ConfigEditorButton(buttonText = "Default")
-    public Runnable presetDefault = GardenCustomKeybinds::defaultAll;
+        private final String str;
 
-    @Expose
-    @ConfigOption(name = "Attack", desc = "")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.LEFT_MOUSE)
-    public Property<Integer> attack = Property.of(KeyboardManager.LEFT_MOUSE);
+        Layouts(String str) {
+            this.str = str;
+        }
 
-    @Expose
-    @ConfigOption(name = "Use Item", desc = "")
-    @ConfigEditorKeybind(defaultKey = KeyboardManager.RIGHT_MOUSE)
-    public Property<Integer> useItem = Property.of(KeyboardManager.RIGHT_MOUSE);
-
-    @Expose
-    @ConfigOption(name = "Move Left", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_A)
-    public Property<Integer> left = Property.of(Keyboard.KEY_A);
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
-    @ConfigOption(name = "Move Right", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_D)
-    public Property<Integer> right = Property.of(Keyboard.KEY_D);
+    @ConfigOption(name = "Profile Selection For Crops", desc = "")
+    @Accordion
+    public LayoutSelection layoutSelectionForCrops = new LayoutSelection();
+
+    public static class LayoutSelection {
+        @Expose
+        @ConfigOption(name = "Layout Wheat", desc = "Select the keybind layout for wheat.")
+        @ConfigEditorDropdown
+        public Layouts wheat = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Carrot", desc = "Select the keybind layout for carrot.")
+        @ConfigEditorDropdown
+        public Layouts carrot = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Potato", desc = "Select the keybind layout for potato.")
+        @ConfigEditorDropdown
+        public Layouts potato = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Nether Wart", desc = "Select the keybind layout for nether wart.")
+        @ConfigEditorDropdown
+        public Layouts netherWart = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Pumpkin", desc = "Select the keybind layout for pumpkin.")
+        @ConfigEditorDropdown
+        public Layouts pumpkin = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Melon", desc = "Select the keybind layout for melon.")
+        @ConfigEditorDropdown
+        public Layouts melon = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Cocoa Beans", desc = "Select the keybind layout for cocoa beans.")
+        @ConfigEditorDropdown
+        public Layouts cocoaBeans = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Sugar Cane", desc = "Select the keybind layout for sugar cane.")
+        @ConfigEditorDropdown
+        public Layouts sugarCane = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Cactus", desc = "Select the keybind layout for cactus.")
+        @ConfigEditorDropdown
+        public Layouts cactus = Layouts.LAYOUT_1;
+
+        @Expose
+        @ConfigOption(name = "Layout Mushroom", desc = "Select the keybind layout for mushroom.")
+        @ConfigEditorDropdown
+        public Layouts mushroom = Layouts.LAYOUT_1;
+    }
 
     @Expose
-    @ConfigOption(name = "Move Forward", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_W)
-    public Property<Integer> forward = Property.of(Keyboard.KEY_W);
+    @ConfigOption(name = "Layout 1", desc = "")
+    @Accordion
+    public KeyBindProfile layout1 = new KeyBindProfile();
 
     @Expose
-    @ConfigOption(name = "Move Back", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_S)
-    public Property<Integer> back = Property.of(Keyboard.KEY_S);
+    @ConfigOption(name = "Layout 2", desc = "")
+    @Accordion
+    public KeyBindProfile layout2 = new KeyBindProfile();
 
     @Expose
-    @ConfigOption(name = "Jump", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_SPACE)
-    public Property<Integer> jump = Property.of(Keyboard.KEY_SPACE);
+    @ConfigOption(name = "Layout 3", desc = "")
+    @Accordion
+    public KeyBindProfile layout3 = new KeyBindProfile();
 
     @Expose
-    @ConfigOption(name = "Sneak", desc = "")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
-    public Property<Integer> sneak = Property.of(Keyboard.KEY_LSHIFT);
+    @ConfigOption(name = "Layout 4", desc = "")
+    @Accordion
+    public KeyBindProfile layout4 = new KeyBindProfile();
+
+    @Expose
+    @ConfigOption(name = "Layout 5", desc = "")
+    @Accordion
+    public KeyBindProfile layout5 = new KeyBindProfile();
 }
