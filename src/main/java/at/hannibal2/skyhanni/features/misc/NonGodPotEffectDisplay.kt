@@ -10,8 +10,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestWarning
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,6 +37,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @SkyHanniModule
 object NonGodPotEffectDisplay {
@@ -83,6 +87,14 @@ object NonGodPotEffectDisplay {
         FILET_O_FORTUNE("§fFilet O' Fortune I"),
         CHILLED_PRISTINE_POTATO("§fChilled Pristine Potato I"),
     }
+
+    /**
+     * REGEX-TEST:  Repellent: §r§9MAX §r§7(12s)
+     */
+    private val repellentPattern by RepoPattern.pattern(
+        "misc.nongodpot.repellant",
+        " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
+    )
 
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
@@ -235,6 +247,24 @@ object NonGodPotEffectDisplay {
                     effectDuration[effect] = Timer(duration)
                     update()
                 }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onTabListUpdate(event: TabListUpdateEvent) {
+        if (!GardenAPI.inGarden()) return
+        event.tabList.firstNotNullOfOrNull {
+            repellentPattern.matchMatcher(it) {
+                // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
+                val time = group("time")?.toIntOrNull() ?: return@matchMatcher
+                val tier = group("tier")
+                val duration = time.toDuration(DurationUnit.SECONDS)
+                when (tier) {
+                    "MAX" -> effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(duration)
+                    "REGULAR" -> effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(duration)
+                }
+                update()
             }
         }
     }
