@@ -1,20 +1,22 @@
 package at.hannibal2.skyhanni.config.features.garden.keybinds;
 
+import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class KeyBindProfile {
-//         @ConfigOption(name = "Disable All", desc = "Disable all keys.")
-//         @ConfigEditorButton(buttonText = "Disable")
-//         public Runnable presetDisable = GardenCustomKeybinds::disableAll;
+        @ConfigOption(name = "Disable All", desc = "Disable all keys.")
+        @ConfigEditorButton(buttonText = "Disable")
+        public Runnable presetDisable = () -> GardenCustomKeybinds.disableAll(this);
 
-//         @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
-//         @ConfigEditorButton(buttonText = "Default")
-//         public Runnable presetDefault = GardenCustomKeybinds::defaultAll;
+    @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
+    @ConfigEditorButton(buttonText = "Default")
+    public Runnable presetDefault = () -> GardenCustomKeybinds.defaultAll(this);
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")

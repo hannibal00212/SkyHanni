@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindProfile
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -118,33 +119,33 @@ object GardenCustomKeybinds {
 
     private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 
-//     @JvmStatic
-//     fun disableAll() {
-//         with(config) {
-//             attack.set(Keyboard.KEY_NONE)
-//             useItem.set(Keyboard.KEY_NONE)
-//             left.set(Keyboard.KEY_NONE)
-//             right.set(Keyboard.KEY_NONE)
-//             forward.set(Keyboard.KEY_NONE)
-//             back.set(Keyboard.KEY_NONE)
-//             jump.set(Keyboard.KEY_NONE)
-//             sneak.set(Keyboard.KEY_NONE)
-//         }
-//     }
+    @JvmStatic
+    fun disableAll(layout: KeyBindProfile) {
+        with(layout) {
+            attack.set(Keyboard.KEY_NONE)
+            useItem.set(Keyboard.KEY_NONE)
+            left.set(Keyboard.KEY_NONE)
+            right.set(Keyboard.KEY_NONE)
+            forward.set(Keyboard.KEY_NONE)
+            back.set(Keyboard.KEY_NONE)
+            jump.set(Keyboard.KEY_NONE)
+            sneak.set(Keyboard.KEY_NONE)
+        }
+    }
 
-//     @JvmStatic
-//     fun defaultAll() {
-//         with(config) {
-//             attack.set(KeyboardManager.LEFT_MOUSE)
-//             useItem.set(KeyboardManager.RIGHT_MOUSE)
-//             left.set(Keyboard.KEY_A)
-//             right.set(Keyboard.KEY_D)
-//             forward.set(Keyboard.KEY_W)
-//             back.set(Keyboard.KEY_S)
-//             jump.set(Keyboard.KEY_SPACE)
-//             sneak.set(Keyboard.KEY_LSHIFT)
-//         }
-//     }
+    @JvmStatic
+    fun defaultAll(layout: KeyBindProfile) {
+        with(layout) {
+            attack.set(KeyboardManager.LEFT_MOUSE)
+            useItem.set(KeyboardManager.RIGHT_MOUSE)
+            left.set(Keyboard.KEY_A)
+            right.set(Keyboard.KEY_D)
+            forward.set(Keyboard.KEY_W)
+            back.set(Keyboard.KEY_S)
+            jump.set(Keyboard.KEY_SPACE)
+            sneak.set(Keyboard.KEY_LSHIFT)
+        }
+    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
