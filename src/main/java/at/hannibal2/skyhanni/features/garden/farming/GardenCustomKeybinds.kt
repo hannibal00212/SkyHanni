@@ -32,21 +32,7 @@ object GardenCustomKeybinds {
     private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-//     private var map: Map<KeyBinding, Int> = emptyMap()
-
-    private var layout1: Map<KeyBinding, Int> = emptyMap()
-    private var layout2: Map<KeyBinding, Int> = emptyMap()
-    private var layout3: Map<KeyBinding, Int> = emptyMap()
-    private var layout4: Map<KeyBinding, Int> = emptyMap()
-    private var layout5: Map<KeyBinding, Int> = emptyMap()
-
-    private var layouts: Map<String, Map<KeyBinding, Int>> = mapOf(
-        "Layout 1" to layout1,
-        "Layout 2" to layout2,
-        "Layout 3" to layout3,
-        "Layout 4" to layout4,
-        "Layout 5" to layout5
-    )
+    private var layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
 
     private var cropLayoutSelection: Map<CropType?, String> = emptyMap()
     private var cropInHand: CropType? = null
@@ -142,11 +128,11 @@ object GardenCustomKeybinds {
             }
         }
 
-        layout1 = buildKeybindLayoutMap(config.layout1)
-        layout2 = buildKeybindLayoutMap(config.layout2)
-        layout3 = buildKeybindLayoutMap(config.layout3)
-        layout4 = buildKeybindLayoutMap(config.layout4)
-        layout5 = buildKeybindLayoutMap(config.layout5)
+        layouts["Layout 1"] = buildKeybindLayoutMap(config.layout1)
+        layouts["Layout 2"] = buildKeybindLayoutMap(config.layout2)
+        layouts["Layout 3"] = buildKeybindLayoutMap(config.layout3)
+        layouts["Layout 4"] = buildKeybindLayoutMap(config.layout4)
+        layouts["Layout 5"] = buildKeybindLayoutMap(config.layout5)
 
         cropLayoutSelection = mapOf(
             CropType.WHEAT to config.cropLayoutSelection.wheat.toString(),
