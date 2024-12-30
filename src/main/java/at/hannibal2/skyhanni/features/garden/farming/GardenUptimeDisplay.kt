@@ -36,7 +36,7 @@ object GardenUptimeDisplay {
     private val tracker = SkyhanniTimedTracker<Data>(
         "Garden Uptime Tracker",
         { Data() },
-        { it.garden.timedTracker },
+        { it.garden.uptimeTracker },
         { drawDisplay(it) }
     )
 

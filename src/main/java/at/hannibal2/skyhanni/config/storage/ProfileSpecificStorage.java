@@ -51,7 +51,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import at.hannibal2.skyhanni.utils.StaticDurations;
-import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData;
 import com.google.gson.annotations.Expose;
 import kotlin.time.Duration;
 import net.minecraft.item.ItemStack;
@@ -548,7 +547,7 @@ public class ProfileSpecificStorage {
 
 
         @Expose
-        public GardenUptimeDisplay.TimeData timedTracker = new GardenUptimeDisplay.TimeData();
+        public GardenUptimeDisplay.TimeData uptimeTracker = new GardenUptimeDisplay.TimeData();
     }
 
     @Expose
