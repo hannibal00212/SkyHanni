@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
 import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -41,8 +42,10 @@ object GardenUptimeDisplay {
     )
 
     class TimeData : TimedTrackerData<Data>({ Data() }) {
-        override fun reset() {
-            super.reset()
+        init {
+            if (config.resetSession) {
+                getOrPutEntry(SkyHanniTracker.DisplayMode.SESSION).reset()
+            }
         }
     }
 

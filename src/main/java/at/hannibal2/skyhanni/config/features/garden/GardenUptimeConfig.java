@@ -21,23 +21,23 @@ import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.Fa
 
 public class GardenUptimeConfig {
     @Expose
-    @ConfigOption(name = "Enable Tracker", desc = "Track Garden Uptime")
+    @ConfigOption(name = "Enable Tracker", desc = "Track garden uptime.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Include Visitors", desc = "Include doing visitors in active farming time")
+    @ConfigOption(name = "Include Visitors", desc = "Include doing visitors in active farming time.")
     @ConfigEditorBoolean
     public boolean includeVisitors = true;
 
     @Expose
-    @ConfigOption(name = "Include Pests", desc = "Include doing pests in active farming time")
+    @ConfigOption(name = "Include Pests", desc = "Include doing pests in active farming time.")
     @ConfigEditorBoolean
     public boolean includePests = true;
 
     @Expose
-    @ConfigOption(name = "Tracker Timeout", desc = "Set duration before timer pauses when not farming")
+    @ConfigOption(name = "Tracker Timeout", desc = "Set duration before timer pauses when not farming.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 60,
@@ -46,18 +46,23 @@ public class GardenUptimeConfig {
     public double timeout = 10;
 
     @Expose
-    @ConfigOption(name = "Movement Timeout", desc = "Custom timeout duration if player moves but isn't farming")
+    @ConfigOption(name = "Movement Timeout", desc = "Custom timeout duration if player moves but isn't farming.")
     @ConfigEditorBoolean
     public boolean movementTimeout = true;
 
     @Expose
-    @ConfigOption(name = "Movement Timeout", desc = "Set duration before timer pauses when player is moving but not farming")
+    @ConfigOption(name = "Movement Timeout", desc = "Set duration before timer pauses when player is moving but not farming.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 60,
         minStep = 1
     )
     public double movementTimeoutDuration = 20;
+
+    @Expose
+    @ConfigOption(name = "Reset Session on Game Start", desc = "Reset session display mode when opening the game.")
+    @ConfigEditorBoolean
+    public boolean resetSession = false;
 
     @Expose
     @ConfigOption(
