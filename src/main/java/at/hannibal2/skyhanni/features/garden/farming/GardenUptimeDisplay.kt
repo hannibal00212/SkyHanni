@@ -21,32 +21,27 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
+import at.hannibal2.skyhanni.utils.tracker.SkyhanniTimedTracker
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.time.LocalDate
-import java.time.temporal.WeekFields
-import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenUptimeDisplay {
     private val config get() = GardenAPI.config.gardenUptime
-    private val tracker = SkyHanniTracker<Data>(
+
+    private val tracker = SkyhanniTimedTracker<Data>(
         "Garden Uptime Tracker",
         { Data() },
-        { it.garden.gardenUptimeStorage.tracker },
-        DisplayMode.WEEK to {
-            it.garden.gardenUptimeStorage.week.getOrPut(getWeekString(LocalDate.now()), ::Data)
-        },
-        DisplayMode.DAY to {
-            it.garden.gardenUptimeStorage.day.getOrPut(getDayString(LocalDate.now()), ::Data)
-        }
-    ) {
-        drawDisplay(it)
+        { it.garden.timedTracker },
+        { drawDisplay(it)}
+    )
+
+    class TimeData: TimedTrackerData<Data>({ Data() }){
+
     }
 
     class Data : TrackerData() {
@@ -162,15 +157,18 @@ object GardenUptimeDisplay {
     var secondsLastMove = 0
     var activityType: ActivityType? = null
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
         val lineMap = mutableMapOf<FarmingUptimeDisplayText, Searchable>()
         lineMap[FarmingUptimeDisplayText.TITLE] = Renderable.string("§6Farming Uptime").toSearchable()
+
+        lineMap[FarmingUptimeDisplayText.DATE] = tracker.buildDate().toSearchable()
 
         var uptime = data.cropBreakTime
         if (config.includeVisitors) uptime += data.visitorTime
         if (config.includePests) uptime += data.pestTime
         lineMap[FarmingUptimeDisplayText.UPTIME] =
-            Renderable.string("§7Uptime: §e${if (uptime > 0) uptime.seconds else "none!"}${if (isAFK) " §cPaused!" else ""}").toSearchable()
+            Renderable.string(
+                "§7Uptime: §e${if (uptime > 0) uptime.seconds else "§cnone"}${if (isAFK) " §cPaused!" else ""}").toSearchable()
 
         var bps = 0.0
         if (uptime > 0) bps =
@@ -219,17 +217,6 @@ object GardenUptimeDisplay {
             }
         }
         return true
-    }
-
-    private fun getDayString(date: LocalDate): String {
-        return "${date.year}.${date.monthValue}.${date.dayOfMonth}"
-    }
-
-    private fun getWeekString(date: LocalDate): String {
-        val weekFields = WeekFields.of(Locale.getDefault())
-        val weekOfYear = date.get(weekFields.weekOfWeekBasedYear())
-        val year = date.get(weekFields.weekBasedYear())
-        return "$year.$weekOfYear"
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.showDisplay

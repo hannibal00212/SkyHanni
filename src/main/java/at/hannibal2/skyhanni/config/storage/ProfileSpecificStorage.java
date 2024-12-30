@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import at.hannibal2.skyhanni.utils.StaticDurations;
+import at.hannibal2.skyhanni.utils.tracker.TimedTrackerData;
 import com.google.gson.annotations.Expose;
 import kotlin.time.Duration;
 import net.minecraft.item.ItemStack;
@@ -545,19 +546,9 @@ public class ProfileSpecificStorage {
         @Expose
         public VinylType activeVinyl = null;
 
+
         @Expose
-        public GardenUptimeStorage gardenUptimeStorage = new GardenUptimeStorage();
-
-        public static class GardenUptimeStorage {
-            @Expose
-            public GardenUptimeDisplay.Data tracker = new GardenUptimeDisplay.Data();
-
-            @Expose
-            public Map<String, GardenUptimeDisplay.Data> day = new HashMap<>();
-
-            @Expose
-            public Map<String, GardenUptimeDisplay.Data> week = new HashMap<>();
-        }
+        public GardenUptimeDisplay.TimeData timedTracker = new GardenUptimeDisplay.TimeData();
     }
 
     @Expose

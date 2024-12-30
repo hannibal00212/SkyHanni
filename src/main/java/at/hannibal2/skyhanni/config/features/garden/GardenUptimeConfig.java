@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.DATE;
 import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.TITLE;
 import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.BLOCKS_BROKEN;
 import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.BPS;
@@ -66,6 +67,7 @@ public class GardenUptimeConfig {
     @ConfigEditorDraggableList
     public List<FarmingUptimeDisplayText> uptimeDisplayText = new ArrayList<>(Arrays.asList(
         TITLE,
+        DATE,
         UPTIME,
         BPS,
         BLOCKS_BROKEN
@@ -73,6 +75,7 @@ public class GardenUptimeConfig {
 
     public enum FarmingUptimeDisplayText {
         TITLE("Farming Uptime"),
+        DATE("Stats for 2024-11-8"),
         UPTIME("Uptime: 1 hour, 15 minutes"),
         BPS("Blocks/Second: 17.9"),
         BLOCKS_BROKEN("Blocks Broken: 17,912"),

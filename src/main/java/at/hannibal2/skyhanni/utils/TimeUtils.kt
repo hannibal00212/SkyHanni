@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils.toWeekString
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.temporal.WeekFields
+import java.util.Locale
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -172,6 +175,28 @@ object TimeUtils {
             (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
             else -> "yyyy-MM-dd HH:mm"
         }
+    }
+
+    fun LocalDate?.toWeekString(): String {
+        if (this == null) return "null"
+        val weekFields = WeekFields.of(Locale.getDefault())
+        val weekOfYear = this.get(weekFields.weekOfWeekBasedYear())
+        val year = this.get(weekFields.weekBasedYear())
+        return "$year-$weekOfYear"
+    }
+
+    fun LocalDate?.toMonthString(): String {
+        if (this == null) return "null"
+        val month = monthValue.toString().padStart(2, '0')
+        return "$year-$month"
+    }
+
+    fun LocalDate?.toWeekStringFormatted(): String{
+        if (this == null) return "null"
+        val weekFields = WeekFields.of(Locale.getDefault())
+        val weekOfYear = this.get(weekFields.weekOfWeekBasedYear())
+        val year = this.get(weekFields.weekBasedYear())
+        return "$year, week $weekOfYear"
     }
 
     val Long.ticks get() = (this * 50).milliseconds
