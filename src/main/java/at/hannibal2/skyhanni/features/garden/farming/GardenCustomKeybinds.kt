@@ -68,12 +68,12 @@ object GardenCustomKeybinds {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-//         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
-//         ChatUtils.chatAndOpenConfig(
-//             "Duplicate Custom Keybinds aren't allowed!",
-//             GardenAPI.config::keyBind,
-//         )
-//         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
+        if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
+        ChatUtils.chatAndOpenConfig(
+            "Duplicate Custom Keybinds aren't allowed!",
+            GardenAPI.config::keyBind,
+        )
+        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
     @HandleEvent
@@ -147,16 +147,26 @@ object GardenCustomKeybinds {
             CropType.MUSHROOM to config.cropLayoutSelection.mushroom.toString(),
         )
 
-//         calculateDuplicates()
+        calculateDuplicates()
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyBinding.unPressAllKeys()
     }
 
-//     private fun calculateDuplicates() {
-//         isDuplicate = map.values
-//             .filter { it != Keyboard.KEY_NONE }
-//             .let { values -> values.size != values.toSet().size }
-//     }
+    private fun isDuplicateInLayout(layout: Map<KeyBinding, Int>) =
+        layout.values
+            .filter { it != Keyboard.KEY_NONE }
+            .let { values -> values.size != values.toSet().size }
+
+
+    private fun calculateDuplicates() {
+        for (layout in layouts.values) {
+            if (isDuplicateInLayout(layout)) {
+                isDuplicate = true
+                return
+            }
+        }
+        isDuplicate = false
+    }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
 
