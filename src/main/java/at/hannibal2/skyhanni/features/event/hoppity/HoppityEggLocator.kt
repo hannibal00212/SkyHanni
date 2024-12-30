@@ -171,7 +171,7 @@ object HoppityEggLocator {
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.anyEggsUnfound()
+    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {

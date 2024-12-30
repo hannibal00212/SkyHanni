@@ -37,12 +37,8 @@ enum class HoppityEggType(
     STRAY("Stray", "§a", -1)
     ;
 
-    private val nextTimeCache = mutableMapOf<HoppityEggType, SimpleTimeMark?>()
-
     fun timeUntil(): Duration {
         if (resetsAt == -1) return Duration.INFINITE
-        nextTimeCache[this]?.takeIf { it.isInFuture() }?.let { return it.timeUntil() }
-
         val now = SkyBlockTime.now()
         val isEggDayToday = altDay == now.isAlternateDay()
 
@@ -52,9 +48,11 @@ enum class HoppityEggType(
             else -> 1
         }
 
-        val nextTimeMark = now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark()
-        nextTimeCache[this] = nextTimeMark
-        return nextTimeMark.timeUntil()
+        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+    }
+
+    fun nextTime(): SimpleTimeMark {
+        return SimpleTimeMark.now() + timeUntil()
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {
@@ -64,7 +62,6 @@ enum class HoppityEggType(
 
     fun markSpawned() {
         claimed = false
-        nextTimeCache[this] = null
     }
 
     private fun hasNotFirstSpawnedYet(): Boolean {
@@ -75,7 +72,9 @@ enum class HoppityEggType(
 
     fun hasRemainingSpawns(): Boolean {
         val hoppityEndMark = HoppityAPI.getEventEndMark() ?: return false
-        // Check if the next spawn is after the end of the event
+        // If it's before the last two days of the event, we can assume there are more spawns
+        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil() < hoppityEndMark.timeUntil()
     }
 
@@ -130,11 +129,11 @@ enum class HoppityEggType(
             }
         }
 
-        fun anyEggsUnfound(): Boolean {
+        fun eggsRemaining(): Boolean {
             return resettingEntries.any { !it.claimed }
         }
 
-        fun allEggsUnfound(): Boolean {
+        fun allEggsRemaining(): Boolean {
             return resettingEntries.all { !it.claimed }
         }
     }
