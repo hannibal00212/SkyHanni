@@ -105,6 +105,7 @@
     + Reset search terms in GUIs after closing inventory (Profit Trackers, Area Navigation list, etc.).
     + Enabled by default to reduce confusion caused by the search feature.
 + The Estimated Item Value now displays material names used to unlock gemstone slots. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3089)
++ Added Mithril Infusion to Estimated Item Value. - Empa (https://github.com/hannibal002/SkyHanni/pull/2990)
 
 #### Chat and Command Improvements
 
@@ -185,6 +186,7 @@
 + Added an option to send the optimal speed warning even when not wearing Rancher's Boots. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2859)
 + Added a Pest Traps tab widget to the Tab Widget Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/2984)
 + Updated Pest chat and GUI to indicate Pests Widget is disabled when displaying pests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3022)
++ Changed Anita medal profit display to show profit per copper medal and sort by this value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3122)
 
 #### Event Improvements
 
@@ -208,6 +210,7 @@
 + Added a warning for empty messages left behind by Stash Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3009)
 + Added option to hide seconds in the Real Time GUI. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2979)
 + Improved graph navigation performance. - hannibal2 & Thunderblade (https://github.com/hannibal002/SkyHanni/pull/3083)
++ Added Roman numeral support to slayer names in trackers, Profit Tracker Items, and Scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3113)
 
 ### Fixes
 
@@ -260,6 +263,7 @@
 + Fixed a small typo in Bestiary Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2748)
 + Fixed `Line to Slayer Miniboss` not checking for walls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2788)
 + Fixed Special Zealots not highlighted after a recent Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/3099)
++ Fixed Kuudra Lines sometimes not displaying in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3118)
 
 #### Custom Scoreboard Fixes
 
@@ -358,6 +362,7 @@
 + Fixed Time Tower warnings showing up on new profiles (e.g. Bingo). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3012)
     + You can open `/cf` once to make the message disappear without changing settings if a new profile was created before applying the fix for the first time.
 + Fixed stray flash overlaying other Chocolate Factory information. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
++ Fixed error when opening Choc Factory via NEU buttons. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3108)
 
 #### Event Fixes
 
@@ -392,6 +397,7 @@
     +  Fixed the color of material messages.
 + Fixed overly liberal player message detection in Enable Chat Formatting. - !nea (https://github.com/hannibal002/SkyHanni/pull/2871)
     +  This should fix many formatting issues related to `[SomethingHere] Something Else: Something Even More`.
++ Fixed /shwords causing blank messages in chat. - nopo (https://github.com/hannibal002/SkyHanni/pull/3110)
 
 #### Misc Fixes
 
@@ -424,6 +430,10 @@
 + Fixed collection tracker to recognize the current collection. - nopo (https://github.com/hannibal002/SkyHanni/pull/3049)
 + Fixed skill level. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3068)
 + Fixed Replace Roman Numerals replacing random letters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/3003)
++ Fixed most incorrect farming skill XP cases. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3121)
+    + Calculation errors when reaching a skill cap below 60 are not fixed yet.
++ Fixed distortion of regular words due to incorrect Roman numeral replacement. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3113)
++ Fixed rare error message in skill progress display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3105)
 
 ### Technical Details
 
@@ -542,6 +552,14 @@
 + Moved Next Jacobs Contest, Best Crop Milestone & Jyrre Timer to Renderable. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3004)
 + Added /shtestactionbar command: set your clipboard as a fake Action Bar. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3085)
 + Added /shdebug support for SkyBlock island, Bingo, and Tab List data tests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3085)
++ Added error logging to trevor solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3107)
++ Added allowlist for Roman numeral replacement. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3113)
++ Added debug command /shdebugvisualwords. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3112)
+    + Added console logging of all words replaced by /shword.
++ Added contributor rabbit names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3109)
+    + Replaced rabbit names in the rabbit collection menu with SkyHanni contributor names.
++ Added debug data for crop reading errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3114)
++ Improved Detekt and .editorconfig rules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3104)
 
 ### Removed Features
 
