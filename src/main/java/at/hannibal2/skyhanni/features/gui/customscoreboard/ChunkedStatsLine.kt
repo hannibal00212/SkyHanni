@@ -70,7 +70,7 @@ enum class ChunkedStatsLine(
     ),
     HEAT(
         displayPair = { "§c${getHeat()}" },
-        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElementHeat.showWhen() },
+        showWhen = { !(hideEmptyLines && getHeat() in listOf("§c♨ 0", "0") ) && ScoreboardElementHeat.showWhen() },
         showIsland = { ScoreboardElementHeat.showIsland() },
         configLine = "§cHeat",
     ),
