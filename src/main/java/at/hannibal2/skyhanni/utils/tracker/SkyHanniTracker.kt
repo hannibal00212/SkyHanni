@@ -100,11 +100,11 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     protected open fun getDisplay() = getSharedTracker()?.let {
-            val data = it.get(getDisplayMode())
-            val searchables = drawDisplay(data)
-            if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
-            else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
-        }.orEmpty()
+        val data = it.get(getDisplayMode())
+        val searchables = drawDisplay(data)
+        if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+        else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
+    }.orEmpty()
 
     protected open fun buildFinalDisplay(searchBox: Renderable) = buildList {
         add(searchBox)

@@ -37,11 +37,13 @@ object GardenUptimeDisplay {
         "Garden Uptime Tracker",
         { Data() },
         { it.garden.timedTracker },
-        { drawDisplay(it)}
+        { drawDisplay(it) }
     )
 
-    class TimeData: TimedTrackerData<Data>({ Data() }){
-
+    class TimeData : TimedTrackerData<Data>({ Data() }) {
+        override fun reset() {
+            super.reset()
+        }
     }
 
     class Data : TrackerData() {
@@ -168,7 +170,8 @@ object GardenUptimeDisplay {
         if (config.includePests) uptime += data.pestTime
         lineMap[FarmingUptimeDisplayText.UPTIME] =
             Renderable.string(
-                "§7Uptime: §e${if (uptime > 0) uptime.seconds else "§cnone"}${if (isAFK) " §cPaused!" else ""}").toSearchable()
+                "§7Uptime: §e${if (uptime > 0) uptime.seconds else "§cnone"}${if (isAFK) " §cPaused!" else ""}"
+            ).toSearchable()
 
         var bps = 0.0
         if (uptime > 0) bps =

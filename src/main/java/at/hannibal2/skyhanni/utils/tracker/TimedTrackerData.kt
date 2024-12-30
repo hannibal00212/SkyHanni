@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.utils.TimeUtils.toMonthString
 import at.hannibal2.skyhanni.utils.TimeUtils.toWeekString
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import com.google.gson.annotations.Expose
-import net.minecraft.util.Session
 import java.time.LocalDate
 import java.util.EnumMap
 
-abstract class TimedTrackerData<Data: TrackerData>(
+abstract class TimedTrackerData<Data : TrackerData>(
     private val createNewSession: () -> Data,
 ) : TrackerData() {
     override fun reset() {
@@ -29,7 +28,7 @@ abstract class TimedTrackerData<Data: TrackerData>(
             DisplayMode.MONTH -> date.toMonthString()
             DisplayMode.YEAR -> date.year.toString()
         }
-        val display = sessions.getOrPut(displayMode) { mutableMapOf()}
+        val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         return display.getOrPut(key) { createNewSession() }
     }
 

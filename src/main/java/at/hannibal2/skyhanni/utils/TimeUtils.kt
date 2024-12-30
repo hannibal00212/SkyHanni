@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils.toWeekString
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -191,7 +190,7 @@ object TimeUtils {
         return "$year-$month"
     }
 
-    fun LocalDate?.toWeekStringFormatted(): String{
+    fun LocalDate?.toWeekStringFormatted(): String {
         if (this == null) return "null"
         val weekFields = WeekFields.of(Locale.getDefault())
         val weekOfYear = this.get(weekFields.weekOfWeekBasedYear())

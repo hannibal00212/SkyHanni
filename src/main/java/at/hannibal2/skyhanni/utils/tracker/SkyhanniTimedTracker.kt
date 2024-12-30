@@ -18,7 +18,8 @@ import java.time.LocalDate
 import java.time.temporal.WeekFields
 import java.util.Locale
 
-class SkyhanniTimedTracker<Data: TrackerData>(
+@Suppress("SpreadOperator")
+class SkyhanniTimedTracker<Data : TrackerData>(
     name: String,
     createNewSession: () -> Data,
     private var storage: (ProfileSpecificStorage) -> TimedTrackerData<Data>,
@@ -45,6 +46,15 @@ class SkyhanniTimedTracker<Data: TrackerData>(
     fun onDateChange(event: DateChangeEvent) {
         if (date == event.oldDate) {
             date = event.newDate
+        }
+        if (week == event.oldDate.toWeekString().weekToLocalDate()) {
+            week = event.newDate.toWeekString().weekToLocalDate()
+        }
+        if (month == event.oldDate.toMonthString().monthToLocalDate()) {
+            month = event.newDate.toMonthString().monthToLocalDate()
+        }
+        if (year == event.oldDate.year.toString().yearToLocalDate()) {
+            year = event.newDate.year.toString().yearToLocalDate()
         }
     }
 
@@ -112,7 +122,8 @@ class SkyhanniTimedTracker<Data: TrackerData>(
                     "§7Date: §a$dateString"
                 }
                 DisplayMode.WEEK -> {
-                    val dateString = if (week.toWeekString() == LocalDate.now().toWeekString()) "This Week" else week.toWeekStringFormatted()
+                    val dateString =
+                        if (week.toWeekString() == LocalDate.now().toWeekString()) "This Week" else week.toWeekStringFormatted()
                     "§7Week: §a$dateString"
                 }
 
@@ -156,28 +167,6 @@ class SkyhanniTimedTracker<Data: TrackerData>(
         }
     }
 
-    private fun getNextDate(displayMode: DisplayMode, date: LocalDate): LocalDate {
-        val newDate = when (displayMode) {
-            DisplayMode.DAY -> date.plusDays(1)
-            DisplayMode.WEEK -> date.plusWeeks(1)
-            DisplayMode.MONTH -> date.plusMonths(1)
-            DisplayMode.YEAR -> date.plusYears(1)
-            else -> date
-        }
-        return newDate
-    }
-
-    private fun getPreviousDate(displayMode: DisplayMode, date: LocalDate): LocalDate {
-        val newDate = when (displayMode) {
-            DisplayMode.DAY -> date.minusDays(1)
-            DisplayMode.WEEK -> date.minusWeeks(1)
-            DisplayMode.MONTH -> date.minusMonths(1)
-            DisplayMode.YEAR -> date.minusYears(1)
-            else -> date
-        }
-        return newDate
-    }
-
     private fun String.dayToLocalDate(): LocalDate = LocalDate.parse(this)
 
     private fun String.weekToLocalDate(): LocalDate {
@@ -204,36 +193,38 @@ class SkyhanniTimedTracker<Data: TrackerData>(
         return LocalDate.ofYearDay(year, 1)
     }
 
+    @Suppress("ReturnCount")
     private fun buildDateSwitcherView(): List<Renderable>? {
         val statsStorage = ProfileStorageData.profileSpecific?.getData() ?: return null
         val entries = statsStorage.getEntries(getDisplayMode())?.keys ?: return null
-        when (getDisplayMode()) {
+        val display = when (getDisplayMode()) {
             DisplayMode.DAY -> {
                 val previousDay = entries.filter { it.dayToLocalDate() < date }.maxOrNull()?.dayToLocalDate()
                 val nextDay = entries.filter { it.dayToLocalDate() > date }.minOrNull()?.dayToLocalDate()
                 if (previousDay == null && nextDay == null) return null
-                return buildDateSwitcherButtons(previousDay, nextDay)
+                buildDateSwitcherButtons(previousDay, nextDay)
             }
             DisplayMode.WEEK -> {
                 val previousWeek = entries.filter { it.weekToLocalDate() < week }.maxOrNull()?.weekToLocalDate()
                 val nextWeek = entries.filter { it.weekToLocalDate() > week }.minOrNull()?.weekToLocalDate()
                 if (previousWeek == null && nextWeek == null) return null
-                return buildDateSwitcherButtons(previousWeek, nextWeek)
+                buildDateSwitcherButtons(previousWeek, nextWeek)
             }
             DisplayMode.MONTH -> {
                 val previousMonth = entries.filter { it.monthToLocalDate() < month }.maxOrNull()?.monthToLocalDate()
                 val nextMonth = entries.filter { it.monthToLocalDate() > month }.minOrNull()?.monthToLocalDate()
                 if (previousMonth == null && nextMonth == null) return null
-                return buildDateSwitcherButtons(previousMonth, nextMonth)
+                buildDateSwitcherButtons(previousMonth, nextMonth)
             }
             DisplayMode.YEAR -> {
                 val previousYear = entries.filter { it.yearToLocalDate() < year }.maxOrNull()?.yearToLocalDate()
                 val nextYear = entries.filter { it.yearToLocalDate() > year }.minOrNull()?.yearToLocalDate()
                 if (previousYear == null && nextYear == null) return null
-                return buildDateSwitcherButtons(previousYear, nextYear)
+                buildDateSwitcherButtons(previousYear, nextYear)
             }
             else -> return null
         }
+        return display
     }
 
     private fun buildDateSwitcherButtons(
@@ -251,7 +242,8 @@ class SkyhanniTimedTracker<Data: TrackerData>(
                             DisplayMode.YEAR -> year = it
                             else -> date = it
                         }
-                        update() },
+                        update()
+                    },
                 )
             },
             next?.let {
@@ -264,7 +256,8 @@ class SkyhanniTimedTracker<Data: TrackerData>(
                             DisplayMode.YEAR -> year = it
                             else -> date = it
                         }
-                        update() },
+                        update()
+                    },
                 )
             },
             if (next != null &&
@@ -274,19 +267,20 @@ class SkyhanniTimedTracker<Data: TrackerData>(
                     DisplayMode.YEAR -> next < LocalDate.now().year.toString().yearToLocalDate()
                     else -> next < LocalDate.now()
                 }
-                ) {
-                        Renderable.optionalLink(
-                            "§a[ §r§f§l->> §r§a]",
-                            onClick = {
-                                when (getDisplayMode()) {
-                                    DisplayMode.WEEK -> week = LocalDate.now()
-                                    DisplayMode.MONTH -> month = LocalDate.now()
-                                    DisplayMode.YEAR -> year = LocalDate.now()
-                                    else -> date = LocalDate.now()
-                                }
-                                update() },
-                        )
-                    } else null
+            ) {
+                Renderable.optionalLink(
+                    "§a[ §r§f§l->> §r§a]",
+                    onClick = {
+                        when (getDisplayMode()) {
+                            DisplayMode.WEEK -> week = LocalDate.now()
+                            DisplayMode.MONTH -> month = LocalDate.now()
+                            DisplayMode.YEAR -> year = LocalDate.now()
+                            else -> date = LocalDate.now()
+                        }
+                        update()
+                    },
+                )
+            } else null
         )
     }
 }
