@@ -66,7 +66,7 @@ object CustomScoreboardUtils {
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
-    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSbLines(), "heat") ?: "§c♨ 0"
+    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSbLines(), "heat")
 
     internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
 
