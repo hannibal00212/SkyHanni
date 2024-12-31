@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindLayout
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
@@ -32,7 +31,7 @@ object GardenCustomKeybinds {
     private val config get() = GardenAPI.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-    private var layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
+    private val layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
 
     private var cropLayoutSelection: Map<CropType?, String> = emptyMap()
     private var cropInHand: CropType? = null
@@ -86,20 +85,15 @@ object GardenCustomKeybinds {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        var allKeybindings = listOf(
-            config.layout1.attack, config.layout1.useItem, config.layout1.left, config.layout1.right,
-            config.layout1.forward, config.layout1.back, config.layout1.jump, config.layout1.sneak,
-            config.layout2.attack, config.layout2.useItem, config.layout2.left, config.layout2.right,
-            config.layout2.forward, config.layout2.back, config.layout2.jump, config.layout2.sneak,
-            config.layout3.attack, config.layout3.useItem, config.layout3.left, config.layout3.right,
-            config.layout3.forward, config.layout3.back, config.layout3.jump, config.layout3.sneak,
-            config.layout4.attack, config.layout4.useItem, config.layout4.left, config.layout4.right,
-            config.layout4.forward, config.layout4.back, config.layout4.jump, config.layout4.sneak,
-            config.layout5.attack, config.layout5.useItem, config.layout5.left, config.layout5.right,
-            config.layout5.forward, config.layout5.back, config.layout5.jump, config.layout5.sneak
+        fun getAllKeybindingsFromLayout(layout: KeyBindLayout) = listOf(
+            layout.attack, layout.useItem, layout.left, layout.right,
+            layout.forward, layout.back, layout.jump, layout.sneak
         )
 
-        ConditionalUtils.onToggle(*allKeybindings.toTypedArray()) {
+        ConditionalUtils.onToggle(
+            *listOf(
+                config.layout1, config.layout2, config.layout3, config.layout4, config.layout5
+            ).flatMap(::getAllKeybindingsFromLayout).toTypedArray()) {
             update()
         }
         update()
@@ -122,7 +116,7 @@ object GardenCustomKeybinds {
                             layout.forward, layout.back, layout.jump, layout.sneak
                         )
                     ) { keyBinding, setKeyProperty ->
-                        put(keyBinding, setKeyProperty.get())  // Add key-value pair
+                        put(keyBinding, setKeyProperty.get()) // Add key-value pair
                     }
                 }
             }
@@ -138,7 +132,7 @@ object GardenCustomKeybinds {
             CropType.WHEAT to config.cropLayoutSelection.wheat.toString(),
             CropType.CARROT to config.cropLayoutSelection.carrot.toString(),
             CropType.POTATO to config.cropLayoutSelection.potato.toString(),
-            CropType.NETHER_WART to  config.cropLayoutSelection.netherWart.toString(),
+            CropType.NETHER_WART to config.cropLayoutSelection.netherWart.toString(),
             CropType.PUMPKIN to config.cropLayoutSelection.pumpkin.toString(),
             CropType.MELON to config.cropLayoutSelection.melon.toString(),
             CropType.COCOA_BEANS to config.cropLayoutSelection.cocoaBeans.toString(),
