@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -55,10 +56,10 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
-            event.isCanceled
+            event.cancel()
             printStats(true)
         }
     }
@@ -137,7 +138,7 @@ object LimboTimeTracker {
         shownPB = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
     }
@@ -168,8 +169,8 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Limbo")
         if (!inLimbo) {
             event.addIrrelevant("not in limbo")
@@ -188,7 +189,7 @@ object LimboTimeTracker {
         notMigratedPB = personalBest
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (!doMigrate) return
         if (notMigratedPB != 0) {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetAPI
@@ -22,7 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -55,6 +56,10 @@ object CaptureFarmingGear {
         "anitabuff",
         "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!",
     )
+
+    /**
+     * REGEX-TEST: §7You have: §6+52☘ Farming Fortune
+     */
     private val anitaMenuPattern by patternGroup.pattern(
         "anitamenu",
         "§7You have: §6\\+(?<level>.*)☘ Farming Fortune",
@@ -67,18 +72,35 @@ object CaptureFarmingGear {
         "petlevelup",
         "Your (?<pet>.*) leveled up to level .*!",
     )
+
+    /**
+     * REGEX-TEST: Yum! You gain +5☘ Farming Fortune for 48 hours!
+     * REGEX-TEST: Big Yum! You refresh +5☘ Farming Fortune for 48 hours!
+     */
     private val cakePattern by patternGroup.pattern(
         "cake",
         "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!",
     )
+
+    /**
+     * REGEX-TEST:  Strength: §r§c❁170
+     */
     private val strengthPattern by patternGroup.pattern(
         "strength",
         " Strength: §r§c❁(?<strength>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Tier 10: §e70%
+     */
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*",
     )
+
+    /**
+     * REGEX-TEST: §2§l§m              §f§l§m      §r §e7§6/§e10
+     */
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
@@ -118,7 +140,7 @@ object CaptureFarmingGear {
             currentCrop.farmingItem.setItem(itemStack)
         }
 
-        TabListData.getTabList().matchFirst(strengthPattern) {
+        strengthPattern.firstMatcher(TabListData.getTabList()) {
             GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
         }
     }
@@ -142,7 +164,7 @@ object CaptureFarmingGear {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         captureFarmingGear()
     }
@@ -216,7 +238,7 @@ object CaptureFarmingGear {
             if (item.displayName.contains("Extra Farming Fortune")) {
                 level = 0
 
-                item.getLore().matchFirst(anitaMenuPattern) {
+                anitaMenuPattern.firstMatcher(item.getLore()) {
                     level = group("level").toInt() / 4
                 }
             }
@@ -394,8 +416,8 @@ object CaptureFarmingGear {
         storage.outdatedItems.clear()
     }
 
-    @SubscribeEvent
-    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
         event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
         event.move(48, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
@@ -20,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -155,7 +156,7 @@ object SackDisplay {
                             )
                         )
                         // TODO add cache
-                        addItemStack("MAGMA_FISH".asInternalName())
+                        addItemStack("MAGMA_FISH".toInternalName())
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
@@ -323,7 +324,7 @@ object SackDisplay {
         UNFORMATTED("Unformatted"),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "inventory.sackDisplay.numberFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

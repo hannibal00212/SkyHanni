@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -58,7 +59,7 @@ object PlayerTabComplete {
             add(getExcluding(PlayerCategory.PARTY))
         }
 
-        parent("w", "msg", "tell", "boop") { add(getExcluding()) }
+        parent("w", "msg", "tell", "boop", "boo") { add(getExcluding()) }
 
         parent("visit") {
             add(getExcluding())
@@ -110,7 +111,7 @@ object PlayerTabComplete {
         vipVisits = data.vipVisits
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tabCompleteCommands", "commands.tabComplete")
     }

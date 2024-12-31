@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -40,6 +40,12 @@ object CollectionTracker {
 
     private var recentGain = 0
     private var lastGainTime = -1L
+
+    private val CACTUS = "CACTUS".toInternalName()
+    private val CACTUS_GREEN = "INK_SACK-2".toInternalName()
+    private val YOUNGITE = "YOUNGITE".toInternalName()
+    private val OBSOLITE = "OBSOLITE".toInternalName()
+    private val TIMITE = "TIMITE".toInternalName()
 
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
@@ -167,16 +173,17 @@ object CollectionTracker {
         )
     }
 
-    private fun countCurrentlyInInventory(): Int {
-        val cactus = "CACTUS".asInternalName()
-        val cactusGreen = "INK_SACK-2".asInternalName()
-        return InventoryUtils.countItemsInLowerInventory {
-            if (internalName == cactus && it.getInternalName() == cactusGreen) {
-                return@countItemsInLowerInventory true
-            }
-            it.getInternalName() == internalName
+    private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {
+        val name = it.getInternalName()
+        if (internalName == CACTUS && name == CACTUS_GREEN) {
+            return@countItemsInLowerInventory true
         }
+        if (internalName == TIMITE && (name == YOUNGITE || name == OBSOLITE)) {
+            return@countItemsInLowerInventory true
+        }
+        name == internalName
     }
+
 
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null

@@ -20,6 +20,6 @@ public class UpdateDataWatcherEventPatch {
 
     @Inject(method = "updateWatchedObjectsFromList", at = @At("TAIL"))
     public void onWhatever(List<DataWatcher.WatchableObject> list, CallbackInfo ci) {
-        new DataWatcherUpdatedEvent(owner, list).postAndCatch();
+        new DataWatcherUpdatedEvent(owner, list).post();
     }
 }

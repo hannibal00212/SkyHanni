@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -53,7 +54,7 @@ object ChocolateFactoryShortcut {
         showItem = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory is ContainerLocalMenu && showItem && event.slot == 15) {
             event.replace(item)
