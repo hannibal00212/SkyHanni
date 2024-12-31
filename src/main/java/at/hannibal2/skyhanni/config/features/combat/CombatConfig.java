@@ -73,11 +73,12 @@ public class CombatConfig {
     public DragonConfig dragon = new DragonConfig();
 
     @Expose
-    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after the it died")
+    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after the it died.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean endstoneProtectorChat = true;
 
+    @Expose
     @ConfigOption(name = "Broodmother", desc = "")
     @Accordion
     public BroodmotherConfig broodmother = new BroodmotherConfig();

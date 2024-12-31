@@ -46,7 +46,8 @@ object DragonFeatures {
      */
     private val eyePlaced by chatGroup.pattern(
         "eye.placed.you",
-        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
+        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|" +
+            "§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
     )
 
     /** REGEX-TEST: §5You recovered a Summoning Eye!
@@ -68,7 +69,7 @@ object DragonFeatures {
      */
     private val endStartLineProtector by protectorRepoGroup.pattern(
         "chat.end.boss",
-        "§f +§r§6§l ENDSTONE PROTECTOR DOWN!",
+        "§f +§r§6§lENDSTONE PROTECTOR DOWN!",
     )
 
     /** REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
@@ -99,15 +100,27 @@ object DragonFeatures {
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>${dragonNamesAsRegex}) Dragon§r§d§l has spawned!",
+        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
     )
+
+    /** REGEX-TEST: Your Damage: §c2,003.2
+     */
     private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
+
+    /** REGEX-TEST: Dragon HP: §a14,659,354 §c❤
+     */
     private val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
+
+    /** REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
+    REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
+    REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
+    REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
+     */
     private val tabDamage by tabListGroup.pattern(
         "fight.player",
-        ".*§r§f(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤",
+        ".*§r§.(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤",
     )
 
     private var yourEyes = 0
@@ -301,7 +314,7 @@ object DragonFeatures {
         if (!event.isWidget(TabWidget.DRAGON)) return
         if (!(enableDisplay() && dragonSpawned)) return
         widgetActive = true
-        for (i in 1 until event.lines.size) {
+        loop@ for (i in 1 until event.lines.size) {
             tabDamage.matchMatcher(event.lines[i]) {
                 if (i == 1) {
                     currentTopDamage = this.group("Damage").toDouble() * this.group("Unit").let {
@@ -313,7 +326,7 @@ object DragonFeatures {
                     }
                 }
                 if (this.group("Name") == LorenzUtils.getPlayerName()) {
-                    currentPlace = i
+                    currentPlace = if (i > 3) null else i
                 }
             }
         }
@@ -339,7 +352,7 @@ object DragonFeatures {
             listOf(
                 "Eyes: $yourEyes",
                 "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}",
-                "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}%",
+                "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}",
             ),
         ),
     )
