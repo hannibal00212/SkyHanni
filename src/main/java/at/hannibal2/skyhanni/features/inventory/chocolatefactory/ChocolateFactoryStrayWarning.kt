@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -28,7 +28,9 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
@@ -37,6 +39,9 @@ object ChocolateFactoryStrayWarning {
 
     private val config get() = ChocolateFactoryAPI.config
     private val warningConfig get() = config.rabbitWarning
+    private const val CHROMA_COLOR = "249:255:255:85:85"
+    private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
+    private const val CHROMA_COLOR_ALT2 = "243:255:255:85:85"
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
@@ -85,7 +90,27 @@ object ChocolateFactoryStrayWarning {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        InventoryUtils.getItemsInOpenChest().filter {
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (config.partyMode.get()) event.partyModeHighlight()
+        else event.strayHighlight()
+    }
+
+    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
+        gui.inventorySlots as? ContainerChest
+
+    private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
+        eventChest.inventorySlots.filter {
+            it.slotNumber != it.slotIndex
+        }.forEach {
+            it highlight CHROMA_COLOR_ALT2.toSpecialColor()
+        }
+    }
+
+    private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
             it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
@@ -100,8 +125,9 @@ object ChocolateFactoryStrayWarning {
         }
         val strayStacks = HoppityAPI.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
-        activeStraySlots = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }.keys
-        flashScreen = strayStacks.any {
+        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
+        activeStraySlots = activeStrays.keys
+        flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
                 StrayTypeEntry.SPECIAL -> isSpecial(stack)
@@ -132,13 +158,14 @@ object ChocolateFactoryStrayWarning {
         flashScreen = false
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!flashScreen) return
+        if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        val color = (alpha shl 24) or (config.rabbitWarning.flashColor.toSpecialColorInt() and 0xFFFFFF)
+        val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
+        val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
         Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }

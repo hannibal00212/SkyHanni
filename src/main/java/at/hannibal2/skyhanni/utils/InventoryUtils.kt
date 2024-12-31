@@ -146,6 +146,13 @@ object InventoryUtils {
         else -> ""
     }
 
+    fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            this[slot] = slot.stack
+        }
+    }
+
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }

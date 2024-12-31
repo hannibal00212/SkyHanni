@@ -236,7 +236,8 @@ object SackAPI {
         if (savingSacks) saveSackData()
     }
 
-    private var sackData = mapOf<NEUInternalName, SackItem>()
+    var sackData = mapOf<NEUInternalName, SackItem>()
+        private set
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 

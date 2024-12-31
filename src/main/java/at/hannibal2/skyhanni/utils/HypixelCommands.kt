@@ -106,6 +106,14 @@ object HypixelCommands {
         send("wiki $text")
     }
 
+    fun backPack(position: Int) {
+        send("bp $position")
+    }
+
+    fun enderChest(position: Int) {
+        send("ec $position")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
