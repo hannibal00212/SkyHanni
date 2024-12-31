@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,8 +14,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -60,7 +61,7 @@ object DragonFeatures {
      */
     private val endStartLineDragon by chatGroup.pattern(
         "end.boss",
-        "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!",
+        "§f +§r§6§l(?<Dragon>$dragonNamesUpperCaseAsRegex) DRAGON DOWN!",
     )
 
     /** REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
@@ -183,12 +184,18 @@ object DragonFeatures {
     }
 
     private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        dragonWeightMap(if (yourDamage == 0.0) -1 else place) + 100 * (eyes + yourDamage / (firstDamage.takeIf { it != 0.0 }
-            ?: 1.0))
+        dragonWeightMap(
+            if (yourDamage == 0.0) -1 else place,
+        ) + 100 * (
+            eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+            )
 
     private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        protectorWeightMap(if (yourDamage == 0.0) -1 else place) + 50 * (yourDamage / (firstDamage.takeIf { it != 0.0 }
-            ?: 1.0)) + if (zealots > 100) 100 else zealots
+        protectorWeightMap(
+            if (yourDamage == 0.0) -1 else place,
+        ) + 50 * (
+            yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+            ) + if (zealots > 100) 100 else zealots
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -272,10 +279,10 @@ object DragonFeatures {
     }
 
     private fun printWeight(weight: Double) {
-        ChatUtils.chat("§f                §r§eYour Weight: §r§a${weight.round(0).addSeparators()}")
+        ChatUtils.chat("§f                §r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
         if (!(enableDisplay())) return
         val index = event.full.indexOfFirst { scoreDragon.matches(it) }
@@ -289,7 +296,7 @@ object DragonFeatures {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
         if (!(enableDisplay() && dragonSpawned)) return
@@ -327,7 +334,7 @@ object DragonFeatures {
         Renderable.hoverTips(
             "§6Current Weight: §f${
                 calculateDragonWeight(yourEyes, currentPlace ?: 6, currentTopDamage, currentDamage)
-                    .round(1).addSeparators()
+                    .roundTo(1).addSeparators()
             }",
             listOf(
                 "Eyes: $yourEyes",
@@ -337,7 +344,7 @@ object DragonFeatures {
         ),
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
         egg = true
