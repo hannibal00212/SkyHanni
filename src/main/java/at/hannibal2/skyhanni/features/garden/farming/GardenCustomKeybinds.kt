@@ -93,7 +93,8 @@ object GardenCustomKeybinds {
         ConditionalUtils.onToggle(
             *listOf(
                 config.layout1, config.layout2, config.layout3, config.layout4, config.layout5
-            ).flatMap(::getAllKeybindingsFromLayout).toTypedArray()) {
+            ).flatMap(::getAllKeybindingsFromLayout).toTypedArray()
+        ) {
             update()
         }
         update()
