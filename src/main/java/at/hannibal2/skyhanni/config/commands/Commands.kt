@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
+import at.hannibal2.skyhanni.features.garden.farming.GardenUptimeCommand
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
@@ -154,6 +155,11 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
+        event.register("shgardenuptime") {
+            description = "Shows garden uptime history for past x days, defaults to 7"
+            category = CommandCategory.USERS_ACTIVE
+            callback { GardenUptimeCommand.onCommand(it) }
+        }
         event.register("shcroptime") {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
