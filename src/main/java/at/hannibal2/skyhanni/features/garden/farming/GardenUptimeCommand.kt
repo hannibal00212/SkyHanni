@@ -25,13 +25,14 @@ object GardenUptimeCommand {
 
         val date = LocalDate.now()
         var totalUptime = 0
+
         val commandString = mutableListOf(
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-            "§b${LorenzUtils.getPlayerName()}§e's garden uptime for the past §a$dayAmount §edays:",
+            "§b${LorenzUtils.getPlayerName()}'s§e garden uptime for the past §a$dayAmount §edays:",
             ""
         )
 
-        for(num in 0..< dayAmount) {
+        for (num in 0..<dayAmount) {
 
             val day = date.minusDays(num.toLong())
             val entry = storage?.getEntry(SkyHanniTracker.DisplayMode.DAY, day)
@@ -52,7 +53,7 @@ object GardenUptimeCommand {
 
         commandString += ""
         commandString += "§bTotal Uptime: §e${totalUptime.seconds}"
-        commandString += "§bAverage Uptime: §e${(totalUptime/dayAmount).seconds}"
+        commandString += "§bAverage Uptime: §e${(totalUptime / dayAmount).seconds}"
         commandString += "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r"
 
         chat(commandString.joinToString("\n"), false)
