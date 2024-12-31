@@ -25,6 +25,7 @@ object ItemPriceUtils {
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
         when (this) {
+            NEUInternalName.GEMSTONE_COLLECTION -> return 0.0
             NEUInternalName.JASPER_CRYSTAL -> return 0.0
             NEUInternalName.RUBY_CRYSTAL -> return 0.0
             NEUInternalName.SKYBLOCK_COIN -> return 1.0
