@@ -10,8 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.*
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -19,8 +18,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.renderables.*
+import at.hannibal2.skyhanni.utils.repopatterns.*
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,7 +46,7 @@ object DragonFeatures {
     private val eyePlaced by chatGroup.pattern(
         "eye.placed.you",
         "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|" +
-            "§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
+                "§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
     )
 
     /** REGEX-TEST: §5You recovered a Summoning Eye!
@@ -114,9 +113,9 @@ object DragonFeatures {
     // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
 
     /** REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
-    REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
-    REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
-    REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
+     * REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
+     * REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
+     * REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
      */
     private val tabDamage by tabListGroup.pattern(
         "fight.player",
@@ -200,15 +199,15 @@ object DragonFeatures {
         dragonWeightMap(
             if (yourDamage == 0.0) -1 else place,
         ) + 100 * (
-            eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
-            )
+                eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+                )
 
     private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
         protectorWeightMap(
             if (yourDamage == 0.0) -1 else place,
         ) + 50 * (
-            yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
-            ) + if (zealots > 100) 100 else zealots
+                yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+                ) + if (zealots > 100) 100 else zealots
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
