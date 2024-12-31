@@ -42,26 +42,31 @@ class SkyhanniTimedTracker<Data : TrackerData>(
         DisplayMode.YEAR,
     ) + extraDisplayModes.keys
 
+    // Todo verify this works
     @HandleEvent
     fun onDateChange(event: DateChangeEvent) {
         if (date == event.oldDate) {
             date = event.newDate
+            update()
         }
         if (week == event.oldDate.toWeekString().weekToLocalDate()) {
             week = event.newDate.toWeekString().weekToLocalDate()
+            update()
         }
         if (month == event.oldDate.toMonthString().monthToLocalDate()) {
             month = event.newDate.toMonthString().monthToLocalDate()
+            update()
         }
         if (year == event.oldDate.year.toString().yearToLocalDate()) {
             year = event.newDate.year.toString().yearToLocalDate()
+            update()
         }
     }
 
     private var date = LocalDate.now()
-    private var week = LocalDate.now().toWeekString().weekToLocalDate()
-    private var month = LocalDate.now().toMonthString().monthToLocalDate()
-    private var year = LocalDate.now().year.toString().yearToLocalDate()
+    private var week = date.toWeekString().weekToLocalDate()
+    private var month = date.toMonthString().monthToLocalDate()
+    private var year = date.year.toString().yearToLocalDate()
 
     private fun getNextDisplay(): DisplayMode {
         return availableTrackers[(availableTrackers.indexOf(displayMode) + 1) % availableTrackers.size]
@@ -197,33 +202,31 @@ class SkyhanniTimedTracker<Data : TrackerData>(
     private fun buildDateSwitcherView(): List<Renderable>? {
         val statsStorage = ProfileStorageData.profileSpecific?.getData() ?: return null
         val entries = statsStorage.getEntries(getDisplayMode())?.keys ?: return null
-        val display = when (getDisplayMode()) {
+
+        var previous: LocalDate? = null
+        var next: LocalDate? = null
+
+        when (getDisplayMode()) {
             DisplayMode.DAY -> {
-                val previousDay = entries.filter { it.dayToLocalDate() < date }.maxOrNull()?.dayToLocalDate()
-                val nextDay = entries.filter { it.dayToLocalDate() > date }.minOrNull()?.dayToLocalDate()
-                if (previousDay == null && nextDay == null) return null
-                buildDateSwitcherButtons(previousDay, nextDay)
+                previous = entries.filter { it.dayToLocalDate() < date }.maxOrNull()?.dayToLocalDate()
+                next = entries.filter { it.dayToLocalDate() > date }.minOrNull()?.dayToLocalDate()
             }
             DisplayMode.WEEK -> {
-                val previousWeek = entries.filter { it.weekToLocalDate() < week }.maxOrNull()?.weekToLocalDate()
-                val nextWeek = entries.filter { it.weekToLocalDate() > week }.minOrNull()?.weekToLocalDate()
-                if (previousWeek == null && nextWeek == null) return null
-                buildDateSwitcherButtons(previousWeek, nextWeek)
+                previous = entries.filter { it.weekToLocalDate() < week }.maxOrNull()?.weekToLocalDate()
+                next = entries.filter { it.weekToLocalDate() > week }.minOrNull()?.weekToLocalDate()
             }
             DisplayMode.MONTH -> {
-                val previousMonth = entries.filter { it.monthToLocalDate() < month }.maxOrNull()?.monthToLocalDate()
-                val nextMonth = entries.filter { it.monthToLocalDate() > month }.minOrNull()?.monthToLocalDate()
-                if (previousMonth == null && nextMonth == null) return null
-                buildDateSwitcherButtons(previousMonth, nextMonth)
+                previous = entries.filter { it.monthToLocalDate() < month }.maxOrNull()?.monthToLocalDate()
+                next = entries.filter { it.monthToLocalDate() > month }.minOrNull()?.monthToLocalDate()
             }
             DisplayMode.YEAR -> {
-                val previousYear = entries.filter { it.yearToLocalDate() < year }.maxOrNull()?.yearToLocalDate()
-                val nextYear = entries.filter { it.yearToLocalDate() > year }.minOrNull()?.yearToLocalDate()
-                if (previousYear == null && nextYear == null) return null
-                buildDateSwitcherButtons(previousYear, nextYear)
+                previous = entries.filter { it.yearToLocalDate() < year }.maxOrNull()?.yearToLocalDate()
+                next = entries.filter { it.yearToLocalDate() > year }.minOrNull()?.yearToLocalDate()
             }
-            else -> return null
+            else -> {}
         }
+        if (previous == null && next == null) return null
+        val display = buildDateSwitcherButtons(previous, next)
         return display
     }
 
