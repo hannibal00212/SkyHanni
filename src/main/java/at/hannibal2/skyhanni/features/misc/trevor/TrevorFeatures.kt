@@ -290,9 +290,7 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
-                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else {
-                    TrevorSolver.currentMob!!.mobName
-                }
+                val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.up(), displayName, 1.5)

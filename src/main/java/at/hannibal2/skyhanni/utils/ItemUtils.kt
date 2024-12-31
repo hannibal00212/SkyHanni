@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -45,6 +48,13 @@ object ItemUtils {
 
     private val missingRepoItems = mutableSetOf<String>()
     private var lastRepoWarning = SimpleTimeMark.farPast()
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
+            itemNameCache.clear()
+        }
+    }
 
     private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
 
@@ -500,15 +510,20 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return itemStack.getLore()[0]
+            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
         }
         if (name.endsWith("Enchanted Book Bundle")) {
-            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
         }
 
         // obfuscated trophy fish
         if (name.contains("§kObfuscated")) {
             return name.replace("§kObfuscated", "Obfuscated")
+        }
+
+        // remove roman runic tier
+        if (isRune()) {
+            return ReplaceRomanNumerals.replaceLine(name)
         }
 
         // hide pet level
