@@ -331,7 +331,7 @@ object CaptureFarmingGear {
                 highestSlugRarity = rarity.toInt()
             }
             if (name == "HEDGEHOG" && rarity.toInt() > highestHedgehogRarity) {
-                FarmingItems.SLUG.setItem(item)
+                FarmingItems.HEDGEHOG.setItem(item)
                 outdatedItems[FarmingItems.HEDGEHOG] = false
                 highestHedgehogRarity = rarity.toInt()
             }
