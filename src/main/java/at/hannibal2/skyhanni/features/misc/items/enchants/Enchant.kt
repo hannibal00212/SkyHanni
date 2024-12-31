@@ -2,20 +2,20 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
 import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
@@ -122,7 +122,7 @@ open class Enchant : Comparable<Enchant> {
             val nbtKey = nbtNum ?: return ""
             val levels = stackLevel ?: return ""
             val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
-            val progress = item.extraAttributes.getDouble(nbtKey).round(0).toInt()
+            val progress = item.extraAttributes.getDouble(nbtKey).roundTo(0).toInt()
             if (progress == 0) return ""
             val nextLevel = levels.higher(progress)
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
