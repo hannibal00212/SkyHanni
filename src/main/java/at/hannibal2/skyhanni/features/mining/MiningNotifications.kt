@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object MiningNotifications {
 
-    private val ASCENSION_ROPE by lazy { "ASCENSION_ROPE".asInternalName().makePrimitiveStack(1) }
+    private val ASCENSION_ROPE by lazy { "ASCENSION_ROPE".toInternalName().makePrimitiveStack(1) }
 
     enum class MiningNotificationList(val str: String, val notification: String) {
         MINESHAFT_SPAWN("§bGlacite Mineshaft", "§bMineshaft"),
@@ -73,7 +74,7 @@ object MiningNotifications {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
         if (!inGlaciteArea()) return
         if (!config.enabled) return
@@ -97,7 +98,7 @@ object MiningNotifications {
         hasSentAscensionRope = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.coldThreshold) {
             if (MiningAPI.cold != config.coldThreshold.get()) hasSentCold = false

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +18,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.InputStreamReader
 import java.io.Reader
 
@@ -52,7 +52,7 @@ object TestExportTools {
         return gson.fromJson(serializable.data)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
         val stack = event.guiContainer.slotUnderMouse?.stack ?: return
@@ -70,7 +70,7 @@ object TestExportTools {
         return fromJson(category, reader)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyNBTDataCompressed", "dev.debug.copyNBTDataCompressed")
         event.move(4, "dev.debug.copyNBTData", "dev.debug.copyItemData")

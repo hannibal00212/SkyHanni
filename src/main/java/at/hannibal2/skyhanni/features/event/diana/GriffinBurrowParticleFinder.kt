@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,8 +36,8 @@ object GriffinBurrowParticleFinder {
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Particle Finder")
 
         if (!DianaAPI.isDoingDiana()) {
@@ -83,7 +83,7 @@ object GriffinBurrowParticleFinder {
 
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
                     if (!burrow.found) {
-                        BurrowDetectEvent(burrow.location, burrow.getType()).postAndCatch()
+                        BurrowDetectEvent(burrow.location, burrow.getType()).post()
                         burrow.found = true
                     }
                 }
@@ -166,7 +166,7 @@ object GriffinBurrowParticleFinder {
         recentlyDugParticleBurrows.add(location)
         lastDugParticleBurrow = null
 
-        BurrowDugEvent(burrow.location).postAndCatch()
+        BurrowDugEvent(burrow.location).post()
         return true
     }
 

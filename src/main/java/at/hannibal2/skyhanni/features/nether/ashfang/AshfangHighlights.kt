@@ -10,9 +10,8 @@ import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.getExtendedColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -41,8 +41,8 @@ object AshfangHighlights {
         val entity = event.entity
         DelayedRun.runNextTick {
             when {
-                entity.hasSkullTexture(BLAZING_SOUL) -> blazingSouls += entity
-                entity.hasSkullTexture(GRAVITY_ORB) -> gravityOrbs += entity
+                entity.wearingSkullTexture(BLAZING_SOUL) -> blazingSouls += entity
+                entity.wearingSkullTexture(GRAVITY_ORB) -> gravityOrbs += entity
             }
         }
     }
@@ -58,7 +58,7 @@ object AshfangHighlights {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
-            val color = config.blazingSouls.color.toChromaColor()
+            val color = config.blazingSouls.color.toSpecialColor()
             blazingSouls.forEach {
                 val location = event.exactLocation(it)
                 event.drawWaypointFilled(location.add(-0.5, 1.25, -0.5), color, extraSize = -0.15)
@@ -67,7 +67,7 @@ object AshfangHighlights {
         }
 
         if (config.gravityOrbs.enabled) {
-            val color = config.gravityOrbs.color.toChromaColor()
+            val color = config.gravityOrbs.color.toSpecialColor()
             gravityOrbs.forEach {
                 val location = event.exactLocation(it)
                 event.drawCylinderInWorld(color, location.add(-0.5, -2.0, -0.5), 3.5f, 4.5f)
@@ -93,7 +93,7 @@ object AshfangHighlights {
     private fun getColorCode(distance: Double): String =
         ColorUtils.blendRGB(LorenzColor.GREEN.toColor(), LorenzColor.RED.toColor(), distance / MAX_DISTANCE).getExtendedColorCode()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ashfang.blazingSouls", "crimsonIsle.ashfang.blazingSouls.enabled")
         event.move(2, "ashfang.blazingSoulsColor", "crimsonIsle.ashfang.blazingSouls.color")

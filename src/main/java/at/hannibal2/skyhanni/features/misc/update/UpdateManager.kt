@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -16,7 +17,6 @@ import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
-import moe.nea.libautoupdate.UpdateSource
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
@@ -44,7 +44,7 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.about.updateStream.onToggle {
             reset()
@@ -134,7 +134,7 @@ object UpdateManager {
     }
 
     private val context = UpdateContext(
-        UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
+        CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
             val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonRoomPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -43,6 +44,11 @@ import kotlin.time.Duration.Companion.seconds
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
+
+    /**
+     * REGEX-TEST: Glacite Tunnels
+     * REGEX-TEST: Great Glacite Lake
+     */
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
@@ -147,6 +153,9 @@ object MiningAPI {
     var cold: Int = 0
         private set
 
+    var mineshaftRoomId: String? = null
+        private set
+
     var lastColdUpdate = SimpleTimeMark.farPast()
         private set
     var lastColdReset = SimpleTimeMark.farPast()
@@ -181,8 +190,16 @@ object MiningAPI {
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        if (!inCustomMiningIsland()) return
+
+        dungeonRoomPattern.firstMatcher(event.added) {
+            mineshaftRoomId = group("roomId")
+        } ?: run {
+            mineshaftRoomId = null
+        }
+
         val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
         } ?: return
@@ -231,7 +248,7 @@ object MiningAPI {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.name == LorenzUtils.getPlayerName()) {
             updateCold(0)
@@ -239,7 +256,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
@@ -283,7 +300,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
         val oldState = event.oldState
@@ -352,7 +369,7 @@ object MiningAPI {
         updateLocation()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
     }
@@ -419,8 +436,8 @@ object MiningAPI {
         pickobulusWaitingForBlock = false
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!inCustomMiningIsland()) {
             event.addIrrelevant("not in a mining island")
@@ -460,7 +477,7 @@ object MiningAPI {
         // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
-        ColdUpdateEvent(newCold).postAndCatch()
+        ColdUpdateEvent(newCold).post()
         cold = newCold
     }
 
