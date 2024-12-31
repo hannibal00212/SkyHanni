@@ -1,0 +1,25 @@
+<Root xmlns="http://notenoughupdates.org/moulconfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://notenoughupdates.org/moulconfig https://raw.githubusercontent.com/NotEnoughUpdates/MoulConfig/master/MoulConfig.xsd">
+    <Gui>
+        <Column>
+            <Row>
+                <Text text="Search: "/>
+                <TextField value="@search"/>
+                <Text text="@poll"/>
+            </Row>
+            <ScrollPanel width="560" height="400">
+                <Array data="@searchResults">
+                    <Row>
+                        <Hover lines="@keyW">
+                            <Text text="@key" width="200"/>
+                        </Hover>
+                        <Hover lines="@hoverRegex">
+                            <Text text="@regex" width="300"/>
+                        </Hover>
+                        <Text text="@overriden" width="50"/>
+                    </Row>
+                </Array>
+            </ScrollPanel>
+        </Column>
+    </Gui>
+</Root>

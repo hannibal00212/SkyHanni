@@ -1,0 +1,9 @@
+{
+    "package": "at.hannibal2.skyhanni.mixins.transformers",
+    "refmap": "mixins.skyhanni.refmap.json",
+    "plugin": "at.hannibal2.skyhanni.mixins.init.SkyhanniMixinPlugin",
+    "compatibilityLevel": "JAVA_8",
+    "injectors": {
+        "maxShiftBy": 2
+    }
+}

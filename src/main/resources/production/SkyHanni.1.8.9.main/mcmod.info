@@ -1,0 +1,20 @@
+[
+    {
+        "modid": "skyhanni",
+        "name": "SkyHanni",
+        "description": "Hypixel SkyBlock Mod",
+        "version": "${version}",
+        "mcversion": "1.8.9",
+        "url": "https://github.com/hannibal002/SkyHanni",
+        "updateUrl": "",
+        "authorList": [
+            "hannibal2"
+        ],
+        "credits": "https://github.com/hannibal002/SkyHanni/graphs/contributors",
+        "logoFile": "assets/skyhanni/logo.png",
+        "screenshots": [],
+        "dependencies": [
+            "NotEnoughUpdates"
+        ]
+    }
+]
