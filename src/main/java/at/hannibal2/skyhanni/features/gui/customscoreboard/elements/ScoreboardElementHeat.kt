@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 // scoreboard update event
 object ScoreboardElementHeat : ScoreboardElement() {
     override fun getDisplay(): String? {
-        val heat = getHeat() ?: return null
-
+        val heat = getHeat()
         return when {
             informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0" -> null
             displayConfig.displayNumbersFirst -> "$heat Heat"
