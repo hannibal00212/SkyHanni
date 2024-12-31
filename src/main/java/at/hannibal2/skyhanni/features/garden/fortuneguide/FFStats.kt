@@ -189,6 +189,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel
                 else -> 0.0
             }
         }
