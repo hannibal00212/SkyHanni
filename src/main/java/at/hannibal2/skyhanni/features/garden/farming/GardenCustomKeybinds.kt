@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.farming.keybinds.KeyBindLayouts
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -32,9 +33,9 @@ import kotlin.time.Duration.Companion.seconds
 object GardenCustomKeybinds {
 
     private val config get() = GardenAPI.config.keyBind
-    private val mcSettings get() = Minecraft.getMinecraft().gameSettings
+    val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-    private val layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
+//     private val layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
 
     private var cropLayoutSelection: Map<CropType?, String> = emptyMap()
     private var cropInHand: CropType? = null
@@ -87,22 +88,24 @@ object GardenCustomKeybinds {
     }
 
 //     TODO: remove the need for this workaround, as GardenAPI should call GardenToolChangeEvent on island change
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) {
-            DelayedRun.runDelayed(2.seconds) {
-                cropInHand = GardenAPI.cropInHand
-                currentLayout = layouts[cropLayoutSelection[cropInHand]]
-            }
-        }
-    }
+//     @HandleEvent
+//     fun onIslandChange(event: IslandChangeEvent) {
+//         if (event.newIsland == IslandType.GARDEN) {
+//             DelayedRun.runDelayed(2.seconds) {
+//                 cropInHand = GardenAPI.cropInHand
+//                 currentLayout = layouts[cropLayoutSelection[cropInHand]]
+//             }
+//         }
+//     }
+
+    @JvmStatic
+    fun getAllKeybindingsFromLayout(layout: KeyBindLayout) = listOf(
+        layout.attack, layout.useItem, layout.left, layout.right,
+        layout.forward, layout.back, layout.jump, layout.sneak
+    )
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        fun getAllKeybindingsFromLayout(layout: KeyBindLayout) = listOf(
-            layout.attack, layout.useItem, layout.left, layout.right,
-            layout.forward, layout.back, layout.jump, layout.sneak
-        )
 
         ConditionalUtils.onToggle(
             *listOf(
@@ -126,15 +129,16 @@ object GardenCustomKeybinds {
 
                 return buildMap {
                     keyBindings.zip(
-                        listOf(
-                            layout.attack, layout.useItem, layout.left, layout.right,
-                            layout.forward, layout.back, layout.jump, layout.sneak
-                        )
+                        getAllKeybindingsFromLayout(layout)
                     ) { keyBinding, setKeyProperty ->
                         put(keyBinding, setKeyProperty.get()) // Add key-value pair
                     }
                 }
             }
+        }
+
+        KeyBindLayouts.entries.forEach { layout ->
+            layout.buildKeybindLayoutMap()
         }
 
         layouts["Layout 1"] = buildKeybindLayoutMap(config.layout1)
