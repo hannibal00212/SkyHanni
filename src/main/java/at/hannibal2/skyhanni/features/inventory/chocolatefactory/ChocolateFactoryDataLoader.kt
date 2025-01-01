@@ -436,7 +436,7 @@ object ChocolateFactoryDataLoader {
 
         for (line in item.getLore()) {
             hitmanAvailableEggsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.availableEggs = group("amount").formatInt()
+                profileStorage.hitmanStats.availableHitmanEggs = group("amount").formatInt()
             }
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
