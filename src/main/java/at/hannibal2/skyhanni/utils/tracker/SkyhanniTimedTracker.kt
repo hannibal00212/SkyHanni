@@ -269,9 +269,9 @@ class SkyhanniTimedTracker<Data : TrackerData>(
                     "§a[ §r§f§l->> §r§a]",
                     onClick = {
                         when (getDisplayMode()) {
-                            DisplayMode.WEEK -> week = LocalDate.now()
-                            DisplayMode.MONTH -> month = LocalDate.now()
-                            DisplayMode.YEAR -> year = LocalDate.now()
+                            DisplayMode.WEEK -> week = LocalDate.now().toWeekString().weekToLocalDate()
+                            DisplayMode.MONTH -> month = LocalDate.now().toMonthString().monthToLocalDate()
+                            DisplayMode.YEAR -> year = LocalDate.now().year.toString().yearToLocalDate()
                             else -> date = LocalDate.now()
                         }
                         update()
