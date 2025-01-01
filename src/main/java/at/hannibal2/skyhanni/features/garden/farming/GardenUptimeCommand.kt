@@ -22,11 +22,7 @@ object GardenUptimeCommand {
             ChatUtils.userError("shgardenuptime requires 'Show Garden Uptime' to be enabled")
         }
 
-        val dayAmount = when {
-            args.isEmpty() -> 7
-            args[0].toIntOrNull() == null -> 7
-            else -> args[0].toInt().coerceAtMost(31)
-        }
+        val dayAmount = args.getOrNull(0)?.toIntOrNull()?.coerceAtMost(31) ?: 7
 
         val date = LocalDate.now()
         var totalUptime = 0
