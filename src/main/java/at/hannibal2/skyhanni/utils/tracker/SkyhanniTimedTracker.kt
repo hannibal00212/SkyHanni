@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.DateChangeEvent
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -32,7 +30,6 @@ class SkyhanniTimedTracker<Data : TrackerData>(
     *extraStorage,
     drawDisplay = drawDisplay
 ) {
-
     private val availableTrackers = arrayOf(
         DisplayMode.TOTAL,
         DisplayMode.SESSION,
@@ -41,27 +38,6 @@ class SkyhanniTimedTracker<Data : TrackerData>(
         DisplayMode.MONTH,
         DisplayMode.YEAR,
     ) + extraDisplayModes.keys
-
-    // Todo verify this works
-    @HandleEvent
-    fun onDateChange(event: DateChangeEvent) {
-        if (date == event.oldDate) {
-            date = event.newDate
-            update()
-        }
-        if (week == event.oldDate.toWeekString().weekToLocalDate()) {
-            week = event.newDate.toWeekString().weekToLocalDate()
-            update()
-        }
-        if (month == event.oldDate.toMonthString().monthToLocalDate()) {
-            month = event.newDate.toMonthString().monthToLocalDate()
-            update()
-        }
-        if (year == event.oldDate.year.toString().yearToLocalDate()) {
-            year = event.newDate.year.toString().yearToLocalDate()
-            update()
-        }
-    }
 
     private var date = LocalDate.now()
     private var week = date.toWeekString().weekToLocalDate()
@@ -117,6 +93,25 @@ class SkyhanniTimedTracker<Data : TrackerData>(
         if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
         else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
     }.orEmpty()
+
+    fun changeDate(oldDate: LocalDate, newDate: LocalDate) {
+        if (date == oldDate) {
+            date = newDate
+            update()
+        }
+        if (week == oldDate.toWeekString().weekToLocalDate()) {
+            week = newDate.toWeekString().weekToLocalDate()
+            update()
+        }
+        if (month == oldDate.toMonthString().monthToLocalDate()) {
+            month = newDate.toMonthString().monthToLocalDate()
+            update()
+        }
+        if (year == oldDate.year.toString().yearToLocalDate()) {
+            year = newDate.year.toString().yearToLocalDate()
+            update()
+        }
+    }
 
 
     fun buildDate() = Renderable.verticalContainer(
@@ -198,7 +193,6 @@ class SkyhanniTimedTracker<Data : TrackerData>(
         return LocalDate.ofYearDay(year, 1)
     }
 
-    @Suppress("ReturnCount")
     private fun buildDateSwitcherView(): List<Renderable>? {
         val statsStorage = ProfileStorageData.profileSpecific?.getData() ?: return null
         val entries = statsStorage.getEntries(getDisplayMode())?.keys ?: return null

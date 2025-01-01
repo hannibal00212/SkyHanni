@@ -84,7 +84,7 @@ public class GardenConfig {
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Farming Uptime Tracker", desc = "")
+    @ConfigOption(name = "Garden Uptime Tracker", desc = "")
     @Accordion
     public GardenUptimeConfig gardenUptime = new GardenUptimeConfig();
 

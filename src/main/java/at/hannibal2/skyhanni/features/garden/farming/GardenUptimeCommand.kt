@@ -38,8 +38,8 @@ object GardenUptimeCommand {
             val entry = storage?.getEntry(SkyHanniTracker.DisplayMode.DAY, day)
 
             val cropBreakTime = entry?.cropBreakTime ?: 0
-            val pestTime = if (config.includePests) entry?.pestTime ?: 0 else 0
-            val visitorTime = if (config.includeVisitors) entry?.visitorTime ?: 0 else 0
+            val pestTime = if (config.includePests.get()) entry?.pestTime ?: 0 else 0
+            val visitorTime = if (config.includeVisitors.get()) entry?.visitorTime ?: 0 else 0
 
             val uptime = cropBreakTime + pestTime + visitorTime
 

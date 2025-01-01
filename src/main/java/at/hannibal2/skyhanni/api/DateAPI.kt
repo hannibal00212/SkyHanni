@@ -15,7 +15,7 @@ object DateAPI {
         val now = LocalDate.now()
         if (now != date) {
             date?.let {
-                DateChangeEvent(it, newDate = now).post()
+                DateChangeEvent(it, now).post()
             }
             date = now
         }

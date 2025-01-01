@@ -8,16 +8,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.DATE;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.TITLE;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.BLOCKS_BROKEN;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.BPS;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText.UPTIME;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.DATE;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.TITLE;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.BLOCKS_BROKEN;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.BPS;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.UPTIME;
 
 public class GardenUptimeConfig {
     @Expose
@@ -29,15 +30,15 @@ public class GardenUptimeConfig {
     @Expose
     @ConfigOption(name = "Include Visitors", desc = "Include doing visitors in active farming time.")
     @ConfigEditorBoolean
-    public boolean includeVisitors = true;
+    public Property<Boolean> includeVisitors = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Include Pests", desc = "Include doing pests in active farming time.")
     @ConfigEditorBoolean
-    public boolean includePests = true;
+    public Property<Boolean> includePests = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Tracker Timeout", desc = "Set duration before timer pauses when not farming.")
+    @ConfigOption(name = "Tracker Timeout", desc = "Set the duration before timer pauses when not farming.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 60,
@@ -46,12 +47,12 @@ public class GardenUptimeConfig {
     public double timeout = 10;
 
     @Expose
-    @ConfigOption(name = "Movement Timeout", desc = "Custom timeout duration if player moves but isn't farming.")
+    @ConfigOption(name = "Movement Timeout", desc = "Custom timeout duration if the player is moving but isn't farming.")
     @ConfigEditorBoolean
     public boolean movementTimeout = true;
 
     @Expose
-    @ConfigOption(name = "Movement Timeout", desc = "Set duration before timer pauses when player is moving but not farming.")
+    @ConfigOption(name = "Movement Timeout", desc = "Set the duration before timer pauses when player is moving but not farming.")
     @ConfigEditorSlider(
         minValue = 5,
         maxValue = 60,
@@ -70,25 +71,25 @@ public class GardenUptimeConfig {
         desc = "Drag text to change what displays in the summary card."
     )
     @ConfigEditorDraggableList
-    public List<FarmingUptimeDisplayText> uptimeDisplayText = new ArrayList<>(Arrays.asList(
+    public Property<List<GardenUptimeDisplayText>> uptimeDisplayText = Property.of(new ArrayList<>(Arrays.asList(
         TITLE,
         DATE,
         UPTIME,
         BPS,
         BLOCKS_BROKEN
-    ));
+    )));
 
-    public enum FarmingUptimeDisplayText {
-        TITLE("Farming Uptime"),
-        DATE("Stats for 2024-11-8"),
-        UPTIME("Uptime: 1 hour, 15 minutes"),
-        BPS("Blocks/Second: 17.9"),
+    public enum GardenUptimeDisplayText {
+        TITLE("Garden Uptime"),
+        DATE("Date: Today"),
+        UPTIME("Uptime: 1h 27m 52s"),
+        BPS("Blocks/Second: 17.11"),
         BLOCKS_BROKEN("Blocks Broken: 17,912"),
         ;
 
         private final String str;
 
-        FarmingUptimeDisplayText(String str) {
+        GardenUptimeDisplayText(String str) {
             this.str = str;
         }
 

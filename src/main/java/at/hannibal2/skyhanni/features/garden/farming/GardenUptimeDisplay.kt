@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.FarmingUptimeDisplayText
+import at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.CropClickEvent
+import at.hannibal2.skyhanni.events.DateChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -15,6 +17,8 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -92,7 +96,7 @@ object GardenUptimeDisplay {
         justRemovedAFK = false
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!config.showDisplay) return
         if (event.oldIsland.isAnyOf(IslandType.GARDEN)) markAFK()
@@ -142,6 +146,12 @@ object GardenUptimeDisplay {
         resetAFK()
     }
 
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayer>) {
+        if (!isEnabled()) return
+        secondsLastMove = 0
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -149,29 +159,41 @@ object GardenUptimeDisplay {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent<EntityPlayer>) {
-        if (!isEnabled()) return
-        secondsLastMove = 0
+    fun onDateChange(event: DateChangeEvent) {
+        tracker.changeDate(event.oldDate, event.newDate)
     }
 
-    var blockBreaksLastSecond = 0
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        onToggle(
+            config.includeVisitors,
+            config.includePests
+        ) {
+            tracker.update()
+        }
+        config.uptimeDisplayText.afterChange {
+            tracker.update()
+        }
+    }
+
+    private var blockBreaksLastSecond = 0
     var storage = GardenAPI.storage
-    var justRemovedAFK = false
-    var isAFK = false
-    var secondsAFK = 0
-    var secondsLastMove = 0
-    var activityType: ActivityType? = null
+    private var justRemovedAFK = false
+    private var isAFK = false
+    private var secondsAFK = 0
+    private var secondsLastMove = 0
+    private var activityType: ActivityType? = null
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
-        val lineMap = mutableMapOf<FarmingUptimeDisplayText, Searchable>()
-        lineMap[FarmingUptimeDisplayText.TITLE] = Renderable.string("§6Farming Uptime").toSearchable()
+        val lineMap = mutableMapOf<GardenUptimeDisplayText, Searchable>()
+        lineMap[GardenUptimeDisplayText.TITLE] = Renderable.string("§6Garden Uptime").toSearchable()
 
-        lineMap[FarmingUptimeDisplayText.DATE] = tracker.buildDate().toSearchable()
+        lineMap[GardenUptimeDisplayText.DATE] = tracker.buildDate().toSearchable()
 
         var uptime = data.cropBreakTime
-        if (config.includeVisitors) uptime += data.visitorTime
-        if (config.includePests) uptime += data.pestTime
-        lineMap[FarmingUptimeDisplayText.UPTIME] =
+        if (config.includeVisitors.get()) uptime += data.visitorTime
+        if (config.includePests.get()) uptime += data.pestTime
+        lineMap[GardenUptimeDisplayText.UPTIME] =
             Renderable.string(
                 "§7Uptime: §e${if (uptime > 0) uptime.seconds else "§cnone"}${if (isAFK) " §cPaused!" else ""}"
             ).toSearchable()
@@ -180,11 +202,11 @@ object GardenUptimeDisplay {
         if (uptime > 0) bps =
             (data.blocksBroken.toDouble() - blockBreaksLastSecond) / uptime
         if (bps > 0) {
-            lineMap[FarmingUptimeDisplayText.BPS] =
+            lineMap[GardenUptimeDisplayText.BPS] =
                 Renderable.string("§7Blocks/Second: §e${bps.roundTo(2)}").toSearchable()
         }
 
-        lineMap[FarmingUptimeDisplayText.BLOCKS_BROKEN] =
+        lineMap[GardenUptimeDisplayText.BLOCKS_BROKEN] =
             Renderable.string("§7Blocks Broken: §e${data.blocksBroken.addSeparators()}").toSearchable()
 
         return formatDisplay(lineMap)
@@ -204,9 +226,9 @@ object GardenUptimeDisplay {
         secondsLastMove = 0
     }
 
-    private fun formatDisplay(lineMap: MutableMap<FarmingUptimeDisplayText, Searchable>): List<Searchable> {
+    private fun formatDisplay(lineMap: MutableMap<GardenUptimeDisplayText, Searchable>): List<Searchable> {
         val newList = mutableListOf<Searchable>()
-        newList.addAll(config.uptimeDisplayText.mapNotNull { lineMap[it] })
+        newList.addAll(config.uptimeDisplayText.get().mapNotNull { lineMap[it] })
         return newList
     }
 
@@ -232,5 +254,6 @@ object GardenUptimeDisplay {
         VISITOR("Visitor"),
         PEST("Pest"),
     }
+
 
 }
