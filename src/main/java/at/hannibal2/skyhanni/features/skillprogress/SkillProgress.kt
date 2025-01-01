@@ -463,18 +463,26 @@ object SkillProgress {
                     }
 
                     if (config.showActionLeft.get() && percent != 100f) {
-                        append(" - ")
-                        val gain = skill.lastGain.formatDouble()
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
-                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                            append("§6$actionLeft Left")
-                        } else {
-                            append("§6∞ Left")
-                        }
+                        append(" - " + addActionsLeft(skill, currentXpMax, currentXp))
                     }
                 },
             ),
         )
+    }
+
+    private fun addActionsLeft(
+        skill: SkillAPI.SkillInfo,
+        currentXpMax: Long,
+        currentXp: Long,
+    ): String {
+        if (skill.lastGain != "") {
+            val gain = skill.lastGain.formatDouble()
+            val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
+            if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                return "§6$actionLeft Left"
+            }
+        }
+        return "§6∞ Left"
     }
 
     private fun updateSkillInfo() {

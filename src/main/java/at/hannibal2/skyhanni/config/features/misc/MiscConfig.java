@@ -305,7 +305,7 @@ public class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean replaceRomanNumerals = false;
+    public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")

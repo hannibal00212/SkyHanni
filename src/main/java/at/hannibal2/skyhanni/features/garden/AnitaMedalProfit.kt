@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -71,20 +71,21 @@ object AnitaMedalProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eMedal Profit"))
+        newList.add(Renderable.string("§eProfit per Bronze Medal"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
-        if (itemName == " ") return
-        if (itemName == "§cClose") return
-        if (itemName == "§eUnique Gold Medals") return
-        if (itemName == "§aMedal Trades") return
+        if (isInvalidItemName(itemName)) return
 
-        val fullCost = getFullCost(getRequiredItems(item))
-        if (fullCost < 0) return
+        val requiredItems = getRequiredItems(item)
+        val additionalMaterials = getAdditionalMaterials(requiredItems)
+        val additionalCost = getAdditionalCost(additionalMaterials)
+
+        // Ignore items without medal cost, e.g. InfiniDirt Wand
+        val bronzeCost = getBronzeCost(requiredItems) ?: return
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
@@ -96,28 +97,56 @@ object AnitaMedalProfit {
         val itemPrice = internalName.getPrice() * amount
         if (itemPrice < 0) return
 
-        val profit = itemPrice - fullCost
-        val profitFormat = profit.shortFormat()
-        val color = if (profit > 0) "§6" else "§c"
+        val profitPerSell = itemPrice - additionalCost
 
-        val hover = listOf(
-            itemName,
-            "",
-            "§7Item price: §6${itemPrice.shortFormat()} ",
+        // profit per bronze
+        val profitPerBronze = profitPerSell / bronzeCost
+
+        val profitPerSellFormat = profitPerSell.shortFormat()
+        val profitPerBronzeFormat = profitPerBronze.shortFormat()
+        val color = if (profitPerBronze > 0) "§6" else "§c"
+
+        val hover = buildList {
+            add(itemName)
+            add("")
+            add("§7Sell price: §6${itemPrice.shortFormat()}")
+
             // TODO add more exact material cost breakdown
-            "§7Material cost: §6${fullCost.shortFormat()} ",
-            "§7Final profit: §6$profitFormat ",
-        )
+            add("§7Additional cost: §6${additionalCost.shortFormat()}")
+            addAdditionalMaterials(additionalMaterials)
+
+            add("§7Profit per sell: §6$profitPerSellFormat")
+            add("")
+            add("§7Bronze medals required: §c$bronzeCost")
+            add("§7Profit per bronze medal: §6$profitPerBronzeFormat")
+        }
         table.add(
             DisplayTableEntry(
                 itemName,
-                "$color$profitFormat",
-                profit,
+                "$color$profitPerBronzeFormat",
+                profitPerBronze,
                 internalName,
                 hover,
                 highlightsOnHoverSlots = listOf(slot),
             ),
         )
+    }
+
+    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NEUInternalName, Int>) {
+        for ((internalName, amount) in additionalMaterials) {
+            val pricePer = internalName.getPrice() * amount
+            add(" " + internalName.itemName + " §8${amount}x §7(§6${pricePer.shortFormat()}§7)")
+        }
+    }
+
+    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
+        " ",
+        "§cClose",
+        "§eUnique Gold Medals",
+        "§aMedal Trades",
+        -> true
+
+        else -> false
     }
 
     private fun getItemName(item: ItemStack): String {
@@ -128,35 +157,39 @@ object AnitaMedalProfit {
         } else name
     }
 
-    private fun getFullCost(requiredItems: MutableList<String>): Double {
-        val jacobTicketPrice = "JACOBS_TICKET".toInternalName().getPrice()
-        var otherItemsPrice = 0.0
-        for (rawItemName in requiredItems) {
-            val pair = ItemUtils.readItemAmount(rawItemName)
-            if (pair == null) {
-                ErrorManager.logErrorStateWithData(
-                    "Error in Anita Medal Contest", "Could not read item amount",
-                    "rawItemName" to rawItemName,
-                )
-                continue
-            }
-
-            val (name, amount) = pair
+    private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NEUInternalName, Int> {
+        val additionalMaterials = mutableMapOf<NEUInternalName, Int>()
+        for ((name, amount) in requiredItems) {
             val medal = getMedal(name)
-            otherItemsPrice += if (medal != null) {
-                val bronze = medal.factorBronze * amount
-                bronze * jacobTicketPrice
-            } else {
-                NEUInternalName.fromItemName(name).getPrice() * amount
+            if (medal == null) {
+                additionalMaterials[NEUInternalName.fromItemName(name)] = amount
             }
+        }
+        return additionalMaterials
+    }
+
+    private fun getAdditionalCost(requiredItems: Map<NEUInternalName, Int>): Double {
+        var otherItemsPrice = 0.0
+        for ((name, amount) in requiredItems) {
+            otherItemsPrice += name.getPrice() * amount
         }
         return otherItemsPrice
     }
 
-    private fun getRequiredItems(item: ItemStack): MutableList<String> {
-        val items = mutableListOf<String>()
+    private fun getBronzeCost(requiredItems: Map<String, Int>): Int? {
+        for ((name, amount) in requiredItems) {
+            getMedal(name)?.let {
+                return it.factorBronze * amount
+            }
+        }
+        return null
+    }
+
+    private fun getRequiredItems(item: ItemStack): MutableMap<String, Int> {
+        val items = mutableMapOf<String, Int>()
         var next = false
-        for (line in item.getLore()) {
+        val lore = item.getLore()
+        for (line in lore) {
             if (line == "§7Cost") {
                 next = true
                 continue
@@ -167,7 +200,19 @@ object AnitaMedalProfit {
                     continue
                 }
 
-                items.add(line.replace("§8 ", " §8"))
+                val rawItemName = line.replace("§8 ", " §8")
+
+                val pair = ItemUtils.readItemAmount(rawItemName)
+                if (pair == null) {
+                    ErrorManager.logErrorStateWithData(
+                        "Error in Anita Medal Contest", "Could not read item amount",
+                        "rawItemName" to rawItemName,
+                        "name" to item.name,
+                        "lore" to lore,
+                    )
+                    continue
+                }
+                items.add(pair)
             }
         }
         return items
