@@ -83,9 +83,9 @@ object HitmanAPI {
         // Determine how many pre-available meals we have, to determine better the first hunt
         val initialAvailable = sortedEntries.filter { !it.isClaimed() && it != nextHuntMeal }.toMutableList()
         // Determine how many hunts we need to perform - 1 is added to account for the initial meal calculation above
-        val huntsToPerform = (targetHuntCount - initialAvailable.size - availableHitmanEggs - 1).takeIf {
+        val huntsToPerform = (targetHuntCount - availableHitmanEggs).takeIf {
             it > 0
-        } ?: return Duration.ZERO
+        }?.minus(1 + initialAvailable.size) ?: return Duration.ZERO
         nextHuntMeal = initialAvailable.maxByOrNull {
             it.timeUntil()
         } ?: nextHuntMeal
@@ -140,7 +140,7 @@ object HitmanAPI {
     fun HitmanStatsStorage.getTimeToFull(): Pair<Duration, Boolean> {
         val eventEndMark = HoppityAPI.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
-        var slotsToFill = getOpenSlots()
+        var slotsToFill = getOpenSlots().takeIf { it > 0 } ?: return Pair(Duration.ZERO, false)
         repeat(20) { // Runaway protection
             // Calculate time needed to fill this many slots
             val timeToFill = getTimeToHuntCount(slotsToFill)
