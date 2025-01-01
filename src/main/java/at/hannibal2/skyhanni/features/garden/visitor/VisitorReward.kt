@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 
 enum class VisitorReward(
-    private val rawInternalName: String,
+    rawInternalName: String,
     val displayName: String,
     private val legacyId: Int = -1,
 ) : HasLegacyId {
@@ -22,7 +22,7 @@ enum class VisitorReward(
     COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     ;
 
-    private val internalName by lazy { rawInternalName.toInternalName() }
+    private val internalName = rawInternalName.toInternalName()
     val itemStack by lazy { internalName.getItemStack() }
     // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }

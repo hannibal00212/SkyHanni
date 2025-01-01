@@ -26,7 +26,7 @@ object ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
-    private val textureLocation by lazy { ResourceLocation("skyhanni", "cold_overlay.png") }
+    private val textureLocation = ResourceLocation("skyhanni", "cold_overlay.png")
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

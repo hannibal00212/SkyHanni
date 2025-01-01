@@ -85,7 +85,7 @@ object HideNotClickableItems {
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
 
-    private val netherWart by lazy { "NETHER_STALK".toInternalName() }
+    private val netherWart = "NETHER_STALK".toInternalName()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {

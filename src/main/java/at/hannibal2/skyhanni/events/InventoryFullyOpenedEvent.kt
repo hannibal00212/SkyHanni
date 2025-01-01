@@ -7,10 +7,10 @@ import net.minecraft.item.ItemStack
 
 open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : LorenzEvent() {
 
-    val inventoryId: Int by lazy { inventory.windowId }
-    val inventoryName: String by lazy { inventory.title }
-    val inventorySize: Int by lazy { inventory.slotCount }
-    val inventoryItems: Map<Int, ItemStack> by lazy { inventory.items }
+    val inventoryId: Int get() = inventory.windowId
+    val inventoryName: String get() = inventory.title
+    val inventorySize: Int get() = inventory.slotCount
+    val inventoryItems: Map<Int, ItemStack> get() = inventory.items
     val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
         (0 until inventorySize).associateWith { inventoryItems[it] }
     }

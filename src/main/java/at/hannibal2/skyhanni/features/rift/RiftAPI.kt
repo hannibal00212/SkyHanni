@@ -23,9 +23,9 @@ object RiftAPI {
     // internal name -> motes
     var motesPrice = emptyMap<NEUInternalName, Double>()
 
-    val farmingTool by lazy { "FARMING_WAND".toInternalName() }
+    val farmingTool = "FARMING_WAND".toInternalName()
 
-    private val blowgun by lazy { "BERBERIS_BLOWGUN".toInternalName() }
+    private val blowgun = "BERBERIS_BLOWGUN".toInternalName()
 
     val ItemStack?.isBlowgun: Boolean
         get() = this?.getInternalName() == blowgun

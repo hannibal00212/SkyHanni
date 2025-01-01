@@ -8,5 +8,5 @@ import net.minecraft.item.ItemStack
 class BlockClickEvent(clickType: ClickType, val position: LorenzVec, itemInHand: ItemStack?) :
     WorldClickEvent(itemInHand, clickType) {
 
-    val getBlockState by lazy { position.getBlockStateAt() }
+    val getBlockState = position.getBlockStateAt()
 }

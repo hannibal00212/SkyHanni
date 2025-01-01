@@ -97,7 +97,7 @@ object FishingProfitTracker {
 
     private val ItemTrackerData.TrackedItem.timesCaught get() = timesGained
 
-    private val MAGMA_FISH by lazy { "MAGMA_FISH".toInternalName() }
+    private val MAGMA_FISH = "MAGMA_FISH".toInternalName()
 
     private const val NAME_ALL: CategoryName = "All"
     private var currentCategory: CategoryName = NAME_ALL

@@ -102,8 +102,8 @@ data class SkyHanniNotification(
 
     var endTime = SimpleTimeMark.farFuture()
 
-    val width by lazy { (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8 }
-    val height by lazy { message.size * 10 + 18 }
+    val width = (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8
+    val height = message.size * 10 + 18
 
     fun setEndTime() {
         if (length.isInfinite()) return
