@@ -83,7 +83,9 @@ object HitmanAPI {
         // Determine how many pre-available meals we have, to determine better the first hunt
         val initialAvailable = sortedEntries.filter { !it.isClaimed() && it != nextHuntMeal }.toMutableList()
         // Determine how many hunts we need to perform - 1 is added to account for the initial meal calculation above
-        val huntsToPerform = targetHuntCount - initialAvailable.size - availableHitmanEggs - 1
+        val huntsToPerform = (targetHuntCount - initialAvailable.size - availableHitmanEggs - 1).takeIf {
+            it > 0
+        } ?: return Duration.ZERO
         nextHuntMeal = initialAvailable.maxByOrNull {
             it.timeUntil()
         } ?: nextHuntMeal
