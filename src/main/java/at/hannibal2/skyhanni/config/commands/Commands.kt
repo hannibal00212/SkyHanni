@@ -155,11 +155,6 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        event.register("shgardenuptime") {
-            description = "Shows garden uptime history for past x days, defaults to 7"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GardenUptimeCommand.onCommand(it) }
-        }
         event.register("shcroptime") {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"

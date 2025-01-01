@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.toMonthString
-import at.hannibal2.skyhanni.utils.TimeUtils.toWeekString
+import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.DisplayMode
 import com.google.gson.annotations.Expose
 import java.time.LocalDate
@@ -15,18 +15,14 @@ abstract class TimedTrackerData<Data : TrackerData>(
         sessions = EnumMap(DisplayMode::class.java)
     }
 
-    init {
-        ChatUtils.debug("Initialized")
-    }
-
     fun getOrPutEntry(displayMode: DisplayMode, date: LocalDate = LocalDate.now()): Data {
         val key = when (displayMode) {
             DisplayMode.TOTAL, DisplayMode.SESSION -> displayMode.name.lowercase()
             DisplayMode.MAYOR -> return createNewSession()
             DisplayMode.DAY -> date.toString()
-            DisplayMode.WEEK -> date.toWeekString()
-            DisplayMode.MONTH -> date.toMonthString()
-            DisplayMode.YEAR -> date.year.toString()
+            DisplayMode.WEEK -> date.format(weekFormatter)
+            DisplayMode.MONTH -> date.format(monthFormatter)
+            DisplayMode.YEAR -> date.format(yearFormatter)
         }
         val display = sessions.getOrPut(displayMode) { mutableMapOf() }
         return display.getOrPut(key) { createNewSession() }
@@ -41,9 +37,9 @@ abstract class TimedTrackerData<Data : TrackerData>(
             DisplayMode.TOTAL, DisplayMode.SESSION -> displayMode.name.lowercase()
             DisplayMode.MAYOR -> return null
             DisplayMode.DAY -> date.toString()
-            DisplayMode.WEEK -> date.toWeekString()
-            DisplayMode.MONTH -> date.toMonthString()
-            DisplayMode.YEAR -> date.year.toString()
+            DisplayMode.WEEK -> date.format(weekFormatter)
+            DisplayMode.MONTH -> date.format(monthFormatter)
+            DisplayMode.YEAR -> date.format(yearFormatter)
         }
         return getEntries(displayMode)?.get(key)
     }

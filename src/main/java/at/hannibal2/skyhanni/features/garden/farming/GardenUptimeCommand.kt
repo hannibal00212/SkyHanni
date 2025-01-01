@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -8,6 +12,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenUptimeCommand {
     private val config get() = GardenAPI.config.gardenUptime
     private val storage get() = GardenAPI.storage?.uptimeTracker
@@ -57,5 +62,14 @@ object GardenUptimeCommand {
         commandString += "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r"
 
         chat(commandString.joinToString("\n"), false)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shgardenuptime") {
+            description = "Shows garden uptime history for past x days, defaults to 7"
+            category = CommandCategory.USERS_ACTIVE
+            callback { onCommand(it) }
+        }
     }
 }

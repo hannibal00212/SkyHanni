@@ -148,7 +148,7 @@ object GardenUptimeDisplay {
 
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<EntityPlayer>) {
-        if (!isEnabled()) return
+        if (!isEnabled() && event.isLocalPlayer) return
         secondsLastMove = 0
     }
 

@@ -14,11 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.DATE;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.TITLE;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.BLOCKS_BROKEN;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.BPS;
-import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.UPTIME;
+import static at.hannibal2.skyhanni.config.features.garden.GardenUptimeConfig.GardenUptimeDisplayText.defaultValues;
 
 public class GardenUptimeConfig {
     @Expose
@@ -71,13 +67,7 @@ public class GardenUptimeConfig {
         desc = "Drag text to change what displays in the summary card."
     )
     @ConfigEditorDraggableList
-    public Property<List<GardenUptimeDisplayText>> uptimeDisplayText = Property.of(new ArrayList<>(Arrays.asList(
-        TITLE,
-        DATE,
-        UPTIME,
-        BPS,
-        BLOCKS_BROKEN
-    )));
+    public Property<List<GardenUptimeDisplayText>> uptimeDisplayText = Property.of(new ArrayList<>(defaultValues));
 
     public enum GardenUptimeDisplayText {
         TITLE("Garden Uptime"),
@@ -86,6 +76,14 @@ public class GardenUptimeConfig {
         BPS("Blocks/Second: 17.11"),
         BLOCKS_BROKEN("Blocks Broken: 17,912"),
         ;
+
+        public static final List<GardenUptimeDisplayText> defaultValues = Arrays.asList(
+            TITLE,
+            DATE,
+            UPTIME,
+            BPS,
+            BLOCKS_BROKEN
+        );
 
         private final String str;
 

@@ -5,16 +5,15 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.toMonthString
-import at.hannibal2.skyhanni.utils.TimeUtils.toWeekString
-import at.hannibal2.skyhanni.utils.TimeUtils.toWeekStringFormatted
+import at.hannibal2.skyhanni.utils.TimeUtils.monthFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.weekFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.weekTextFormatter
+import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import java.time.LocalDate
-import java.time.temporal.WeekFields
-import java.util.Locale
 
 @Suppress("SpreadOperator")
 class SkyhanniTimedTracker<Data : TrackerData>(
@@ -40,9 +39,9 @@ class SkyhanniTimedTracker<Data : TrackerData>(
     ) + extraDisplayModes.keys
 
     private var date = LocalDate.now()
-    private var week = date.toWeekString().weekToLocalDate()
-    private var month = date.toMonthString().monthToLocalDate()
-    private var year = date.year.toString().yearToLocalDate()
+    private var week = date.format(weekFormatter).weekToLocalDate()
+    private var month = date.format(monthFormatter).monthToLocalDate()
+    private var year = date.format(yearFormatter).yearToLocalDate()
 
     private fun getNextDisplay(): DisplayMode {
         return availableTrackers[(availableTrackers.indexOf(displayMode) + 1) % availableTrackers.size]
@@ -99,16 +98,16 @@ class SkyhanniTimedTracker<Data : TrackerData>(
             date = newDate
             update()
         }
-        if (week == oldDate.toWeekString().weekToLocalDate()) {
-            week = newDate.toWeekString().weekToLocalDate()
+        if (week == oldDate.format(weekFormatter).weekToLocalDate()) {
+            week = newDate.format(weekFormatter).weekToLocalDate()
             update()
         }
-        if (month == oldDate.toMonthString().monthToLocalDate()) {
-            month = newDate.toMonthString().monthToLocalDate()
+        if (month == oldDate.format(monthFormatter).monthToLocalDate()) {
+            month = newDate.format(monthFormatter).monthToLocalDate()
             update()
         }
-        if (year == oldDate.year.toString().yearToLocalDate()) {
-            year = newDate.year.toString().yearToLocalDate()
+        if (year == oldDate.format(yearFormatter).yearToLocalDate()) {
+            year = newDate.format(yearFormatter).yearToLocalDate()
             update()
         }
     }
@@ -123,17 +122,20 @@ class SkyhanniTimedTracker<Data : TrackerData>(
                 }
                 DisplayMode.WEEK -> {
                     val dateString =
-                        if (week.toWeekString() == LocalDate.now().toWeekString()) "This Week" else week.toWeekStringFormatted()
+                        if (week.format(weekFormatter) == LocalDate.now().format(weekFormatter))
+                            "This Week" else week.format(weekTextFormatter)
                     "§7Week: §a$dateString"
                 }
 
                 DisplayMode.MONTH -> {
-                    val dateString = if (month.toMonthString() == LocalDate.now().toMonthString()) "This Month" else month.toMonthString()
+                    val dateString = if (month.format(monthFormatter) == LocalDate.now().format(monthFormatter))
+                        "This Month" else month.format(monthFormatter)
                     "§7Month: §a$dateString"
                 }
 
                 DisplayMode.YEAR -> {
-                    val dateString = if (year.year == LocalDate.now().year) "This Year" else year.year.toString()
+                    val dateString = if (year.year == LocalDate.now().year)
+                        "This Year" else year.format(yearFormatter)
                     "§7Year: §a$dateString"
                 }
 
@@ -169,29 +171,11 @@ class SkyhanniTimedTracker<Data : TrackerData>(
 
     private fun String.dayToLocalDate(): LocalDate = LocalDate.parse(this)
 
-    private fun String.weekToLocalDate(): LocalDate {
-        val str = this.split("-")
-        val year = str[0].toIntOrNull() ?: throw IllegalArgumentException("invalid year")
-        val week = str[1].toIntOrNull() ?: throw IllegalArgumentException("invalid week")
-        val weekFields = WeekFields.of(Locale.getDefault())
+    private fun String.weekToLocalDate(): LocalDate = LocalDate.parse(this, weekFormatter)
 
-        return LocalDate.now()
-            .withYear(year)
-            .with(weekFields.weekOfYear(), week.toLong())
-            .with(weekFields.dayOfWeek(), 1)
-    }
+    private fun String.monthToLocalDate(): LocalDate = LocalDate.parse(this, monthFormatter)
 
-    private fun String.monthToLocalDate(): LocalDate {
-        val str = this.split("-")
-        val year = str[0].toIntOrNull() ?: throw IllegalArgumentException("invalid year")
-        val month = str[1].toIntOrNull() ?: throw IllegalArgumentException("invalid month")
-        return LocalDate.of(year, month, 1)
-    }
-
-    private fun String.yearToLocalDate(): LocalDate {
-        val year = this.trim().toIntOrNull() ?: throw IllegalArgumentException("invalid year")
-        return LocalDate.ofYearDay(year, 1)
-    }
+    private fun String.yearToLocalDate(): LocalDate = LocalDate.parse(this, yearFormatter)
 
     private fun buildDateSwitcherView(): List<Renderable>? {
         val statsStorage = ProfileStorageData.profileSpecific?.getData() ?: return null
@@ -259,9 +243,9 @@ class SkyhanniTimedTracker<Data : TrackerData>(
             },
             if (next != null &&
                 when (getDisplayMode()) {
-                    DisplayMode.WEEK -> next < LocalDate.now().toWeekString().weekToLocalDate()
-                    DisplayMode.MONTH -> next < LocalDate.now().toMonthString().monthToLocalDate()
-                    DisplayMode.YEAR -> next < LocalDate.now().year.toString().yearToLocalDate()
+                    DisplayMode.WEEK -> next < LocalDate.now().format(weekFormatter).weekToLocalDate()
+                    DisplayMode.MONTH -> next < LocalDate.now().format(monthFormatter).monthToLocalDate()
+                    DisplayMode.YEAR -> next < LocalDate.now().format(yearFormatter).yearToLocalDate()
                     else -> next < LocalDate.now()
                 }
             ) {
@@ -269,9 +253,9 @@ class SkyhanniTimedTracker<Data : TrackerData>(
                     "§a[ §r§f§l->> §r§a]",
                     onClick = {
                         when (getDisplayMode()) {
-                            DisplayMode.WEEK -> week = LocalDate.now().toWeekString().weekToLocalDate()
-                            DisplayMode.MONTH -> month = LocalDate.now().toMonthString().monthToLocalDate()
-                            DisplayMode.YEAR -> year = LocalDate.now().year.toString().yearToLocalDate()
+                            DisplayMode.WEEK -> week = LocalDate.now().format(weekFormatter).weekToLocalDate()
+                            DisplayMode.MONTH -> month = LocalDate.now().format(monthFormatter).monthToLocalDate()
+                            DisplayMode.YEAR -> year = LocalDate.now().format(yearFormatter).yearToLocalDate()
                             else -> date = LocalDate.now()
                         }
                         update()
