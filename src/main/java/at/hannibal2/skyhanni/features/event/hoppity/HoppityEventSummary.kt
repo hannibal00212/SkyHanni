@@ -619,24 +619,20 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
-                val uniquePair = stats.getPairTriple(year, 0)
                 getRabbitsFormat(
-                    stats.rabbitsFound.mapValues { m -> m.value.uniques },
-                    "Unique",
-                    prevCount = uniquePair.first,
-                    currCount = uniquePair.second,
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.uniques },
+                    name = "Unique",
+                    countTriple = stats.getPairTriple(year, 0),
                 ).forEach {
                     statList.addStr(it)
                 }
             }
 
             put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
-                val dupeTriple = stats.getPairTriple(year, 1)
                 getRabbitsFormat(
-                    stats.rabbitsFound.mapValues { m -> m.value.dupes },
-                    "Duplicate",
-                    prevCount = dupeTriple.first,
-                    currCount = dupeTriple.second,
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.dupes },
+                    name = "Duplicate",
+                    countTriple = stats.getPairTriple(year, 1),
                 ).forEach {
                     statList.addStr(it)
                 }
@@ -644,12 +640,10 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
-                val strayPair = stats.getPairTriple(year, 1)
                 getRabbitsFormat(
-                    stats.rabbitsFound.mapValues { m -> m.value.strays },
-                    "Stray",
-                    prevCount = strayPair.first,
-                    currCount = strayPair.second,
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
+                    name = "Stray",
+                    countTriple = stats.getPairTriple(year, 1),
                 ).forEach {
                     statList.addStr(it)
                 }
@@ -810,10 +804,9 @@ object HoppityEventSummary {
     private fun getRabbitsFormat(
         rarityMap: Map<LorenzRarity, Int>,
         name: String,
-        prevCount: Int = 0,
-        currCount: Int = 0,
-        sinceCount: Int = 0,
+        countTriple: Triple<Int, Int, Int> = Triple(0, 0, 0),
     ): List<String> {
+        val (prevCount, currCount, sinceCount) = countTriple
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
