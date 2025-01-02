@@ -140,8 +140,8 @@ object HoppityEggsCompactChat {
 
     private fun HoppityStateDataSet.createCompactMessage(withMeal: Boolean = true): String {
         val mealNameFormat = if (withMeal) when (lastMeal) {
-            in resettingEntries -> "${lastMeal?.coloredName.orEmpty()} Egg"
-            else -> "${lastMeal?.coloredName.orEmpty()} Rabbit"
+            in resettingEntries -> "${lastMeal?.coloredName.orEmpty()} Egg! "
+            else -> "${lastMeal?.coloredName.orEmpty()} Rabbit! "
         } else ""
 
         val nameFormat = getNameFormat()
@@ -160,9 +160,9 @@ object HoppityEggsCompactChat {
 
             val dupeChocFormat = " §7(§6+$dupeChocColor$dupeChocAmount §6Chocolate§7$timeStr)"
 
-            "$mealNameFormat! §7Duplicate $rarityFormat$nameFormat$dupeNumberFormat$dupeChocFormat"
+            "$mealNameFormat§7Duplicate $rarityFormat$nameFormat$dupeNumberFormat$dupeChocFormat"
         } else {
-            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7($lastProfit§7)"
+            "$mealNameFormat§d§lNEW $rarityFormat$nameFormat §7($lastProfit§7)"
         }
     }
 
