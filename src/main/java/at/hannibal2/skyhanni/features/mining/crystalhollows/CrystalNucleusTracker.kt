@@ -148,7 +148,7 @@ object CrystalNucleusTracker {
                 ).toSearchable(),
             )
 
-            val useApparatus = config.professorUsage == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
+            val useApparatus = config.professorUsage.get() == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
             val perRunSapphireCost =
                 if (useApparatus) PRECURSOR_APPARATUS_ITEM.getPrice()
                 else robotPartItems.sumOf {
