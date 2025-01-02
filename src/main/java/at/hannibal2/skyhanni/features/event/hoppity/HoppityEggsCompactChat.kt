@@ -85,29 +85,25 @@ object HoppityEggsCompactChat {
         val summaryMessage = buildString {
             appendLine("§c§lHitman Summary")
             appendLine()
+
             // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-            val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets
-                .mapNotNull { it.lastRarity }
-                .groupingBy { it }
-                .eachCount()
+            val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets.getGroupedRarityMap()
             getRabbitsFormat(rarityMap, "Total Hitman").forEach { appendLine(it) }
+
             hitmanCompactDataSets.filter { !it.duplicate }.takeIfNotEmpty()?.let { sets ->
                 appendLine()
-                appendLine("§d§lNEW Rabbits")
-                sets.forEach { set ->
-                    appendLine(
-                        "${set.getRarityFormat()}${set.getNameFormat()} §7(${hoppityDataSet.lastProfit}§7)"
-                    )
-                }
+                // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
+                val newRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
+                getRabbitsFormat(newRarityMap, "New").forEach { appendLine(it) }
             }
+
             hitmanCompactDataSets.filter { it.duplicate }.takeIfNotEmpty()?.let { sets ->
                 appendLine()
                 // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-                val dupeRarityMap: Map<LorenzRarity, Int> = sets
-                    .mapNotNull { it.lastRarity }
-                    .groupingBy { it }
-                    .eachCount()
+                val dupeRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
                 getRabbitsFormat(dupeRarityMap, "Duplicate").forEach { appendLine(it) }
+
+                // Add the total amount of chocolate from duplicates
                 val dupeChocolateAmount = sets.sumOf { it.lastDuplicateAmount ?: 0 }
                 val timeFormat = dupeChocolateAmount.getChocExtraTimeString()
                 appendLine(" §6+${dupeChocolateAmount.addSeparators()} §6Chocolate§7$timeFormat")
@@ -115,15 +111,18 @@ object HoppityEggsCompactChat {
         }
         ChatUtils.hoverableChat(
             summaryMessage,
-            hover = hitmanCompactDataSets.mapNotNull { set ->
-                set.hoppityMessages.firstOrNull {
-                    rabbitFoundPattern.matches(it)
-                }
-            },
+            hover = hitmanCompactDataSets.sortedBy {
+              if (it.duplicate) 1 else 0
+            }.map { it.createCompactMessage(withMeal = false) },
             prefix = false,
         )
         hitmanCompactDataSets.clear()
     }
+
+    private fun Collection<HoppityStateDataSet>.getGroupedRarityMap(): Map<LorenzRarity, Int> =
+        this.mapNotNull { it.lastRarity }
+        .groupingBy { it }
+        .eachCount()
 
     private fun Long?.getChocExtraTimeString(): String {
         if (this == null) return "?"
@@ -141,33 +140,35 @@ object HoppityEggsCompactChat {
         else -> ""
     }
 
-    private fun createCompactMessage(withMeal: Boolean = true): String {
-        val mealNameFormat = if (withMeal) when (hoppityDataSet.lastMeal) {
-            in resettingEntries -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Egg"
-            else -> "${hoppityDataSet.lastMeal?.coloredName.orEmpty()} Rabbit"
+    private fun HoppityStateDataSet.createCompactMessage(withMeal: Boolean = true): String {
+        val mealNameFormat = if (withMeal) when (lastMeal) {
+            in resettingEntries -> "${lastMeal?.coloredName.orEmpty()} Egg"
+            else -> "${lastMeal?.coloredName.orEmpty()} Rabbit"
         } else ""
 
-        val nameFormat = hoppityDataSet.getNameFormat()
-        val rarityFormat = hoppityDataSet.getRarityFormat()
+        val nameFormat = getNameFormat()
+        val rarityFormat = getRarityFormat()
 
-        return if (hoppityDataSet.duplicate) {
-            val dupeChocAmount = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
+        return if (duplicate) {
+            val dupeChocAmount = lastDuplicateAmount?.shortFormat() ?: "?"
             val dupeNumberFormat = if (chatConfig.showDuplicateNumber) {
-                (HoppityCollectionStats.getRabbitCount(hoppityDataSet.lastName)).takeIf { it > 0 }?.let {
+                (HoppityCollectionStats.getRabbitCount(lastName)).takeIf { it > 0 }?.let {
                     " §7(§b#$it§7)"
                 }.orEmpty()
             } else ""
 
-            val timeStr = hoppityDataSet.lastDuplicateAmount.getChocExtraTimeString()
+            val timeStr = lastDuplicateAmount.getChocExtraTimeString()
             val dupeChocColor = if (chatConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d" else "§6"
 
             val dupeChocFormat = " §7(§6+$dupeChocColor$dupeChocAmount §6Chocolate§7$timeStr)"
 
             "$mealNameFormat! §7Duplicate $rarityFormat$nameFormat$dupeNumberFormat$dupeChocFormat"
         } else {
-            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7(${hoppityDataSet.lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7(${lastProfit}§7)"
         }
     }
+
+    private fun createCompactMessage(withMeal: Boolean = true) = hoppityDataSet.createCompactMessage(withMeal)
 
     private fun createWaypointShareCompactMessage(onClick: () -> Unit) {
         val hover = hoppityDataSet.hoppityMessages.joinToString("\n") +
