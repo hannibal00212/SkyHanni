@@ -142,7 +142,11 @@ object CrystalNucleusTracker {
             )
 
             val useApparatus = config.professorUsage == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
-            val perRunSapphireCost = if (useApparatus) PRECURSOR_APPARATUS_ITEM.getPrice() else robotPartItems.sumOf { it.getPrice() }
+            val perRunSapphireCost =
+                if (useApparatus) PRECURSOR_APPARATUS_ITEM.getPrice()
+                else robotPartItems.sumOf {
+                    it.getPrice()
+                }
             val totalSapphireCost = perRunSapphireCost * runsCompleted
             val usageString =
                 if (useApparatus) StringUtils.pluralize(runsCompleted.toInt(), config.professorUsage.toString(), "Apparatuses")
