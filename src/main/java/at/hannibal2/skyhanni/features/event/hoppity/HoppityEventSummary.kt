@@ -186,8 +186,13 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
-        if (!HoppityAPI.isHoppityEvent()) return
         val stats = getYearStats() ?: return
+        if (!HoppityAPI.isHoppityEvent()) {
+            DelayedRun.runDelayed(5.seconds) {
+                stats.typeCountsSince = HoppityCollectionStats.getTypeCountSnapshot()
+            }
+            return
+        }
 
         stats.mealsFound.addOrPut(event.eggType, 1)
         val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
@@ -198,7 +203,7 @@ object HoppityEventSummary {
 
         // Make sure we account for event priority, since HoppityCollectionStats has a statically set lower priority
         DelayedRun.runDelayed(5.seconds) {
-            stats.typeCount = HoppityCollectionStats.getTypeCountSnapshot()
+            stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
         }
     }
 
@@ -329,9 +334,9 @@ object HoppityEventSummary {
     private fun checkStatsTypeCountInit() {
         val stats = getYearStats() ?: return
         for (i in 1..3) {
-            if (stats.typeCount.getByIndex(i) != 0) return
+            if (stats.typeCountSnapshot.getByIndex(i) != 0) return
         }
-        stats.typeCount = HoppityCollectionStats.getTypeCountSnapshot()
+        stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
     }
 
     private fun checkLbUpdateWarning() {
@@ -558,7 +563,7 @@ object HoppityEventSummary {
         add(StatString(chocFormatLine))
     }
 
-    private fun HoppityEventStats.getPreviousStats(year: Int): HoppityEventStats? =
+    private fun getPreviousStats(year: Int): HoppityEventStats? =
         storage?.hoppityEventStats?.get(year - 1)
 
     private fun HoppityEventStats.getMilestoneCount(): Int =
@@ -614,7 +619,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
-                val uniquePair = stats.getPairCount(year, stats.typeCount.uniqueCount, 0)
+                val uniquePair = stats.getPairTriple(year, 0)
                 getRabbitsFormat(
                     stats.rabbitsFound.mapValues { m -> m.value.uniques },
                     "Unique",
@@ -626,12 +631,12 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
-                val dupePair = stats.getPairCount(year, stats.typeCount.dupeCount, 1)
+                val dupeTriple = stats.getPairTriple(year, 1)
                 getRabbitsFormat(
                     stats.rabbitsFound.mapValues { m -> m.value.dupes },
                     "Duplicate",
-                    prevCount = dupePair.first,
-                    currCount = dupePair.second,
+                    prevCount = dupeTriple.first,
+                    currCount = dupeTriple.second,
                 ).forEach {
                     statList.addStr(it)
                 }
@@ -639,7 +644,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
-                val strayPair = stats.getPairCount(year, stats.typeCount.dupeCount, 1)
+                val strayPair = stats.getPairTriple(year, 1)
                 getRabbitsFormat(
                     stats.rabbitsFound.mapValues { m -> m.value.strays },
                     "Stray",
@@ -787,30 +792,34 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    private fun HoppityEventStats.getPairCount(
+    private fun HoppityEventStats.getPairTriple(
         year: Int,
-        currentValue: Int,
         index: Int
-    ): Pair<Int, Int> = getPreviousStats(year)?.let {
-        val previousValue = it.typeCount.getByIndex(index)
+    ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
+        val currentValue = this.typeCountSnapshot.getByIndex(index)
+        val previousValue = it.typeCountSnapshot.getByIndex(index)
+        val sinceValue = it.typeCountsSince.getByIndex(index)
         val validData = previousValue != 0 && previousValue != currentValue
-        Pair(
+        Triple(
             if (validData) previousValue else 0,
-            if (validData) currentValue else 0
+            if (validData) currentValue else 0,
+            if (validData) sinceValue else 0,
         )
-    } ?: Pair(0, 0)
+    } ?: Triple(0, 0, 0)
 
-    fun getRabbitsFormat(
+    private fun getRabbitsFormat(
         rarityMap: Map<LorenzRarity, Int>,
         name: String,
         prevCount: Int = 0,
-        currCount: Int = 0
+        currCount: Int = 0,
+        sinceCount: Int = 0,
     ): List<String> {
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
+        val sinceFormat = if (sinceCount != 0) " §8(+$sinceCount)§7" else ""
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
-            " §7($prevCount -> $currCount)"
+            " §7($prevCount$sinceFormat -> $currCount)"
         } else ""
 
         return mutableListOf(

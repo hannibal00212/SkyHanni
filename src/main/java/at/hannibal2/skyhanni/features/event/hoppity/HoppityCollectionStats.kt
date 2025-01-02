@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -627,26 +628,23 @@ object HoppityCollectionStats {
         return newList
     }
 
-    fun getTypeCountSnapshot(): ProfileSpecificStorage.HoppityEventStats.TypeCount {
-        var uniqueCount = 0
-        var duplicateCount = 0
+    fun getTypeCountSnapshot(): ProfileSpecificStorage.HoppityEventStats.RabbitData {
+        val (uniqueCount, duplicateCount) = RabbitCollectionRarity.entries.sumOfPair(
+            selector = { rarity ->
+                val foundOfRarity = loggedRabbits.filterKeys {
+                    HoppityCollectionData.getRarity(it) == rarity
+                }
+                val uniquesFound = foundOfRarity.size
+                val duplicates = foundOfRarity.values.sum() - uniquesFound
+                uniquesFound to duplicates
+            },
+            resultConverter = Double::toInt
+        )
 
-        RabbitCollectionRarity.entries.forEach { rarity ->
-            val foundOfRarity = loggedRabbits.filterKeys {
-                HoppityCollectionData.getRarity(it) == rarity
-            }
-            val uniquesFound = foundOfRarity.size
-            val duplicates = foundOfRarity.values.sum() - uniquesFound
-            uniqueCount += uniquesFound
-            duplicateCount += duplicates
-        }
-
-        val strayCount = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0
-
-        return ProfileSpecificStorage.HoppityEventStats.TypeCount(
-            uniqueCount,
-            duplicateCount,
-            strayCount,
+        return ProfileSpecificStorage.HoppityEventStats.RabbitData(
+            uniques = uniqueCount,
+            dupes = duplicateCount,
+            strays = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0,
         )
     }
 
