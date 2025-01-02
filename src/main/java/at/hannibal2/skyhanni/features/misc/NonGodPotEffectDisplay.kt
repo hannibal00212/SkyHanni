@@ -60,7 +60,7 @@ object NonGodPotEffectDisplay {
         REV("§cZombie Brain Mixin", true),
         TARA("§6Spider Egg Mixin", true),
         SVEN("§bWolf Fur Mixin", true),
-        VOID("§6Ender Portal Fumes", true),
+        VOID("§6End Portal Fumes", true),
         BLAZE("§fGabagoey", true),
         GLOWING_MUSH("§2Glowing Mush Mixin", true),
         HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),

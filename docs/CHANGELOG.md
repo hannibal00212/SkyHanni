@@ -129,6 +129,7 @@
 + Improved Slayer Miniboss features. - Empa (https://github.com/hannibal002/SkyHanni/pull/2081)
 + Added the ability to remove people from the Carry Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/2829)
 + Added Venom Shot attacks to the Arachne chat filter. - BearySuperior (https://github.com/hannibal002/SkyHanni/pull/3032)
++ Fixed Blaze Slayer features requiring Damage Indicator to be enabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3139)
 
 #### Mining Improvements
 
@@ -149,6 +150,7 @@
 
 + Added an option to always display the Barn Fishing Timer anywhere. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/2735)
 + Improved the Golden Fish Timer to account for server lag. - Empa (https://github.com/hannibal002/SkyHanni/pull/2823)
++ Added loading of Trophy Fish data by talking with Odger. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3137)
 
 #### Hoppity Improvements
 
@@ -173,6 +175,7 @@
 + Added an option to display the profile type instead of the name in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2810)
 + Improved performance when checking the Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/2765)
 + Added a dropdown menu to select the Lobby Code date format. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2890)
++ Updated the Custom Scoreboard default config. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3126)
 
 #### Dungeon Improvements
 
@@ -187,6 +190,7 @@
 + Added a Pest Traps tab widget to the Tab Widget Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/2984)
 + Updated Pest chat and GUI to indicate Pests Widget is disabled when displaying pests. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3022)
 + Changed Anita medal profit display to show profit per copper medal and sort by this value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3122)
++ Added Hedgehog to /ff guide. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3136)
 
 #### Event Improvements
 
@@ -253,6 +257,7 @@
 + Fixed a rare error with Reforge Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3093)
 + Fixed skill overflow detection for values slightly above the maximum. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3084)
 + Fixed /shtrackcollection not tracking Youngite and Obsolite. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3082)
++ Disabled the Page Scrolling feature while using NEU Storage Overlay. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3135)
 
 #### Combat Fixes
 
@@ -279,6 +284,7 @@
 + Fixed a Custom Scoreboard error while waiting for the Mineshaft Queue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3036)
 + Fixed Custom Scoreboard errors from the new Rift update. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3046)
 + Fixed Custom Scoreboard's player count to exclude offline players in co-ops and guest islands. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3026)
++ Fixed heat showing as `null` in Custom Scoreboard. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3131)
 
 #### Hoppity Fixes
 
@@ -300,6 +306,7 @@
 + Fixed stray timer not activating from Hitman Eggs outside of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3015)
 + Fixed Hitman Full Time calculation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3075)
 + Fixed edge case where Hoppity Call warning wouldn't disappear. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3086)
++ Fixed stray timer not rendering if Hoppity's Hunt is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3129)
 
 #### Garden Fixes
 
@@ -329,6 +336,7 @@
 + Fixed the next visitor timer not decreasing on pest kills. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3027)
 + Fixed chat error spam from Garden Composter Overlay. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3037)
 + Fixed Vacuum Item Stack Size not showing with over 1k Pests. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3088)
++ Fixed Gemstone Powder showing as being worth billions of coins in Garden visitor rewards. - Luna (https://github.com/hannibal002/SkyHanni/pull/3124)
 
 #### Crimson Isle Fixes
 
@@ -363,6 +371,7 @@
     + You can open `/cf` once to make the message disappear without changing settings if a new profile was created before applying the fix for the first time.
 + Fixed stray flash overlaying other Chocolate Factory information. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
 + Fixed error when opening Choc Factory via NEU buttons. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3108)
++ Fixed stray tracker partying a bit too much. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3128)
 
 #### Event Fixes
 
@@ -434,6 +443,9 @@
     + Calculation errors when reaching a skill cap below 60 are not fixed yet.
 + Fixed distortion of regular words due to incorrect Roman numeral replacement. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3113)
 + Fixed rare error message in skill progress display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3105)
++ Fixed End Portal Fumes not being detected in Non-God Pot Display. - hannibal2 & The_Deerman (https://github.com/hannibal002/SkyHanni/pull/3140)
++ Fixed a rare case where stats could fail to parse. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3133)
++ Fixed Moby being highlighted by Trapper Highlight. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3127)
 
 ### Technical Details
 
