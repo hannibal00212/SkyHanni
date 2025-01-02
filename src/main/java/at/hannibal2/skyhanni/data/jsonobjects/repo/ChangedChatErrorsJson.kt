@@ -13,6 +13,8 @@ data class RepoErrorData(
     @Expose @SerializedName("message_starts_with") private val rawMessageStartsWith: List<String>?,
     @Expose @SerializedName("replace_message") val replaceMessage: String?,
     @Expose @SerializedName("custom_message") val customMessage: String?,
+    // TODO delete affectedVersions later
+    @Deprecated("use fixed_in instead")
     @Expose @SerializedName("affected_versions") val affectedVersions: List<String> = listOf(),
     @Expose @SerializedName("fixed_in") val fixedIn: ModVersion?,
 ) {
