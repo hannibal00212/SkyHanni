@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.rabbitFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.getRabbitsFormat
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.milliseconds
@@ -112,7 +110,7 @@ object HoppityEggsCompactChat {
         ChatUtils.hoverableChat(
             summaryMessage,
             hover = hitmanCompactDataSets.sortedBy {
-              if (it.duplicate) 1 else 0
+                if (it.duplicate) 1 else 0
             }.map { it.createCompactMessage(withMeal = false) },
             prefix = false,
         )
@@ -121,8 +119,8 @@ object HoppityEggsCompactChat {
 
     private fun Collection<HoppityStateDataSet>.getGroupedRarityMap(): Map<LorenzRarity, Int> =
         this.mapNotNull { it.lastRarity }
-        .groupingBy { it }
-        .eachCount()
+            .groupingBy { it }
+            .eachCount()
 
     private fun Long?.getChocExtraTimeString(): String {
         if (this == null) return "?"
@@ -164,7 +162,7 @@ object HoppityEggsCompactChat {
 
             "$mealNameFormat! §7Duplicate $rarityFormat$nameFormat$dupeNumberFormat$dupeChocFormat"
         } else {
-            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7(${lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW $rarityFormat$nameFormat §7($lastProfit§7)"
         }
     }
 
