@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.mining.CrystalNucleusTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -19,10 +20,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -47,8 +49,9 @@ object CrystalNucleusTracker {
         "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!"
     )
 
-    private val EPIC_BAL_ITEM by lazy { "BAL;3".asInternalName() }
-    private val LEGENDARY_BAL_ITEM by lazy { "BAL;4".asInternalName() }
+    private val EPIC_BAL_ITEM by lazy { "BAL;3".toInternalName() }
+    private val LEGENDARY_BAL_ITEM by lazy { "BAL;4".toInternalName() }
+    private val PRECURSOR_APPARATUS_ITEM by lazy { "PRECURSOR_APPARATUS".toInternalName() }
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
@@ -138,15 +141,22 @@ object CrystalNucleusTracker {
                 ).toSearchable(),
             )
 
-            val robotPartsCost = robotPartItems.sumOf { it.getPrice() } * runsCompleted
-            profit -= robotPartsCost
-            val robotPartsCostFormat = robotPartsCost.shortFormat()
+            val useApparatus = config.professorUsage == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
+            val perRunSapphireCost = if (useApparatus) PRECURSOR_APPARATUS_ITEM.getPrice() else robotPartItems.sumOf { it.getPrice() }
+            val totalSapphireCost = perRunSapphireCost * runsCompleted
+            val usageString =
+                if (useApparatus) StringUtils.pluralize(runsCompleted.toInt(), config.professorUsage.toString(), "Apparatuses")
+                else config.professorUsage.toString()
+
+
+            profit -= totalSapphireCost
+            val totalSapphireCostFormat = totalSapphireCost.shortFormat()
             add(
                 Renderable.hoverTips(
-                    " §7${runsCompleted * 6}x §9Robot Parts§7: §c-$robotPartsCostFormat",
+                    " §7${runsCompleted * 6}x $usageString§7: §c-$totalSapphireCostFormat",
                     listOf(
-                        "§7You lost §c$robotPartsCostFormat §7of total profit",
-                        "§7due to §9Robot Parts§7."
+                        "§7You lost §c$totalSapphireCostFormat §7of total profit",
+                        "§7due to $usageString§7."
                     ),
                 ).toSearchable(),
             )

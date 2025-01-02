@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -38,4 +39,26 @@ public class CrystalNucleusTrackerConfig {
     @ConfigOption(name = "Profit Per Minimum", desc = "Only show items above this coin amount in the summary message hover.")
     @ConfigEditorSlider(minValue = 0, maxValue = 1000000, minStep = 5000)
     public int profitPerMinimum = 20000;
+
+    @Expose
+    @ConfigOption(name = "Professor Usage", desc = "Determine how cost for Sapphire Crystal is calculated.")
+    @ConfigEditorDropdown
+    public ProfessorUsageType professorUsage = ProfessorUsageType.ROBOT_PARTS;
+
+    public enum ProfessorUsageType {
+        ROBOT_PARTS("§9Robot Parts"),
+        PRECURSOR_APPARATUS("§5Precursor Apparatus"),
+        ;
+
+        private final String str;
+
+        ProfessorUsageType(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 }
