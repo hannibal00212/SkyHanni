@@ -187,7 +187,7 @@ object HoppityCollectionStats {
     )
     // </editor-fold>
 
-    private val profileStorage = ProfileStorageData.profileSpecific?.chocolateFactory
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
     private var shCountData: HoppityEggLocationsJson? = null
     private var neuCountData: HoppityInfo? = null
     private var hotspotRabbitCount = 0
@@ -242,7 +242,7 @@ object HoppityCollectionStats {
             val yearNow = SkyBlockTime.now().year
             if (storage.skyblockYear != yearNow) {
                 HotspotRabbitStorage(yearNow).also {
-                    profileStorage.hotspotRabbitStorage = it
+                    profileStorage?.hotspotRabbitStorage = it
                 }
             } else storage
         }
