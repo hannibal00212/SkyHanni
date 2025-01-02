@@ -65,10 +65,6 @@ object UpdateManager {
         }
     }
 
-    fun isCurrentlyBeta(): Boolean {
-        return SkyHanniMod.version.contains("beta", ignoreCase = true)
-    }
-
     private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
@@ -86,7 +82,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
-        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
+        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
             config.updateStream = Property.of(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
@@ -184,7 +180,7 @@ object UpdateManager {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !SkyHanniMod.isBetaVersion)
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
