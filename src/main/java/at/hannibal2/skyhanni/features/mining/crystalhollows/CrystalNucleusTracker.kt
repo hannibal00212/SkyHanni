@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.CrystalNucleusTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfit
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotPartItems
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -113,6 +115,11 @@ object CrystalNucleusTracker {
         for ((internalName, amount) in event.loot) {
             tracker.addItem(internalName, amount, false)
         }
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.professorUsage.onToggle(tracker::update)
     }
 
     private fun addCompletedRun() {

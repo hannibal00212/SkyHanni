@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class CrystalNucleusTrackerConfig {
     @Expose
@@ -43,7 +44,7 @@ public class CrystalNucleusTrackerConfig {
     @Expose
     @ConfigOption(name = "Professor Usage", desc = "Determine how cost for Sapphire Crystal is calculated.")
     @ConfigEditorDropdown
-    public ProfessorUsageType professorUsage = ProfessorUsageType.ROBOT_PARTS;
+    public Property<ProfessorUsageType> professorUsage = Property.of(ProfessorUsageType.ROBOT_PARTS);
 
     public enum ProfessorUsageType {
         ROBOT_PARTS("§9Robot Parts"),
