@@ -27,28 +27,28 @@ import java.awt.Color
 
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
-    //not a great programmer, but it's better than nothing :p -maj
+    // not a great programmer, but it's better than nothing :p -maj
 
     private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
 
-    //list of berberis in the current plot, in the order they appeared in
+    // list of berberis in the current plot, in the order they appeared in
     private var list = listOf<LorenzVec>()
 
-    //array of the bounds of each berberis plot
+    // array of the bounds of each berberis plot
     private val plots = arrayOf(
-        Plot(LorenzVec(-54,71,-128), LorenzVec(-41,70,-117)),
-        Plot(LorenzVec(-77,72,-143), LorenzVec(-59,71,-125)),
-        Plot(LorenzVec(-87,73,-169), LorenzVec(-69,72,-152)),
-        Plot(LorenzVec(-72,73,-191), LorenzVec(-57,72,-175)),
-        Plot(LorenzVec(-35,72,-185), LorenzVec(-22,71,-171)),
-        Plot(LorenzVec(-42,72,-155), LorenzVec(-22,70,-126))
+        Plot(LorenzVec(-54, 71, -128), LorenzVec(-41, 70, -117)),
+        Plot(LorenzVec(-77, 72, -143), LorenzVec(-59, 71, -125)),
+        Plot(LorenzVec(-87, 73, -169), LorenzVec(-69, 72, -152)),
+        Plot(LorenzVec(-72, 73, -191), LorenzVec(-57, 72, -175)),
+        Plot(LorenzVec(-35, 72, -185), LorenzVec(-22, 71, -171)),
+        Plot(LorenzVec(-42, 72, -155), LorenzVec(-22, 70, -126))
     )
 
-    //the closest plot to the player
+    // the closest plot to the player
     private var closestPlot = 0
-    //the closest plot to the player last tick
+    // the closest plot to the player last tick
     private var oldClosest = 0
 
     data class Plot(var c1: LorenzVec, var c2: LorenzVec)
@@ -58,31 +58,32 @@ object RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        //detect if the player enters a different plot
-        if(closestPlot != oldClosest) list = list.editCopy { clear() }
+        // detect if the player enters a different plot
+        if (closestPlot != oldClosest) list = list.editCopy { clear() }
         oldClosest = closestPlot
 
-        //calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
-        var plotDistances = arrayOf(0.0,0.0,0.0,0.0,0.0,0.0)
-        for (i in 0..5) plotDistances[i] = LocationUtils.playerLocation().distance(plots[i].c1.middle(plots[i].c2)) //this line is a monstrosity
+        // calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
+        val plotDistances = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        for (i in 0..5) plotDistances[i] = LocationUtils.playerLocation().distance(plots[i].c1.middle(plots[i].c2))
+        // this line is a monstrosity ^
         for (i in 0..5) if (plotDistances[i] < plotDistances[closestPlot]) closestPlot = i
 
 
-        //remove first berberis from list if broken
-        if(list.size > 1 && list[0].getBlockAt() != Blocks.deadbush) list = list.editCopy { removeFirst() }
+        // remove first berberis from list if broken
+        if (list.size > 1 && list[0].getBlockAt() != Blocks.deadbush) list = list.editCopy { removeFirst() }
 
 
-        //when a berberis grows, add its location to the end of the list
+        // when a berberis grows, add its location to the end of the list
         for (block in BlockPos.getAllInBox(plots[closestPlot].c1.toBlockPos(), plots[closestPlot].c2.toBlockPos())) {
             if (block.toLorenzVec().getBlockAt() == Blocks.deadbush && !list.contains(block.toLorenzVec())) {
                 list = list.editCopy { add(block.toLorenzVec()) }
             }
         }
 
-        //get if player holding farming wand
+        // get if player holding farming wand
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
 
-        //get if player is on farmland
+        // get if player is on farmland
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
             val currentY = LocationUtils.playerLocation().y
@@ -92,7 +93,7 @@ object RiftWiltedBerberisHelper {
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        //hide particles when farming wand is out and the setting is enabled
+        // hide particles when farming wand is out and the setting is enabled
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
@@ -103,7 +104,7 @@ object RiftWiltedBerberisHelper {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        //mute sounds if setting on
+        // mute sounds if setting on
         if (!isMuteOthersSoundsEnabled()) return
         val soundName = event.soundName
 
@@ -122,15 +123,15 @@ object RiftWiltedBerberisHelper {
         var previous: LorenzVec? = null
         event.drawDynamicText(list[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
-        //for the first 3 berberis
+        // for the first 3 berberis
         for (i in 0..(list.size - 1).coerceAtMost(2)) {
             //box it with half the opacity of the previous box, first in list is yellow
             if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.YELLOW, alpha)
             else event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.WHITE, alpha)
             alpha /= 2f
 
-            //if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
-            if(i == 1) previous?.let { event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false) }
+            // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
+            if (i == 1) previous?.let { event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false) }
             else previous?.let { event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false) }
 
             previous = list[i]
