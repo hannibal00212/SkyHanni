@@ -125,14 +125,18 @@ object RiftWiltedBerberisHelper {
 
         // for the first 3 berberis
         for (i in 0..(list.size - 1).coerceAtMost(2)) {
-            //box it with half the opacity of the previous box, first in list is yellow
+            // box it with half the opacity of the previous box, first in list is yellow
             if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.YELLOW, alpha)
             else event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.WHITE, alpha)
             alpha /= 2f
 
             // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
-            if (i == 1) previous?.let { event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false) }
-            else previous?.let { event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false) }
+            if (i == 1) previous?.let {
+                event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
+            }
+            else previous?.let {
+                event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
+            }
 
             previous = list[i]
         }
