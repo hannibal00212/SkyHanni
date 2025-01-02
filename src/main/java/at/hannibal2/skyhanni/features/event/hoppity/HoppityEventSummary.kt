@@ -810,7 +810,7 @@ object HoppityEventSummary {
         if (rabbitsSum == 0) return emptyList()
 
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
-            " §7($prevCount -> §a$currCount)"
+            " §7($prevCount -> $currCount)"
         } else ""
 
         return mutableListOf(
