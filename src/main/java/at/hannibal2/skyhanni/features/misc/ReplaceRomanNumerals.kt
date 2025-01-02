@@ -4,54 +4,65 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ReplaceRomanNumerals {
-    private val patternGroup = RepoPattern.group("replace.roman")
+    // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
+    private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
+    private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
-    /**
-     * REGEX-TEST: §9Dedication IV
-     * REGEX-FAIL: §cD§6y§ee§as
-     */
-    private val findRomanNumeralPattern by patternGroup.pattern(
-        "findroman",
-        "[ ➜](?=[MDCLXVI])(?<roman>M*(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3}))(?<extra>.?)"
+    private val patternGroup = RepoPattern.group("replace.roman.numerals")
+
+    @Suppress("MaxLineLength")
+    private val allowedPatterns by patternGroup.list(
+        "allowed.patterns",
+        "§o§a(?:Combat|Farming|Fishing|Mining|Foraging|Enchanting|Alchemy|Carpentry|Runecrafting|Taming|Social|)( Level)? (?<roman>[IVXLCDM]+)§r",
+        "(?:§5§o)?§7Progress to (?:Collection|Level|Tier|Floor|Milestone|Chocolate Factory) (?<roman>[IVXLCDM]+): §.(?:.*)%",
+        "§5§o  §e(?:\\w+) (?<roman>[IVXLCDM]+)",
+        "(?:§.)*Abiphone (?<roman>[IVXLCDM]+) .*",
+        "§o§a§a(?:§c§lMM§c )?The Catacombs §8- §eFloor (?<roman>[IVXLCDM]+)§r",
+        ".*Extra Farming Fortune (?<roman>[IVXLCDM]+)",
+        ".*(?:Collection|Level|Tier|Floor|Milestone) (?<roman>[IVXLCDM]+)(?: ?§(?:7|r).*)?",
+        "(?:§5§o§a ✔|§5§o§c ✖) §.* (?<roman>[IVXLCDM]+)",
+        "§o§a✔ §.* (?<roman>[IVXLCDM]+)§r",
+        "§5§o§7Purchase §a.* (?<roman>[IVXLCDM]+) §7.*",
+        "§5§o(?:§7)§.(?<roman>[IVXLCDM]+).*",
+        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*"
     )
 
     /**
-     * REGEX-TEST: K
+     * REGEX-TEST: §eSelect an option: §r§a[§aOk, then what?§a]
      */
-    private val isWordPattern by patternGroup.pattern(
-        "findword",
-        "^[\\w-']"
+    private val isSelectOptionPattern by patternGroup.pattern(
+        "string.isselectoption",
+        "§eSelect an option: .*",
     )
 
-    /**
-     * REGEX-TEST: ➜
-     */
-    private val allowedCharactersAfter by patternGroup.pattern(
-        "allowedcharactersafter",
-        "[➜):]?"
-    )
-
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ItemHoverEvent) {
+    // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
 
-        event.toolTip.replaceAll { it.transformLine() }
+        event.toolTip.replaceAll { it.tryReplace() }
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -60,7 +71,7 @@ object ReplaceRomanNumerals {
         if (!isEnabled()) return
 
         val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
-        lore.replaceAll { it.transformLine() }
+        lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = ChatComponentText(lore.joinToString("\n"))
         val hoverEvent = HoverEvent(event.component.chatStyle.chatHoverEvent?.action, chatComponentText)
@@ -70,38 +81,58 @@ object ReplaceRomanNumerals {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
-        if (!isEnabled()) return
-        event.applyIfPossible { it.transformLine() }
+        if (!isEnabled() || event.message.isSelectOption()) return
+        event.applyIfPossible { it.tryReplace() }
     }
 
-    /**
-     * Transforms a line with a roman numeral to a line with a decimal numeral.
-     * Override block one is to be used for tablist or other places where there is no need to check for normal text containing
-     * the word "I".
-     *
-     * Currently not replaced:
-     * - "§7Bonzo I Reward:" in the collection rewards when hovering on the collection
-     */
-    private fun String.transformLine(overrideBlockOne: Boolean = false): String {
-        val (romanNumeral, rest) = findRomanNumeralPattern.findMatcher(this.removeFormatting()) {
-            group("roman") to group("extra")
-        } ?: return this
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        cachedStrings.clear()
+    }
 
-        if (romanNumeral.isNullOrEmpty() || !romanNumeral.isRoman() || isWordPattern.matches(rest)) {
-            return recursiveSplit(romanNumeral)
+    private fun String.isSelectOption(): Boolean = isSelectOptionPattern.matches(this)
+
+    private fun String.tryReplace(): String = cachedStrings.getOrPut(this) {
+        if (allowedPatterns.matches(this)) replace() else this
+    }
+
+    fun replaceLine(line: String): String {
+        if (!isEnabled()) return line
+
+        return cachedStrings.getOrPut(line) {
+            line.replace()
         }
-
-        val parsedRomanNumeral = romanNumeral.romanToDecimal()
-
-        return takeIf { parsedRomanNumeral != 1 || overrideBlockOne || rest.isEmpty() || allowedCharactersAfter.matches(rest) }
-            ?.replaceFirst(romanNumeral, parsedRomanNumeral.toString())?.transformLine()
-            ?: recursiveSplit(romanNumeral)
     }
 
-    private fun String.recursiveSplit(romanNumeral: String) =
-        this.split(romanNumeral, limit = 2).let { it[0] + romanNumeral + it[1].transformLine() }
+    private fun String.replace() = splitRegex.findAll(this).map { it.value }.joinToString("") {
+        it.takeIf { it.isValidRomanNumeral() && it.removeFormatting().romanToDecimal() != 2000 }?.coloredRomanToDecimal() ?: it
+    }
 
     private fun String.removeFormatting() = removeColor().replace(",", "")
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals
+    private fun String.isValidRomanNumeral() = removeFormatting().let { it.isRoman() && it.isNotEmpty() }
+
+    private fun String.coloredRomanToDecimal() = removeFormatting().let { replace(it, it.romanToDecimal().toString()) }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+
+    init {
+        RecalculatingValue
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Replace Roman Numerals")
+        event.addIrrelevant {
+            val map = cachedStrings.toMap()
+            add("cachedStrings: (${map.size})")
+            for ((original, changed) in map) {
+                if (original == changed) {
+                    add("unchanged: '$original'")
+                } else {
+                    add("'$original' -> '$changed'")
+                }
+            }
+        }
+    }
 }
