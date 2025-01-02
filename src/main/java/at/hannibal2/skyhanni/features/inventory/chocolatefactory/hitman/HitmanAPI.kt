@@ -86,7 +86,9 @@ object HitmanAPI {
         val huntsToPerform = (targetHuntCount - availableHitmanEggs).takeIf {
             it > 0
         }?.minus(1 + initialAvailable.size) ?: return Duration.ZERO
-        nextHuntMeal = initialAvailable.maxByOrNull {
+
+        val initialCeiling = initialAvailable.size.coerceAtMost(huntsToPerform)
+        nextHuntMeal = initialAvailable.sortedBy { it.timeUntil() }.take(initialCeiling).maxByOrNull {
             it.timeUntil()
         } ?: nextHuntMeal
 
