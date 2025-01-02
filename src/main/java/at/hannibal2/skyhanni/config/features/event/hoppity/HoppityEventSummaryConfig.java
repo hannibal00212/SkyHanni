@@ -6,7 +6,6 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
@@ -87,4 +86,13 @@ public class HoppityEventSummaryConfig {
             return display;
         }
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Show Count Diff",
+        desc = "Store and display the count of Uniques/Duplicates next to their respective rabbit count.\n" +
+            ".e.g. §7Unique Rabbits: §f5 §7(270 -> 275)"
+    )
+    @ConfigEditorBoolean
+    public boolean showCountDiff = true;
 }

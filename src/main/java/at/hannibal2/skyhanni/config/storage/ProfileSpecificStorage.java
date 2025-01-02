@@ -829,6 +829,40 @@ public class ProfileSpecificStorage {
         }
 
         @Expose
+        public TypeCount typeCount = new TypeCount(0, 0, 0);
+
+        public static class TypeCount {
+            @Expose
+            public int uniqueCount;
+
+            @Expose
+            public int dupeCount;
+
+            @Expose
+            public int strayCount;
+
+            public TypeCount(int uniqueCount, int dupeCount, int strayCount) {
+                this.uniqueCount = uniqueCount;
+                this.dupeCount = dupeCount;
+                this.strayCount = strayCount;
+            }
+
+            public int getByIndex(int index) {
+                switch(index) {
+                    case 0: return uniqueCount;
+                    case 1: return dupeCount;
+                    case 2: return strayCount;
+                    default: return 0;
+                }
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(uniqueCount, dupeCount, strayCount);
+            }
+        }
+
+        @Expose
         public long dupeChocolateGained = 0;
 
         @Expose
