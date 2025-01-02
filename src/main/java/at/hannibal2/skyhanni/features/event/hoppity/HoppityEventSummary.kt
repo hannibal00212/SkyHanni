@@ -643,7 +643,7 @@ object HoppityEventSummary {
                 getRabbitsFormat(
                     rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
                     name = "Stray",
-                    countTriple = stats.getPairTriple(year, 1),
+                    countTriple = stats.getPairTriple(year, 2),
                 ).forEach {
                     statList.addStr(it)
                 }
