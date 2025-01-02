@@ -801,7 +801,7 @@ object HoppityEventSummary {
         )
     } ?: Triple(0, 0, 0)
 
-    private fun getRabbitsFormat(
+    fun getRabbitsFormat(
         rarityMap: Map<LorenzRarity, Int>,
         name: String,
         countTriple: Triple<Int, Int, Int> = Triple(0, 0, 0),
