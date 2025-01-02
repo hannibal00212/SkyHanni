@@ -155,13 +155,13 @@ object CrystalNucleusTracker {
                     "§5Precursor Apparatuses"
                 )
                 else config.professorUsage.toString()
-
+            val usageTotal = if (useApparatus) runsCompleted else runsCompleted * 6
 
             profit -= totalSapphireCost
             val totalSapphireCostFormat = totalSapphireCost.shortFormat()
             add(
                 Renderable.hoverTips(
-                    " §7${runsCompleted * 6}x $usageString§7: §c-$totalSapphireCostFormat",
+                    " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
                     listOf(
                         "§7You lost §c$totalSapphireCostFormat §7of total profit",
                         "§7due to $usageString§7."
