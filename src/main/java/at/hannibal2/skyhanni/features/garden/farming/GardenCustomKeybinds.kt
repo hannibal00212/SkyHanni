@@ -37,7 +37,6 @@ object GardenCustomKeybinds {
 
     private var cropLayoutSelection: Map<CropType?, Map<KeyBinding, Int>> = emptyMap()
     private var cropInHand: CropType? = null
-    private var lastCrop: CropType? = null
     private var lastToolSwitch = SimpleTimeMark.farPast()
     private var currentLayout: Map<KeyBinding, Int>? = null
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
@@ -81,7 +80,6 @@ object GardenCustomKeybinds {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
-        event.crop?.let { lastCrop = it }
         currentLayout = cropLayoutSelection[cropInHand]
     }
 
