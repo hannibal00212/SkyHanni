@@ -17,26 +17,25 @@ class RenderDisplayHelper(
 ) {
 
     init {
-        renderDisplays.add(this)
+        allDisplays.add(this)
     }
 
     @SkyHanniModule
     companion object {
         private val noInventory = InventoryDetector { false }
 
-        private val renderDisplays = mutableListOf<RenderDisplayHelper>()
-
-        private var visibleDisplays = emptyList<RenderDisplayHelper>()
+        private val allDisplays = mutableListOf<RenderDisplayHelper>()
+        private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 
         @SubscribeEvent
         fun onTick(event: LorenzTickEvent) {
-            visibleDisplays = renderDisplays.filter { it.checkCondition() }
+            currentlyVisibleDisplays = allDisplays.filter { it.checkCondition() }
         }
 
         @SubscribeEvent
         fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
-            for (display in visibleDisplays) {
+            for (display in currentlyVisibleDisplays) {
                 if ((display.inOwnInventory && isInOwnInventory) || display.inventory.isInside()) {
                     display.render()
                 }
@@ -45,7 +44,7 @@ class RenderDisplayHelper(
 
         @SubscribeEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            for (display in visibleDisplays) {
+            for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory) {
                     display.render()
                 }

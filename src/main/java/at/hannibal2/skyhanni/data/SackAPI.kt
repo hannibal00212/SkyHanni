@@ -44,9 +44,7 @@ object SackAPI {
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
-    val inventory = InventoryDetector { name ->
-        sackPattern.matches(name)
-    }
+    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
 
     private val patternGroup = RepoPattern.group("data.sacks")
 
