@@ -61,7 +61,7 @@ public class KeyBindLayout {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     public Property<Integer> sneak = Property.of(Keyboard.KEY_LSHIFT);
 
-    public List<Property<Integer>> getAllKeybindings() {
+    public List<Property<Integer>> getAllKeybindingFields() {
         return Arrays.asList(attack, useItem, left, right, forward, back, jump, sneak);
     }
 }

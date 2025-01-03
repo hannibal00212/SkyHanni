@@ -98,7 +98,7 @@ object GardenCustomKeybinds {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindings }
+        val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindingFields }
 
         ConditionalUtils.onToggle(
             *allKeybindings.toTypedArray(),

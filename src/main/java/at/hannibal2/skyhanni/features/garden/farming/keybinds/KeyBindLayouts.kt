@@ -8,13 +8,13 @@ import net.minecraft.client.settings.KeyBinding
 enum class KeyBindLayouts(
     val displayName: String,
     val layoutProvider: () -> KeyBindLayout,
-    val map: MutableMap<KeyBinding, Int>,
+    var map: Map<KeyBinding, Int>,
 ) {
-    LAYOUT_1("Layout 1", { GardenAPI.config.keyBind.layout1 }, mutableMapOf()),
-    LAYOUT_2("Layout 2", { GardenAPI.config.keyBind.layout2 }, mutableMapOf()),
-    LAYOUT_3("Layout 3", { GardenAPI.config.keyBind.layout3 }, mutableMapOf()),
-    LAYOUT_4("Layout 4", { GardenAPI.config.keyBind.layout4 }, mutableMapOf()),
-    LAYOUT_5("Layout 5", { GardenAPI.config.keyBind.layout5 }, mutableMapOf());
+    LAYOUT_1("Layout 1", { GardenAPI.config.keyBind.layout1 }, mapOf()),
+    LAYOUT_2("Layout 2", { GardenAPI.config.keyBind.layout2 }, mapOf()),
+    LAYOUT_3("Layout 3", { GardenAPI.config.keyBind.layout3 }, mapOf()),
+    LAYOUT_4("Layout 4", { GardenAPI.config.keyBind.layout4 }, mapOf()),
+    LAYOUT_5("Layout 5", { GardenAPI.config.keyBind.layout5 }, mapOf());
 
     val layout: KeyBindLayout
         get() = layoutProvider()
@@ -27,11 +27,10 @@ enum class KeyBindLayouts(
             )
         }
 
-        map.clear()
-        keyBindings.zip(
-            layout.allKeybindings
-        ).forEach { (keyBinding, setKeyProperty) ->
-            map[keyBinding] = setKeyProperty.get() // Update map directly
+        val zipped = keyBindings.zip(layout.allKeybindingFields)
+
+        map = zipped.associate { (keyBinding, keybind) ->
+            keyBinding to keybind.get()
         }
     }
 
