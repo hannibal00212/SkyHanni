@@ -120,8 +120,8 @@ object RiftWiltedBerberisHelper {
         for (berberis in list) {
             with(berberis) {
                 // if there is a particle in the same place as where the new helper thinks the next bush is,
-                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3
-                    && currentParticles.distanceToPlayer() <= 20 && y != 0.0
+                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3 &&
+                    currentParticles.distanceToPlayer() <= 20 && y != 0.0
                 ) {
                     lastSyncedAt = SimpleTimeMark.now()
                 }
@@ -254,7 +254,7 @@ object RiftWiltedBerberisHelper {
                     else event.drawFilledBoundingBoxNea(axisAlignedBB(berberisList[i]), Color.WHITE, alpha)
                     alpha /= 2f
 
-                    //if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
+                    // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
                     if (i == 1) previousBerberis?.let {
                         event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
                     }
