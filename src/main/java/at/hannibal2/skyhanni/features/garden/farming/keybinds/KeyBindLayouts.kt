@@ -45,7 +45,7 @@ enum class KeyBindLayouts(
 //                 TODO: Implement ErrorManager
 //                 ErrorManager.logErrorWithData("KeyBindLayouts.getLayoutByDisplayName: Layout not found: $displayName")
 //             }
-            return result?: LAYOUT_1
+            return result ?: LAYOUT_1
         }
     }
 }
