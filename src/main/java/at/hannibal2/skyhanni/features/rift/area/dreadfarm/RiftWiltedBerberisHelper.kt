@@ -50,11 +50,12 @@ object RiftWiltedBerberisHelper {
         Plot(LorenzVec(-87, 73, -169), LorenzVec(-69, 72, -152)),
         Plot(LorenzVec(-72, 73, -191), LorenzVec(-57, 72, -175)),
         Plot(LorenzVec(-35, 72, -185), LorenzVec(-22, 71, -171)),
-        Plot(LorenzVec(-42, 72, -155), LorenzVec(-22, 70, -126))
+        Plot(LorenzVec(-42, 72, -155), LorenzVec(-22, 70, -126)),
     )
 
     // the closest plot to the player
     private var closestPlot = 0
+
     // the closest plot to the player last tick
     private var oldClosest = 0
 
@@ -65,6 +66,7 @@ object RiftWiltedBerberisHelper {
 
     // original system stuff:
     private var list = listOf<WiltedBerberis>()
+
     data class WiltedBerberis(var currentParticles: LorenzVec) {
         var previous: LorenzVec? = null
         var moving = true
@@ -116,10 +118,11 @@ object RiftWiltedBerberisHelper {
 
         // check if the new system is right about which bush to break. If the particle is still moving, assume it's right for now
         for (berberis in list) {
-            with (berberis) {
+            with(berberis) {
                 // if there is a particle in the same place as where the new helper thinks the next bush is,
-                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3 &&
-                    currentParticles.distanceToPlayer() <= 20 && y != 0.0) {
+                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3
+                    && currentParticles.distanceToPlayer() <= 20 && y != 0.0
+                ) {
                     lastSyncedAt = SimpleTimeMark.now()
                 }
                 // or if there is a moving particle
@@ -157,14 +160,14 @@ object RiftWiltedBerberisHelper {
         val location = event.location
         val berberis = nearestBerberis(location)
 
-        //the purple particles on the edges dont get touched, just cancel them if the setting is on
+        // the purple particles on the edges dont get touched, just cancel them if the setting is on
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
             if (config.hideParticles && berberis != null) {
                 event.cancel()
             }
             return
         }
-        //the firework sparks in the center just get cancelled, but the below code runs on them
+        // the firework sparks in the center just get cancelled, but the below code runs on them
         if (config.hideParticles) {
             event.cancel()
         }
@@ -176,7 +179,7 @@ object RiftWiltedBerberisHelper {
             return
         }
 
-        with (berberis) {
+        with(berberis) {
             val isMoving = currentParticles != location
             if (isMoving) {
                 if (currentParticles.distance(location) > 3) {
@@ -219,7 +222,7 @@ object RiftWiltedBerberisHelper {
         // original system:
         if (fallback) {
             for (berberis in list) {
-                with (berberis) {
+                with(berberis) {
                     if (currentParticles.distanceToPlayer() > 20) continue
                     if (y == 0.0) continue
 
@@ -252,8 +255,8 @@ object RiftWiltedBerberisHelper {
                     alpha /= 2f
 
                     //if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
-                    if(i == 1) previousBerberis?.let {
-                        event.draw3DLine(berberisList[i].add(0.5,0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
+                    if (i == 1) previousBerberis?.let {
+                        event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
                     }
                     else previousBerberis?.let {
                         event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
