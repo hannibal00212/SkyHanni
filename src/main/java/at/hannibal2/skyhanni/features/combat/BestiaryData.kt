@@ -171,7 +171,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = stack.displayName
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
@@ -200,7 +199,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
             val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
