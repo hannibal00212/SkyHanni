@@ -59,7 +59,7 @@ object GardenCustomKeybinds {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(@Suppress("unused") event: LorenzTickEvent) {
         if (!isEnabled()) return
         val screen = Minecraft.getMinecraft().currentScreen ?: return
         if (screen !is GuiEditSign) return
@@ -67,7 +67,7 @@ object GardenCustomKeybinds {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed(@Suppress("unused") event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
         ChatUtils.chatAndOpenConfig(
@@ -97,7 +97,7 @@ object GardenCustomKeybinds {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad(@Suppress("unused") event: ConfigLoadEvent) {
         val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindingFields }
 
         ConditionalUtils.onToggle(
