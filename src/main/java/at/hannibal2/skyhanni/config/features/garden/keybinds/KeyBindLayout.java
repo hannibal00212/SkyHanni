@@ -9,10 +9,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class KeyBindLayout {
-        @ConfigOption(name = "Disable All", desc = "Disable all keys.")
-        @ConfigEditorButton(buttonText = "Disable")
-        public Runnable presetDisable = () -> GardenCustomKeybinds.disableAll(this);
+    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
+    @ConfigEditorButton(buttonText = "Disable")
+    public Runnable presetDisable = () -> GardenCustomKeybinds.disableAll(this);
 
     @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
     @ConfigEditorButton(buttonText = "Default")
@@ -57,4 +60,8 @@ public class KeyBindLayout {
     @ConfigOption(name = "Sneak", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     public Property<Integer> sneak = Property.of(Keyboard.KEY_LSHIFT);
+
+    public List<Property<Integer>> getAllKeybindings() {
+        return Arrays.asList(attack, useItem, left, right, forward, back, jump, sneak);
+    }
 }
