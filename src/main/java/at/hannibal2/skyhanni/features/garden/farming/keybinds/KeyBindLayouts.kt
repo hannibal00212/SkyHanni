@@ -34,6 +34,10 @@ enum class KeyBindLayouts(
         }
     }
 
+    override fun toString(): String {
+        return displayName
+    }
+
     companion object {
         fun update() {
             entries.forEach { it.buildKeybindLayoutMap() }
