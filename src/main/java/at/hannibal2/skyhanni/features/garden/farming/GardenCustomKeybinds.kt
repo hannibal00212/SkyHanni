@@ -35,9 +35,7 @@ object GardenCustomKeybinds {
     private val config get() = GardenAPI.config.keyBind
     val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-//     private val layouts: MutableMap<String, Map<KeyBinding, Int>> = mutableMapOf()
-
-    private var cropLayoutSelection: Map<CropType?, String> = emptyMap()
+    private var cropLayoutSelection: Map<CropType?, Map<KeyBinding, Int>> = emptyMap()
     private var cropInHand: CropType? = null
     private var lastCrop: CropType? = null
     private var lastToolSwitch = SimpleTimeMark.farPast()
@@ -84,33 +82,26 @@ object GardenCustomKeybinds {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
         event.crop?.let { lastCrop = it }
-        currentLayout = layouts[cropLayoutSelection[cropInHand]]
+        currentLayout = cropLayoutSelection[cropInHand]
     }
 
 //     TODO: remove the need for this workaround, as GardenAPI should call GardenToolChangeEvent on island change
-//     @HandleEvent
-//     fun onIslandChange(event: IslandChangeEvent) {
-//         if (event.newIsland == IslandType.GARDEN) {
-//             DelayedRun.runDelayed(2.seconds) {
-//                 cropInHand = GardenAPI.cropInHand
-//                 currentLayout = layouts[cropLayoutSelection[cropInHand]]
-//             }
-//         }
-//     }
-
-    @JvmStatic
-    fun getAllKeybindingsFromLayout(layout: KeyBindLayout) = listOf(
-        layout.attack, layout.useItem, layout.left, layout.right,
-        layout.forward, layout.back, layout.jump, layout.sneak
-    )
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) {
+            DelayedRun.runDelayed(2.seconds) {
+                cropInHand = GardenAPI.cropInHand
+                currentLayout = cropLayoutSelection[cropInHand]
+            }
+        }
+    }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
+        val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindings }
 
         ConditionalUtils.onToggle(
-            *listOf(
-                config.layout1, config.layout2, config.layout3, config.layout4, config.layout5
-            ).flatMap(::getAllKeybindingsFromLayout).toTypedArray()
+            *allKeybindings.toTypedArray(),
         ) {
             update()
         }
@@ -118,46 +109,19 @@ object GardenCustomKeybinds {
     }
 
     private fun update() {
-        fun buildKeybindLayoutMap(
-            layout: KeyBindLayout
-        ): Map<KeyBinding, Int> {
-            with(mcSettings) {
-                val keyBindings = listOf(
-                    keyBindAttack, keyBindUseItem, keyBindLeft, keyBindRight,
-                    keyBindForward, keyBindBack, keyBindJump, keyBindSneak
-                )
-
-                return buildMap {
-                    keyBindings.zip(
-                        getAllKeybindingsFromLayout(layout)
-                    ) { keyBinding, setKeyProperty ->
-                        put(keyBinding, setKeyProperty.get()) // Add key-value pair
-                    }
-                }
-            }
-        }
-
-        KeyBindLayouts.entries.forEach { layout ->
-            layout.buildKeybindLayoutMap()
-        }
-
-        layouts["Layout 1"] = buildKeybindLayoutMap(config.layout1)
-        layouts["Layout 2"] = buildKeybindLayoutMap(config.layout2)
-        layouts["Layout 3"] = buildKeybindLayoutMap(config.layout3)
-        layouts["Layout 4"] = buildKeybindLayoutMap(config.layout4)
-        layouts["Layout 5"] = buildKeybindLayoutMap(config.layout5)
+        KeyBindLayouts.update()
 
         cropLayoutSelection = mapOf(
-            CropType.WHEAT to config.cropLayoutSelection.wheat.toString(),
-            CropType.CARROT to config.cropLayoutSelection.carrot.toString(),
-            CropType.POTATO to config.cropLayoutSelection.potato.toString(),
-            CropType.NETHER_WART to config.cropLayoutSelection.netherWart.toString(),
-            CropType.PUMPKIN to config.cropLayoutSelection.pumpkin.toString(),
-            CropType.MELON to config.cropLayoutSelection.melon.toString(),
-            CropType.COCOA_BEANS to config.cropLayoutSelection.cocoaBeans.toString(),
-            CropType.SUGAR_CANE to config.cropLayoutSelection.sugarCane.toString(),
-            CropType.CACTUS to config.cropLayoutSelection.cactus.toString(),
-            CropType.MUSHROOM to config.cropLayoutSelection.mushroom.toString(),
+            CropType.WHEAT to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.wheat.toString()).map,
+            CropType.CARROT to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.carrot.toString()).map,
+            CropType.POTATO to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.potato.toString()).map,
+            CropType.NETHER_WART to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.netherWart.toString()).map,
+            CropType.PUMPKIN to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.pumpkin.toString()).map,
+            CropType.MELON to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.melon.toString()).map,
+            CropType.COCOA_BEANS to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.cocoaBeans.toString()).map,
+            CropType.SUGAR_CANE to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.sugarCane.toString()).map,
+            CropType.CACTUS to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.cactus.toString()).map,
+            CropType.MUSHROOM to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.mushroom.toString()).map,
         )
 
         calculateDuplicates()
@@ -170,10 +134,9 @@ object GardenCustomKeybinds {
             .filter { it != Keyboard.KEY_NONE }
             .let { values -> values.size != values.toSet().size }
 
-
     private fun calculateDuplicates() {
-        for (layout in layouts.values) {
-            if (isDuplicateInLayout(layout)) {
+        for (layout in KeyBindLayouts.entries) {
+            if (isDuplicateInLayout(layout.map)) {
                 isDuplicate = true
                 return
             }
