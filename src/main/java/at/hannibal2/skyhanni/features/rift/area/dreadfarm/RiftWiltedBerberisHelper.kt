@@ -13,17 +13,21 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
@@ -34,7 +38,10 @@ object RiftWiltedBerberisHelper {
     private var hasFarmingToolInHand = false
 
     // list of berberis in the current plot, in the order they appeared in
-    private var list = listOf<LorenzVec>()
+    private var berberisList = listOf<LorenzVec>()
+    private var lastSpawn = SimpleTimeMark.now()
+    private var lastSyncedAt = SimpleTimeMark.now()
+    private var lastUpdated = SimpleTimeMark.now()
 
     // array of the bounds of each berberis plot
     private val plots = arrayOf(
@@ -53,32 +60,79 @@ object RiftWiltedBerberisHelper {
 
     data class Plot(var c1: LorenzVec, var c2: LorenzVec)
 
+    private var fallback = false
+
+
+    // original system stuff:
+    private var list = listOf<WiltedBerberis>()
+    data class WiltedBerberis(var currentParticles: LorenzVec) {
+        var previous: LorenzVec? = null
+        var moving = true
+        var y = 0.0
+        var lastTime = SimpleTimeMark.now()
+    }
+
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
+        list.filter { it.currentParticles.distanceSq(location) < 8 }
+            .minByOrNull { it.currentParticles.distanceSq(location) }
+
+    private fun LorenzVec.fixLocation(wiltedBerberis: WiltedBerberis): LorenzVec {
+        val x = x - 0.5
+        val y = wiltedBerberis.y
+        val z = z - 0.5
+        return LorenzVec(x, y, z)
+    }
+    // end original system stuff
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
 
-        // detect if the player enters a different plot
-        if (closestPlot != oldClosest) list = list.editCopy { clear() }
-        oldClosest = closestPlot
-
         // calculates the player's distance to the center of each plot, then sets closestPlot to the smallest
         val plotDistances = arrayListOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
         for (i in 0..5) plotDistances[i] = LocationUtils.playerLocation().distance(plots[i].c1.middle(plots[i].c2))
-        // this line is a monstrosity ^
         for (i in 0..5) if (plotDistances[i] < plotDistances[closestPlot]) closestPlot = i
 
+        // if the player enters a new plot, clear the list of berberis locations
+        if (closestPlot != oldClosest) berberisList = berberisList.editCopy { clear() }
+        oldClosest = closestPlot
 
-        // remove first berberis from list if broken
-        if (list.size > 1 && list[0].getBlockAt() != Blocks.deadbush) list = list.editCopy { removeFirst() }
-
-
-        // when a berberis grows, add its location to the end of the list
+        // when a berberis grows in the current plot, add its location to the end of the list
         for (block in BlockPos.getAllInBox(plots[closestPlot].c1.toBlockPos(), plots[closestPlot].c2.toBlockPos())) {
-            if (block.toLorenzVec().getBlockAt() == Blocks.deadbush && !list.contains(block.toLorenzVec())) {
-                list = list.editCopy { add(block.toLorenzVec()) }
+            if (block.toLorenzVec().getBlockAt() == Blocks.deadbush && !berberisList.contains(block.toLorenzVec())) {
+                berberisList = berberisList.editCopy { add(block.toLorenzVec()) }
+                lastSpawn = SimpleTimeMark.now()
+                lastUpdated = SimpleTimeMark.now()
             }
         }
+
+        // remove first berberis from list if broken and no berberis have grown in the last 1/4 seccond
+        // (to stop you from breaking it before they all spawn in)
+        while (berberisList.isNotEmpty() && berberisList[0].getBlockAt() != Blocks.deadbush && lastSpawn.passedSince() > 250.milliseconds) {
+            berberisList = berberisList.editCopy { removeFirst() }
+            lastUpdated = SimpleTimeMark.now()
+        }
+
+        // check if the new system is right about which bush to break. If the particle is still moving, assume it's right for now
+        for (berberis in list) {
+            with (berberis) {
+                // if there is a particle in the same place as where the new helper thinks the next bush is,
+                if (berberisList.isNotEmpty() && (currentParticles.distance(berberisList[0])) < 1.3 &&
+                    currentParticles.distanceToPlayer() <= 20 && y != 0.0) {
+                    lastSyncedAt = SimpleTimeMark.now()
+                }
+                // or if there is a moving particle
+                if (moving) {
+                    lastSyncedAt = SimpleTimeMark.now()
+                }
+            }
+        }
+
+        // if we've been desynced (new system wrong) for more than 2 secconds and the list hasn't updated in that time,
+        // switch to fallback mode. switch off of fallback once the plot is cleared
+        if (lastSyncedAt.passedSince() > 1000.milliseconds && lastUpdated.passedSince() > 1000.milliseconds) fallback = true
+        if (berberisList.isEmpty()) fallback = false
 
         // get if player holding farming wand
         hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
@@ -89,16 +143,58 @@ object RiftWiltedBerberisHelper {
             val currentY = LocationUtils.playerLocation().y
             isOnFarmland = block == Blocks.farmland && (currentY % 1 == 0.0)
         }
+
+        // original system stuff:
+        list = list.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
+
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        // hide particles when farming wand is out and the setting is enabled
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 
+        val location = event.location
+        val berberis = nearestBerberis(location)
+
+        //the purple particles on the edges dont get touched, just cancel them if the setting is on
+        if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
+            if (config.hideParticles && berberis != null) {
+                event.cancel()
+            }
+            return
+        }
+        //the firework sparks in the center just get cancelled, but the below code runs on them
         if (config.hideParticles) {
             event.cancel()
+        }
+
+
+        // original system stuff:
+        if (berberis == null) {
+            list = list.editCopy { add(WiltedBerberis(location)) }
+            return
+        }
+
+        with (berberis) {
+            val isMoving = currentParticles != location
+            if (isMoving) {
+                if (currentParticles.distance(location) > 3) {
+                    previous = null
+                    moving = true
+                }
+                if (!moving) {
+                    previous = currentParticles
+                }
+            }
+            if (!isMoving) {
+                y = location.y - 1
+            }
+
+            moving = isMoving
+            currentParticles = location
+            lastTime = SimpleTimeMark.now()
+            // end original system stuff
         }
     }
 
@@ -119,26 +215,53 @@ object RiftWiltedBerberisHelper {
         if (!hasFarmingToolInHand) return
         if (config.onlyOnFarmland && !isOnFarmland) return
 
-        var alpha = 0.8f
-        var previous: LorenzVec? = null
-        event.drawDynamicText(list[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
-        // for the first 3 berberis
-        for (i in 0..(list.size - 1).coerceAtMost(2)) {
-            // box it with half the opacity of the previous box, first in list is yellow
-            if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.YELLOW, alpha)
-            else event.drawFilledBoundingBoxNea(axisAlignedBB(list[i]), Color.WHITE, alpha)
-            alpha /= 2f
+        // original system:
+        if (fallback) {
+            for (berberis in list) {
+                with (berberis) {
+                    if (currentParticles.distanceToPlayer() > 20) continue
+                    if (y == 0.0) continue
 
-            // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
-            if (i == 1) previous?.let {
-                event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
+                    val location = currentParticles.fixLocation(berberis)
+                    if (!moving) {
+                        event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.YELLOW, 0.7f)
+                        event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+                    } else {
+                        event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.WHITE, 0.5f)
+                        previous?.fixLocation(berberis)?.let {
+                            event.drawFilledBoundingBoxNea(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
+                            event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
+                        }
+                    }
+                }
             }
-            else previous?.let {
-                event.draw3DLine(list[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
-            }
+        } else {
+            // new system
+            if (berberisList.isNotEmpty()) {
 
-            previous = list[i]
+                var alpha = 0.8f
+                var previousBerberis: LorenzVec? = null
+                event.drawDynamicText(berberisList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+
+                // for the first 3 berberis
+                for (i in 0..(berberisList.size - 1).coerceAtMost(2)) {
+                    // box it with half the opacity of the previous box, first in list is yellow
+                    if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(berberisList[i]), Color.YELLOW, alpha)
+                    else event.drawFilledBoundingBoxNea(axisAlignedBB(berberisList[i]), Color.WHITE, alpha)
+                    alpha /= 2f
+
+                    //if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
+                    if(i == 1) previousBerberis?.let {
+                        event.draw3DLine(berberisList[i].add(0.5,0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
+                    }
+                    else previousBerberis?.let {
+                        event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
+                    }
+
+                    previousBerberis = berberisList[i]
+                }
+            }
         }
     }
 
