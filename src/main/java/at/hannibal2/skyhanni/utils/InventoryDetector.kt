@@ -13,8 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  *
  * @property onInventoryOpen A callback triggered when the given inventory is detected to be open. Optional.
  * @property checkInventoryName Define what inventory name or names we are looking for.
- *
- * @constructor Initializes the detector and registers it to a global list of active detectors.
  */
 class InventoryDetector(
     val onInventoryOpen: () -> Unit = {},
