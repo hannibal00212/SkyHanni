@@ -20,26 +20,6 @@ public class KeyBindConfig {
     @ConfigEditorBoolean
     public boolean excludeBarn = false;
 
-//     public enum Layouts {
-//         LAYOUT_1("Layout 1"),
-//         LAYOUT_2("Layout 2"),
-//         LAYOUT_3("Layout 3"),
-//         LAYOUT_4("Layout 4"),
-//         LAYOUT_5("Layout 5"),
-//         ;
-//
-//         private final String str;
-//
-//         Layouts(String str) {
-//             this.str = str;
-//         }
-//
-//         @Override
-//         public String toString() {
-//             return str;
-//         }
-//     }
-
     @Expose
     @ConfigOption(name = "Profile Selection For Crops", desc = "")
     @Accordion
