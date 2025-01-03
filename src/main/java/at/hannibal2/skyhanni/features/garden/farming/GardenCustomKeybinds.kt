@@ -101,7 +101,7 @@ object GardenCustomKeybinds {
         val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindingFields }
 
         ConditionalUtils.onToggle(
-            *allKeybindings.toTypedArray(),
+            allKeybindings,
         ) {
             update()
         }

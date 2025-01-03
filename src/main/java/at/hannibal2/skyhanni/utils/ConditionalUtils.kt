@@ -22,6 +22,10 @@ object ConditionalUtils {
         onChange(*properties) { _, _ -> observer.run() }
     }
 
+    fun <T> onToggle(properties: Collection<Property<out T>>, observer: Runnable) {
+        onChange(*properties.toTypedArray()) { _, _ -> observer.run() }
+    }
+
     fun <T> Property<out T>.onToggle(observer: Runnable) {
         whenChanged { _, _ -> observer.run() }
     }
