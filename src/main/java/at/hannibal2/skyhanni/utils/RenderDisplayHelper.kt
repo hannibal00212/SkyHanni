@@ -1,3 +1,4 @@
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -8,6 +9,17 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+/**
+ * RenderDisplayHelper determines when to render displays based on
+ * conditions and context, such as whether the player is in their inventory or
+ * outside of an inventory GUI, or in a inventory defined by InventoryDetector.
+ *
+ * @property inventory set a InventoryDetector the display should be rendered in.
+ * @property outsideInventory Specifies if the display should render when not inside any inventory.
+ * @property inOwnInventory Specifies if the display should render when the player is in their own inventory.
+ * @property condition Should the display be rendered at all? Insert the isEnabled() function here.
+ * @property onRender This is getting called when the render should happen.
+ */
 class RenderDisplayHelper(
     private val inventory: InventoryDetector = noInventory,
     private val outsideInventory: Boolean = false,
@@ -17,13 +29,13 @@ class RenderDisplayHelper(
 ) {
 
     init {
+        // Registers the instance to the list of all display helpers.
         allDisplays.add(this)
     }
 
     @SkyHanniModule
     companion object {
         private val noInventory = InventoryDetector { false }
-
         private val allDisplays = mutableListOf<RenderDisplayHelper>()
         private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 

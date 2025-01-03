@@ -233,7 +233,6 @@ object MineshaftPityDisplay {
     init {
         RenderDisplayHelper(
             condition = { isDisplayEnabled() },
-//             inOwnInventory = true,
             outsideInventory = true,
         ) {
             display.ifEmpty { update() }

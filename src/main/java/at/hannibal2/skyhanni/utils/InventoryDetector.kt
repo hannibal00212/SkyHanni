@@ -7,6 +7,15 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+/**
+ * The InventoryDetector tracks whether an inventory is open and provides
+ * a inventory open consumer and a isInside function to handle inventory check logic.
+ *
+ * @property onInventoryOpen A callback triggered when the given inventory is detected to be open. Optional.
+ * @property checkInventoryName Define what inventory name or names we are looking for.
+ *
+ * @constructor Initializes the detector and registers it to a global list of active detectors.
+ */
 class InventoryDetector(
     val onInventoryOpen: () -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
@@ -18,12 +27,15 @@ class InventoryDetector(
 
     private var inInventory = false
 
+    /**
+     * Check if the player is currently inside this inventory.
+     */
     fun isInside() = inInventory
 
     @SkyHanniModule
     companion object {
 
-        val detectors = mutableListOf<InventoryDetector>()
+        private val detectors = mutableListOf<InventoryDetector>()
 
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         fun onInventoryClose(event: InventoryCloseEvent) {
