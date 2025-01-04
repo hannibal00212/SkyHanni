@@ -238,29 +238,29 @@ object RiftWiltedBerberisHelper {
             }
         } else {
             // new system
-            if (berberisList.isNotEmpty()) {
+            if (berberisList.isEmpty()) return
+            var alpha = 0.8f
+            var previousBerberis: LorenzVec? = null
+            event.drawDynamicText(berberisList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
-                var alpha = 0.8f
-                var previousBerberis: LorenzVec? = null
-                event.drawDynamicText(berberisList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
+            berberisList.take(3).forEachIndexed { i, loc ->
+                // box it with half the opacity of the previous box, first in list is yellow
+                if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(loc), Color.YELLOW, alpha)
+                else event.drawFilledBoundingBoxNea(axisAlignedBB(loc), Color.WHITE, alpha)
+                alpha /= 2f
 
-                // for the first 3 berberis
-                for (i in 0..(berberisList.size - 1).coerceAtMost(2)) {
-                    // box it with half the opacity of the previous box, first in list is yellow
-                    if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(berberisList[i]), Color.YELLOW, alpha)
-                    else event.drawFilledBoundingBoxNea(axisAlignedBB(berberisList[i]), Color.WHITE, alpha)
-                    alpha /= 2f
-
-                    // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
-                    if (i == 1) previousBerberis?.let {
-                        event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
+                // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be yellow
+                if (i == 1) {
+                    previousBerberis?.let {
+                        event.draw3DLine(loc.add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.YELLOW, 4, false)
                     }
-                    else previousBerberis?.let {
-                        event.draw3DLine(berberisList[i].add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
+                } else {
+                    previousBerberis?.let {
+                        event.draw3DLine(loc.add(0.5, 0.5, 0.5), it.add(0.5, 0.5, 0.5), Color.WHITE, 2, false)
                     }
-
-                    previousBerberis = berberisList[i]
                 }
+
+                previousBerberis = loc
             }
         }
     }
