@@ -23,6 +23,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.Config;
 import io.github.notenoughupdates.moulconfig.Social;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation;
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign;
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory;
 import net.minecraft.util.ResourceLocation;
@@ -32,9 +33,9 @@ import java.util.List;
 
 
 public class Features extends Config {
-    public static final ResourceLocation DISCORD = new ResourceLocation("notenoughupdates:social/discord.png");
-    public static final ResourceLocation GITHUB = new ResourceLocation("notenoughupdates:social/github.png");
-    public static final ResourceLocation PATREON = new ResourceLocation("notenoughupdates:social/patreon.png");
+    public static final MyResourceLocation DISCORD = new MyResourceLocation("skyhanni", "social/discord.png");
+    public static final MyResourceLocation GITHUB = new MyResourceLocation("skyhanni", "social/github.png");
+    public static final MyResourceLocation PATREON = new MyResourceLocation("skyhanni", "social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
