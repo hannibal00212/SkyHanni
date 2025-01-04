@@ -22,9 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @Deprecated("Use SkyHanniEvent instead")
 abstract class LorenzEvent : Event() {
 
-    private val eventName by lazy {
-        this::class.simpleName!!
-    }
+    private val eventName = this::class.simpleName!!
 
     @Deprecated("Use SkyHanniEvent instead")
     fun postAndCatch() = postAndCatchAndBlock {}

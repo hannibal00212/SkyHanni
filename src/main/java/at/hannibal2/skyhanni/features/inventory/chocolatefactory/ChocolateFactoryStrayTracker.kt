@@ -2,16 +2,20 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -174,8 +178,8 @@ object ChocolateFactoryStrayTracker {
 
         add(
             Renderable.hoverTips(
-                "§6§lStray Tracker",
-                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7"),
+                "§6§lStray Tracker".partyModeReplace(),
+                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7".partyModeReplace()),
             ).toSearchable(),
         )
         HoppityAPI.hoppityRarities.forEach { rarity ->
@@ -192,12 +196,12 @@ object ChocolateFactoryStrayTracker {
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
-        val lineFormat = "$lineHeader$caughtString"
+        val lineFormat = "$lineHeader$caughtString".partyModeReplace()
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
             if (rarity == LEGENDARY) tip += extractGoldenTypesCaught(data)
-            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.split("\n"))
+            Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.partyModeReplace().split("\n"))
         } ?: Renderable.string(lineFormat)
         return renderable.toSearchable(rarity.toString())
     }
@@ -308,7 +312,15 @@ object ChocolateFactoryStrayTracker {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
+        // Force a refresh for party mode
+        if (ChocolateFactoryAPI.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (!isEnabled()) return
+        tracker.update() // Make sure we don't stay in party mode
     }
 
     private fun <T> migrateJsonStringKeyToRarityKey(jElement: JsonElement, enumClass: Class<T>): JsonElement {
@@ -335,6 +347,11 @@ object ChocolateFactoryStrayTracker {
         event.transform(58, "chocolateFactory.strayTracker.straysExtraChocMs") { element ->
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)
         }
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.partyMode.onToggle(tracker::update)
     }
 
     fun resetCommand() {

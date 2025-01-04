@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -108,9 +109,16 @@ class SkyHanniMod {
 
         const val MODID = "skyhanni"
 
+        val modVersion: ModVersion by lazy {
+            ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
+        }
+
         @JvmStatic
         val version: String
-            get() = Loader.instance().indexedModList[MODID]!!.version
+            get() = modVersion.asString
+
+        val isBetaVersion: Boolean
+            get() = modVersion.isBeta
 
         @JvmField
         var feature: Features = Features()

@@ -109,6 +109,22 @@ object UtilsPatterns {
     )
 
     /**
+     * REGEX-TEST: §5§kX§5 Rift-Transferable §kX
+     */
+    val riftTransferablePattern by patternGroup.pattern(
+        "item.rift.transferable",
+        "§5§kX§5 Rift-Transferable §kX",
+    )
+    /**
+     * REGEX-TEST: §5§kX§5 Rift-Exportable §kX
+     * REGEX-TEST: §5§kX§5 Rift-Exported §kX
+     */
+    val riftExportablePattern by patternGroup.pattern(
+        "item.rift.exportable",
+        "§5§kX§5 Rift-Export(?:able|ed) §kX",
+    )
+
+    /**
      * REGEX-TEST: Late Winter
      * REGEX-TEST: Early Spring
      * REGEX-TEST: Summer
