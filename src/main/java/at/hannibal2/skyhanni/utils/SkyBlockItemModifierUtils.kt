@@ -7,12 +7,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-<<<<<<< HEAD
 import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
-import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-=======
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
->>>>>>> upstream/beta
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
