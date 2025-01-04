@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -17,6 +18,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkyBlockXPAPI {
+
+    private val group = RepoPattern.group("skyblockxpapi.inventory")
+
+    private val itemNamePattern by group.pattern("itemname", "§aSkyBlock Leveling")
+
+    /**
+     * REGEX-TEST: §7Your SkyBlock Level: §8[§9287§8]
+     */
+    private val levelPattern by group.pattern("level", "§7Your SkyBlock Level: §8\\[§.(?<level>\\d+)§8\\]")
+
+    /**
+     * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
+     */
+    private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
+
 
     private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
 
@@ -47,20 +63,6 @@ object SkyBlockXPAPI {
         440..479 to LorenzColor.RED,
         480..Int.MAX_VALUE to LorenzColor.DARK_RED,
     )
-
-    private val group = RepoPattern.group("skyblockxpapi.inventory")
-
-    private val itemNamePattern by group.pattern("itemname", "§aSkyBlock Leveling")
-
-    /**
-     * REGEX-TEST: §7Your SkyBlock Level: §8[§9287§8]
-     */
-    private val levelPattern by group.pattern("level", "§7Your SkyBlock Level: §8\\[§.(?<level>\\d+)§8\\]")
-
-    /**
-     * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
-     */
-    private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
 
     fun getLevelColor() = level?.let { getLevelColor(it) } ?: LorenzColor.BLACK
