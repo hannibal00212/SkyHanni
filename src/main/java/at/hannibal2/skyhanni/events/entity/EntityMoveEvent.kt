@@ -11,5 +11,5 @@ class EntityMoveEvent<T : Entity>(
     val newLocation: LorenzVec,
     val distance: Double,
 ) : GenericSkyHanniEvent<T>(entity.javaClass) {
-    val isLocalPlayer by lazy { entity == Minecraft.getMinecraft().thePlayer }
+    val isLocalPlayer get() = entity == Minecraft.getMinecraft().thePlayer
 }
