@@ -16,6 +16,7 @@ import kotlin.math.floor
 
 object FFStats {
 
+    @Suppress("PropertyWrapping")
     private val mathCrops = setOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
     private val dicerCrops = setOf(CropType.PUMPKIN, CropType.MELON)
 

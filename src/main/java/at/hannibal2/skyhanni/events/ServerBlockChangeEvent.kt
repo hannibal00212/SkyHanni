@@ -11,7 +11,7 @@ class ServerBlockChangeEvent(blockPos: BlockPos, blockState: IBlockState) : SkyH
 
     val location = blockPos.toLorenzVec()
     val old by lazy { oldState.block.toString().getName() }
-    val oldState = location.getBlockStateAt()
+    val oldState by lazy { location.getBlockStateAt() }
     val new by lazy { blockState.block.toString().getName() }
     val newState = blockState
 
