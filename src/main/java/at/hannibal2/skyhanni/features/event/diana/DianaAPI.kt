@@ -17,7 +17,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object DianaAPI {
 
-    private val spade by lazy { "ANCESTRAL_SPADE".toInternalName() }
+    private val spade = "ANCESTRAL_SPADE".toInternalName()
 
     fun hasSpadeInHand() = InventoryUtils.itemInHandId == spade
 

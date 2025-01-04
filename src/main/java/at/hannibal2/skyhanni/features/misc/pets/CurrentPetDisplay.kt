@@ -16,6 +16,80 @@ object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
 
+<<<<<<< HEAD
+=======
+    private val patternGroup = RepoPattern.group("misc.currentpet")
+
+    /**
+     * REGEX-TEST: §7§7Selected pet: §6Enderman
+     * REGEX-TEST: §7§7Selected pet: §cNone
+     */
+    private val inventorySelectedPetPattern by patternGroup.pattern(
+        "inventory.selected",
+        "§7§7Selected pet: (?<pet>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §aYou summoned your §r§6Enderman§r§a!
+     */
+    private val chatSpawnPattern by patternGroup.pattern(
+        "chat.spawn",
+        "§aYou summoned your §r(?<pet>.*)§r§a!",
+    )
+
+    /**
+     * REGEX-TEST: §aYou despawned your §r§6Enderman§r§a!
+     */
+    private val chatDespawnPattern by patternGroup.pattern(
+        "chat.despawn",
+        "§aYou despawned your §r.*§r§a!",
+    )
+
+    /**
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Griffin§4 ✦§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Elephant§e! §a§lVIEW RULE
+     */
+    private val chatPetRulePattern by patternGroup.pattern(
+        "chat.rule",
+        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)§e! §a§lVIEW RULE",
+    )
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        findPetInChat(event.message)?.let {
+            PetAPI.currentPet = it
+            if (config.hideAutopet) {
+                event.blockedReason = "pets"
+            }
+        }
+    }
+
+    private fun findPetInChat(message: String): String? {
+        chatSpawnPattern.matchMatcher(message) {
+            return group("pet")
+        }
+        if (chatDespawnPattern.matches(message)) {
+            return ""
+        }
+        chatPetRulePattern.matchMatcher(message) {
+            return group("pet")
+        }
+
+        return null
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!PetAPI.isPetMenu(event.inventoryName)) return
+
+        val lore = event.inventoryItems[4]?.getLore() ?: return
+        inventorySelectedPetPattern.firstMatcher(lore) {
+            val newPet = group("pet")
+            PetAPI.currentPet = if (newPet != "§cNone") newPet else ""
+        }
+    }
+
+>>>>>>> upstream/beta
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock || RiftAPI.inRift() || !config.display) return

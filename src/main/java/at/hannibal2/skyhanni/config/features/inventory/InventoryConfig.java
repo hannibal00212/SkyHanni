@@ -70,7 +70,7 @@ public class InventoryConfig {
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
-    @Category(name = "Craftable Item List", desc = "")
+    @Category(name = "Craftable Item List", desc = "Helps to find items to §e/craft.")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
 

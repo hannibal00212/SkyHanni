@@ -10,7 +10,5 @@ class PartyChatEvent(
     chatComponent: IChatComponent,
     blockedReason: String? = null,
 ) : AbstractChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
-    val cleanedAuthor by lazy {
-        author.cleanPlayerName()
-    }
+    val cleanedAuthor = author.cleanPlayerName()
 }
