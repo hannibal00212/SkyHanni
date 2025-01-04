@@ -1,27 +1,27 @@
-
 config:
     validation: true
 
 GrammarRules:
-    active: true
-    AvoidBritishSpelling: # custom rule to prefer american spellings over british ones
+    AvoidBritishSpelling:
         active: true
 
 FormattingRules:
-    active: true
     CustomCommentSpacing:
         active: true
+    CustomAnnotationSpacing:
+        active: true
 
-UseRepoRules:
-    active: true
+RepoRules:
     SkullTexturesUseRepo:
+        active: true
+    RepoPatternRegexTest:
+        active: true
+    RepoPatternUnnamedGroup:
         active: true
 
 ImportRules:
-    active: true
     CustomImportOrdering:
         active: true
-
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
@@ -84,6 +84,8 @@ formatting:
     SpacingBetweenDeclarationsWithComments: # also nah
         active: false
     ImportOrdering: # handled by custom rule
+        active: false
+    AnnotationSpacing: # handled by custom rule
         active: false
 
 complexity:

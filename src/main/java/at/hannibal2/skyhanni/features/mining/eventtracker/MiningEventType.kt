@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -21,16 +22,15 @@ private fun Item.toItemStack(meta: Int = 0): ItemStack = ItemStack(this, 1, meta
 
 enum class MiningEventType(
     val eventName: String,
-    private val shortName: String,
+    shortName: String,
     val defaultLength: Duration,
-    // TODO change to LorenzColor
-    private val colorCode: Char,
+    color: LorenzColor,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
     var itemStack: ItemStack? = null,
 ) {
     GONE_WITH_THE_WIND(
-        "GONE WITH THE WIND", "Wind", 18.minutes, '9', false,
+        "GONE WITH THE WIND", "Wind", 18.minutes, LorenzColor.BLUE, false,
         object : Renderable {
             override val width = 10
             override val height = 10
@@ -50,7 +50,7 @@ enum class MiningEventType(
         },
     ),
     DOUBLE_POWDER(
-        "2X POWDER", "2x", 15.minutes, 'b', false,
+        "2X POWDER", "2x", 15.minutes, LorenzColor.AQUA, false,
         object : Renderable {
             override val width = 10
             override val height = 10
@@ -72,16 +72,12 @@ enum class MiningEventType(
     ),
 
     GOBLIN_RAID(
-        "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
-        ItemUtils.createSkull(
-            "Goblin",
-            "32518c29-6127-3c71-b2a7-be4c3251e76f",
-            "" // Late init when SkullTextureHolder is loaded
-        ),
+        "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
+        Renderable.itemStack(Items.skull.toItemStack(3), 0.36) // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
-        "BETTER TOGETHER", "Better", 18.minutes, 'd', false,
+        "BETTER TOGETHER", "Better", 18.minutes, LorenzColor.LIGHT_PURPLE, false,
         object : Renderable {
             override val width = 10
             override val height = 10
@@ -114,14 +110,14 @@ enum class MiningEventType(
         "RAFFLE",
         "Raffle",
         160.seconds,
-        colorCode = '6',
+        color = LorenzColor.GOLD,
         dwarvenSpecific = true,
         iconInput = Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
         "Gourmand", 10.minutes,
-        colorCode = 'b',
+        color = LorenzColor.AQUA,
         dwarvenSpecific = true,
         iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
     ),
@@ -131,24 +127,29 @@ enum class MiningEventType(
         eventName: String,
         shortName: String,
         defaultLength: Duration,
-        // TODO change to LorenzColor
-        colorCode: Char,
+        color: LorenzColor,
         dwarvenSpecific: Boolean,
         iconInput: ItemStack,
     ) : this(
-        eventName, shortName, defaultLength, colorCode, dwarvenSpecific,
+        eventName, shortName, defaultLength, color, dwarvenSpecific,
         Renderable.itemStack(
             iconInput, xSpacing = 0,
         ),
         iconInput,
     )
 
-    val icon = Renderable.hoverTips(iconInput, listOf(eventName))
-    val compactText = Renderable.string("§$colorCode$shortName")
-    val normalText = Renderable.string("§$colorCode$eventName")
+    private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
+    private val compactText = Renderable.string("${color.getChatColor()}$shortName")
+    private val normalText = Renderable.string("${color.getChatColor()}$eventName")
 
-    val compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
-    val normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+    private var compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
+    private var normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+
+    private fun rebuildIcons(iconInput: ItemStack) {
+        icon = Renderable.hoverTips(iconInput, listOf(eventName))
+        compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
+        normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)
+    }
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> compactTextWithIcon
@@ -165,11 +166,12 @@ enum class MiningEventType(
 
         // Because we don't want to hard-code the goblin texture, this gets called by SkullTextureHolder when the repository is loaded
         fun fixGoblinItemStack() {
-            GOBLIN_RAID.itemStack = ItemUtils.createSkull(
+            val goblinItemStack = ItemUtils.createSkull(
                 "Goblin",
                 "32518c29-6127-3c71-b2a7-be4c3251e76f",
                 SkullTextureHolder.getTexture("GOBLIN_RAID"),
             )
+            GOBLIN_RAID.rebuildIcons(goblinItemStack)
         }
 
         enum class CompressFormat {

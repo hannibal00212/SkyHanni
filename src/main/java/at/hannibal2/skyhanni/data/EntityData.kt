@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -52,7 +52,7 @@ object EntityData {
             val oldMaxHealth = maxHealthMap.getOrDefault(id, -1)
             if (oldMaxHealth != maxHealth) {
                 maxHealthMap[id] = maxHealth
-                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
+                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
             }
         }
     }
@@ -83,7 +83,7 @@ object EntityData {
             val health = (it.`object` as Float).toInt()
             if (entity is EntityWither && health == 300 && entityId < 0) return
             if (entity is EntityLivingBase) {
-                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
+                EntityHealthUpdateEvent(entity, health.derpy()).post()
             }
         }
     }
@@ -100,14 +100,14 @@ object EntityData {
 
     private fun postRenderNametag(entity: Entity, chatComponent: ChatComponentText) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
-        event.postAndCatch()
+        event.post()
         event.chatComponent
     }
 
     @JvmStatic
     fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
         val event = EntityHealthDisplayEvent(text)
-        event.postAndCatch()
+        event.post()
         event.text
     }
 

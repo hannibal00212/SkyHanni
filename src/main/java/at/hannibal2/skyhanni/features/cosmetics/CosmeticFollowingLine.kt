@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.cosmetics
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -8,13 +9,13 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -43,7 +44,7 @@ object CosmeticFollowingLine {
         updateClose(event)
 
         val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
-        val color = config.lineColor.toChromaColor()
+        val color = config.lineColor.toSpecialColor()
 
         renderClose(event, firstPerson, color)
         renderFar(event, firstPerson, color)
@@ -129,7 +130,7 @@ object CosmeticFollowingLine {
 
     private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.FOLLOWING_LINE.isSelected()) && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "misc.cosmeticConfig", "misc.cosmetic")
         event.move(9, "misc.cosmeticConfig.followingLineConfig", "misc.cosmetic.followingLine")

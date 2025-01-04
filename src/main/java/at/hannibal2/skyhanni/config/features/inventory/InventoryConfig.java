@@ -70,7 +70,7 @@ public class InventoryConfig {
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
-    @Category(name = "Craftable Item List", desc = "")
+    @Category(name = "Craftable Item List", desc = "Helps to find items to §e/craft.")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
 
@@ -134,6 +134,11 @@ public class InventoryConfig {
     @Accordion
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
+    @Expose
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
+  
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion

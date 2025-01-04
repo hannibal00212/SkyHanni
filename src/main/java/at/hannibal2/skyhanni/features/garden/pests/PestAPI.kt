@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -25,17 +26,20 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
@@ -57,11 +61,11 @@ object PestAPI {
 
     // TODO move into repo
     val vacuumVariants = listOf(
-        "SKYMART_VACUUM".asInternalName(),
-        "SKYMART_TURBO_VACUUM".asInternalName(),
-        "SKYMART_HYPER_VACUUM".asInternalName(),
-        "INFINI_VACUUM".asInternalName(),
-        "INFINI_VACUUM_HOOVERIUS".asInternalName(),
+        "SKYMART_VACUUM".toInternalName(),
+        "SKYMART_TURBO_VACUUM".toInternalName(),
+        "SKYMART_HYPER_VACUUM".toInternalName(),
+        "INFINI_VACUUM".toInternalName(),
+        "INFINI_VACUUM_HOOVERIUS".toInternalName(),
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
@@ -71,7 +75,7 @@ object PestAPI {
     private val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)"
+        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
     )
 
     /**
@@ -80,7 +84,7 @@ object PestAPI {
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.nopests",
-        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$"
+        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
     )
 
     /**
@@ -88,7 +92,7 @@ object PestAPI {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)"
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -96,11 +100,11 @@ object PestAPI {
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.nopests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$"
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!"
+        "§4§lൠ §cThis plot has §6(?<amount>\\d) Pests?§c!",
     )
 
     /**
@@ -108,20 +112,32 @@ object PestAPI {
      */
     private val infectedPlotsTablistPattern by patternGroup.pattern(
         "tablist.infectedplots",
-        "\\sPlots: (?<plots>.*)"
+        "\\sPlots: (?<plots>.*)",
     )
 
     /**
-     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §6Locust§e!
-     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §6Moth§e!
+     * REGEX-TEST: §eYou received §a7x Enchanted Potato §efor killing a §2Locust§e!
+     * REGEX-TEST: §eYou received §a6x Enchanted Cocoa Beans §efor killing a §2Moth§e!
+     * REGEX-TEST: §eYou received §a64x Enchanted Sugar §efor killing a §2Mosquito§e!
      */
     val pestDeathChatPattern by patternGroup.pattern(
         "chat.pestdeath",
-        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §6(?<pest>.*)§e!"
+        "§eYou received §a(?<amount>[0-9]*)x (?<item>.*) §efor killing an? §2(?<pest>.*)§e!",
     )
-    private val noPestsChatPattern by patternGroup.pattern(
+    val noPestsChatPattern by patternGroup.pattern(
         "chat.nopests",
-        "§cThere are not any Pests on your Garden right now! Keep farming!"
+        "§cThere are not any Pests on your Garden right now! Keep farming!",
+    )
+
+    /**
+     * REGEX-TEST: §eMouse Trap #1§r
+     * REGEX-TEST: §eMouse Trap #2§r
+     * REGEX-TEST: §eMouse Trap #3§r
+     * REGEX-TEST: §aPest Trap #3§r
+     */
+    private val pestTrapPattern by patternGroup.pattern(
+        "entity.pesttrap",
+        "(?:§.)+(?:Pest|Mouse) Trap(?: #\\d+)?(?:§.)+"
     )
 
     var gardenJoinTime = SimpleTimeMark.farPast()
@@ -196,14 +212,14 @@ object PestAPI {
             plot.pests = 0
             plot.isPestCountInaccurate = false
             val item = event.inventoryItems[plot.inventorySlot] ?: continue
-            item.getLore().matchFirst(pestInventoryPattern) {
+            pestInventoryPattern.firstMatcher(item.getLore()) {
                 plot.pests = group("amount").toInt()
             }
         }
         updatePests()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         for (line in event.tabList) {
@@ -226,7 +242,7 @@ object PestAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
@@ -239,6 +255,7 @@ object PestAPI {
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
+            PestKillEvent.post()
         }
         if (noPestsChatPattern.matches(event.message)) {
             resetAllPests()
@@ -263,7 +280,7 @@ object PestAPI {
         firstScoreboardCheck = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.oldItem !in vacuumVariants) return
@@ -280,6 +297,10 @@ object PestAPI {
 
     fun getNearestInfestedPlot() = getInfestedPlots().minByOrNull { it.middle.distanceSqToPlayer() }
 
+    fun isNearPestTrap() = EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>().any {
+        it.distanceToPlayer() < 10 && pestTrapPattern.matches(it.displayName.formattedText)
+    }
+
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
         repeat(removedPests) {
@@ -288,8 +309,10 @@ object PestAPI {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot()
-            ?: ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+        val plot = getNearestInfestedPlot() ?: run {
+            if (isNearPestTrap()) return
+            else ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+        }
 
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--
@@ -312,7 +335,7 @@ object PestAPI {
             "scoreboardPests" to scoreboardPests,
             "plots" to getInfestedPlots().map { "id: ${it.id} pests: ${it.pests} isInaccurate: ${it.isPestCountInaccurate}" },
             noStackTrace = true,
-            betaOnly = true
+            betaOnly = true,
         )
     }
 
@@ -360,8 +383,8 @@ object PestAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenAPI.inGarden()) {

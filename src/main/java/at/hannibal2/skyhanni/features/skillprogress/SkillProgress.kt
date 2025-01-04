@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -33,14 +34,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -115,7 +114,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toSpecialColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get(),
             )
@@ -125,8 +124,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = barConfig.barStartColor.toSpecialColor(),
+                endColor = barConfig.barStartColor.toSpecialColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get(),
@@ -136,7 +135,7 @@ object SkillProgress {
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         allDisplay = emptyList()
@@ -158,7 +157,7 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
@@ -196,7 +195,7 @@ object SkillProgress {
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.enabled,
@@ -219,10 +218,9 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar || !isEnabled()) return
-        if (event.isCanceled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
@@ -465,18 +463,26 @@ object SkillProgress {
                     }
 
                     if (config.showActionLeft.get() && percent != 100f) {
-                        append(" - ")
-                        val gain = skill.lastGain.formatDouble()
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
-                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                            append("§6$actionLeft Left")
-                        } else {
-                            append("§6∞ Left")
-                        }
+                        append(" - " + addActionsLeft(skill, currentXpMax, currentXp))
                     }
                 },
             ),
         )
+    }
+
+    private fun addActionsLeft(
+        skill: SkillAPI.SkillInfo,
+        currentXpMax: Long,
+        currentXp: Long,
+    ): String {
+        if (skill.lastGain != "") {
+            val gain = skill.lastGain.formatDouble()
+            val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
+            if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                return "§6$actionLeft Left"
+            }
+        }
+        return "§6∞ Left"
     }
 
     private fun updateSkillInfo() {

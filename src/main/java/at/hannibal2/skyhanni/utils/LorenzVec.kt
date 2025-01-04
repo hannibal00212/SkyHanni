@@ -75,15 +75,6 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
-    fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
-
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
     fun angleAsCos(other: LorenzVec) = normalize().dotProduct(other.normalize())
@@ -92,11 +83,13 @@ data class LorenzVec(
 
     fun angleInDeg(other: LorenzVec) = Math.toDegrees(angleInRad(other))
 
-    @Deprecated("Use operator fun plus instead", ReplaceWith("this + other"))
-    fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+    fun crossProduct(other: LorenzVec): LorenzVec = LorenzVec(
+        this.y * other.z - this.z * other.y,
+        this.z * other.x - this.x * other.z,
+        this.x * other.y - this.y * other.x,
+    )
 
-    @Deprecated("Use operator fun minus instead", ReplaceWith("this - other"))
-    fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+    fun scaledTo(other: LorenzVec) = this.normalize().times(other.length())
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
 
@@ -152,9 +145,6 @@ data class LorenzVec(
         result = 31 * result + z.hashCode()
         return result
     }
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun round(precision: Int) = roundTo(precision)
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 

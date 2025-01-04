@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -28,13 +29,11 @@ object ChumBucketHider {
         reset()
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!config.enabled.get()) return
 
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (entity in hiddenEntities) {
             event.cancel()
@@ -55,7 +54,7 @@ object ChumBucketHider {
         // Second text line
         if (name.contains("/10 §aChums")) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity.toSet()) {
+            for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.cancel()
@@ -71,7 +70,7 @@ object ChumBucketHider {
             }
         ) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity.toSet()) {
+            for (title in titleEntity) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.cancel()
@@ -81,7 +80,7 @@ object ChumBucketHider {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }

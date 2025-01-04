@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
@@ -27,17 +28,16 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.math.ceil
@@ -106,17 +105,17 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".toInternalName() }
-    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
-    private val VOLTA by lazy { "VOLTA".toInternalName() }
-    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
+    private val COMPOST = "COMPOST".toInternalName()
+    private val BIOFUEL = "BIOFUEL".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
+    private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!inInventory) return
 
@@ -506,6 +505,7 @@ object ComposterOverlay {
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
+                replaceSameMessage = true
             )
             return
         }
@@ -543,7 +543,7 @@ object ComposterOverlay {
         return price
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         updateOrganicMatterFactors()
     }
@@ -586,14 +586,14 @@ object ComposterOverlay {
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
             if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
-            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
+            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.toInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
-                map[internalName.asInternalName()] = it * amount
+                map[internalName.toInternalName()] = it * amount
             }
         }
         return map
@@ -621,7 +621,7 @@ object ComposterOverlay {
         DAY("Day", 60 * 60 * 24),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
@@ -634,8 +634,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {

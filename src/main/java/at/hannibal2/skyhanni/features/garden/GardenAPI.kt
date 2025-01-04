@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -130,7 +129,7 @@ object GardenAPI {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+        GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
 
     private fun checkItemInHand() {
@@ -172,16 +171,7 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    @Deprecated("use renderable list instead", ReplaceWith(""))
-    fun MutableList<Any>.addCropIcon(
-        crop: CropType,
-        scale: Double = NEUItems.itemFontSize,
-        highlight: Boolean = false,
-    ) =
-        addItemIcon(crop.icon.copy(), highlight, scale = scale)
-
-    // TODO rename to addCropIcon
-    fun MutableList<Renderable>.addCropIconRenderable(
+    fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
         scale: Double = NEUItems.itemFontSize,
         highlight: Boolean = false,
@@ -207,7 +197,7 @@ object GardenAPI {
         ChatUtils.chat("Manually reset all crop speed data!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         GardenBestCropTime.reset()
     }
@@ -231,7 +221,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).post()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {

@@ -12,8 +12,9 @@ import java.lang.reflect.ParameterizedType
 object ListEnumSkippingTypeAdapterFactory : TypeAdapterFactory {
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
         val rawType = type.rawType
-        if (rawType == List::class.java) {
-            val actualType = (type.type as ParameterizedType).actualTypeArguments[0]
+        if (rawType == List::class.java && type.type is ParameterizedType) {
+            val paramType = type.type as ParameterizedType
+            val actualType = paramType.actualTypeArguments[0]
             if (actualType is Class<*> && actualType.isEnum) {
                 @Suppress("UNCHECKED_CAST")
                 return ListEnumSkippingTypeAdapter(actualType as Class<out Enum<*>>) as TypeAdapter<T>

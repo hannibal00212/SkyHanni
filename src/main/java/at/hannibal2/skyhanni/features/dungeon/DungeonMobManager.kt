@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -9,12 +10,12 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -29,7 +30,7 @@ object DungeonMobManager {
     private val staredInvisible = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             starredConfig.highlight,
@@ -87,7 +88,7 @@ object DungeonMobManager {
                 event.draw3DLine(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
                     event.exactPlayerEyeLocation(),
-                    fel.colour.get().toChromaColor(),
+                    fel.colour.get().toSpecialColor(),
                     3,
                     true,
                 )
@@ -97,7 +98,7 @@ object DungeonMobManager {
         felOnTheGround.removeIf { mob ->
             event.drawWaypointFilled(
                 mob.baseEntity.getLorenzVec().add(-0.5, -0.23, -0.5),
-                fel.colour.get().toChromaColor(),
+                fel.colour.get().toSpecialColor(),
                 seeThroughBlocks = false,
                 beacon = false,
                 extraSize = -0.2,
@@ -125,7 +126,7 @@ object DungeonMobManager {
         }
     }
 
-    private fun getStarColor(): Color = starredConfig.colour.get().toChromaColor()
+    private fun getStarColor(): Color = starredConfig.colour.get().toSpecialColor()
 
     private fun handleStar0(mob: Mob, colour: Color?) {
         if (mob.isInvisible()) {
