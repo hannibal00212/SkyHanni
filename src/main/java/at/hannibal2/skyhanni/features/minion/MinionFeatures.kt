@@ -210,7 +210,7 @@ object MinionFeatures {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
-                    lastClicked = 0
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
         } else {
@@ -271,7 +271,7 @@ object MinionFeatures {
             val location = lastMinion ?: return
 
             if (location !in minions) {
-                minions[location]?.lastClicked = 0
+                minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
         MinionCloseEvent().post()
@@ -305,17 +305,17 @@ object MinionFeatures {
 
         val duration = minions?.get(loc)?.let {
             val lastClicked = it.lastClicked
-            if (lastClicked == 0L) {
+            if (lastClicked.isFarPast()) {
                 return "§cCan't calculate coins/day: No time data available!"
             }
-            System.currentTimeMillis() - lastClicked
+            SimpleTimeMark.now() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
         // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 
-        val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
+        val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
         return "§7Coins/day with ${stack.name}§7: §6$format coins"
@@ -337,7 +337,7 @@ object MinionFeatures {
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
-                it.lastClicked = System.currentTimeMillis()
+                it.lastClicked = SimpleTimeMark.now()
             }
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
@@ -349,8 +349,8 @@ object MinionFeatures {
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
             minions = minions?.editCopy {
                 this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
-                    displayName = newMinionName
-                    lastClicked = 0
+                    displayName = newMinionName.orEmpty()
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
             newMinion = null
@@ -387,9 +387,8 @@ object MinionFeatures {
                 event.drawString(location.up(0.65), name, true)
             }
 
-            if (config.emptiedTime.display && lastEmptied != 0L) {
-                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
-                val format = passedSince.format(longName = true) + " ago"
+            if (config.emptiedTime.display && !lastEmptied.isFarPast()) {
+                val format = lastEmptied.passedSince().format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.up(1.15), text, true)
             }

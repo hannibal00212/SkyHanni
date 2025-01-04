@@ -95,8 +95,11 @@ object ChocolateFactoryStrayWarning {
         else event.strayHighlight()
     }
 
+    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
+        gui.inventorySlots as? ContainerChest
+
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
-        val eventChest = (gui.inventorySlots as ContainerChest)
+        val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
@@ -106,7 +109,8 @@ object ChocolateFactoryStrayWarning {
     }
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
-        (gui.inventorySlots as ContainerChest).getUpperItems().keys.filter {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
             it highlight warningConfig.inventoryHighlightColor.toSpecialColor()

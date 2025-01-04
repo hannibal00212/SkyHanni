@@ -33,6 +33,6 @@ public class EventsConfig {
     @Expose
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of the one with the highest priority.")
     @ConfigEditorBoolean
-    public boolean showAllActiveEvents = false;
+    public boolean showAllActiveEvents = true;
 
 }

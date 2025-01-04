@@ -92,6 +92,11 @@ public class ChocolateFactoryConfig {
     public boolean showStackSizes = true;
 
     @Expose
+    @ConfigOption(name = "Contributor Rabbit Name", desc = "Replaces the rabbit names in the rabbit collection menu with SkyHanni contributor names.")
+    @ConfigEditorBoolean
+    public boolean contributorRabbitName = false;
+
+    @Expose
     @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.\n" +
         "The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford.")
     @ConfigEditorBoolean
@@ -210,15 +215,6 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigLink(owner = ChocolateFactoryConfig.class, field = "strayRabbitTracker")
     public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
-
-    @Expose
-    @ConfigOption(
-        name = "Hitman Slot Rabbit",
-        desc = "Show the last rabbit found in hitman slots that are on cooldown."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean hitmanSlotInfo = false;
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
