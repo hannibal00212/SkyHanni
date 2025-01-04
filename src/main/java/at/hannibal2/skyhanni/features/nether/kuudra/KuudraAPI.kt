@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.kuudra
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
@@ -24,13 +22,17 @@ object KuudraAPI {
 
     private val patternGroup = RepoPattern.group("data.kuudra")
 
+    /**
+     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T5)
+     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T2)
+     */
     private val tierPattern by patternGroup.pattern(
         "scoreboard.tier",
-        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)"
+        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)",
     )
     private val completePattern by patternGroup.pattern(
         "chat.complete",
-        "§.\\s*(?:§.)*KUUDRA DOWN!"
+        "§.\\s*(?:§.)*KUUDRA DOWN!",
     )
 
     /**
@@ -41,7 +43,7 @@ object KuudraAPI {
      */
     private val kuudraArmorPattern by patternGroup.pattern(
         "internalname.armor",
-        "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+        "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     private val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
