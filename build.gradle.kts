@@ -1,8 +1,4 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
-import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import at.skyhanni.sharedvariables.*
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -312,7 +308,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
-    archiveAppendix.set("mc${target.minecraftVersion.versionName}")
+    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"

@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +38,7 @@ object EssenceShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private val GOLD_NUGGET_ITEM by lazy { "GOLD_NUGGET".toInternalName().getItemStack().item }
+    private inline val GOLD_NUGGET_ITEM get() = Items.gold_nugget
 
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null

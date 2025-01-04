@@ -56,7 +56,7 @@ object ItemUtils {
         }
     }
 
-    private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
+    private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
