@@ -68,7 +68,7 @@ public class Features extends Config {
         if (LorenzUtils.INSTANCE.isAprilFoolsDay())
             modName = new StringBuilder().append("اسکای هانی").reverse().toString(); // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
 
-        return modName + " " + SkyHanniMod.getVersion() + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
+        return modName + " " + SkyHanniMod.VERSION + " by §channibal2§r, config by §5Moulberry §rand §5nea89";
     }
 
     /*

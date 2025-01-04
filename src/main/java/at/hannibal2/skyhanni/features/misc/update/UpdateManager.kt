@@ -133,12 +133,10 @@ object UpdateManager {
         CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
-            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
-            override fun display(): String {
-                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
-                    return "Force Outdated"
-                return normalDelegate.display()
-            }
+            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.VERSION)
+            override fun display(): String =
+                if (SkyHanniMod.feature.dev.debug.alwaysOutdated) "Force Outdated"
+                else SkyHanniMod.VERSION
 
             override fun isOlderThan(element: JsonElement): Boolean {
                 if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
