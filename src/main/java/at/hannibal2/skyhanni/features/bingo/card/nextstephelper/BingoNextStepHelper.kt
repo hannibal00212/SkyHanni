@@ -42,6 +42,10 @@ object BingoNextStepHelper {
         "crystal.obtained",
         " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal",
     )
+
+    /**
+     * REGEX-TEST: §7§7Reach §a1,000 §7Ink Sac Collection.
+     */
     private val collectionPattern by patternGroup.pattern(
         "collection",
         "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.",
@@ -50,6 +54,10 @@ object BingoNextStepHelper {
         "crystal.obtain",
         "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.",
     )
+
+    /**
+     * REGEX-TEST: §7§7Obtain level §e10§7 in the §6Foraging §7Skill.
+     */
     private val skillPattern by patternGroup.pattern(
         "skill",
         "Obtain level (?<level>.*) in the (?<skill>.*) Skill.",

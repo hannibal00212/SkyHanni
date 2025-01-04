@@ -16,12 +16,11 @@ import kotlin.math.floor
 
 object FFStats {
 
-    private val mathCrops by lazy {
-        listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
-    }
-    private val dicerCrops by lazy { listOf(CropType.PUMPKIN, CropType.MELON) }
+    @Suppress("PropertyWrapping")
+    private val mathCrops = setOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
+    private val dicerCrops = setOf(CropType.PUMPKIN, CropType.MELON)
 
-    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
+    private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
     var cakeExpireTime
         get() = GardenAPI.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
@@ -189,6 +188,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel
                 else -> 0.0
             }
         }
