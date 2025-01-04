@@ -730,6 +730,17 @@ class ProfileSpecificStorage {
     }
 
     @Expose
+    var skyblockXP: SkyBlockXpStorage = SkyBlockXpStorage()
+
+    class SkyBlockXpStorage {
+        @Expose
+        var xp: Int? = null
+
+        @Expose
+        var level: Int? = null
+    }
+
+    @Expose
     var draconicSacrificeTracker: DraconicSacrificeTracker.Data = DraconicSacrificeTracker.Data()
 
     @Expose
