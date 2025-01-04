@@ -42,7 +42,7 @@ object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
-    private val chestItems = mutableMapOf<String, Item>()
+    private var chestItems = mapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
 
@@ -88,7 +88,7 @@ object ChestValue {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        chestItems.clear()
+        chestItems = emptyMap()
     }
 
     private fun update() {
@@ -197,7 +197,7 @@ object ChestValue {
                 put(it.slotIndex, it.stack)
             }
         }
-        chestItems.clear()
+        val items = mutableMapOf<String, Item>()
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -208,13 +208,14 @@ object ChestValue {
                 total /= 2
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
-            val item = chestItems.getOrPut(key) {
+            val item = items.getOrPut(key) {
                 Item(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
             item.total += total * stack.stackSize
         }
+        chestItems = items
     }
 
     private fun Double.formatPrice(): String {

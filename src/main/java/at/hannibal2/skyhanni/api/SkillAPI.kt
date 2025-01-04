@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -154,7 +156,11 @@ object SkillAPI {
         levelArray = data.levelingXp
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }
         exactLevelingMap = levelArray.withIndex().associate { (index, xp) -> xp to (index + 1) }
-        defaultSkillCap = data.levelingCaps
+        defaultSkillCap = data.levelingCaps.editCopy {
+            if (this["farming"] == 50) {
+                this["farming"] = 60
+            }
+        }
     }
 
     @SubscribeEvent
@@ -361,6 +367,10 @@ object SkillAPI {
         val levelXp = calculateLevelXp(level - 1).toLong() + currentXp
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXp, defaultSkillCap[skillType.lowercaseName] ?: 60)
+
+        if (skillInfo.overflowLevel > 60 && currentLevel == skillInfo.overflowLevel + 1) {
+            SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, currentLevel).post()
+        }
 
         skillInfo.apply {
             this.overflowCurrentXp = currentOverflow

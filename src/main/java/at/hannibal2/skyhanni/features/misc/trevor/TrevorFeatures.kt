@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -273,6 +274,8 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
+            // Solve for the fact that Moby also has the same ID as the Trapper
+            if (entityTrapper.mob?.name == "Moby") return
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
                 config.trapperTalkCooldown
             }
@@ -290,9 +293,7 @@ object TrevorFeatures {
                 location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
             }
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
-                val displayName = if (TrevorSolver.currentMob == null) "Mob Location" else {
-                    TrevorSolver.currentMob!!.mobName
-                }
+                val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
                 event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
                 event.drawDynamicText(location.up(), displayName, 1.5)

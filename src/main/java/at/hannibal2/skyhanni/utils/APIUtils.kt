@@ -54,7 +54,7 @@ object APIUtils {
     data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
 
     private val builder: HttpClientBuilder =
-        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
+        HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.VERSION}")
             .setDefaultHeaders(
                 mutableListOf(
                     BasicHeader("Pragma", "no-cache"),

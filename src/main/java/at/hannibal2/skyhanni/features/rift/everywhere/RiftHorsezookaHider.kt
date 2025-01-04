@@ -12,7 +12,7 @@ import net.minecraft.entity.passive.EntityHorse
 @SkyHanniModule
 object RiftHorsezookaHider {
 
-    private val HORSEZOOKA by lazy { "HORSEZOOKA".toInternalName() }
+    private val HORSEZOOKA = "HORSEZOOKA".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityHorse>) {

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -53,6 +53,7 @@ object EnchantParser {
         "exclusive",
         "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
+
     // Above regex tests apply to this pattern also
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
@@ -213,7 +214,7 @@ object EnchantParser {
                 "Item has enchants in nbt but none were found?",
                 "item" to currentItem,
                 "loreList" to loreList,
-                "nbt" to currentItem?.getExtraAttributes()
+                "nbt" to currentItem?.getExtraAttributes(),
             )
             return
         } catch (e: ConcurrentModificationException) {
@@ -222,7 +223,7 @@ object EnchantParser {
                 "ConcurrentModificationException whilst formatting enchants",
                 "loreList" to loreList,
                 "format" to config.format.get(),
-                "orderedEnchants" to orderedEnchants.toString()
+                "orderedEnchants" to orderedEnchants.toString(),
             )
         }
 
@@ -271,22 +272,18 @@ object EnchantParser {
     private fun orderEnchants(loreList: MutableList<String>) {
         var lastEnchant: FormattedEnchant? = null
 
+        val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+        val regex = "[\\d,.kKmMbB]+\$".toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantmentPattern.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
-            var isRoman = true
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = try {
-                    // If one enchant is not a roman numeral we assume all are not roman numerals (idk a situation where this wouldn't be the case)
-                    matcher.group("levelNumeral").toInt().also { isRoman = false }
-                } catch (e: NumberFormatException) {
-                    matcher.group("levelNumeral").romanToDecimal()
-                }
-                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,.kKmMbB]+\$".toRegex())) {
+                val level = matcher.group("levelNumeral").romanToDecimalIfNecessary()
+                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches(regex)) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
@@ -295,9 +292,9 @@ object EnchantParser {
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
 
                 if (!orderedEnchants.add(lastEnchant)) {
-                    for (e: FormattedEnchant in orderedEnchants) {
-                        if (lastEnchant?.let { e.compareTo(it) } == 0) {
-                            lastEnchant = e
+                    for (formattedEnchant: FormattedEnchant in orderedEnchants) {
+                        if (lastEnchant?.let { formattedEnchant.compareTo(it) } == 0) {
+                            lastEnchant = formattedEnchant
                             break
                         }
                     }
