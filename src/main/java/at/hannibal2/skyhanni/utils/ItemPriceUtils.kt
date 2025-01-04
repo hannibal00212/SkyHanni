@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object ItemPriceUtils {
 
-    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
-    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".toInternalName() }
+    private val JACK_O_LANTERN = "JACK_O_LANTERN".toInternalName()
+    private val GOLDEN_CARROT = "GOLDEN_CARROT".toInternalName()
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
@@ -25,6 +25,7 @@ object ItemPriceUtils {
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
         when (this) {
+            NEUInternalName.GEMSTONE_COLLECTION -> return 0.0
             NEUInternalName.JASPER_CRYSTAL -> return 0.0
             NEUInternalName.RUBY_CRYSTAL -> return 0.0
             NEUInternalName.SKYBLOCK_COIN -> return 1.0

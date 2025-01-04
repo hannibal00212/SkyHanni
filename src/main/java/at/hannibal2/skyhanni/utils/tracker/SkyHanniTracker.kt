@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
@@ -43,7 +43,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = TextInput()
+    private val textInput = SearchTextInput()
 
     companion object {
 

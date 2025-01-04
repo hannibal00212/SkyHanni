@@ -222,8 +222,6 @@ object SlayerRngMeterDisplay {
         ) {
             return ""
         }
-        val latestSlayerCategory = SlayerAPI.latestSlayerCategory
-        latestSlayerCategory.endsWith(" I")
 
         with(storage) {
             if (itemGoal == "?") return "§cOpen RNG Meter Inventory!"
