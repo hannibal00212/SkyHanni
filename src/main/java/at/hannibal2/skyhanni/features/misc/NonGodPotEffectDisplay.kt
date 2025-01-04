@@ -4,13 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -252,9 +253,11 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
-        event.tabList.firstNotNullOfOrNull {
+        if (!event.isWidget(TabWidget.PESTS)) return
+
+        event.lines.firstNotNullOfOrNull {
             repellentPattern.matchMatcher(it) {
                 // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
                 val time = group("time")?.toIntOrNull() ?: return@matchMatcher

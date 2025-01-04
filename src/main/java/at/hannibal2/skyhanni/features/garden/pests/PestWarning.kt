@@ -194,7 +194,7 @@ object PestWarning {
             add("Last Pest Spawn: ${PestSpawnTimer.lastSpawnTime}")
             add("")
             add("Warning Shown: $warningShown")
-            add("Wardrobe Open: $wardrobeOpened")
+            add("Wardrobe Opened: $wardrobeOpened")
         }
     }
 
