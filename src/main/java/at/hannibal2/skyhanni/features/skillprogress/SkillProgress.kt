@@ -63,7 +63,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (showDisplay) {
@@ -81,7 +81,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
@@ -145,7 +145,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         allDisplay = formatAllDisplay(drawAllDisplay())
@@ -159,7 +159,7 @@ object SkillProgress {
 
     @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
@@ -220,7 +220,7 @@ object SkillProgress {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar || !isEnabled()) return
+        if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
@@ -532,5 +532,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isDisplayEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 }

@@ -146,8 +146,8 @@ object EffectAPI {
         }
         godPotConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
-            val existingValue = profileStorage?.godPotExpiryTime?.takeIfInitialized() ?: SimpleTimeMark.now()
-            profileStorage?.godPotExpiryTime = existingValue + durationAdded
+            val existingValue = profileStorage?.godPotExpiry?.takeIfInitialized() ?: SimpleTimeMark.now()
+            profileStorage?.godPotExpiry = existingValue + durationAdded
         }
 
         var effect: NonGodPotEffect? = null
@@ -218,7 +218,7 @@ object EffectAPI {
         if (!LorenzUtils.inSkyBlock) return
         for (line in event.footer.split("\n")) {
             godPotTabPattern.matchMatcher(line) {
-                profileStorage?.godPotExpiryTime = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
+                profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
             }
             for (effect in NonGodPotEffect.entries) {
                 val tabListName = effect.tabListName
@@ -241,7 +241,7 @@ object EffectAPI {
 
         val potionLore = event.inventoryItems[10]?.getLore() ?: run {
             // No active god pot effects found, reset the expiry time
-            profileStorage?.godPotExpiryTime = SimpleTimeMark.farPast()
+            profileStorage?.godPotExpiry = SimpleTimeMark.farPast()
             return
         }
 
@@ -249,7 +249,7 @@ object EffectAPI {
             TimeUtils.getDuration(group("time"))
         } ?: return
 
-        profileStorage?.godPotExpiryTime = SimpleTimeMark.now() + expiryDuration
+        profileStorage?.godPotExpiry = SimpleTimeMark.now() + expiryDuration
     }
 
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =

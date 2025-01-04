@@ -123,7 +123,7 @@ object ChocolateFactoryBlockOpen {
             } ?: TryBlockResult.SUCCESS
         } else if (config.hotChocolateMixinRequirement) {
             val mixinExpiryTime = profileStorage?.chocolateFactory?.hotChocolateMixinExpiry ?: SimpleTimeMark.farPast()
-            val godPotExpiryTime = profileStorage?.godPotExpiryTime ?: SimpleTimeMark.farPast()
+            val godPotExpiryTime = profileStorage?.godPotExpiry ?: SimpleTimeMark.farPast()
             if (mixinExpiryTime.isInPast()) {
                 ChatUtils.clickToActionOrDisable(
                     "§cBlocked opening the Chocolate Factory without a §dHot Chocolate Mix §cactive! " +
