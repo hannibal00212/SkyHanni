@@ -63,7 +63,6 @@ object RiftWiltedBerberisHelper {
 
     private var fallback = false
 
-
     // original system stuff:
     private var list = listOf<WiltedBerberis>()
 
@@ -172,7 +171,6 @@ object RiftWiltedBerberisHelper {
             event.cancel()
         }
 
-
         // original system stuff:
         if (berberis == null) {
             list = list.editCopy { add(WiltedBerberis(location)) }
@@ -217,7 +215,6 @@ object RiftWiltedBerberisHelper {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
         if (config.onlyOnFarmland && !isOnFarmland) return
-
 
         // original system:
         if (fallback) {
