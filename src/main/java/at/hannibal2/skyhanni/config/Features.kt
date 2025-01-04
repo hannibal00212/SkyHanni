@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.version
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig
@@ -60,7 +59,7 @@ class Features : Config() {
         val modName = if (isAprilFoolsDay) StringBuilder().append("اسکای هانی").reverse().toString()
         else "SkyHanni"
 
-        return "$modName $version by §channibal2§r, config by §5Moulberry §rand §5nea89"
+        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
     /*
