@@ -60,7 +60,7 @@ import kotlin.time.Duration
 
 class ProfileSpecificStorage {
     @Expose
-    var currentPetData: PetData = PetData();
+    var currentPetData: PetData = PetData()
 
     @Expose
     var experimentation: ExperimentationStorage = ExperimentationStorage()
