@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -36,10 +36,10 @@ object MinionUpgradeHelper {
 
     private val requiredItemsPattern by RepoPattern.pattern(
         "minion.items.upgrade",
-        "§7§cYou need §6(?<amount>\\d+) §cmore (?<itemName>.+)\\."
+        "§7§cYou need §6(?<amount>\\d+) §cmore (?<itemName>.+)\\.",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.minionConfigHelper) return
         event.inventoryItems[50]?.getLore()?.joinToString(" ")?.let { lore ->
@@ -55,7 +55,7 @@ object MinionUpgradeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionClose(event: MinionCloseEvent) {
         if (!config.minionConfigHelper) return
         resetItems()
@@ -69,7 +69,7 @@ object MinionUpgradeHelper {
     }
 
     private fun createDisplayItem(): ItemStack {
-        val itemPrice = itemName.asInternalName().getPriceOrNull() ?: 0.0
+        val itemPrice = itemName.toInternalName().getPriceOrNull() ?: 0.0
 
         val displayName = "§bGet required items"
 
@@ -102,7 +102,7 @@ object MinionUpgradeHelper {
         return diamondBlockItemStack.setStackDisplayName(displayName).setLore(lore)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.minionConfigHelper) return
         if (event.inventory !is InventoryPlayer && event.slot == 51) {
@@ -119,7 +119,7 @@ object MinionUpgradeHelper {
             if (remainingItems > 0) {
                 BazaarApi.searchForBazaarItem(itemName, remainingItems)
             } else {
-                GetFromSackAPI.getFromSack(itemName.asInternalName(), itemsNeeded)
+                GetFromSackAPI.getFromSack(itemName.toInternalName(), itemsNeeded)
             }
         }
     }
