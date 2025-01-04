@@ -893,7 +893,5 @@ public class ProfileSpecificStorage {
     public static class EnchantedClockData {
         @Expose
         public Map<EnchantedClockHelper.SimpleType, EnchantedClockHelper.Status> clockBoosts = new HashMap<>();
-
-
     }
 }

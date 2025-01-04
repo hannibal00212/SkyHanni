@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
-import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -124,6 +123,11 @@ public class MiscConfig {
     @ConfigOption(name = "Last Servers", desc = "")
     @Accordion
     public LastServersConfig lastServers = new LastServersConfig();
+
+    @Expose
+    @ConfigOption(name = "Enchanted Clock", desc = "")
+    @Accordion
+    public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
 
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
@@ -360,9 +364,4 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
-
-    @Expose
-    @ConfigOption(name = "Enchanted Clock Reminder", desc = "Show reminders when an Enchanted Clock charge for a boost type is available.")
-    @ConfigEditorDraggableList
-    public List<EnchantedClockHelper.SimpleType> enchantedClockReminder = new ArrayList<>();
 }

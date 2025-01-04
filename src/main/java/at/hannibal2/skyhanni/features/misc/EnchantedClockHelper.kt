@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BoostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -14,10 +14,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -30,7 +32,7 @@ object EnchantedClockHelper {
 
     private val patternGroup = RepoPattern.group("misc.eclock")
     private val storage get() = ProfileStorageData.profileSpecific?.enchantedClock
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.enchantedClock
 
     // <editor-fold desc="Patterns">
     /**
@@ -136,12 +138,23 @@ object EnchantedClockHelper {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        val storage = storage ?: return
+        if (!isEnabled()) return
+        val readyNowBoosts = loadBoostsReadyNow()
+        if (readyNowBoosts.isEmpty()) return
+        val boostList = readyNowBoosts.joinToString(", ") { it.formattedName }
+        val starter = if (readyNowBoosts.size == 1) "boost is ready" else "boosts are ready"
+        ChatUtils.chat("§6§lTIME WARP! §r§aThe following $starter:\n$boostList")
+        SoundUtils.playPlingSound()
+        // TODO add repeating reminder every 2m, default off
+    }
+
+    private fun loadBoostsReadyNow(): List<ClockBoostType> {
+        val storage = EnchantedClockHelper.storage ?: return emptyList()
 
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
         for ((type, status) in storage.clockBoosts.filter { !it.value.warned }) {
-            val inConfig = type != null && config.enchantedClockReminder.contains(type)
+            val inConfig = type != null && config.reminderBoosts.contains(type)
             val isProperState = status.state == State.CHARGING
             val inFuture = status.availableAt?.isInFuture() == true
             if (!inConfig || !isProperState || inFuture) continue
@@ -153,16 +166,12 @@ object EnchantedClockHelper {
             status.warned = true
             readyNowBoosts.add(complexType)
         }
-
-        if (readyNowBoosts.isEmpty()) return
-        val boostList = readyNowBoosts.joinToString(", ") { it.formattedName }
-        val starter = if (readyNowBoosts.size == 1) "boost is ready" else "boosts are ready"
-        ChatUtils.chat("§6§lTIME WARP! §r§aThe following $starter:\n$boostList")
+        return readyNowBoosts
     }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<EnchantedClockJson>("EnchantedClock")
+        val data = event.getConstant<EnchantedClockJson>("misc/EnchantedClock")
         ClockBoostType.clear()
         ClockBoostType.populateFromJson(data)
     }
@@ -172,13 +181,11 @@ object EnchantedClockHelper {
         val usageString = boostUsedChatPattern.matchMatcher(event.message) { group("usagestring") } ?: return
         val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return
         val simpleType = boostType.toSimple() ?: return
-        storage?.clockBoosts?.getOrPut(simpleType) {
-            Status(State.CHARGING, boostType.getCooldownFromNow())
-        }
+        storage?.clockBoosts?.putIfAbsent(simpleType, Status(State.CHARGING, boostType.getCooldownFromNow()))
     }
 
     @SubscribeEvent
-    fun onInventoryUpdatedEvent(event: InventoryUpdatedEvent) {
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!enchantedClockPattern.matches(event.inventoryName)) return
         val storage = storage ?: return
 
@@ -210,9 +217,7 @@ object EnchantedClockHelper {
                 }
             }
 
-            storage.clockBoosts.getOrPut(simpleType) {
-                Status(currentStatus, parsedCooldown)
-            }
+            storage.clockBoosts.putIfAbsent(simpleType, Status(currentStatus, parsedCooldown))
         }
     }
 
@@ -232,4 +237,6 @@ object EnchantedClockHelper {
 
         override fun toString(): String = "§" + color.chatColorCode + displayName
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.reminder
 }
