@@ -30,7 +30,9 @@ object DefaultConfigFeatures {
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val updated = SkyHanniMod.VERSION !in knownToggles
         val processor = FeatureToggleProcessor()
-        ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(SkyHanniMod.feature)
         knownToggles[SkyHanniMod.VERSION] = processor.allOptions.map { it.path }
         SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
@@ -62,7 +64,9 @@ object DefaultConfigFeatures {
 
     fun onCommand(old: String, new: String) {
         val processor = FeatureToggleProcessor()
-        ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(SkyHanniMod.feature)
         var optionList = processor.orderedOptions
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
         val togglesInNewVersion = knownToggles[new]

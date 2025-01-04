@@ -89,7 +89,6 @@ object MiningEventDisplay {
         Renderable.string("§8:"),
     )
 
-
     private val unknownDisplay = Renderable.string("§7???")
     private val transitionDisplay = Renderable.string("§8->")
 

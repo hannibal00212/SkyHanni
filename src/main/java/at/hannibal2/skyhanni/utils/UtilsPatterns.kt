@@ -9,14 +9,14 @@ object UtilsPatterns {
 
     private val patternGroup = RepoPattern.group("utils")
 
-    /** Examples:
-     * §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
-     * §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-     * §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
-     * §6§lSHINY LEGENDARY DUNGEON BOOTS
-     * §6§lLEGENDARY DUNGEON BOOTS
-     * §5§lEPIC BOOTS
-     * §f§lCOMMON
+    /**
+     * REGEX-TEST: §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
+     * REGEX-TEST: §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+     * REGEX-TEST: §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
+     * REGEX-TEST: §6§lSHINY LEGENDARY DUNGEON BOOTS
+     * REGEX-TEST: §6§lLEGENDARY DUNGEON BOOTS
+     * REGEX-TEST: §5§lEPIC BOOTS
+     * REGEX-TEST: §f§lCOMMON
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line",
@@ -25,6 +25,9 @@ object UtilsPatterns {
             ") ?(?:DUNGEON )?(?<itemCategory>[^§]*)(?: (?:§.){3}.)?$",
     )
 
+    /**
+     * REGEX-TEST: §5Abiphone XIII Pro Giga
+     */
     val abiPhonePattern by patternGroup.pattern(
         "item.name.abiphone",
         ".{2}Abiphone .*",
@@ -94,6 +97,10 @@ object UtilsPatterns {
         "string.playerchat",
         "(?<important>.*?)(?:§[f7r])*: .*",
     )
+
+    /**
+     * REGEX-TEST: 8[§r§2164§r§8] §r§7❤ §r§a[VIP§6+§a] Heaven_Reaper§f§r§f: stop
+     */
     val chatUsernamePattern by patternGroup.pattern(
         "string.chatusername",
         "^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?<rankedName>(?:§\\w\\[\\w.+] )?(?:§\\w)?(?<username>\\w+))(?: (?:§\\w)?\\[.+?])?",
@@ -103,6 +110,9 @@ object UtilsPatterns {
         "^M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})",
     )
 
+    /**
+     * REGEX-TEST: §5Large Enchanted Husbandry Sack
+     */
     val sackPattern by patternGroup.pattern(
         "item.sack",
         ".*Sack",

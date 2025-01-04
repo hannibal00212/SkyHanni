@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DARK_CACAO_TRUFFLE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
@@ -25,6 +23,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -49,7 +48,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -59,6 +57,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -282,14 +281,10 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BOTTLE_OF_JYRRE.isSelected() && internalName == "NEW_BOTTLE_OF_JYRRE".toInternalName()) {
-            val seconds = item.getBottleOfJyrreSeconds() ?: 0
-            return "§a${(seconds / 3600)}"
-        }
-
-        if (DARK_CACAO_TRUFFLE.isSelected() && internalName == "DARK_CACAO_TRUFFLE".toInternalName()) {
-            val seconds = item.getSecondsHeld() ?: 0
-            return "§a${(seconds / 3600)}"
+        if (TIME_POCKET_ITEMS.isSelected()) {
+            item.getSecondsHeld()?.let { seconds ->
+                return "§a${(seconds / 3600)}"
+            }
         }
 
         if (EDITION_NUMBER.isSelected()) {
@@ -367,6 +362,9 @@ object ItemDisplayOverlayFeatures {
         event.transform(29, "inventory.itemNumberAsStackSize") { element ->
             fixRemovedConfigElement(element)
         }
+        event.transform(70, "inventory.itemNumberAsStackSize") { element ->
+            migrateTimePocketItems(element)
+        }
     }
 
     private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
@@ -374,6 +372,23 @@ object ItemDisplayOverlayFeatures {
         val newList = JsonArray()
         for (element in data.asJsonArray) {
             if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
+    }
+
+    private fun migrateTimePocketItems(data: JsonElement): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        val oldValues = setOf("BOTTLE_OF_JYRRE", "DARK_CACAO_TRUFFLE")
+        val timePocketItems = JsonPrimitive("TIME_POCKET_ITEMS")
+        for (element in data.asJsonArray) {
+            if (element.asString in oldValues) {
+                if (timePocketItems !in newList) {
+                    newList.add(timePocketItems)
+                }
+                continue
+            }
             newList.add(element)
         }
         return newList

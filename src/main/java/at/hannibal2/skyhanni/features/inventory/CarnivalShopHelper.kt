@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
@@ -125,16 +123,6 @@ object CarnivalShopHelper {
         tokensNeeded = 0
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        processInventoryEvent(event)
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        processInventoryEvent(event)
-    }
-
     private fun checkSavedProgress() {
         val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
         for (key in storage.keys) {
@@ -225,23 +213,33 @@ object CarnivalShopHelper {
         )
     }
 
-    private fun processInventoryEvent(event: InventoryOpenEvent) {
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
-        processTokenShopFooter(event)
-        val matchingShop = repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
-        currentEventType = matchingShop.shopName
-        processEventShopUpgrades(event.inventoryItems)
+        var shouldUpdate = processTokenShopFooter(event)
+        repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) }?.let { matchingShop ->
+            currentEventType = matchingShop.shopName
+            processEventShopUpgrades(event.inventoryItems)
+            shouldUpdate = true
+        }
+
+        if (!shouldUpdate) return
         regenerateShopSpecificItemStack()
         regenerateOverviewItemStack()
         saveProgress()
     }
 
-    private fun processTokenShopFooter(event: InventoryOpenEvent) {
+    private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
         val tokenFooterStack = event.inventoryItems[32]
-        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return
+        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
-            tokensOwned = groupOrNull("tokens")?.formatInt() ?: 0
+            val new = groupOrNull("tokens")?.formatInt() ?: 0
+            val changed = new != tokensOwned
+            tokensOwned = new
+            return changed
         }
+
+        return false
     }
 
     private fun processEventShopUpgrades(inventoryItems: Map<Int, ItemStack>) {

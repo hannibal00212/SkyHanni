@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.hours
 object EnchantedClockHelper {
 
     private val patternGroup = RepoPattern.group("misc.eclock")
-    private val storage get() = ProfileStorageData.profileSpecific?.enchantedClock
+    private val storage get() = ProfileStorageData.profileSpecific?.enchantedClockBoosts
     private val config get() = SkyHanniMod.feature.misc.enchantedClock
 
     // <editor-fold desc="Patterns">
@@ -153,8 +153,8 @@ object EnchantedClockHelper {
 
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
-        for ((type, status) in storage.clockBoosts.filter { !it.value.warned }) {
-            val inConfig = type != null && config.reminderBoosts.contains(type)
+        for ((type, status) in storage.filter { !it.value.warned }) {
+            val inConfig = config.reminderBoosts.contains(type)
             val isProperState = status.state == State.CHARGING
             val inFuture = status.availableAt?.isInFuture() == true
             if (!inConfig || !isProperState || inFuture) continue
@@ -181,7 +181,7 @@ object EnchantedClockHelper {
         val usageString = boostUsedChatPattern.matchMatcher(event.message) { group("usagestring") } ?: return
         val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return
         val simpleType = boostType.toSimple() ?: return
-        storage?.clockBoosts?.putIfAbsent(simpleType, Status(State.CHARGING, boostType.getCooldownFromNow()))
+        storage?.putIfAbsent(simpleType, Status(State.CHARGING, boostType.getCooldownFromNow()))
     }
 
     @SubscribeEvent
@@ -211,13 +211,13 @@ object EnchantedClockHelper {
 
             // Because the times provided by the clock UI is inaccurate (we only get hour count)
             //  We only want to set it if the current time is horribly incorrect.
-            storage.clockBoosts[simpleType]?.availableAt?.let { existing ->
+            storage[simpleType]?.availableAt?.let { existing ->
                 parsedCooldown?.let { parsed ->
                     if (existing.absoluteDifference(parsed) < 2.hours) return
                 }
             }
 
-            storage.clockBoosts.putIfAbsent(simpleType, Status(currentStatus, parsedCooldown))
+            storage.putIfAbsent(simpleType, Status(currentStatus, parsedCooldown))
         }
     }
 
