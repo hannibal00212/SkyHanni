@@ -19,16 +19,16 @@ object SkyBlockXPAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
 
-    var xp: Int?
-        get() = storage?.xp
-        set(value) {
-            storage?.let { it.xp = value }
-        }
-
     var level: Int?
         get() = storage?.level
         set(value) {
             storage?.let { it.level = value }
+        }
+
+    var xp: Int?
+        get() = storage?.xp
+        set(value) {
+            storage?.let { it.xp = value }
         }
 
     private val group = RepoPattern.group("skyblockxpapi.inventory")
