@@ -26,7 +26,7 @@ object KuudraAPI {
 
     private val tierPattern by patternGroup.pattern(
         "scoreboard.tier",
-        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>.*)\\)"
+        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)"
     )
     private val completePattern by patternGroup.pattern(
         "chat.complete",
