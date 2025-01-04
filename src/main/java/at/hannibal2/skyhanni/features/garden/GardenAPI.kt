@@ -120,10 +120,8 @@ object GardenAPI {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        DelayedRun.runDelayed(2.seconds) {
-            if (event.newIsland == IslandType.GARDEN) {
-                checkItemInHand()
-            }
+        if (event.newIsland == IslandType.GARDEN) {
+            checkItemInHand()
         }
     }
 
