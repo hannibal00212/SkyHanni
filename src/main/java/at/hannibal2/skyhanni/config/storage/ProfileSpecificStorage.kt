@@ -201,7 +201,7 @@ class ProfileSpecificStorage {
             var allSlotsCooldownMark: SimpleTimeMark? = null
 
             @Expose
-            var purchasedSlots: Int = 0
+            var purchasedHitmanSlots: Int = 0
         }
 
         @Expose

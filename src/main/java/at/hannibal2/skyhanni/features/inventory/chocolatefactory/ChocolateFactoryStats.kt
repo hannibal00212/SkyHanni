@@ -117,7 +117,7 @@ object ChocolateFactoryStats {
         val hitmanSingleSlotCd = hitmanStats.singleSlotCooldownMark.formatIfFuture() ?: "§aAll Ready"
         val hitmanAllSlotsCd = hitmanStats.allSlotsCooldownMark.formatIfFuture() ?: "§aAll Ready"
         val openSlotsNow = hitmanStats.getOpenSlots()
-        val purchasedSlots = hitmanStats.purchasedSlots
+        val purchasedSlots = hitmanStats.purchasedHitmanSlots
 
         val (hitmanAllSlotsTime, allSlotsEventInhibited) = hitmanStats.getHitmanTimeToAll()
         val hitmanAllClaimString = hitmanAllSlotsTime.takeIf { it > Duration.ZERO }?.format() ?: "§aAll Ready"

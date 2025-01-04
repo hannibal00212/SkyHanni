@@ -129,9 +129,9 @@ object HitmanAPI {
      * menu, and only gives cooldown timers...
      */
     fun HitmanStatsStorage.getOpenSlots(): Int {
-        val allSlotsCooldownDuration = allSlotsCooldownMark?.takeIfFuture()?.timeUntil() ?: return purchasedSlots
+        val allSlotsCooldownDuration = allSlotsCooldownMark?.takeIfFuture()?.timeUntil() ?: return purchasedHitmanSlots
         val slotsOnCooldown = ceil(allSlotsCooldownDuration.inPartialMinutes / MINUTES_PER_DAY).toInt()
-        return purchasedSlots - slotsOnCooldown - availableHitmanEggs
+        return purchasedHitmanSlots - slotsOnCooldown - availableHitmanEggs
     }
 
     /**
@@ -155,7 +155,7 @@ object HitmanAPI {
 
             // If we didn't get any extra slots, or we have enough slots to fill, we're done
             // Otherwise set the adjusted number of slots we can fill
-            slotsToFill = (getOpenSlots() + extraSlotsInTime).coerceAtMost(purchasedSlots).takeIf { newVal ->
+            slotsToFill = (getOpenSlots() + extraSlotsInTime).coerceAtMost(purchasedHitmanSlots).takeIf { newVal ->
                 newVal != slotsToFill && extraSlotsInTime != 0
             } ?: return Pair(timeToFill, false)
         }
@@ -173,8 +173,8 @@ object HitmanAPI {
     fun HitmanStatsStorage.getHitmanTimeToAll(): Pair<Duration, Boolean> {
         val eventEndMark = HoppityAPI.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
-        val timeToSlots = getTimeToNumSlots(purchasedSlots)
-        val timeToHunt = getTimeToHuntCount(purchasedSlots)
+        val timeToSlots = getTimeToNumSlots(purchasedHitmanSlots)
+        val timeToHunt = getTimeToHuntCount(purchasedHitmanSlots)
 
         // Figure out which timer is the inhibitor
         val longerTime = if (timeToSlots > timeToHunt) timeToSlots else timeToHunt

@@ -449,7 +449,7 @@ object ChocolateFactoryDataLoader {
                 profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
             }
             hitmanPurchasedSlotsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
+                profileStorage.hitmanStats.purchasedHitmanSlots = group("amount").formatInt()
             }
         }
     }
