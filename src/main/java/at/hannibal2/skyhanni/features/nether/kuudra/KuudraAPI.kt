@@ -1,15 +1,18 @@
 package at.hannibal2.skyhanni.features.nether.kuudra
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -61,16 +64,14 @@ object KuudraAPI {
 
     fun inKuudra() = kuudraTier != null
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (kuudraTier != null) return
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            tierPattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
-                kuudraTier = tier
-                KuudraEnterEvent(tier).post()
-            }
+        tierPattern.firstMatcher(event.added) {
+            val tier = group("tier").toInt()
+            kuudraTier = tier
+            KuudraEnterEvent(tier).post()
         }
     }
 
@@ -81,8 +82,8 @@ object KuudraAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message
-        completePattern.matchMatcher(message) {
+        if (!LorenzUtils.inSkyBlock) return
+        completePattern.matchMatcher(event.message) {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }
