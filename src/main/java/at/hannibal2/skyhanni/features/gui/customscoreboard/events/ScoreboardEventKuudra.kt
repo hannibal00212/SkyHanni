@@ -24,7 +24,5 @@ object ScoreboardEventKuudra : ScoreboardEvent() {
         ScoreboardPattern.submergesPattern,
     )
 
-    override val configLine = "§7(All Kuudra Lines)"
-
     override fun showIsland() = IslandType.KUUDRA_ARENA.isInIsland()
 }
