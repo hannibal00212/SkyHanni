@@ -69,7 +69,7 @@ abstract class LorenzEvent : Event() {
             val hiddenErrors = errors - visibleErrors
             ChatUtils.chat(
                 Text.text(
-                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!",
+                    "§c[SkyHanni-${SkyHanniMod.VERSION}] $hiddenErrors more errors in $eventName are hidden!",
                 ),
             )
         }
