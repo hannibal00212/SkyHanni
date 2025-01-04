@@ -33,6 +33,7 @@ class Features : Config() {
     private val github = MyResourceLocation("notenoughupdates", "social/github.png")
     private val patreon = MyResourceLocation("notenoughupdates", "social/patreon.png")
 
+    // in moulconfig, this value is currently bugged (version 3.5.0)
     override fun shouldAutoFocusSearchbar(): Boolean {
         return false
     }
