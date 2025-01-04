@@ -72,6 +72,8 @@ object CurrentPetAPI {
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Scatha§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 99] §6Flying Fish§e! §a§lVIEW RULE
      * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dBlack Cat§d ✦§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Griffin§4 ✦§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Elephant§e! §a§lVIEW RULE
      */
     private val autopetMessagePattern by patternGroup.pattern(
         "chat.autopet",
@@ -88,6 +90,8 @@ object CurrentPetAPI {
 
     /**
      * REGEX-TEST: §7§7Selected pet: §6Hedgehog
+     * REGEX-TEST: §7§7Selected pet: §6Enderman
+     * REGEX-TEST: §7§7Selected pet: §cNone
      */
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
@@ -159,6 +163,7 @@ object CurrentPetAPI {
     /**
      * REGEX-TEST: §aYou despawned your §r§6Golden Dragon§r§a!
      * REGEX-TEST: §aYou despawned your §r§6Silverfish§r§5 ✦§r§a!
+     * REGEX-TEST: §aYou despawned your §r§6Enderman§r§a!
      */
     private val chatDespawnPattern by patternGroup.pattern(
         "chat.despawn",
@@ -168,6 +173,7 @@ object CurrentPetAPI {
     /**
      * REGEX-TEST: §aYou summoned your §r§6Silverfish§r§5 ✦§r§a!
      * REGEX-TEST: §aYou summoned your §r§6Golden Dragon§r§a!
+     * REGEX-TEST: §aYou summoned your §r§6Enderman§r§a!
      */
     private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
