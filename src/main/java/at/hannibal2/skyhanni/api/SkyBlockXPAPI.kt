@@ -20,21 +20,17 @@ object SkyBlockXPAPI {
 
     private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
 
-    var xp: Int?
-        get() = storage?.xp
-        set(value) {
-            storage?.let { it.xp = value }
-        }
-
     var level: Int?
         get() = storage?.level
         set(value) {
             storage?.let { it.level = value }
         }
 
-    fun getLevelColor() = level?.let { getLevelColor(it) } ?: LorenzColor.BLACK
-
-    fun getLevelColor(level: Int) = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
+    var xp: Int?
+        get() = storage?.xp
+        set(value) {
+            storage?.let { it.xp = value }
+        }
 
     private val levelColors = mapOf(
         0..39 to LorenzColor.GRAY,
@@ -66,6 +62,10 @@ object SkyBlockXPAPI {
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
+
+    fun getLevelColor() = level?.let { getLevelColor(it) } ?: LorenzColor.BLACK
+
+    fun getLevelColor(level: Int) = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
