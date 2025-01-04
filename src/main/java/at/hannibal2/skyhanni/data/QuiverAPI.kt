@@ -68,7 +68,18 @@ object QuiverAPI {
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
-    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
+
+    /**
+     * REGEX-TEST: §aYou set your selected arrow type to §r§fFlint Arrow§r§a!
+     */
+    private val selectPattern by chatGroup.pattern(
+        "select",
+        "§aYou set your selected arrow type to §.(?<arrow>.*)§a!",
+    )
+
+    /**
+     * REGEX-TEST: §aJax forged §r§fFlint Arrow§r§8 x386 §r§afor §r§61,930 Coins§r§a!
+     */
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
         "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!",
@@ -85,11 +96,18 @@ object QuiverAPI {
         "cleared",
         "§aCleared your quiver!|§c§lYour quiver is now completely empty!",
     )
+
+    /**
+     * REGEX-TEST: §c§lQUIVER! §r§cYou have run out of §r§fFlint Arrows§r§c!
+     */
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
         "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!",
     )
-    private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
+    private val arrowResetPattern by chatGroup.pattern(
+        "arrowreset",
+        "§cYour favorite arrow has been reset!",
+    )
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
         "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!",
@@ -100,8 +118,8 @@ object QuiverAPI {
      * REGEX-TEST: BOSS_SPIRIT_BOW
      * REGEX-TEST: CRYPT_BOW
      */
-    private val fakeBowsPattern by group.pattern("fakebows", "^(?:BOSS_SPIRIT_BOW|CRYPT_BOW)$")
-    private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
+    private val fakeBowsPattern by group.pattern("fakebows", "BOSS_SPIRIT_BOW|CRYPT_BOW")
+    private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
 
     /**
      * REGEX-TEST: §7Active Arrow: §fFlint Arrow §7(§e2880§7)

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.version
 import at.hannibal2.skyhanni.config.features.About
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig
@@ -24,17 +23,18 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
 import io.github.notenoughupdates.moulconfig.annotations.Category
+import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
-import net.minecraft.util.ResourceLocation
 
 class Features : Config() {
-    private val discord: ResourceLocation = ResourceLocation("notenoughupdates:social/discord.png")
-    private val github: ResourceLocation = ResourceLocation("notenoughupdates:social/github.png")
-    private val patreon: ResourceLocation = ResourceLocation("notenoughupdates:social/patreon.png")
+    private val discord = MyResourceLocation("notenoughupdates", "social/discord.png")
+    private val github = MyResourceLocation("notenoughupdates", "social/github.png")
+    private val patreon = MyResourceLocation("notenoughupdates", "social/patreon.png")
 
+    // in moulconfig, this value is currently bugged (version 3.5.0)
     override fun shouldAutoFocusSearchbar(): Boolean {
-        return true
+        return false
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
@@ -46,7 +46,7 @@ class Features : Config() {
         return listOf(
             Social.forLink("Discord", discord, "https://discord.com/invite/skyhanni-997079228510117908"),
             Social.forLink("GitHub", github, "https://github.com/hannibal002/SkyHanni"),
-            Social.forLink("Patreon", patreon, "https://www.patreon.com/hannibal2")
+            Social.forLink("Patreon", patreon, "https://www.patreon.com/hannibal2"),
         )
     }
 
@@ -59,9 +59,8 @@ class Features : Config() {
         val modName = if (isAprilFoolsDay) StringBuilder().append("اسکای هانی").reverse().toString()
         else "SkyHanni"
 
-        return "$modName $version by §channibal2§r, config by §5Moulberry §rand §5nea89"
+        return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
-
 
     /*
      * If you are adding a new category, please insert it alphabetically

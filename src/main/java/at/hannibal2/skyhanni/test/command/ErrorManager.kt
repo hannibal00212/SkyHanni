@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -129,7 +128,7 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
-        if (betaOnly && !LorenzUtils.isBetaVersion()) return
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return
         if (!ignoreErrorCache) {
             val pair = if (throwable.stackTrace.isNotEmpty()) {
                 throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
@@ -156,13 +155,13 @@ object ErrorManager {
 
         val extraDataString = buildExtraDataString(extraData)
         val rawMessage = message.removeColor()
-        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n \n$stackTrace\n$extraDataString```"
+        errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
-            "```\nSkyHanni ${SkyHanniMod.version}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
+            "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val finalMessage = buildFinalMessage(message) ?: return
         ChatUtils.clickableChat(
-            "§c[SkyHanni-${SkyHanniMod.version}]: $finalMessage Click here to copy the error into the clipboard.",
+            "§c[SkyHanni-${SkyHanniMod.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
@@ -206,10 +205,10 @@ object ErrorManager {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<RepoErrorJson>("ChangedChatErrors")
-        val version = SkyHanniMod.version
+        val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
+        val version = SkyHanniMod.modVersion
 
-        repoErrors = data.changedErrorMessages.filter { version in it.affectedVersions }
+        repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }
 
     private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
