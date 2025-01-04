@@ -198,6 +198,12 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val state = QuestState.valueOf(split[1])
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
+            if (quest is UnknownQuest) {
+                dailyQuestHelper.quests.clear()
+                storage.quests.clear()
+                println("Reset crimson isle quest data from the config because the config was invalid!")
+                return
+            }
             if (quest is ProgressQuest && split.size == 4) {
                 try {
                     val haveAmount = split[3].toInt()

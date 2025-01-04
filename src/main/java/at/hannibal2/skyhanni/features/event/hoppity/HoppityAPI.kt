@@ -149,7 +149,7 @@ object HoppityAPI {
         }
     }
 
-    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+    val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedStraySlots = mutableMapOf<Int, String>()
     private val miscProcessableItemTypes by lazy {
@@ -201,7 +201,6 @@ object HoppityAPI {
         !processedStraySlots.contains(it.key) && // Don't process the same slot twice.
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
-
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.

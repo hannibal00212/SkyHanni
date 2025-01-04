@@ -80,8 +80,10 @@ object FarmingPersonalBestGain {
         newFFPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
+            val newFF = newFF ?: return
             crop = cropName
             cropType = CropType.getByName(cropName)
+            val cropType = cropType ?: return
             GardenAPI.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }

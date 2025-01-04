@@ -5,10 +5,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages.getInternalName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -17,6 +25,24 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object TrophyFishManager {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
+
+    private val patternGroup = RepoPattern.group("fishing.trophyfish")
+
+    /**
+     * REGEX-TEST: §6Gold §a✔§7 (1)
+     */
+    private val odgerRankPattern by patternGroup.pattern(
+        "odger.rank",
+        "§.(?<rarity>.*) §a✔§7 \\((?<amount>.*)\\)",
+    )
+
+    /**
+     * REGEX-TEST: §bDiamond §c✖
+     */
+    private val odgerRankEmptyPattern by patternGroup.pattern(
+        "odger.rank.empty",
+        "§.(?<rarity>.*) §c✖",
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -55,12 +81,60 @@ object TrophyFishManager {
         }
         if (changed) {
             ChatUtils.clickableChat(
-                "Click here to load Trophy Fishing data from NEU PV!", onClick = {
+                "Click here to load Trophy Fishing data from NEU PV!",
+                onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
                 "§eClick to load!",
-                oneTimeClick = true
+                oneTimeClick = true,
             )
+        }
+    }
+
+    // Fetch when talking with Odger
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (event.inventoryName != "Trophy Fishing") return
+
+        val savedFishes = fish ?: return
+        var updatedFishes = 0
+        for (stack in event.inventoryItems.values) {
+            val internalName = getInternalName(stack.name.replace("§k", ""))
+
+            fun getRarity(rawRarity: String, line: String): TrophyRarity =
+                TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
+                    "unknown trophy fish rarity in odger inventory",
+                    "rawRarity" to rawRarity,
+                    "line" to line,
+                    "stack.name" to stack.name,
+                    "internalName" to internalName,
+                )
+
+            var updated = false
+            for (line in stack.getLore()) {
+                val (rarity, amount) = odgerRankPattern.matchMatcher(line) {
+                    val rarity = getRarity(group("rarity"), line)
+                    val amount = group("amount").formatInt()
+                    rarity to amount
+                } ?: odgerRankEmptyPattern.matchMatcher(line) {
+                    val rarity = getRarity(group("rarity"), line)
+                    rarity to 0
+                } ?: continue
+
+                val stored = savedFishes[internalName]?.get(rarity) ?: -1
+                if (amount != stored) {
+                    updated = true
+                    savedFishes.getOrPut(internalName) { mutableMapOf() }[rarity] = amount
+                }
+            }
+            if (updated) {
+                updatedFishes++
+            }
+        }
+
+        if (updatedFishes > 0) {
+            ChatUtils.chat("Updated $updatedFishes Trophy Fishes from Odger.")
+            TrophyFishDisplay.update()
         }
     }
 
@@ -94,7 +168,7 @@ object TrophyFishManager {
     fun getTooltip(internalName: String): ChatStyle? {
         val display = TrophyFishAPI.hoverInfo(internalName) ?: return null
         return ChatStyle().setChatHoverEvent(
-            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(display))
+            HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(display)),
         )
     }
 }
