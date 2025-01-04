@@ -6,6 +6,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.CURRENT
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.NEXT_EVENT
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType.PAST_EVENTS
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -25,13 +29,17 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventEndMark
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventStartMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -49,7 +57,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -98,6 +108,7 @@ object HoppityEventSummary {
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
     private var statYear: Int = getCurrentSBYear()
+    private var currentTimerActive = false
     private var onHoppityIsland = false
 
     private fun inMatchingInventory(): Boolean {
@@ -141,9 +152,14 @@ object HoppityEventSummary {
             isInventoryEnabled
     }
 
-    private data class StatString(val string: String, val headed: Boolean = true)
+    private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
+        if (ChocolateFactoryAPI.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        else this
+
+    private data class StatString(var string: String, val headed: Boolean = true)
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
+
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
 
     @SubscribeEvent
@@ -153,8 +169,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        onHoppityIsland = LorenzUtils.inSkyBlock &&
-            allowedHoppityIslands.any { it.isInIsland() }
+        onHoppityIsland = LorenzUtils.inSkyBlock && allowedHoppityIslands.any { it.isInIsland() }
     }
 
     @HandleEvent
@@ -243,6 +258,9 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
+        ChocolateFactoryAPI.config.partyMode.afterChange {
+            lastKnownStatHash = 0
+        }
     }
 
     @SubscribeEvent
@@ -251,17 +269,26 @@ object HoppityEventSummary {
         checkLbUpdateWarning()
         reCheckInventoryState()
         checkEnded()
+        recheckHashClear(event)
         if (!HoppityAPI.isHoppityEvent()) return
         checkAddCfTime()
     }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
+        lastSnapshotServer = null
         checkEnded()
     }
 
     private fun isInInventory(): Boolean =
         Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
+
+    private fun recheckHashClear(event: SecondPassedEvent) {
+        if (!currentTimerActive) return
+        // Refresh every 5 seconds
+        if (!event.repeatSeconds(5)) return
+        lastKnownStatHash = 0
+    }
 
     private fun reCheckInventoryState() {
         if (isInInventory() != lastKnownInInvState) {
@@ -301,7 +328,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = HoppityAPI.getEventEndMark() ?: return
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSBYear())
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -323,12 +350,8 @@ object HoppityEventSummary {
 
     private fun buildDisplayRenderables(stats: HoppityEventStats?, statYear: Int): List<Renderable> = buildList {
         // Add title renderable with centered alignment
-        add(
-            Renderable.string(
-                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ),
-        )
+        currentTimerActive = true
+        add(buildTitle(statYear))
 
         // Conditionally add year switcher renderable for inventory or chest screens
         if (isInInventory()) {
@@ -356,27 +379,86 @@ object HoppityEventSummary {
         add(cardRenderable)
     }
 
+    private fun SimpleTimeMark.formatForHoppity(): Pair<String, Boolean> =
+        if (SkyHanniMod.feature.event.hoppityEggs.eventSummary.liveDisplay.dateTimeFormat == RELATIVE)
+            Pair(passedSince().absoluteValue.format(maxUnits = 2), false)
+        else {
+            val countDownFormat = toLocalDateTime().getCountdownFormat()
+            Pair(formattedDate(countDownFormat), true)
+        }
+
+    private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
+        buildList {
+            addString(
+                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats".partyModeReplace(),
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            )
+            val eventEnd = getEventEndMark(statYear)
+            val yearNow = getCurrentSBYear()
+            val isHoppity = HoppityAPI.isHoppityEvent()
+
+            val isCurrentEvent = isHoppity && statYear == yearNow
+            val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
+
+            val configMatches = when {
+                isCurrentEvent -> liveDisplayConfig.dateTimeDisplay.contains(CURRENT)
+                isPastEvent -> liveDisplayConfig.dateTimeDisplay.contains(PAST_EVENTS)
+                else -> liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
+            }
+            if (!configMatches) return@buildList
+
+            val (timeMarkFormat, timeMarkAbs) = when {
+                isCurrentEvent || isPastEvent -> eventEnd
+                else -> getEventStartMark(statYear)
+            }.formatForHoppity()
+
+            val grammarFormat = when {
+                isCurrentEvent -> if (timeMarkAbs) "Ends" else "Ends in"
+                isPastEvent -> if (timeMarkAbs) "" else " ago"
+                else -> if (timeMarkAbs) "Starts" else "Starts in"
+            }
+
+            addCenteredString(
+                when {
+                    isCurrentEvent -> "§7$grammarFormat §f$timeMarkFormat"
+                    isPastEvent -> "§7Ended §f$timeMarkFormat$grammarFormat"
+                    else -> "§7$grammarFormat §f$timeMarkFormat"
+                }.partyModeReplace(),
+            )
+        },
+        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+    )
+
     private fun buildYearSwitcherRenderables(currentStatYear: Int): List<Renderable>? {
         val storage = storage ?: return null
         val statsStorage = storage.hoppityEventStats
 
+        val nextYear = getCurrentSBYear() + 1
+        val isAlreadyNextEvent = currentStatYear == nextYear
         val predecessorYear = statsStorage.keys.filter { it < currentStatYear }.maxOrNull()
-        val successorYear = statsStorage.keys.filter { it > currentStatYear }.minOrNull()
+        val successorYear = statsStorage.keys.filter { it in (currentStatYear + 1)..<nextYear }.minOrNull()
         if (predecessorYear == null && successorYear == null) return null
+
+        val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
 
         return listOfNotNull(
             predecessorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]",
+                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
-                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]",
+                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]".partyModeReplace(),
                     onClick = { statYear = it },
                 )
-            },
+            } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
+                Renderable.optionalLink(
+                    "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
+                    onClick = { statYear = getCurrentSBYear() + 1 },
+                )
+            } else null,
         )
     }
 
@@ -403,18 +485,16 @@ object HoppityEventSummary {
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
         val currentYear = getCurrentSBYear()
-        val currentSeason = SkyblockSeason.currentSeason
-        val isSpring = currentSeason == SkyblockSeason.SPRING
+        val isSpring = SkyblockSeason.SPRING.isSeason()
 
-        for ((year, stats) in getUnsummarizedYearStats()) {
-            val isPastYear = year < currentYear
-            val isPastSpring = (year == currentYear && !isSpring)
-            if (!isPastYear && !isPastSpring) continue
-
-            sendStatsMessage(stats, year)
-            storage?.let {
-                it.hoppityEventStats[year]?.summarized = true
-            } ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
+        getUnsummarizedYearStats().filter {
+            it.key < currentYear || (it.key == currentYear && !isSpring)
+        }.forEach { (year, stats) ->
+            storage?.hoppityEventStats?.get(year)?.let {
+                // Only send the message if we're going to be able to set the stats as summarized
+                sendStatsMessage(stats, year)
+                it.summarized = true
+            }
         }
     }
 
@@ -466,12 +546,10 @@ object HoppityEventSummary {
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
 
     private fun HoppityEventStats.getBoughtCount(): Int =
-        (mealsFound[HoppityEggType.BOUGHT] ?: 0) +
-            (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
+        (mealsFound[HoppityEggType.BOUGHT] ?: 0) + (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
 
     private fun HoppityEventStats.getMealEggCount(): Int =
         mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt()
-
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
@@ -625,7 +703,7 @@ object HoppityEventSummary {
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
 
-        return statList
+        return statList.chromafyLiveDisplay()
     }
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {

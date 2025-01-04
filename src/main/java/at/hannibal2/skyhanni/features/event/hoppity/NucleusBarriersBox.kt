@@ -14,6 +14,7 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+// TODO move into mining category and package
 @SkyHanniModule
 object NucleusBarriersBox {
     private val config get() = SkyHanniMod.feature.mining.crystalHighlighter
