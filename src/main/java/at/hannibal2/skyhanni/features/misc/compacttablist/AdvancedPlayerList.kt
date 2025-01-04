@@ -34,6 +34,11 @@ object AdvancedPlayerList {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
+    /**
+     * REGEX-TEST: §8[§r§9290§r§8] §r§bSkirtwearer §r§6ꀾ§r§7♲
+     * REGEX-TEST: §8[§r§714§r§8] §r§bSrColombianoGood §r§6Ⓑ
+     * REGEX-TEST: §8[§r§b218§r§8] §r§bnightdives
+     */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
         ".*\\[(?<level>.*)] §r(?<name>.*)",
