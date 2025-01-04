@@ -40,6 +40,8 @@ import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteHelper;
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
@@ -885,4 +887,7 @@ public class ProfileSpecificStorage {
             );
         }
     }
+
+    @Expose
+    public TimiteTracker.Data timiteHelperTracker = new TimiteTracker.Data();
 }
