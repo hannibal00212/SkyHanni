@@ -28,10 +28,10 @@ object DefaultConfigFeatures {
         }
 
         val knownToggles = SkyHanniMod.knownFeaturesData.knownFeatures
-        val updated = SkyHanniMod.version !in knownToggles
+        val updated = SkyHanniMod.VERSION !in knownToggles
         val processor = FeatureToggleProcessor()
         ConfigProcessorDriver(processor).processConfig(SkyHanniMod.feature)
-        knownToggles[SkyHanniMod.version] = processor.allOptions.map { it.path }
+        knownToggles[SkyHanniMod.VERSION] = processor.allOptions.map { it.path }
         SkyHanniMod.configManager.saveConfig(ConfigFileType.KNOWN_FEATURES, "Updated known feature flags")
         if (!SkyHanniMod.feature.storage.hasPlayedBefore) {
             SkyHanniMod.feature.storage.hasPlayedBefore = true
@@ -42,12 +42,12 @@ object DefaultConfigFeatures {
                 "§eClick to run /shdefaultoptions!"
             )
         } else if (updated) {
-            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.version }
-            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.version}"
+            val lastVersion = knownToggles.keys.last { it != SkyHanniMod.VERSION }
+            val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.clickableChat(
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
-                onClick = { onCommand(lastVersion, SkyHanniMod.version) },
+                onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
                 "§eClick to run /shdefaultoptions!"
             )
         }

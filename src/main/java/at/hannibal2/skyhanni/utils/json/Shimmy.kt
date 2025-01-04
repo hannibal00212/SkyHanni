@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import com.google.gson.JsonElement
 import java.lang.reflect.Field
 
@@ -13,8 +14,7 @@ class Shimmy private constructor(
         private fun shimmy(source: Any?, fieldName: String): Any? {
             if (source == null) return null
             return try {
-                val declaredField = source.javaClass.getDeclaredField(fieldName)
-                declaredField.isAccessible = true
+                val declaredField = source.javaClass.getDeclaredField(fieldName).makeAccessible()
                 declaredField.get(source)
             } catch (e: NoSuchFieldException) {
                 null
@@ -32,8 +32,7 @@ class Shimmy private constructor(
             if (source == null) return null
             val lastName = path.last()
             return try {
-                val field = source.javaClass.getDeclaredField(lastName)
-                field.isAccessible = true
+                val field = source.javaClass.getDeclaredField(lastName).makeAccessible()
                 Shimmy(
                     source,
                     field,

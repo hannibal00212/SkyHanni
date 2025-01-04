@@ -149,7 +149,7 @@ object HoppityAPI {
         }
     }
 
-    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+    val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedStraySlots = mutableMapOf<Int, String>()
     private val miscProcessableItemTypes by lazy {
