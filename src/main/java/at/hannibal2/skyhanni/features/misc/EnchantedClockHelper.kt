@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.hours
 object EnchantedClockHelper {
 
     private val patternGroup = RepoPattern.group("misc.eclock")
-    private val storage get() = ProfileStorageData.profileSpecific?.enchantedClockStats
+    private val storage get() = ProfileStorageData.profileSpecific?.enchantedClock
     private val config get() = SkyHanniMod.feature.misc
 
     // <editor-fold desc="Patterns">
@@ -73,7 +73,7 @@ object EnchantedClockHelper {
     )
     // </editor-fold>
 
-    enum class SimpleClockBoostType(val displayString: String) {
+    enum class SimpleType(val displayString: String) {
         MINIONS("§bMinions"),
         CHOCOLATE_FACTORY("§6Chocolate Factory"),
         PET_TRAINING("§dPet Training"),
@@ -98,13 +98,7 @@ object EnchantedClockHelper {
 
         fun getCooldownFromNow() = SimpleTimeMark.now() + cooldown
 
-        fun toSimple(): SimpleClockBoostType? {
-            return try {
-                SimpleClockBoostType.valueOf(name.uppercase())
-            } catch (e: IllegalArgumentException) {
-                null
-            }
-        }
+        fun toSimple(): SimpleType? = SimpleType.entries.find { it.name == name.uppercase() }
 
         companion object {
             private val entries = mutableListOf<ClockBoostType>()
@@ -120,7 +114,7 @@ object EnchantedClockHelper {
 
             fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
 
-            fun fromSimple(simple: SimpleClockBoostType) = entries.firstOrNull { it.displayName == simple.displayString }
+            fun fromSimple(simple: SimpleType) = entries.firstOrNull { it.displayName == simple.displayString }
 
             fun Map<Int, ItemStack>.filterStatusSlots() = filterKeys { key ->
                 ClockBoostType.entries.any { entry ->
@@ -146,15 +140,15 @@ object EnchantedClockHelper {
 
         val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
 
-        for ((boostType, status) in storage.clockBoosts.filter { !it.value.warned }) {
-            val inConfig = boostType != null && config.enchantedClockReminder.contains(boostType)
-            val isProperState = status.state == ClockBoostState.CHARGING
+        for ((type, status) in storage.clockBoosts.filter { !it.value.warned }) {
+            val inConfig = type != null && config.enchantedClockReminder.contains(type)
+            val isProperState = status.state == State.CHARGING
             val inFuture = status.availableAt?.isInFuture() == true
             if (!inConfig || !isProperState || inFuture) continue
 
-            val complexType = ClockBoostType.fromSimple(boostType) ?: continue
+            val complexType = ClockBoostType.fromSimple(type) ?: continue
 
-            status.state = ClockBoostState.READY
+            status.state = State.READY
             status.availableAt = null
             status.warned = true
             readyNowBoosts.add(complexType)
@@ -175,14 +169,11 @@ object EnchantedClockHelper {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        boostUsedChatPattern.matchMatcher(event.message) {
-            val usageString = group("usagestring") ?: return@matchMatcher
-            val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return@matchMatcher
-            val simpleType = boostType.toSimple() ?: return@matchMatcher
-            val storage = storage ?: return@matchMatcher
-            storage.clockBoosts.getOrPut(simpleType) {
-                ClockBoostStatus(ClockBoostState.CHARGING, boostType.getCooldownFromNow())
-            }
+        val usageString = boostUsedChatPattern.matchMatcher(event.message) { group("usagestring") } ?: return
+        val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return
+        val simpleType = boostType.toSimple() ?: return
+        storage?.clockBoosts?.getOrPut(simpleType) {
+            Status(State.CHARGING, boostType.getCooldownFromNow())
         }
     }
 
@@ -196,22 +187,22 @@ object EnchantedClockHelper {
             val boostType = ClockBoostType.byItemStackOrNull(stack) ?: continue
             val simpleType = boostType.toSimple() ?: continue
 
-            val currentStatus: ClockBoostState = statusLorePattern.firstMatcher(stack.getLore()) {
+            val currentStatus: State = statusLorePattern.firstMatcher(stack.getLore()) {
                 group("status")?.let { statusStr ->
-                    runCatching { ClockBoostState.valueOf(statusStr) }.getOrElse {
+                    runCatching { State.valueOf(statusStr) }.getOrElse {
                         ErrorManager.skyHanniError("Invalid status string: $statusStr")
                     }
                 }
             } ?: continue
 
             val parsedCooldown: SimpleTimeMark? = when (currentStatus) {
-                ClockBoostState.READY, ClockBoostState.PROBLEM -> null
+                State.READY, State.PROBLEM -> null
                 else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
                     group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
                 }
             }
 
-            // Because the times provided by the clock UI suck ass (we only get hour count)
+            // Because the times provided by the clock UI is inaccurate (we only get hour count)
             //  We only want to set it if the current time is horribly incorrect.
             storage.clockBoosts[simpleType]?.availableAt?.let { existing ->
                 parsedCooldown?.let { parsed ->
@@ -220,20 +211,20 @@ object EnchantedClockHelper {
             }
 
             storage.clockBoosts.getOrPut(simpleType) {
-                ClockBoostStatus(currentStatus, parsedCooldown)
+                Status(currentStatus, parsedCooldown)
             }
         }
     }
 
-    class ClockBoostStatus(
-        @field:Expose var state: ClockBoostState,
+    class Status(
+        @field:Expose var state: State,
         @field:Expose var availableAt: SimpleTimeMark?,
     ) {
         @Expose
         var warned: Boolean = false
     }
 
-    enum class ClockBoostState(val displayName: String, val color: LorenzColor) {
+    enum class State(val displayName: String, val color: LorenzColor) {
         READY("Ready", LorenzColor.GREEN),
         CHARGING("Charging", LorenzColor.RED),
         PROBLEM("Problem", LorenzColor.YELLOW),

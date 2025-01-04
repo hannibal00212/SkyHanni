@@ -888,11 +888,11 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
-    public EnchantedClockStats enchantedClockStats = new EnchantedClockStats();
+    public EnchantedClockData enchantedClock = new EnchantedClockData();
 
-    public static class EnchantedClockStats {
+    public static class EnchantedClockData {
         @Expose
-        public Map<EnchantedClockHelper.SimpleClockBoostType, EnchantedClockHelper.ClockBoostStatus> clockBoosts = new HashMap<>();
+        public Map<EnchantedClockHelper.SimpleType, EnchantedClockHelper.Status> clockBoosts = new HashMap<>();
 
 
     }
