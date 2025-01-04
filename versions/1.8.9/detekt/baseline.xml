@@ -231,10 +231,6 @@
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTest:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSb.pattern( "teammates", "(?:§.)*(?&lt;classAbbv&gt;\\[\\w]) (?:§.)*(?&lt;username&gt;\\w{2,16}) (?:(?:§.)*(?&lt;classLevel&gt;\\[Lvl?(?&lt;level&gt;[\\w,.]+)?]?)|(?:§.)*(?&lt;health&gt;[\\w,.]+)(?:§.)*.?)", )</ID>
     <ID>RepoPatternRegexTest:ShowMotesNpcSellPrice.kt$ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*" )</ID>
-    <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill", "\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;\\w+) \\((?&lt;current&gt;[\\d.,]+)/(?&lt;needed&gt;[\\d.,]+)\\)", )</ID>
-    <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.multiplier", "\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;.+) \\((?&lt;current&gt;[\\d.,]+)/(?&lt;needed&gt;[\\d,.]+[kmb])\\)", )</ID>
-    <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.percent", "\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;.+) \\((?&lt;progress&gt;[\\d.]+)%\\)", )</ID>
-    <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.tab", " (?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: §r§a(?&lt;progress&gt;[0-9.]+)%", )</ID>
     <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.tab.max", " (?&lt;type&gt;\\w+) (?&lt;level&gt;\\d+): §r§c§lMAX", )</ID>
     <ID>RepoPatternRegexTest:SkillAPI.kt$SkillAPI$by patternGroup.pattern( "skill.tab.nopercent", " §r§a(?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: §r§e(?&lt;current&gt;[0-9,.]+)§r§6/§r§e(?&lt;needed&gt;[0-9kmb]+)", )</ID>
     <ID>RepoPatternRegexTest:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
@@ -276,7 +272,6 @@
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
     <ID>RepoPatternRegexTest:VisitorListener.kt$VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
-    <ID>ReturnCount:AnitaMedalProfit.kt$AnitaMedalProfit$private fun readItem(slot: Int, item: ItemStack, table: MutableList&lt;DisplayTableEntry&gt;)</ID>
     <ID>ReturnCount:ArachneChatMessageHider.kt$ArachneChatMessageHider$private fun shouldHide(message: String): Boolean</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt$BingoNextStepHelper$private fun readDescription(description: String): NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
@@ -418,8 +413,6 @@
     <ID>UnsafeCallOnNullableType:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:TiaRelayWaypoints.kt$TiaRelayWaypoints$waypointName!!</ID>
     <ID>UnsafeCallOnNullableType:Translator.kt$Translator$messageContentRegex.find(message)!!</ID>
-    <ID>UnsafeCallOnNullableType:TrevorFeatures.kt$TrevorFeatures$TrevorSolver.currentMob!!</ID>
-    <ID>UnsafeCallOnNullableType:TrevorSolver.kt$TrevorSolver$currentMob!!</ID>
     <ID>UnsafeCallOnNullableType:TunnelsMaps.kt$TunnelsMaps$campfire.name!!</ID>
     <ID>UnsafeCallOnNullableType:UpdateManager.kt$UpdateManager$potentialUpdate!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalPrice!!</ID>
