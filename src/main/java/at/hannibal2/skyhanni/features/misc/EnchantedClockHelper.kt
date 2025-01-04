@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.BoostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -112,19 +113,7 @@ object EnchantedClockHelper {
 
             fun populateFromJson(json: EnchantedClockJson) {
                 entries.clear()
-                entries.addAll(
-                    json.boosts.map { boost ->
-                        ClockBoostType(
-                            name = boost.name,
-                            displayName = boost.displayName,
-                            usageString = boost.usageString ?: boost.displayName,
-                            color = LorenzColor.valueOf(boost.color),
-                            displaySlot = boost.displaySlot,
-                            statusSlot = boost.statusSlot,
-                            cooldown = boost.cooldownHours.hours,
-                        )
-                    },
-                )
+                entries.addAll(json.boosts.map { it.toBoostType() })
             }
 
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
@@ -140,6 +129,16 @@ object EnchantedClockHelper {
             }
         }
     }
+
+    private fun BoostJson.toBoostType(): ClockBoostType = ClockBoostType(
+        name = name,
+        displayName = displayName,
+        usageString = usageString ?: displayName,
+        color = LorenzColor.valueOf(color),
+        displaySlot = displaySlot,
+        statusSlot = statusSlot,
+        cooldown = cooldownHours.hours,
+    )
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -230,7 +229,8 @@ object EnchantedClockHelper {
         @field:Expose var state: ClockBoostState,
         @field:Expose var availableAt: SimpleTimeMark?,
     ) {
-        @Expose var warned: Boolean = false
+        @Expose
+        var warned: Boolean = false
     }
 
     enum class ClockBoostState(val displayName: String, val color: LorenzColor) {
