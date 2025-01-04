@@ -74,20 +74,10 @@ public class BackgroundConfig {
 
     @Expose
     @ConfigOption(
-        name = "Custom Background",
-        desc = "Add an image named \"scoreboard.png\" to your texture pack at \"\\assets\\skyhanni\\scoreboard.png.\" " +
-            "Activate the texture pack in Minecraft, then reload the game."
+        name = "Pack Creator",
+        desc = "Click here to open the background creator. You can use this website to add your own image into as your Scoreboard Background.",
     )
-    @ConfigEditorInfoText
-    public String useless;
-
-    @Expose
-    @ConfigOption(
-        name = "Template Link",
-        desc = "Click here to get a template for the custom background image on the SkyHanni Discord. " +
-            "You can use this template to add your own custom background image."
-    )
-    @ConfigEditorButton(buttonText = "Get")
-    public Runnable runnable = () -> OSUtils.openBrowser("https://discord.com/channels/997079228510117908/1000669238035497022/1247650261879623740");
+    @ConfigEditorButton(buttonText = "Create")
+    public Runnable runnable = () -> OSUtils.openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html");
 
 }
