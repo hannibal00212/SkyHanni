@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -92,7 +93,9 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver(processor).processConfig(features)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(features)
 
         try {
             findPositionLinks(features, mutableSetOf())
@@ -124,8 +127,7 @@ class ConfigManager {
         if (ic in slog) return
         slog.add(ic)
         var missingConfigLink = false
-        for (field in obj.javaClass.fields) {
-            field.isAccessible = true
+        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
             if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue

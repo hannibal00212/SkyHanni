@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
+import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -15,7 +16,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     val button = GuiElementButton("", -1) {}
 
-    override fun render(x: Int, y: Int, width: Int) {
+    override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
         val fr = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
