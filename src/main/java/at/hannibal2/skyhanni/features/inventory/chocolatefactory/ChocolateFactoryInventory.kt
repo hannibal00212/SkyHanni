@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -64,9 +65,6 @@ object ChocolateFactoryInventory {
             if (slotIndex == ChocolateFactoryAPI.barnIndex && ChocolateFactoryBarnManager.barnFull) {
                 slot highlight LorenzColor.RED
             }
-            if (slotIndex == ChocolateFactoryAPI.clickRabbitSlot) {
-                slot highlight LorenzColor.RED
-            }
             if (slotIndex == ChocolateFactoryAPI.milestoneIndex) {
                 unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
                     slot highlight LorenzColor.RED
@@ -83,7 +81,7 @@ object ChocolateFactoryInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.showStackSizes) return

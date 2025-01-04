@@ -240,7 +240,7 @@ class RepoManager(private val configLocation: File) {
                 val text = mutableListOf<IChatComponent>()
                 text.add(
                     (
-                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
                             "Please report this error on the Discord!"
                         ).asComponent(),
                 )

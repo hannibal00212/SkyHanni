@@ -1,23 +1,18 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryScreenFlash.isRarityOrHigher
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryScreenFlash.isSpecial
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -140,7 +135,7 @@ object ChocolateFactoryDataLoader {
 
     /**
      * REGEX-TEST: §7Status: §a§lACTIVE §f59m58s
-     * REGEX-TEST:
+     * REGEX-TEST: §7Status: §c§lINACTIVE
      */
     private val timeTowerStatusPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "timetower.status",
@@ -209,6 +204,15 @@ object ChocolateFactoryDataLoader {
     )
 
     /**
+     * REGEX-TEST: §7Purchased slots: §a28§7/§a28
+     * REGEX-TEST: §7Purchased slots: §e0§7/§a22
+     */
+    private val hitmanPurchasedSlotsPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hitman.purchasedslots",
+        "§7Purchased slots: §.(?<amount>\\d+)§7\\/§a\\d+",
+    )
+
+    /**
      * REGEX-TEST: §7Slot cooldown: §a8m 6s
      */
     private val hitmanSingleSlotCooldownPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -243,7 +247,7 @@ object ChocolateFactoryDataLoader {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             47,
@@ -252,7 +256,7 @@ object ChocolateFactoryDataLoader {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.rabbitWarning.specialRabbitSound
         ConditionalUtils.onToggle(soundProperty) {
@@ -413,21 +417,14 @@ object ChocolateFactoryDataLoader {
             timeTowerStatusPattern.matchMatcher(line) {
                 val activeTime = group("acitveTime")
                 if (activeTime.isNotEmpty()) {
-                    // todo in future fix this issue with TimeUtils.getDuration
-                    val formattedGroup = activeTime.replace("h", "h ").replace("m", "m ")
-
-                    val activeDuration = TimeUtils.getDuration(formattedGroup)
-                    val activeUntil = SimpleTimeMark.now() + activeDuration
+                    val activeUntil = SimpleTimeMark.now() + TimeUtils.getDuration(activeTime)
                     profileStorage.currentTimeTowerEnds = activeUntil
                 } else {
                     profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast()
                 }
             }
             timeTowerRechargePattern.matchMatcher(line) {
-                // todo in future fix this issue with TimeUtils.getDuration
-                val formattedGroup = group("duration").replace("h", "h ").replace("m", "m ")
-
-                val timeUntilTower = TimeUtils.getDuration(formattedGroup)
+                val timeUntilTower = TimeUtils.getDuration(group("duration"))
                 val nextTimeTower = SimpleTimeMark.now() + timeUntilTower
                 profileStorage.nextTimeTower = nextTimeTower
             }
@@ -444,19 +441,20 @@ object ChocolateFactoryDataLoader {
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
                 val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
-                profileStorage.hitmanStats.slotCooldown = nextSlot
+                profileStorage.hitmanStats.singleSlotCooldownMark = nextSlot
             }
             hitmanAllSlotsCooldownPattern.matchMatcher(line) {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
-                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
+                profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
+            }
+            hitmanPurchasedSlotsPattern.matchMatcher(line) {
+                profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
             }
         }
     }
 
     private fun processInventory(list: MutableList<ChocolateFactoryUpgrade>, inventory: Map<Int, ItemStack>) {
-        ChocolateFactoryAPI.clickRabbitSlot = null
-
         for ((slotIndex, item) in inventory) {
             processItem(list, item, slotIndex)
         }
@@ -464,8 +462,6 @@ object ChocolateFactoryDataLoader {
 
     private fun processItem(list: MutableList<ChocolateFactoryUpgrade>, item: ItemStack, slotIndex: Int) {
         if (slotIndex == ChocolateFactoryAPI.prestigeIndex) return
-
-        handleRabbitWarnings(item, slotIndex)
 
         if (slotIndex !in ChocolateFactoryAPI.otherUpgradeSlots && slotIndex !in ChocolateFactoryAPI.rabbitSlots) return
 
@@ -557,34 +553,6 @@ object ChocolateFactoryDataLoader {
         val effectiveCost = (upgradeCost!! / extra).roundTo(2)
         val upgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
-    }
-
-    private fun handleRabbitWarnings(item: ItemStack, slotIndex: Int) {
-        val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
-        val warningConfig = config.rabbitWarning
-
-        if (!clickMeRabbitPattern.matches(item.name) && !isGoldenRabbit) return
-        if (shouldWarnAboutStray(item)) {
-            if (isGoldenRabbit || item.getSkullTexture() in specialRabbitTextures) {
-                SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
-            } else SoundUtils.playBeepSound()
-        }
-
-        ChocolateFactoryAPI.clickRabbitSlot = slotIndex
-    }
-
-    private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
-        StrayTypeEntry.SPECIAL -> isSpecial(item)
-
-        StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)
-        StrayTypeEntry.EPIC_P -> isRarityOrHigher(item, LorenzRarity.EPIC)
-        StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
-        StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
-
-        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.name) || isSpecial(item)
-
-        StrayTypeEntry.NONE -> false
-        else -> false
     }
 
     private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {

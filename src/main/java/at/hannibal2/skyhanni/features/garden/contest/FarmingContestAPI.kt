@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -98,7 +99,19 @@ object FarmingContestAPI {
     private fun readCurrentCrop(): CropType? {
         val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
         return sidebarCropPattern.matchMatcher(line) {
-            CropType.getByName(group("crop"))
+            val cropName = group("crop")
+            try {
+                CropType.getByName(cropName)
+            } catch (e: IllegalStateException) {
+                ScoreboardData.sidebarLinesFormatted
+                ErrorManager.logErrorWithData(
+                    e, "Farming contest read current crop failed",
+                    "cropName" to cropName,
+                    "line" to line,
+                    "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+                )
+                null
+            }
         }
     }
 

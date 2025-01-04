@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -114,7 +115,7 @@ object BasketWaypoints {
         event.drawDynamicText(position, "§dBasket", 1.0)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (LorenzUtils.inSkyBlock) {
             isActive = false
@@ -150,7 +151,7 @@ object BasketWaypoints {
         isActive = newIsActive
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.pathfind.onToggle {
             if (config.pathfind.get() && isActive && isEnabled()) startPathfind()
@@ -188,7 +189,7 @@ object BasketWaypoints {
 
     private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(13, "event.halloweenBasket", "event.lobbyWaypoints.halloweenBasket")
     }

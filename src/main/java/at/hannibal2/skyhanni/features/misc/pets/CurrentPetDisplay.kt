@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,14 +24,27 @@ object CurrentPetDisplay {
     private val config get() = SkyHanniMod.feature.misc.pets
 
     private val patternGroup = RepoPattern.group("misc.currentpet")
+
+    /**
+     * REGEX-TEST: §7§7Selected pet: §6Enderman
+     * REGEX-TEST: §7§7Selected pet: §cNone
+     */
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
         "§7§7Selected pet: (?<pet>.*)",
     )
+
+    /**
+     * REGEX-TEST: §aYou summoned your §r§6Enderman§r§a!
+     */
     private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
         "§aYou summoned your §r(?<pet>.*)§r§a!",
     )
+
+    /**
+     * REGEX-TEST: §aYou despawned your §r§6Enderman§r§a!
+     */
     private val chatDespawnPattern by patternGroup.pattern(
         "chat.despawn",
         "§aYou despawned your §r.*§r§a!",
@@ -90,7 +104,7 @@ object CurrentPetDisplay {
         config.displayPos.renderString(PetAPI.currentPet, posLabel = "Current Pet")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")

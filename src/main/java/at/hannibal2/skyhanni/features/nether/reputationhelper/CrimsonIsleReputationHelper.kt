@@ -77,12 +77,16 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             miniBossHelper.loadData(it)
             kuudraBossHelper.loadData(it)
             questHelper.load(it)
+        }
+
+        config.hideComplete.afterChange {
+            updateRender()
         }
     }
 
@@ -114,13 +118,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
                     FactionType.NONE
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
-        config.hideComplete.afterChange {
-            updateRender()
         }
     }
 
@@ -169,7 +166,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         return config.hotkey.isKeyHeld()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.crimsonIsleReputationHelper", "crimsonIsle.reputationHelper.enabled")
         event.move(2, "misc.reputationHelperUseHotkey", "crimsonIsle.reputationHelper.useHotkey")

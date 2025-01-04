@@ -153,6 +153,8 @@ for more information and usages.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
+- When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
+- Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve readability and maintain encapsulation.
 
 ## Additional Useful Development Tools
 

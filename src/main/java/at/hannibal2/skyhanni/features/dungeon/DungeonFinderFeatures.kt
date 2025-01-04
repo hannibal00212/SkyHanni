@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -30,10 +31,18 @@ object DungeonFinderFeatures {
 
     //  Repo group and patterns
     private val patternGroup = RepoPattern.group("dungeon.finder")
+
+    /**
+     * REGEX-TEST: §7§7Note: §f3m comp carry
+     */
     private val pricePattern by patternGroup.pattern(
         "price",
         "(?i).*(?:[0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
+    /**
+     * REGEX-TEST: §7§7Note: §f3m comp carry
+     * REGEX-TEST: §7§7Note: §f250k comp carry
+     */
     private val carryPattern by patternGroup.pattern(
         "carry",
         "(?i).*(?:CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
@@ -58,16 +67,6 @@ object DungeonFinderFeatures {
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
         "§c(?:Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
-    )
-
-    // TODO why is this same pattern here twice?
-    /**
-     * REGEX-TEST:  §b4sn_§f: §eArcher§b (§e29§b)
-     * REGEX-TEST:  §akaydo_odyak§f: §eBerserk§b (§e26§b)
-     */
-    private val classLevelPattern by patternGroup.pattern(
-        "class.level",
-        " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
 
     /**
@@ -106,10 +105,18 @@ object DungeonFinderFeatures {
         "select.floor",
         "Select Floor",
     )
+
+    /**
+     * REGEX-TEST: §a§aThe Catacombs §8- §eEntrance
+     */
     private val entranceFloorPattern by patternGroup.pattern(
         "entrance",
         ".*Entrance",
     )
+
+    /**
+     * REGEX-TEST: Floor: Floor VII
+     */
     private val floorPattern by patternGroup.pattern(
         "floor",
         "Floor .*",
@@ -127,14 +134,18 @@ object DungeonFinderFeatures {
         "floor.mastermode",
         "(?:MM|.*Master Mode) The Catacombs.*",
     )
+
+    /**
+     * REGEX-TEST: Dungeon: The Catacombs
+     */
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
         "Dungeon: .*",
     )
-    private val floorFloorPattern by patternGroup.pattern(
-        "floor.pattern",
-        "Floor: .*",
-    )
+
+    /**
+     * REGEX-TEST: Floor VII
+     */
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",
         ".* (?<floorNum>[IV\\d]+)",
@@ -200,7 +211,7 @@ object DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
-            val floor = lore.find { floorFloorPattern.matches(it.removeColor()) } ?: continue
+            val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
             val dungeon = lore.find { dungeonFloorPattern.matches(it.removeColor()) } ?: continue
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -307,7 +318,7 @@ object DungeonFinderFeatures {
             val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
             val toolTip = stack.getLore().toMutableList()
             for ((index, line) in stack.getLore().withIndex()) {
-                classLevelPattern.matchMatcher(line) {
+                memberPattern.matchMatcher(line) {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
@@ -352,7 +363,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
@@ -379,7 +390,7 @@ object DungeonFinderFeatures {
         toolTipMap = emptyMap()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -21,15 +21,15 @@ object AllBurrowsList {
     private var list = listOf<LorenzVec>()
     private val config get() = SkyHanniMod.feature.event.diana.allBurrowsList
     private var burrowLocations
-        get() = SkyHanniMod.feature.storage?.foundDianaBurrowLocations
+        get() = SkyHanniMod.feature.storage.foundDianaBurrowLocations
         set(value) {
-            SkyHanniMod.feature.storage?.foundDianaBurrowLocations = value
+            SkyHanniMod.feature.storage.foundDianaBurrowLocations = value
         }
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         if (!isEnabled()) return
-        burrowLocations = burrowLocations?.editCopy {
+        burrowLocations = burrowLocations.editCopy {
             add(event.burrowLocation)
         }
     }
@@ -37,7 +37,6 @@ object AllBurrowsList {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        val burrowLocations = burrowLocations ?: return
 
         val range = 5..70
         list = burrowLocations.asSequence().map { it to it.distanceToPlayer() }
@@ -48,7 +47,6 @@ object AllBurrowsList {
     }
 
     fun copyToClipboard() {
-        val burrowLocations = burrowLocations ?: return
         val list = burrowLocations.map { it.printWithAccuracy(0, ":") }
         OSUtils.copyToClipboard(list.joinToString(";"))
         ChatUtils.chat("Saved all ${list.size} burrow locations to clipboard.")
@@ -57,7 +55,6 @@ object AllBurrowsList {
     fun addFromClipboard() {
         SkyHanniMod.coroutineScope.launch {
             val text = OSUtils.readFromClipboard() ?: return@launch
-            val burrowLocations = burrowLocations ?: return@launch
 
             var new = 0
             var duplicate = 0
@@ -71,7 +68,7 @@ object AllBurrowsList {
                     duplicate++
                 }
             }
-            AllBurrowsList.burrowLocations = burrowLocations.editCopy {
+            burrowLocations = burrowLocations.editCopy {
                 addAll(newEntries)
             }
 

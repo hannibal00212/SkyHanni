@@ -35,7 +35,7 @@ object DungeonsRaceGuide {
 
     private var currentRace: String? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelpers.forEach { it.value.reset() }
         currentRace = null
@@ -57,7 +57,7 @@ object DungeonsRaceGuide {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()

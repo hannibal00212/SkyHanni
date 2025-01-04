@@ -36,10 +36,11 @@ object CollectionAPI {
 
     /**
      * REGEX-TEST: §7Total collected: §e261,390
+     * REGEX-TEST: §7Total Collected: §e2,012,418
      */
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
-        "§7Total collected: §e(?<amount>.*)",
+        "§7Total [c|C]ollected: §e(?<amount>.*)",
     )
 
     /**
@@ -57,7 +58,7 @@ object CollectionAPI {
         "Mushroom" to "RED_MUSHROOM".toInternalName(),
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         collectionValue.clear()
     }

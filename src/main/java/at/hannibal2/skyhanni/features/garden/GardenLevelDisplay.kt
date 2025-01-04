@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -45,32 +46,36 @@ object GardenLevelDisplay {
     private val patternGroup = RepoPattern.group("garden.level")
     private val expToNextLevelPattern by patternGroup.pattern(
         "inventory.nextxp",
-        ".* §e(?<nextLevelExp>.*)§6/.*"
+        ".* §e(?<nextLevelExp>.*)§6/.*",
     )
+
+    /**
+     * REGEX-TEST: §aGarden Level 17
+     */
     private val gardenItemNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Garden (?:Desk|Level (?<currentLevel>.*))"
+        "Garden (?:Desk|Level (?<currentLevel>.*))",
     )
     private val overflowPattern by patternGroup.pattern(
         "inventory.overflow",
-        ".*§r §6(?<overflow>.*)"
+        ".*§r §6(?<overflow>.*)",
     )
     private val gardenLevelPattern by patternGroup.pattern(
         "inventory.levelprogress",
-        "§7Progress to Level (?<currentLevel>[^:]*).*"
+        "§7Progress to Level (?<currentLevel>[^:]*).*",
     )
     private val gardenMaxLevelPattern by patternGroup.pattern(
         "inventory.max",
-        "§5§o§7§8Max level reached!"
+        "§5§o§7§8Max level reached!",
     )
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
-        " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience"
+        " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",
     )
 
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         update()
     }
@@ -100,7 +105,7 @@ object GardenLevelDisplay {
                     " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
                 onClick = { HypixelCommands.gardenLevels() },
                 "§eClick to view your Garden Level progress and rewards!",
-                prefix = false
+                prefix = false,
             )
 
         }
@@ -213,14 +218,14 @@ object GardenLevelDisplay {
         config.pos.renderString(display, posLabel = "Garden Level")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.overflow) { update() }
     }
 
     private fun isEnabled() = GardenAPI.inGarden() && config.display
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.gardenLevelDisplay", "garden.gardenLevels.display")
         event.move(3, "garden.gardenLevelPos", "garden.gardenLevels.pos")

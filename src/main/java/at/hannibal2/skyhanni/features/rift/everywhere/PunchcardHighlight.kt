@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -75,7 +75,8 @@ object PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
     private val playerQueue = mutableListOf<String>()
 
-    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".toInternalName().getItemStack() }
+    private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
+    private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
     @SubscribeEvent
@@ -91,8 +92,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
-    fun onToggle(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.highlight,
             config.color,
@@ -120,15 +121,15 @@ object PunchcardHighlight {
     private fun checkPunchcard() {
         if (!RiftAPI.inRift()) return
 
-        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".toInternalName())
+        val hasPunchcard = InventoryUtils.isItemInInventory(PUNCHCARD_ARTIFACT)
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
             warningCooldown = SimpleTimeMark.now()
             ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: IslandChangeEvent) {
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         DelayedRun.runDelayed(1500.milliseconds) {
             if (playerList.isEmpty()) return@runDelayed
             if (event.newIsland != IslandType.THE_RIFT) return@runDelayed

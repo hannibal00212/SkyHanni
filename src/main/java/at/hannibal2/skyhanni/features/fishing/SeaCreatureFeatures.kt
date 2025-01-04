@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -49,7 +50,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         var shouldHighlight = config.highlight
-        if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
             val seaCreaturesBosses =
                 BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
             if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
@@ -73,7 +74,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.alertOwnCatches) return
@@ -100,7 +101,7 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }

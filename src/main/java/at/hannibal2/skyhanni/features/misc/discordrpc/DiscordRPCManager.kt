@@ -4,7 +4,6 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.logger
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
@@ -13,12 +12,13 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -51,17 +51,22 @@ object DiscordRPCManager : IPCListener {
 
     var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
 
+    private var debugError = false
+    private var debugStatusMessage = "nothing"
+
     fun start(fromCommand: Boolean = false) {
         coroutineScope.launch {
             try {
                 if (isConnected()) return@launch
 
-                logger.info("Starting Discord RPC...")
+                updateDebugStatus("Starting...")
                 startTimestamp = System.currentTimeMillis()
                 client = IPCClient(APPLICATION_ID)
                 client?.setup(fromCommand)
-            } catch (ex: Throwable) {
-                logger.warn("Discord RPC has thrown an unexpected error while trying to start...", ex)
+            } catch (e: Throwable) {
+                updateDebugStatus("Unexpected error: ${e.message}", error = true)
+                ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
+
             }
         }
     }
@@ -69,6 +74,7 @@ object DiscordRPCManager : IPCListener {
     private fun stop() {
         coroutineScope.launch {
             if (isConnected()) {
+                updateDebugStatus("Stopped")
                 client?.close()
                 started = false
             }
@@ -84,21 +90,23 @@ object DiscordRPCManager : IPCListener {
 
             // confirm that /shrpcstart worked
             ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
-        } catch (ex: Exception) {
-            logger.warn("Failed to connect to RPC!", ex)
+            updateDebugStatus("Successfully started")
+            status
+        } catch (e: Exception) {
+            updateDebugStatus("Failed to connect: ${e.message} (discord not started yet?)", error = true)
             ChatUtils.clickableChat(
                 "Discord Rich Presence was unable to start! " +
                     "This usually happens when you join SkyBlock when Discord is not started. " +
                     "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = { startCommand() },
-                "§eClick to run /shrpcstart!"
+                "§eClick to run /shrpcstart!",
             )
         }
     }
 
     private fun isConnected() = client?.status == PipeStatus.CONNECTED
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             if (isConnected()) {
@@ -131,16 +139,16 @@ object DiscordRPCManager : IPCListener {
                     addButton(
                         RichPresenceButton(
                             "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                            "Open SkyCrypt"
-                        )
+                            "Open SkyCrypt",
+                        ),
                     )
                 }
-            }.build()
+            }.build(),
         )
     }
 
     override fun onReady(client: IPCClient) {
-        logger.info("Discord RPC Ready.")
+        updateDebugStatus("Discord RPC Ready.")
     }
 
     @SubscribeEvent
@@ -152,17 +160,18 @@ object DiscordRPCManager : IPCListener {
     }
 
     override fun onClose(client: IPCClient, json: JsonObject?) {
-        logger.info("Discord RPC closed.")
+        updateDebugStatus("Discord RPC closed.")
         this.client = null
     }
 
     override fun onDisconnect(client: IPCClient?, t: Throwable?) {
-        logger.info("Discord RPC disconnected.")
+        updateDebugStatus("Discord RPC disconnected.")
         this.client = null
     }
 
-    private fun getStatusByConfigId(entry: LineEntry) =
-        DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
+    private fun getStatusByConfigId(entry: LineEntry): DiscordStatus {
+        return DiscordStatus.entries.getOrElse(entry.ordinal) { DiscordStatus.NONE }
+    }
 
     private fun isEnabled() = config.enabled.get()
 
@@ -207,22 +216,46 @@ object DiscordRPCManager : IPCListener {
         ChatUtils.chat("Attempting to start Discord Rich Presence...")
         try {
             start(true)
+            updateDebugStatus("Successfully started")
         } catch (e: Exception) {
+            updateDebugStatus("Unable to start: ${e.message}", error = true)
             ErrorManager.logErrorWithData(
                 e,
-                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer."
+                "Unable to start Discord Rich Presence! Please report this on Discord and ping @netheriteminer.",
             )
         }
     }
 
+    private fun updateDebugStatus(message: String, error: Boolean = false) {
+        debugStatusMessage = message
+        debugError = error
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Discord RCP")
+
+        if (debugError) {
+            event.addData {
+                add("Error detected!")
+                add(debugStatusMessage)
+            }
+        } else {
+            event.addIrrelevant {
+                add("no error detected.")
+                add("status: $debugStatusMessage")
+            }
+        }
+    }
+
     // Events that change things in DiscordStatus
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "misc.discordRPC.firstLine") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)

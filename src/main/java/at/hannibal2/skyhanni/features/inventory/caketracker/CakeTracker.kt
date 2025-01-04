@@ -168,7 +168,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.maxHeight) {
             lastKnownCakeDataHash = 0
@@ -278,7 +278,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
+        storage.missingCakes = ((1..currentYear).toSet() - storage.ownedCakes).toMutableSet()
     }
 
     private fun getCakePrice(year: Int): Double {

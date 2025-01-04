@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -235,7 +236,8 @@ object SackAPI {
         if (savingSacks) saveSackData()
     }
 
-    private var sackData = mapOf<NEUInternalName, SackItem>()
+    var sackData = mapOf<NEUInternalName, SackItem>()
+        private set
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 
@@ -279,7 +281,7 @@ object SackAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()

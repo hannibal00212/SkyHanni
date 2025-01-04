@@ -297,7 +297,7 @@ object HoppityCollectionStats {
         reCalcHotspotCount()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.readConstant<NeuHoppityJson>("hoppity").hoppity
         neuCountData = data
@@ -804,7 +804,7 @@ object HoppityCollectionStats {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val bp = "inventory.chocolateFactory"
         mapOf(
