@@ -59,7 +59,7 @@ public class BackgroundConfig {
     @Expose
     @ConfigOption(
         name = "Custom Background Image",
-        desc = "See below on how to add your own custom background.."
+        desc = "See below on how to add your own custom background."
     )
     @ConfigEditorBoolean
     public boolean useCustomBackgroundImage = false;
@@ -75,7 +75,7 @@ public class BackgroundConfig {
     @Expose
     @ConfigOption(
         name = "Pack Creator",
-        desc = "Click here to open the background creator. You can use this website to add your own image into as your Scoreboard Background.",
+        desc = "Click here to open the background creator. You can use this website to add your own image into as your Scoreboard Background."
     )
     @ConfigEditorButton(buttonText = "Create")
     public Runnable runnable = () -> OSUtils.openBrowser("https://j10a1n15.github.io/j10a1n15/pages/background.html");
