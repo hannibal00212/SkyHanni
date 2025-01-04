@@ -24,7 +24,7 @@ object NucleusBarriersBox {
 
     private enum class Crystal(
         val boundingBox: AxisAlignedBB,
-        val configColorOption: Property<String>
+        val configColorOption: Property<String>,
     ) {
         AMBER(
             AxisAlignedBB(
