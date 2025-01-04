@@ -127,18 +127,18 @@ object EnchantedClockHelper {
                     entry.statusSlot == key
                 }
             }
+
+            private fun BoostJson.toBoostType(): ClockBoostType = ClockBoostType(
+                name = name,
+                displayName = displayName,
+                usageString = usageString ?: displayName,
+                color = LorenzColor.valueOf(color),
+                displaySlot = displaySlot,
+                statusSlot = statusSlot,
+                cooldown = cooldownHours.hours,
+            )
         }
     }
-
-    private fun BoostJson.toBoostType(): ClockBoostType = ClockBoostType(
-        name = name,
-        displayName = displayName,
-        usageString = usageString ?: displayName,
-        color = LorenzColor.valueOf(color),
-        displaySlot = displaySlot,
-        statusSlot = statusSlot,
-        cooldown = cooldownHours.hours,
-    )
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
