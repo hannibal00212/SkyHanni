@@ -46,7 +46,6 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
-import at.hannibal2.skyhanni.utils.LorenzColor;
 import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -893,43 +892,8 @@ public class ProfileSpecificStorage {
 
     public static class EnchantedClockStats {
         @Expose
-        public Map<EnchantedClockHelper.SimpleClockBoostType, ClockBoostStatus> clockBoosts = new HashMap<>();
+        public Map<EnchantedClockHelper.SimpleClockBoostType, EnchantedClockHelper.ClockBoostStatus> clockBoosts = new HashMap<>();
 
-        public static class ClockBoostStatus {
-            @Expose
-            public ClockBoostState state;
 
-            @Expose
-            @Nullable
-            public SimpleTimeMark availableAt;
-
-            @Expose
-            public boolean warned = false;
-
-            public enum ClockBoostState {
-                READY("Ready", LorenzColor.GREEN),
-                CHARGING("Charging", LorenzColor.RED),
-                PROBLEM("Problem", LorenzColor.YELLOW),
-                ;
-
-                public final String displayName;
-                public final LorenzColor color;
-
-                ClockBoostState(String displayName, LorenzColor color) {
-                    this.displayName = displayName;
-                    this.color = color;
-                }
-
-                @Override
-                public String toString() {
-                    return "§" + color.getChatColorCode() + displayName;
-                }
-            }
-
-            public ClockBoostStatus(ClockBoostState state, @Nullable SimpleTimeMark availableAt) {
-                this.state = state;
-                this.availableAt = availableAt;
-            }
-        }
     }
 }

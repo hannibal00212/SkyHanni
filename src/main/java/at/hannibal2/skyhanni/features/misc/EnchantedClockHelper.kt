@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.EnchantedClockStats.ClockBoostStatus.ClockBoostState
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -20,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -73,9 +72,7 @@ object EnchantedClockHelper {
     )
     // </editor-fold>
 
-    enum class SimpleClockBoostType(
-        val displayString: String
-    ) {
+    enum class SimpleClockBoostType(val displayString: String) {
         MINIONS("§bMinions"),
         CHOCOLATE_FACTORY("§6Chocolate Factory"),
         PET_TRAINING("§dPet Training"),
@@ -94,7 +91,7 @@ object EnchantedClockHelper {
         val color: LorenzColor,
         val displaySlot: Int,
         val statusSlot: Int,
-        val cooldown: Duration = 48.hours
+        val cooldown: Duration = 48.hours,
     ) {
         val formattedName: String = "§${color.chatColorCode}$displayName"
 
@@ -124,9 +121,9 @@ object EnchantedClockHelper {
                             color = LorenzColor.valueOf(boost.color),
                             displaySlot = boost.displaySlot,
                             statusSlot = boost.statusSlot,
-                            cooldown = boost.cooldownHours.hours
+                            cooldown = boost.cooldownHours.hours,
                         )
-                    }
+                    },
                 )
             }
 
@@ -185,10 +182,7 @@ object EnchantedClockHelper {
             val simpleType = boostType.toSimple() ?: return@matchMatcher
             val storage = storage ?: return@matchMatcher
             storage.clockBoosts.getOrPut(simpleType) {
-                ProfileSpecificStorage.EnchantedClockStats.ClockBoostStatus(
-                    ClockBoostState.CHARGING,
-                    boostType.getCooldownFromNow()
-                )
+                ClockBoostStatus(ClockBoostState.CHARGING, boostType.getCooldownFromNow())
             }
         }
     }
@@ -227,11 +221,24 @@ object EnchantedClockHelper {
             }
 
             storage.clockBoosts.getOrPut(simpleType) {
-                ProfileSpecificStorage.EnchantedClockStats.ClockBoostStatus(
-                    currentStatus,
-                    parsedCooldown
-                )
+                ClockBoostStatus(currentStatus, parsedCooldown)
             }
         }
+    }
+
+    class ClockBoostStatus(
+        @field:Expose var state: ClockBoostState,
+        @field:Expose var availableAt: SimpleTimeMark?,
+    ) {
+        @Expose var warned: Boolean = false
+    }
+
+    enum class ClockBoostState(val displayName: String, val color: LorenzColor) {
+        READY("Ready", LorenzColor.GREEN),
+        CHARGING("Charging", LorenzColor.RED),
+        PROBLEM("Problem", LorenzColor.YELLOW),
+        ;
+
+        override fun toString(): String = "§" + color.chatColorCode + displayName
     }
 }
