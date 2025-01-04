@@ -274,7 +274,7 @@ object CroesusChestTracker {
     }
 
     @JvmStatic
-    fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
+    fun generateMaxChestAsList(): MutableList<DungeonRunInfo> = generateMaxChest().toMutableList()
     private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
 
     private fun getLastActiveChest(includeDungeonKey: Boolean = false): Int = (

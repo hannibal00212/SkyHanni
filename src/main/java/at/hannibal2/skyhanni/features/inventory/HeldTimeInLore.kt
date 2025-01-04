@@ -18,8 +18,8 @@ import kotlin.time.Duration.Companion.seconds
 object HeldTimeInLore {
     private val config get() = SkyHanniMod.feature.inventory
 
-    private val jyrreBottle by lazy { "NEW_BOTTLE_OF_JYRRE".toInternalName() }
-    private val cacaoTruffle by lazy { "DARK_CACAO_TRUFFLE".toInternalName() }
+    private val jyrreBottle = "NEW_BOTTLE_OF_JYRRE".toInternalName()
+    private val cacaoTruffle = "DARK_CACAO_TRUFFLE".toInternalName()
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {

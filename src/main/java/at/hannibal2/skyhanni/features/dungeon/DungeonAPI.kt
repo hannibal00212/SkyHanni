@@ -121,7 +121,7 @@ object DungeonAPI {
         WISDOM(0),
         TIME(0);
 
-        val displayName by lazy { name.firstLetterUppercase() }
+        val displayName = name.firstLetterUppercase()
 
         companion object {
             fun reset() {

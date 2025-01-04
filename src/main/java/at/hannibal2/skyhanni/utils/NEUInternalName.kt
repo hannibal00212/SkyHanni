@@ -11,6 +11,7 @@ class NEUInternalName private constructor(private val internalName: String) {
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()
 
+        val GEMSTONE_COLLECTION = "GEMSTONE_COLLECTION".toInternalName()
         val JASPER_CRYSTAL = "JASPER_CRYSTAL".toInternalName()
         val RUBY_CRYSTAL = "RUBY_CRYSTAL".toInternalName()
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()

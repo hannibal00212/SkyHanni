@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -315,8 +314,6 @@ object LorenzUtils {
     }
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
-
-    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

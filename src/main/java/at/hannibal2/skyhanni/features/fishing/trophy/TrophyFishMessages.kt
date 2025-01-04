@@ -101,9 +101,11 @@ object TrophyFishMessages {
         LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
     }
 
+    val regex = "[- ]".toRegex()
+
     fun getInternalName(displayName: String): String {
         return displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace("[- ]".toRegex(), "").lowercase().removeColor()
+            .replace(regex, "").lowercase().removeColor()
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
