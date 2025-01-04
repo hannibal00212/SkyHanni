@@ -242,9 +242,9 @@ object UnknownLinesHandler {
                 unknownLine.lastFound = SimpleTimeMark.now()
                 val firstFoundSince = unknownLine.firstFound.passedSince()
                 val lastWarnedSince = unknownLine.lastWarned.passedSince()
-                if (firstFoundSince > 3.seconds && lastWarnedSince > 30.minutes) {
+                if (firstFoundSince > 10.seconds && lastWarnedSince > 30.minutes) {
                     unknownLine.lastWarned = SimpleTimeMark.now()
-                    warn(line, "same line active for 3 seconds")
+                    warn(line, "same line active for 10 seconds")
                     continue
                 }
             }

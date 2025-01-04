@@ -300,6 +300,7 @@ object CaptureFarmingGear {
         var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestSlugRarity = (FarmingItems.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestHedgehogRarity = (FarmingItems.HEDGEHOG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
@@ -328,6 +329,11 @@ object CaptureFarmingGear {
                 FarmingItems.SLUG.setItem(item)
                 outdatedItems[FarmingItems.SLUG] = false
                 highestSlugRarity = rarity.toInt()
+            }
+            if (name == "HEDGEHOG" && rarity.toInt() > highestHedgehogRarity) {
+                FarmingItems.HEDGEHOG.setItem(item)
+                outdatedItems[FarmingItems.HEDGEHOG] = false
+                highestHedgehogRarity = rarity.toInt()
             }
         }
     }

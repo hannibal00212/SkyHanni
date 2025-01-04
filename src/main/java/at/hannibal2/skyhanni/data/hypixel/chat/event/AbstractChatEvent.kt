@@ -10,6 +10,6 @@ open class AbstractChatEvent(
     var chatComponent: IChatComponent,
     var blockedReason: String? = null,
 ) : SkyHanniEvent() {
-    val message by lazy { messageComponent.getText().removePrefix("§r") }
-    val author by lazy { authorComponent.getText() }
+    val message = messageComponent.getText().removePrefix("§r")
+    val author = authorComponent.getText()
 }

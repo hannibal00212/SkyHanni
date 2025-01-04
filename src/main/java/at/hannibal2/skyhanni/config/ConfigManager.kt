@@ -43,7 +43,7 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
-    return if (LorenzUtils.isBetaVersion()) {
+    return if (SkyHanniMod.isBetaVersion) {
         registerTypeAdapterFactory(create)
     } else this
 }

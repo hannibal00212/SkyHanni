@@ -42,7 +42,7 @@ object KloonHacking {
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
-    private val RETRO_ENCABULATING_VISOR by lazy { "RETRO_ENCABULATING_VISOR".toInternalName() }
+    private val RETRO_ENCABULATING_VISOR = "RETRO_ENCABULATING_VISOR".toInternalName()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {

@@ -103,7 +103,6 @@ object IslandGraphs {
 
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
-    private var secondClosestNode: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -251,13 +250,11 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
-        val newClosest = sortedNodes.first()
+        val newClosest = graph.minBy { it.position.distanceSqToPlayer() }
         if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
-        secondClosestNode = sortedNodes.getOrNull(1)
         onNewNode()
         if (newClosest == prevClosest) return
         if (newPath) {
@@ -277,9 +274,6 @@ object IslandGraphs {
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
         fastestPath = skipIfCloser(newGraph)
-        newNodes.getOrNull(1)?.let {
-            secondClosestNode = it
-        }
         setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
     }
