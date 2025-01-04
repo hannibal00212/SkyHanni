@@ -17,20 +17,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyBlockXPAPI {
 
-    private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
-
-    var level: Int?
-        get() = storage?.level
-        set(value) {
-            storage?.let { it.level = value }
-        }
-
-    var xp: Int?
-        get() = storage?.xp
-        set(value) {
-            storage?.let { it.xp = value }
-        }
-
     private val group = RepoPattern.group("skyblockxpapi.inventory")
 
     private val itemNamePattern by group.pattern("itemname", "§aSkyBlock Leveling")
@@ -44,6 +30,21 @@ object SkyBlockXPAPI {
      * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
+
+
+    private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
+
+    var level: Int?
+        get() = storage?.level
+        set(value) {
+            storage?.let { it.level = value }
+        }
+
+    var xp: Int?
+        get() = storage?.xp
+        set(value) {
+            storage?.let { it.xp = value }
+        }
 
 
     @HandleEvent
