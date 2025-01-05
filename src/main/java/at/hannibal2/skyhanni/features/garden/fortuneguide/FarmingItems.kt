@@ -36,6 +36,7 @@ enum class FarmingItems(
     RABBIT(ItemCategory.PET, FFStats::getPetFFData),
     BEE(ItemCategory.PET, FFStats::getPetFFData),
     SLUG(ItemCategory.PET, FFStats::getPetFFData),
+    HEDGEHOG(ItemCategory.PET, FFStats::getPetFFData),
     ;
 
     var selectedState = false
@@ -138,7 +139,7 @@ enum class FarmingItems(
 
         val armor = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
         val equip = listOf(NECKLACE, CLOAK, BELT, BRACELET)
-        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE, SLUG)
+        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE, SLUG, HEDGEHOG)
 
         fun getArmorDisplay(clickEnabled: Boolean = false): List<Renderable> = armor.map { it.getDisplay(clickEnabled) }
 

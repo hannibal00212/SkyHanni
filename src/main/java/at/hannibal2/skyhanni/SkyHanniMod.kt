@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -28,7 +29,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
@@ -42,7 +42,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "@MOD_VERSION@",
+    version = SkyHanniMod.VERSION,
 )
 class SkyHanniMod {
 
@@ -106,11 +106,13 @@ class SkyHanniMod {
 
     companion object {
 
-        const val MODID = "skyhanni"
+        const val MODID: String = "skyhanni"
+        const val VERSION: String = "@MOD_VERSION@"
 
-        @JvmStatic
-        val version: String
-            get() = Loader.instance().indexedModList[MODID]!!.version
+        val modVersion: ModVersion = ModVersion.fromString(VERSION)
+
+        val isBetaVersion: Boolean
+            get() = modVersion.isBeta
 
         @JvmField
         var feature: Features = Features()
