@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+import at.hannibal2.skyhanni.features.gui.ShTrack
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.WardrobeData
@@ -54,7 +55,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
+import java.util.EnumMap
+import java.util.Objects
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
@@ -790,6 +792,7 @@ class ProfileSpecificStorage {
             override fun hashCode(): Int {
                 return Objects.hash(position, percentile)
             }
+
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other == null) return false
@@ -821,7 +824,7 @@ class ProfileSpecificStorage {
                 rabbitTheFishFinds,
                 initialLeaderboardPosition,
                 finalLeaderboardPosition,
-                summarized
+                summarized,
             )
         }
 
@@ -833,4 +836,7 @@ class ProfileSpecificStorage {
             return otherProp.hashCode() == hashCode()
         }
     }
+
+    @Expose
+    val tracking: ShTrack.TrackingList = ShTrack.TrackingList()
 }

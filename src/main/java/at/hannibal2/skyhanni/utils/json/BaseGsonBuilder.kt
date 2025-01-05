@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.gui.ShTrack
+import at.hannibal2.skyhanni.features.gui.ShTrack.TrackingElement
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -17,6 +19,9 @@ import java.util.UUID
 import kotlin.time.Duration
 
 object BaseGsonBuilder {
+
+    val finishedBase = gson().create()
+
     fun gson(): GsonBuilder = GsonBuilder().setPrettyPrinting()
         .excludeFieldsWithoutExposeAnnotation()
         .serializeSpecialFloatingPointValues()
@@ -37,6 +42,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
+        .registerTypeHierarchyAdapter(TrackingElement::class.java, ShTrack.typeAdapter.nullSafe())
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()

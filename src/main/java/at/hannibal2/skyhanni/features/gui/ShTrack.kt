@@ -7,12 +7,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.ProfileLeaveEvent
 import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.features.gui.ShTrack.DocumentationExcludes.itemTrack
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.CommandUtils
@@ -25,6 +29,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -33,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
@@ -57,6 +63,7 @@ object ShTrack {
             description = "Track any item"
             category = CommandCategory.USERS_ACTIVE
             specifiers = arguments
+            aliases = listOf("shtrackitems")
             context = { ContextObject() }
             excludedSpecifiersFromDescription = itemTrack
             context = { ContextObject().apply { state = ContextObject.StateType.ITEM } }
@@ -147,8 +154,8 @@ object ShTrack {
             c.multiItem = true
             0
         },
-        CommandArgument("<> - Does not save the tracker on game close", "-t") { _, c ->
-            c.shouldSave = false
+        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
+            c.shouldSave = true
             0
         },
     )
@@ -169,7 +176,7 @@ object ShTrack {
         var autoDelete = true
         var notify = false
         var multiItem = false
-        var shouldSave = true
+        var shouldSave = false
 
         var state: StateType? = null
             set(value) {
@@ -322,7 +329,30 @@ object ShTrack {
         }
     }
 
-    private val tracker: MutableList<TrackingElement<*>> = object : ArrayList<TrackingElement<*>>() {
+    private val tracker get() = ProfileStorageData.profileSpecific!!.tracking
+
+    class TrackingList : ArrayList<TrackingElement<*>>(), MutableList<TrackingElement<*>> {
+
+        var isActive = false
+
+        fun activate() {
+            if (isActive) return
+            isActive = true
+            forEach {
+                it.atAdd()
+                it.line = it.generateLine()
+            }
+            updateDisplay()
+        }
+
+        fun deactivate() {
+            if (!isActive) return
+            isActive = false
+            forEach {
+                it.atRemove()
+                it.line = emptyList()
+            }
+        }
 
         override fun clear() {
             forEach {
@@ -410,23 +440,49 @@ object ShTrack {
         }
     }
 
-    private val gson = BaseGsonBuilder.gson().registerTypeHierarchyAdapter(
-        TrackingElement::class.java,
-        object : TypeAdapter<TrackingElement<*>>() {
-            override fun write(out: JsonWriter, value: TrackingElement<*>) {
-                out.beginObject()
-                value.toJson(out)
-                out.endObject()
+    val typeAdapter = object : TypeAdapter<TrackingElement<*>>() {
+        override fun write(out: JsonWriter, value: TrackingElement<*>) {
+            if (!value.shouldSave) {
+                return
+            }
+            out.beginObject()
+            value.toJson(out)
+            out.endObject()
+        }
+
+        override fun read(reader: JsonReader): TrackingElement<*>? {
+            reader.beginObject()
+
+            val map = mutableMapOf<String, JsonElement>()
+
+            while (reader.hasNext()) {
+                println(reader.peek())
+                val name = reader.nextName()
+                val value = BaseGsonBuilder.finishedBase.fromJson<JsonElement>(reader, JsonElement::class.java)
+                println(reader.peek())
+                map[name] = value
             }
 
-            override fun read(reader: JsonReader): TrackingElement<*>? {
+            reader.endObject()
+
+            try {
+                val tracker: TrackingElement<*> =
+                    when (map["type"]?.asString) {
+                        PowderTrackingElement::class.simpleName -> PowderTrackingElement.fromJson(map)
+                        ItemsStackElement::class.simpleName -> ItemsStackElement.fromJson(map)
+                        ItemTrackingElement::class.simpleName -> ItemTrackingElement.fromJson(map)
+                        else -> return null
+                    }
+                tracker.applyMetaOptions(map)
+                return tracker
+            } catch (e: Throwable) {
+                ErrorManager.logErrorWithData(
+                    e, "Malformed Json",
+                    "data" to map,
+                )
                 return null
             }
-        },
-    ).create()
-
-    fun toJson(): String {
-        return gson.toJson(tracker.toList())
+        }
     }
 
     private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
@@ -436,8 +492,23 @@ object ShTrack {
 
     private var hasGrab = false
 
+    @HandleEvent
+    fun onProfileLeave(event: ProfileLeaveEvent) {
+        if (ProfileStorageData.profileSpecific != null) {
+            tracker.deactivate()
+        }
+    }
+
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (ProfileStorageData.profileSpecific != null) {
+            tracker.activate()
+        }
+    }
+
     @SubscribeEvent
     fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (scheduledUpdate) {
             display = Renderable.verticalEditTable(
                 tracker.map { it.line },
@@ -494,11 +565,16 @@ object ShTrack {
         scheduledUpdate = true
     }
 
-    private interface ItemTrackingInterface {
+    private abstract class ItemTrackingInterface() : TrackingElement<Long>() {
 
-        fun itemChange(item: PrimitiveItemStack)
+        abstract fun itemChange(item: PrimitiveItemStack)
 
-        val includeSack: Boolean
+        abstract val includeSack: Boolean
+
+        override fun toJson(out: JsonWriter) {
+            super.toJson(out)
+            out.name("sack").value(includeSack)
+        }
     }
 
     private class ItemTrackingElement(
@@ -506,9 +582,10 @@ object ShTrack {
         override var current: Long,
         override val target: Long?,
         override val includeSack: Boolean,
-    ) : TrackingElement<Long>(), ItemTrackingInterface {
+    ) : ItemTrackingInterface() {
 
-        override val name = item.itemName
+        override val name get() = item.itemName
+        override val saveName = item.asString()
 
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemTrackingElement) return false
@@ -541,6 +618,15 @@ object ShTrack {
         override fun itemChange(item: PrimitiveItemStack) {
             update(item.amount)
         }
+
+        companion object {
+            fun fromJson(read: Map<String, JsonElement>): ItemsStackElement = ItemsStackElement(
+                read["name"]!!.asString.toInternalName(),
+                read["current"]?.asLong ?: 0,
+                read["target"]?.asLong,
+                read["sack"]?.asBoolean ?: false,
+            )
+        }
     }
 
     private fun NEUInternalName.getMultipleMap() = CollectionAPI.findAllMultiples()[this] ?: mapOf(this to 1)
@@ -550,9 +636,10 @@ object ShTrack {
         override var current: Long,
         override val target: Long?,
         override val includeSack: Boolean,
-    ) : TrackingElement<Long>(), ItemTrackingInterface {
+    ) : ItemTrackingInterface() {
 
-        override val name = main.itemName
+        override val name get() = main.itemName
+        override val saveName = main.asString()
 
         val map = NEUItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
 
@@ -595,6 +682,16 @@ object ShTrack {
             val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")
             update(item.amount * multiple)
         }
+
+        companion object {
+
+            fun fromJson(read: Map<String, JsonElement>): ItemsStackElement = ItemsStackElement(
+                read["name"]!!.asString.toInternalName(),
+                read["current"]?.asLong ?: 0,
+                read["target"]?.asLong,
+                read["sack"]?.asBoolean ?: false,
+            )
+        }
     }
 
     // TODO remove
@@ -604,9 +701,10 @@ object ShTrack {
         override var current: Long,
         override val target: Long?,
         override val includeSack: Boolean,
-    ) : TrackingElement<Long>(), ItemTrackingInterface {
+    ) : ItemTrackingInterface() {
 
         override val name = group.name
+        override val saveName = group.name
 
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemGroupElement) return false
@@ -650,6 +748,7 @@ object ShTrack {
         TrackingElement<Long>() {
 
         override val name = "${type.displayNameWithColor} Powder"
+        override val saveName = type.name
 
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
@@ -677,18 +776,27 @@ object ShTrack {
             powderTracker.add(this)
         }
 
+        companion object {
+            fun fromJson(read: Map<String, JsonElement>): PowderTrackingElement =
+                PowderTrackingElement(extractType(read), read["current"]?.asLong ?: 0, read["target"]?.asLong)
+
+            private fun extractType(read: Map<String, JsonElement>) =
+                HotmAPI.PowderType.getValue(read["name"]!!.asString)!!
+        }
+
     }
 
-    private abstract class TrackingElement<T : Number> {
+    abstract class TrackingElement<T : Number> {
 
         var shouldNotify = false
         var shouldAutoDelete = false
-        var shouldSave = true
+        var shouldSave = false
 
         abstract var current: T
         abstract val target: T?
 
         abstract val name: String
+        abstract val saveName: String
 
         fun update(amount: Number) {
             if (amount == 0) return
@@ -740,13 +848,18 @@ object ShTrack {
 
         open fun toJson(out: JsonWriter) {
             out.name("type").value(this::class.simpleName)
-            out.name("name").value(name)
+            out.name("name").value(saveName)
             out.name("target").value(target)
             out.name("current").value(current)
             out.name("shouldAutoDelete").value(shouldAutoDelete)
             out.name("shouldNotify").value(shouldNotify)
         }
+    }
 
+    private fun <T : TrackingElement<*>> T.applyMetaOptions(read: Map<String, JsonElement>) {
+        shouldSave = true
+        shouldAutoDelete = read["shouldAutoDelete"]?.asBoolean ?: false
+        shouldNotify = read["shouldNotify"]?.asBoolean ?: false
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
