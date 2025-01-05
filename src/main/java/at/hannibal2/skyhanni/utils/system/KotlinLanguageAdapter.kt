@@ -20,5 +20,6 @@ class KotlinLanguageAdapter : ILanguageAdapter {
         field[clazz.kotlin.objectInstance] = proxy
     }
 
+    @Suppress("EmptyFunctionBlock")
     override fun setInternalProxies(modContainer: ModContainer, side: Side, classLoader: ClassLoader) {}
 }
