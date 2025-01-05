@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -31,6 +33,7 @@ object RiftAPI {
         get() = this?.getInternalName() == blowgun
 
     fun ItemStack.motesNpcPrice(): Double? {
+        if (isRiftExportable() && wasRiftTransferred()) return null
         val baseMotes = motesPrice[getInternalName()] ?: return null
         val burgerStacks = config.motes.burgerStacks
         val pricePer = baseMotes + (burgerStacks * 5) * baseMotes / 100
