@@ -243,7 +243,7 @@ object RiftWiltedBerberisHelper {
         var previousBerberis: LorenzVec? = null
         event.drawDynamicText(berberisList[0].up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
 
-        berberisList.take(config.previewCount+1).forEachIndexed { i, loc ->
+        berberisList.take(config.previewCount + 1).forEachIndexed { i, loc ->
             // box it with half the opacity of the previous box, first in list is highlighted
             if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(loc), config.highlightColor.toSpecialColor(), alpha)
             else event.drawFilledBoundingBoxNea(axisAlignedBB(loc), Color.WHITE, alpha)
