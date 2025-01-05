@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
-import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import net.minecraft.client.Minecraft
@@ -22,7 +24,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -39,9 +40,9 @@ object VoltHighlighter {
     private val CHARGE_TIME = 12.seconds
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
-    @SubscribeEvent
-    fun onArmorChange(event: EntityEquipmentChangeEvent) {
-        if (!RiftAPI.inRift() || !config.voltWarning) return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
+        if (!config.voltWarning) return
         val player = Minecraft.getMinecraft().thePlayer ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
@@ -67,17 +68,17 @@ object VoltHighlighter {
                         VoltState.DOING_LIGHTNING -> 0x800000FF.toInt()
                         VoltState.HOSTILE -> 0x80FF0000.toInt()
                         else -> 0
-                    }
+                    },
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 RenderUtils.drawCylinderInWorld(
-                    Color(SpecialColor.specialToChromaRGB(config.voltColour), true),
+                    config.voltColour.toSpecialColor(),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,
                     radius = LIGHTNING_DISTANCE,
                     partialTicks = event.partialTicks,
-                    height = 20F
+                    height = 20F,
                 )
                 val dischargingSince = chargingSince.getOrDefault(entity, SimpleTimeMark.farPast())
                 val dischargeTimeLeft = CHARGE_TIME - dischargingSince.passedSince()

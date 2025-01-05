@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.bingo
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.BingoSession
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BingoData
@@ -31,13 +32,16 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
+    /**
+     * REGEX-TEST:  §9Ⓑ §9Bingo
+     */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
         " §.Ⓑ §.Bingo"
     )
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bingo Card")
 
         if (!LorenzUtils.isBingoProfile) {

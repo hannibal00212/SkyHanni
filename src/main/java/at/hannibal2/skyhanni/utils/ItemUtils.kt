@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -31,7 +35,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
@@ -46,13 +49,21 @@ object ItemUtils {
     private val missingRepoItems = mutableSetOf<String>()
     private var lastRepoWarning = SimpleTimeMark.farPast()
 
-    private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
+            itemNameCache.clear()
+        }
+    }
+
+    private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
     fun ItemStack.cleanName() = displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()
@@ -501,15 +512,20 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return itemStack.getLore()[0]
+            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
         }
         if (name.endsWith("Enchanted Book Bundle")) {
-            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
         }
 
         // obfuscated trophy fish
         if (name.contains("§kObfuscated")) {
             return name.replace("§kObfuscated", "Obfuscated")
+        }
+
+        // remove roman runic tier
+        if (isRune()) {
+            return ReplaceRomanNumerals.replaceLine(name)
         }
 
         // hide pet level
@@ -553,8 +569,8 @@ object ItemUtils {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
         if (missingRepoItems.isNotEmpty()) {

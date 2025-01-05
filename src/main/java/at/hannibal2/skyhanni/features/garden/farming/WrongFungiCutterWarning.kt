@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -31,7 +32,7 @@ object WrongFungiCutterWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != CropType.MUSHROOM) return
@@ -55,7 +56,7 @@ object WrongFungiCutterWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (event.crop == CropType.MUSHROOM) {
             readItem(event.toolItem ?: error("Tool item is null"))

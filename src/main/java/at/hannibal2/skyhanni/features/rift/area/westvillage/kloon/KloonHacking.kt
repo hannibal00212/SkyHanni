@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -41,7 +42,7 @@ object KloonHacking {
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
-    private val RETRO_ENCABULATING_VISOR by lazy { "RETRO_ENCABULATING_VISOR".toInternalName() }
+    private val RETRO_ENCABULATING_VISOR = "RETRO_ENCABULATING_VISOR".toInternalName()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -172,7 +173,7 @@ object KloonHacking {
         return closestTerminal
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
     }

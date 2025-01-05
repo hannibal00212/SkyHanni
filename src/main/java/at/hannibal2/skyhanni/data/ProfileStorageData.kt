@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +35,7 @@ object ProfileStorageData {
     var sackProfiles: SackData.ProfileSpecific? = null
     private var hypixelDataLoaded = false
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
@@ -51,7 +51,7 @@ object ProfileStorageData {
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
@@ -72,10 +72,10 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PROFILE)) return
         noTabListTime = if (event.isClear()) SimpleTimeMark.now() else SimpleTimeMark.farPast()
@@ -95,7 +95,6 @@ object ProfileStorageData {
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {
-            println("Tablist missing debug:\n${TabListData.getTabList()}")
             ChatUtils.clickableChat(
                 "§cCan not read profile name from tab list! Open /widget and enable Profile Widget. " +
                     "This is needed for the mod to function! And therefore this warning cannot be disabled",
@@ -123,15 +122,15 @@ object ProfileStorageData {
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     @SubscribeEvent

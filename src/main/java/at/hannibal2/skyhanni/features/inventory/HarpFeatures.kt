@@ -42,13 +42,17 @@ object HarpFeatures {
     private val buttonColors = listOf('d', 'e', 'a', '2', '5', '9', 'b')
 
     private val patternGroup = RepoPattern.group("harp")
+
+    /**
+     * REGEX-TEST: Harp - Amazing Grace
+     */
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
         "Harp.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*",
+        "Melody",
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
@@ -58,7 +62,7 @@ object HarpFeatures {
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
@@ -72,13 +76,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            Minecraft.getMinecraft().playerController.windowClick(
-                chest.inventorySlots.windowId,
-                37 + index,
-                2,
-                3,
-                Minecraft.getMinecraft().thePlayer,
-            ) // middle clicks > left clicks
+            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -175,17 +173,11 @@ object HarpFeatures {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
             event.cancel()
-            Minecraft.getMinecraft().playerController.windowClick(
-                event.container.windowId,
-                it,
-                event.clickedButton,
-                event.clickType,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, event.clickType)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
@@ -200,7 +192,7 @@ object HarpFeatures {
         event.stackTip = KeyboardManager.getKeyName(keyCode).take(3)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.harpKeybinds", "inventory.helper.harp.keybinds")
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")

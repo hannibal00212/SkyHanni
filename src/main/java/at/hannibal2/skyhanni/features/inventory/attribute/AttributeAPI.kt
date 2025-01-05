@@ -51,7 +51,7 @@ object AttributeAPI {
         FISHING_EXPERIENCE("Fishing Experience", "fishing_experience", "FE"),
         INFECTION("Infection", "infection", "IN"),
         DOUBLE_HOOK("Double Hook", "double_hook", "DH"),
-        FISHERMAN("Fisherman", "fisherman", "FH"),
+        FISHERMAN("Fisherman", "fisherman", "FM"),
         FISHING_SPEED("Fishing Speed", "fishing_speed", "FS"),
         HUNTER("Hunter", "hunter", "HU"),
         TROPHY_HUNTER("Trophy Hunter", "trophy_hunter", "TH"),

@@ -1,4 +1,3 @@
-
 config:
     validation: true
 
@@ -12,14 +11,17 @@ FormattingRules:
     CustomAnnotationSpacing:
         active: true
 
-UseRepoRules:
+RepoRules:
     SkullTexturesUseRepo:
+        active: true
+    RepoPatternRegexTest:
+        active: true
+    RepoPatternUnnamedGroup:
         active: true
 
 ImportRules:
     CustomImportOrdering:
         active: true
-
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule

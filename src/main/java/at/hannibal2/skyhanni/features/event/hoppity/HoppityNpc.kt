@@ -37,7 +37,7 @@ object HoppityNpc {
             ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened = value
         }
 
-    private var slotsToHighlight = mutableSetOf<Int>()
+    private val slotsToHighlight = mutableSetOf<Int>()
     private var inShop = false
 
     @SubscribeEvent

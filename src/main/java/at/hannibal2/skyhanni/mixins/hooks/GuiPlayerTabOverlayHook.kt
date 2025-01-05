@@ -22,7 +22,7 @@ fun getPlayerName(original: String, cir: CallbackInfoReturnable<String>) {
     if (tabListGuard) return
 
     val event = TabListLineRenderEvent(original)
-    event.postAndCatch()
+    event.post()
     val newText = event.text
     if (original != newText) {
         cir.returnValue = newText
