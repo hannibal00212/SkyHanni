@@ -16,7 +16,7 @@ object RestorePieceOfWizardPortalLore {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private val item by lazy { "WIZARD_PORTAL_MEMENTO".toInternalName() }
+    private val item = "WIZARD_PORTAL_MEMENTO".toInternalName()
 
     private val earnedPattern by RepoPattern.pattern(
         "misc.restore.wizard.portal.earned",

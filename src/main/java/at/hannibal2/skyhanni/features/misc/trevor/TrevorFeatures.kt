@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -273,6 +274,9 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
+            // Solve for the fact that Moby also has the same ID as the Trapper
+            val entityMob = MobData.entityToMob[entityTrapper] ?: return
+            if (entityMob.name == "Moby") return
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) {
                 config.trapperTalkCooldown
             }
