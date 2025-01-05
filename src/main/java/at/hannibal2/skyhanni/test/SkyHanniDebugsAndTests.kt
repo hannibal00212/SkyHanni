@@ -204,7 +204,7 @@ object SkyHanniDebugsAndTests {
             // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
             val configManager = ConfigManager()
             configManager.firstLoad()
-            SkyHanniMod.Companion::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
+            SkyHanniMod::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
                 .set(SkyHanniMod, configManager)
 
             // resetting the MoulConfigProcessor in use
