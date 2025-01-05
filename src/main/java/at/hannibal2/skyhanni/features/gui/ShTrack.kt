@@ -444,7 +444,10 @@ object ShTrack {
                 onHover = {
                     if (!hasGrab) {
                         val tracker = tracker[it]
-                        RenderableTooltips.setTooltipForRender(tracker.generateHover().map { Renderable.string(it) }, spacedTitle = true)
+                        RenderableTooltips.setTooltipForRender(
+                            tracker.generateHover().map { i -> Renderable.string(i) },
+                            spacedTitle = true,
+                        )
                         tracker.handleUserInput()
                     }
                 },
@@ -532,7 +535,7 @@ object ShTrack {
         override fun generateLine() = listOf(
             Renderable.itemStack(item.getItemStack()),
             Renderable.string(item.itemName),
-            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
         )
 
         override fun itemChange(item: PrimitiveItemStack) {
@@ -585,7 +588,7 @@ object ShTrack {
             Renderable.itemStack(main.getItemStack()),
             Renderable.string(main.itemName),
 
-            Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }) ?: "")),
+            Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }).orEmpty())),
         )
 
         override fun itemChange(item: PrimitiveItemStack) {
@@ -634,7 +637,7 @@ object ShTrack {
         override fun generateLine() = listOf(
             Renderable.itemStack(group.icon.getItemStack()),
             Renderable.string(group.name),
-            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
         )
 
         override fun itemChange(item: PrimitiveItemStack) {
@@ -658,7 +661,7 @@ object ShTrack {
         override fun generateLine() = listOf(
             Renderable.itemStack(type.icon),
             Renderable.string(type.displayName),
-            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
         )
 
         override fun similarElement(other: TrackingElement<*>): Boolean {

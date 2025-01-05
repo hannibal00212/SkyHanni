@@ -35,7 +35,7 @@ object CommandUtils {
     private enum class NameSource {
         INTERNAL_NAME,
         ITEM_NAME,
-        GROUP;
+        GROUP
     }
 
     private val namePattern = "^(?i)(name:)(.*)".toRegex()
@@ -43,8 +43,8 @@ object CommandUtils {
     private val groupPattern = "(?i)^(group:|collection:)(.*)".toRegex()
 
     fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
-        @Suppress("ReplaceSizeZeroCheckWithIsEmpty") // A bug since the replacement does not work for iterable interface.
-        if (args.count() == 0) {
+        // This replacement does not work for iterable interface. Therefore, the suppression.
+        @Suppress("ReplaceSizeZeroCheckWithIsEmpty") if (args.count() == 0) {
             context.errorMessage = "No item specified"
             return 0 to null
         }
@@ -188,16 +188,16 @@ data class CommandArgument<T : CommandContextAwareObject>(
             context: O,
             amountNoPrefixArguments: Int,
             amountNoPrefixArgumentsIncrement: () -> Unit,
-        ): Pair<A?, Int> = (firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
-            ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
-                ?.let {
+        ): Pair<A?, Int> = (
+            firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
+            ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
                     amountNoPrefixArgumentsIncrement()
                     it to -1
-                }
-            ?: firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
+                } ?: firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
                 amountNoPrefixArgumentsIncrement()
                 it to -1
-            } ?: (null to 0))
+            } ?: (null to 0)
+            )
 
         fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifierAndGetResult(
             args: Array<String>,

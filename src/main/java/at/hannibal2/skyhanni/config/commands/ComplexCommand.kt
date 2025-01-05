@@ -103,14 +103,14 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
         val validSpecifier = specifiers.filter { it.validity(context) }
 
-        val rest = (args.slice(index..<args.size).joinToString(" ") + (partial?.let { " $it" } ?: "")).trimStart()
+        val rest = (args.slice(index..<args.size).joinToString(" ") + (partial?.let { " $it" }.orEmpty())).trimStart()
 
         if (rest.isEmpty()) {
-            result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { it.isNotEmpty() } })
+            result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { i -> i.isNotEmpty() } })
             result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete("") }.flatten())
         } else {
             result.addAll(
-                validSpecifier.filter { it.prefix.startsWith(rest) }.mapNotNull { it.prefix.takeIf { it.isNotEmpty() } },
+                validSpecifier.filter { it.prefix.startsWith(rest) }.mapNotNull { it.prefix.takeIf { i -> i.isNotEmpty() } },
             )
             result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete(rest) }.flatten())
         }
@@ -118,7 +118,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         return result
     }
 
-    //TODO use
+    // TODO use
     override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
         return null
     }

@@ -20,8 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
