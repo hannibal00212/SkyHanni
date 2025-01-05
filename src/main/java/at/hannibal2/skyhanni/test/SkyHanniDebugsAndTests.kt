@@ -341,7 +341,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun debugVersion() {
-        val name = "SkyHanni ${SkyHanniMod.version}"
+        val name = "SkyHanni ${SkyHanniMod.VERSION}"
         ChatUtils.chat("§eYou are using $name")
         OSUtils.copyToClipboard(name)
     }
