@@ -52,7 +52,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
-import at.hannibal2.skyhanni.features.gui.ShTrack
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -92,15 +91,6 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CommandArgument
-import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
-import at.hannibal2.skyhanni.utils.CommandContextAwareObject
-import at.hannibal2.skyhanni.utils.ComplexCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -112,7 +102,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 @Suppress("LargeClass", "LongMethod")
 object Commands {
 
-    val commandList = mutableListOf<CommandBuilder>()
+    val commandList = mutableListOf<CommandBuilderBase>()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -164,22 +154,6 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        event.registerComplex("shtrack", "Track any quantity",CommandCategory.USERS_ACTIVE, ShTrack.arguments) { ShTrack.ContextObject() }
-        event.registerComplex(
-            "shtrackitem",
-            "Track any item",
-            CommandCategory.USERS_ACTIVE,
-            ShTrack.arguments,
-            ShTrack.DocumentationExcludes.itemTrack,
-        ) {
-            ShTrack.ContextObject().apply { state = ShTrack.ContextObject.StateType.ITEM }
-        }
-
-        event.register("shimportghostcounterdata") {
-            description = "Manually importing the ghost counter data from GhostCounterV3"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GhostUtil.importCTGhostCounterData() }
-        }
         event.register("shcroptime") {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
@@ -214,7 +188,7 @@ object Commands {
         event.register("shcopytranslation") {
             description =
                 "Copy the translation of a message in another language to your clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message."
+                    "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
             callback { Translator.fromNativeLanguage(it) }
         }
@@ -581,7 +555,7 @@ object Commands {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback { ScoreboardData.toggleMonitor() }
         }
@@ -737,8 +711,8 @@ object Commands {
         event.register("shresetconfig") {
             description =
                 "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff)."
+                    "This §cWILL RESET §7your config, but also updating the java config files " +
+                    "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.resetConfigCommand() }
         }
@@ -784,28 +758,6 @@ object Commands {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
             callback { ChatClickActionManager.onCommand(it) }
-        }
-    }
-    fun <O : CommandContextAwareObject, A : CommandArgument<O>> advancedHandleCommand(
-        args: Array<String>,
-        specifiers: Collection<A>,
-        context: O,
-    ) {
-        var index = 0
-        var amountNoPrefixArguments = 0
-
-        while (args.size > index) {
-            val step = specifiers.findSpecifierAndGetResult(args, index, context, amountNoPrefixArguments) { amountNoPrefixArguments++ }
-            context.errorMessage?.let {
-                ChatUtils.userError(it)
-                return
-            }
-            index += step
-        }
-        context.post()
-        context.errorMessage?.let {
-            ChatUtils.userError(it)
-            return
         }
     }
 }

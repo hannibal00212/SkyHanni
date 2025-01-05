@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -43,20 +45,40 @@ object ShTrack {
 
     private val config get() = SkyHanniMod.feature.gui.shTrackConfig
 
+    @HandleEvent
+    fun register(event: CommandRegistrationEvent) {
+        event.registerComplex<ContextObject>("shtrack") {
+            description = "Track any quantity"
+            category = CommandCategory.USERS_ACTIVE
+            specifiers = arguments
+            context = { ContextObject() }
+        }
+        event.registerComplex<ContextObject>("shtrackitem") {
+            description = "Track any item"
+            category = CommandCategory.USERS_ACTIVE
+            specifiers = arguments
+            context = { ContextObject() }
+            excludedSpecifiersFromDescription = itemTrack
+            context = { ContextObject().apply { state = ContextObject.StateType.ITEM } }
+        }
+    }
+
     val arguments = listOf<CommandArgument<ContextObject>>(
         CommandArgument(
             "<> - Sets the tracking type to items",
             "-i",
             noDocumentationFor = listOf(itemTrack),
         ) { _, c ->
-            c.state = ContextObject.StateType.ITEM; 0
+            c.state = ContextObject.StateType.ITEM
+            0
         },
         CommandArgument(
             "<> - Sets the tracking type to powder",
             "-p",
             noDocumentationFor = listOf(itemTrack),
         ) { _, c ->
-            c.state = ContextObject.StateType.POWDER; 0
+            c.state = ContextObject.StateType.POWDER
+            0
         },
         CommandArgument("<number/calculation> - Sets the target amount", defaultPosition = 1) { a, c ->
             numberCalculate(
@@ -93,9 +115,13 @@ object ShTrack {
             "<> - Sets the current amount from sacks and inventory",
             "-s",
             validity = ::validIfItemState,
-        ) { _, c -> c.currentFetch = ContextObject.CurrentFetch.SACKS; 0 },
+        ) { _, c ->
+            c.currentFetch = ContextObject.CurrentFetch.SACKS
+            0
+        },
         CommandArgument("<> - Sets the current amount from inventory", "-v", validity = ::validIfItemState) { _, c ->
-            c.currentFetch = ContextObject.CurrentFetch.INVENTORY; 0
+            c.currentFetch = ContextObject.CurrentFetch.INVENTORY
+            0
         },
         CommandArgument(
             "<> - Sets the current amount from collections (Does also do -m)", "-cc",
@@ -105,11 +131,26 @@ object ShTrack {
             c.multiItem = true
             0
         },
-        CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c -> c.allowDupe = true; 0 },
-        CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c -> c.autoDelete = false; 0 },
-        CommandArgument("<> - Sends a notification on completion", "-n") { _, c -> c.notify = true; 0 },
-        CommandArgument("<> - Uses all tiers of an item", "-m", validity = ::validIfItemState) { _, c -> c.multiItem = true; 0 },
-        CommandArgument("<> - Does not save the tracker on game close", "-t") { _, c -> c.shouldSave = false; 0 },
+        CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c ->
+            c.allowDupe = true
+            0
+        },
+        CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c ->
+            c.autoDelete = false
+            0
+        },
+        CommandArgument("<> - Sends a notification on completion", "-n") { _, c ->
+            c.notify = true
+            0
+        },
+        CommandArgument("<> - Uses all tiers of an item", "-m", validity = ::validIfItemState) { _, c ->
+            c.multiItem = true
+            0
+        },
+        CommandArgument("<> - Does not save the tracker on game close", "-t") { _, c ->
+            c.shouldSave = false
+            0
+        },
     )
 
     object DocumentationExcludes {
@@ -419,7 +460,7 @@ object ShTrack {
         config.position.renderRenderable(display, posLabel = "Tracker")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         val trackers = itemTrackers[event.internalName] ?: return
         if (event.source == ItemAddManager.Source.SACKS) {

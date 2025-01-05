@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -794,7 +793,7 @@ interface Renderable {
                             posY + boxY.first,
                             posX + width,
                             posY + boxY.second - emptySpaceY,
-                            Color.GRAY.withAlpha(if (dropped) 50 else 35),
+                            Color.GRAY.addAlpha(if (dropped) 50 else 35).rgb,
                         )
                     }
                     content.getOrNull(contentRowIndex)?.drawRow(contentRowIndex, posX, posY + ySpace, ySpace.toFloat(), true)
@@ -835,7 +834,7 @@ interface Renderable {
                     if (!isSnappingIn) {
                         GlStateManager.translate(3f, 0f, 0f)
                         content[rowIndex].drawRow(rowIndex, 0, 0, 0f, false)
-                        Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.withAlpha(30))
+                        Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.addAlpha(30).rgb)
                         GlStateManager.translate(-3f, 0f, 0f)
                     }
                 }
@@ -1117,7 +1116,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-            showScrollableTipsInList: Boolean = false
+            showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")
