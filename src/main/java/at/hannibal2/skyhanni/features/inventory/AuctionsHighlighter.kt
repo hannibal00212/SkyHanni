@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
@@ -54,7 +55,7 @@ object AuctionsHighlighter {
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
-                lore.matchFirst(buyItNowPattern) {
+                buyItNowPattern.firstMatcher(lore) {
                     val coins = group("coins").formatLong()
                     val totalPrice = EstimatedItemValueCalculator.getTotalPrice(stack)
                     if (coins > totalPrice) {
@@ -65,7 +66,7 @@ object AuctionsHighlighter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(25, "inventory.highlightAuctions", "inventory.auctions.highlightAuctions")
         event.move(25, "inventory.highlightAuctionsUnderbid", "inventory.auctions.highlightAuctionsUnderbid")

@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 enum class PestType(
     val displayName: String,
     val damageIndicatorBoss: BossType,
-    val spray: SprayType,
-    val vinyl: VinylType,
+    val spray: SprayType?,
+    val vinyl: VinylType?,
     val internalName: NEUInternalName,
-    val crop: CropType,
+    val crop: CropType?,
 ) {
     BEETLE(
         "Beetle",
@@ -92,6 +92,14 @@ enum class PestType(
         VinylType.SLOW_AND_GROOVY,
         "PEST_SLUG_MONSTER".toInternalName(),
         CropType.MUSHROOM,
+    ),
+    MOUSE(
+        "Field Mouse",
+        BossType.GARDEN_PEST_MOUSE,
+        spray = null,
+        vinyl = null,
+        "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
+        crop = null,
     ),
     ;
 

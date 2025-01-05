@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -75,7 +76,11 @@ object TimeUtils {
 
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
-    fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
+    private fun String.preFixDurationString() =
+        replace(Regex("(\\d+)([yMWwdhms])(?!\\s)"), "$1$2 ") // Add a space only after common time units
+            .trim()
+
+    fun getDuration(string: String) = getMillis(string.preFixDurationString())
 
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
@@ -155,6 +160,19 @@ object TimeUtils {
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
+
+    fun LocalDateTime.getCountdownFormat(): String {
+        val timeNow = LocalDateTime.now()
+        val yearDiff = year - timeNow.year
+        val monthDiff = monthValue - timeNow.monthValue
+        val dayDiff = dayOfMonth - timeNow.dayOfMonth
+
+        return when {
+            yearDiff == 0 && monthDiff == 0 && dayDiff == 0 -> "HH:mm:ss"
+            (yearDiff == 0 && monthDiff == 0) || (yearDiff == 0) -> "MM-dd HH:mm"
+            else -> "yyyy-MM-dd HH:mm"
+        }
+    }
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds

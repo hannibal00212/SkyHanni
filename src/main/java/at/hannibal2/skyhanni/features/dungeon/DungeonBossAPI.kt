@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.dungeon
 
-import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonBossPhaseChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonFloor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -37,7 +38,7 @@ object DungeonBossAPI {
     private val patternGroup = RepoPattern.group("dungeon.boss.message")
 
     /**
-     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\? Sadan\?!
+     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me? Sadan?!
      */
     private val terracottaStartPattern by patternGroup.pattern(
         "f6.terracotta",
@@ -161,7 +162,7 @@ object DungeonBossAPI {
         bossPhase = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
         bossPhase = null
     }

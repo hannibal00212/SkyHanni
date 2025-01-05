@@ -27,6 +27,8 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -44,8 +46,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -345,7 +345,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun debugVersion() {
-        val name = "SkyHanni ${SkyHanniMod.version}"
+        val name = "SkyHanni ${SkyHanniMod.VERSION}"
         ChatUtils.chat("§eYou are using $name")
         OSUtils.copyToClipboard(name)
     }
@@ -406,7 +406,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat(result.joinToString("\n"), prefix = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = event.guiContainer.slotUnderMouse ?: return
@@ -521,10 +521,10 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
         if (false) {
             itemRenderDebug()
         }
@@ -559,8 +559,8 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    @Suppress("ConstantConditionIf")
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
         if (false) {
             dragAbleTest()
         }
@@ -630,7 +630,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
-        val originalOre = event.originalOre?.let { "$it " } ?: ""
+        val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
@@ -660,7 +660,7 @@ object SkyHanniDebugsAndTests {
 //        println("offset: $offset")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")

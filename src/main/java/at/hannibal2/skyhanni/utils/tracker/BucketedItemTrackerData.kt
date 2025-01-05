@@ -65,7 +65,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     @Expose
     private var selectedBucket: E? = null
     @Expose
-    private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
+    private val bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
     private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
     private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {

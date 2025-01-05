@@ -10,7 +10,7 @@ data class SeaCreature(
     val rarity: LorenzRarity,
 ) {
 
-    val displayName by lazy { chatColor + rare() + name }
+    val displayName = chatColor + rare() + name
 
     private fun rare() = if (rare) "§l" else ""
 }

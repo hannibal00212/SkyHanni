@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -9,11 +10,11 @@ import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -57,8 +58,8 @@ object SlayerAPI {
             }
         }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Slayer")
 
         if (!hasActiveSlayerQuest()) {
@@ -112,12 +113,12 @@ object SlayerAPI {
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
-            SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
+            SlayerChangeEvent(old, latestSlayerCategory).post()
         }
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
         if (latestSlayerProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).post()
             latestSlayerProgress = slayerProgress
         }
 

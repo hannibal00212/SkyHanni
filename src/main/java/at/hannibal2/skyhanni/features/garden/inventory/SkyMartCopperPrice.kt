@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -7,13 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -28,9 +29,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyMartCopperPrice {
 
+    /**
+     * REGEX-TEST: §c250 Copper
+     */
     private val copperPattern by RepoPattern.pattern(
         "garden.inventory.skymart.copper",
-        "§c(?<amount>.*) Copper"
+        "§c(?<amount>.*) Copper",
     )
 
     private var display = emptyList<Renderable>()
@@ -81,8 +85,8 @@ object SkyMartCopperPrice {
                         factor,
                         internalName,
                         hover,
-                        highlightsOnHoverSlots = listOf(slot)
-                    )
+                        highlightsOnHoverSlots = listOf(slot),
+                    ),
                 )
             }
         }
@@ -104,12 +108,12 @@ object SkyMartCopperPrice {
             config.copperPricePos.renderRenderables(
                 display,
                 extraSpace = 5,
-                posLabel = "SkyMart Copper Price"
+                posLabel = "SkyMart Copper Price",
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.skyMartCopperPrice", "garden.skyMart.copperPrice")
         event.move(3, "garden.skyMartCopperPriceAdvancedStats", "garden.skyMart.copperPriceAdvancedStats")

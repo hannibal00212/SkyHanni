@@ -1,8 +1,4 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
-import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import at.skyhanni.sharedvariables.*
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -191,9 +187,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // October 3, 2024, 11:43 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
+    // December 29, 2024, 07:30 PM EST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -215,7 +211,7 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -312,6 +308,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -384,6 +381,7 @@ preprocess {
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

@@ -15,10 +15,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object TeleportPadCompactName {
     private val patternGroup = RepoPattern.group("misc.teleportpad")
+
+    /**
+     * REGEX-TEST: §a✦ §aWarp To §9Blue
+     */
     private val namePattern by patternGroup.pattern(
         "name",
         "§.✦ §aWarp To (?<name>.*)"
     )
+
+    /**
+     * REGEX-TEST: §c✦ §cNo Destination
+     */
     private val noNamePattern by patternGroup.pattern(
         "noname",
         "§.✦ §cNo Destination"
