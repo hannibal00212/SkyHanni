@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
