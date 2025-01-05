@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -36,9 +37,9 @@ object SoopyGuessBurrow {
     private var guessPoint: LorenzVec? = null
 
     private var lastSoundPoint: LorenzVec? = null
-    private var locations = mutableListOf<LorenzVec>()
+    private val locations = mutableListOf<LorenzVec>()
 
-    private var dingSlope = mutableListOf<Float>()
+    private val dingSlope = mutableListOf<Float>()
 
     var distance: Double? = null
     private var distance2: Double? = null
@@ -59,7 +60,7 @@ object SoopyGuessBurrow {
         dingSlope.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (event.soundName != "note.harp") return
@@ -122,7 +123,7 @@ object SoopyGuessBurrow {
         val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
 
         distance = distance2!!
-        val changesHelp = particlePoint?.subtract(lastParticlePoint2!!)!!
+        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
         var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
         changes = changes.map { o -> o / lineDist }
 
@@ -247,7 +248,7 @@ object SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        BurrowGuessEvent(finalLocation).postAndCatch()
+                        BurrowGuessEvent(finalLocation).post()
                     }
                 }
             }
@@ -267,7 +268,7 @@ object SoopyGuessBurrow {
 
             distance = distance2!!
 
-            val changesHelp = particlePoint?.subtract(lastParticlePoint2!!)!!
+            val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
 
             var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
             changes = changes.map { o -> o / lineDist }

@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 public class GardenConfig {
     @Expose
@@ -141,6 +142,11 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Bests", desc = "")
+    @Accordion
+    public PersonalBestsConfig personalBests = new PersonalBestsConfig();
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -211,15 +217,6 @@ public class GardenConfig {
     @FeatureToggle
     public boolean jacobContestSummary = true;
 
-    @Expose
-    @ConfigOption(
-        name = "Personal Best Increase FF",
-        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean contestPersonalBestIncreaseFF = true;
-
     // Does not have a config element!
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
@@ -245,4 +242,11 @@ public class GardenConfig {
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
     public Position logBookStatsPos = new Position(427, 92, false, true);
+
+    @Expose
+    @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")
+    @SearchTag("Expired Pumpkin, Exportable Carrots, Supreme Chocolate Bar, Fine Flour")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean helpCarrolyn = true;
 }

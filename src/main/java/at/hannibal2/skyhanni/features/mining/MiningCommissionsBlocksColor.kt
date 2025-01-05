@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI.inCrystalHollows
 import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
@@ -66,7 +67,7 @@ object MiningCommissionsBlocksColor {
     private var replaceBlocksMapCache = mutableMapOf<IBlockState, IBlockState>()
 
     // TODO Commission API
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
             val tabList = " §r§f${block.commissionName}: "
@@ -129,8 +130,8 @@ object MiningCommissionsBlocksColor {
         }
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
@@ -151,8 +152,8 @@ object MiningCommissionsBlocksColor {
         replaceBlocksMapCache = mutableMapOf()
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")

@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.BurrowDetectEvent
-import at.hannibal2.skyhanni.events.BurrowDugEvent
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
+import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
@@ -68,8 +69,8 @@ object GriffinBurrowHelper {
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaAPI.isDoingDiana()) {
@@ -148,7 +149,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
 
@@ -156,7 +157,7 @@ object GriffinBurrowHelper {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
@@ -172,17 +173,17 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { remove(location) }
         update()
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+        if (event.distance > 10 && event.isLocalPlayer) {
             update()
         }
     }
@@ -353,7 +354,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "diana", "event.diana")
     }

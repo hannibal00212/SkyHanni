@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
@@ -102,7 +103,6 @@ object IslandGraphs {
 
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
-    private var secondClosestNode: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -127,12 +127,12 @@ object IslandGraphs {
 
     /**
      * REGEX-TEST: Dwarven Base Camp
-     * REGEX-TEST: Forge
+     * REGEX-FAIL: Forge
      * REGEX-TEST: Fossil Research Center
      */
     private val glaciteTunnelsPattern by patternGroup.pattern(
         "glacitetunnels",
-        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+        "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
     @SubscribeEvent
@@ -142,7 +142,7 @@ object IslandGraphs {
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
@@ -250,13 +250,11 @@ object IslandGraphs {
         }
 
         val graph = currentIslandGraph ?: return
-        val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
-        val newClosest = sortedNodes.first()
+        val newClosest = graph.minBy { it.position.distanceSqToPlayer() }
         if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
         closestNode = newClosest
-        secondClosestNode = sortedNodes.getOrNull(1)
         onNewNode()
         if (newClosest == prevClosest) return
         if (newPath) {
@@ -276,9 +274,6 @@ object IslandGraphs {
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
         fastestPath = skipIfCloser(newGraph)
-        newNodes.getOrNull(1)?.let {
-            secondClosestNode = it
-        }
         setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
     }
@@ -329,9 +324,9 @@ object IslandGraphs {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (currentIslandGraph != null && event.entity == Minecraft.getMinecraft().thePlayer) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (currentIslandGraph != null && event.isLocalPlayer) {
             hasMoved = true
         }
     }

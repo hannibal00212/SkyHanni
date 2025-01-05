@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
@@ -19,6 +19,9 @@ import org.lwjgl.input.Mouse
 
 @SkyHanniModule
 object KeyboardManager {
+
+    const val LEFT_MOUSE = -100
+    const val RIGHT_MOUSE = -99
 
     private var lastClickedMouseButton = -1
 
@@ -53,7 +56,7 @@ object KeyboardManager {
     @SubscribeEvent
     fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+        if (GuiKeyPressEvent(guiScreen).post()) {
             event.isCanceled = true
         }
     }
@@ -68,21 +71,21 @@ object KeyboardManager {
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
-            LorenzKeyPressEvent(key).postAndCatch()
+            KeyPressEvent(key).post()
             lastClickedMouseButton = key
             return
         }
 
         if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
             val key = Keyboard.getEventKey()
-            LorenzKeyPressEvent(key).postAndCatch()
+            KeyPressEvent(key).post()
             lastClickedMouseButton = -1
             return
         }
 
         if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
-                LorenzKeyPressEvent(lastClickedMouseButton).postAndCatch()
+                KeyPressEvent(lastClickedMouseButton).post()
                 return
             }
             lastClickedMouseButton = -1
@@ -90,7 +93,7 @@ object KeyboardManager {
 
         // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
-            LorenzKeyPressEvent(Keyboard.getEventCharacter().code + 256).postAndCatch()
+            KeyPressEvent(Keyboard.getEventCharacter().code + 256).post()
         }
     }
 

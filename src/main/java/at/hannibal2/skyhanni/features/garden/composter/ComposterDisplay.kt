@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
@@ -46,14 +47,14 @@ object ComposterDisplay {
 
         val displayItem by lazy { icon.toInternalName().getItemStack() }
 
-        val pattern by lazy { rawPattern.toPattern() }
+        val pattern = rawPattern.toPattern()
 
         fun addToList(map: Map<DataType, String>): List<Any> {
             return map[this]?.let { listOf(displayItem, it) }.orEmpty()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.COMPOSTER)) return
@@ -204,7 +205,7 @@ object ComposterDisplay {
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterDisplayEnabled", "garden.composters.displayEnabled")
         event.move(3, "garden.composterDisplayOutsideGarden", "garden.composters.displayOutsideGarden")

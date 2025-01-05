@@ -18,10 +18,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
-import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
-import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
@@ -116,7 +113,6 @@ object Commands {
         devTest(event)
         devDebug(event)
         internalCommands(event)
-        shortenedCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
@@ -128,10 +124,6 @@ object Commands {
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGUI.onCommand() }
-        }
-        event.register("shcommands") {
-            description = "Shows this list"
-            callback { HelpCommand.onCommand(it) }
         }
         event.register("shdefaultoptions") {
             description = "Select default options"
@@ -162,14 +154,9 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
-        event.register("shimportghostcounterdata") {
-            description = "Manually importing the ghost counter data from GhostCounterV3"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GhostUtil.importCTGhostCounterData() }
-        }
         event.register("shcroptime") {
             description =
-                "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropTimeCommand.onCommand(it) }
         }
@@ -383,11 +370,6 @@ object Commands {
         }
 
         // non trackers
-        event.register("shresetghostcounter") {
-            description = "Resets the ghost counter"
-            category = CommandCategory.USERS_RESET
-            callback { GhostUtil.reset() }
-        }
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
@@ -776,44 +758,6 @@ object Commands {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
             callback { ChatClickActionManager.onCommand(it) }
-        }
-    }
-
-    private fun shortenedCommands(event: CommandRegistrationEvent) {
-        event.register("pko") {
-            description = "Kicks offline party members"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kickOffline() }
-        }
-        event.register("pw") {
-            description = "Warps your party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.warp() }
-        }
-        event.register("pk") {
-            description = "Kick a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kick(it) }
-        }
-        event.register("pt") {
-            description = "Transfer the party to another party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.transfer(it) }
-        }
-        event.register("pp") {
-            description = "Promote a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.promote(it) }
-        }
-        event.register("pd") {
-            description = "Disbands the party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.disband() }
-        }
-        event.register("rpt") {
-            description = "Reverse transfer party to the previous leader"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.reverseTransfer() }
         }
     }
 }

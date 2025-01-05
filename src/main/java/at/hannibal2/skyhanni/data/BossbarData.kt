@@ -25,11 +25,12 @@ object BossbarData {
         bossbar = null
     }
 
-    @SubscribeEvent
     //#if MC < 1.12
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         val bossbarLine = BossStatus.bossName ?: return
         //#else
+        //$$ @SubscribeEvent
         //$$ fun onRenderGameOverlay(event: RenderGameOverlayEvent.BossInfo) {
         //$$ val bossbarLine = event.bossInfo.name.formattedText
         //#endif
@@ -39,6 +40,6 @@ object BossbarData {
         if (previousServerBossbar.isNotEmpty()) previousServerBossbar = ""
 
         bossbar = bossbarLine
-        BossbarUpdateEvent(bossbarLine).postAndCatch()
+        BossbarUpdateEvent(bossbarLine).post()
     }
 }

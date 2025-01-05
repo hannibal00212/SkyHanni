@@ -15,7 +15,7 @@ object BlockUtils {
 
     fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
 
-    fun LorenzVec.isInLoadedChunk(): Boolean = world.chunkProvider.provideChunk(toBlockPos()).isLoaded
+    fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
 
     fun getTextureFromSkull(position: LorenzVec?): String? {
         val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
@@ -39,6 +39,6 @@ object BlockUtils {
     fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),
         Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
-        distance
+        distance,
     )
 }
