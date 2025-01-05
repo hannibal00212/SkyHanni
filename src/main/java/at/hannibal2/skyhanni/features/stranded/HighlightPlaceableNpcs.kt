@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.stranded
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -28,14 +29,10 @@ object HighlightPlaceableNpcs {
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
     )
-
-    // TODO Please add regex tests
     private val clickToSetPattern by RepoPattern.pattern(
         "clicktoset",
         "§7§eClick to set the location of this NPC!",
     )
-
-    // TODO Please add regex tests
     private val clickToSpawnPattern by RepoPattern.pattern(
         "clicktospawn",
         "§elocation!",
@@ -77,7 +74,7 @@ object HighlightPlaceableNpcs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "stranded", "misc.stranded")
     }

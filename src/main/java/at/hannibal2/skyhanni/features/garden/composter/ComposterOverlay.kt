@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
@@ -27,16 +28,16 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -48,7 +49,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.math.ceil
@@ -105,14 +105,17 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".asInternalName() }
+    private val COMPOST = "COMPOST".toInternalName()
+    private val BIOFUEL = "BIOFUEL".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
+    private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!inInventory) return
 
@@ -481,7 +484,7 @@ object ComposterOverlay {
     private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
-            !LorenzUtils.noTradeMode && !internalName.equals("BIOFUEL")
+            !LorenzUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
             return
@@ -496,13 +499,13 @@ object ComposterOverlay {
             HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
             // TODO Add sack type repo data
 
-            val isDwarvenMineable =
-                internalName.let { it.equals("VOLTA") || it.equals("OIL_BARREL") || it.equals("BIOFUEL") }
+            val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
+                replaceSameMessage = true
             )
             return
         }
@@ -535,12 +538,12 @@ object ComposterOverlay {
 
     private fun getPrice(internalName: NEUInternalName): Double {
         val price = internalName.getPrice(config.priceSource)
-        if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
+        if (internalName == BIOFUEL && price > 20_000) return 20_000.0
 
         return price
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         updateOrganicMatterFactors()
     }
@@ -583,14 +586,14 @@ object ComposterOverlay {
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
             if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
-            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
+            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.toInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error
                 amount = 5184
             }
             baseValues[newId]?.let {
-                map[internalName.asInternalName()] = it * amount
+                map[internalName.toInternalName()] = it * amount
             }
         }
         return map
@@ -618,7 +621,7 @@ object ComposterOverlay {
         DAY("Day", 60 * 60 * 24),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterOverlay", "garden.composters.overlay")
         event.move(3, "garden.composterOverlayPriceType", "garden.composters.overlayPriceType")
@@ -631,8 +634,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Composter")
 
         event.addIrrelevant {

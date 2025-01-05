@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -8,13 +9,14 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -37,7 +39,7 @@ object GardenOptimalSpeed {
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
-    private val rancherBoots = "RANCHERS_BOOTS".asInternalName()
+    private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
     /**
      * This speed value represents the walking speed, not the speed stat.
@@ -120,7 +122,7 @@ object GardenOptimalSpeed {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
@@ -128,7 +130,7 @@ object GardenOptimalSpeed {
         optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
             ConditionalUtils.onToggle(value.getConfig()) {
@@ -185,26 +187,37 @@ object GardenOptimalSpeed {
         if (GardenAPI.onBarnPlot) return
         if (!config.warning) return
         if (!GardenAPI.isCurrentlyFarming()) return
-        if (InventoryUtils.getBoots()?.getInternalNameOrNull() != rancherBoots) return
         if (lastWarnTime.passedSince() < 20.seconds) return
+        val ranchersEquipped = InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots
+        if (!ranchersEquipped && config.onlyWarnRanchers) return
 
         lastWarnTime = SimpleTimeMark.now()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         val cropInHand = cropInHand ?: return
 
-        var text = "§cWrong speed while farming ${cropInHand.cropName} detected!"
-        text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
-        ChatUtils.clickToActionOrDisable(
-            text,
-            config::warning,
-            actionName = "change the speed",
-            action = { HypixelCommands.setMaxSpeed() },
-        )
+        val text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +
+            "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed"
+
+        if (ranchersEquipped) {
+            ChatUtils.clickToActionOrDisable(
+                text,
+                config::warning,
+                actionName = "change the speed",
+                action = { HypixelCommands.setMaxSpeed(optimalSpeed) },
+            )
+        } else {
+            ChatUtils.clickableChat(
+                text,
+                onClick = { config::onlyWarnRanchers.jumpToEditor() },
+                hover = "§eClick to disable this feature!",
+                replaceSameMessage = true,
+            )
+        }
     }
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
         event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")

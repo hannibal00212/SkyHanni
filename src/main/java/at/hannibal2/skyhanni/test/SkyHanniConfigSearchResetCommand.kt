@@ -169,7 +169,7 @@ object SkyHanniConfigSearchResetCommand {
         val elements = findConfigElements(configFilter, classFilter)
         val builder = StringBuilder()
         builder.append("```\n")
-        builder.append("Search config for SkyHanni ${SkyHanniMod.version}\n")
+        builder.append("Search config for SkyHanni ${SkyHanniMod.VERSION}\n")
         builder.append("configSearchTerm: $configSearchTerm\n")
         builder.append("classSearchTerm: $classSearchTerm\n")
         builder.append("\n")

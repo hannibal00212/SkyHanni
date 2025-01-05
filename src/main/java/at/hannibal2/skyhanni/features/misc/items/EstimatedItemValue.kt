@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -50,7 +51,7 @@ object EstimatedItemValue {
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
@@ -65,7 +66,7 @@ object EstimatedItemValue {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
-        if (Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
+        if (PlatformUtils.isNeuLoaded() && Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
@@ -137,7 +138,7 @@ object EstimatedItemValue {
         cache.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
@@ -154,7 +155,7 @@ object EstimatedItemValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -246,7 +247,7 @@ object EstimatedItemValue {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")

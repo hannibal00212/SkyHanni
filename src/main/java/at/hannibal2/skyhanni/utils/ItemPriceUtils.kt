@@ -5,12 +5,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
 object ItemPriceUtils {
+
+    private val JACK_O_LANTERN = "JACK_O_LANTERN".toInternalName()
+    private val GOLDEN_CARROT = "GOLDEN_CARROT".toInternalName()
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
@@ -22,6 +25,7 @@ object ItemPriceUtils {
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double? {
         when (this) {
+            NEUInternalName.GEMSTONE_COLLECTION -> return 0.0
             NEUInternalName.JASPER_CRYSTAL -> return 0.0
             NEUInternalName.RUBY_CRYSTAL -> return 0.0
             NEUInternalName.SKYBLOCK_COIN -> return 1.0
@@ -37,11 +41,11 @@ object ItemPriceUtils {
                 return it
             }
 
-            if (equals("JACK_O_LANTERN")) {
-                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
+            if (this == JACK_O_LANTERN) {
+                return "PUMPKIN".toInternalName().getPrice(priceSource) + 1
             }
         }
-        if (equals("GOLDEN_CARROT")) {
+        if (this == GOLDEN_CARROT) {
             // 6.8 for some players
             return 7.0 // NPC price
         }
@@ -115,7 +119,7 @@ object ItemPriceUtils {
         return if (name.isEmpty()) {
             InventoryUtils.getItemInHand()?.getInternalName()
         } else {
-            val internalName = name.asInternalName()
+            val internalName = name.toInternalName()
             if (internalName.getItemStackOrNull() != null) {
                 internalName
             } else {

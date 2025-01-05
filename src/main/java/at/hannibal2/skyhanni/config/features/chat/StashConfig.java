@@ -24,17 +24,27 @@ public class StashConfig {
     public String notice = "";
 
     @Expose
+    @ConfigOption(name = "Hide Added Messages", desc = "Hide the messages when something is added to your stash.")
+    @ConfigEditorBoolean
+    public boolean hideAddedMessages = true;
+
+    @Expose
     @ConfigOption(name = "Hide Duplicate Warnings", desc = "Hide duplicate warnings for previously reported stash counts.")
     @ConfigEditorBoolean
     public boolean hideDuplicateCounts = true;
 
     @Expose
     @ConfigOption(name = "Hide Low Warnings", desc = "Hide warnings with a total count below this number.")
-    @ConfigEditorSlider(minValue = 0, maxValue = 1000000, minStep = 100)
+    @ConfigEditorSlider(minValue = 0, maxValue = 1_000_000, minStep = 100)
     public int hideLowWarningsThreshold = 0;
 
     @Expose
     @ConfigOption(name = "Use /ViewStash", desc = "Use /viewstash [type] instead of /pickupstash.")
     @ConfigEditorBoolean
     public boolean useViewStash = false;
+
+    @Expose
+    @ConfigOption(name = "Disable Empty Warnings", desc = "Disable first-time warnings for empty messages left behind.")
+    @ConfigEditorBoolean
+    public boolean disableEmptyWarnings = false;
 }

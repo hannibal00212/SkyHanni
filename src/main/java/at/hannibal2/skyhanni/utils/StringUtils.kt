@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
@@ -334,13 +335,6 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
-    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-    fun generateRandomString(length: Int): String {
-        var res: String = ""
-        repeat(length) { res += CHARS.random() }
-        return res
-    }
-
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
@@ -509,6 +503,7 @@ object StringUtils {
 
     fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
+    @Deprecated("This function strips internal formatting changes like the color of the pluses of the MVP+ rank")
     fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
         formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
 
@@ -530,5 +525,13 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.addStrikethorugh(strikethorugh: Boolean = true): String {
+        if (!strikethorugh) return this
+
+        val firstColor = getFirstColorCode()
+        val clean = removeColor()
+        return "§$firstColor§m$clean"
     }
 }
