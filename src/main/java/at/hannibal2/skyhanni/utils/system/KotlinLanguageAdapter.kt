@@ -20,5 +20,5 @@ class KotlinLanguageAdapter : ILanguageAdapter {
         field[clazz.kotlin.objectInstance] = proxy
     }
 
-    override fun setInternalProxies(modContainer: ModContainer?, side: Side?, classLoader: ClassLoader?) {}
+    override fun setInternalProxies(modContainer: ModContainer, side: Side, classLoader: ClassLoader) {}
 }
