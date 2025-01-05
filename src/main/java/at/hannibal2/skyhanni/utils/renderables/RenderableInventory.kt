@@ -8,7 +8,7 @@ import kotlin.math.ceil
 
 object RenderableInventory {
 
-    private val inventoryTextures by lazy { ResourceLocation("skyhanni", "gui/slot.png") }
+    private val inventoryTextures = ResourceLocation("skyhanni", "gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 

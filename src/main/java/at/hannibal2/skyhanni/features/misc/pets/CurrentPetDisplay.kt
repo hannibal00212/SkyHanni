@@ -24,14 +24,27 @@ object CurrentPetDisplay {
     private val config get() = SkyHanniMod.feature.misc.pets
 
     private val patternGroup = RepoPattern.group("misc.currentpet")
+
+    /**
+     * REGEX-TEST: §7§7Selected pet: §6Enderman
+     * REGEX-TEST: §7§7Selected pet: §cNone
+     */
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
         "§7§7Selected pet: (?<pet>.*)",
     )
+
+    /**
+     * REGEX-TEST: §aYou summoned your §r§6Enderman§r§a!
+     */
     private val chatSpawnPattern by patternGroup.pattern(
         "chat.spawn",
         "§aYou summoned your §r(?<pet>.*)§r§a!",
     )
+
+    /**
+     * REGEX-TEST: §aYou despawned your §r§6Enderman§r§a!
+     */
     private val chatDespawnPattern by patternGroup.pattern(
         "chat.despawn",
         "§aYou despawned your §r.*§r§a!",

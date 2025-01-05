@@ -154,7 +154,7 @@ object TunnelsMaps {
 
     private var clickTranslate = mapOf<Int, String>()
 
-    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".toInternalName() }
+    private val ROYAL_PIGEON = "ROYAL_PIGEON".toInternalName()
 
     private var isCommission = false
 

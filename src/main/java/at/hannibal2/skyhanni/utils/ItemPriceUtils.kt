@@ -22,8 +22,8 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object ItemPriceUtils {
 
-    private val JACK_O_LANTERN by lazy { "JACK_O_LANTERN".toInternalName() }
-    private val GOLDEN_CARROT by lazy { "GOLDEN_CARROT".toInternalName() }
+    private val JACK_O_LANTERN = "JACK_O_LANTERN".toInternalName()
+    private val GOLDEN_CARROT = "GOLDEN_CARROT".toInternalName()
 
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,

@@ -17,16 +17,16 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -40,9 +40,8 @@ object DeepCavernsGuide {
     private var showStartIcon = false
 
     private val startIcon by lazy {
-        val neuItem = "MAP".toInternalName().getItemStack()
         ItemUtils.createItemStack(
-            neuItem.item,
+            Items.map,
             "§bDeep Caverns Guide",
             "§8(From SkyHanni)",
             "",
@@ -100,7 +99,9 @@ object DeepCavernsGuide {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
         if (notUnlockedPattern.matches(event.message)) {
-            start()
+            DelayedRun.runNextTick {
+                start()
+            }
         }
     }
 
@@ -133,8 +134,9 @@ object DeepCavernsGuide {
                 prefixColor = "§c",
             )
         }
+        @Suppress("MaxLineLength")
         ChatUtils.chat(
-            "Automatically enabling Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
+            "Automatically enabling the Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
         )
     }
 
