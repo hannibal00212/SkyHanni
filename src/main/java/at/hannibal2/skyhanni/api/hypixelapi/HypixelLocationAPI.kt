@@ -122,7 +122,7 @@ object HypixelLocationAPI {
         return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hypixel Mod API")
         event.addIrrelevant {
