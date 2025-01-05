@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -10,13 +11,14 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -41,7 +43,7 @@ object RiftGunthersRace {
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
-        "§3§lRIFT RACING §r§eRace finished in \\d+:\\d+.\\d+!.*"
+        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*"
     )
 
     /**
@@ -54,7 +56,7 @@ object RiftGunthersRace {
         "§3§lRIFT RACING §r§cRace cancelled!.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelper?.reset()
     }
@@ -76,7 +78,7 @@ object RiftGunthersRace {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -86,7 +88,7 @@ object RiftGunthersRace {
     private fun updateConfig() {
         parkourHelper?.run {
             rainbowColor = config.rainbowColor.get()
-            monochromeColor = config.monochromeColor.get().toChromaColor()
+            monochromeColor = config.monochromeColor.get().toSpecialColor()
             lookAhead = config.lookAhead.get() + 1
         }
     }
@@ -108,8 +110,8 @@ object RiftGunthersRace {
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
         if (!RiftAPI.inRiftRace) return

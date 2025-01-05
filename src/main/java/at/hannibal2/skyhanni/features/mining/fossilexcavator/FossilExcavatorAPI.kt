@@ -27,7 +27,7 @@ object FossilExcavatorAPI {
     /**
      * REGEX-TEST:   §r§6§lEXCAVATION COMPLETE
      */
-    private val startPattern by chatPatternGroup.pattern("start", " {2}§r§6§lEXCAVATION COMPLETE ")
+    private val startPattern by chatPatternGroup.pattern("start", " {2}§r§6§lEXCAVATION COMPLETE ?")
 
     /**
      * REGEX-TEST: §a§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -86,7 +86,7 @@ object FossilExcavatorAPI {
         val message = event.message
 
         if (emptyPattern.matches(message)) {
-            FossilExcavationEvent(emptyList()).postAndCatch()
+            FossilExcavationEvent(emptyList()).post()
         }
 
 
@@ -98,7 +98,7 @@ object FossilExcavatorAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            FossilExcavationEvent(loot.toList()).postAndCatch()
+            FossilExcavationEvent(loot.toList()).post()
             loot.clear()
             inLoot = false
             return

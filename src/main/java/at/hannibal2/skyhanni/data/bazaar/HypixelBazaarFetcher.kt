@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -35,8 +36,8 @@ object HypixelBazaarFetcher {
     private var failedAttempts = 0
     private var nextFetchIsManual = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Bazaar Data Fetcher from API")
 
         val data = listOf(
@@ -93,11 +94,19 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            if (LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
+            if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
         internalName to BazaarData(internalName.itemName, sellOfferPrice, instantBuyPrice, product)
     }.toMap()
+
+    private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {
+        "ENCHANTMENT_COUNTER_STRIKE_3",
+        "ENCHANTMENT_COUNTER_STRIKE_4",
+        -> true
+
+        else -> false
+    }
 
     private fun BazaarQuickStatus.isEmpty(): Boolean = with(this) {
         sellPrice == 0.0 &&
@@ -122,7 +131,8 @@ object HypixelBazaarFetcher {
             if (rawResponse == null || rawResponse.toString() == "{}") {
                 ChatUtils.chat(
                     "§cFailed loading Bazaar Price data!\n" +
-                        "Please wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                        "§cPlease wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                    replaceSameMessage = true,
                 )
             } else {
                 ErrorManager.logErrorWithData(

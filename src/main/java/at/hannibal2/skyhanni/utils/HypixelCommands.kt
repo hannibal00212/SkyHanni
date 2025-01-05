@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.utils.ChatUtils.debug
+import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 object HypixelCommands {
@@ -100,6 +102,14 @@ object HypixelCommands {
         send("wiki $text")
     }
 
+    fun backPack(position: Int) {
+        send("bp $position")
+    }
+
+    fun enderChest(position: Int) {
+        send("ec $position")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
@@ -140,9 +150,10 @@ object HypixelCommands {
         send("pq $quality")
     }
 
-    // Changes the speed of rancher boots in garden
-    fun setMaxSpeed() {
-        send("setmaxspeed")
+    // Changes the speed of Rancher's Boots
+    fun setMaxSpeed(speed: Int? = null) = when {
+        speed == null -> send("setmaxspeed")
+        else -> send("setmaxspeed $speed")
     }
 
     fun showRng(major: String? = null, minor: String? = null) = when {
@@ -175,8 +186,9 @@ object HypixelCommands {
     }
 
     private fun send(command: String) {
-        // TODO rename function
-        @Suppress("DEPRECATION")
-        ChatUtils.sendCommandToServer(command)
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
+        sendMessageToServer("/$command")
     }
 }

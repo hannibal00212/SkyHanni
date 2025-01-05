@@ -118,12 +118,12 @@ object FlowstateHelper {
         } else blockBreakStreak * flowstateLevel
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
         hasFlowstate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         streakEndTimer = SimpleTimeMark.farPast()
         attemptClearDisplay()

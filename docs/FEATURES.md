@@ -236,6 +236,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Options to highlight good rolls in different colors, show only certain attributes, etc.
 + Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
     +  Assists with maxing upgrades.
++ Added New Year Cake Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2237)
+    +  Highlights unowned cakes in AH.
+    +  Displays a list of missing cake years.
++ Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
 
 </details>
 <details open><summary>
@@ -769,6 +773,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Removed the chat message "There are no Pests on your Garden!".
 + Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
     + Shows a title when you use the Pest Tracker without any pests to clear.
++ Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
 
 </details>
 <details open><summary>
@@ -1032,6 +1037,19 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added the ability to display the Hoppity Event Card in real-time within a GUI element. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2749)
     +  This replaces the command `/shhoppitystats` (but it can be used to view past events).
     +  Can be configured to toggle visibility with a keybind.
++ Added a 30-second stay timer to Chocolate Factory after a Meal Egg is opened. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hoppity Event stat text for Hitman Rabbits. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hoppity Collection highlighting for Resident and Hotspot Rabbits. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
+    + Highlights Resident/Hotspot Rabbits on your current island.
++ Added Resident and Hotspot Rabbit overview option to Hoppity Collection stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added Hitman slot tracking to display the most recent rabbits you obtained. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
+    + Displays slots with an active cooldown.
++ Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
++ Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
++ Added Hitman statistics to Chocolate Factory stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2991)
+    + Allows to view remaining time for full and 28 claimable slots.
++ Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
+    + Using it is not recommended.
 
 ### The Carnival
 
@@ -1095,6 +1113,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 </summary>
 
 + Highlights NPCs in the stranded menu that are placeable but haven't been placed. - walker
+
+</details>
+<details open><summary>
+
+## Combat
+
+</summary>
+
++ Added Ghost Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1753)
+    + Replaces the outdated and buggy Ghost Counter.
 
 </details>
 <details open><summary>
@@ -1344,7 +1372,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Quiver Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
     + Only shows the type of arrow when wearing a Skeleton Master Chestplate.
 + Low Quiver Reminder at the end of Dungeon/Kuudra run. - Empa (https://github.com/hannibal002/SkyHanni/pull/1190)
-+ party chat commands. - !nea (https://github.com/hannibal002/SkyHanni/pull/1433)
++ party chat commands. - nea (https://github.com/hannibal002/SkyHanni/pull/1433)
     + Added `!pt` (and aliases) as a command that allows others to transfer the party to themselves.
     + Added `!pw` (and aliases) as a command that allows others to request a warp.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)

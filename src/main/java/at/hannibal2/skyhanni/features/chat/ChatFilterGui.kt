@@ -29,9 +29,8 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
         result.actionReason?.let { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0
 
-    private val historySize by lazy {
+    private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
-    }
 
     override fun drawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         super.drawScreen(originalMouseX, originalMouseY, partialTicks)

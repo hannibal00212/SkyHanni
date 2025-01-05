@@ -35,6 +35,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun takeIfInitialized() = if (isFarPastOrFuture()) null else this
 
+    fun takeIfFuture() = if (isInFuture()) this else null
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
     override fun toString(): String = when (this) {
@@ -55,6 +57,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
         return localDateTime.format(formatter)
     }
+
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
 
     fun toMillis() = millis
 

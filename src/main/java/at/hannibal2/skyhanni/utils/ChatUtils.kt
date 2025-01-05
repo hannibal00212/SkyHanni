@@ -88,20 +88,30 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
         } else {
-            internalChat(message, replaceSameMessage)
+            internalChat(message, replaceSameMessage, onlySendOnce)
         }
     }
+
+    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
 
     private fun internalChat(
         message: String,
         replaceSameMessage: Boolean,
+        onlySendOnce: Boolean = false,
     ): Boolean {
         val text = ChatComponentText(message)
+        if (onlySendOnce) {
+            if (message in messagesThatAreOnlySentOnce) {
+                return false
+            }
+            messagesThatAreOnlySentOnce.add(message)
+        }
 
         return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
@@ -167,13 +177,16 @@ object ChatUtils {
         }
     }
 
-    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    private fun getUniqueMessageIdForString(string: String): Int {
+        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    }
 
-    var lastUniqueMessageId = 123242
+    private var lastUniqueMessageId = 123242
 
-    fun getUniqueMessageId() = lastUniqueMessageId++
+    private fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -310,14 +323,6 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
-    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
-    fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            debug("Sending wrong command to server? ($command)")
-        }
-        sendMessageToServer("/$command")
-    }
-
     fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
         it.isNotEmpty()
     }?.get(0) == commandWithSlash
@@ -370,4 +375,5 @@ object ChatUtils {
     val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
 
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
+
 }

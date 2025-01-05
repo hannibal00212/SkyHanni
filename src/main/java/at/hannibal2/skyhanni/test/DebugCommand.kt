@@ -23,7 +23,7 @@ object DebugCommand {
         }
         val list = mutableListOf<String>()
         list.add("```")
-        list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
+        list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} =")
         list.add("")
 
         val search = args.joinToString(" ")
@@ -45,7 +45,7 @@ object DebugCommand {
         profileName(event)
         profileType(event)
 
-        event.postAndCatch()
+        event.post()
 
         if (event.empty) {
             list.add("")

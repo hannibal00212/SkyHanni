@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -47,7 +47,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -60,7 +60,6 @@ import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 @SkyHanniModule
 object MinionFeatures {
@@ -75,21 +74,35 @@ object MinionFeatures {
     private var coinsPerDay = ""
 
     private val patternGroup = RepoPattern.group("minion")
+
+    /**
+     * REGEX-TEST: §aYou have upgraded your Minion to Tier V
+     */
     private val minionUpgradePattern by patternGroup.pattern(
         "chat.upgrade",
-        "§aYou have upgraded your Minion to Tier (?<tier>.*)"
+        "§aYou have upgraded your Minion to Tier (?<tier>.*)",
     )
+
+    /**
+     * REGEX-TEST: §aYou received §r§64 coins§r§a!
+     * REGEX-TEST: §aYou received §r§610.5 coins§r§a!
+     */
     private val minionCoinPattern by patternGroup.pattern(
         "chat.coin",
-        "§aYou received §r§6(.*) coins§r§a!"
+        "§aYou received §r§6.* coins§r§a!",
     )
+
+    /**
+     * REGEX-TEST: Redstone Minion IV
+     * REGEX-TEST: Chicken Minion XI
+     */
     private val minionTitlePattern by patternGroup.pattern(
         "title",
-        "Minion [^➜]"
+        "Minion [^➜]",
     )
     private val minionCollectItemPattern by patternGroup.pattern(
         "item.collect",
-        "^§aCollect All$"
+        "^§aCollect All$",
     )
 
     var lastMinion: LorenzVec? = null
@@ -143,8 +156,7 @@ object MinionFeatures {
         if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
-        val special = config.lastClickedMinion.color
-        val color = Color(SpecialColor.specialToChromaRGB(special), true)
+        val color = config.lastClickedMinion.color.toSpecialColor()
 
         val loc = lastMinion
         if (loc != null) {
@@ -156,7 +168,7 @@ object MinionFeatures {
                     true,
                     extraSize = -0.25,
                     extraSizeTopY = 0.2,
-                    extraSizeBottomY = 0.0
+                    extraSizeBottomY = 0.0,
                 )
             }
         }
@@ -169,12 +181,12 @@ object MinionFeatures {
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
                 return
             }
         }
 
-        MinionStorageOpenEvent(lastStorage, event.inventoryItems).postAndCatch()
+        MinionStorageOpenEvent(lastStorage, event.inventoryItems).post()
         minionStorageInventoryOpen = true
     }
 
@@ -182,11 +194,11 @@ object MinionFeatures {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
-            MinionOpenEvent(event.inventoryName, event.inventoryItems).postAndCatch()
+            MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         removeBuggedMinions()
         val minions = minions ?: return
@@ -198,7 +210,7 @@ object MinionFeatures {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
-                    lastClicked = 0
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
         } else {
@@ -259,10 +271,10 @@ object MinionFeatures {
             val location = lastMinion ?: return
 
             if (location !in minions) {
-                minions[location]?.lastClicked = 0
+                minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
-        MinionCloseEvent().postAndCatch()
+        MinionCloseEvent().post()
     }
 
     @SubscribeEvent
@@ -293,17 +305,17 @@ object MinionFeatures {
 
         val duration = minions?.get(loc)?.let {
             val lastClicked = it.lastClicked
-            if (lastClicked == 0L) {
+            if (lastClicked.isFarPast()) {
                 return "§cCan't calculate coins/day: No time data available!"
             }
-            System.currentTimeMillis() - lastClicked
+            SimpleTimeMark.now() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
         // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 
-        val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
+        val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
         return "§7Coins/day with ${stack.name}§7: §6$format coins"
@@ -325,7 +337,7 @@ object MinionFeatures {
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
-                it.lastClicked = System.currentTimeMillis()
+                it.lastClicked = SimpleTimeMark.now()
             }
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
@@ -337,8 +349,8 @@ object MinionFeatures {
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
             minions = minions?.editCopy {
                 this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
-                    displayName = newMinionName
-                    lastClicked = 0
+                    displayName = newMinionName.orEmpty()
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
             newMinion = null
@@ -375,9 +387,8 @@ object MinionFeatures {
                 event.drawString(location.up(0.65), name, true)
             }
 
-            if (config.emptiedTime.display && lastEmptied != 0L) {
-                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
-                val format = passedSince.format(longName = true) + " ago"
+            if (config.emptiedTime.display && !lastEmptied.isFarPast()) {
+                val format = lastEmptied.passedSince().format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.up(1.15), text, true)
             }
@@ -417,7 +428,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "minions.lastClickedMinionDisplay", "minions.lastClickedMinion.display")
         event.move(3, "minions.lastOpenedMinionColor", "minions.lastClickedMinion.color")

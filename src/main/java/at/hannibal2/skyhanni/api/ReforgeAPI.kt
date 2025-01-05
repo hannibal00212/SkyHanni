@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
@@ -20,7 +21,6 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ReforgeAPI {
@@ -151,7 +151,7 @@ object ReforgeAPI {
         override fun toString(): String = "Reforge $name"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val reforgeStoneData = event.readConstant<Map<String, NeuReforgeJson>>("reforgestones", reforgeGson).values
         val reforgeData = event.readConstant<Map<String, NeuReforgeJson>>("reforges", reforgeGson).values
