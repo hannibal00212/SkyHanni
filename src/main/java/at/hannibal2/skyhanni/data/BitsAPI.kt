@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -198,7 +200,7 @@ object BitsAPI {
         }
     }
 
-    private fun updateBits(amount: Int, modifyAvailable: Boolean = true) {
+    private fun updateBits(amount: Int) {
         val diff = amount - bits
         if (diff == 0) return
 
@@ -295,43 +297,44 @@ object BitsAPI {
             var foundFameRankStack = false
             var foundBitsStack = false
             var foundCookieStack = false
-            items@ for (item in stacks.values.reversed()) {
+            items@ for (item in stacks.values.toList().asReversed()) {
                 if (foundFameRankStack && foundBitsStack && foundCookieStack) return
                 if (!foundFameRankStack && fameRankGuiStackPattern.matches(item.displayName)) {
                     foundFameRankStack = true
                     lore@ for (line in item.getLore()) {
                         for (pattern in listOf(fameRankCommunityShopPattern, fameRankSbMenuPattern)) {
-                    pattern.matchMatcher(line) {
-                        val rank = group("rank")
+                            pattern.matchMatcher(line) {
+                                val rank = group("rank")
 
-                            currentFameRank = getFameRankByNameOrNull(rank)
-                                ?: return ErrorManager.logErrorWithData(
-                                    FameRankNotFoundException(rank),
-                                    "FameRank $rank not found",
-                                    "Rank" to rank,
-                                    "Lore" to item.getLore(),
-                                    "FameRanks" to FameRanks.fameRanks,
-                                )
+                                fameRank = FameRanks.getByName(rank)
+                                    ?: return ErrorManager.logErrorWithData(
+                                        FameRankNotFoundException(rank),
+                                        "FameRank $rank not found",
+                                        "Rank" to rank,
+                                        "Lore" to item.getLore(),
+                                        "FameRanks" to FameRanks.fameRanksMap,
+                                    )
 
-                            continue@lore
+                                continue@lore
+                            }
+
+                            fameRankSbMenuPattern.matchMatcher(line) {
+                                val rank = group("rank")
+
+                                fameRank = FameRanks.getByName(rank)
+                                    ?: return ErrorManager.logErrorWithData(
+                                        FameRankNotFoundException(rank),
+                                        "FameRank $rank not found",
+                                        "Rank" to rank,
+                                        "Lore" to item.getLore(),
+                                        "FameRanks" to FameRanks.fameRanksMap,
+                                    )
+
+                                continue@lore
+                            }
                         }
-
-                        fameRankSbMenuPattern.matchMatcher(line) {
-                            val rank = group("rank")
-
-                            currentFameRank = getFameRankByNameOrNull(rank)
-                                ?: return ErrorManager.logErrorWithData(
-                                    FameRankNotFoundException(rank),
-                                    "FameRank $rank not found",
-                                    "Rank" to rank,
-                                    "Lore" to item.getLore(),
-                                    "FameRanks" to FameRanks.fameRanks,
-                                )
-
-                            continue@lore
-                        }
+                        continue@items
                     }
-                    continue@items
                 }
                 if (!foundBitsStack && bitsStackPattern.matches(item.displayName)) {
                     foundBitsStack = true
@@ -342,7 +345,7 @@ object BitsAPI {
                         if (!foundBits) bitsPurseMenuPattern.findMatcher(line) {
                             foundBits = true
                             val amount = group("amount").formatInt()
-                            updateBits(amount, false)
+                            updateBits(amount)
 
                             continue@lore
                         }
@@ -388,7 +391,6 @@ object BitsAPI {
 
     private fun sendBitsSpentEvent(difference: Int) =
         BitsUpdateEvent.BitsSpent(bits, bitsAvailable, difference).post()
-
     private fun sendBitsAvailableGainedEvent() = BitsAvailableUpdateEvent(bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && profileStorage != null
