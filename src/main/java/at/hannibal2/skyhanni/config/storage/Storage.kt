@@ -17,11 +17,11 @@ class Storage {
     @Expose
     var savedMouseloweredSensitivity: Float = .5f
 
-    @Deprecated("")
+    @Deprecated("Moved into separate file")
     @Expose
     var knownFeatureToggles: Map<String, List<String>> = HashMap()
 
-    @Deprecated("")
+    @Deprecated("Moved into separate file")
     @Expose
     var modifiedWords: List<VisualWord> = ArrayList()
 
