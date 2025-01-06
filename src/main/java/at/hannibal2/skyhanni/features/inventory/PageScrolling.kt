@@ -62,7 +62,9 @@ object PageScrolling {
         if (inventoryName.isEmpty()) return
         if (illegalInventory.matches(inventoryName)) return
 
-        if (((ToolTipData.lastSlot != null) xor config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        if (ToolTipData.lastSlot != null) {
+            if (!(config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        }
 
         val dWheel = Mouse.getEventDWheel()
         if (dWheel == 0) return
