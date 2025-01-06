@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -46,7 +45,7 @@ object Year300RaffleEvent {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderRenderable(
             overlay ?: return,
-            posLabel = "300þ Anniversary Active Timer"
+            posLabel = "300þ Anniversary Active Timer",
         )
     }
 
@@ -69,8 +68,8 @@ object Year300RaffleEvent {
         overlay = Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(displayItem),
-                Renderable.string("§eTime Left: ${timeLeft.format()}")
-            )
+                Renderable.string("§eTime Left: ${timeLeft.format()}"),
+            ),
         )
     }
 }
