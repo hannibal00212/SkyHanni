@@ -792,7 +792,7 @@ object HoppityEventSummary {
     ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
         val currentValue = this.typeCountSnapshot.getByIndex(index)
         val previousValue = it.typeCountSnapshot.getByIndex(index)
-        val sinceValue = it.typeCountsSince.getByIndex(index)
+        val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
         val validData = previousValue != 0 && previousValue != currentValue
         Triple(
             if (validData) previousValue else 0,
