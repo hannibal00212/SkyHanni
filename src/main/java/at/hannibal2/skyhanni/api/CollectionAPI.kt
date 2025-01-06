@@ -122,6 +122,8 @@ object CollectionAPI {
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
     fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
 
+    fun NEUInternalName.getMultipleMap() = CollectionAPI.findAllMultiples()[this] ?: mapOf(this to 1)
+
     fun findAllMultiples(): Map<NEUInternalName, MutableMap<NEUInternalName, Int>> {
         val entries = mutableMapOf<NEUInternalName, MutableMap<NEUInternalName, Int>>()
         NEUItems.allInternalNames.values.filter {

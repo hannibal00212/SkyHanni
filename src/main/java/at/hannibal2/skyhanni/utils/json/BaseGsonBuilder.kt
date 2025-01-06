@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.gui.ShTrack
-import at.hannibal2.skyhanni.features.gui.ShTrack.TrackingElement
+import at.hannibal2.skyhanni.features.gui.shtrack.ShTrack
+import at.hannibal2.skyhanni.features.gui.shtrack.TrackingElement
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
