@@ -1,7 +1,8 @@
-package at.hannibal2.skyhanni.features.garden.farming.keybinds
+package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindLayout
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.farming.keybinds.KeyBindLayouts
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -35,10 +37,10 @@ object GardenCustomKeybinds {
 
     private var cropLayoutSelection: Map<CropType?, Map<KeyBinding, Int>> = emptyMap()
     private var cropInHand: CropType? = null
-    private var lastToolSwitch = SimpleTimeMark.Companion.farPast()
+    private var lastToolSwitch = SimpleTimeMark.farPast()
     private var currentLayout: Map<KeyBinding, Int>? = null
-    private var lastWindowOpenTime = SimpleTimeMark.Companion.farPast()
-    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.Companion.farPast()
+    private var lastWindowOpenTime = SimpleTimeMark.farPast()
+    private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
     private var isDuplicate = false
 
     @JvmStatic
@@ -60,7 +62,7 @@ object GardenCustomKeybinds {
         if (!isEnabled()) return
         val screen = Minecraft.getMinecraft().currentScreen ?: return
         if (screen !is GuiEditSign) return
-        lastWindowOpenTime = SimpleTimeMark.Companion.now()
+        lastWindowOpenTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -71,12 +73,12 @@ object GardenCustomKeybinds {
             "Duplicate Custom Keybinds aren't allowed!",
             GardenAPI.config::keyBind,
         )
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.Companion.now()
+        lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
     @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastToolSwitch = SimpleTimeMark.Companion.now()
+        lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
         currentLayout = cropLayoutSelection[cropInHand]
     }
@@ -130,7 +132,7 @@ object GardenCustomKeybinds {
         )
 
         calculateDuplicates()
-        lastDuplicateKeybindsWarnTime = SimpleTimeMark.Companion.farPast()
+        lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyBinding.unPressAllKeys()
 
         currentLayout = cropLayoutSelection[cropInHand]
