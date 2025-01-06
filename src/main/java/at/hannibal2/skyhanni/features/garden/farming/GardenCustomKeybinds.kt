@@ -119,16 +119,16 @@ object GardenCustomKeybinds {
         KeyBindLayouts.update()
 
         cropLayoutSelection = mapOf(
-            CropType.WHEAT to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.wheat.get().toString()).map,
-            CropType.CARROT to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.carrot.get().toString()).map,
-            CropType.POTATO to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.potato.get().toString()).map,
-            CropType.NETHER_WART to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.netherWart.get().toString()).map,
-            CropType.PUMPKIN to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.pumpkin.get().toString()).map,
-            CropType.MELON to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.melon.get().toString()).map,
-            CropType.COCOA_BEANS to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.cocoaBeans.get().toString()).map,
-            CropType.SUGAR_CANE to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.sugarCane.get().toString()).map,
-            CropType.CACTUS to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.cactus.get().toString()).map,
-            CropType.MUSHROOM to KeyBindLayouts.getLayoutByDisplayName(config.cropLayoutSelection.mushroom.get().toString()).map,
+            CropType.WHEAT to config.cropLayoutSelection.wheat.get().map,
+            CropType.CARROT to config.cropLayoutSelection.carrot.get().map,
+            CropType.POTATO to config.cropLayoutSelection.potato.get().map,
+            CropType.NETHER_WART to config.cropLayoutSelection.netherWart.get().map,
+            CropType.PUMPKIN to config.cropLayoutSelection.pumpkin.get().map,
+            CropType.MELON to config.cropLayoutSelection.melon.get().map,
+            CropType.COCOA_BEANS to config.cropLayoutSelection.cocoaBeans.get().map,
+            CropType.SUGAR_CANE to config.cropLayoutSelection.sugarCane.get().map,
+            CropType.CACTUS to config.cropLayoutSelection.cactus.get().map,
+            CropType.MUSHROOM to config.cropLayoutSelection.mushroom.get().map,
         )
 
         calculateDuplicates()

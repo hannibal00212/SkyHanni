@@ -42,14 +42,5 @@ enum class KeyBindLayouts(
         fun update() {
             entries.forEach { it.buildKeybindLayoutMap() }
         }
-
-        fun getLayoutByDisplayName(displayName: String): KeyBindLayouts {
-            val result = entries.find { it.displayName == displayName }
-//             if (result == null) {
-//                 TODO: Implement ErrorManager
-//                 ErrorManager.logErrorWithData("KeyBindLayouts.getLayoutByDisplayName: Layout not found: $displayName")
-//             }
-            return result ?: LAYOUT_1
-        }
     }
 }
