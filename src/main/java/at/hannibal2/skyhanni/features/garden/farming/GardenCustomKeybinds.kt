@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
@@ -35,9 +36,7 @@ object GardenCustomKeybinds {
     private val config get() = GardenAPI.config.keyBind
     val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
-    private var cropLayoutSelection: Map<CropType?, Map<KeyBinding, Int>> = emptyMap()
     private var cropInHand: CropType? = null
-    private var lastToolSwitch = SimpleTimeMark.farPast()
     private var currentLayout: Map<KeyBinding, Int>? = null
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
@@ -58,7 +57,7 @@ object GardenCustomKeybinds {
     }
 
     @SubscribeEvent
-    fun onTick(@Suppress("unused") event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         val screen = Minecraft.getMinecraft().currentScreen ?: return
         if (screen !is GuiEditSign) return
@@ -66,7 +65,7 @@ object GardenCustomKeybinds {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(@Suppress("unused") event: SecondPassedEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
         ChatUtils.chatAndOpenConfig(
@@ -78,19 +77,35 @@ object GardenCustomKeybinds {
 
     @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
-        currentLayout = cropLayoutSelection[cropInHand]
+        currentLayout = cropInHand?.getKebindLayoutMap()
     }
 
 //     TODO: remove the need for this workaround, as GardenAPI should call GardenToolChangeEvent on island change
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) {
-            DelayedRun.runDelayed(2.seconds) {
-                cropInHand = GardenAPI.cropInHand
-                currentLayout = cropLayoutSelection[cropInHand]
-            }
+//     @HandleEvent
+//     fun onIslandChange(event: IslandChangeEvent) {
+//         if (event.newIsland == IslandType.GARDEN) {
+//             DelayedRun.runDelayed(2.seconds) {
+//                 cropInHand = GardenAPI.cropInHand
+//                 currentLayout = cropInHand?.getKebindLayoutMap()
+//             }
+//         }
+//     }
+
+    private fun CropType.getKebindLayoutMap() = getKebindLayout().get().map
+
+    private fun CropType.getKebindLayout(): Property<KeyBindLayouts> = with(config.cropLayoutSelection) {
+        when (this@getKebindLayout) {
+            CropType.WHEAT -> wheat
+            CropType.CARROT -> carrot
+            CropType.POTATO -> potato
+            CropType.NETHER_WART -> netherWart
+            CropType.PUMPKIN -> pumpkin
+            CropType.MELON -> melon
+            CropType.COCOA_BEANS -> cocoaBeans
+            CropType.SUGAR_CANE -> sugarCane
+            CropType.CACTUS -> cactus
+            CropType.MUSHROOM -> mushroom
         }
     }
 
@@ -118,24 +133,11 @@ object GardenCustomKeybinds {
     private fun update() {
         KeyBindLayouts.update()
 
-        cropLayoutSelection = mapOf(
-            CropType.WHEAT to config.cropLayoutSelection.wheat.get().map,
-            CropType.CARROT to config.cropLayoutSelection.carrot.get().map,
-            CropType.POTATO to config.cropLayoutSelection.potato.get().map,
-            CropType.NETHER_WART to config.cropLayoutSelection.netherWart.get().map,
-            CropType.PUMPKIN to config.cropLayoutSelection.pumpkin.get().map,
-            CropType.MELON to config.cropLayoutSelection.melon.get().map,
-            CropType.COCOA_BEANS to config.cropLayoutSelection.cocoaBeans.get().map,
-            CropType.SUGAR_CANE to config.cropLayoutSelection.sugarCane.get().map,
-            CropType.CACTUS to config.cropLayoutSelection.cactus.get().map,
-            CropType.MUSHROOM to config.cropLayoutSelection.mushroom.get().map,
-        )
-
         calculateDuplicates()
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.farPast()
         KeyBinding.unPressAllKeys()
 
-        currentLayout = cropLayoutSelection[cropInHand]
+        currentLayout = cropInHand?.getKebindLayoutMap()
     }
 
     private fun isDuplicateInLayout(layout: Map<KeyBinding, Int>) =
