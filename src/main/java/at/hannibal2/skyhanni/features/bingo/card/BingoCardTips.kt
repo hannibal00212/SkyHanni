@@ -26,19 +26,27 @@ object BingoCardTips {
     private val patternGroup = RepoPattern.group("bingo.card.tips")
     private val inventoryPattern by patternGroup.pattern(
         "card",
-        "Bingo Card"
+        "Bingo Card",
     )
+
+    /**
+     * REGEX-TEST: §7Reward
+     */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "§.§.§7Reward"
+        "(§.)+Reward",
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "§.§.§7Contribution Rewards.*"
+        "(§.)+Contribution Rewards.*",
     )
+
+    /**
+     * REGEX-TEST: §eRow #4
+     */
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "§o§.Row #.*"
+        "(§.)+Row #.*",
     )
 
     @SubscribeEvent
@@ -71,7 +79,7 @@ object BingoCardTips {
                 "BingoCardTips reward line not found",
                 "goal displayName" to goal.displayName,
                 "slot slotNumber" to slot.slotNumber,
-                "toolTip" to toolTip
+                "toolTip" to toolTip,
             )
             return
         }
