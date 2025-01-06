@@ -28,7 +28,7 @@ object RngMeterInventory {
      */
     private val floorPattern by RepoPattern.pattern(
         "rngmeterinventory.floor.name",
-        "(§.)*Catacombs \\((?<floor>.*)\\)",
+        "(?:§.)*Catacombs \\((?<floor>.*)\\)",
     )
 
     @HandleEvent
