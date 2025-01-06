@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
@@ -43,7 +42,7 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "@MOD_VERSION@",
+    version = SkyHanniMod.VERSION,
 )
 class SkyHanniMod {
 
@@ -107,15 +106,10 @@ class SkyHanniMod {
 
     companion object {
 
-        const val MODID = "skyhanni"
+        const val MODID: String = "skyhanni"
+        const val VERSION: String = "@MOD_VERSION@"
 
-        val modVersion: ModVersion by lazy {
-            ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
-        }
-
-        @JvmStatic
-        val version: String
-            get() = modVersion.asString
+        val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
         val isBetaVersion: Boolean
             get() = modVersion.isBeta

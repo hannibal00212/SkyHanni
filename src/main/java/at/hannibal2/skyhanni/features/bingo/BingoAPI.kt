@@ -32,6 +32,9 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
+    /**
+     * REGEX-TEST:  §9Ⓑ §9Bingo
+     */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
         " §.Ⓑ §.Bingo"
