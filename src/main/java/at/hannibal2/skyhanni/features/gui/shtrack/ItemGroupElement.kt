@@ -43,14 +43,10 @@ class ItemGroupElement(
         }
     }
 
-    override fun generateLine() = listOf(
-        Renderable.itemStack(group.icon.getItemStack()),
-        Renderable.string(group.name),
-        Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
-    )
+    override val icon: Renderable get() = Renderable.itemStack(group.icon.getItemStack())
 
     override fun itemChange(item: PrimitiveItemStack) {
         val multiple = group.items[item.internalName] ?: throw IllegalStateException("You should not be here!")
-        update(item.amount * multiple)
+        update((item.amount * multiple).toLong())
     }
 }

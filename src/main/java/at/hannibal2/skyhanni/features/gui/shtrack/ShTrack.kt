@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ProfileLeaveEvent
@@ -65,6 +66,10 @@ object ShTrack {
     }
 
     val arguments = listOf<CommandArgument<ContextObject>>(
+        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
+            c.shouldSave = true
+            0
+        },
         CommandArgument(
             "<> - Sets the tracking type to items",
             "-i",
@@ -148,8 +153,12 @@ object ShTrack {
             c.multiItem = true
             0
         },
-        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
-            c.shouldSave = true
+        CommandArgument("<> - Removes the percent value", "-np") { _, c ->
+            c.showPercent = false
+            0
+        },
+        CommandArgument("<> - Removes the gain value", "-ng") { _, c ->
+            c.showGain = false
             0
         },
     )
@@ -167,6 +176,8 @@ object ShTrack {
         var notify = false
         var multiItem = false
         var shouldSave = false
+        var showPercent = true
+        var showGain = true
 
         var state: StateType? = null
             set(value) {
@@ -295,6 +306,8 @@ object ShTrack {
             result.shouldNotify = notify
             result.shouldAutoDelete = autoDelete
             result.shouldSave = shouldSave
+            result.showPercent = showPercent
+            result.showGain = showGain
             result.line = result.generateLine()
             val tracker = tracker ?: run {
                 errorMessage = NullPointerException("tracker").message
@@ -416,6 +429,14 @@ object ShTrack {
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         tracker?.activate()
+    }
+
+    @HandleEvent
+    fun onHypixelJoin(event: HypixelJoinEvent) {
+        // Clear out values that where loaded via gson
+        ProfileStorageData.playerSpecific?.profiles?.forEach { (_, profile) ->
+            profile.tracking.deactivate()
+        }
     }
 
     @SubscribeEvent

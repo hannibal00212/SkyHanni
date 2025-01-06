@@ -4,7 +4,7 @@ import java.util.function.Predicate
 
 class TrackingList : ArrayList<TrackingElement<*>>(), MutableList<TrackingElement<*>> {
 
-    var isActive = false
+    var isActive = true
 
     fun activate() {
         if (isActive) return

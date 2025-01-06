@@ -36,18 +36,14 @@ class ItemTrackingElement(
     override fun internalUpdate(amount: Number) {
         current += amount.toLong()
         if (target != null && current >= target) {
-            handleDone("$name §adone")
+            handleDone()
         }
     }
 
-    override fun generateLine() = listOf(
-        Renderable.itemStack(item.getItemStack()),
-        Renderable.string(item.itemName),
-        Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
-    )
+    override val icon: Renderable get() = Renderable.itemStack(item.getItemStack())
 
     override fun itemChange(item: PrimitiveItemStack) {
-        update(item.amount)
+        update(item.amount.toLong())
     }
 
     companion object {

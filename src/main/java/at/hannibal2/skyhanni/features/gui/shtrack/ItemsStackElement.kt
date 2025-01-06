@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
@@ -46,20 +47,17 @@ class ItemsStackElement(
     override fun internalUpdate(amount: Number) {
         current += amount.toLong()
         if (target != null && mappedCurrent >= target) {
-            handleDone("$name §adone")
+            handleDone()
         }
     }
 
-    override fun generateLine() = listOf(
-        Renderable.itemStack(main.getItemStack()),
-        Renderable.string(main.itemName),
-
-        Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }).orEmpty())),
-    )
+    override val icon get() = Renderable.itemStack(main.getItemStack())
+    override val percentText get() = if (showPercent && target != null) mappedCurrent.percentWithColorCode(target, 1) else ""
+    override val amount get() = Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }).orEmpty()))
 
     override fun itemChange(item: PrimitiveItemStack) {
         val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")
-        update(item.amount * multiple)
+        update((item.amount * multiple).toLong())
     }
 
     companion object {

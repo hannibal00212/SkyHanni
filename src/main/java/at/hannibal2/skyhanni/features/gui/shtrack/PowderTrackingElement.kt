@@ -13,15 +13,11 @@ class PowderTrackingElement(val type: HotmAPI.PowderType, override var current: 
     override fun internalUpdate(amount: Number) {
         current += amount.toLong()
         if (target != null && current >= target) {
-            handleDone("${type.displayName} §adone")
+            handleDone()
         }
     }
 
-    override fun generateLine() = listOf(
-        Renderable.itemStack(type.icon),
-        Renderable.string(type.displayName),
-        Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty())),
-    )
+    override val icon: Renderable get() = Renderable.itemStack(type.icon)
 
     override fun similarElement(other: TrackingElement<*>): Boolean {
         if (other !is PowderTrackingElement) return false
