@@ -110,7 +110,7 @@ object GardenCustomKeybinds {
     }
 
     @HandleEvent
-    fun onConfigLoad(@Suppress("unused") event: ConfigLoadEvent) {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         val allKeybindings = KeyBindLayouts.entries.flatMap { it.layout.allKeybindingFields }
 
         ConditionalUtils.onToggle(
