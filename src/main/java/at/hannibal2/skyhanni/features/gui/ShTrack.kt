@@ -306,6 +306,10 @@ object ShTrack {
             result.shouldAutoDelete = autoDelete
             result.shouldSave = shouldSave
             result.line = result.generateLine()
+            val tracker = tracker ?: run {
+                errorMessage = NullPointerException("tracker").message
+                return
+            }
             if (!allowDupe) {
                 val index = tracker.indexOfFirst { result.similarElement(it) }
                 if (index != -1) {
@@ -329,7 +333,7 @@ object ShTrack {
         }
     }
 
-    private val tracker get() = ProfileStorageData.profileSpecific!!.tracking
+    private val tracker get() = ProfileStorageData.profileSpecific?.tracking
 
     class TrackingList : ArrayList<TrackingElement<*>>(), MutableList<TrackingElement<*>> {
 
@@ -466,13 +470,12 @@ object ShTrack {
             reader.endObject()
 
             try {
-                val tracker: TrackingElement<*> =
-                    when (map["type"]?.asString) {
-                        PowderTrackingElement::class.simpleName -> PowderTrackingElement.fromJson(map)
-                        ItemsStackElement::class.simpleName -> ItemsStackElement.fromJson(map)
-                        ItemTrackingElement::class.simpleName -> ItemTrackingElement.fromJson(map)
-                        else -> return null
-                    }
+                val tracker: TrackingElement<*> = when (map["type"]?.asString) {
+                    PowderTrackingElement::class.simpleName -> PowderTrackingElement.fromJson(map)
+                    ItemsStackElement::class.simpleName -> ItemsStackElement.fromJson(map)
+                    ItemTrackingElement::class.simpleName -> ItemTrackingElement.fromJson(map)
+                    else -> return null
+                }
                 tracker.applyMetaOptions(map)
                 return tracker
             } catch (e: Throwable) {
@@ -494,32 +497,29 @@ object ShTrack {
 
     @HandleEvent
     fun onProfileLeave(event: ProfileLeaveEvent) {
-        if (ProfileStorageData.profileSpecific != null) {
-            tracker.deactivate()
-        }
+        tracker?.deactivate()
     }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        if (ProfileStorageData.profileSpecific != null) {
-            tracker.activate()
-        }
+        tracker?.activate()
     }
 
     @SubscribeEvent
     fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (scheduledUpdate) {
+        val tracker = tracker
+        if (scheduledUpdate && tracker != null) {
             display = Renderable.verticalEditTable(
                 tracker.map { it.line },
                 onHover = {
                     if (!hasGrab) {
-                        val tracker = tracker[it]
+                        val track = tracker[it]
                         RenderableTooltips.setTooltipForRender(
-                            tracker.generateHover().map { i -> Renderable.string(i) },
+                            track.generateHover().map { i -> Renderable.string(i) },
                             spacedTitle = true,
                         )
-                        tracker.handleUserInput()
+                        track.handleUserInput()
                     }
                 },
                 onStartGrab = { hasGrab = true },
@@ -780,8 +780,7 @@ object ShTrack {
             fun fromJson(read: Map<String, JsonElement>): PowderTrackingElement =
                 PowderTrackingElement(extractType(read), read["current"]?.asLong ?: 0, read["target"]?.asLong)
 
-            private fun extractType(read: Map<String, JsonElement>) =
-                HotmAPI.PowderType.getValue(read["name"]!!.asString)!!
+            private fun extractType(read: Map<String, JsonElement>) = HotmAPI.PowderType.getValue(read["name"]!!.asString)!!
         }
 
     }
@@ -821,7 +820,11 @@ object ShTrack {
         }
 
         fun delete() {
-            tracker.remove(this)
+            tracker?.remove(this) ?: ErrorManager.logErrorStateWithData(
+                "Could not delete tracker element.",
+                "Tracker is null",
+                "element" to this,
+            )
         }
 
         protected abstract fun internalUpdate(amount: Number)
