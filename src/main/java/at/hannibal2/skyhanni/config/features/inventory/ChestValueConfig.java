@@ -48,7 +48,7 @@ public class ChestValueConfig {
     public int nameLength = 100;
 
     @Expose
-    @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is, when you hover over it in the display.")
+    @ConfigOption(name = "Highlight Slot", desc = "Highlight slot where the item is when you hover over it in the display.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enableHighlight = true;
