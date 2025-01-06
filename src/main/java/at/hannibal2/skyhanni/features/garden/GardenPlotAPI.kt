@@ -388,7 +388,7 @@ object GardenPlotAPI {
                     else -> "${seconds}s"
                 }
 
-                val newSpray = SprayType.getByName(sprayName)
+                val newSpray: SprayType? = SprayType.getByName(sprayName)
 
                 if (plot.currentSpray != null) {
                     val expectedExpireTime = SimpleTimeMark.now() + time
