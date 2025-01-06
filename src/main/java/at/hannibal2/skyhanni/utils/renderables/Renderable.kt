@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
@@ -438,6 +439,29 @@ interface Renderable {
             val inverseScale = 1 / scale
 
             override fun render(posX: Int, posY: Int) {
+                RenderableUtils.renderString(text, scale, color, inverseScale)
+            }
+        }
+
+        /** Does hide itself if [deathTime] is reached, does still exist but does not show anything anymore*/
+        fun tempString(
+            deathTime: SimpleTimeMark,
+            text: String,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+        ) = object : Renderable {
+
+            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+            override val height = (9 * scale).toInt() + 1
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val inverseScale = 1 / scale
+
+            override fun render(posX: Int, posY: Int) {
+                if (deathTime.isInPast()) return
                 RenderableUtils.renderString(text, scale, color, inverseScale)
             }
         }
