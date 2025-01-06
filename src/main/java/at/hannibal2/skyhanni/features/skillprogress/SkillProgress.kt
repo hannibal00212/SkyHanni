@@ -63,7 +63,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (showDisplay) {
@@ -81,7 +81,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
@@ -145,7 +145,7 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         allDisplay = formatAllDisplay(drawAllDisplay())
@@ -159,7 +159,7 @@ object SkillProgress {
 
     @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
@@ -220,7 +220,7 @@ object SkillProgress {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar || !isEnabled()) return
+        if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
@@ -463,18 +463,26 @@ object SkillProgress {
                     }
 
                     if (config.showActionLeft.get() && percent != 100f) {
-                        append(" - ")
-                        val gain = skill.lastGain.formatDouble()
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
-                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                            append("§6$actionLeft Left")
-                        } else {
-                            append("§6∞ Left")
-                        }
+                        append(" - " + addActionsLeft(skill, currentXpMax, currentXp))
                     }
                 },
             ),
         )
+    }
+
+    private fun addActionsLeft(
+        skill: SkillAPI.SkillInfo,
+        currentXpMax: Long,
+        currentXp: Long,
+    ): String {
+        if (skill.lastGain != "") {
+            val gain = skill.lastGain.formatDouble()
+            val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
+            if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                return "§6$actionLeft Left"
+            }
+        }
+        return "§6∞ Left"
     }
 
     private fun updateSkillInfo() {
@@ -524,5 +532,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isDisplayEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 }

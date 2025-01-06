@@ -103,7 +103,7 @@ object FarmingFortuneDisplay {
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
 
-    private val ZORROS_CAPE by lazy { "ZORROS_CAPE".toInternalName() }
+    private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
     @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {

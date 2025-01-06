@@ -489,4 +489,8 @@ object CollectionUtils {
     fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
         if (index < size) add(index, element) else add(element)
     }
+
+    fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
+        this[pair.first] = pair.second
+    }
 }

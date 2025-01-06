@@ -50,7 +50,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         var shouldHighlight = config.highlight
-        if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
             val seaCreaturesBosses =
                 BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
             if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {

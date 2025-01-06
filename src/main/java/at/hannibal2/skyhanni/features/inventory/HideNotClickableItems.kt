@@ -85,7 +85,7 @@ object HideNotClickableItems {
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
 
-    private val netherWart by lazy { "NETHER_STALK".toInternalName() }
+    private val netherWart = "NETHER_STALK".toInternalName()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -261,18 +261,10 @@ object HideNotClickableItems {
         if (chestName != "Rift Transfer Chest") return false
 
         showGreenLine = true
-        val riftTransferable = stack.isRiftTransferable() ?: return true
-        if (riftTransferable) {
-            return false
-        }
-        if (RiftAPI.inRift()) {
-            val riftExportable = stack.isRiftExportable() ?: return true
-            if (riftExportable) {
-                return false
-            }
-        }
 
-        hideReason = "Not Rift-Transferable!"
+        if (stack.isRiftTransferable() || stack.isRiftExportable()) return false
+
+        hideReason = "Not Rift-Transferable or Rift-Exportable!"
         return true
     }
 
