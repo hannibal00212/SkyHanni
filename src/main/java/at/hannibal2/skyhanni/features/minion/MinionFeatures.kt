@@ -177,7 +177,15 @@ object MinionFeatures {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!minionTitlePattern.find(event.inventoryName)) return
+        if (!minionTitlePattern.find(event.inventoryName)) {
+            // This should never happen, but somehow it still does. Therefore the workaround
+            if (minionInventoryOpen) {
+                minionInventoryOpen = false
+                MinionCloseEvent().post()
+                ChatUtils.debug("Detected unexpected minion menu closing. please report in discord what you have done between the last minion open and now, exactly.")
+            }
+            return
+        }
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
