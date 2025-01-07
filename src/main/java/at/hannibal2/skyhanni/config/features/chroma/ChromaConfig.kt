@@ -53,13 +53,8 @@ class ChromaConfig {
         // Constructor if new enum elements are added post-migration
         constructor(str: String) : this(str, -1)
 
-        override fun getLegacyId(): Int {
-            return legacyId
-        }
-
-        override fun toString(): String {
-            return str
-        }
+        override fun getLegacyId() = legacyId
+        override fun toString() = str
     }
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all chroma settings to the default.")
