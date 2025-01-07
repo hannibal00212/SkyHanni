@@ -229,7 +229,7 @@ public class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(
         name = "§6CF §zParty Mode",
-        desc = "Don't turn this on.\n§cRequires Chroma to be enabled to fully function."
+        desc = "Don't turn this on.\n§cRequires SkyHanni Chroma to be enabled to fully function."
     )
     @ConfigEditorBoolean
     public Property<Boolean> partyMode = Property.of(false);
