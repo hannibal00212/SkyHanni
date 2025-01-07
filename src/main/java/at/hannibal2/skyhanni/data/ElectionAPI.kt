@@ -101,6 +101,7 @@ object ElectionAPI {
     private val dispatcher = Dispatchers.IO
 
     var rawMayorData: MayorJson? = null
+        private set
     private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
