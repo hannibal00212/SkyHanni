@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -182,7 +183,11 @@ object MinionFeatures {
             if (minionInventoryOpen) {
                 minionInventoryOpen = false
                 MinionCloseEvent().post()
-                ChatUtils.debug("Detected unexpected minion menu closing. please report in discord what you have done between the last minion open and now, exactly.")
+                ErrorManager.logErrorStateWithData(
+                    "Detected unexpected minion menu closing",
+                    "minionInventoryOpen = true without minion title in InventoryFullyOpenedEvent()",
+                    betaOnly = true,
+                )
             }
             return
         }
