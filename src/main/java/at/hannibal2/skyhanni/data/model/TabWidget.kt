@@ -482,5 +482,11 @@ enum class TabWidget(
                 it.postClearEvent()
             }
         }
+
+        fun forceUpdateWidget(widget: TabWidget) {
+            if (widget.isActive) {
+                widget.postClearEvent()
+            }
+        }
     }
 }
