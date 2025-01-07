@@ -54,7 +54,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -452,11 +451,6 @@ object Commands {
             description = "Shows the status of all the mods constants"
             category = CommandCategory.USERS_BUG_FIX
             callback { SkyHanniMod.repo.displayRepoStatus(false) }
-        }
-        event.register("shkingfix") {
-            description = "Resets the local King Talisman Helper offset."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { KingTalismanHelper.kingFix() }
         }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."

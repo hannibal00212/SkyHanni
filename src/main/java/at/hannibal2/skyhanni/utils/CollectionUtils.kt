@@ -490,6 +490,20 @@ object CollectionUtils {
         if (index < size) add(index, element) else add(element)
     }
 
+    /**
+     * If there is only one element in the iterator, returns it. Otherwise, returns the [defaultValue].
+     */
+    fun <T> getOnlyElement(it: Iterator<T>, defaultValue: T): T {
+        if (!it.hasNext()) return defaultValue
+        val ret = it.next()
+        if (it.hasNext()) return defaultValue
+        return ret
+    }
+
+    fun <T> getOnlyElement(it: Iterable<T>, defaultValue: T): T {
+        return getOnlyElement(it.iterator(), defaultValue)
+    }
+
     fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
         this[pair.first] = pair.second
     }
