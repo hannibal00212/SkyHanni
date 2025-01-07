@@ -213,9 +213,9 @@ object CustomScoreboard {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
 
-        activePatterns = ScoreboardConfigElement.getElements()
-            .filter(ScoreboardElement::showIsland)
-            .flatMap(ScoreboardElement::elementPatterns)
+        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
+            .filter { it.showIsland() }
+            .flatMap { it.elementPatterns }
             .distinct()
     }
 
