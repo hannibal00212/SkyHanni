@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.update
 
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import moe.nea.libautoupdate.GithubReleaseUpdateData
@@ -10,6 +11,14 @@ import moe.nea.libautoupdate.UpdateData
  * This class is a custom implementation of the [GithubReleaseUpdateSource] that filters assets based on the mod's version.
  */
 class CustomGithubReleaseUpdateSource(owner: String, repository: String) : GithubReleaseUpdateSource(owner, repository) {
+
+    override fun selectUpdate(updateStream: String, releases: MutableList<GithubRelease>): UpdateData? {
+        return when (updateStream) {
+            "pre" -> findLatestRelease(releases.filter { !it.isDraft && !ModVersion.fromString(it.tagName).isBackport })
+            "full" -> findLatestRelease(releases.filter { !it.isDraft && !it.isPrerelease })
+            else -> null
+        }
+    }
 
     override fun findAsset(release: GithubRelease?): UpdateData? {
         release ?: return null
