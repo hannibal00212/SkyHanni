@@ -25,8 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-
-//#if MC<1.12
+//#if MC < 1.12
 import net.minecraft.world.WorldSettings
 //#else
 //$$ import net.minecraft.world.GameType
@@ -120,7 +119,7 @@ object TabListData {
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
                 //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o2.gameType != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(

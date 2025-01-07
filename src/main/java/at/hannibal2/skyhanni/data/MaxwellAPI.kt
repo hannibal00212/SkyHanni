@@ -335,7 +335,7 @@ object MaxwellAPI {
     private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && storage != null
 
     // Load powers from repo
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<MaxwellPowersJson>("MaxwellPowers")
         powers = data.powers

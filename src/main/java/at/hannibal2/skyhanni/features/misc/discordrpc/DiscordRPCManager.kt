@@ -120,7 +120,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }

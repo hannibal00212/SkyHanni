@@ -90,7 +90,7 @@ object DojoRankDisplay {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<BeltsJson>("Belts")
         belts = data.belts

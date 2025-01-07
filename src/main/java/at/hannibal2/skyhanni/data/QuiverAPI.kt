@@ -303,7 +303,7 @@ object QuiverAPI {
     }
 
     // Load arrows from repo
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.toInternalName()) }

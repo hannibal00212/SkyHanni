@@ -169,7 +169,7 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas

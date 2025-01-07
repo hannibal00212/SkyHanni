@@ -125,7 +125,7 @@ object FishingAPI {
         holdingWaterRod = event.newItem.isWaterRod()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods

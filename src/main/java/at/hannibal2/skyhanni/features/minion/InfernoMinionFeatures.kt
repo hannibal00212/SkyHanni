@@ -32,7 +32,7 @@ object InfernoMinionFeatures {
     private var fuelItemIds = listOf<NEUInternalName>()
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
         fuelItemIds = data.minionFuels

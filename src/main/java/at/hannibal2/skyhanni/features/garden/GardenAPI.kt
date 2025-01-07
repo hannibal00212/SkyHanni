@@ -262,7 +262,7 @@ object GardenAPI {
         return tier
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp

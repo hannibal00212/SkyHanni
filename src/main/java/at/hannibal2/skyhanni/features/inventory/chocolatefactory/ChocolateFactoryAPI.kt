@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -148,7 +147,7 @@ object ChocolateFactoryAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 

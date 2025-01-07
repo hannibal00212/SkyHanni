@@ -71,7 +71,7 @@ object RiftBloodEffigies {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
         if (newLocations.size != 6) {

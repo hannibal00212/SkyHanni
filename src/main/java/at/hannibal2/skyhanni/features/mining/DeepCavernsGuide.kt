@@ -63,7 +63,7 @@ object DeepCavernsGuide {
         show = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("DeepCavernsParkour")
         parkourHelper = ParkourHelper(

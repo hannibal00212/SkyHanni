@@ -162,7 +162,7 @@ object HoppityEventSummary {
 
     private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedHoppityIslands = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").apiEggLocations.keys.toSet()
     }

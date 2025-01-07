@@ -548,7 +548,7 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         organicMatter = data.organicMatter

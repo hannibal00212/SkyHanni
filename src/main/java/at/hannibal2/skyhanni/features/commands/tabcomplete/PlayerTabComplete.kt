@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
 import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerTabComplete {
@@ -105,7 +104,7 @@ object PlayerTabComplete {
         it.isNotEmpty()
     }?.distinct()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<VipVisitsJson>("VipVisits")
         vipVisits = data.vipVisits

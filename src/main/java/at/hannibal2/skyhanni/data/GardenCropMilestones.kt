@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestones {
@@ -193,7 +192,7 @@ object GardenCropMilestones {
         return (progress - startCrops).toDouble() / (end - startCrops)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }
