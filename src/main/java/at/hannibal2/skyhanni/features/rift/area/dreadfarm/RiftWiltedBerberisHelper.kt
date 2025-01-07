@@ -224,12 +224,12 @@ object RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), config.highlightColor.toSpecialColor(), 0.7f)
+                    event.drawBox(location, config.highlightColor.toSpecialColor(), 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
-                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.WHITE, 0.5f)
+                    event.drawBox(location, Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawFilledBoundingBoxNea(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
+                        event.drawBox(it, Color.LIGHT_GRAY, 0.2f)
                         event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
                     }
                 }
@@ -245,8 +245,8 @@ object RiftWiltedBerberisHelper {
 
         berberisList.take(config.previewCount + 1).forEachIndexed { i, loc ->
             // box it with half the opacity of the previous box, first in list is highlighted
-            if (i == 0) event.drawFilledBoundingBoxNea(axisAlignedBB(loc), config.highlightColor.toSpecialColor(), alpha)
-            else event.drawFilledBoundingBoxNea(axisAlignedBB(loc), Color.WHITE, alpha)
+            if (i == 0) event.drawBox(loc, config.highlightColor.toSpecialColor(), alpha)
+            else event.drawBox(loc, Color.WHITE, alpha)
             alpha *= 0.6f
 
             // if there's a previous berberis, draw a line to it. The line from the 2nd to the 1st should be highlighted
@@ -276,6 +276,10 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
+
+    private fun LorenzRenderWorldEvent.drawBox(location: LorenzVec, color: Color, alphaMultiplier: Float) {
+        drawFilledBoundingBoxNea(axisAlignedBB(location), color, alphaMultiplier)
+    }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
 
