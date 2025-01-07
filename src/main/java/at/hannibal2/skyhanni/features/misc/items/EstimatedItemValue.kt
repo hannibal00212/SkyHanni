@@ -133,7 +133,7 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }

@@ -194,13 +194,13 @@ object HoppityEventSummary {
         if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()

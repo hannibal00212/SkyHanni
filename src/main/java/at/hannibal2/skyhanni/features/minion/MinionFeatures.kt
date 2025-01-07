@@ -174,8 +174,8 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
         if (!minionTitlePattern.find(event.inventoryName)) return
 
@@ -190,7 +190,7 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
@@ -254,7 +254,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.reopenSameName) return
 

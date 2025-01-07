@@ -126,8 +126,8 @@ object ChocolateFactoryAPI {
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {

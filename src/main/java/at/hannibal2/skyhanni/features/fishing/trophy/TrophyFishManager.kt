@@ -92,8 +92,8 @@ object TrophyFishManager {
     }
 
     // Fetch when talking with Odger
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Trophy Fishing") return
 
         val savedFishes = fish ?: return

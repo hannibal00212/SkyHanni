@@ -113,7 +113,7 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return

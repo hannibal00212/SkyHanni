@@ -33,7 +33,7 @@ object AuctionHousePriceComparison {
     private var worstPrice = 0L
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inInventory = event.inventoryName.startsWith("Auctions")
         if (!inInventory) return
@@ -56,7 +56,7 @@ object AuctionHousePriceComparison {
         this.slotPriceMap = map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

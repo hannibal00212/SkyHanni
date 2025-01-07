@@ -31,8 +31,8 @@ object GuardianReminder {
     private var lastInventoryOpen = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onInventory(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Experimentation Table") return
         lastInventoryOpen = SimpleTimeMark.now()

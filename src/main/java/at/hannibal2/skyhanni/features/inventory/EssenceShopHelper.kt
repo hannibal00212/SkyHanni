@@ -135,7 +135,7 @@ object EssenceShopHelper {
         }.toMutableList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEssenceType = ""
@@ -144,12 +144,12 @@ object EssenceShopHelper {
         essenceNeeded = 0
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         processInventoryEvent(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         processInventoryEvent(event)
     }

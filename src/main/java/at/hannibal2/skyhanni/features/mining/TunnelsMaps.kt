@@ -158,7 +158,7 @@ object TunnelsMaps {
 
     private var isCommission = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         clickTranslate = mapOf()
@@ -198,7 +198,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clickTranslate = mapOf()
     }

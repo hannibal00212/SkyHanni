@@ -94,7 +94,7 @@ object GardenAPI {
         checkItemInHand()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()

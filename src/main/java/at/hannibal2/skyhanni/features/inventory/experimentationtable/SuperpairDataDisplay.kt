@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -46,7 +47,7 @@ object SuperpairDataDisplay {
     private var uncoveredItems = mapOf<Int, SuperpairItem>()
     private val found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = emptyList()
 
