@@ -368,7 +368,7 @@ object SkillAPI {
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXp, defaultSkillCap[skillType.lowercaseName] ?: 60)
 
-        if (skillInfo.overflowLevel > 60 && currentLevel == skillInfo.overflowLevel + 1) {
+        if (skillInfo.overflowLevel > skillType.maxLevel && currentLevel == skillInfo.overflowLevel + 1) {
             SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, currentLevel).post()
         }
 
