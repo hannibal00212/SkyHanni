@@ -10,7 +10,8 @@ import org.lwjgl.input.Keyboard
 class BetterWikiCommandConfig {
     @Expose
     @ConfigOption(
-        name = "Enabled", desc = "Improve the functionality of the /wiki command. " +
+        name = "Enabled",
+        desc = "Improve the functionality of the /wiki command. " +
             "This is required for all of the below features."
     )
     @ConfigEditorBoolean
