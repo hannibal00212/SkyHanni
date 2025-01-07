@@ -9,6 +9,9 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -118,4 +121,28 @@ object CollectionAPI {
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
     fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
+
+    fun NEUInternalName.getMultipleMap() = CollectionAPI.findAllMultiples()[this] ?: mapOf(this to 1)
+
+    fun findAllMultiples(): Map<NEUInternalName, MutableMap<NEUInternalName, Int>> {
+        val entries = mutableMapOf<NEUInternalName, MutableMap<NEUInternalName, Int>>()
+        NEUItems.allInternalNames.values.filter {
+            it.getItemStackOrNull()?.getItemCategoryOrNull()?.let {
+                ItemCategory.nonGear.contains(it)
+            } == true
+        }.map {
+            it!! to NEUItems.getPrimitiveMultiplier(it)
+        }.forEach {
+            entries.compute(it.second.internalName) { _, v ->
+                val pair = it.first to it.second.amount
+                if (v == null) {
+                    mutableMapOf(pair)
+                } else {
+                    v.put(pair)
+                    v
+                }
+            }
+        }
+        return entries.filter { it.value.size > 1 }
+    }
 }

@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -492,6 +493,27 @@ object SkyHanniDebugsAndTests {
     @SubscribeEvent
     @Suppress("EmptyFunctionBlock")
     fun onChat(event: LorenzChatEvent) {
+    }
+
+    val test by lazy {
+        Renderable.verticalEditTable(
+            listOf(
+                listOf(Renderable.string("Help"), Renderable.string("Me")),
+                listOf(Renderable.string("Not"), Renderable.placeholder(0, 15)),
+                listOf(Renderable.string("I'm Fine"), Renderable.string("And You")),
+            ),
+            onStartGrab = { ChatUtils.chat("Clicked: $it") },
+            onHover = { /* ChatUtils.chat("Hover: $it") */ },
+            onDrop = { f, t -> ChatUtils.chat("Dropped: $f to $t") },
+        )
+    }
+
+    @SubscribeEvent
+    fun onGuiRenderChestGuiOverlayRender2(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        config.debugPos.renderRenderable(
+            test,
+            posLabel = "Test",
+        )
     }
 
     @SubscribeEvent

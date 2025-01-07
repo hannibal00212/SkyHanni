@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
@@ -44,6 +45,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
+import java.util.UUID
 import kotlin.math.max
 
 interface Renderable {
@@ -441,6 +443,29 @@ interface Renderable {
             }
         }
 
+        /** Does hide itself if [deathTime] is reached, does still exist but does not show anything anymore*/
+        fun tempString(
+            deathTime: SimpleTimeMark,
+            text: String,
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+        ) = object : Renderable {
+
+            override val width by lazy { (Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale).toInt() + 1 }
+            override val height = (9 * scale).toInt() + 1
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            val inverseScale = 1 / scale
+
+            override fun render(posX: Int, posY: Int) {
+                if (deathTime.isInPast()) return
+                RenderableUtils.renderString(text, scale, color, inverseScale)
+            }
+        }
+
         fun wrappedString(
             text: String,
             width: Int,
@@ -699,6 +724,146 @@ interface Renderable {
                 }
             }
 
+        }
+
+        fun verticalEditTable(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            useEmptySpace: Boolean = false,
+            onDrop: (Int, Int) -> Unit,
+            onHover: (Int) -> Unit = {},
+            onStartGrab: (Int) -> Unit = {},
+            onEndGrab: (Int) -> Unit = {},
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            val emptySpaceX = if (useEmptySpace) 0 else xPadding
+            val emptySpaceY = if (useEmptySpace) 0 else yPadding
+
+            var holdingIndex = -1
+            var isSnappingIn = false
+            var ySpace = 0
+
+            val uuid = UUID.randomUUID()
+
+            override fun render(posX: Int, posY: Int) {
+                isSnappingIn = false
+                ySpace = 0
+                GlStateManager.pushMatrix()
+                var rowIndex = 0
+                var contentRowIndex = 0
+                while (rowIndex < content.size) {
+                    if (contentRowIndex == holdingIndex) {
+                        contentRowIndex++
+                        continue
+                    }
+                    if (isBoxHovered(
+                            posX,
+                            width,
+                            posY + yOffsets[rowIndex],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY - 1,
+                        ) && condition() && shouldAllowLink(true, bypassChecks)
+                    ) {
+                        onHover(rowIndex)
+                        DragNDrop.dragOnPress(Drag(rowIndex, uuid)) {
+                            holdingIndex = contentRowIndex
+                            onStartGrab(rowIndex)
+                        }
+                        var dropped = false
+                        val preYSpace = ySpace
+                        DragNDrop.handelDroppable(
+                            object : Droppable {
+
+                                override fun handle(drop: Any?) {
+                                    val element = drop as? Drag ?: return
+                                    onEndGrab(holdingIndex)
+                                    holdingIndex = -1
+                                    onDrop(element.rowIndex, rowIndex)
+                                }
+
+                                override fun preDrop(drop: Any?) {
+                                    val element = drop as? Drag ?: return
+                                    val index = element.rowIndex
+                                    content[index].drawRow(index, posX, posY + ySpace, ySpace.toFloat(), true)
+                                    dropped = true
+                                    isSnappingIn = true
+                                }
+
+                                override fun validTarget(item: Any?): Boolean = item is Drag && item.uuid == uuid
+
+                            },
+                        )
+                        val boxY: Pair<Int, Int>
+                        if (dropped) {
+                            rowIndex++
+                            boxY = preYSpace to ySpace
+                        } else {
+                            boxY = ySpace to if (contentRowIndex == content.size) height
+                            else ySpace + yOffsets[contentRowIndex + 1] - yOffsets[contentRowIndex]
+                        }
+                        Gui.drawRect(
+                            posX,
+                            posY + boxY.first,
+                            posX + width,
+                            posY + boxY.second - emptySpaceY,
+                            Color.GRAY.addAlpha(if (dropped) 50 else 35).rgb,
+                        )
+                    }
+                    content.getOrNull(contentRowIndex)?.drawRow(contentRowIndex, posX, posY + ySpace, ySpace.toFloat(), true)
+                    rowIndex++
+                    contentRowIndex++
+                }
+                GlStateManager.popMatrix()
+            }
+
+            private fun List<Renderable?>.drawRow(rowIndex: Int, x: Int, y: Int, yOff: Float, setYOffset: Boolean) {
+                val slotHeight = yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
+                for ((index, renderable) in this.withIndex()) {
+                    GlStateManager.pushMatrix()
+                    GlStateManager.translate(xOffsets[index].toFloat(), yOff, 0F)
+                    renderable?.renderXYAligned(
+                        x + xOffsets[index],
+                        y,
+                        xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                        slotHeight,
+                    )
+                    GlStateManager.popMatrix()
+                }
+                if (setYOffset) {
+                    ySpace += slotHeight
+                }
+            }
+
+            inner class Drag(val rowIndex: Int, val uuid: UUID) : DragItem<Drag> {
+
+                override fun get() = this
+
+                override fun onDiscard() {
+                    onEndGrab(holdingIndex)
+                    holdingIndex = -1
+                }
+
+                override fun onRender(mouseX: Int, mouseY: Int) {
+                    if (!isSnappingIn) {
+                        GlStateManager.translate(3f, 0f, 0f)
+                        content[rowIndex].drawRow(rowIndex, 0, 0, 0f, false)
+                        Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.addAlpha(30).rgb)
+                        GlStateManager.translate(-3f, 0f, 0f)
+                    }
+                }
+
+            }
         }
 
         fun progressBar(
@@ -975,7 +1140,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-            showScrollableTipsInList: Boolean = false
+            showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")

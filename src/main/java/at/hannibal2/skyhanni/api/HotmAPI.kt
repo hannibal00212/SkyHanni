@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,21 +33,23 @@ object HotmAPI {
             }
         } == true
 
-    enum class PowderType(val displayName: String, val color: String) {
-        MITHRIL("Mithril", "§2"),
-        GEMSTONE("Gemstone", "§d"),
-        GLACITE("Glacite", "§b"),
+    enum class PowderType(val displayName: String, val color: String, val icon: ItemStack) {
+        MITHRIL("Mithril", "§2", ItemStack(Items.dye, 1, 10)),
+        GEMSTONE("Gemstone", "§d", ItemStack(Items.dye, 1, 9)),
+        GLACITE("Glacite", "§b", ItemStack(Items.dye, 1, 6)),
 
         ;
 
         val heartPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.heart",
-            "§7$displayName Powder: §a§.(?<powder>[\\d,]+)"
+            "§7$displayName Powder: §a§.(?<powder>[\\d,]+)",
         )
         val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
-            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder"
+            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder",
         )
+
+        val displayNameWithColor = color + displayName
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
 
@@ -83,6 +86,10 @@ object HotmAPI {
         fun reset() {
             setCurrent(0)
             setTotal(0)
+        }
+
+        companion object {
+            fun getValue(s: String) = entries.firstOrNull { it.name == s.uppercase() }
         }
     }
 

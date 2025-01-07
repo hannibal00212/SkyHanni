@@ -6,8 +6,8 @@ import java.math.BigDecimal
 
 object NEUCalculator {
 
-    fun calculateOrNull(input: String): BigDecimal? {
-        if (!PlatformUtils.isNeuLoaded()) return null
+    fun calculateOrNull(input: String?): BigDecimal? {
+        if (input.isNullOrEmpty() || !PlatformUtils.isNeuLoaded()) return null
         return runCatching { Calculator.calculate(input) }.getOrNull()
     }
 }

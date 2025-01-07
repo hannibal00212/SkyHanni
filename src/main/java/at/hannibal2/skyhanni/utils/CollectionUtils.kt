@@ -273,7 +273,6 @@ object CollectionUtils {
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
 
-
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
     fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
@@ -454,6 +453,12 @@ object CollectionUtils {
             sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
         }
         return sum
+    }
+
+    fun <E> MutableList<E>.move(from: Int, to: Int) {
+        val element = this[from]
+        this.removeAt(from)
+        add(to, element)
     }
 
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {

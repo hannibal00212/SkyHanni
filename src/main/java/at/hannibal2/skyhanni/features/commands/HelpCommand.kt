@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandBuilder
+import at.hannibal2.skyhanni.config.commands.CommandBuilderBase
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.Commands.commandList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,10 +17,10 @@ object HelpCommand {
     private const val COMMANDS_PER_PAGE = 15
     private const val HELP_ID = -6457563
 
-    private fun createCommandEntry(command: CommandBuilder): IChatComponent {
+    private fun createCommandEntry(command: CommandBuilderBase): IChatComponent {
         val category = command.category
         val color = category.color
-        val description = command.description.splitLines(200).replace("§r", "§7")
+        val description = command.descriptor.splitLines(300).replace("§r", "§7")
         val categoryDescription = category.description.splitLines(200).replace("§r", "§7")
         val aliases = command.aliases
 
@@ -37,7 +37,7 @@ object HelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<CommandBuilder>) {
+    private fun showPage(page: Int, search: String, commands: List<CommandBuilderBase>) {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) ||
                 it.aliases.any { alias -> alias.contains(search, ignoreCase = true) } ||

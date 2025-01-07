@@ -165,6 +165,7 @@ object NumberUtil {
     }
 
     fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
+    fun Number.toStringWithPlusAndColor() = (if (this.toDouble() >= 0.0) "§a+" else "§c") + this.toString()
 
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
         lastDecimal - decimal
@@ -272,4 +273,26 @@ object NumberUtil {
         return interp
     }
 
+    @Suppress("UNCHECKED_CAST")
+    operator fun <T : Number> T.plus(other: T): T = when {
+        this is Long -> this.plus(other as Long) as T
+        this is Int -> this.plus(other as Int) as T
+        this is Short -> this.plus(other as Short) as T
+        this is Byte -> this.plus(other as Byte) as T
+        this is Double -> this.plus(other as Double) as T
+        this is Float -> this.plus(other as Float) as T
+        else -> throw TypeCastException("Not a number")
+    }
+
+    /** Returns 0 as T*/
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Number> T.getZero(): T = when {
+        this is Long -> 0L as T
+        this is Int -> 0 as T
+        this is Short -> 0.toShort() as T
+        this is Byte -> 0.toByte() as T
+        this is Double -> 0.0 as T
+        this is Float -> 0.0f as T
+        else -> throw TypeCastException("Not a number")
+    }
 }

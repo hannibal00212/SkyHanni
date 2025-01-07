@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -30,6 +31,7 @@ object DragNDrop {
     fun onGuiContainerAfterDraw(event: GuiContainerEvent.PostDraw) {
         val item = currentDrag ?: return
         if (!BUTTON_MAPPED.isKeyHeld()) {
+            currentDrag?.onDiscard()
             currentDrag = null
             return
         }
@@ -69,17 +71,25 @@ object DragNDrop {
         }
     }
 
-    private fun handelDroppable(drop: Droppable) {
-        val item = currentDrag ?: return
-        if (drop.validTarget(item.get())) {
+    fun handelDroppable(drop: Droppable) {
+        val item = currentDrag?.get() ?: return
+        if (drop.validTarget(item)) {
             if (!BUTTON_MAPPED.isKeyHeld()) {
-                drop.handle(item.get())
+                drop.handle(item)
                 currentDrag = null
+            } else {
+                drop.preDrop(item)
             }
         } else {
             isInvalidDrop = true
         }
+    }
 
+    fun dragOnPress(item: DragItem<*>, onClick: () -> Unit) {
+        if (BUTTON_MAPPED.isKeyClicked()) {
+            currentDrag = item
+            onClick()
+        }
     }
 }
 
@@ -97,10 +107,15 @@ interface DragItem<T> {
     fun get(): T
     fun onRender(mouseX: Int, mouseY: Int)
 
+    fun onDiscard() {}
+
 }
 
 interface Droppable {
 
     fun handle(drop: Any?)
+
+    fun preDrop(drop: Any?) {}
+
     fun validTarget(item: Any?): Boolean
 }

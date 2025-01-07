@@ -97,6 +97,11 @@ public class GUIConfig {
     public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
+    @ConfigOption(name = "Track Anything", desc = "")
+    @Accordion
+    public ShTrackConfig shTrackConfig = new ShTrackConfig();
+
+    @Expose
     @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -18,6 +18,7 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -126,6 +127,12 @@ object StringUtils {
         if ("" == prefix) return map
         val lastKey = nextLexicographicallyStringWithSameLength(prefix)
         return map.subMap(prefix, true, lastKey, false)
+    }
+
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
     }
 
     fun nextLexicographicallyStringWithSameLength(input: String): String {
