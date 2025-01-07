@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event.diana;
 
+import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent;
+import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare;
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
@@ -21,7 +23,7 @@ public class InquisitorSoundConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    public Runnable testSound = FarmingLaneFeatures::playUserSound;
+    public Runnable testSound = InquisitorWaypointShare::playUserSound;
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
