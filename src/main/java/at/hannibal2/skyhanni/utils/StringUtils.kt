@@ -503,10 +503,6 @@ object StringUtils {
 
     fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
-    @Deprecated("This function strips internal formatting changes like the color of the pluses of the MVP+ rank")
-    fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
-        formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
-
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
     fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)

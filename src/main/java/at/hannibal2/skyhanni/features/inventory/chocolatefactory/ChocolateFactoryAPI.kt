@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -36,6 +37,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChocolateFactoryAPI {
 
+    private val chromaEnabled get() = ChromaManager.config.enabled.get()
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
@@ -267,6 +269,6 @@ object ChocolateFactoryAPI {
     } ?: false
 
     fun String.partyModeReplace(): String =
-        if (config.partyMode.get() && inChocolateFactory) replace(Regex("§[a-fA-F0-9]"), "§z")
+        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
         else this
 }

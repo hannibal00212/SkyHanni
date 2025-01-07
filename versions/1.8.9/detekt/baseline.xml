@@ -89,7 +89,7 @@
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "goalcomplete", "§6§lBINGO GOAL COMPLETE! §r§e(?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "hiddengoal", ".*§7§eThe next hint will unlock in (?&lt;time&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "percentage", " {2}§8Top §.(?&lt;percentage&gt;.*)%" )</ID>
-    <ID>RepoPatternRegexTest:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(§.)+Contribution Rewards.*", )</ID>
+    <ID>RepoPatternRegexTest:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(?:§.)+Contribution Rewards.*", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "collection", "Reach (?&lt;amount&gt;[0-9]+(?:,\\d+)*) (?&lt;name&gt;.*) Collection\\.", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.found", " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.obtain", "Obtain a (?&lt;name&gt;\\w+) Crystal in the Crystal Hollows\\.", )</ID>
@@ -242,9 +242,6 @@
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
     <ID>RepoPatternRegexTest:VisitorListener.kt$VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward", "(§.)+Reward", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(§.)+Contribution Rewards.*", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "row.name", "(§.)+Row #.*", )</ID>
     <ID>ReturnCount:ArachneChatMessageHider.kt$ArachneChatMessageHider$private fun shouldHide(message: String): Boolean</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt$BingoNextStepHelper$private fun readDescription(description: String): NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
