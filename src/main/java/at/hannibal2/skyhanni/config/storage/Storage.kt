@@ -21,7 +21,10 @@ class Storage {
     @Expose
     var knownFeatureToggles: Map<String, List<String>> = HashMap()
 
-    @Deprecated("")
+    @Deprecated(
+        message = "Use SkyHanniMod.visualWordsData.modifiedWords instead.",
+        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords")
+    )
     @Expose
     var modifiedWords: List<VisualWord> = ArrayList()
 

@@ -23,7 +23,7 @@ object ModifyVisualWords {
     var userModifiedWords = mutableListOf<VisualWord>()
 
     // Replacements the mod added automatically for some features, april jokes, etc
-    private var modModifiedWords = mutableListOf<VisualWord>()
+    private val modModifiedWords = mutableListOf<VisualWord>()
     private var finalWordsList = listOf<VisualWord>()
     private var debug = false
 
@@ -86,6 +86,7 @@ object ModifyVisualWords {
     }
 
     @HandleEvent
+    @Suppress("DEPRECATION")
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val oldModifiedWords = SkyHanniMod.feature.storage.modifiedWords
         if (oldModifiedWords.isNotEmpty()) {
