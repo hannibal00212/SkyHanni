@@ -178,7 +178,8 @@ object MinionFeatures {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!minionTitlePattern.find(event.inventoryName)) {
+        val inventoryName = event.inventoryName
+        if (!minionTitlePattern.find(inventoryName)) {
             // This should never happen, but somehow it still does. Therefore the workaround
             if (minionInventoryOpen) {
                 minionInventoryOpen = false
@@ -186,6 +187,7 @@ object MinionFeatures {
                 ErrorManager.logErrorStateWithData(
                     "Detected unexpected minion menu closing",
                     "minionInventoryOpen = true without minion title in InventoryFullyOpenedEvent()",
+                    "current inventoryName" to inventoryName,
                     betaOnly = true,
                 )
             }
@@ -194,7 +196,7 @@ object MinionFeatures {
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
+                MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
         }
