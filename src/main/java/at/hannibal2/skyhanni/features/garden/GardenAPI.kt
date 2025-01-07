@@ -119,9 +119,8 @@ object GardenAPI {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) {
-            checkItemInHand()
-        }
+        if (event.newIsland != IslandType.GARDEN) return
+        checkItemInHand()
     }
 
     private fun updateGardenTool() {
