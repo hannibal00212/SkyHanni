@@ -17,11 +17,11 @@ allprojects {
 
     /**
      * The version of the project.
-     * Major version
-     * Minor version
+     * Stable version
      * Beta version
+     * Bugfix version
      */
-    version = "1.0.0"
+    version = "1.1.0"
 
     repositories {
         mavenCentral()
