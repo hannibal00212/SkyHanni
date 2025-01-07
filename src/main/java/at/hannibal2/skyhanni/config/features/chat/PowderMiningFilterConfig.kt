@@ -50,9 +50,7 @@ class PowderMiningFilterConfig {
         TREASURITE("§5Treasurite"),
         ;
 
-        override fun toString(): String {
-            return str
-        }
+        override fun toString() = str
     }
 
     @Expose
@@ -81,9 +79,7 @@ class PowderMiningFilterConfig {
         RED_UP("Show §cRed §7and up"),
         BLUE_ONLY("Show §3Blue §7only");
 
-        override fun toString(): String {
-            return str
-        }
+        override fun toString() = str
     }
 
     // TODO rename to "gemstoneFilter" (addressed in #2285)

@@ -53,8 +53,6 @@ class PowderMiningGemstoneFilterConfig {
         FINE_UP("Show §9Fine §7or higher"),
         FLAWLESS_ONLY("Show §5Flawless §7only");
 
-        override fun toString(): String {
-            return str
-        }
+        override fun toString() = str
     }
 }

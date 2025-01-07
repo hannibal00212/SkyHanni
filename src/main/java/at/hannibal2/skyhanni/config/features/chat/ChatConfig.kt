@@ -48,9 +48,7 @@ class ChatConfig {
         END("§cEnd §a(End of run spam)"),
         ;
 
-        override fun toString(): String {
-            return str
-        }
+        override fun toString() = str
     }
 
     @Expose

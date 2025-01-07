@@ -41,9 +41,7 @@ class PlayerMessagesConfig {
         BINGO_LEVEL("Bingo Level"),
         ;
 
-        override fun toString(): String {
-            return str
-        }
+        override fun toString() = str
     }
 
     @Expose
