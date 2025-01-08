@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC<1.12
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -22,12 +21,12 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-
+//#if MC < 1.12
+import net.minecraft.world.WorldSettings
 //#else
 //$$ import net.minecraft.world.GameType
 //#endif
@@ -120,7 +119,7 @@ object TabListData {
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
                 //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o2.gameType != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(

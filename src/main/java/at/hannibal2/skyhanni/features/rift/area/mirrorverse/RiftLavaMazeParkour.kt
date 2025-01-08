@@ -22,7 +22,7 @@ object RiftLavaMazeParkour {
     private var parkourHelper: ParkourHelper? = null
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
