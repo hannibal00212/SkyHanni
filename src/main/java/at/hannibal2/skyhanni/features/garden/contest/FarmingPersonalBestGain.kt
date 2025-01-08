@@ -53,7 +53,7 @@ object FarmingPersonalBestGain {
     var crop: String? = null
     var cropType: CropType? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement

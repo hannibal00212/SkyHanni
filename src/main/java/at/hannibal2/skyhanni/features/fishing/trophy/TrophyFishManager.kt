@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TrophyFishManager {
@@ -44,7 +43,7 @@ object TrophyFishManager {
         "§.(?<rarity>.*) §c✖",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
         trophyFishInfo = data.trophyFish
@@ -92,8 +91,8 @@ object TrophyFishManager {
     }
 
     // Fetch when talking with Odger
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Trophy Fishing") return
 
         val savedFishes = fish ?: return

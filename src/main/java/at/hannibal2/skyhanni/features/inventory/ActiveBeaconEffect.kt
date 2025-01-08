@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -39,7 +40,7 @@ object ActiveBeaconEffect {
 
     private var slot: Int? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(event.inventoryName)) {
@@ -52,7 +53,7 @@ object ActiveBeaconEffect {
         }.firstNotNullOfOrNull { it.key }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         slot = null
     }

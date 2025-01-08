@@ -87,7 +87,7 @@ object HideNotClickableItems {
 
     private val netherWart = "NETHER_STALK".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)

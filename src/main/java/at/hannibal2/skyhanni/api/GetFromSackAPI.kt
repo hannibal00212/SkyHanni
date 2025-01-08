@@ -100,7 +100,7 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryMap.clear()
     }
