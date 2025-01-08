@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -46,7 +47,7 @@ object SuperpairDataDisplay {
     private var uncoveredItems = mapOf<Int, SuperpairItem>()
     private val found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = emptyList()
 
@@ -110,7 +111,7 @@ object SuperpairDataDisplay {
 
         val since = clicksSinceSeparator(items)
 
-        val lastReward = items.entries.last().value.reward
+        val lastReward = items.entries.lastOrNull()?.value?.reward
         // TODO use repo patterns for "Instant Find"
         if ((since >= 2 || (since == -1 && items.size >= 2)) && lastReward != "Instant Find") items[uncovered + 2] =
             emptySuperpairItem

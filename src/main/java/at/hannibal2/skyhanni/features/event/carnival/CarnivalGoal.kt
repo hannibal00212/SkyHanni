@@ -170,12 +170,12 @@ enum class CarnivalGoal(
         private fun getEntry(item: Item, lore: List<String>): CarnivalGoal? =
             entries.filter { it.type.item == item }.firstOrNull { it.lorePattern.matches(lore.firstOrNull()) }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
             dirty = true
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             if (!inventoryPattern.matches(event.inventoryName)) return

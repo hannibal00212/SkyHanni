@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 object FireVeilWandParticles {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
-    private val item by lazy { "FIRE_VEIL_WAND".toInternalName() }
+    private val item = "FIRE_VEIL_WAND".toInternalName()
 
     private var lastClick = SimpleTimeMark.farPast()
 
@@ -62,7 +62,7 @@ object FireVeilWandParticles {
         RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "itemAbilities.fireVeilWandDisplayColor", "itemAbilities.fireVeilWands.displayColor")
         event.move(3, "itemAbilities.fireVeilWandDisplay", "itemAbilities.fireVeilWands.display")

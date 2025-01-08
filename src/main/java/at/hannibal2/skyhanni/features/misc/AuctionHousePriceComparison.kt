@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
@@ -31,11 +33,10 @@ object AuctionHousePriceComparison {
     private var worstPrice = 0L
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inInventory = false
-        if (!event.inventoryName.startsWith("Auctions")) return
-        inInventory = true
+        inInventory = event.inventoryName.startsWith("Auctions")
+        if (!inInventory) return
 
         bestPrice = 0L
         worstPrice = 0L
@@ -53,6 +54,11 @@ object AuctionHousePriceComparison {
             }
         }
         this.slotPriceMap = map
+    }
+
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
     }
 
     private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
@@ -122,7 +128,7 @@ object AuctionHousePriceComparison {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "inventory.auctionsPriceComparison", "inventory.auctions.auctionsPriceComparison")
     }

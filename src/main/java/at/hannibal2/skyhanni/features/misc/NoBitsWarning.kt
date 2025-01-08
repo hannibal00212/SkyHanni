@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,6 +28,7 @@ object NoBitsWarning {
                     HypixelCommands.bazaar("booster cookie")
                 }, "§eClick to run /bz booster cookie!"
             )
+            // TODO use reminder utils
             LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
@@ -39,7 +39,7 @@ object NoBitsWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")

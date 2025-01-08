@@ -34,7 +34,7 @@ object QuiverDisplay {
     private var amount = QuiverAPI.currentAmount
     private var hideAmount = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         arrow = QuiverAPI.currentArrow
@@ -87,7 +87,7 @@ object QuiverDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.whenToShow,

@@ -176,7 +176,7 @@ object GhostTracker {
         add(tracker.addTotalProfit(profit, data.kills, "kill"))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
         if (!isEnabled()) return
         if (event.gained > 10_000) return
@@ -208,7 +208,7 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
@@ -276,7 +276,7 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !isEnabled()) return
@@ -290,7 +290,7 @@ object GhostTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
     }
@@ -301,7 +301,7 @@ object GhostTracker {
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
@@ -349,7 +349,7 @@ object GhostTracker {
         override fun toString(): String = display
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
@@ -368,7 +368,7 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         fun migrateItem(oldData: JsonElement): JsonElement {

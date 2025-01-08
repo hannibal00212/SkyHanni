@@ -9,7 +9,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 
 object ReminderUtils {
 
-    // TODO: add arachne fight, add slayer boss spawned, add dragon fight
+    /**
+     * TODO:
+     *  add arachne fight
+     *  add slayer boss spawned
+     *  add dragon fight
+     *  add experimentation solver
+     *  add matriach lair
+     *  add server restart
+     */
     fun isBusy(ignoreFarmingContest: Boolean = false): Boolean =
         (DungeonAPI.inDungeon() && !DungeonAPI.completed) ||
             LorenzUtils.inKuudraFight || (FarmingContestAPI.inContest && !ignoreFarmingContest) ||

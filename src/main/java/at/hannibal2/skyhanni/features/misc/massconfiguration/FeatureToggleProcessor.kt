@@ -24,8 +24,7 @@ class FeatureToggleProcessor : ConfigStructureReader {
         latestCategory = Category(name, description)
     }
 
-    @Suppress("EmptyFunctionBlock")
-    override fun endCategory() {}
+    override fun endCategory() = Unit
 
     override fun beginAccordion(baseObject: Any?, field: Field?, o: ConfigOption?, id: Int) {
         val option = o ?: return
@@ -81,11 +80,8 @@ class FeatureToggleProcessor : ConfigStructureReader {
                 featureToggle.trueIsEnabled,
                 latestCategory!!,
                 setter,
-                pathStack.joinToString(".") + "." + field.name
-            )
+                pathStack.joinToString(".") + "." + field.name,
+            ),
         )
     }
-
-    @Suppress("EmptyFunctionBlock")
-    override fun emitGuiOverlay(baseObject: Any?, field: Field?, option: ConfigOption?) {}
 }

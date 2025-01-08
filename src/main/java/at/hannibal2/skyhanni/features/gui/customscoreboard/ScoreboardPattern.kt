@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -12,8 +12,8 @@ object ScoreboardPattern {
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
-    @SubscribeEvent
-    fun onRepositoryReload(event: RepositoryReloadEvent) {
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
         UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
     }
 
@@ -639,6 +639,11 @@ object ScoreboardPattern {
         "Position: (?:§.)*#\\d+ (?:§.)*Since: .*",
     )
 
+    val queueWaitingForLeaderPattern by miscSb.pattern(
+        "queuewaitingforleader",
+        "§aWaiting on party leader!",
+    )
+
     /**
      * REGEX-TEST: §d5th Anniversary§f 167:59:54
      */
@@ -816,6 +821,19 @@ object ScoreboardPattern {
     val barryProtestorsHandledPattern by riftSb.pattern(
         "protestors.handled",
         "Protestors handled: §b\\d+\\/\\d+",
+    )
+
+    val timeSlicedPattern by riftSb.pattern(
+        "timesliced",
+        "§c§lTIME SLICED!",
+    )
+
+    /**
+     * REGEX-TEST:  Big damage in: §d2m 59s
+     */
+    val bigDamagePattern by riftSb.pattern(
+        "bigdamage",
+        "\\s*Big damage in: §d[\\w\\s]+",
     )
 
     private val carnivalSb = scoreboardGroup.group("carnival")

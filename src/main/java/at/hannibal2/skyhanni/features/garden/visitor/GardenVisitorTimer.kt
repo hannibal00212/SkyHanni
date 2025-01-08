@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
@@ -70,7 +71,7 @@ object GardenVisitorTimer {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
         lastMillis = 0.seconds
@@ -215,6 +216,16 @@ object GardenVisitorTimer {
         }
     }
 
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
+        sixthVisitorArrivalTime -= 30.seconds
+
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 30.seconds
+        }
+    }
+
     private fun updateSixthVisitorArrivalTime() {
         visitorInterval?.let {
             sixthVisitorArrivalTime = SimpleTimeMark.now() + it
@@ -225,7 +236,7 @@ object GardenVisitorTimer {
     private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")

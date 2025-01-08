@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.tiarelay
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -29,7 +30,7 @@ object TiaRelayHelper {
 
     private val resultDisplay = mutableMapOf<Int, Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val soundName = event.soundName
@@ -98,7 +99,7 @@ object TiaRelayHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
@@ -140,7 +141,7 @@ object TiaRelayHelper {
         lastClickTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tiaRelayMute", "inventory.helper.tiaRelay.tiaRelayMute")
         event.move(2, "misc.tiaRelayHelper", "inventory.helper.tiaRelay.soundHelper")

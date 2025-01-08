@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
@@ -34,6 +35,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
+
+    fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
@@ -73,21 +76,21 @@ object SkyBlockItemModifierUtils {
         return data.heldItem
     }
 
-    fun ItemStack.isRiftTransferable(): Boolean? {
+    fun ItemStack.isRiftTransferable(): Boolean {
         val data = cachedData
-        if (data.riftTransferable == null) {
-            data.riftTransferable = getLore().any { it == "§5§kX§5 Rift-Transferable §kX" }
-        }
         return data.riftTransferable
+            ?: UtilsPatterns.riftTransferablePattern.anyMatches(getLore())
+                .also { data.riftTransferable = it }
     }
 
-    fun ItemStack.isRiftExportable(): Boolean? {
+    fun ItemStack.isRiftExportable(): Boolean {
         val data = cachedData
-        if (data.riftExportable == null) {
-            data.riftExportable = getLore().any { it == "§5§kX§5 Rift-Exportable §kX" }
-        }
         return data.riftExportable
+            ?: UtilsPatterns.riftExportablePattern.anyMatches(getLore())
+                .also { data.riftExportable = it }
     }
+
+    fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
     private fun ItemStack.getPetInfo() =
         ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
@@ -186,9 +189,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
-
-    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+        "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
+        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
+        else -> null
+    }
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 

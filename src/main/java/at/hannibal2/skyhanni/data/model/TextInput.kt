@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-class TextInput {
+open class TextInput {
 
     var textBox: String = ""
     private var carriage: Int? = null
@@ -45,6 +45,10 @@ class TextInput {
     val isActive get() = Companion.activeInstance == this
 
     private val updateEvents = mutableMapOf<Int, (TextInput) -> Unit>()
+
+    protected fun update() {
+        updateEvents.forEach { (_, it) -> it(this) }
+    }
 
     fun registerToEvent(key: Int, event: (TextInput) -> Unit) {
         updateEvents[key] = event
@@ -102,7 +106,7 @@ class TextInput {
         private fun updated() {
             with(activeInstance) {
                 if (this == null) return
-                this.updateEvents.forEach { (_, it) -> it(this) }
+                update()
             }
         }
 
