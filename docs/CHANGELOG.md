@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 1.1.0
+## Version 2.0.0
 
 ### New Features
 
@@ -10,6 +10,12 @@
     + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
     + Opens Bazaar if items aren't found in Sacks.
     + Shows the cost of required items and total upgrade cost.
+
+#### Misc
+
++ Removed NotEnoughUpdates requirement. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
+    + SkyHanni no longer requires NEU to run, preparing for updates to modern Minecraft versions.
+    + Using NEU is still recommended.
 
 ### Improvements
 
@@ -25,6 +31,11 @@
 
 + Enabled per-crystal color customization for Crystal Nucleus Barrier highlights. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3062)
 + Sorted mining islands in Mining Event Tracker. - Penguin4life (https://github.com/hannibal002/SkyHanni/pull/3117)
++ Added `/shresetkinghelper` command to reset the King Talisman Helper. - Luna (https://github.com/hannibal002/SkyHanni/pull/3163)
+
+#### Misc Improvements
+
++ Added EliteBot profile button to Discord Rich Presence. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3169)
 
 ### Bug Fixes
 
@@ -33,6 +44,12 @@
 + Fixed "Rift-Exported" items incorrectly marked as "salable" for motes in the features "Show Motes Price" and "Hide Not Clickable Items". - Luna (https://github.com/hannibal002/SkyHanni/pull/3144)
 + Fixed Rift-Exportable items incorrectly marked as non-transferable with Hide Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/3144)
     + Items can still be transferred inside the Rift but cannot be sold for motes.
++ Fixed Motes Session incorrectly showing negative changes as gained motes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3166)
+
+
+#### Chocolate Factory Bug Fixes
+
++ Fixed Chocolate Factory's "Party Mode" not checking if chroma is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3164)
 
 #### Event Bug Fixes
 
@@ -41,6 +58,8 @@
 #### Inventory Bug Fixes
 
 + Fixed a rare error in Estimated Chest Value calculation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3150)
++ Fixed auction price comparison not detecting when the inventory is closed. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3165)
++ Fixed Minion Upgrade Feature appearing outside minion menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3175)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -49,6 +68,7 @@
 #### Misc Bug Fixes
 
 + Fixed overflow level-up message not showing and removed dependency on skill progress display. - appable (https://github.com/hannibal002/SkyHanni/pull/3146)
++ Fixed visual words not saving. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3170)
 
 ### Technical Details
 
@@ -57,6 +77,14 @@
 + Improved ModVersion class and integrated it into UpdateManager. - Empa (https://github.com/hannibal002/SkyHanni/pull/3156)
 + Moved EntityHealthUpdateEvent to DataWatcherAPI. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2876)
 + Preprocessed DataWatcherAPI and related code. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2876)
++ Added `InventoryDetector` and `RenderDisplayHelper` utility classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3154)
++ Added functionality to download NEU repo if NEU isn't installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
++ Parsed NEU item repo for item and recipe data. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
+    + Ensured parsing occurs regardless of NEU installation status.
++ Removed deprecated methods. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3168)
++ Replaced `LorenzWorldChangeEvent` with `IslandChangeEvent` in GardenAPI. - Cédric Ab (https://github.com/hannibal002/SkyHanni/pull/3151)
++ Retrieved lowest BIN prices if NEU isn't installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
+    + Using NEU's item price data if NEU is installed.
 
 ### New Features
 

@@ -96,8 +96,8 @@ object HarpFeatures {
 
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (config.quickRestart && isMenuGui(event.inventoryName)) {
             openTime = SimpleTimeMark.now()
@@ -121,7 +121,7 @@ object HarpFeatures {
         minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return

@@ -207,8 +207,8 @@ object NonGodPotEffectDisplay {
         checkFooter = true
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 

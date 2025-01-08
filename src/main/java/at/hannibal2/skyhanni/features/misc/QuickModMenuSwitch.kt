@@ -32,7 +32,7 @@ object QuickModMenuSwitch {
     private var currentlyOpeningMod = ""
     private var lastGuiOpen = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = modsJar.mods.filter { mod ->

@@ -62,7 +62,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(kuudraBossHelper)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         miniBossHelper.onRepoReload(data.MINIBOSS)

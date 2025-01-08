@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AuctionHouseCopyUnderbidPrice {
@@ -49,7 +48,7 @@ object AuctionHouseCopyUnderbidPrice {
         "Auctions Browser|Manage Auctions|Auctions: \".*\"?",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.autoCopyUnderbidPrice) return
