@@ -198,20 +198,17 @@ object FarmingFortuneDisplay {
                     "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!"
                 }
             }
-            add(Renderable.string(text))
+            add(Renderable.hoverTips(text, listOf("§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!")))
         }
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
         if (config.hideMissingFortuneWarnings) return@buildList
-        if (config.compactFormat) {
-            add(Renderable.string("§cInaccurate!"))
-            return@buildList
-        }
         if (cropFortune) {
             add(
+
                 Renderable.clickAndHover(
-                    "§cNo Crop Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
@@ -224,7 +221,7 @@ object FarmingFortuneDisplay {
         } else {
             add(
                 Renderable.clickAndHover(
-                    "§cNo Farming Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
