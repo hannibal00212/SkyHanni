@@ -85,7 +85,7 @@ object MinisterInCalendar {
         return item.setLore(ministerLore).setStackDisplayName(ministerDisplayName)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
 
