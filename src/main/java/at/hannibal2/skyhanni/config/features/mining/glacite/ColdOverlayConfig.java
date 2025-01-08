@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.mining;
+package at.hannibal2.skyhanni.config.features.mining.glacite;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;

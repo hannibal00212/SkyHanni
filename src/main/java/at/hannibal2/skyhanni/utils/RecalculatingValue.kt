@@ -9,8 +9,7 @@ class RecalculatingValue<T>(private val expireTime: Duration, private val calcul
     private var currentValue: Any? = UNINITIALIZED_VALUE
     private var lastAccessTime = SimpleTimeMark.farPast()
 
-    @Deprecated("use \"by RecalculatingValue\" instead")
-    fun getValue(): T {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (lastAccessTime.passedSince() > expireTime) {
             currentValue = calculation()
             lastAccessTime = SimpleTimeMark.now()
@@ -18,9 +17,6 @@ class RecalculatingValue<T>(private val expireTime: Duration, private val calcul
         @Suppress("UNCHECKED_CAST")
         return currentValue as T
     }
-
-    @Suppress("DEPRECATION")
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = getValue()
 
     companion object {
         private val UNINITIALIZED_VALUE = Any()

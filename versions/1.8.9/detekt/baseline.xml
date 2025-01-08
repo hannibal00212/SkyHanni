@@ -13,6 +13,7 @@
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NEUInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
+    <ID>CyclomaticComplexMethod:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
     <ID>CyclomaticComplexMethod:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun addEnchantments(stack: ItemStack, list: MutableList&lt;String&gt;): Double</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
@@ -45,6 +46,7 @@
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt$GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenVisitorFeatures.kt$GardenVisitorFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:IslandAreas.kt$IslandAreas$for</ID>
+    <ID>LoopWithTooManyJumpStatements:ItemResolutionQuery.kt$ItemResolutionQuery.Companion$for</ID>
     <ID>LoopWithTooManyJumpStatements:RiftBloodEffigies.kt$RiftBloodEffigies$for</ID>
     <ID>LoopWithTooManyJumpStatements:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils$for</ID>
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
@@ -89,7 +91,7 @@
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "goalcomplete", "§6§lBINGO GOAL COMPLETE! §r§e(?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "hiddengoal", ".*§7§eThe next hint will unlock in (?&lt;time&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:BingoCardReader.kt$BingoCardReader$by patternGroup.pattern( "percentage", " {2}§8Top §.(?&lt;percentage&gt;.*)%" )</ID>
-    <ID>RepoPatternRegexTest:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(§.)+Contribution Rewards.*", )</ID>
+    <ID>RepoPatternRegexTest:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(?:§.)+Contribution Rewards.*", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "collection", "Reach (?&lt;amount&gt;[0-9]+(?:,\\d+)*) (?&lt;name&gt;.*) Collection\\.", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.found", " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)", )</ID>
     <ID>RepoPatternRegexTest:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "crystal.obtain", "Obtain a (?&lt;name&gt;\\w+) Crystal in the Crystal Hollows\\.", )</ID>
@@ -242,9 +244,6 @@
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "string.playerchat", "(?&lt;important&gt;.*?)(?:§[f7r])*: .*", )</ID>
     <ID>RepoPatternRegexTest:UtilsPatterns.kt$UtilsPatterns$by patternGroup.pattern( "time.amount", "(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?", )</ID>
     <ID>RepoPatternRegexTest:VisitorListener.kt$VisitorListener$by RepoPattern.pattern( "garden.visitor.offersaccepted", "§7Offers Accepted: §a(?&lt;offersAccepted&gt;\\d+)", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward", "(§.)+Reward", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "reward.contribution", "(§.)+Contribution Rewards.*", )</ID>
-    <ID>RepoPatternUnnamedGroup:BingoCardTips.kt$BingoCardTips$by patternGroup.pattern( "row.name", "(§.)+Row #.*", )</ID>
     <ID>ReturnCount:ArachneChatMessageHider.kt$ArachneChatMessageHider$private fun shouldHide(message: String): Boolean</ID>
     <ID>ReturnCount:BingoNextStepHelper.kt$BingoNextStepHelper$private fun readDescription(description: String): NextStep?</ID>
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
@@ -255,6 +254,7 @@
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
     <ID>ReturnCount:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
+    <ID>ReturnCount:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
     <ID>ReturnCount:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun calculateStarPrice( internalName: NEUInternalName, inputStars: Int, ): Pair&lt;EssenceItemUtils.EssenceUpgradePrice, Pair&lt;Int, Int&gt;&gt;?</ID>
     <ID>ReturnCount:FishingAPI.kt$FishingAPI$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
@@ -263,6 +263,7 @@
     <ID>ReturnCount:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>ReturnCount:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
     <ID>ReturnCount:ItemPriceUtils.kt$ItemPriceUtils$fun NEUInternalName.getPriceOrNull( priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes: List&lt;PrimitiveRecipe&gt; = emptyList(), ): Double?</ID>
+    <ID>ReturnCount:ItemResolutionQuery.kt$ItemResolutionQuery$private fun resolveContextualName(): String?</ID>
     <ID>ReturnCount:ItemUtils.kt$ItemUtils$private fun NEUInternalName.grabItemName(): String</ID>
     <ID>ReturnCount:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>ReturnCount:MiningEventTracker.kt$MiningEventTracker$private fun sendData(eventName: String, time: String?)</ID>
@@ -288,6 +289,7 @@
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
     <ID>TooManyFunctions:InventoryUtils.kt$InventoryUtils</ID>
+    <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
     <ID>TooManyFunctions:LorenzUtils.kt$LorenzUtils</ID>
     <ID>TooManyFunctions:LorenzVec.kt$LorenzVec</ID>
