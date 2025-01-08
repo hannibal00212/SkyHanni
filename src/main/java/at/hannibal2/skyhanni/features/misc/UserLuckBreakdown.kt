@@ -114,8 +114,8 @@ object UserLuckBreakdown {
         }
     }
 
-    @SubscribeEvent
-    fun openInventory(event: InventoryOpenEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Stats Breakdown") {
             inMiscStats = false
             return
@@ -136,8 +136,8 @@ object UserLuckBreakdown {
         return
     }
 
-    @SubscribeEvent
-    fun closeInventory(event: InventoryCloseEvent) {
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inMiscStats = false
         inCustomBreakdown = false
     }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -65,10 +66,6 @@ object UpdateManager {
         }
     }
 
-    fun isCurrentlyBeta(): Boolean {
-        return SkyHanniMod.version.contains("beta", ignoreCase = true)
-    }
-
     private val config get() = SkyHanniMod.feature.about
 
     fun reset() {
@@ -86,7 +83,7 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
-        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
+        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
             config.updateStream = Property.of(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
@@ -137,21 +134,14 @@ object UpdateManager {
         CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
-            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
-            override fun display(): String {
-                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
-                    return "Force Outdated"
-                return normalDelegate.display()
-            }
+            private val debug get() = SkyHanniMod.feature.dev.debug.alwaysOutdated
+            override fun display(): String = if (debug) "Force Outdated" else SkyHanniMod.VERSION
 
-            override fun isOlderThan(element: JsonElement): Boolean {
-                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
-                    return true
-                return normalDelegate.isOlderThan(element)
-            }
-
-            override fun toString(): String {
-                return "ForceOutdateDelegate($normalDelegate)"
+            override fun isOlderThan(element: JsonElement?): Boolean {
+                if (debug) return true
+                val asString = element?.asString ?: return true
+                val otherVersion = ModVersion.fromString(asString)
+                return SkyHanniMod.modVersion < otherVersion
             }
         },
         SkyHanniMod.MODID,
@@ -184,7 +174,7 @@ object UpdateManager {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !SkyHanniMod.isBetaVersion)
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",

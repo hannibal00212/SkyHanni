@@ -149,7 +149,7 @@ object HoppityAPI {
         }
     }
 
-    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+    val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()
     private val processedStraySlots = mutableMapOf<Int, String>()
     private val miscProcessableItemTypes by lazy {
@@ -202,7 +202,6 @@ object HoppityAPI {
             it.value.getLore().isNotEmpty() // All processable strays have lore.
     }
 
-
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
         stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
@@ -216,15 +215,15 @@ object HoppityAPI {
         ).post()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
         if (event.inventoryName != "Hoppity") return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         processedStraySlots.clear()
         if (lastHoppityCallAccept == null) return
@@ -240,7 +239,7 @@ object HoppityAPI {
         checkNextInvOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
@@ -29,6 +29,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(NEUInternalName::class.java, SkyHanniTypeAdapters.INTERNAL_NAME.nullSafe())
         .registerTypeAdapter(LorenzRarity::class.java, SkyHanniTypeAdapters.RARITY.nullSafe())
         .registerTypeAdapter(IslandType::class.java, SkyHanniTypeAdapters.ISLAND_TYPE.nullSafe())
+        .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),

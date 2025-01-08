@@ -125,6 +125,11 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
+    @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
+    @ConfigEditorBoolean
+    public boolean resetSearchGuiOnClose = true;
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
@@ -300,7 +305,7 @@ public class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean replaceRomanNumerals = false;
+    public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
@@ -318,6 +323,15 @@ public class MiscConfig {
     @Accordion
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(
+        name = "Open Last Storage",
+        desc = "Allows running §e/shlastopened §7as a command to open the last storage you opened. " +
+            "Also allows §e/ec - §7and §e/bp - §7to open the last Ender Chest and Backpack you opened.")
+    @FeatureToggle
+    @ConfigEditorBoolean
+    public boolean openLastStorage = true;
 
     @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
@@ -340,7 +354,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Computer Time Offset Warning",
         desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
-        "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
+            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
     )
     @ConfigEditorBoolean
     @FeatureToggle
