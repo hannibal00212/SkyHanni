@@ -290,7 +290,7 @@ object GhostTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
     }

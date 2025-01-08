@@ -49,13 +49,13 @@ object JacobFarmingContestsInventory {
         "§7§7You placed in the (?<medal>.*) §7bracket!"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         realTime.clear()
         hideEverything = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return

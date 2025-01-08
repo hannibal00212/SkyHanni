@@ -163,8 +163,8 @@ object ElectionAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventory(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return

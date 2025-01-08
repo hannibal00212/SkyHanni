@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -41,7 +40,7 @@ object FirstMinionTier {
         minions: MutableMap<String, NEUInternalName>,
         minionId: NEUInternalName,
     ) {
-        if (recipe.getCachedIngredients().any { help.contains(it.internalName) }) {
+        if (recipe.ingredients.any { help.contains(it.internalName) }) {
             val name = recipe.output?.internalName?.getItemStackOrNull()?.displayName?.removeColor() ?: return
             val abc = name.replace(" I", " 0")
             minions[abc] = minionId.replace("_1", "_0")

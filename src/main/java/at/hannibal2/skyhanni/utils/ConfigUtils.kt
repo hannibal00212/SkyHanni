@@ -80,7 +80,7 @@ object ConfigUtils {
     }
 
     fun KMutableProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
-        return editor.processedConfig.getOptionFromField(this.javaField ?: return null)
+        return editor.getOptionFromField(this.javaField ?: return null)
     }
 
     fun KMutableProperty0<*>.jumpToEditor() {
