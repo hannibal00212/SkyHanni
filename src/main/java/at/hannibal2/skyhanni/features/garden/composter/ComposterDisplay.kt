@@ -47,7 +47,7 @@ object ComposterDisplay {
 
         val displayItem by lazy { icon.toInternalName().getItemStack() }
 
-        val pattern by lazy { rawPattern.toPattern() }
+        val pattern = rawPattern.toPattern()
 
         fun addToList(map: Map<DataType, String>): List<Any> {
             return map[this]?.let { listOf(displayItem, it) }.orEmpty()

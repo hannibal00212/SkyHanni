@@ -185,7 +185,7 @@ object MinionXp {
         collectItemXpList.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
             xpType.value.mapNotNull { it.key.toInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }

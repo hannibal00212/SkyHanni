@@ -53,7 +53,7 @@ object FarmingPersonalBestGain {
     var crop: String? = null
     var cropType: CropType? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
@@ -80,8 +80,10 @@ object FarmingPersonalBestGain {
         newFFPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
+            val newFF = newFF ?: return
             crop = cropName
             cropType = CropType.getByName(cropName)
+            val cropType = cropType ?: return
             GardenAPI.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }
