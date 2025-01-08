@@ -43,13 +43,13 @@ object AnitaMedalProfit {
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
         if (VisitorAPI.inInventory) return
