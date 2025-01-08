@@ -367,7 +367,7 @@ object CurrentPetAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inPetMenu = isPetMenu(event.inventoryName, event.inventoryItems)
         if (!inPetMenu) return
@@ -382,7 +382,7 @@ object CurrentPetAPI {
         updatePet(petData.copy(xp = petData.xp?.plus(overflowXp)))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inPetMenu = false
     }
