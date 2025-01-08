@@ -191,6 +191,20 @@ object EnchantedClockHelper {
         storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow())
     }
 
+    private fun ItemStack.getTypePair(): Pair<BoostType?, SimpleBoostType?> {
+        val boostType = BoostType.byItemStackOrNull(this) ?: return null to null
+        val simpleType = boostType.toSimple() ?: return null to null
+        return boostType to simpleType
+    }
+
+    private fun ItemStack.getBoostState(): State? = statusLorePattern.firstMatcher(getLore()) {
+        group("status")?.let { statusStr ->
+            runCatching { State.valueOf(statusStr) }.getOrElse {
+                ErrorManager.skyHanniError("Invalid status string: $statusStr")
+            }
+        }
+    }
+
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!enchantedClockPattern.matches(event.inventoryName)) return
@@ -198,18 +212,11 @@ object EnchantedClockHelper {
 
         val statusStacks = event.inventoryItems.filterStatusSlots()
         for ((_, stack) in statusStacks) {
-            val boostType = BoostType.byItemStackOrNull(stack) ?: continue
-            val simpleType = boostType.toSimple() ?: continue
+            val (boostType, simpleType) = stack.getTypePair()
+            val currentBoostState = stack.getBoostState()
+            if (boostType == null || simpleType == null || currentBoostState == null) continue
 
-            val currentStatus: State = statusLorePattern.firstMatcher(stack.getLore()) {
-                group("status")?.let { statusStr ->
-                    runCatching { State.valueOf(statusStr) }.getOrElse {
-                        ErrorManager.skyHanniError("Invalid status string: $statusStr")
-                    }
-                }
-            } ?: continue
-
-            val parsedCooldown: SimpleTimeMark? = when (currentStatus) {
+            val parsedCooldown: SimpleTimeMark? = when (currentBoostState) {
                 State.READY, State.PROBLEM -> {
                     storage[simpleType]?.availableAt = SimpleTimeMark.now()
                     continue
@@ -227,7 +234,7 @@ object EnchantedClockHelper {
                 }
             }
 
-            storage[simpleType] = Status(currentStatus, parsedCooldown)
+            storage[simpleType] = Status(currentBoostState, parsedCooldown)
         }
     }
 
