@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -8,7 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
@@ -34,11 +35,11 @@ object HighlightBonzoMasks {
     private val patternGroup = RepoPattern.group("inventory.masks.timers")
     private val bonzoMaskPattern by patternGroup.pattern(
         "bonzo",
-        "Your .*Bonzo's Mask saved your life!"
+        "Your Bonzo's Mask saved your life!",
     )
     private val spiritMaskPattern by patternGroup.pattern(
         "spirit",
-        "Second Wind Activated! Your Spirit Mask saved your life!"
+        "Second Wind Activated! Your Spirit Mask saved your life!",
     )
 
     private val greenHue = Color.RGBtoHSB(0, 255, 0, null)[0].toDouble()
@@ -75,15 +76,15 @@ object HighlightBonzoMasks {
         maskTimers.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "inventory.highlightDepletedBonzosMasks", "itemAbilities.depletedBonzosMasks")
     }
 
     // This timer is overestimating since mage level affects the cooldown
     private enum class MaskType(val internalNames: List<NEUInternalName>, val cooldown: Duration) {
-        BONZO_MASK(listOf("BONZO_MASK".asInternalName(), "STARRED_BONZO_MASK".asInternalName()), 6.minutes),
-        SPIRIT_MASK(listOf("SPIRIT_MASK".asInternalName(), "STARRED_SPIRIT_MASK".asInternalName()), 30.seconds),
+        BONZO_MASK(listOf("BONZO_MASK".toInternalName(), "STARRED_BONZO_MASK".toInternalName()), 6.minutes),
+        SPIRIT_MASK(listOf("SPIRIT_MASK".toInternalName(), "STARRED_SPIRIT_MASK".toInternalName()), 30.seconds),
         ;
 
         fun percentageComplete(timeUntil: Duration): Double {

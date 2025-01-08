@@ -60,9 +60,10 @@ object NonGodPotEffectDisplay {
         REV("§cZombie Brain Mixin", true),
         TARA("§6Spider Egg Mixin", true),
         SVEN("§bWolf Fur Mixin", true),
-        VOID("§6Ender Portal Fumes", true),
+        VOID("§6End Portal Fumes", true),
         BLAZE("§fGabagoey", true),
         GLOWING_MUSH("§2Glowing Mush Mixin", true),
+        HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 
@@ -88,7 +89,7 @@ object NonGodPotEffectDisplay {
     )
     private var totalEffectsCount = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()
@@ -206,8 +207,8 @@ object NonGodPotEffectDisplay {
         checkFooter = true
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 
@@ -281,7 +282,7 @@ object NonGodPotEffectDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")

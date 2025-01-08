@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
@@ -31,7 +32,7 @@ object QuickModMenuSwitch {
     private var currentlyOpeningMod = ""
     private var lastGuiOpen = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = modsJar.mods.filter { mod ->
@@ -101,7 +102,7 @@ object QuickModMenuSwitch {
             return config.javaClass.name
         }
         if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
-            val actualGui = Minecraft.getMinecraft().currentScreen
+            val actualGui = Minecraft.getMinecraft().currentScreen ?: return openGui
             val currentPage = actualGui.javaClass.getDeclaredField("currentPage")
                 .makeAccessible()
                 .get(actualGui)
@@ -164,7 +165,7 @@ object QuickModMenuSwitch {
 
     fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
     }

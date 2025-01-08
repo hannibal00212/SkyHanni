@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -7,20 +8,28 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     * REGEX-TEST: Purse: §6423,085,776 §e(+5)
+     */
     val coinsPattern by patternGroup.pattern(
         "coins",
-        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
+        "(?:§.)*(?:Piggy|Purse): §6(?<coins>[\\d,.]+)(?: ?(?:§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     */
     val piggyPattern by patternGroup.pattern(
         "piggy",
         "Piggy: (?<coins>.*)",
@@ -30,20 +39,20 @@ object PurseAPI {
     var currentPurse = 0.0
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        event.scoreboard.matchFirst(coinsPattern) {
+        coinsPattern.firstMatcher(event.added) {
             val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
             if (diff == 0.0) return
             currentPurse = newPurse
 
-            PurseChangeEvent(diff, getCause(diff)).postAndCatch()
+            PurseChangeEvent(diff, currentPurse, getCause(diff)).post()
         }
     }
 

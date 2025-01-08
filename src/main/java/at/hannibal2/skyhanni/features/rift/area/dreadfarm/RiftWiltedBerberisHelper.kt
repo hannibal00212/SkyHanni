@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -16,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -107,7 +108,7 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isMuteOthersSoundsEnabled()) return
         val soundName = event.soundName
@@ -131,12 +132,12 @@ object RiftWiltedBerberisHelper {
 
                 val location = currentParticles.fixLocation(berberis)
                 if (!moving) {
-                    event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.YELLOW, 0.7f)
+                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.YELLOW, 0.7f)
                     event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, ignoreBlocks = false)
                 } else {
-                    event.drawFilledBoundingBox_nea(axisAlignedBB(location), Color.WHITE, 0.5f)
+                    event.drawFilledBoundingBoxNea(axisAlignedBB(location), Color.WHITE, 0.5f)
                     previous?.fixLocation(berberis)?.let {
-                        event.drawFilledBoundingBox_nea(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
+                        event.drawFilledBoundingBoxNea(axisAlignedBB(it), Color.LIGHT_GRAY, 0.2f)
                         event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE, 3, false)
                     }
                 }
@@ -144,7 +145,7 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(60, "rift.area.dreadfarm.wiltedBerberis.hideparticles", "rift.area.dreadfarm.wiltedBerberis.hideParticles")
     }

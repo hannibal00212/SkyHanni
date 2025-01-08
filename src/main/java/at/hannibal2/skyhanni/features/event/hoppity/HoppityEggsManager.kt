@@ -7,11 +7,10 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -26,7 +25,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -39,10 +37,21 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6Chocolate Brunch Egg §r§don a lower platform§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Déjeuner Egg §r§don the arms of the Amethyst statue§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Supper Egg §r§dunderneath the stairwell§r§d!
      */
     val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!",
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>[\\wé]+) Egg §r§d(?<note>.*)§r§d!",
+    )
+
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§cHitman Egg§r§d!
+     */
+    val hitmanEggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.found.hitman",
+        "§d§lHOPPITY'S HUNT §r§dYou found a (?:§.)+Hitman Egg(?:§.)+!",
     )
 
     /**
@@ -51,7 +60,7 @@ object HoppityEggsManager {
      */
     val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!",
+        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6(?<cost>[\\d,]*) Coins§r§a!",
     )
 
     /**
@@ -61,7 +70,7 @@ object HoppityEggsManager {
      */
     val rabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found",
-        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\((?<rarity>.*)§7\\)!",
+        "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\(§.§L(?<rarity>.*)§7\\)!",
     )
 
     /**
@@ -71,9 +80,12 @@ object HoppityEggsManager {
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))",
+        "§d§lNEW RABBIT! (?:(?:§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!|(?<other>.*))",
     )
 
+    /**
+     * REGEX-TEST: §7§lDUPLICATE RABBIT! §6+6,759,912 Chocolate
+     */
     val duplicateRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.duplicate",
         "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate",
@@ -83,13 +95,23 @@ object HoppityEggsManager {
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!",
     )
+
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Lunch Egg §r§dhas appeared!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Déjeune Egg §r§dhas appeared!
+     */
     private val eggSpawnedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.spawned",
-        "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>\\w+) Egg §r§dhas appeared!",
+        "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>[\\wé]+) Egg §r§dhas appeared!",
     )
+
+    /**
+     * REGEX-TEST: §cYou have already collected this Chocolate Breakfast Egg§r§c! Try again when it respawns!
+     * REGEX-TEST: §cYou have already collected this Chocolate Déjeune Egg§r§c! Try again when it respawns!
+     */
     private val eggAlreadyCollectedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.alreadycollected",
-        "§cYou have already collected this Chocolate (?<meal>\\w+) Egg§r§c! Try again when it respawns!",
+        "§cYou have already collected this Chocolate (?<meal>[\\wé]+) Egg§r§c! Try again when it respawns!",
     )
     private val hoppityEventNotOn by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.notevent",
@@ -118,13 +140,6 @@ object HoppityEggsManager {
         event.type.markClaimed()
         lastMeal = event.type
         lastNote = event.note
-    }
-
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onRabbitFound(event: RabbitFoundEvent) {
-        DelayedRun.runDelayed(1.seconds) {
-            HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
-        }
     }
 
     @SubscribeEvent
@@ -170,14 +185,6 @@ object HoppityEggsManager {
             return
         }
     }
-
-    internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
-        HoppityEggType.getMealByName(group("meal")) ?: run {
-            ErrorManager.skyHanniError(
-                "Unknown meal: ${group("meal")}",
-                "message" to event.message,
-            )
-        }
 
     fun getAndDisposeWaypointOnclick(): () -> Unit {
         val onClick = latestWaypointOnclick
@@ -250,7 +257,7 @@ object HoppityEggsManager {
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             44,
@@ -259,6 +266,8 @@ object HoppityEggsManager {
         )
         event.move(44, "event.chocolateFactory.hoppityEggs", "event.hoppityEggs")
         event.move(50, "event.hoppityEggs.showDuringContest", "event.hoppityEggs.showWhileBusy")
+        event.move(62, "event.hoppityEggs.uniquesWarpMenu", "event.hoppityEggs.warpMenu.enabled")
+        event.move(62, "event.hoppityEggs.uniquesWarpMenuHideMax", "event.hoppityEggs.warpMenu.hideWhenMaxed")
     }
 
     fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&

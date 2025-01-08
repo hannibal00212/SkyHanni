@@ -43,6 +43,7 @@ class DefaultConfigOptionGui(
     private val resetSuggestionState =
         orderedOptions.keys.associateWith { ResetSuggestionState.LEAVE_DEFAULTS }.toMutableMap()
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.drawScreen(mouseX, mouseY, partialTicks)
         drawDefaultBackground()

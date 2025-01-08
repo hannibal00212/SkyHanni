@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -17,36 +18,63 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object TabWidgetSettings {
     private val patternGroup = RepoPattern.group("tab.widget.setting")
+
+    /**
+     * REGEX-TEST: Widgets on Private Island
+     * REGEX-TEST: Widgets in Crystal Hollows
+     */
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "(Widgets in.*|Widgets on.*)"
+        "Widgets in.*|Widgets on.*",
     )
+
+    /**
+     * REGEX-TEST: §7Currently: §aALWAYS ENABLED
+     * REGEX-TEST: §7Currently: §cDISABLED
+     */
     private val mainPageWidgetPattern by patternGroup.pattern(
         "main",
-        "§7Currently:.*"
+        "§7Currently:.*",
     )
+
+    /**
+     * REGEX-TEST: §eClick to disable!
+     * REGEX-TEST: §eClick to edit!
+     */
     private val subPageWidgetPattern by patternGroup.pattern(
         "sub",
-        "§eClick to .*"
+        "§eClick to .*",
     )
+
+    /**
+     * REGEX-TEST: Profile Widget Settings
+     */
     private val shownSettingPattern by patternGroup.pattern(
         "show",
-        "Shown .* Setting.*|.*Widget Settings"
+        "Shown .* Setting.*|.*Widget Settings",
     )
+
+    /**
+     * REGEX-TEST: §eClick to disable!
+     */
     private val clickToDisablePattern by patternGroup.pattern(
         "click.disable",
-        ".*(disable!)"
+        ".*disable!",
     )
+
+    /**
+     * REGEX-TEST: §7Currently: §aENABLED
+     */
     private val enabledPattern by patternGroup.pattern(
         "is.enabled",
-        ".*ENABLED"
+        ".*ENABLED",
     )
 
     var inInventory = false
     var highlights = mutableMapOf<Int, LorenzColor>()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         highlights.clear()
 
@@ -79,7 +107,7 @@ object TabWidgetSettings {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         highlights.clear()

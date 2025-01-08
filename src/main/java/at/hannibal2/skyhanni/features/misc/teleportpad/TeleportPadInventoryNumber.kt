@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.teleportpad
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TeleportPadInventoryNumber {
@@ -69,13 +69,13 @@ object TeleportPadInventoryNumber {
         "§.(?<number>.*) teleport pad"
     )
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTeleportPad =
             event.inventoryName == "Set Destination" && SkyHanniMod.feature.misc.teleportPad.inventoryNumbers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!inTeleportPad) return

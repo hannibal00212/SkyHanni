@@ -37,6 +37,10 @@ object OwnInventoryData {
 
     private var itemAmounts = mapOf<NEUInternalName, Int>()
     private var dirty = false
+
+    /**
+     * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
+     */
     private val sackToInventoryChatPattern by RepoPattern.pattern(
         "data.owninventory.chat.movedsacktoinventory",
         "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory.",
@@ -54,7 +58,7 @@ object OwnInventoryData {
                 val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).post()
                 }
             }
         }
@@ -109,7 +113,7 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
@@ -187,6 +191,6 @@ object OwnInventoryData {
 
         if (internalName.startsWith("MAP-")) return
 
-        ItemAddInInventoryEvent(internalName, add).postAndCatch()
+        ItemAddInInventoryEvent(internalName, add).post()
     }
 }

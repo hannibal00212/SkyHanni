@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -33,18 +34,18 @@ object HoppityEggLocations {
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
     val islandLocations
-        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet() ?: emptySet()
+        get() = apiEggLocations[LorenzUtils.skyBlockIsland]?.values?.toSet().orEmpty()
 
     val islandCollectedLocations
-        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet() ?: emptySet()
+        get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet().orEmpty()
 
     fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
-        return collectedEggStorage[islandType] ?: emptySet()
+        return collectedEggStorage[islandType].orEmpty()
     }
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         // TODO: split Chocolate Factory and Hoppity repo data
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
@@ -74,12 +75,12 @@ object HoppityEggLocations {
 
     private var loadedNeuThisProfile = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         loadedNeuThisProfile = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
 

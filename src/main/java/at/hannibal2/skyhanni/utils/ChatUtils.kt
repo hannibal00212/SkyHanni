@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -45,8 +44,11 @@ object ChatUtils {
      *
      * @see DEBUG_PREFIX
      */
-    fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+    fun debug(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }
@@ -59,8 +61,11 @@ object ChatUtils {
      *
      * @see USER_ERROR_PREFIX
      */
-    fun userError(message: String) {
-        internalChat(USER_ERROR_PREFIX + message)
+    fun userError(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ) {
+        internalChat(USER_ERROR_PREFIX + message, replaceSameMessage)
     }
 
     /**
@@ -77,30 +82,40 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
         } else {
-            internalChat(message, replaceSameMessage)
+            internalChat(message, replaceSameMessage, onlySendOnce)
         }
     }
+
+    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
 
     private fun internalChat(
         message: String,
-        replaceSameMessage: Boolean = false,
+        replaceSameMessage: Boolean,
+        onlySendOnce: Boolean = false,
     ): Boolean {
         val text = ChatComponentText(message)
+        if (onlySendOnce) {
+            if (message in messagesThatAreOnlySentOnce) {
+                return false
+            }
+            messagesThatAreOnlySentOnce.add(message)
+        }
 
-        if (replaceSameMessage) {
+        return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
+            chat(text, false)
         } else {
             chat(text)
         }
-        return chat(text)
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -116,7 +131,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
@@ -156,13 +171,16 @@ object ChatUtils {
         }
     }
 
-    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    private fun getUniqueMessageIdForString(string: String): Int {
+        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    }
 
-    var lastUniqueMessageId = 123242
+    private var lastUniqueMessageId = 123242
 
-    fun getUniqueMessageId() = lastUniqueMessageId++
+    private fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -189,7 +207,7 @@ object ChatUtils {
                 if (command != null) {
                     this.command = command
                 }
-            }
+            },
         )
     }
 
@@ -217,7 +235,7 @@ object ChatUtils {
             Text.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
-            }
+            },
         )
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -263,16 +281,9 @@ object ChatUtils {
         sendQueue.add(message)
     }
 
-    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
-    fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            debug("Sending wrong command to server? ($command)")
-        }
-        sendMessageToServer("/$command")
-    }
-
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
+        it.isNotEmpty()
+    }?.get(0) == commandWithSlash
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
@@ -286,7 +297,7 @@ object ChatUtils {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
-            "§eClick to find setting in the config!"
+            "§eClick to find setting in the config!",
         )
     }
 
@@ -297,8 +308,13 @@ object ChatUtils {
         return this
     }
 
-
-    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+    fun clickToActionOrDisable(
+        message: String,
+        option: KMutableProperty0<*>,
+        actionName: String,
+        action: () -> Unit,
+        oneTimeClick: Boolean = false,
+    ) {
         clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
@@ -308,9 +324,10 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n" +
-                "§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
     }
+
 }

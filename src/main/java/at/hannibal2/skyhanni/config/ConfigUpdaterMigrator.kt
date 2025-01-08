@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
@@ -12,7 +12,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 61
+    const val CONFIG_VERSION = 70
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -30,7 +30,7 @@ object ConfigUpdaterMigrator {
         val oldVersion: Int,
         var movesPerformed: Int,
         val dynamicPrefix: Map<String, List<String>>,
-    ) : LorenzEvent() {
+    ) : SkyHanniEvent() {
 
         init {
             dynamicPrefix.entries
@@ -83,7 +83,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be relocated to $new, " +
-                    "since another element already inhabits that path"
+                        "since another element already inhabits that path"
                 )
                 return
             }
@@ -128,13 +128,11 @@ object ConfigUpdaterMigrator {
                         ?.flatMap { player ->
                             player.value.asJsonObject["profiles"]?.asJsonObject?.entrySet()?.map {
                                 "storage.players.${player.key}.profiles.${it.key}"
-                            } ?: listOf()
-                        }
-                        ?: listOf()
+                            }.orEmpty()
+                        }.orEmpty()
                     ),
                 "#player" to (
-                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
-                        ?: listOf()
+                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }.orEmpty()
                     ),
             )
             val migration = ConfigFixEvent(
@@ -143,7 +141,7 @@ object ConfigUpdaterMigrator {
                     it.add("lastVersion", JsonPrimitive(i + 1))
                 },
                 i, 0, dynamicPrefix
-            ).also { it.postAndCatch() }
+            ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)
             logger.log("Migration done with $mergesPerformed merges and ${migration.movesPerformed} moves performed")

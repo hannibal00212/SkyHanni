@@ -104,7 +104,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
+        val armorName = FarmingItems.currentArmor?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,
@@ -162,7 +162,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName ?: ""
+        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,

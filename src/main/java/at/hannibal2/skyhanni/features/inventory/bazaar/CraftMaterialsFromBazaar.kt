@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -8,11 +9,11 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -34,8 +35,8 @@ object CraftMaterialsFromBazaar {
     private var neededMaterials = listOf<PrimitiveItemStack>()
     private var multiplier = 1
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
@@ -73,8 +74,8 @@ object CraftMaterialsFromBazaar {
                         listOf("§eClick here to buy the items from bazaar!"),
                         onClick = {
                             getFromBazaar(neededMaterials)
-                        }
-                    )
+                        },
+                    ),
                 )
             }
         }
@@ -109,8 +110,8 @@ object CraftMaterialsFromBazaar {
                         text,
                         onClick = {
                             BazaarApi.searchForBazaarItem(material, priceMultiplier)
-                        }
-                    )
+                        },
+                    ),
                 )
             }
             add(
@@ -120,8 +121,8 @@ object CraftMaterialsFromBazaar {
                     onClick = {
                         purchasing = false
                         display = emptyList()
-                    }
-                )
+                    },
+                ),
             )
             addMultipliers()
         }
@@ -142,8 +143,8 @@ object CraftMaterialsFromBazaar {
                         onClick = {
                             multiplier = m
                             updateBazaarDisplay()
-                        }
-                    )
+                        },
+                    ),
                 )
             } else {
                 addString(text)
@@ -156,7 +157,7 @@ object CraftMaterialsFromBazaar {
             .filter { it.internalName.isBazaarItem() }
             .sumOf { it.internalName.getPrice() * it.amount * multiplier }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inRecipeInventory = false
     }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -17,22 +18,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object CropAccessoryData {
 
+    /**
+     * REGEX-TEST: Accessory Bag (1/2)
+     */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "data.accessory.bagname.new",
-        "Accessory Bag.*"
+        "Accessory Bag.*",
     )
 
     private var accessoryInBag = CropAccessory.NONE
     private var accessoryInInventory = CropAccessory.NONE
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         accessoryInBag = CropAccessory.NONE
         accessoryInInventory = CropAccessory.NONE
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!accessoryBagNamePattern.matches(event.inventoryName)) return
 
         val items = event.inventoryItems.mapNotNull { it.value }

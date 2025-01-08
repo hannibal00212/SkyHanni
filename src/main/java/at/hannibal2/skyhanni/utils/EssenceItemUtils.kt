@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 @SkyHanniModule
 object EssenceItemUtils {
     var itemPrices = mapOf<NEUInternalName, Map<Int, EssenceUpgradePrice>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts", NeuEssenceCostJson.TYPE)
         this.itemPrices = reformatData(unformattedData)
@@ -25,17 +25,17 @@ object EssenceItemUtils {
         for ((name, data) in unformattedData) {
 
             val essencePrices = loadEssencePrices(data)
-            val extraItems = data.extraItems ?: emptyMap()
+            val extraItems = data.extraItems.orEmpty()
             val (coinPrices, iemPrices) = loadCoinAndItemPrices(extraItems)
 
             val upgradePrices = mutableMapOf<Int, EssenceUpgradePrice>()
             for ((tier, essencePrice) in essencePrices) {
                 val coinPrice = coinPrices[tier]
-                val itemPrice = iemPrices[tier] ?: emptyMap()
+                val itemPrice = iemPrices[tier].orEmpty()
                 upgradePrices[tier] = EssenceUpgradePrice(essencePrice, coinPrice, itemPrice)
             }
 
-            val internalName = name.asInternalName()
+            val internalName = name.toInternalName()
             itemPrices[internalName] = upgradePrices
         }
         return itemPrices
@@ -65,7 +65,7 @@ object EssenceItemUtils {
     }
 
     private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let {
-        it[0].asInternalName() to it[1].toLong()
+        it[0].toInternalName() to it[1].toLong()
     }
 
     private fun loadEssencePrices(data: NeuEssenceCostJson): MutableMap<Int, EssencePrice> {

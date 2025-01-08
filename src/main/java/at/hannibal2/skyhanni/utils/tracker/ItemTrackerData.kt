@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : TrackerData() {
-
-    private val config get() = SkyHanniMod.feature.misc.tracker
 
     abstract fun resetItems()
 

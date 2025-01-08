@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent;
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent;
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
@@ -26,7 +26,7 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
 
     @Inject(method = "handleEntityEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setCurrentItemOrArmor(ILnet/minecraft/item/ItemStack;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     public void onEntityEquipment(S04PacketEntityEquipment packetIn, CallbackInfo ci, Entity entity) {
-        new EntityEquipmentChangeEvent(entity, packetIn.getEquipmentSlot(), packetIn.getItemStack()).postAndCatch();
+        new EntityEquipmentChangeEvent(entity, packetIn.getEquipmentSlot(), packetIn.getItemStack()).post();
     }
 
 }

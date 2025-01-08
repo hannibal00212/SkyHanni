@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MotesSession {
@@ -36,7 +36,7 @@ object MotesSession {
         "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RIFT_INFO)) return
         lifetimeMotesPattern.firstMatcher(event.widget.lines) {
@@ -50,7 +50,7 @@ object MotesSession {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.oldIsland == IslandType.THE_RIFT) {
             sendMotesInfo()
@@ -64,7 +64,7 @@ object MotesSession {
         val initial = initialMotes ?: return
         val current = currentMotes ?: return
         val gained = current - initial
-        if (gained == 0L) return
+        if (gained < 1) return
         val timeInRift = enterRiftTime.passedSince()
         val motesPerHour = (gained / timeInRift.inPartialHours).toLong()
         val hover = buildList {

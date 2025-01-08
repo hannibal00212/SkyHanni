@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
@@ -35,6 +36,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -45,10 +47,9 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -84,20 +85,32 @@ object GardenVisitorFeatures {
 
     /**
      * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
-     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
      */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
         ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
+
+    /**
+     * REGEX-TEST:  §8+§c20 Copper
+     */
     private val copperPattern by patternGroup.pattern(
         "copper",
         " §8\\+§c(?<amount>.*) Copper",
     )
+
+    /**
+     * REGEX-TEST:  §8+§215 §7Garden Experience
+     */
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",
         " §8\\+§2(?<amount>.*) §7Garden Experience",
     )
+
+    /**
+     * REGEX-TEST: §e[NPC] §6Madame Eleanor Q. Goldsworth III§f: §r§fI'm here to put a value on your farm. Bring me your fanciest crop.
+     * REGEX-TEST: §e[NPC] §aRhys§f: §r§fI found an unexplored cave while mining for titanium. But it's too dark to see in there, even for me! Can you spare any glowing pumpkins?
+     */
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
         "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",
@@ -109,14 +122,14 @@ object GardenVisitorFeatures {
 
     private val logger = LorenzLogger("garden/visitors")
     private var lastFullPrice = 0.0
-    private val greenThumb = "GREEN_THUMB;1".asInternalName()
+    private val greenThumb = "GREEN_THUMB;1".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
@@ -175,6 +188,8 @@ object GardenVisitorFeatures {
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in VisitorAPI.getVisitorsMap()) {
             if (visitor.status == VisitorAPI.VisitorStatus.ACCEPTED || visitor.status == VisitorAPI.VisitorStatus.REFUSED) continue
+
+            if (visitor.visitorName.removeColor() == "Spaceman" && config.shoppingList.ignoreSpaceman) continue
 
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
@@ -252,7 +267,7 @@ object GardenVisitorFeatures {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
-            ?.ingredients ?: emptySet()
+            ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
@@ -329,34 +344,34 @@ object GardenVisitorFeatures {
         add(list)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             update()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackUpdate(event: SackDataUpdateEvent) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
         GardenVisitorDropStatistics.deniedVisitors += 1
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
-        VisitorAcceptEvent(event.visitor).postAndCatch()
+        VisitorAcceptEvent(event.visitor).post()
         update()
         GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
         GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRender(event: VisitorRenderEvent) {
         val visitor = event.visitor
         val text = visitor.status.displayName
@@ -501,7 +516,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
         val name = visitor.visitorName
@@ -586,14 +601,16 @@ object GardenVisitorFeatures {
                 entity is EntityLivingBase
             ) {
                 val color = visitor.status.color
-                if (color != -1) {
+                if (color != null) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
                         color,
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
-                // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
-                if (color == -1 || !GardenAPI.inGarden()) RenderLivingEntityHelper.removeEntityColor(entity)
+                if (color == null || !GardenAPI.inGarden()) {
+                    // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
+                    RenderLivingEntityHelper.removeEntityColor(entity)
+                }
             }
         }
     }
@@ -662,8 +679,8 @@ object GardenVisitorFeatures {
         return false
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Visitor Stats")
 
         if (!GardenAPI.inGarden()) {
@@ -690,7 +707,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
         event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")

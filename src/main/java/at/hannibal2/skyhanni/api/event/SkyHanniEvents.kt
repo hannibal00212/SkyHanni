@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import java.lang.reflect.Method
 
 @SkyHanniModule
@@ -45,14 +45,14 @@ object SkyHanniEvents {
             .addListener(method, instance, options)
     }
 
-    @SubscribeEvent
-    fun onRepoLoad(event: RepositoryReloadEvent) {
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
@@ -60,7 +60,7 @@ object SkyHanniEvents {
                 .filter { it.invokeCount > 0 }
                 .sortedWith(compareBy({ -it.invokeCount }, { it.name }))
                 .forEach {
-                    add("- ${it.name} (${it.invokeCount} ${it.invokeCount / (MinecraftData.totalTicks / 20)}/s)")
+                    add("- ${it.name} (${it.invokeCount.addSeparators()} ${it.invokeCount / (MinecraftData.totalTicks / 20)}/s)")
                 }
         }
     }

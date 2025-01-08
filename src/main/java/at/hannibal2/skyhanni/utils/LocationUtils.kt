@@ -42,11 +42,11 @@ object LocationUtils {
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
-    fun LorenzVec.canBeSeen(radius: Double = 150.0, offset: Double? = null): Boolean {
+    fun LorenzVec.canBeSeen(viewDistance: Number = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
         val noBlocks = canSee(a, b, offset)
-        val notTooFar = a.distance(b) < radius
+        val notTooFar = a.distance(b) < viewDistance.toDouble()
         val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
         return noBlocks && notTooFar && inFov
     }
@@ -97,9 +97,9 @@ object LocationUtils {
 
     fun AxisAlignedBB.getEdgeLengths() = maxBox() - minBox()
 
-    fun AxisAlignedBB.getCenter() = getEdgeLengths() * 0.5 + minBox()
+    fun AxisAlignedBB.getBoxCenter() = getEdgeLengths() * 0.5 + minBox()
 
-    fun AxisAlignedBB.getTopCenter() = getCenter().up((maxY - minY) / 2)
+    fun AxisAlignedBB.getTopCenter() = getBoxCenter().up((maxY - minY) / 2)
 
     fun AxisAlignedBB.clampTo(other: AxisAlignedBB): AxisAlignedBB {
         val minX = max(this.minX, other.minX)
@@ -121,7 +121,7 @@ object LocationUtils {
     }
 
     fun calculatePlayerFacingDirection(): LorenzVec {
-        var yaw = LocationUtils.calculatePlayerYaw() + 180
+        val yaw = calculatePlayerYaw() + 180
         return when {
             yaw < 45 -> LorenzVec(0, 0, -1)
             yaw < 135 -> LorenzVec(1, 0, 0)

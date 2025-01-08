@@ -5,14 +5,18 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AuctionOutbidWarning {
+
+    /**
+     * REGEX-TEST: §6[Auction] §aMrBaiacu §eoutbid you by §659,083 coins §efor §fFiredust Dagger §e§lCLICK
+     */
     private val outbidPattern by RepoPattern.pattern(
         "auction.outbid",
         "§6\\[Auction].*§eoutbid you by.*§e§lCLICK"

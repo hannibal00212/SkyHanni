@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FlowstateHelperConfig {
@@ -23,7 +24,7 @@ public class FlowstateHelperConfig {
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance.")
     @ConfigEditorDraggableList()
-    public List<FlowstateElements> appearance = FlowstateElements.defaultOption;
+    public List<FlowstateElements> appearance = new ArrayList<>(FlowstateElements.defaultOption);
 
     @Expose
     @ConfigOption(name = "Dynamic Color", desc = "Makes the timer's color dynamic.")

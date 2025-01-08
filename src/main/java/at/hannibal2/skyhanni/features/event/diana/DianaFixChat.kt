@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -59,8 +59,10 @@ object DianaFixChat {
         errorCounter++
         if (errorCounter == 1) {
             if (successfulCounter < 5) {
-                ChatUtils.chat("Could not find Diana Guess using sound and particles, " +
-                    "please try again. (Was this a funny sound easter egg?)")
+                ChatUtils.chat(
+                    "Could not find Diana Guess using sound and particles, " +
+                        "please try again. (Was this a funny sound easter egg?)"
+                )
             }
             return
         }
@@ -118,7 +120,7 @@ object DianaFixChat {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         foundGuess = true
 

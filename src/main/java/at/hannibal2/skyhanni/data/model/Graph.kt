@@ -194,6 +194,7 @@ data class DijkstraTree(
     val lastVisitedNode: GraphNode,
 )
 
+@Suppress("MapGetWithNotNullAssertionOperator")
 fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
     val distances = this
     val reversePath = buildList {

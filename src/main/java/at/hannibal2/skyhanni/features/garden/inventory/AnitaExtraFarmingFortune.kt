@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradePrice
@@ -10,7 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -23,9 +24,12 @@ object AnitaExtraFarmingFortune {
 
     private val config get() = GardenAPI.config.anitaShop
 
+    /**
+     * REGEX-TEST: §5§o§aJacob's Ticket §8x450
+     */
     private val realAmountPattern by RepoPattern.pattern(
         "garden.inventory.anita.extrafortune.realamount",
-        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)"
+        "§5§o§aJacob's Ticket §8x(?<realAmount>.*)",
     )
 
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
@@ -63,7 +67,7 @@ object AnitaExtraFarmingFortune {
 
         // TODO: maybe only show the price when playing classic
 //        if (!LorenzUtils.noTradeMode) {
-        val price = jacobTickets * "JACOBS_TICKET".asInternalName().getPrice()
+        val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()
         event.toolTip.add(index, "  §7Price: §6${price.shortFormat()} coins")
 //        }
         event.toolTip.add(index, "§aJacob Tickets §8x${jacobTickets.addSeparators()}")
@@ -77,13 +81,13 @@ object AnitaExtraFarmingFortune {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
         levelPrice = data.levelPrice
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
     }

@@ -32,6 +32,6 @@ data class CachedItemData(
      * We can't call the generated no args constructors (or rather we cannot generate that constructor), because inline
      * classes are not part of the java-kotlin ABI that is super well supported (especially with default arguments).
      */
-    @Suppress("ForbiddenVoid")
+    @Suppress("ForbiddenVoid", "UnusedPrivateProperty")
     constructor(void: Void?) : this()
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -8,15 +9,15 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -59,13 +59,13 @@ object MinionCraftHelper {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
+        val mainInventory = InventoryUtils.getItemsInOwnInventory()
+
         if (event.isMod(10)) {
-            val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
-            hasMinionInInventory = mainInventory.mapNotNull { it?.name }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.name }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
-            val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
             hasItemsForMinion = loadFromInventory(mainInventory).first.isNotEmpty()
         }
 
@@ -75,8 +75,6 @@ object MinionCraftHelper {
         }
 
         if (!event.isMod(3)) return
-
-        val mainInventory = Minecraft.getMinecraft()?.thePlayer?.inventory?.mainInventory ?: return
 
         val (minions, otherItems) = loadFromInventory(mainInventory)
 
@@ -98,7 +96,7 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack?>):
+    private fun loadFromInventory(mainInventory: List<ItemStack>):
         Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
@@ -106,7 +104,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NEUInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item?.name?.removeColor() ?: continue
+            val name = item.name.removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -117,17 +115,19 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item?.name?.removeColor() ?: continue
-            if (item.hasEnchantments()) continue
+            val name = item.name.removeColor()
             val rawId = item.getInternalName()
-            if (!isMinionName(name)) {
-                if (!allIngredients.contains(rawId)) continue
-                if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
-                val old = otherItems.getOrDefault(itemId, 0)
-                otherItems[itemId] = old + item.stackSize * multiplier
-            }
+            if (
+                item.hasEnchantments() ||
+                !isMinionName(name) ||
+                !allIngredients.contains(rawId) ||
+                !isAllowed(allMinions, rawId)
+            ) continue
+
+            val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
+            val old = otherItems.getOrDefault(itemId, 0)
+            otherItems[itemId] = old + item.stackSize * multiplier
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -140,13 +140,14 @@ object MinionCraftHelper {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
-                for (ingredient in recipe.getCachedIngredients()) {
+                for (ingredient in recipe.ingredients) {
                     val ingredientInternalName = ingredient.internalName
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
                     if (primitiveStack.internalName == ingredientPrimitive.internalName &&
-                        primitiveStack.amount < ingredientPrimitive.amount) return true
+                        primitiveStack.amount < ingredientPrimitive.amount
+                    ) return true
                 }
             }
         }
@@ -159,13 +160,13 @@ object MinionCraftHelper {
         allIngredients.clear()
 
         for (internalId in NEUItems.allNeuRepoItems().keys) {
-            val internalName = internalId.asInternalName()
+            val internalName = internalId.toInternalName()
             if (internalName.endsWith("_GENERATOR_1")) {
-                if (internalName == "REVENANT_GENERATOR_1".asInternalName() ||
-                    internalName == "TARANTULA_GENERATOR_1".asInternalName() ||
-                    internalName == "VOIDLING_GENERATOR_1".asInternalName() ||
-                    internalName == "INFERNO_GENERATOR_1".asInternalName() ||
-                    internalName == "VAMPIRE_GENERATOR_1".asInternalName()
+                if (internalName == "REVENANT_GENERATOR_1".toInternalName() ||
+                    internalName == "TARANTULA_GENERATOR_1".toInternalName() ||
+                    internalName == "VOIDLING_GENERATOR_1".toInternalName() ||
+                    internalName == "INFERNO_GENERATOR_1".toInternalName() ||
+                    internalName == "VAMPIRE_GENERATOR_1".toInternalName()
                 ) continue
                 tierOneMinions.add(internalName)
             }
@@ -174,7 +175,7 @@ object MinionCraftHelper {
                 for (recipe in NEUItems.getRecipes(internalName)) {
                     if (!recipe.isCraftingRecipe()) continue
 
-                    for (ingredient in recipe.getCachedIngredients()) {
+                    for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalName
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
@@ -261,8 +262,8 @@ object MinionCraftHelper {
 
     private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (event.inventoryName != "Crafted Minions") return
 
@@ -275,7 +276,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(26, "#player.bingoSessions") { element ->
             for ((_, data) in element.asJsonObject.entrySet()) {

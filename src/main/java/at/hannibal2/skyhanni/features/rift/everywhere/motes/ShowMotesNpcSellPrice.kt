@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -72,19 +73,21 @@ object ShowMotesNpcSellPrice {
         val burgerText = if (burgerStacks > 0) "(${burgerStacks}x≡) " else ""
         val size = itemStack.stackSize
         if (size > 1) {
-            event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
-                "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)")
+            event.toolTip.add(
+                "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
+                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)"
+            )
         } else {
             event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes")
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }
@@ -192,7 +195,7 @@ object ShowMotesNpcSellPrice {
 
     private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

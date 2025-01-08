@@ -248,8 +248,8 @@ object DungeonChatFilter {
      * @see messagesEndsWithMap
      */
     private fun String.isPresent(key: MessageTypes): Boolean {
-        return this in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-            (messagesEndsWithMap[key] ?: emptyList()).any { this.endsWith(it) }
+        return this in (messagesMap[key].orEmpty()) ||
+            (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+            (messagesEndsWithMap[key].orEmpty()).any { this.endsWith(it) }
     }
 }
