@@ -135,6 +135,15 @@ object DiscordRPCManager : IPCListener {
                 setStartTimestamp(startTimestamp)
                 setLargeImage(discordIconKey, location)
 
+                if (config.showEliteBotButton.get()) {
+                    addButton(
+                        RichPresenceButton(
+                            "https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                            "Open EliteBot",
+                        ),
+                    )
+                }
+
                 if (config.showSkyCryptButton.get()) {
                     addButton(
                         RichPresenceButton(
