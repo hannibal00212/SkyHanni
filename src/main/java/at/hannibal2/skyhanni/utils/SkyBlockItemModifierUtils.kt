@@ -189,9 +189,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
-
-    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+        "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
+        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
+        else -> null
+    }
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 

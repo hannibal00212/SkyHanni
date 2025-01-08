@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -57,14 +58,14 @@ object StockOfStonkFeature {
 
     var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (isEnabled()) {
             inInventory = inventoryPattern.matches(event.inventoryName)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
