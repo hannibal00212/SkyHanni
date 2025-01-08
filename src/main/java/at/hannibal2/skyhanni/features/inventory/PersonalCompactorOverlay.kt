@@ -96,13 +96,13 @@ object PersonalCompactorOverlay {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         compactorRenderableMap.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         compactorEnabledMap.clear()
     }
 

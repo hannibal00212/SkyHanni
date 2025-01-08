@@ -78,7 +78,7 @@ object ChestValue {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (inInventory) {
@@ -86,7 +86,7 @@ object ChestValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems = emptyMap()
     }

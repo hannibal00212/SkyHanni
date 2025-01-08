@@ -1,6 +1,17 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig;
+import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.GlaciteMineshaftConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.MineshaftConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.MineshaftPityDisplayConfig;
+import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
