@@ -57,8 +57,8 @@ object SkyBlockXPAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
 
         val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.displayName) } ?: return
