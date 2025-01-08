@@ -56,7 +56,7 @@ object PowderChestTimer {
         EntityUtils.getPlayerEntities().any { it.distanceToPlayer() < NEAR_PLAYER_DISTANCE }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (event.soundName == "random.levelup" && event.pitch == 1.0f && event.volume == 1.0f) {
@@ -78,7 +78,7 @@ object PowderChestTimer {
         chestSet.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onServerBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
@@ -118,9 +118,9 @@ object PowderChestTimer {
     }
 
     private fun drawDisplay(): Renderable {
-        if (chestSet.entries().isEmpty()) return Renderable.string("")
+        if (chestSet.entries.isEmpty()) return Renderable.string("")
 
-        val count = chestSet.entries().size
+        val count = chestSet.entries.size
         val name = StringUtils.pluralize(count, "chest")
         val first = chestSet.minByOrNull { it.value.timeUntil() } ?: return Renderable.string("")
 
@@ -149,8 +149,8 @@ object PowderChestTimer {
             }
 
             val sorted = when (config.lineMode) {
-                PowderChestTimerConfig.LineMode.OLDEST -> chestSet.sortedBy { it.value.timeUntil() }
-                PowderChestTimerConfig.LineMode.NEAREST -> chestSet.sortedBy { it.key.distanceToPlayer() }
+                PowderChestTimerConfig.LineMode.OLDEST -> chestSet.entries.sortedBy { it.value.timeUntil() }
+                PowderChestTimerConfig.LineMode.NEAREST -> chestSet.entries.sortedBy { it.key.distanceToPlayer() }
                 else -> continue
             }
 
