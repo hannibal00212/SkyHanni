@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -22,12 +23,21 @@ public class EnchantedClockConfig {
     @Expose
     @ConfigOption(name = "Reminder Boosts", desc = "List of boost types to remind about.")
     @ConfigEditorDraggableList
-    public List<EnchantedClockHelper.SimpleType> reminderBoosts = new ArrayList<>(Arrays.asList(
-        EnchantedClockHelper.SimpleType.MINIONS,
-        EnchantedClockHelper.SimpleType.CHOCOLATE_FACTORY,
-        EnchantedClockHelper.SimpleType.PET_TRAINING,
-        EnchantedClockHelper.SimpleType.PET_SITTER,
-        EnchantedClockHelper.SimpleType.AGING_ITEMS,
-        EnchantedClockHelper.SimpleType.FORGE)
+    public List<EnchantedClockHelper.SimpleBoostType> reminderBoosts = new ArrayList<>(Arrays.asList(
+        EnchantedClockHelper.SimpleBoostType.MINIONS,
+        EnchantedClockHelper.SimpleBoostType.CHOCOLATE_FACTORY,
+        EnchantedClockHelper.SimpleBoostType.PET_TRAINING,
+        EnchantedClockHelper.SimpleBoostType.PET_SITTER,
+        EnchantedClockHelper.SimpleBoostType.AGING_ITEMS,
+        EnchantedClockHelper.SimpleBoostType.FORGE)
     );
+
+    @Expose
+    @ConfigOption(
+        name = "Repeat Reminder",
+        desc = "Repeat reminders every §cX §7minutes until you use the boost.\n" +
+            "§eSet to 0 to disable."
+    )
+    @ConfigEditorSlider(minValue = 0, maxValue = 60, minStep = 1)
+    public int repeatReminder = 0;
 }

@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.BoostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.ClockBoostType.Companion.filterStatusSlots
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.BoostType.Companion.filterStatusSlots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object EnchantedClockHelper {
@@ -76,7 +77,7 @@ object EnchantedClockHelper {
     )
     // </editor-fold>
 
-    enum class SimpleType(val displayString: String) {
+    enum class SimpleBoostType(private val displayString: String) {
         MINIONS("§bMinions"),
         CHOCOLATE_FACTORY("§6Chocolate Factory"),
         PET_TRAINING("§dPet Training"),
@@ -88,7 +89,7 @@ object EnchantedClockHelper {
         override fun toString(): String = displayString
     }
 
-    data class ClockBoostType(
+    data class BoostType(
         val name: String,
         val displayName: String,
         val usageString: String,
@@ -96,63 +97,67 @@ object EnchantedClockHelper {
         val displaySlot: Int,
         val statusSlot: Int,
         val cooldown: Duration = 48.hours,
-    ) {
         val formattedName: String = "§${color.chatColorCode}$displayName"
-
+    ) {
         fun getCooldownFromNow() = SimpleTimeMark.now() + cooldown
-
-        fun toSimple(): SimpleType? = SimpleType.entries.find { it.name == name.uppercase() }
+        fun toSimple(): SimpleBoostType? = SimpleBoostType.entries.find { it.name == name }
 
         companion object {
-            private val entries = mutableListOf<ClockBoostType>()
-
+            private val entries = mutableListOf<BoostType>()
             fun clear() = entries.clear()
+
+            fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
+            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
+            fun bySimpleBoostType(simple: SimpleBoostType) = entries.firstOrNull { it.name == simple.name }
 
             fun populateFromJson(json: EnchantedClockJson) {
                 entries.clear()
-                entries.addAll(json.boosts.map { it.toBoostType() })
+                entries.addAll(
+                    json.boosts.map {
+                        BoostType(
+                            name = it.name,
+                            displayName = it.displayName,
+                            usageString = it.usageString ?: it.displayName,
+                            color = LorenzColor.valueOf(it.color),
+                            displaySlot = it.displaySlot,
+                            statusSlot = it.statusSlot,
+                            cooldown = it.cooldownHours.hours,
+                        )
+                    }
+                )
             }
 
-            fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
-
-            fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
-
-            fun fromSimple(simple: SimpleType) = entries.firstOrNull { it.displayName == simple.displayString }
-
             fun Map<Int, ItemStack>.filterStatusSlots() = filterKeys { key ->
-                ClockBoostType.entries.any { entry ->
+                BoostType.entries.any { entry ->
                     entry.statusSlot == key
                 }
             }
-
-            private fun BoostJson.toBoostType(): ClockBoostType = ClockBoostType(
-                name = name,
-                displayName = displayName,
-                usageString = usageString ?: displayName,
-                color = LorenzColor.valueOf(color),
-                displaySlot = displaySlot,
-                statusSlot = statusSlot,
-                cooldown = cooldownHours.hours,
-            )
         }
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        val readyNowBoosts = loadBoostsReadyNow()
-        if (readyNowBoosts.isEmpty()) return
-        val boostList = readyNowBoosts.joinToString(", ") { it.formattedName }
-        val starter = if (readyNowBoosts.size == 1) "boost is ready" else "boosts are ready"
-        ChatUtils.chat("§6§lTIME WARP! §r§aThe following $starter:\n$boostList")
+        val readyNowBoosts = loadBoostsReadyNow().takeIf { it.isNotEmpty() } ?: return
+
+        val boostListFormat = readyNowBoosts.joinToString(", ") { it.formattedName }
+        val preamble = if (readyNowBoosts.size == 1) "boost is ready" else "boosts are ready"
+        ChatUtils.chat("§6§lTIME WARP! §r§aThe following $preamble:\n$boostListFormat")
         SoundUtils.playPlingSound()
-        // TODO add repeating reminder every 2m, default off
+
+        // Set up repeating reminder if enabled in config
+        config.repeatReminder.takeIf { it > 0 }?.let { interval ->
+            val simpleBoostsReadyNow = readyNowBoosts.mapNotNull { it.toSimple() }
+            DelayedRun.runDelayed(interval.minutes) {
+                storage?.filterKeys { it in simpleBoostsReadyNow }?.values ?.forEach { it.warned = false }
+            }
+        }
     }
 
-    private fun loadBoostsReadyNow(): List<ClockBoostType> {
+    private fun loadBoostsReadyNow(): List<BoostType> {
         val storage = EnchantedClockHelper.storage ?: return emptyList()
 
-        val readyNowBoosts: MutableList<ClockBoostType> = mutableListOf()
+        val readyNowBoosts: MutableList<BoostType> = mutableListOf()
 
         for ((type, status) in storage.filter { !it.value.warned }) {
             val inConfig = config.reminderBoosts.contains(type)
@@ -160,7 +165,7 @@ object EnchantedClockHelper {
             val inFuture = status.availableAt?.isInFuture() == true
             if (!inConfig || !isProperState || inFuture) continue
 
-            val complexType = ClockBoostType.fromSimple(type) ?: continue
+            val complexType = BoostType.bySimpleBoostType(type) ?: continue
 
             status.state = State.READY
             status.availableAt = null
@@ -173,16 +178,17 @@ object EnchantedClockHelper {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnchantedClockJson>("misc/EnchantedClock")
-        ClockBoostType.clear()
-        ClockBoostType.populateFromJson(data)
+        BoostType.clear()
+        BoostType.populateFromJson(data)
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         val usageString = boostUsedChatPattern.matchMatcher(event.message) { group("usagestring") } ?: return
-        val boostType = ClockBoostType.byUsageStringOrNull(usageString) ?: return
+        val boostType = BoostType.byUsageStringOrNull(usageString) ?: return
         val simpleType = boostType.toSimple() ?: return
-        storage?.putIfAbsent(simpleType, Status(State.CHARGING, boostType.getCooldownFromNow()))
+        val storage = storage ?: return
+        storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow())
     }
 
     @HandleEvent
@@ -192,7 +198,7 @@ object EnchantedClockHelper {
 
         val statusStacks = event.inventoryItems.filterStatusSlots()
         for ((_, stack) in statusStacks) {
-            val boostType = ClockBoostType.byItemStackOrNull(stack) ?: continue
+            val boostType = BoostType.byItemStackOrNull(stack) ?: continue
             val simpleType = boostType.toSimple() ?: continue
 
             val currentStatus: State = statusLorePattern.firstMatcher(stack.getLore()) {
@@ -218,7 +224,7 @@ object EnchantedClockHelper {
                 }
             }
 
-            storage.putIfAbsent(simpleType, Status(currentStatus, parsedCooldown))
+            storage[simpleType] = Status(currentStatus, parsedCooldown)
         }
     }
 

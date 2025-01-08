@@ -837,6 +837,6 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleType, EnchantedClockHelper.Status> =
-        EnumMap(EnchantedClockHelper.SimpleType::class.java)
+    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> =
+        EnumMap(EnchantedClockHelper.SimpleBoostType::class.java)
 }
