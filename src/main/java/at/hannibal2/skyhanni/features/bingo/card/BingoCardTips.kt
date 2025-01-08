@@ -34,11 +34,11 @@ object BingoCardTips {
      */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "(§.)+Reward",
+        "(?:§.)+Reward",
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "(§.)+Contribution Rewards.*",
+        "(?:§.)+Contribution Rewards.*",
     )
 
     /**
@@ -46,7 +46,7 @@ object BingoCardTips {
      */
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "(§.)+Row #.*",
+        "(?:§.)+Row #.*",
     )
 
     @SubscribeEvent

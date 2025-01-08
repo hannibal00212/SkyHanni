@@ -22,7 +22,7 @@ public class MinionsConfig {
     public boolean nameOnlyTier = false;
 
     @Expose
-    @ConfigOption(name = "Minion Upgrade Helper", desc = "Shows a button in Minion menu to get required items for next Minion upgrade from sacks or bazaar.")
+    @ConfigOption(name = "Minion Upgrade Helper", desc = "Add a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean minionConfigHelper = true;

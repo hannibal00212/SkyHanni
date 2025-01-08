@@ -30,8 +30,8 @@ object UniqueGiftCounter {
 
     private var display = ""
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Generow") return
         val item = event.inventoryItems[40] ?: return
 

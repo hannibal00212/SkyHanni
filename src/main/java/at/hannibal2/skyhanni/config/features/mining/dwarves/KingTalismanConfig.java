@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.mining;
+package at.hannibal2.skyhanni.config.features.mining.dwarves;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;

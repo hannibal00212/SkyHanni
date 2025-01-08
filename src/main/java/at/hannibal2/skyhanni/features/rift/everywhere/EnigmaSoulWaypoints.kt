@@ -64,8 +64,8 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!event.inventoryName.contains("Enigma Souls")) return
         inInventory = true
@@ -78,7 +78,7 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inventoryUnfound.clear()
@@ -169,7 +169,7 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnigmaSoulsJson>("EnigmaSouls")
         val areas = data.areas
