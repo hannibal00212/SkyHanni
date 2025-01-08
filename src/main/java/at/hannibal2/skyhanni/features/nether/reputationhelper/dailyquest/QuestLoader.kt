@@ -190,7 +190,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
-            val state = QuestState.valueOf(split[1])
+            val state = if (split[1] == "NOT_ACCEPTED") {
+                QuestState.ACCEPTED
+            } else {
+                QuestState.valueOf(split[1])
+            }
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
             if (quest is UnknownQuest) {
