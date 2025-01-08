@@ -97,34 +97,30 @@ object EnchantedClockHelper {
         val displaySlot: Int,
         val statusSlot: Int,
         val cooldown: Duration = 48.hours,
-        val formattedName: String = "§${color.chatColorCode}$displayName"
+        val formattedName: String = "§${color.chatColorCode}$displayName",
     ) {
         fun getCooldownFromNow() = SimpleTimeMark.now() + cooldown
         fun toSimple(): SimpleBoostType? = SimpleBoostType.entries.find { it.name == name }
 
         companion object {
-            private val entries = mutableListOf<BoostType>()
-            fun clear() = entries.clear()
+            private var entries = listOf<BoostType>()
 
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
             fun byItemStackOrNull(stack: ItemStack) = entries.firstOrNull { it.formattedName == stack.displayName }
             fun bySimpleBoostType(simple: SimpleBoostType) = entries.firstOrNull { it.name == simple.name }
 
             fun populateFromJson(json: EnchantedClockJson) {
-                entries.clear()
-                entries.addAll(
-                    json.boosts.map {
-                        BoostType(
-                            name = it.name,
-                            displayName = it.displayName,
-                            usageString = it.usageString ?: it.displayName,
-                            color = LorenzColor.valueOf(it.color),
-                            displaySlot = it.displaySlot,
-                            statusSlot = it.statusSlot,
-                            cooldown = it.cooldownHours.hours,
-                        )
-                    }
-                )
+                entries = json.boosts.map {
+                    BoostType(
+                        name = it.name,
+                        displayName = it.displayName,
+                        usageString = it.usageString ?: it.displayName,
+                        color = LorenzColor.valueOf(it.color),
+                        displaySlot = it.displaySlot,
+                        statusSlot = it.statusSlot,
+                        cooldown = it.cooldownHours.hours,
+                    )
+                }
             }
 
             fun Map<Int, ItemStack>.filterStatusSlots() = filterKeys { key ->
@@ -149,7 +145,7 @@ object EnchantedClockHelper {
         config.repeatReminder.takeIf { it > 0 }?.let { interval ->
             val simpleBoostsReadyNow = readyNowBoosts.mapNotNull { it.toSimple() }
             DelayedRun.runDelayed(interval.minutes) {
-                storage?.filterKeys { it in simpleBoostsReadyNow }?.values ?.forEach { it.warned = false }
+                storage?.filterKeys { it in simpleBoostsReadyNow }?.values?.forEach { it.warned = false }
             }
         }
     }
@@ -178,7 +174,6 @@ object EnchantedClockHelper {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnchantedClockJson>("misc/EnchantedClock")
-        BoostType.clear()
         BoostType.populateFromJson(data)
     }
 
@@ -221,6 +216,7 @@ object EnchantedClockHelper {
                     storage[simpleType]?.availableAt = SimpleTimeMark.now()
                     continue
                 }
+
                 else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
                     group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
                 }
@@ -241,7 +237,7 @@ object EnchantedClockHelper {
     class Status(
         @field:Expose var state: State,
         @field:Expose var availableAt: SimpleTimeMark?,
-        @field:Expose var warned: Boolean = false
+        @field:Expose var warned: Boolean = false,
     ) {
         override fun toString(): String = "Status(state=$state, availableAt=$availableAt, warned=$warned)"
     }
