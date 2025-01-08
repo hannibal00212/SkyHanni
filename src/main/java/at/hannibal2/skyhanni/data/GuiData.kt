@@ -60,7 +60,7 @@ object GuiData {
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
             if (Minecraft.getMinecraft().currentScreen !is GuiChest) {

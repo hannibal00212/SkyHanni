@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.craft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -46,7 +47,7 @@ object CraftableItemList {
         "Craft Item",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (!craftItemPattern.matches(event.inventoryName)) return
@@ -133,7 +134,7 @@ object CraftableItemList {
         ).toSearchable(itemName)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

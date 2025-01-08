@@ -42,8 +42,8 @@ object SkyMartCopperPrice {
 
     var inInventory = false
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!event.inventoryName.startsWith("SkyMart ")) return
 
@@ -97,7 +97,7 @@ object SkyMartCopperPrice {
         display = newList
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

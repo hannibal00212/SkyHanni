@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
 import java.util.regex.Pattern
@@ -131,8 +130,8 @@ enum class SkyblockStat(
             }
         }
 
-        @SubscribeEvent
-        fun onInventory(event: InventoryFullyOpenedEvent) {
+        @HandleEvent
+        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             onSkyblockMenu(event)
             onStatsMenu(event)

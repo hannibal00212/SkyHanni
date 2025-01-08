@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class InventoryCloseEvent(val inventoryTitle: String, val reopenSameName: Boolean) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class InventoryCloseEvent(val inventoryTitle: String, val reopenSameName: Boolean) : SkyHanniEvent()
