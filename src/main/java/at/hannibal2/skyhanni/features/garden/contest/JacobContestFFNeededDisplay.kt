@@ -53,7 +53,7 @@ object JacobContestFFNeededDisplay {
         lastToolTipTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }
