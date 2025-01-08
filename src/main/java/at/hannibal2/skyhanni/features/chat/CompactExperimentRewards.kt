@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,7 +59,7 @@ object CompactExperimentRewards {
         "^(?:§8 \\+| §r§8\\+)(?<reward>.*)\$",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (isEnabled() && experimentInventoriesPattern.matches(InventoryUtils.openInventoryName())) {
             lastTimeTableOpened = SimpleTimeMark.now()

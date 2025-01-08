@@ -303,6 +303,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Added Minion Upgrade Helper. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2589)
+    + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
+    + Opens Bazaar if items aren't found in Sacks.
+    + Shows the cost of required items and total upgrade cost.
 
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 

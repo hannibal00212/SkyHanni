@@ -142,8 +142,8 @@ object SlayerRngMeterDisplay {
 
     private fun getCurrentSlayer() = SlayerAPI.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         readRngMeterInventory(event)

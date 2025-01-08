@@ -198,8 +198,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
@@ -239,7 +239,7 @@ object CakeTracker {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
