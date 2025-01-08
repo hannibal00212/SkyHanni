@@ -19,6 +19,16 @@ public class FarmingFortuneConfig {
     @FeatureToggle
     public boolean display = false;
 
+    @Expose
+    @ConfigOption(name = "Compact Format", desc = "Compact the farming fortune display.")
+    @ConfigEditorBoolean
+    public boolean compactFormat = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Missing Fortune Warnings", desc = "Hide missing fortune warnings from the display.")
+    @ConfigEditorBoolean
+    public boolean hideMissingFortuneWarnings = false;
+
     @ConfigOption(name = "Farming Fortune Guide", desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable open = FFGuideGUI::onCommand;

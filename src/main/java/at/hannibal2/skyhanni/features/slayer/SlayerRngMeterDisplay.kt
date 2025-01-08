@@ -142,8 +142,8 @@ object SlayerRngMeterDisplay {
 
     private fun getCurrentSlayer() = SlayerAPI.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         readRngMeterInventory(event)
@@ -222,8 +222,6 @@ object SlayerRngMeterDisplay {
         ) {
             return ""
         }
-        val latestSlayerCategory = SlayerAPI.latestSlayerCategory
-        latestSlayerCategory.endsWith(" I")
 
         with(storage) {
             if (itemGoal == "?") return "§cOpen RNG Meter Inventory!"

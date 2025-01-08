@@ -126,6 +126,16 @@ public class DevConfig {
     public boolean numberFormatOverride = false;
 
     @Expose
+    @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    @ConfigEditorBoolean
+    public boolean hypixelModApi = true;
+
+    @Expose
+    @ConfigOption(name = "Damage Indicator", desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!")
+    @ConfigEditorBoolean
+    public boolean damageIndicatorBackend = true;
+
+    @Expose
     @ConfigOption(
         name = "NTP Server",
         desc = "Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!"

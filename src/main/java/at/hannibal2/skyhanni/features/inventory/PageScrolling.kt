@@ -54,6 +54,7 @@ object PageScrolling {
     @SubscribeEvent
     fun onLorenzTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
         if (cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 

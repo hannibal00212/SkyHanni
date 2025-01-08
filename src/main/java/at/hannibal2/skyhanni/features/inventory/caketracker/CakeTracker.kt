@@ -200,8 +200,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
@@ -241,7 +241,7 @@ object CakeTracker {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
@@ -280,7 +280,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
+        storage.missingCakes = ((1..currentYear).toSet() - storage.ownedCakes).toMutableSet()
     }
 
     private fun getCakePrice(year: Int): Double {

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -88,7 +89,6 @@ object SkillAPI {
     var levelingMap = mapOf<Int, Int>()
     var levelArray = listOf<Int>()
     var activeSkill: SkillType? = null
-    var defaultSkillCap = mapOf<String, Int>()
 
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
@@ -154,11 +154,10 @@ object SkillAPI {
         levelArray = data.levelingXp
         levelingMap = levelArray.withIndex().associate { (index, xp) -> (index + 1) to xp }
         exactLevelingMap = levelArray.withIndex().associate { (index, xp) -> xp to (index + 1) }
-        defaultSkillCap = data.levelingCaps
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Skills") return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
@@ -186,7 +185,7 @@ object SkillAPI {
 
     private fun onUpdateMax(progress: String, skill: SkillType, skillInfo: SkillInfo, skillLevel: Int) {
         val totalXp = progress.formatLong()
-        val cap = defaultSkillCap[skill.lowercaseName] ?: 60
+        val cap = skill.maxLevel
         val maxXp = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
         val currentXp = totalXp - maxXp
         val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXp, cap)
@@ -321,7 +320,7 @@ object SkillAPI {
     }
 
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXp: Long, maxXp: Long, totalXp: Long, gained: String) {
-        val cap = defaultSkillCap[activeSkill?.lowercaseName] ?: 60
+        val cap = activeSkill?.maxLevel
         val add = if (level >= 50) {
             when (cap) {
                 50 -> XP_NEEDED_FOR_50
@@ -333,7 +332,7 @@ object SkillAPI {
         }
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
-            calculateSkillLevel(totalXp + add, defaultSkillCap[activeSkill?.lowercaseName] ?: 60)
+            calculateSkillLevel(totalXp + add, cap ?: 60)
 
         existingLevel.apply {
             this.totalXp = totalXp
@@ -360,7 +359,11 @@ object SkillAPI {
 
         val levelXp = calculateLevelXp(level - 1).toLong() + currentXp
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
-            calculateSkillLevel(levelXp, defaultSkillCap[skillType.lowercaseName] ?: 60)
+            calculateSkillLevel(levelXp, skillType.maxLevel)
+
+        if (skillInfo.overflowLevel > skillType.maxLevel && currentLevel == skillInfo.overflowLevel + 1) {
+            SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, currentLevel).post()
+        }
 
         skillInfo.apply {
             this.overflowCurrentXp = currentOverflow

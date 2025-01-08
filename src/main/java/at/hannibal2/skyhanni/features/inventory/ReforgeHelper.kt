@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -177,8 +178,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         when {
             isHexReforgeMenu(event.inventoryName) -> {
@@ -202,8 +203,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onClose(event: InventoryCloseEvent) {
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isInReforgeMenu) return
         isInReforgeMenu = false
         isInHexReforgeMenu = false

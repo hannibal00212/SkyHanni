@@ -706,7 +706,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryClose(event: InventoryCloseEvent) {
             if (!inInventory) return
             inInventory = false
@@ -714,8 +714,8 @@ enum class HotmData(
             heartItem = null
         }
 
-        @SubscribeEvent
-        fun onInventoryFullyOpen(event: InventoryFullyOpenedEvent) {
+        @HandleEvent
+        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             inInventory = inventoryPattern.matches(event.inventoryName)
             if (!inInventory) return
