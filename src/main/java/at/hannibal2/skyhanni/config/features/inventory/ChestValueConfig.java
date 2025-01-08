@@ -130,7 +130,7 @@ public class ChestValueConfig {
     public int itemToShow = 15;
 
     @Expose
-    @ConfigOption(name = "Hide below", desc = "Item item value below configured amount.\n" +
+    @ConfigOption(name = "Hide below", desc = "Hide items with value below configured amount.\n" +
         "Items are still counted for the total value.")
     @ConfigEditorSlider(
         minValue = 50_000,

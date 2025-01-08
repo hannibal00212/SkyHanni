@@ -35,7 +35,7 @@ object MiningEventDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(display, posLabel = "Upcoming Mining Events")
+        config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
     }
 
     private fun updateDisplay() {
@@ -49,7 +49,17 @@ object MiningEventDisplay {
             add(Renderable.string("§cSwap servers to try again!"))
         }
 
-        for ((islandType, eventDetails) in islandEventData) {
+        val sortedIslandEventData = islandEventData.entries
+            .sortedBy { entry ->
+                when (entry.key) {
+                    IslandType.DWARVEN_MINES -> 0
+                    IslandType.CRYSTAL_HOLLOWS -> 1
+                    else -> Int.MAX_VALUE
+                }
+            }
+            .associate { it.key to it.value }
+
+        for ((islandType, eventDetails) in sortedIslandEventData) {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
@@ -88,7 +98,6 @@ object MiningEventDisplay {
         },
         Renderable.string("§8:"),
     )
-
 
     private val unknownDisplay = Renderable.string("§7???")
     private val transitionDisplay = Renderable.string("§8->")

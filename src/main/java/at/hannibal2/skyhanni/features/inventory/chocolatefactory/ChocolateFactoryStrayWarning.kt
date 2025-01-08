@@ -117,8 +117,8 @@ object ChocolateFactoryStrayWarning {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) {
             flashScreen = false
             return
@@ -147,7 +147,7 @@ object ChocolateFactoryStrayWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }

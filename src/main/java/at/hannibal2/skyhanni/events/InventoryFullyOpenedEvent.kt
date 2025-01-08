@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import net.minecraft.item.ItemStack
 
-open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : LorenzEvent() {
+open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title

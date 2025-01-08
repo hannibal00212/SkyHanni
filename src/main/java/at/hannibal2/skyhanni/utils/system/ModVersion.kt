@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.utils.system
 
-data class ModVersion(val major: Int, val minor: Int, val beta: Int) : Comparable<ModVersion> {
+data class ModVersion(val stable: Int, val beta: Int, val bugfix: Int) : Comparable<ModVersion> {
 
     val isBeta get() = beta != 0
 
     inline val asString get() = toString()
 
-    override fun toString(): String = "$major.$minor.$beta"
+    override fun toString(): String = "$stable.$beta.$bugfix"
 
     override fun compareTo(other: ModVersion): Int {
         return when {
-            major != other.major -> major.compareTo(other.major)
-            minor != other.minor -> minor.compareTo(other.minor)
-            else -> beta.compareTo(other.beta)
+            stable != other.stable -> stable.compareTo(other.stable)
+            beta != other.beta -> beta.compareTo(other.beta)
+            else -> bugfix.compareTo(other.bugfix)
         }
     }
 
