@@ -235,7 +235,7 @@ object EffectAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock || !event.isGodPotEffectsFilterSelect()) return
 
@@ -260,8 +260,8 @@ object EffectAPI {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 
