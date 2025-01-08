@@ -67,10 +67,12 @@ enum class IslandType(private val nameFallback: String) {
         var maxPlayersMega = 80
             private set
 
-        fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
         fun getByName(name: String): IslandType = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+        fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
+        fun getByNameOrNull(name: String): IslandType? = entries.find { it.displayName == name }
 
-        fun getByNameOrNull(name: String) = entries.firstOrNull { it.islandData?.name == name }
+        fun getByIdOrNull(id: String): IslandType? = entries.find { it.islandData?.apiName == id }
+        fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
         @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) {
@@ -87,10 +89,6 @@ enum class IslandType(private val nameFallback: String) {
             maxPlayers = data.maxPlayers
             maxPlayersMega = data.maxPlayersMega
         }
-        fun getByNameOrNull(name: String): IslandType? = entries.find { it.displayName == name }
-
-        fun getByIdOrNull(id: String): IslandType? = entries.find { it.id == id }
-        fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
     }
 }
 
