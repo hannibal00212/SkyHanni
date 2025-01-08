@@ -40,14 +40,14 @@ object ItemAddManager {
     private var inSackInventory = false
     private var lastSackInventoryLeave = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName.contains("Sack")) {
             inSackInventory = true
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (inSackInventory) {
             inSackInventory = false

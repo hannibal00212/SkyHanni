@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
@@ -75,7 +76,7 @@ private fun getCropMilestoneDisplay(): String {
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
     val petName = it.substring(2).removeColor()
-    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
+    val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
 } ?: "No pet equipped"

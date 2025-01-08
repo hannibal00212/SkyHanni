@@ -66,7 +66,7 @@ object RiftGunthersRace {
         RiftAPI.inRiftRace = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(

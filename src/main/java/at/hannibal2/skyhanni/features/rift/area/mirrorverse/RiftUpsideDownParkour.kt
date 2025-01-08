@@ -21,7 +21,7 @@ object RiftUpsideDownParkour {
     private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(

@@ -83,10 +83,7 @@ object SkyHanniTypeAdapters {
         { SkyblockStat.getValue(this.uppercase()) },
     )
 
-    val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(
-        { asString },
-        { ModVersion.fromString(this) },
-    )
+    val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()

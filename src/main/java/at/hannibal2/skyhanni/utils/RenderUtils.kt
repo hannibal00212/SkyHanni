@@ -646,25 +646,6 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    /**
-     * Accepts a single line to print.
-     * This line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<Renderable>", ReplaceWith(""))
-    fun Position.renderSingleLineWithItems(
-        list: List<Any?>,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-        renderRenderable(
-            Renderable.horizontalContainer(
-                list.mapNotNull { Renderable.fromAny(it) },
-            ),
-            posLabel = posLabel,
-        )
-        // TODO Future write that better
-    }
-
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
@@ -1912,7 +1893,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
 
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             x - borderAdjustment,
             y - borderAdjustment,
             x + width + borderAdjustment,
@@ -1923,46 +1904,6 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
-    }
-
-    // todo merge with the one in GuiRenderUtils
-    fun drawGradientRect(
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-        startColor: Int = -0xfeffff0,
-        endColor: Int = -0xfeffff0,
-    ) {
-        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
-        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
-        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
-        val startBlue = (startColor and 255).toFloat() / 255.0f
-        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
-        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
-        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
-        val endBlue = (endColor and 255).toFloat() / 255.0f
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.shadeModel(7425)
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        tessellator.draw()
-        GlStateManager.shadeModel(7424)
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
     }
 
     fun getAlpha(): Float {

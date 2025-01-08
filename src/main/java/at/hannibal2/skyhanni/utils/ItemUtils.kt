@@ -56,7 +56,7 @@ object ItemUtils {
         }
     }
 
-    private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
+    private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -202,6 +202,7 @@ object ItemUtils {
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
         val nbt = tagCompound ?: return null
+
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }

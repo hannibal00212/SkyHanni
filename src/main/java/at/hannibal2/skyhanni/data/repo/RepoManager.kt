@@ -64,7 +64,9 @@ class RepoManager(private val configLocation: File) {
         private const val DEFAULT_BRANCH = "main"
 
         fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-            user == DEFAULT_USER && name == DEFAULT_NAME && branch == DEFAULT_BRANCH
+            user.lowercase() == DEFAULT_USER.lowercase() &&
+                name.lowercase() == DEFAULT_NAME.lowercase() &&
+                branch.lowercase() == DEFAULT_BRANCH.lowercase()
     }
 
     fun loadRepoInformation() {
@@ -192,7 +194,7 @@ class RepoManager(private val configLocation: File) {
             unsuccessfulConstants.clear()
             lastConstant = null
 
-            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
+            RepositoryReloadEvent(repoLocation, gson).post {
                 error = true
                 lastConstant?.let {
                     unsuccessfulConstants.add(it)
@@ -240,7 +242,7 @@ class RepoManager(private val configLocation: File) {
                 val text = mutableListOf<IChatComponent>()
                 text.add(
                     (
-                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
                             "Please report this error on the Discord!"
                         ).asComponent(),
                 )

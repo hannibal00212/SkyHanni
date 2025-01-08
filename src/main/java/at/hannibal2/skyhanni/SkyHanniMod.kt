@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -19,8 +20,8 @@ import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -29,7 +30,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
@@ -43,13 +43,13 @@ import org.apache.logging.log4j.Logger
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "@MOD_VERSION@",
+    version = SkyHanniMod.VERSION,
 )
 class SkyHanniMod {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+        PlatformUtils.checkIfNeuIsLoaded()
 
         HotswapSupport.load()
 
@@ -59,6 +59,7 @@ class SkyHanniMod {
         loadModule(CrimsonIsleReputationHelper(this))
 
         SkyHanniEvents.init(modules)
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         CommandRegistrationEvent.post()
 
@@ -107,15 +108,10 @@ class SkyHanniMod {
 
     companion object {
 
-        const val MODID = "skyhanni"
+        const val MODID: String = "skyhanni"
+        const val VERSION: String = "@MOD_VERSION@"
 
-        val modVersion: ModVersion by lazy {
-            ModVersion.fromString(Loader.instance().indexedModList[MODID]!!.version)
-        }
-
-        @JvmStatic
-        val version: String
-            get() = modVersion.asString
+        val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
         val isBetaVersion: Boolean
             get() = modVersion.isBeta
