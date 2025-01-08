@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFo
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -37,19 +37,20 @@ object SackDisplay {
     private var display = emptyList<Renderable>()
     private val config get() = SkyHanniMod.feature.inventory.sackDisplay
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (SackAPI.inSackInventory) {
-            if (!isEnabled()) return
+    init {
+        RenderDisplayHelper(
+            inventory = SackAPI.inventory,
+            condition = { isEnabled() },
+        ) {
             config.position.renderRenderables(
-                display, extraSpace = config.extraSpace, posLabel = "Sacks Items"
+                display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
             )
         }
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SackAPI.inSackInventory) return
+        if (!SackAPI.inventory.isInside()) return
         if (!config.highlightFull) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
@@ -106,7 +107,7 @@ object SackDisplay {
                                 BazaarApi.searchForBazaarItem(itemName)
                             }
                         },
-                        highlightsOnHoverSlots = listOf(slot)
+                        highlightsOnHoverSlots = listOf(slot),
                     ) { !NEUItems.neuHasFocus() }
                     add(nameText)
 
@@ -146,20 +147,20 @@ object SackDisplay {
                             Renderable.hoverTips(
                                 Renderable.string(
                                     "§d$magmaFish",
-                                    horizontalAlign = config.alignment
+                                    horizontalAlign = config.alignment,
                                 ),
                                 listOf(
                                     "§6Magmafish: §b${magmaFish.addSeparators()}",
                                     "§6Magmafish value: §b${price / magmaFish}",
-                                    "§6Magmafish per: §b${magmaFish / stored}"
+                                    "§6Magmafish per: §b${magmaFish / stored}",
                                 ),
-                            )
+                            ),
                         )
                         // TODO add cache
                         addItemStack("MAGMA_FISH".toInternalName())
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
-                }
+                },
             ] = itemName
             rendered++
         }
@@ -197,7 +198,7 @@ object SackDisplay {
             onChange = {
                 config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
                 update(false)
-            }
+            },
         )
 
         list.addButton(
@@ -208,7 +209,7 @@ object SackDisplay {
                 config.numberFormat =
                     NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 3]
                 update(false)
-            }
+            },
         )
 
         if (config.showPrice) {
@@ -219,7 +220,7 @@ object SackDisplay {
                 onChange = {
                     config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update(false)
-                }
+                },
             )
             list.addButton(
                 prefix = "§7Price Format: ",
@@ -229,7 +230,7 @@ object SackDisplay {
                     config.priceFormat =
                         PriceFormatEntry.entries[(config.priceFormat.ordinal + 1) % 2]
                     update(false)
-                }
+                },
             )
             list.addString("§eTotal price: §6${format(totalPrice)}")
         }
@@ -249,13 +250,13 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onClick = {},
-                            highlightsOnHoverSlots = listOf(rune.slot)
-                        )
+                            highlightsOnHoverSlots = listOf(rune.slot),
+                        ),
                     )
                     addAlignedNumber("§e$lv1")
                     addAlignedNumber("§e$lv2")
                     addAlignedNumber("§e$lv3")
-                }
+                },
             ] = name
         }
         list.add(table.buildSearchableTable())
@@ -277,8 +278,8 @@ object SackDisplay {
                             onClick = {
                                 BazaarApi.searchForBazaarItem(name.dropLast(1))
                             },
-                            highlightsOnHoverSlots = listOf(gem.slot)
-                        ) { !NEUItems.neuHasFocus() }
+                            highlightsOnHoverSlots = listOf(gem.slot),
+                        ) { !NEUItems.neuHasFocus() },
                     )
                     addAlignedNumber(gem.rough.addSeparators())
                     addAlignedNumber("§a${gem.flawed.addSeparators()}")
@@ -286,7 +287,7 @@ object SackDisplay {
                     val price = gem.priceSum
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
-                }
+                },
             ] = name
         }
 

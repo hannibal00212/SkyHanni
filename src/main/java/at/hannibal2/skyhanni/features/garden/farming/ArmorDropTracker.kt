@@ -131,7 +131,7 @@ object ArmorDropTracker {
         hasArmor = armorPieces > 1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
         armorDropInfo = data.specialCrops

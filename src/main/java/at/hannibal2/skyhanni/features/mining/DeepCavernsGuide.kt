@@ -63,7 +63,7 @@ object DeepCavernsGuide {
         show = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("DeepCavernsParkour")
         parkourHelper = ParkourHelper(
@@ -105,8 +105,8 @@ object DeepCavernsGuide {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         showStartIcon = false
         if (!isEnabled()) return
         if (event.inventoryName != "Lift") return
@@ -140,7 +140,7 @@ object DeepCavernsGuide {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         showStartIcon = false
     }

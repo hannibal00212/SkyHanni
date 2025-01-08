@@ -64,7 +64,7 @@ object MotesSession {
         val initial = initialMotes ?: return
         val current = currentMotes ?: return
         val gained = current - initial
-        if (gained == 0L) return
+        if (gained < 1) return
         val timeInRift = enterRiftTime.passedSince()
         val motesPerHour = (gained / timeInRift.inPartialHours).toLong()
         val hover = buildList {
