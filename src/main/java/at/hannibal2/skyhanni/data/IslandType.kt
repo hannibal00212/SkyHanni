@@ -79,7 +79,8 @@ enum class IslandType(private val nameFallback: String) {
             val data = event.getConstant<IslandTypeJson>("IslandType")
 
             val islandDataMap = data.islands.mapValues {
-                IslandData(it.value.name, it.value.apiName, it.value.maxPlayers ?: data.maxPlayers)
+                val island = it.value
+                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers)
             }
 
             entries.forEach { islandType ->
