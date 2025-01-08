@@ -175,7 +175,7 @@ enum class CarnivalGoal(
             dirty = true
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             if (!inventoryPattern.matches(event.inventoryName)) return

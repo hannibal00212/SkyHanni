@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -15,12 +16,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object HighlightOnHoverSlot {
     val currentSlots = mutableMapOf<Pair<Int, Int>, List<Int>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         currentSlots.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentSlots.clear()
     }
