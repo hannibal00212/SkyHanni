@@ -363,7 +363,7 @@ object BlockStrengthGuide {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!sbMenuOpened) return
         shouldBlockSHMenu = false
@@ -382,5 +382,4 @@ object BlockStrengthGuide {
             callback { onCommand() }
         }
     }
-
 }
