@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.fromItemNameOrNull
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,8 +44,8 @@ object CrystalNucleusAPI {
     private var unCheckedBooks: Int = 0
     private val loot = mutableMapOf<NEUInternalName, Int>()
 
-    private val LAPIDARY_I_BOOK_ITEM by lazy { "LAPIDARY;1".asInternalName() }
-    private val FORTUNE_IV_BOOK_ITEM by lazy { "FORTUNE;4".asInternalName() }
+    private val LAPIDARY_I_BOOK_ITEM = "LAPIDARY;1".toInternalName()
+    private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
 
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {

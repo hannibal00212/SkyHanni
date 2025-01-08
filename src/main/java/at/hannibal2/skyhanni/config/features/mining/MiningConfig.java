@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.MineshaftPityDisplay
 import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
