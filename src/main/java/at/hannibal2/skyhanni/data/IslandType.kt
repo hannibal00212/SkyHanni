@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.IslandType.entries
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
@@ -60,7 +60,7 @@ enum class IslandType(private val nameFallback: String) {
 
         fun getByNameOrNull(name: String) = entries.firstOrNull { it.islandData?.name == name }
 
-        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) {
             val data = event.getConstant<IslandTypeJson>("IslandType")
 
