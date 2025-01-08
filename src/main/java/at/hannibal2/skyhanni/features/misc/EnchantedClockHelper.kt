@@ -231,12 +231,9 @@ object EnchantedClockHelper {
     class Status(
         @field:Expose var state: State,
         @field:Expose var availableAt: SimpleTimeMark?,
+        @field:Expose var warned: Boolean = false
     ) {
-        @Expose
-        var warned: Boolean = false
-
         override fun toString(): String = "Status(state=$state, availableAt=$availableAt, warned=$warned)"
-
     }
 
     enum class State(val displayName: String, val color: LorenzColor) {
