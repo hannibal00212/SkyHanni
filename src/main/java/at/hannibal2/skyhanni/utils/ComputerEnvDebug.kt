@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ComputerEnvDebug {
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         os(event)
         java(event)
         launcher(event)
@@ -38,6 +38,8 @@ object ComputerEnvDebug {
 
         event.addData {
             add("Unknown launcher!")
+            val launcherBrand = System.getProperty("minecraft.launcher.brand")
+            add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
         }
     }
@@ -52,6 +54,9 @@ object ComputerEnvDebug {
         }
         if (firstStack.contains("org.prismlauncher.EntryPoint.main")) {
             return Pair("Prism", false)
+        }
+        if (firstStack.contains("org.multimc.EntryPoint.main")) {
+            return Pair("MultiMC", false)
         }
         if (firstStack.contains("net.digitalingot.vendor.")) {
             return Pair("Feather Client", true)

@@ -1,40 +1,30 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
+import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
-import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
-import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonToken
-import com.google.gson.stream.JsonWriter
-import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -44,57 +34,14 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull as getPriceOrNullNew
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRawCraftCostOrNullNew
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object NEUItems {
-
-    val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
     private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
-    private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
-    private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
     private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
-
-    private val hypixelApiGson by lazy {
-        BaseGsonBuilder.gson()
-            .registerTypeAdapter(
-                HypixelApiTrophyFish::class.java,
-                object : TypeAdapter<HypixelApiTrophyFish>() {
-                    @Suppress("EmptyFunctionBlock")
-                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
-
-                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                        val trophyFish = mutableMapOf<String, Int>()
-                        var totalCaught = 0
-                        reader.beginObject()
-                        while (reader.hasNext()) {
-                            val key = reader.nextName()
-                            if (key == "total_caught") {
-                                totalCaught = reader.nextInt()
-                                continue
-                            }
-                            if (reader.peek() == JsonToken.NUMBER) {
-                                val valueAsString = reader.nextString()
-                                if (valueAsString.isInt()) {
-                                    trophyFish[key] = valueAsString.toInt()
-                                    continue
-                                }
-                            }
-                            reader.skipValue()
-                        }
-                        reader.endObject()
-                        return HypixelApiTrophyFish(totalCaught, trophyFish)
-                    }
-                }.nullSafe(),
-            )
-            .create()
-    }
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -108,43 +55,28 @@ object NEUItems {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         allItemsCache = readAllNeuItems()
-    }
-
-    @SubscribeEvent
-    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
-        val apiData = event.data ?: return
-        try {
-            val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
-
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error reading hypixel player api data",
-                "data" to apiData,
-            )
-        }
     }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            var name = manager.createItem(rawInternalName).displayName.lowercase()
+            var name = getItemStackOrNull(rawInternalName)?.displayName?.lowercase() ?: continue
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
             if (rawInternalName.startsWith("BUILDER_")) continue
 
-            val internalName = rawInternalName.asInternalName()
+            val internalName = rawInternalName.toInternalName()
 
             // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
@@ -163,58 +95,36 @@ object NEUItems {
         return map
     }
 
-    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
+    fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
-        ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
+    // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
-        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+        return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
 
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getPrice(
-        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<PrimitiveRecipe> = emptyList(),
-    ): Double = getPriceNew(priceSource, pastRecipes)
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
-
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
+        ItemResolutionQuery.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getPriceOrNull(
-        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<PrimitiveRecipe> = emptyList(),
-    ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
-
-    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<PrimitiveRecipe> = emptyList()): Double? =
-        getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
-
-    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
+    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
-    fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
+    fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            getPriceOrNullNew() ?: return@run fallbackItem
+            getPriceOrNull() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
 
             val name = this.toString()
@@ -224,13 +134,28 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
 
-    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
+    private val hardcodedVanillaItems = listOf(
+        "WOOD_AXE", "WOOD_HOE", "WOOD_PICKAXE", "WOOD_SPADE", "WOOD_SWORD",
+        "GOLD_AXE", "GOLD_HOE", "GOLD_PICKAXE", "GOLD_SPADE", "GOLD_SWORD",
+    )
+
+    fun NEUInternalName.isVanillaItem(): Boolean {
+        val asString = this.asString()
+        if (hardcodedVanillaItems.contains(asString)) return true
+
+        val vanillaName = asString.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
+        if (allNeuRepoItems().containsKey(vanillaName)) {
+            val json = allNeuRepoItems()[vanillaName]
+            if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
+        }
+        return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
+    }
 
     fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
         if (prefix.isEmpty()) return this
         val string = asString()
         if (!string.startsWith(prefix)) return this
-        return string.substring(prefix.length).asInternalName()
+        return string.substring(prefix.length).toInternalName()
     }
 
     const val itemFontSize = 2.0 / 3.0
@@ -271,18 +196,22 @@ object NEUItems {
         try {
             Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         } catch (e: Exception) {
-            println(" ")
-            println("item: $item")
-            println("name: ${item.name}")
-            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
-            println(" ")
-            @Suppress("PrintStackTrace")
-            e.printStackTrace()
+            if (lastWarn.passedSince() > 1.seconds) {
+                lastWarn = SimpleTimeMark.now()
+                println(" ")
+                println("item: $item")
+                println("name: ${item.name}")
+                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+                println(" ")
+                ChatUtils.debug("rendering an item has failed.")
+            }
         }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
     }
+
+    private var lastWarn = SimpleTimeMark.farPast()
 
     private object AdjustStandardItemLighting {
 
@@ -303,15 +232,17 @@ object NEUItems {
         }
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+    fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
         itemIdCache[item]?.let {
             return it
         }
-        val result = allNeuRepoItems()
-            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
-            .keys.map { it.asInternalName() }
+        val result = allNeuRepoItems().filter {
+            Item.getByNameOrId(it.value["itemid"].asString) == item
+        }.keys.map {
+            it.toInternalName()
+        }
         itemIdCache[item] = result
         return result
     }
@@ -330,26 +261,26 @@ object NEUItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
+            for (ingredient in recipe.ingredients.toPrimitiveItemStacks()) {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
-                if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
-                    internalItemId = "CACTUS".asInternalName()
+                if (internalName == "ENCHANTED_CACTUS_GREEN".toInternalName() && internalItemId == "INK_SACK-2".toInternalName()) {
+                    internalItemId = "CACTUS".toInternalName()
                 }
 
                 // ignore wheat in enchanted cookie
-                if (internalName == "ENCHANTED_COOKIE".asInternalName() && internalItemId == "WHEAT".asInternalName()) {
+                if (internalName == "ENCHANTED_COOKIE".toInternalName() && internalItemId == "WHEAT".toInternalName()) {
                     continue
                 }
 
                 // ignore golden carrot in enchanted golden carrot
-                if (internalName == "ENCHANTED_GOLDEN_CARROT".asInternalName() && internalItemId == "GOLDEN_CARROT".asInternalName()) {
+                if (internalName == "ENCHANTED_GOLDEN_CARROT".toInternalName() && internalItemId == "GOLDEN_CARROT".toInternalName()) {
                     continue
                 }
 
                 // ignore rabbit hide in leather
-                if (internalName == "LEATHER".asInternalName() && internalItemId == "RABBIT_HIDE".asInternalName()) {
+                if (internalName == "LEATHER".toInternalName() && internalItemId == "RABBIT_HIDE".toInternalName()) {
                     continue
                 }
 
@@ -373,15 +304,10 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> {
-        return recipesCache.getOrPut(internalName) {
-            PrimitiveRecipe.convertMultiple(manager.getRecipesFor(internalName.asString())).toSet()
-        }
-    }
-
-    fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
+        if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
         // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
@@ -394,7 +320,7 @@ object NEUItems {
 
     // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
-        val jsonObject = manager.getJsonForItem(item)
+        val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
         }
@@ -406,6 +332,6 @@ object NEUItems {
     fun loadNBTData(encoded: String): ItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
-        return manager.jsonToStack(jsonObject, false)
+        return EnoughUpdatesManager.jsonToStack(jsonObject, false)
     }
 }

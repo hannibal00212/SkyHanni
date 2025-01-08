@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -17,11 +15,9 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -38,7 +34,6 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
-import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -53,9 +48,6 @@ object LorenzUtils {
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
-
-    @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
-    val inDungeons get() = DungeonAPI.inDungeon()
 
     /**
      * Consider using [IslandType.isInIsland] instead
@@ -83,34 +75,18 @@ object LorenzUtils {
             val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
             val result = (!never && (always || itsTime))
             if (previousApril != result) {
-                ModifyVisualWords.textCache.clear()
+                ModifyVisualWords.update()
             }
             previousApril = result
             return result
         }
 
-    val debug: Boolean = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+    val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     private var previousApril = false
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
-
-    // TODO move to string utils
-    @Deprecated("outdated", ReplaceWith("originalMessage.stripHypixelMessage()"))
-    fun stripVanillaMessage(originalMessage: String): String {
-        return originalMessage.stripHypixelMessage()
-    }
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
-    fun Double.round(decimals: Int) = this.roundTo(decimals)
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
-    fun Float.round(decimals: Int) = this.roundTo(decimals)
-
-    // TODO replace all calls with regex
-    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
-    fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
@@ -280,12 +256,8 @@ object LorenzUtils {
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
-        val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (
-            tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" &&
-                tileSign.signText[2].unformattedText.removeColor() == "Set your" &&
-                tileSign.signText[3].unformattedText.removeColor() == "speed cap!"
-            )
+        val signText = (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
+        return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -296,13 +268,7 @@ object LorenzUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            Minecraft.getMinecraft().playerController.windowClick(
-                container.windowId,
-                slotNumber,
-                0,
-                1,
-                Minecraft.getMinecraft().thePlayer,
-            )
+            InventoryUtils.clickSlot(slotNumber, container.windowId, 0, 1)
             this.cancel()
         }
     }
@@ -329,8 +295,7 @@ object LorenzUtils {
     }
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
-        enumValueOfOrNull<T>(name)
-            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+        enumValueOfOrNull<T>(name) ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
@@ -338,31 +303,13 @@ object LorenzUtils {
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
     fun shutdownMinecraft(reason: String? = null) {
-        System.err.println("SkyHanni-${SkyHanniMod.version} forced the game to shutdown.")
-        reason?.let {
-            System.err.println("Reason: $it")
-        }
+        val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
+        System.err.println("SkyHanni-@MOD_VERSION@ ${"forced the game to shutdown.$reasonLine"}")
+
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    /**
-     * Get the group, otherwise, return null
-     * @param groupName The group name in the pattern
-     */
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.groupOrNull"))
-    fun Matcher.groupOrNull(groupName: String): String? = runCatching { this.group(groupName) }.getOrNull()
-
-    @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
-    fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
-
-    // TODO move into Mining API
-    @Deprecated("", ReplaceWith("MiningAPI.inAdvancedMiningIsland()", "at.hannibal2.skyhanni.data.MiningAPI"))
-    fun inAdvancedMiningIsland() = MiningAPI.inAdvancedMiningIsland()
-
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
-        IslandType.DEEP_CAVERNS.isInIsland() || inAdvancedMiningIsland()
-
-    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

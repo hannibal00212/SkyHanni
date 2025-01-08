@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -44,7 +45,7 @@ object HoppityEggLocations {
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         // TODO: split Chocolate Factory and Hoppity repo data
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
@@ -74,12 +75,12 @@ object HoppityEggLocations {
 
     private var loadedNeuThisProfile = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         loadedNeuThisProfile = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
 

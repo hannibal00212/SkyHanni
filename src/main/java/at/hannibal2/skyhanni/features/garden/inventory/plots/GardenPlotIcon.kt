@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.inventory.plots
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -29,8 +30,8 @@ object GardenPlotIcon {
     // TODO replace with enum
     private var editMode = 0 // 0 = off, 1 = on, 2 = reset
     private var lastClickedSlotId = -1
-    private var originalStack = mutableMapOf<Int, ItemStack>()
-    private var cachedStack = mutableMapOf<Int, ItemStack>()
+    private val originalStack = mutableMapOf<Int, ItemStack>()
+    private val cachedStack = mutableMapOf<Int, ItemStack>()
     private val editStack = ItemStack(Items.wooden_axe)
     private val whitelistedSlot =
         listOf(2, 3, 4, 5, 6, 11, 12, 13, 14, 15, 20, 21, 23, 24, 29, 30, 31, 32, 33, 38, 39, 40, 41, 42)
@@ -39,8 +40,8 @@ object GardenPlotIcon {
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled && inInventory
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName == "Configure Plots"
         if (!isEnabled()) return
 
@@ -55,13 +56,13 @@ object GardenPlotIcon {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         editMode = 0
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
@@ -80,7 +81,7 @@ object GardenPlotIcon {
                     lastClickedSlotId = -1
                     return
                 }
-                event.replace(cachedStack[event.slot])
+                cachedStack[event.slot]?.let { event.replace(it) }
             }
         }
     }

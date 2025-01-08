@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -25,10 +26,13 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Breakfast Egg
      * REGEX-TEST: Chocolate Lunch Egg
      * REGEX-TEST: Chocolate Dinner Egg
+     * REGEX-TEST: Chocolate Brunch Egg
+     * REGEX-TEST: Chocolate Déjeuner Egg
+     * REGEX-TEST: Chocolate Supper Egg
      */
-    private val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val mealEggInventoryPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.name",
-        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner) Egg.*",
+        "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
 
     /**
@@ -55,17 +59,17 @@ object HoppityRabbitTheFishChecker {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        rabbitTheFishIndex?.let {
-            InventoryUtils.getItemsInOpenChest()[it] highlight LorenzColor.RED
-        }
+        val index = rabbitTheFishIndex ?: return
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        rabbitTheFishIndex = null
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName()
+            it.value.hasDisplayName() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key
@@ -80,7 +84,7 @@ object HoppityRabbitTheFishChecker {
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.cancel()
             SoundUtils.playErrorSound()
-        } else if (rabbitTheFishIndex == event.slot.slotNumber) {
+        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
@@ -95,5 +99,5 @@ object HoppityRabbitTheFishChecker {
         return shouldContinue
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingFish
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingRabbitTheFish
 }

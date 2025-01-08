@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -26,20 +27,24 @@ object DungeonCopilot {
     private val patternGroup = RepoPattern.group("dungeon.copilot")
     private val countdownPattern by patternGroup.pattern(
         "countdown",
-        "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute."
+        ".* has started the dungeon countdown. The dungeon will begin in 1 minute.",
     )
+
+    /**
+     * REGEX-TEST: §a§r§bCalMWolfs§r§a opened a §r§8§lWITHER §r§adoor!
+     */
     private val witherDoorPattern by patternGroup.pattern(
         "wither.door",
-        "(.*) opened a §r§8§lWITHER §r§adoor!"
+        ".* opened a §r§8§lWITHER §r§adoor!",
     )
     private val bloodDoorPattern by patternGroup.pattern(
         "blood.door",
-        "§cThe §r§c§lBLOOD DOOR§r§c has been opened!"
+        "§cThe §r§c§lBLOOD DOOR§r§c has been opened!",
     )
 
     private val keyPatternsList = listOf(
         "§eA §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e was picked up!".toPattern(),
-        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern()
+        "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern(),
     )
 
     private var nextStep = ""
@@ -103,12 +108,9 @@ object DungeonCopilot {
         nextStep = step
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (!searchForKey) return
 
@@ -122,13 +124,13 @@ object DungeonCopilot {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         changeNextStep("Clear first room")
         searchForKey = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonEnterEvent) {
         changeNextStep("Talk to Mort")
         searchForKey = true
@@ -153,7 +155,7 @@ object DungeonCopilot {
         config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
         event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")

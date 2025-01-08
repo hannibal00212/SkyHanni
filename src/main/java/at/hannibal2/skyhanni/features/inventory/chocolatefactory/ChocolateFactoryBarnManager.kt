@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -36,6 +36,11 @@ object ChocolateFactoryBarnManager {
 
     var barnFull = false
     private var sentBarnFullWarning = false
+    private var lastRabbit = ""
+
+    fun processDataSet(dataSet: HoppityAPI.HoppityStateDataSet) {
+        lastRabbit = dataSet.lastName
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -58,16 +63,29 @@ object ChocolateFactoryBarnManager {
                 }
             }
             ChocolateAmount.addToAll(amount)
-            HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
-            HoppityAPI.attemptFireRabbitFound(lastDuplicateAmount = amount)
+            HoppityAPI.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
+
+            var changedMessage = event.message
 
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
-                (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit())).takeIf { it > 0 }?.let {
-                    event.chatComponent = ChatComponentText(
-                        event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"),
+                // Add duplicate number to the duplicate rabbit message
+                (HoppityCollectionStats.getRabbitCount(lastRabbit)).takeIf { it > 0 }?.let {
+                    changedMessage = changedMessage.replace(
+                        "§7§lDUPLICATE RABBIT!",
+                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"
                     )
                 }
             }
+
+            if (hoppityConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+                // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
+                changedMessage = changedMessage.replace(
+                    "§6\\+(?<amount>[\\d,]+) Chocolate",
+                    "§6\\+§d${group("amount")} §6Chocolate"
+                )
+            }
+
+            if (event.message != changedMessage) event.chatComponent = ChatComponentText(changedMessage)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
@@ -76,7 +94,7 @@ object ChocolateFactoryBarnManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         sentBarnFullWarning = false
     }

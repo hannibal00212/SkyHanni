@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -27,7 +28,7 @@ object VolcanoExplosivityDisplay {
     )
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.VOLCANO)) return

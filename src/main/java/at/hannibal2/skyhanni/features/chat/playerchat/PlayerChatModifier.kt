@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerChatModifier {
@@ -22,7 +22,7 @@ object PlayerChatModifier {
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         event.applyIfPossible { cutMessage(it) }
     }
@@ -63,7 +63,7 @@ object PlayerChatModifier {
         return string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")
