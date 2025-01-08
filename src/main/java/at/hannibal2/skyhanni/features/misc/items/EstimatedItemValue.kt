@@ -57,7 +57,7 @@ object EstimatedItemValue {
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
@@ -134,7 +134,7 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }

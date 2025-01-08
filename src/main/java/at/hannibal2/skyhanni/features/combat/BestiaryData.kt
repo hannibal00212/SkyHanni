@@ -119,8 +119,8 @@ object BestiaryData {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
         val items = event.inventoryItems
@@ -134,7 +134,7 @@ object BestiaryData {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         mobList.clear()
         stackList.clear()

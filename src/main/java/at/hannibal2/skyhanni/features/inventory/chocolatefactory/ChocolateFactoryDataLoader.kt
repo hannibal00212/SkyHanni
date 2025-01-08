@@ -230,7 +230,7 @@ object ChocolateFactoryDataLoader {
 
     // </editor-fold>
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
@@ -242,7 +242,7 @@ object ChocolateFactoryDataLoader {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }

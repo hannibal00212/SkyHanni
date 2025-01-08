@@ -122,8 +122,8 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!RiftAPI.inRift() || event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
