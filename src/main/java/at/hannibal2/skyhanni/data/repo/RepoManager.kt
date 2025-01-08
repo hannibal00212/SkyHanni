@@ -64,7 +64,9 @@ class RepoManager(private val configLocation: File) {
         private const val DEFAULT_BRANCH = "main"
 
         fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-            user == DEFAULT_USER && name == DEFAULT_NAME && branch == DEFAULT_BRANCH
+            user.lowercase() == DEFAULT_USER.lowercase() &&
+                name.lowercase() == DEFAULT_NAME.lowercase() &&
+                branch.lowercase() == DEFAULT_BRANCH.lowercase()
     }
 
     fun loadRepoInformation() {
@@ -192,7 +194,7 @@ class RepoManager(private val configLocation: File) {
             unsuccessfulConstants.clear()
             lastConstant = null
 
-            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
+            RepositoryReloadEvent(repoLocation, gson).post {
                 error = true
                 lastConstant?.let {
                     unsuccessfulConstants.add(it)

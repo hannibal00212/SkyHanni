@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkullTextureHolder {
 
     private var skullTextures = mutableMapOf<String, String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         skullTextures = event.getConstant<Map<String, String>>("Skulls").toMutableMap()
         fixLateInits()
