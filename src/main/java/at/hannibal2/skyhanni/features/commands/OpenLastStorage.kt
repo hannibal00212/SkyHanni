@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 object OpenLastStorage {
 
     private val config get() = SkyHanniMod.feature.misc.lastStorage
-    private val storage = ProfileStorageData.profileSpecific?.lastStorage
+    private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
 
     private var lastStorageType: StorageType?
         get() = storage?.type
@@ -42,7 +42,6 @@ object OpenLastStorage {
     }
 
     private fun openLastStoragePage(type: StorageType) {
-        ChatUtils.chat("Opening last ${type.storageName} page $lastStoragePage.")
         lastStoragePage?.let { type.runCommand(it) } ?: ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
 
         val message = lastStoragePage?.let { page ->
@@ -56,9 +55,7 @@ object OpenLastStorage {
         if (!isEnabled()) return
         if (event.senderIsSkyhanni()) return
         val args = event.message.lowercase().split(" ")
-        ChatUtils.chat("Message: ${event.message}, args: $args")
         val type = StorageType.fromCommand(args[0]) ?: return
-        ChatUtils.chat("Type: ${type.storageName}")
 
         if (handleStorage(args, type)) {
             event.cancel()
@@ -74,7 +71,6 @@ object OpenLastStorage {
             callback {
                 if (isEnabled()) {
                     lastStorageType?.let { type -> openLastStoragePage(type) }
-                    ChatUtils.chat("Should open ${lastStorageType?.storageName} page $lastStoragePage.")
                 } else {
                     ChatUtils.chatAndOpenConfig(
                         "This feature is disabled, enable it in the config if you want to use it.",
@@ -96,11 +92,9 @@ object OpenLastStorage {
             lastStoragePage = 1
         } else {
             val pageNumber = args[1].formatIntOrUserError() ?: return false
-            ChatUtils.chat("Page number: $pageNumber, (arg 1: ${args[1]})")
             lastStoragePage = pageNumber.takeIf { type.isValidPage(it) }
         }
         lastStorageType = type
-        ChatUtils.chat("Set last ${type.storageName} page to $lastStoragePage.")
         return false
     }
 
