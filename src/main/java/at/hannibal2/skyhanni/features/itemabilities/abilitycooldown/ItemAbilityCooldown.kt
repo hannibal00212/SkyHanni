@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -50,6 +49,14 @@ object ItemAbilityCooldown {
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
         "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
+    )
+
+    /**
+     * REGEX-TEST: §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
+     */
+    private val abilityUsePattern by patternGroup.pattern(
+        "abilityuse",
+        ".*§b-\\d+ Mana \\(§6(?<type>.*)§b\\).*",
     )
 
     private var lastAbility = ""
@@ -265,9 +272,8 @@ object ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
-        // TODO use regex
-        if (message.contains(" (§6") && message.contains("§b) ")) {
-            val name: String = message.between(" (§6", "§b) ")
+        abilityUsePattern.matchMatcher(message) {
+            val name = group("type")
             if (name == lastAbility) return
             lastAbility = name
             for (ability in ItemAbility.entries) {

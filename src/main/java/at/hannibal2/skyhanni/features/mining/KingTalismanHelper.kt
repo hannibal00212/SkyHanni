@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -65,9 +68,14 @@ object KingTalismanHelper {
         return currentOffset
     }
 
-    fun kingFix() {
+    private fun kingFix() {
         currentOffset = null
         ChatUtils.chat("Reset internal offset of King Talisman Helper.")
+    }
+
+    private fun resetKings() {
+        storage?.kingsTalkedTo = mutableListOf<String>()
+        update()
     }
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
@@ -229,6 +237,20 @@ object KingTalismanHelper {
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()
             update()
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shkingfix") {
+            description = "Resets the local King Talisman Helper offset."
+            category = CommandCategory.USERS_BUG_FIX
+            callback { kingFix() }
+        }
+        event.register("shresetkinghelper") {
+            description = "Resets the King Talisman Helper"
+            category = CommandCategory.USERS_RESET
+            callback { resetKings() }
         }
     }
 }
