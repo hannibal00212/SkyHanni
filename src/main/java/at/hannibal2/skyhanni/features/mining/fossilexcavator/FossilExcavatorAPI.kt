@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -52,14 +53,14 @@ object FossilExcavatorAPI {
 
     val scrapItem = "SUSPICIOUS_SCRAP".toInternalName()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (event.inventoryName != "Fossil Excavator") return
         inInventory = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
@@ -73,7 +74,7 @@ object FossilExcavatorAPI {
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inExcavatorMenu = false

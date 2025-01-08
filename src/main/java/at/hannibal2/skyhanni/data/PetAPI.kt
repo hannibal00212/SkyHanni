@@ -51,7 +51,7 @@ object PetAPI {
     var currentPet: String?
         get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
         set(value) {
-            ProfileStorageData.profileSpecific?.currentPet = value
+            ProfileStorageData.profileSpecific?.currentPet = value.orEmpty()
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false

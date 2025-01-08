@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MagicalPowerDisplay {
@@ -97,8 +96,8 @@ object MagicalPowerDisplay {
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}$endMP"
     }
 
-    @SubscribeEvent
-    fun onInventoryOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!abiphoneNamePattern.matches(event.inventoryName)) return
 

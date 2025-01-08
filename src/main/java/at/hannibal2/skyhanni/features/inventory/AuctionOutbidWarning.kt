@@ -13,6 +13,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AuctionOutbidWarning {
+
+    /**
+     * REGEX-TEST: §6[Auction] §aMrBaiacu §eoutbid you by §659,083 coins §efor §fFiredust Dagger §e§lCLICK
+     */
     private val outbidPattern by RepoPattern.pattern(
         "auction.outbid",
         "§6\\[Auction].*§eoutbid you by.*§e§lCLICK"
