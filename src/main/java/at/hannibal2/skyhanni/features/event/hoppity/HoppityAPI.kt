@@ -215,15 +215,15 @@ object HoppityAPI {
         ).post()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
         if (event.inventoryName != "Hoppity") return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         processedStraySlots.clear()
         if (lastHoppityCallAccept == null) return
@@ -239,7 +239,7 @@ object HoppityAPI {
         checkNextInvOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {

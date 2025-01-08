@@ -104,7 +104,7 @@ object FishingProfitTracker {
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
     }

@@ -39,7 +39,7 @@ object GardenCropMilestoneInventory {
         average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         average = -1.0
     }
