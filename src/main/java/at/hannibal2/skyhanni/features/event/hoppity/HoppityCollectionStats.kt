@@ -281,7 +281,7 @@ object HoppityCollectionStats {
         hotspotRabbitCount -= 1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         for ((island, residents) in data.residentLocations) {
@@ -304,8 +304,8 @@ object HoppityCollectionStats {
         reCalcHotspotCount()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) {
             // Clear highlight cache in case options are toggled
@@ -453,7 +453,7 @@ object HoppityCollectionStats {
 
     private val highlightMap = mutableMapOf<String, LorenzColor>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         display = emptyList()

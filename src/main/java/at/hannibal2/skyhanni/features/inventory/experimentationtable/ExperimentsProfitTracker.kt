@@ -186,7 +186,7 @@ object ExperimentsProfitTracker {
 
     private fun NEUInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
 
@@ -211,7 +211,7 @@ object ExperimentsProfitTracker {
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -34,8 +35,8 @@ object CraftMaterialsFromBazaar {
     private var neededMaterials = listOf<PrimitiveItemStack>()
     private var multiplier = 1
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
@@ -156,7 +157,7 @@ object CraftMaterialsFromBazaar {
             .filter { it.internalName.isBazaarItem() }
             .sumOf { it.internalName.getPrice() * it.amount * multiplier }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inRecipeInventory = false
     }
