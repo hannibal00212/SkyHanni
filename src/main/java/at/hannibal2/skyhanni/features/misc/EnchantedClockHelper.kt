@@ -210,7 +210,10 @@ object EnchantedClockHelper {
             } ?: continue
 
             val parsedCooldown: SimpleTimeMark? = when (currentStatus) {
-                State.READY, State.PROBLEM -> null
+                State.READY, State.PROBLEM -> {
+                    storage[simpleType]?.availableAt = SimpleTimeMark.now()
+                    continue
+                }
                 else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
                     group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
                 }
