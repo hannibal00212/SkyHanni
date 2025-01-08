@@ -189,12 +189,12 @@ object FarmingFortuneDisplay {
         add(Renderable.horizontalContainer(list))
 
         if (ffReduction > 0) {
-            add(
-                Renderable.string(
-                    if (config.compactFormat) "§cPests: §7-§e$ffReduction%"
-                    else "§cPests are reducing your fortune by §e$ffReduction%§c!"
-                )
-            )
+            if (config.compactFormat) {
+                add(Renderable.string("§cPests: §7-§e$ffReduction%"))
+            } else {
+                add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+            }
+
         }
 
         if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
