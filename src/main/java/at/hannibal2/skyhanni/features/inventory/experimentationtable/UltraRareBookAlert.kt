@@ -63,7 +63,7 @@ object UltraRareBookAlert {
         GlStateManager.popMatrix()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (enchantsFound) return
@@ -80,7 +80,7 @@ object UltraRareBookAlert {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         enchantsFound = false
     }

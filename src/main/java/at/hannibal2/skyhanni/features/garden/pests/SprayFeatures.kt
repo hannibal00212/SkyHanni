@@ -32,7 +32,7 @@ object SprayFeatures {
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
 
-    private val SPRAYONATOR by lazy { "SPRAYONATOR".toInternalName() }
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
 
     private fun SprayType?.getSprayEffect(): String =
         this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->

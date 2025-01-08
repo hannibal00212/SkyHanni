@@ -305,6 +305,9 @@ object ChatFilter {
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
     )
 
+    /**
+     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
+     */
     private val skymallPerkPattern by RepoPattern.pattern(
         "chat.skymall.perk",
         "§eNew buff§r§r§r:.*",

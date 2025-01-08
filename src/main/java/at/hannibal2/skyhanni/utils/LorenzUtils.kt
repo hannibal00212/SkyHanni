@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
@@ -88,10 +87,6 @@ object LorenzUtils {
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
-
-    // TODO replace all calls with regex
-    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
-    fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
@@ -315,8 +310,6 @@ object LorenzUtils {
     }
 
     fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
-
-    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

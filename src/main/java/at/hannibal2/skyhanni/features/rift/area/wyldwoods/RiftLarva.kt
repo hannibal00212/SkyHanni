@@ -23,7 +23,7 @@ object RiftLarva {
 
     private val LARVA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    private val LARVA_HOOK by lazy { "LARVA_HOOK".toInternalName() }
+    private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

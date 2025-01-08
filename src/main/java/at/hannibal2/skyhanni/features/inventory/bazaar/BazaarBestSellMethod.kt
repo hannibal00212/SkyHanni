@@ -30,7 +30,7 @@ object BazaarBestSellMethod {
     private var lastClickedItem: ItemStack? = null
     private var nextCloseWillResetItem = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = ""
         if (lastClickedItem != null) {

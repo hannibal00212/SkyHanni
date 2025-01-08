@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -18,44 +19,48 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object NucleusBarriersBox {
     private val config get() = SkyHanniMod.feature.mining.crystalHighlighter
+    private val colorConfig get() = config.colors
 
     private var inNucleus = false
 
-    private enum class Crystal(val color: LorenzColor, val boundingBox: AxisAlignedBB) {
+    private enum class Crystal(
+        val boundingBox: AxisAlignedBB,
+        val configColorOption: Property<String>,
+    ) {
         AMBER(
-            LorenzColor.GOLD,
             AxisAlignedBB(
                 BlockPos(474.0, 124.0, 524.0),
                 BlockPos(485.0, 111.0, 535.0),
             ).expandBlock(),
+            colorConfig.amber,
         ),
         AMETHYST(
-            LorenzColor.DARK_PURPLE,
             AxisAlignedBB(
                 BlockPos(474.0, 124.0, 492.0),
                 BlockPos(485.0, 111.0, 503.0),
             ).expandBlock(),
+            colorConfig.amethyst,
         ),
         TOPAZ(
-            LorenzColor.YELLOW,
             AxisAlignedBB(
                 BlockPos(508.0, 124.0, 473.0),
                 BlockPos(519.0, 111.0, 484.0),
             ).expandBlock(),
+            colorConfig.topaz,
         ),
         JADE(
-            LorenzColor.GREEN,
             AxisAlignedBB(
                 BlockPos(542.0, 124.0, 492.0),
                 BlockPos(553.0, 111.0, 503.0),
             ).expandBlock(),
+            colorConfig.jade,
         ),
         SAPPHIRE(
-            LorenzColor.BLUE,
             AxisAlignedBB(
                 BlockPos(542.0, 124.0, 524.0),
                 BlockPos(553.0, 111.0, 535.0),
             ).expandBlock(),
+            colorConfig.sapphire,
         ),
     }
 
@@ -71,7 +76,7 @@ object NucleusBarriersBox {
         Crystal.entries.forEach { crystal ->
             event.drawFilledBoundingBoxNea(
                 crystal.boundingBox,
-                crystal.color.addOpacity(config.opacity),
+                crystal.configColorOption.get().toSpecialColor(),
                 renderRelativeToCamera = false,
             )
         }
