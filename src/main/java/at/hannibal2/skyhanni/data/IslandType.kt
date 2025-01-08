@@ -36,6 +36,18 @@ enum class IslandType(private val nameFallback: String) {
     UNKNOWN("???"),
     ;
 
+    fun guestVariant(): IslandType = when (this) {
+        PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
+        GARDEN -> GARDEN_GUEST
+        else -> this
+    }
+
+    // TODO: IslandTags
+    fun hasGuestVariant(): Boolean = when (this) {
+        PRIVATE_ISLAND, GARDEN -> true
+        else -> false
+    }
+
     var islandData: IslandData? = null
         private set
 
@@ -55,8 +67,8 @@ enum class IslandType(private val nameFallback: String) {
         var maxPlayersMega = 80
             private set
 
-        fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
-        fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+        fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
+        fun getByName(name: String): IslandType = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 
         fun getByNameOrNull(name: String) = entries.firstOrNull { it.islandData?.name == name }
 
@@ -75,6 +87,10 @@ enum class IslandType(private val nameFallback: String) {
             maxPlayers = data.maxPlayers
             maxPlayersMega = data.maxPlayersMega
         }
+        fun getByNameOrNull(name: String): IslandType? = entries.find { it.displayName == name }
+
+        fun getByIdOrNull(id: String): IslandType? = entries.find { it.id == id }
+        fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
     }
 }
 

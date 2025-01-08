@@ -208,7 +208,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
-    implementation("net.hypixel:mod-api:0.3.1")
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        compileOnly(libs.hypixelmodapi)
+        shadowImpl(libs.hypixelmodapitweaker)
+    }
+
 
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
@@ -343,6 +347,7 @@ tasks.shadowJar {
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
     relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
