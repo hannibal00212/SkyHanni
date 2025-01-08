@@ -16,7 +16,7 @@ object ScreenData {
         if (wasOpen == isOpen) return
         wasOpen = isOpen
         if (!wasOpen) {
-            InventoryCloseEvent(false).postAndCatch()
+            InventoryCloseEvent(false).post()
         }
     }
 }

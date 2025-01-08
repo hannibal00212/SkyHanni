@@ -91,8 +91,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         questLoader.checkInventory(event)

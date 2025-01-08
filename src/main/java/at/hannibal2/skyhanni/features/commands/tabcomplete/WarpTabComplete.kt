@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object WarpTabComplete {
@@ -15,7 +14,7 @@ object WarpTabComplete {
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var warps = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<WarpsJson>("Warps")
         warps = data.warpCommands
