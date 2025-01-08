@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BoostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
@@ -169,7 +170,7 @@ object EnchantedClockHelper {
         return readyNowBoosts
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnchantedClockJson>("misc/EnchantedClock")
         ClockBoostType.clear()
@@ -184,7 +185,7 @@ object EnchantedClockHelper {
         storage?.putIfAbsent(simpleType, Status(State.CHARGING, boostType.getCooldownFromNow()))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!enchantedClockPattern.matches(event.inventoryName)) return
         val storage = storage ?: return
