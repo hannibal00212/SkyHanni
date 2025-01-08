@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CarnivalShopHelper {
@@ -115,7 +114,7 @@ object CarnivalShopHelper {
         regenerateOverviewItemStack()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEventType = ""
@@ -213,7 +212,7 @@ object CarnivalShopHelper {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
         var shouldUpdate = processTokenShopFooter(event)
