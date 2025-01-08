@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -43,9 +42,8 @@ object OpenLastStorage {
     }
 
     private fun openLastStoragePage(type: StorageType) {
-        ChatUtils.chat("Opening last ${type.storageName} page ${lastStoragePage}.")
-        lastStoragePage?.let { type.runCommand(it) } ?:
-            ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
+        ChatUtils.chat("Opening last ${type.storageName} page $lastStoragePage.")
+        lastStoragePage?.let { type.runCommand(it) } ?: ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
 
         val message = lastStoragePage?.let { page ->
             "Opened last ${type.storageName} $page."
@@ -76,7 +74,7 @@ object OpenLastStorage {
             callback {
                 if (isEnabled()) {
                     lastStorageType?.let { type -> openLastStoragePage(type) }
-                    ChatUtils.chat("Should open ${lastStorageType?.storageName} page ${lastStoragePage}.")
+                    ChatUtils.chat("Should open ${lastStorageType?.storageName} page $lastStoragePage.")
                 } else {
                     ChatUtils.chatAndOpenConfig(
                         "This feature is disabled, enable it in the config if you want to use it.",
@@ -102,7 +100,7 @@ object OpenLastStorage {
             lastStoragePage = pageNumber.takeIf { type.isValidPage(it) }
         }
         lastStorageType = type
-        ChatUtils.chat("Set last ${type.storageName} page to ${lastStoragePage}.")
+        ChatUtils.chat("Set last ${type.storageName} page to $lastStoragePage.")
         return false
     }
 
