@@ -193,7 +193,7 @@ class ProfileSpecificStorage {
 
         class HitmanStatsStorage {
             @Expose
-            var availableEggs: Int? = null
+            var availableHitmanEggs: Int = 0
 
             @Expose
             var singleSlotCooldownMark: SimpleTimeMark? = null
@@ -202,7 +202,7 @@ class ProfileSpecificStorage {
             var allSlotsCooldownMark: SimpleTimeMark? = null
 
             @Expose
-            var purchasedSlots: Int? = null
+            var purchasedHitmanSlots: Int = 0
         }
 
         @Expose
