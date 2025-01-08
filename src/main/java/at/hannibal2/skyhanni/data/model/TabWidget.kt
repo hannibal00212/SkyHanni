@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -445,7 +444,7 @@ enum class TabWidget(
             sentSinceWorldChange = false
         }
 
-        @SubscribeEvent(priority = EventPriority.LOW)
+        @HandleEvent(priority = HandleEvent.LOW)
         fun onRepoReload(event: RepositoryReloadEvent) {
             extraPatterns = repoGroup.getUnusedPatterns()
         }

@@ -41,8 +41,8 @@ object HighlightPlaceableNpcs {
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!isEnabled()) return
 
@@ -58,7 +58,7 @@ object HighlightPlaceableNpcs {
         this.highlightedItems = highlightedItems
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         highlightedItems = emptyList()

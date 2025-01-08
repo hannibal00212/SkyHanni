@@ -35,8 +35,8 @@ object CropAccessoryData {
         accessoryInInventory = CropAccessory.NONE
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!accessoryBagNamePattern.matches(event.inventoryName)) return
 
         val items = event.inventoryItems.mapNotNull { it.value }
