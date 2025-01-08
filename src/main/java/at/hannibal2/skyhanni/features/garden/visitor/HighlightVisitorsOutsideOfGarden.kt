@@ -35,7 +35,7 @@ object HighlightVisitorsOutsideOfGarden {
 
     private val config get() = GardenAPI.config.visitors
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
             "Garden", GardenJson::class.java,

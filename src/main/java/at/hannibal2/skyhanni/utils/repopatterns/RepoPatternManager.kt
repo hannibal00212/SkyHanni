@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -156,7 +155,7 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }

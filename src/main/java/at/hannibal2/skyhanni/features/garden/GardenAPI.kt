@@ -94,7 +94,7 @@ object GardenAPI {
         checkItemInHand()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
@@ -262,7 +262,7 @@ object GardenAPI {
         return tier
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp

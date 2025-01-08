@@ -41,8 +41,8 @@ object AuctionHouseOpenPriceWebsite {
     private var searchTerm = ""
     private var displayItem: ItemStack? = null
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         // TODO get search from search sign (slot 48) since it can be cut off in title
         ahSearchPattern.matchMatcher(event.inventoryName) {
@@ -62,7 +62,7 @@ object AuctionHouseOpenPriceWebsite {
         "§7on §csky.coflnet.com"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         displayItem = null
     }

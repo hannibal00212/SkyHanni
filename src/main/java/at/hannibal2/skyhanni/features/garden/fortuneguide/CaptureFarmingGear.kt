@@ -181,8 +181,8 @@ object CaptureFarmingGear {
         captureFarmingGear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
