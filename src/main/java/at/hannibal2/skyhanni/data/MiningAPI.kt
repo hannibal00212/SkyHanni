@@ -498,8 +498,8 @@ object MiningAPI {
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }
 
-    @SubscribeEvent
-    fun onRepositoryReload(event: RepositoryReloadEvent) {
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
         val repo = event.getConstant<MiningJson>("Mining")
 
         blockStrengths.clear()
