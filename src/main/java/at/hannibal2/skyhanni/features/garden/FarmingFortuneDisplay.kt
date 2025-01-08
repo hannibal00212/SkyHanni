@@ -177,7 +177,14 @@ object FarmingFortuneDisplay {
             farmingFortune.roundTo(0).addSeparators()
         } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
 
-        list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+        val latest = if (farmingFortune != -1.0) " latest" else ""
+        val wrongTabCropText = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!"
+
+        if (!wrongTabCrop || !config.compactFormat) {
+            list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+        } else {
+            list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
+        }
 
         add(Renderable.horizontalContainer(list))
 
@@ -190,15 +197,8 @@ object FarmingFortuneDisplay {
             )
         }
 
-        if (wrongTabCrop && !config.hideMissingFortuneWarnings) {
-            val latest = if (farmingFortune != -1.0) " latest" else ""
-            val text = when {
-                config.compactFormat -> "§cInaccurate!"
-                else -> {
-                    "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!"
-                }
-            }
-            add(Renderable.hoverTips(text, listOf("§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!")))
+        if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
+            add(Renderable.string(wrongTabCropText))
         }
     }
 
