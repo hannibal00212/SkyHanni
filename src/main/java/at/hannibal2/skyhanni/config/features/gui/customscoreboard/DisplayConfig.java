@@ -138,7 +138,7 @@ public class DisplayConfig {
     @Expose
     @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
     @ConfigEditorBoolean
-    public boolean skyblockTimeExactMinutes = true;
+    public boolean skyblockTimeExactMinutes = false;
 
     @Expose
     @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")

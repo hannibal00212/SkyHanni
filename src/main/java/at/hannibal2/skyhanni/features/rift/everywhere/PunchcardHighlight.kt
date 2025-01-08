@@ -75,7 +75,8 @@ object PunchcardHighlight {
     private val playerList: MutableSet<String> = mutableSetOf()
     private val playerQueue = mutableListOf<String>()
 
-    private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".toInternalName().getItemStack() }
+    private val PUNCHCARD_ARTIFACT = "PUNCHCARD_ARTIFACT".toInternalName()
+    private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
     @SubscribeEvent
@@ -120,7 +121,7 @@ object PunchcardHighlight {
     private fun checkPunchcard() {
         if (!RiftAPI.inRift()) return
 
-        val hasPunchcard = InventoryUtils.isItemInInventory("PUNCHCARD_ARTIFACT".toInternalName())
+        val hasPunchcard = InventoryUtils.isItemInInventory(PUNCHCARD_ARTIFACT)
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
             warningCooldown = SimpleTimeMark.now()
             ChatUtils.chat("You don't seem to own a Punchcard Artifact, this feature will not work without one.")

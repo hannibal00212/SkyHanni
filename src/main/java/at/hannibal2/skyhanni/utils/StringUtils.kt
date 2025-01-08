@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
@@ -29,6 +30,9 @@ object StringUtils {
     private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
+    private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
+    fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
+    fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -193,6 +197,7 @@ object StringUtils {
     }
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
+    fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
     fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
         ChatComponentText(this),
@@ -502,10 +507,6 @@ object StringUtils {
 
     fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
-    @Deprecated("This function strips internal formatting changes like the color of the pluses of the MVP+ rank")
-    fun IChatComponent.cleanPlayerName(displayName: Boolean = false): IChatComponent =
-        formattedText.cleanPlayerName(displayName).applyFormattingFrom(this)
-
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
     fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
@@ -524,5 +525,13 @@ object StringUtils {
     fun optionalAn(string: String): String {
         if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
+    }
+
+    fun String.addStrikethorugh(strikethorugh: Boolean = true): String {
+        if (!strikethorugh) return this
+
+        val firstColor = getFirstColorCode()
+        val clean = removeColor()
+        return "§$firstColor§m$clean"
     }
 }

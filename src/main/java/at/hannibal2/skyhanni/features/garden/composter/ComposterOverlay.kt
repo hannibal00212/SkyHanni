@@ -105,12 +105,12 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".toInternalName() }
-    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
-    private val VOLTA by lazy { "VOLTA".toInternalName() }
-    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
+    private val COMPOST = "COMPOST".toInternalName()
+    private val BIOFUEL = "BIOFUEL".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
+    private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
@@ -131,8 +131,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
@@ -548,7 +548,7 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         organicMatter = data.organicMatter

@@ -22,9 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @Deprecated("Use SkyHanniEvent instead")
 abstract class LorenzEvent : Event() {
 
-    private val eventName by lazy {
-        this::class.simpleName!!
-    }
+    private val eventName = this::class.simpleName!!
 
     @Deprecated("Use SkyHanniEvent instead")
     fun postAndCatch() = postAndCatchAndBlock {}
@@ -71,7 +69,7 @@ abstract class LorenzEvent : Event() {
             val hiddenErrors = errors - visibleErrors
             ChatUtils.chat(
                 Text.text(
-                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!",
+                    "§c[SkyHanni-${SkyHanniMod.VERSION}] $hiddenErrors more errors in $eventName are hidden!",
                 ),
             )
         }

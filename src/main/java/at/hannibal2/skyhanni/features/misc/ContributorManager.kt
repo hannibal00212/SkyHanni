@@ -10,17 +10,23 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ContributorManager {
     private val config get() = SkyHanniMod.feature.dev
 
+    // Key is the lowercase contributor name
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
 
-    @SubscribeEvent
+    // Just the names of the contributors including their proper case
+    var contributorNames = emptyList<String>()
+        private set
+
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
+        val map = event.getConstant<ContributorsJson>("Contributors").contributors
+        contributors = map.mapKeys { it.key.lowercase() }
+        contributorNames = map.map { it.key }
     }
 
     @HandleEvent
