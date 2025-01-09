@@ -71,7 +71,7 @@ object DungeonLividFinder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!inLividBossRoom()) return
         val block = blockLocation.getBlockStateAt()

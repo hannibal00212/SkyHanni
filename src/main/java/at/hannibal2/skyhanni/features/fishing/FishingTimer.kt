@@ -65,9 +65,15 @@ object FishingTimer {
     private var currentCount = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+
+        if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 3.seconds) {
+            babyMagmaSlugsToFind = 0
+            lastMagmaSlugLocation = null
+        }
+
         rightLocation = updateLocation()
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
             playSound()
@@ -188,15 +194,6 @@ object FishingTimer {
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
             else -> false
         }
-    }
-
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (babyMagmaSlugsToFind == 0) return
-        if (lastMagmaSlugTime.passedSince() < 3.seconds) return
-        babyMagmaSlugsToFind = 0
-        lastMagmaSlugLocation = null
     }
 
     @SubscribeEvent
