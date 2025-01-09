@@ -37,7 +37,7 @@ object SeaCreatureFeatures {
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -69,8 +69,8 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         rareSeaCreatures.remove(event.mob)
     }
 

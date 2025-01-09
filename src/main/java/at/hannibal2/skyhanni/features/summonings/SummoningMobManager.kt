@@ -79,7 +79,7 @@ object SummoningMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.Summon) {
         if (event.mob.owner?.ownerName != LorenzUtils.getPlayerName()) return
 
@@ -87,7 +87,7 @@ object SummoningMobManager {
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
         val mob = event.mob
         if (mob !in mobs) return

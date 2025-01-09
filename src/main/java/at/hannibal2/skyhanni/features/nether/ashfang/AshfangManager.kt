@@ -33,7 +33,7 @@ object AshfangManager {
 
     val active get() = ashfang != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         val mob = event.mob
@@ -52,7 +52,7 @@ object AshfangManager {
         if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!event.mob.name.contains("Ashfang ")) return
@@ -60,8 +60,8 @@ object AshfangManager {
         lastSpawnTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         ashfangMobs -= mob
         if (ashfang == mob) {

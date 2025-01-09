@@ -90,7 +90,7 @@ object FishingTimer {
 
     private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -106,8 +106,8 @@ object FishingTimer {
         handle()
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         recentBabyMagmaSlugs -= event.mob
         if (mob in mobDespawnTime) {
