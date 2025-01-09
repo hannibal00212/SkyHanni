@@ -62,8 +62,8 @@ object BeaconPower {
     private const val BEACON_POWER_SLOT = 22
     private const val STATS_SLOT = 23
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Beacon") return
         val items = event.inventoryItems

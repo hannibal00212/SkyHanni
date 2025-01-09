@@ -248,6 +248,6 @@ public class Position {
     }
 
     public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
-        linkField = configLink.owner().getField(configLink.field());
+        linkField = configLink.owner().getDeclaredField(configLink.field());
     }
 }
