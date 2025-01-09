@@ -54,15 +54,15 @@ public class PowderMiningGemstoneFilterConfig {
         FINE_UP("Show §9Fine §7or higher"),
         FLAWLESS_ONLY("Show §5Flawless §7only");
 
-        private final String str;
+        private final String displayName;
 
-        GemstoneFilterEntry(String str) {
-            this.str = str;
+        GemstoneFilterEntry(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }
