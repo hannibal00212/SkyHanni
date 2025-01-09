@@ -5,7 +5,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class PlayerMessagesConfig {
     @Expose
@@ -29,7 +28,7 @@ class PlayerMessagesConfig {
         MessagePart.EMBLEM
     )
 
-    enum class MessagePart(private val str: String) {
+    enum class MessagePart(private val displayName: String) {
         SKYBLOCK_LEVEL("SkyBlock Level"),
         EMBLEM("Emblem"),
         PLAYER_NAME("§bPlayer Name"),
@@ -41,7 +40,7 @@ class PlayerMessagesConfig {
         BINGO_LEVEL("Bingo Level"),
         ;
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 
     @Expose

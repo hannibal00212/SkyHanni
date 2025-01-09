@@ -46,13 +46,13 @@ class PowderMiningGemstoneFilterConfig {
     @ConfigEditorDropdown
     var jasperGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
-    enum class GemstoneFilterEntry(private val str: String) {
+    enum class GemstoneFilterEntry(private val displayName: String) {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
         FLAWED_UP("Show §aFlawed §7or higher"),
         FINE_UP("Show §9Fine §7or higher"),
         FLAWLESS_ONLY("Show §5Flawless §7only");
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 }

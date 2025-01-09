@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class PowderMiningFilterConfig {
     @Expose
@@ -37,7 +36,7 @@ class PowderMiningFilterConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var essenceFilterThreshold: Int = 5
 
-    enum class SimplePowderMiningRewardTypes(private val str: String) {
+    enum class SimplePowderMiningRewardTypes(private val displayName: String) {
         ASCENSION_ROPE("§9Ascension Rope"),
         WISHING_COMPASS("§aWishing Compass"),
         OIL_BARREL("§aOil Barrel"),
@@ -50,7 +49,7 @@ class PowderMiningFilterConfig {
         TREASURITE("§5Treasurite"),
         ;
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 
     @Expose
@@ -71,7 +70,7 @@ class PowderMiningFilterConfig {
     @ConfigEditorDropdown
     var goblinEggs: GoblinEggFilterEntry = GoblinEggFilterEntry.YELLOW_UP
 
-    enum class GoblinEggFilterEntry(private val str: String) {
+    enum class GoblinEggFilterEntry(private val displayName: String) {
         SHOW_ALL("Show all"),
         HIDE_ALL("Hide all"),
         GREEN_UP("Show §aGreen §7and up"),
@@ -79,7 +78,7 @@ class PowderMiningFilterConfig {
         RED_UP("Show §cRed §7and up"),
         BLUE_ONLY("Show §3Blue §7only");
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 
     // TODO rename to "gemstoneFilter" (addressed in #2285)

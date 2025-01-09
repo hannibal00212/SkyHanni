@@ -34,7 +34,7 @@ class ChatConfig {
     var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = ArrayList()
 
 
-    enum class DungeonMessageTypes(private val str: String) {
+    enum class DungeonMessageTypes(private val displayName: String) {
         PREPARE("§bPreparation"),
         START("§aClass Buffs §r/ §cMort Dialogue"),
         AMBIENCE("§bAmbience"),
@@ -48,7 +48,7 @@ class ChatConfig {
         END("§cEnd §a(End of run spam)"),
         ;
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 
     @Expose
