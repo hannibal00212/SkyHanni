@@ -12,10 +12,9 @@ import moe.nea.libautoupdate.UpdateData
  */
 class CustomGithubReleaseUpdateSource(owner: String, repository: String) : GithubReleaseUpdateSource(owner, repository) {
 
-    override fun selectUpdate(updateStream: String, releases: MutableList<GithubRelease>) = when (updateStream) {
-        "pre" -> findLatestRelease(releases.filter { !it.isDraft && !ModVersion.fromString(it.tagName).isBackport })
-        "full" -> findLatestRelease(releases.filter { !it.isDraft && !it.isPrerelease })
-        else -> null
+    override fun findLatestRelease(validReleases: Iterable<GithubRelease>): UpdateData {
+        return validReleases.asSequence().maxBy { ModVersion.fromString(it.tagName) }.let { findAsset(it) }
+            ?: throw IllegalStateException("No valid release found")
     }
 
     override fun findAsset(release: GithubRelease?): UpdateData? {
