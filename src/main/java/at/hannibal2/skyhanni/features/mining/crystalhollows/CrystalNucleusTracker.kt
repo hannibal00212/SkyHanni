@@ -51,9 +51,9 @@ object CrystalNucleusTracker {
         "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!"
     )
 
-    private val EPIC_BAL_ITEM by lazy { "BAL;3".toInternalName() }
-    private val LEGENDARY_BAL_ITEM by lazy { "BAL;4".toInternalName() }
-    private val PRECURSOR_APPARATUS_ITEM by lazy { "PRECURSOR_APPARATUS".toInternalName() }
+    private val EPIC_BAL_ITEM = "BAL;3".toInternalName()
+    private val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
+    private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
@@ -111,7 +111,9 @@ object CrystalNucleusTracker {
 
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
-        addCompletedRun()
+        tracker.modify {
+            it.runsCompleted++
+        }
         for ((internalName, amount) in event.loot) {
             tracker.addItem(internalName, amount, false)
         }
@@ -120,12 +122,6 @@ object CrystalNucleusTracker {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.professorUsage.onToggle(tracker::update)
-    }
-
-    private fun addCompletedRun() {
-        tracker.modify {
-            it.runsCompleted++
-        }
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -203,6 +199,6 @@ object CrystalNucleusTracker {
     }
 
     private fun isCfEnabled() = !config.hideInCf || !ChocolateFactoryAPI.inChocolateFactory
-    private fun isNucEnabled() = config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isNucEnabled() && isCfEnabled()
+    private fun isAreaEnabled() = config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus"
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isAreaEnabled() && isCfEnabled()
 }
