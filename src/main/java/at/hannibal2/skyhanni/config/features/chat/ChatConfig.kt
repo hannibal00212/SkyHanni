@@ -29,6 +29,11 @@ class ChatConfig {
     var playerMessage: PlayerMessagesConfig = PlayerMessagesConfig()
 
     @Expose
+    @ConfigOption(name = "Sound Responses", desc = "")
+    @Accordion
+    var soundResponse: SoundResponseConfig = SoundResponseConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = ArrayList()
@@ -144,9 +149,4 @@ class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var petRarityDropMessage: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Sound Responses", desc = "")
-    @Accordion
-    public SoundResponseConfig soundResponse = new SoundResponseConfig();
 }
