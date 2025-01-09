@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getAvailableEggs
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getHitmanTimeToAll
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getPurchasedSlots
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToFull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -109,17 +107,17 @@ object ChocolateFactoryStats {
         put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
     }
 
-    private fun SimpleTimeMark?.formatIfFuture(): String? = this?.takeIfFuture()?.timeUntil()?.format()
+    private fun SimpleTimeMark?.formatIfFuture(): String? = this?.takeIf { it.isInFuture() }?.timeUntil()?.format()
 
     private fun MutableMap<ChocolateFactoryStat, String>.addHitman() {
         val profileStorage = ChocolateFactoryStats.profileStorage ?: return
 
         val hitmanStats = profileStorage.hitmanStats
-        val availableHitmanEggs = hitmanStats.getAvailableEggs().takeIf { it > 0 }?.toString() ?: "§7None"
+        val availableHitmanEggs = hitmanStats.availableHitmanEggs.takeIf { it > 0 }?.toString() ?: "§7None"
         val hitmanSingleSlotCd = hitmanStats.singleSlotCooldownMark.formatIfFuture() ?: "§aAll Ready"
         val hitmanAllSlotsCd = hitmanStats.allSlotsCooldownMark.formatIfFuture() ?: "§aAll Ready"
         val openSlotsNow = hitmanStats.getOpenSlots()
-        val purchasedSlots = hitmanStats.getPurchasedSlots()
+        val purchasedSlots = hitmanStats.purchasedHitmanSlots
 
         val (hitmanAllSlotsTime, allSlotsEventInhibited) = hitmanStats.getHitmanTimeToAll()
         val hitmanAllClaimString = hitmanAllSlotsTime.takeIf { it > Duration.ZERO }?.format() ?: "§aAll Ready"
