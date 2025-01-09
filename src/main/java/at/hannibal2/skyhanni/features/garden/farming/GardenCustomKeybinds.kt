@@ -50,7 +50,7 @@ object GardenCustomKeybinds {
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
         val override = currentLayout?.get(keyBinding) ?: run {
-            val layout = currentLayout?: return
+            val layout = currentLayout ?: return
             if (layout.containsValue(keyBinding.keyCode)) {
                 cir.returnValue = false
             }
