@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.defaultSkillCap
 import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
 import at.hannibal2.skyhanni.utils.Quad
@@ -48,7 +47,7 @@ object SkillUtil {
     }
 
     fun getLevelExact(neededXp: Long): Int {
-        return exactLevelingMap.getOrDefault(neededXp.toInt(), defaultSkillCap[activeSkill?.lowercaseName] ?: 60)
+        return exactLevelingMap.getOrDefault(neededXp.toInt(), activeSkill?.maxLevel ?: 60)
     }
 
     fun calculateLevelXp(level: Int): Double {
