@@ -55,46 +55,12 @@ object MiningStatsDisplay {
         "tablist.universal",
         " Mining Fortune: §r§6☘(?<fortune>\\d+)",
     )
-    //private val cropSpecificTabFortunePattern by patternGroup.pattern(
-    //    "tablist.cropspecific",
-    //    " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
-    //)
-
-    private val collectionPattern by patternGroup.pattern(
-        "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
-    )
 
     @Suppress("MaxLineLength")
     private val miningFortunePattern by RepoPattern.pattern(
         "garden.tooltip.miningfortune",
         "§7Mining Fortune: §a",
     )
-    private val armorAbilityPattern by patternGroup.pattern(
-        "armorability",
-        "Tiered Bonus: .* [(](?<pieces>.*)/4[)]",
-    )
-    //private val lotusAbilityPattern by patternGroup.pattern(
-    //    "lotusability",
-    //    "§7Piece Bonus: §6+(?<bonus>.*)☘",
-    //)
-
-    // todo make pattern work on Melon and Cropie armor
-    //private val armorAbilityFortunePattern by patternGroup.pattern(
-    //    "armorabilityfortune",
-    //    "§7.*§7Grants §6(?<bonus>.*)☘.*",
-    //)
-
-    private var display = emptyList<Renderable>()
-
-    private var lastToolSwitch = SimpleTimeMark.farPast()
-
-    private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
-
-    //private var currentCrop: CropType? = null
-
-    private var tabFortuneUniversal: Double = 0.0
-    private var tabFortuneCrop: Double = 0.0
 
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
@@ -103,81 +69,11 @@ object MiningStatsDisplay {
     var fortuneFortune = 0.0
     var engineFortune = 0.0
     var omeletteFortune = 0.0
-    //var greenThumbFortune = 0.0
-    //var pesterminatorFortune = 0.0
-
-    private var foundTabUniversalFortune = false
-    private var foundTabCropFortune = false
-    private var gardenJoinTime = SimpleTimeMark.farPast()
-    private var firstBrokenCropTime = SimpleTimeMark.farPast()
-    private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
-    private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
-
-    //private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
-
-    @HandleEvent
-    fun onGardenToolChange(event: GardenToolChangeEvent) {
-        lastToolSwitch = SimpleTimeMark.now()
-    }
-
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (GardenAPI.toolInHand == null) return
-        config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
-    }
-
-    private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
-        if (config.hideMissingFortuneWarnings) return@buildList
-        if (cropFortune) {
-            add(
-
-                Renderable.clickAndHover(
-                    if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
-                    listOf(
-                        "§cEnable the Stats widget and enable",
-                        "§cshowing latest Crop Fortune.",
-                    ),
-                    onClick = {
-                        HypixelCommands.widget()
-                    },
-                ),
-            )
-        } else {
-            add(
-                Renderable.clickAndHover(
-                    if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
-                    listOf(
-                        "§cEnable the Stats widget and enable",
-                        "§cshowing the Farming Fortune stat.",
-                    ),
-                    onClick = {
-                        HypixelCommands.widget()
-                    },
-                ),
-            )
-        }
-    }
-
-    @HandleEvent
-    fun onCropClick(event: CropClickEvent) {
-        if (firstBrokenCropTime == SimpleTimeMark.farPast()) firstBrokenCropTime = SimpleTimeMark.now()
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        display = emptyList()
-        gardenJoinTime = SimpleTimeMark.now()
-        firstBrokenCropTime = SimpleTimeMark.farPast()
-        foundTabUniversalFortune = false
-        foundTabCropFortune = false
-    }
 
     private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
 
-    fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
-    fun getToolFortune(internalName: NEUInternalName?): Double {
+    //fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
+    fun getBaseFortune(internalName: NEUInternalName?): Double {
         if (internalName == null) return 0.0
         val string = internalName.asString()
         if (string == "THEORETICAL_HOE") {
@@ -194,9 +90,9 @@ object MiningStatsDisplay {
                 7.0
             }
         } else if (string.contains("TITANIUM_DRILL")) {
-            if (string.endsWith("X355")) {
+            if (string.endsWith("1")) {
                 25.0
-            } else if (string.endsWith("X455")) {
+            } else if (string.endsWith("2")) {
                 40.0
             } else if (string.endsWith("3")) {
                 70.0
@@ -240,37 +136,37 @@ object MiningStatsDisplay {
     }
     fun getDivanPowderCoatingFortune(tool: ItemStack?) = if (tool?.hasDivanPowderCoating() == true) 10 else 0
 
-    fun getEfficiencySpeed(tool: ItemStack?) = (tool?.getEnchantments()?.get("efficiency") ?: 0) * 20 + 10
-    fun getOmeletteSpeed(tool: ItemStack?) : Double {
-        val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
-        for (internalName in drillUpgrade) {
-            if (internalName.itemName == "STARFALL_SEASONING") {
-                return 25.0
-            } else 0.0
-        }
-        return 0.0
-    }
-    fun getPolarVoidSpeed(tool: ItemStack?) = (tool?.getPolarvoidBookCount() ?: 0) * 10.0
-    fun getEngineSpeed(tool: ItemStack?) : Double {
-        val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
-        for (internalName in drillUpgrade) {
-            if (internalName.itemName.startsWith("MITHRIL")) {
-                return 75.0
-            } else if (internalName.itemName.startsWith("TITANIUM")) {
-                return 150.0
-            } else if (internalName.itemName.startsWith("RUBY")) {
-                return 250.0
-            } else if (internalName.itemName.startsWith("SAPPHIRE")) {
-                return 400.0
-            } else if (internalName.itemName.startsWith("AMBER")) {
-                return 600.0
-            }
-        }
-        return 0.0
-    }
-    fun getDivanPowderCoatingSpeed(tool: ItemStack?) = if (tool?.hasDivanPowderCoating() == true) 500 else 0
+    //fun getEfficiencySpeed(tool: ItemStack?) = (tool?.getEnchantments()?.get("efficiency") ?: 0) * 20 + 10
+    //fun getOmeletteSpeed(tool: ItemStack?) : Double {
+    //    val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
+    //    for (internalName in drillUpgrade) {
+    //        if (internalName.itemName == "STARFALL_SEASONING") {
+    //            return 25.0
+    //        } else 0.0
+    //    }
+    //    return 0.0
+    //}
+    //fun getPolarVoidSpeed(tool: ItemStack?) = (tool?.getPolarvoidBookCount() ?: 0) * 10.0
+    //fun getEngineSpeed(tool: ItemStack?) : Double {
+    //    val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
+    //    for (internalName in drillUpgrade) {
+    //        if (internalName.itemName.startsWith("MITHRIL")) {
+    //            return 75.0
+    //        } else if (internalName.itemName.startsWith("TITANIUM")) {
+    //            return 150.0
+    //        } else if (internalName.itemName.startsWith("RUBY")) {
+    //            return 250.0
+    //        } else if (internalName.itemName.startsWith("SAPPHIRE")) {
+    //            return 400.0
+    //       } else if (internalName.itemName.startsWith("AMBER")) {
+    //            return 600.0
+    //        }
+    //    }
+    //    return 0.0
+    //}
+    //fun getDivanPowderCoatingSpeed(tool: ItemStack?) = if (tool?.hasDivanPowderCoating() == true) 500 else 0
 
-    fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
+    fun loadFortuneLineData(tool: ItemStack?) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
         gemstoneFortune = 0.0
@@ -289,7 +185,8 @@ object MiningStatsDisplay {
                 gemstoneFortune = groupOrNull("gemstone")?.toDouble() ?: 0.0
             } ?: continue
 
-            itemBaseFortune = 10.0 //if ((tool.getInternalName()).itemName.contains("JUNGLE_PICKAXE")) 5 else 0.0
+
+            //itemBaseFortune = 10.0 //if ((tool.getInternalName()).itemName.contains("JUNGLE_PICKAXE")) 5 else 0.0
 
             //}// else if (tool.getInternalName().contains("ZORROS_CAPE")) {
 

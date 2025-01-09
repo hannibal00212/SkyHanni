@@ -3,10 +3,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.mining.MiningStatsDisplay
+//import at.hannibal2.skyhanni.features.mining.MiningStatsDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.mining.ToolTooltipTweaksMining.miningFortunePattern
+//import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+//import at.hannibal2.skyhanni.features.mining.ToolTooltipTweaksMining.miningFortunePattern
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -15,12 +15,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.find
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
+//import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.options.seperateSections.Mining
+//import io.github.moulberry.notenoughupdates.options.seperateSections.Mining
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -46,10 +46,11 @@ object ToolTooltipTweaksMining {
         if (!LorenzUtils.inSkyBlock) return
 
         val itemStack = event.itemStack
+
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()
 
-        val toolFortune = MiningStatsDisplay.getToolFortune(internalName)
+        val baseFortune = MiningStatsDisplay.getBaseFortune(internalName)
         val reforgeName = itemStack.getReforgeName()?.firstLetterUppercase()
 
         val fortuneFortune = MiningStatsDisplay.getFortuneFortune(itemStack)
@@ -59,12 +60,12 @@ object ToolTooltipTweaksMining {
         val divanPowderCoatingFortune = MiningStatsDisplay.getDivanPowderCoatingFortune(itemStack)
 
         val hiddenFortune =
-            (toolFortune + omeletteFortune + engineFortune )
+            (omeletteFortune + engineFortune )
 
         //val lapidaryFortune = MiningStatsDisplay.getHarvestingFortune(itemStack)
 
-        val efficiencySpeed = MiningStatsDisplay.getEfficiencySpeed(itemStack)
-        val dpcMSpeed = itemStack.hasDivanPowderCoating()
+        //val efficiencySpeed = MiningStatsDisplay.getEfficiencySpeed(itemStack)
+        //val dpcMSpeed = itemStack.hasDivanPowderCoating()
 
 
         val iterator = event.toolTip.listIterator()
@@ -77,7 +78,7 @@ object ToolTooltipTweaksMining {
         for (line in iterator) {
             if (miningFortunePattern.find(line)) {
 
-                MiningStatsDisplay.loadFortuneLineData(itemStack, fortuneFortune)
+                MiningStatsDisplay.loadFortuneLineData(itemStack)
 
                 val displayedFortune = MiningStatsDisplay.displayedFortune
                 val reforgeFortune = MiningStatsDisplay.reforgeFortune
@@ -87,10 +88,10 @@ object ToolTooltipTweaksMining {
                 val omeletteFortune = MiningStatsDisplay.omeletteFortune
                 val engineFortune = MiningStatsDisplay.engineFortune
 
-                val totalFortune = displayedFortune + toolFortune
+                val totalFortune = displayedFortune + baseFortune
 
                 val reforgeString = if (reforgeFortune != 0.0) " §9(+${reforgeFortune.formatStat()})" else ""
-                val cropString = if (toolFortune != 0.0) " §6[+${toolFortune.roundToInt()}]" else ""
+                val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
@@ -104,7 +105,6 @@ object ToolTooltipTweaksMining {
 
                 if (config.fortuneTooltipKeybind.isKeyHeld()) {
                     iterator.addStat("  §7Base: §6+", baseFortune)
-                    iterator.addStat("  §7Tool: §6+", toolFortune)
                     iterator.addStat("  §7${reforgeName?.removeColor()}: §9+", reforgeFortune)
                     iterator.addStat("  §7Gemstone: §d+", gemstoneFortune)
                     iterator.addStat("  §7Fortune: §6+", fortuneFortune)
