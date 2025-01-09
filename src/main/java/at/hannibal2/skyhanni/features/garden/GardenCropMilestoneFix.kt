@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
@@ -16,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -29,13 +30,14 @@ object GardenCropMilestoneFix {
      * REGEX-TEST:  Cocoa Beans 31: §r§a68%
      * REGEX-TEST:  Potato 32: §r§a97.7%
      */
+    @Suppress("MaxLineLength")
     private val tabListPattern by patternGroup.pattern(
         "tablist",
-        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%"
+        " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) (?<tier>\\d+): §r§a(?<percentage>.*)%",
     )
     private val levelUpPattern by patternGroup.pattern(
         "levelup",
-        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)"
+        " {2}§r§b§lGARDEN MILESTONE §3(?<crop>.*) §8.*➜§3(?<tier>.*)",
     )
 
     /**
@@ -43,7 +45,7 @@ object GardenCropMilestoneFix {
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "pests.raredrop",
-        "§6§lRARE DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§lRARE DROP! (?:§.)*(?<item>.+) §6\\(§6\\+.*☘\\)",
     )
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
@@ -68,7 +70,7 @@ object GardenCropMilestoneFix {
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + (amount * primitiveStack.amount)
+                cropType.getCounter() + (amount * primitiveStack.amount),
             )
             GardenCropMilestoneDisplay.update()
         }
@@ -80,16 +82,16 @@ object GardenCropMilestoneFix {
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + primitiveStack.amount
+                cropType.getCounter() + primitiveStack.amount,
             )
             GardenCropMilestoneDisplay.update()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
-        event.lines.matchFirst(tabListPattern) {
+        tabListPattern.firstMatcher(event.lines) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")

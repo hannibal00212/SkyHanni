@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -53,7 +55,7 @@ object DanceRoomHelper {
 
         when {
             index < size && index == lineIndex -> {
-                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" }.orEmpty()
                 "${now.formatColor()} $format $countdown"
             }
 
@@ -112,10 +114,12 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
-        if ((event.soundName == "random.burp" && event.volume == 0.8f) || (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)) {
+        if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
+            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
+        ) {
             index = 0
             found = false
             countdown = null
@@ -128,7 +132,7 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
         if (config.hideOriginalTitle && inRoom) event.cancel()
@@ -155,17 +159,14 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (RiftAPI.inRift() && config.hidePlayers) {
-            val entity = event.entity
-            if (entity is EntityOtherPlayerMP && inRoom) {
-                event.cancel()
-            }
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+        if (config.enabled && inRoom) {
+            event.cancel()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
@@ -182,7 +183,7 @@ object DanceRoomHelper {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.mirrorVerseConfig", "rift.area.mirrorverse")
     }

@@ -4,7 +4,7 @@ import java.awt.Color
 
 class ExtendedChatColor(
     val rgb: Int,
-    val hasAlpha: Boolean,
+    val hasAlpha: Boolean = false,
 ) {
     override fun toString(): String {
         val stringBuilder = StringBuilder()

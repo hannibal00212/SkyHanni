@@ -4,15 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
-import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -36,13 +36,23 @@ object UniqueGiftingOpportunitiesFeatures {
         get() = ProfileStorageData.playerSpecific?.winter?.playersThatHaveBeenGifted
 
     private val patternGroup = RepoPattern.group("event.winter.uniquegifts")
+
+    /**
+     * REGEX-TEST: §6+1 Unique Gift given! To oBlazin§r§6!
+     */
     private val giftedPattern by patternGroup.pattern(
         "gifted",
-        "§6\\+1 Unique Gift given! To ([^§]+)§r§6!"
+        "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
     )
+
+    /**
+     * REGEX-TEST: WHITE_GIFT
+     * REGEX-TEST: RED_GIFT
+     * REGEX-TEST: GREEN_GIFT
+     */
     private val giftNamePattern by patternGroup.pattern(
         "giftname",
-        "(?:WHITE|RED|GREEN)_GIFT\$"
+        "(?:WHITE|RED|GREEN)_GIFT\$",
     )
 
     private var holdingGift = false
@@ -57,6 +67,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private fun isEnabled() = holdingGift
 
+    @Suppress("UnusedPrivateProperty")
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
     private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 
@@ -69,10 +80,9 @@ object UniqueGiftingOpportunitiesFeatures {
         addGiftedPlayer(matchedPlayer.name)
     }
 
-    @SubscribeEvent
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent) {
-        val entity = event.entity as? EntityArmorStand ?: return
-        analyzeArmorStand(entity)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+        analyzeArmorStand(event.entity)
     }
 
     @HandleEvent
@@ -89,7 +99,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
             RenderLivingEntityHelper.setEntityColor(
                 entity,
-                LorenzColor.DARK_GREEN.toColor().withAlpha(127)
+                LorenzColor.DARK_GREEN.toColor().addAlpha(127),
             ) { isEnabled() && !hasGiftedPlayer(entity) }
         }
     }
@@ -103,7 +113,7 @@ object UniqueGiftingOpportunitiesFeatures {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         giftedPattern.matchMatcher(event.message) {
-            addGiftedPlayer(group(1))
+            addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }
     }

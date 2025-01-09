@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -33,10 +34,12 @@ internal object RenderableUtils {
     /** Calculates the absolute y position of the rows in a table*/
     fun calculateTableYOffsets(content: List<List<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
-        listOf(0) + (content.takeIf { it.isNotEmpty() }?.map { row ->
-            buffer += (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
-            buffer
-        } ?: listOf(yPadding))
+        listOf(0) + (
+            content.takeIf { it.isNotEmpty() }?.map { row ->
+                buffer += (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
+                buffer
+            } ?: listOf(yPadding)
+            )
     }
 
     fun calculateAlignmentXOffset(width: Int, xSpace: Int, alignment: HorizontalAlignment) = when (alignment) {
@@ -123,6 +126,9 @@ internal object RenderableUtils {
             ).toSearchable(),
         )
     }
+
+    fun MutableList<Renderable>.addCenteredString(string: String) =
+        this.add(Renderable.string(string, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {

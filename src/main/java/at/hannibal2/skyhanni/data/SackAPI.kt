@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -15,17 +16,18 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,17 +44,35 @@ object SackAPI {
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
-    var inSackInventory = false
+    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
 
     private val patternGroup = RepoPattern.group("data.sacks")
+
+    /**
+     * REGEX-TEST: Fishing Sack
+     * REGEX-TEST: Enchanted Agronomy Sack
+     */
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$",
+        "^(?:.* Sack|Enchanted .* Sack)\$",
     )
+
+    /**
+     * REGEX-TEST: §7Stored: §e28,183§7/60.5k
+     * REGEX-TEST: §7Stored: §80§7/60.5k
+     */
+    @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+
+    /**
+     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
+     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
+     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
+     */
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
         " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
@@ -83,9 +103,8 @@ object SackAPI {
     var sackListNames = emptySet<String>()
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inSackInventory = false
         isRuneSack = false
         isGemstoneSack = false
         isTrophySack = false
@@ -95,19 +114,17 @@ object SackAPI {
         stackList.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
-        val match = sackPattern.matches(inventoryName)
-        if (!match) return
+        if (!inventory.isInside()) return
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
         sackRarity = inventoryName.getTrophyRarity()
-        inSackInventory = true
         stackList.putAll(stacks)
         SackDisplay.update(isNewInventory)
     }
@@ -130,14 +147,14 @@ object SackAPI {
 
             if (isGemstoneSack) {
                 val gem = SackGemstone()
-                lore.matchAll(gemstonePattern) {
+                gemstonePattern.matchAll(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
                     if (gemstoneMap.containsKey(name.removeColor())) {
                         val internalName = "${rarity.uppercase()}_${
                             name.uppercase().split(" ")[0].removeColor()
-                        }_GEM".asInternalName()
+                        }_GEM".toInternalName()
 
                         gem.slot = slot
 
@@ -191,7 +208,7 @@ object SackAPI {
                 }
             } else {
                 // normal sack
-                lore.matchFirst(numPattern) {
+                numPattern.firstMatcher(lore) {
                     val item = SackOtherItem()
                     val stored = group("stored").formatInt()
                     val internalName = stack.getInternalName()
@@ -205,7 +222,7 @@ object SackAPI {
                         val filletPerTrophy = FishingAPI.getFilletPerTrophy(stack.getInternalName())
                         val filletValue = filletPerTrophy * stored
                         item.magmaFish = filletValue
-                        "MAGMA_FISH".asInternalName().sackPrice(filletValue)
+                        "MAGMA_FISH".toInternalName().sackPrice(filletValue)
                     } else {
                         internalName.sackPrice(stored).coerceAtLeast(0)
                     }
@@ -217,7 +234,8 @@ object SackAPI {
         if (savingSacks) saveSackData()
     }
 
-    private var sackData = mapOf<NEUInternalName, SackItem>()
+    var sackData = mapOf<NEUInternalName, SackItem>()
+        private set
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 
@@ -231,12 +249,12 @@ object SackAPI {
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
-        } ?: ""
+        }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
-        } ?: ""
+        }.orEmpty()
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
@@ -255,13 +273,13 @@ object SackAPI {
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
-        sackEvent.postAndCatch()
+        sackEvent.post()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()
@@ -332,7 +350,7 @@ object SackAPI {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
 
-        SackDataUpdateEvent().postAndCatch()
+        SackDataUpdateEvent.post()
     }
 
     data class SackGemstone(
@@ -343,7 +361,10 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    ) : AbstractSackItem()
+    ) : AbstractSackItem() {
+        val priceSum: Long
+            get() = roughPrice + flawedPrice + finePrice
+    }
 
     data class SackRune(
         var stack: ItemStack? = null,
@@ -373,7 +394,7 @@ object SackAPI {
     fun testSackAPI(args: Array<String>) {
         if (args.size == 1) {
             if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].asInternalName())}")
+                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
             } else {
                 ChatUtils.userError("That item isn't a valid sack item.")
             }
@@ -393,18 +414,18 @@ data class SackItem(
 
 // TODO repo
 private val gemstoneMap = mapOf(
-    "Jade Gemstones" to "ROUGH_JADE_GEM".asInternalName(),
-    "Amber Gemstones" to "ROUGH_AMBER_GEM".asInternalName(),
-    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".asInternalName(),
-    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".asInternalName(),
-    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".asInternalName(),
-    "Jasper Gemstones" to "ROUGH_JASPER_GEM".asInternalName(),
-    "Ruby Gemstones" to "ROUGH_RUBY_GEM".asInternalName(),
-    "Opal Gemstones" to "ROUGH_OPAL_GEM".asInternalName(),
-    "Onyx Gemstones" to "ROUGH_ONYX_GEM".asInternalName(),
-    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".asInternalName(),
-    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".asInternalName(),
-    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".asInternalName(),
+    "Jade Gemstones" to "ROUGH_JADE_GEM".toInternalName(),
+    "Amber Gemstones" to "ROUGH_AMBER_GEM".toInternalName(),
+    "Topaz Gemstones" to "ROUGH_TOPAZ_GEM".toInternalName(),
+    "Sapphire Gemstones" to "ROUGH_SAPPHIRE_GEM".toInternalName(),
+    "Amethyst Gemstones" to "ROUGH_AMETHYST_GEM".toInternalName(),
+    "Jasper Gemstones" to "ROUGH_JASPER_GEM".toInternalName(),
+    "Ruby Gemstones" to "ROUGH_RUBY_GEM".toInternalName(),
+    "Opal Gemstones" to "ROUGH_OPAL_GEM".toInternalName(),
+    "Onyx Gemstones" to "ROUGH_ONYX_GEM".toInternalName(),
+    "Aquamarine Gemstones" to "ROUGH_AQUAMARINE_GEM".toInternalName(),
+    "Citrine Gemstones" to "ROUGH_CITRINE_GEM".toInternalName(),
+    "Peridot Gemstones" to "ROUGH_PERIDOT_GEM".toInternalName(),
 )
 
 // ideally should be correct but using alright should also be fine unless they sold their whole sacks

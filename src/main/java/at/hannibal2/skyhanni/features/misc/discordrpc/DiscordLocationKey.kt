@@ -298,16 +298,12 @@ object DiscordLocationKey {
     fun getDiscordIconKey(location: String): String {
         val keyIfNormal = location.lowercase().replace(' ', '-')
 
-        return if (normalRPC.contains(keyIfNormal)) {
-            keyIfNormal
-        } else if (specialRPC.containsKey(location)) {
-            specialRPC[location]!!
-        } else if (specialNetherRPC.contains(location)) {
-            "crimson-isle"
-        } else if (specialRiftRPC.containsKey(location)) {
-            specialRiftRPC[location]!!
-        } else {
-            getAmbiguousKey(location) // will return skyblock-logo if not found
+        return when {
+            normalRPC.contains(keyIfNormal) -> keyIfNormal
+            specialRPC.containsKey(location) -> specialRPC[location] ?: getAmbiguousKey(location)
+            specialNetherRPC.contains(location) -> "crimson-isle"
+            specialRiftRPC.containsKey(location) -> specialRiftRPC[location] ?: getAmbiguousKey(location)
+            else -> getAmbiguousKey(location) // will return skyblock-logo if not found
         }
     }
 }

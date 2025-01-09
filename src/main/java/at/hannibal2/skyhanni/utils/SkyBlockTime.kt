@@ -41,6 +41,16 @@ data class SkyBlockTime(
         fun fromSbYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
+            return fromInstant(
+                Instant.ofEpochMilli(
+                    SKYBLOCK_EPOCH_START_MILLIS +
+                        (SKYBLOCK_YEAR_MILLIS * year) +
+                        (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier)))
+                )
+            )
+        }
+
         fun now(): SkyBlockTime = fromInstant(Instant.now())
 
         private fun calculateSkyBlockTime(realMillis: Long): SkyBlockTime {
@@ -107,6 +117,11 @@ data class SkyBlockTime(
                 3 -> "rd"
                 else -> "th"
             }
+        }
+
+        operator fun SkyBlockTime.plus(duration: kotlin.time.Duration): SkyBlockTime {
+            val millis = toMillis() + duration.inWholeMilliseconds
+            return fromInstant(Instant.ofEpochMilli(millis))
         }
     }
 }

@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,7 +58,7 @@ object MobDetection {
 
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
-    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
+    private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
@@ -97,8 +97,9 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.worldObj != world || (this.armorStand?.let { it.worldObj != world }
-            ?: false) || this.extraEntities.any { it.worldObj != world }
+        this.baseEntity.worldObj != world || (
+            this.armorStand?.let { it.worldObj != world } ?: false
+            ) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -158,13 +159,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.postAndCatch()
         }
         return isVisible
     }
@@ -249,7 +252,7 @@ object MobDetection {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
             event.entity is EntityBat && event.health == 6 -> {
@@ -338,7 +341,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
@@ -352,8 +355,9 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
                 shouldClear.set(true)
                 allEntitiesViaPacketId.clear()
             }
@@ -373,8 +377,8 @@ object MobDetection {
         shouldClear.set(true)
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
         if (forceReset) {
             event.addData("Mob Detection is manually disabled!")

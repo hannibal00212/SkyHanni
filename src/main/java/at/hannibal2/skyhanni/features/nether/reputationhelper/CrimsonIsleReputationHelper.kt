@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -42,21 +42,18 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     var factionType = FactionType.NONE
 
-    private var lastUpdate = SimpleTimeMark.farPast()
-
     private var display = emptyList<List<Any>>()
     private var dirty = true
     var tabListQuestsMissing = false
 
     /**
-     *  c - Barbarian Not Accepted
-     *  d - Mage Not Accepted
-     *  e - Accepted
-     *  a - Completed
+     * REGEX-TEST:  §r§c✖ Rescue Mission
+     * REGEX-TEST:  §r§a✔ Digested Mushrooms §r§8x20
+     * REGEX-TEST:  §r§c✖ Slugfish §r§8x1
      */
     val tabListQuestPattern by RepoPattern.pattern(
-        "crimson.reputation.tablist",
-        " §r§[cdea].*",
+        "crimson.reputationhelper.tablist.quest",
+        " (?:§.*)?(?<status>[✖✔]) (?<name>.+?)(?: (?:§.)*?x(?<amount>\\d+))?",
     )
 
     init {
@@ -65,7 +62,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(kuudraBossHelper)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         miniBossHelper.onRepoReload(data.MINIBOSS)
@@ -80,16 +77,20 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             miniBossHelper.loadData(it)
             kuudraBossHelper.loadData(it)
             questHelper.load(it)
         }
+
+        config.hideComplete.afterChange {
+            updateRender()
+        }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         dirty = true
     }
@@ -117,13 +118,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
                     FactionType.NONE
                 }
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onConfigInit(event: ConfigLoadEvent) {
-        config.hideComplete.afterChange {
-            updateRender()
         }
     }
 
@@ -172,7 +166,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         return config.hotkey.isKeyHeld()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.crimsonIsleReputationHelper", "crimsonIsle.reputationHelper.enabled")
         event.move(2, "misc.reputationHelperUseHotkey", "crimsonIsle.reputationHelper.useHotkey")

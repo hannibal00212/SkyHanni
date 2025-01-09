@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -52,30 +53,19 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun readQuest(line: String) {
-        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+        dailyQuestHelper.reputationHelper.tabListQuestPattern.matchMatcher(line) {
+            if (line.contains("The Great Spook")) {
+                dailyQuestHelper.greatSpook = true
+                dailyQuestHelper.update()
+                return
+            }
 
-        if (line.contains("The Great Spook")) {
-            dailyQuestHelper.greatSpook = true
-            dailyQuestHelper.update()
-            return
+            val name = group("name")
+            val amount = groupOrNull("amount")?.toInt() ?: 1
+            val green = group("status") == "✔"
+
+            checkQuest(name, green, amount)
         }
-        var text = line.substring(3)
-        val green = text.startsWith("§a")
-        text = text.substring(2)
-
-        val amount: Int
-        val name: String
-        // TODO use regex
-        if (text.contains(" §r§8x")) {
-            val split = text.split(" §r§8x")
-            name = split[0]
-            amount = split[1].toInt()
-        } else {
-            name = text
-            amount = 1
-        }
-
-        checkQuest(name, green, amount)
     }
 
     private fun checkQuest(name: String, green: Boolean, needAmount: Int) {
@@ -89,7 +79,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             return
         }
 
-        val state = if (green) QuestState.READY_TO_COLLECT else QuestState.NOT_ACCEPTED
+        val state = if (green) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
         dailyQuestHelper.update()
         addQuest(addQuest(name, state, needAmount))
     }
@@ -156,17 +146,12 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             if (!categoryName.equals(name, ignoreCase = true)) continue
             val stack = event.inventoryItems[22] ?: continue
 
-            val completed = stack.getLore().any { it.contains("Completed!") }
+            val completed = stack.getLore().any { dailyQuestHelper.completedPattern.matches(it) }
             if (completed && quest.state != QuestState.COLLECTED) {
                 quest.state = QuestState.COLLECTED
                 dailyQuestHelper.update()
             }
 
-            val accepted = !stack.getLore().any { it.contains("Click to start!") }
-            if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
-                quest.state = QuestState.ACCEPTED
-                dailyQuestHelper.update()
-            }
             if (name == "Miniboss") {
                 fixMinibossAmount(quest, stack)
             }
@@ -205,9 +190,19 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
-            val state = QuestState.valueOf(split[1])
+            val state = if (split[1] == "NOT_ACCEPTED") {
+                QuestState.ACCEPTED
+            } else {
+                QuestState.valueOf(split[1])
+            }
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
+            if (quest is UnknownQuest) {
+                dailyQuestHelper.quests.clear()
+                storage.quests.clear()
+                println("Reset crimson isle quest data from the config because the config was invalid!")
+                return
+            }
             if (quest is ProgressQuest && split.size == 4) {
                 try {
                     val haveAmount = split[3].toInt()

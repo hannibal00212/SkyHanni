@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -27,11 +28,11 @@ object RiftTimer {
 
     private val config get() = RiftAPI.config.timer
 
-    private val repoGroup = RepoPattern.group("rift.everywhere")
+    private val patternGroup = RepoPattern.group("rift.everywhere")
     /**
      * REGEX-TEST: 3150 §aф
      */
-    private val nametagPattern by repoGroup.pattern(
+    private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
         "(?<time>\\d+) §aф"
     )
@@ -50,7 +51,7 @@ object RiftTimer {
         currentTime = 0.seconds
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
         if (!isEnabled() || RiftAPI.inRiftRace) return
@@ -110,7 +111,7 @@ object RiftTimer {
         changes[System.currentTimeMillis()] = diffFormat
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.percentage,
@@ -125,12 +126,12 @@ object RiftTimer {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea == "Mirrorverse") return
+        if (RiftAPI.inMirrorVerse) return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!RiftAPI.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {

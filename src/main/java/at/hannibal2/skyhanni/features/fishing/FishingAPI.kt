@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
@@ -35,9 +35,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object FishingAPI {
 
+    /**
+     * REGEX-TEST: BRONZE_HUNTER_HELMET
+     * REGEX-TEST: SILVER_HUNTER_CHESTPLATE
+     * REGEX-TEST: GOLD_HUNTER_LEGGINGS
+     * REGEX-TEST: DIAMOND_HUNTER_BOOTS
+     */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
@@ -64,7 +70,7 @@ object FishingAPI {
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
         bobberHasTouchedLiquid = false
-        FishingBobberCastEvent(event.entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).post()
     }
 
     private fun resetBobber() {
@@ -97,7 +103,7 @@ object FishingAPI {
                 }
 
                 bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).postAndCatch()
+                FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
     }
@@ -111,7 +117,7 @@ object FishingAPI {
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
@@ -119,7 +125,7 @@ object FishingAPI {
         holdingWaterRod = event.newItem.isWaterRod()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods

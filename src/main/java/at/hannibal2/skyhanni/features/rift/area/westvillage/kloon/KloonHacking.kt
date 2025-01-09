@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -40,6 +42,8 @@ object KloonHacking {
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
+    private val RETRO_ENCABULATING_VISOR = "RETRO_ENCABULATING_VISOR".toInternalName()
+
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
@@ -47,11 +51,11 @@ object KloonHacking {
     }
 
     private fun checkHelmet() {
-        wearingHelmet = InventoryUtils.getHelmet()?.getInternalName()?.equals("RETRO_ENCABULATING_VISOR") ?: false
+        wearingHelmet = InventoryUtils.getHelmet()?.getInternalName() == RETRO_ENCABULATING_VISOR
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
         inColorInventory = false
         nearestTerminal = null
@@ -71,7 +75,7 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
         inColorInventory = false
@@ -89,7 +93,9 @@ object KloonHacking {
                     slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
                     continue
                 }
-                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 && slot.stack!!.displayName.removeColor() == correctButtons[i]) {
+                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
+                    slot.stack!!.displayName.removeColor() == correctButtons[i]
+                ) {
                     slot highlight LorenzColor.YELLOW
                 }
                 if (slot.slotIndex == i * 9 + 17) {
@@ -101,7 +107,7 @@ object KloonHacking {
             if (!config.colour) return
             val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack.getLore().any { it.contains(targetColor?.name ?: "") }) {
+                if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
                     slot highlight LorenzColor.GREEN
                 }
             }
@@ -167,7 +173,7 @@ object KloonHacking {
         return closestTerminal
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
     }

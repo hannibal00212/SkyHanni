@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -23,36 +24,54 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
+// TODO also fix up this all being coded very poorly and having the same patterns in multiple places
 @SkyHanniModule
 object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     //  Repo group and patterns
     private val patternGroup = RepoPattern.group("dungeon.finder")
+
+    /**
+     * REGEX-TEST: §7§7Note: §f3m comp carry
+     */
     private val pricePattern by patternGroup.pattern(
         "price",
-        "(?i).*([0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
+        "(?i).*(?:[0-9]{2,3}K|[0-9]{1,3}M|[0-9]+\\.[0-9]M|[0-9] ?MIL).*",
     )
+    /**
+     * REGEX-TEST: §7§7Note: §f3m comp carry
+     * REGEX-TEST: §7§7Note: §f250k comp carry
+     */
     private val carryPattern by patternGroup.pattern(
         "carry",
-        "(?i).*(CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
+        "(?i).*(?:CARRY|CARY|CARRIES|CARIES|COMP|TO CATA [0-9]{2}).*",
     )
     private val nonPugPattern by patternGroup.pattern(
         "nonpug",
-        "(?i).*(PERM|VC|DISCORD).*",
+        "(?i).*(?:PERM|VC|DISCORD).*",
     )
+
+    /**
+     * REGEX-TEST:  §b4sn_§f: §eArcher§b (§e29§b)
+     * REGEX-TEST:  §akaydo_odyak§f: §eBerserk§b (§e26§b)
+     */
     private val memberPattern by patternGroup.pattern(
         "member",
         ".*§.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
     )
+
+    /**
+     * REGEX-TEST: §cRequires a Class at Level 25!
+     */
     private val ineligiblePattern by patternGroup.pattern(
         "ineligible",
-        "§c(Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
+        "§c(?:Requires .*$|You don't meet the requirement!|Complete previous floor first!$)",
     )
-    private val classLevelPattern by patternGroup.pattern(
-        "class.level",
-        " §.(?<playerName>.*)§f: §e(?<className>.*)§b \\(§e(?<level>.*)§b\\)",
-    )
+
+    /**
+     * REGEX-TEST: §7§7Note: §fs+ clear first
+     */
     private val notePattern by patternGroup.pattern(
         "note",
         "§7§7Note: §f(?<note>.*)",
@@ -64,35 +83,47 @@ object DungeonFinderFeatures {
      */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM The Catacombs).*",
+        "The Catacombs.*|.*MM The Catacombs.*",
     )
+
+    /**
+     * REGEX-TEST: JohnRealNoob's Party
+     */
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
-        ".*('s Party)",
+        ".*'s Party",
     )
     private val partyFinderTitlePattern by patternGroup.pattern(
         "party.finder.title",
-        "(Party Finder)",
+        "Party Finder",
     )
     private val catacombsGatePattern by patternGroup.pattern(
         "catacombs.gate",
-        "(Catacombs Gate)",
+        "Catacombs Gate",
     )
     private val selectFloorPattern by patternGroup.pattern(
         "select.floor",
-        "(Select Floor)",
+        "Select Floor",
     )
+
+    /**
+     * REGEX-TEST: §a§aThe Catacombs §8- §eEntrance
+     */
     private val entranceFloorPattern by patternGroup.pattern(
         "entrance",
-        "(.*Entrance)",
+        ".*Entrance",
     )
+
+    /**
+     * REGEX-TEST: Floor: Floor VII
+     */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "(Floor .*)",
+        "Floor .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
-        "(Any)",
+        "Any",
     )
 
     /**
@@ -101,30 +132,36 @@ object DungeonFinderFeatures {
      */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM|.*Master Mode) The Catacombs.*",
+        "(?:MM|.*Master Mode) The Catacombs.*",
     )
+
+    /**
+     * REGEX-TEST: Dungeon: The Catacombs
+     */
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
-        "(Dungeon: .*)",
+        "Dungeon: .*",
     )
-    private val floorFloorPattern by patternGroup.pattern(
-        "floor.pattern",
-        "(Floor: .*)",
-    )
+
+    /**
+     * REGEX-TEST: Floor VII
+     */
     private val floorNumberPattern by patternGroup.pattern(
         "floor.number",
         ".* (?<floorNum>[IV\\d]+)",
     )
+
+    /**
+     * REGEX-TEST: Currently Selected: Mage
+     */
     private val getDungeonClassPattern by patternGroup.pattern(
         "get.dungeon.class",
-        ".* (?<class>.*)",
+        "Currently Selected: (?<class>.*)",
     )
     private val detectDungeonClassPattern by patternGroup.pattern(
         "detect.dungeon.class",
-        "§7View and select a dungeon class.",
+        "§7View and select a dungeon class\\.",
     )
-
-    private val allowedSlots = (10..34).filter { it !in listOf(17, 18, 26, 27) }
 
     //  Variables used
     private var selectedClass = ""
@@ -133,7 +170,7 @@ object DungeonFinderFeatures {
     private var toolTipMap = mapOf<Int, List<String>>()
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
@@ -174,7 +211,7 @@ object DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
-            val floor = lore.find { floorFloorPattern.matches(it.removeColor()) } ?: continue
+            val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
             val dungeon = lore.find { dungeonFloorPattern.matches(it.removeColor()) } ?: continue
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -217,6 +254,8 @@ object DungeonFinderFeatures {
         val map = mutableMapOf<Int, LorenzColor>()
         if (!partyFinderTitlePattern.matches(event.inventoryName)) return map
         inInventory = true
+        // TODO: Refactor this to not have so many continue statements
+        @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             if (!checkIfPartyPattern.matches(stack.displayName)) continue
@@ -279,7 +318,7 @@ object DungeonFinderFeatures {
             val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
             val toolTip = stack.getLore().toMutableList()
             for ((index, line) in stack.getLore().withIndex()) {
-                classLevelPattern.matchMatcher(line) {
+                memberPattern.matchMatcher(line) {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
@@ -324,7 +363,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
@@ -343,7 +382,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         floorStackSize = emptyMap()
@@ -351,7 +390,7 @@ object DungeonFinderFeatures {
         toolTipMap = emptyMap()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }

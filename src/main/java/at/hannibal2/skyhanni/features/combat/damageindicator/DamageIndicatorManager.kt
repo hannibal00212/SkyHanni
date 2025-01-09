@@ -10,13 +10,13 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
@@ -51,7 +51,6 @@ import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -66,8 +65,8 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@SkyHanniModule
 // TODO cut class into smaller pieces
+@SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
 
@@ -80,8 +79,6 @@ object DamageIndicatorManager {
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
-    fun isBoss(entity: EntityLivingBase) = data.values.any { it.entity == entity }
-
     fun isDamageSplash(entity: EntityLivingBase): Boolean {
         if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
         if (!entity.hasCustomName()) return false
@@ -91,7 +88,7 @@ object DamageIndicatorManager {
         return damagePattern.matcher(name).matches()
     }
 
-    fun isBossSpawned(type: BossType) = data.entries.find { it.value.bossType == type } != null
+    fun isBossSpawned(type: BossType) = data.entries.any { it.value.bossType == type }
 
     fun isBossSpawned(vararg types: BossType) = types.any { isBossSpawned(it) }
 
@@ -130,6 +127,9 @@ object DamageIndicatorManager {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
+
+        // only render when actually enabled
+        if (!config.enabled) return
 
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
@@ -278,22 +278,21 @@ object DamageIndicatorManager {
 
     private fun EntityData.isConfigEnabled() = bossType.bossTypeToggle in config.bossesToShow
 
-    private fun noDeathDisplay(bossType: BossType): Boolean {
-        return when (bossType) {
-            BossType.SLAYER_BLAZE_TYPHOEUS_1,
-            BossType.SLAYER_BLAZE_TYPHOEUS_2,
-            BossType.SLAYER_BLAZE_TYPHOEUS_3,
-            BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            BossType.SLAYER_BLAZE_QUAZII_1,
-            BossType.SLAYER_BLAZE_QUAZII_2,
-            BossType.SLAYER_BLAZE_QUAZII_3,
-            BossType.SLAYER_BLAZE_QUAZII_4,
+    @Suppress("Indentation")
+    private fun noDeathDisplay(bossType: BossType): Boolean = when (bossType) {
+        BossType.SLAYER_BLAZE_TYPHOEUS_1,
+        BossType.SLAYER_BLAZE_TYPHOEUS_2,
+        BossType.SLAYER_BLAZE_TYPHOEUS_3,
+        BossType.SLAYER_BLAZE_TYPHOEUS_4,
+        BossType.SLAYER_BLAZE_QUAZII_1,
+        BossType.SLAYER_BLAZE_QUAZII_2,
+        BossType.SLAYER_BLAZE_QUAZII_3,
+        BossType.SLAYER_BLAZE_QUAZII_4,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-            -> true
+        -> true
 
-            else -> false
-        }
+        else -> false
     }
 
     private fun tickDamage(damageCounter: DamageCounter) {
@@ -367,12 +366,12 @@ object DamageIndicatorManager {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
+            data[entity.uniqueID]?.let {
+                val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 
-                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
+                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).post()
             }
             entityData.lastHealth = health
 
@@ -393,6 +392,7 @@ object DamageIndicatorManager {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun getCustomHealth(
         entityData: EntityData,
         health: Long,
@@ -680,11 +680,12 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
+        val ridingEntity = entity.ridingEntity
         // Laser phase
-        if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
+        if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 
-            val ticksAlive = entity.ridingEntity.ticksExisted.ticks
+            val ticksAlive = ridingEntity.ticksExisted.ticks
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
@@ -738,6 +739,7 @@ object DamageIndicatorManager {
         return ""
     }
 
+    @Suppress("CyclomaticComplexMethod", "ReturnCount")
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
         val health = if (DungeonAPI.isOneOf("F4")) {
@@ -837,13 +839,13 @@ object DamageIndicatorManager {
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
         )
-        DamageIndicatorDetectedEvent(entityData).postAndCatch()
+        DamageIndicatorDetectedEvent(entityData).post()
         return entityData
     }
 
     private fun checkFinalBoss(finalBoss: Boolean, id: Int) {
         if (finalBoss) {
-            DamageIndicatorFinalBossEvent(id).postAndCatch()
+            DamageIndicatorFinalBossEvent(id).post()
         }
     }
 
@@ -856,7 +858,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
@@ -864,6 +866,7 @@ object DamageIndicatorManager {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+        if (!isEnabled()) return
         val entity = event.entity
 
         val entityData = data.values.find {
@@ -887,7 +890,7 @@ object DamageIndicatorManager {
                 }
             }
         } else {
-            if (entityData != null && isEnabled() && config.hideVanillaNametag && entityData.isConfigEnabled()) {
+            if (entityData != null && config.hideVanillaNametag && entityData.isConfigEnabled()) {
                 val name = entity.name
                 if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return
@@ -898,18 +901,18 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val data = data[event.entity.uniqueID] ?: return
         if (event.health <= 1) {
             if (!data.firstDeath) {
                 data.firstDeath = true
-                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+                DamageIndicatorDeathEvent(event.entity, data).post()
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")
@@ -932,5 +935,5 @@ object DamageIndicatorManager {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.dev.damageIndicatorBackend
 }

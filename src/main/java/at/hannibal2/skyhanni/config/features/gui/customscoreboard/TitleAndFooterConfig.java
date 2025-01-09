@@ -6,21 +6,19 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class TitleAndFooterConfig {
     @Expose
-    @ConfigOption(name = "Title and Footer Alignment", desc = "Align the title and footer in the scoreboard.")
+    @ConfigOption(name = "Title Alignment", desc = "Align the title in the scoreboard.")
     @ConfigEditorDropdown
-    // TODO rename to "horizontalAlignment" or "alignment"
-    public RenderUtils.HorizontalAlignment alignTitleAndFooter = RenderUtils.HorizontalAlignment.CENTER;
+    public RenderUtils.HorizontalAlignment alignTitle = RenderUtils.HorizontalAlignment.CENTER;
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard." +
-        "\nUse & for colors." +
+        "\nUse && for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public Property<String> customTitle = Property.of("&6&lSKYBLOCK");
+    public String customTitle = "&&6&&lSKYBLOCK";
 
     @Expose
     @ConfigOption(name = "Use Custom Title", desc = "Use a custom title instead of the default Hypixel title.")
@@ -33,9 +31,21 @@ public class TitleAndFooterConfig {
     public boolean useCustomTitleOutsideSkyBlock = false;
 
     @Expose
+    @ConfigOption(name = "Footer Alignment", desc = "Align the footer in the scoreboard.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment alignFooter = RenderUtils.HorizontalAlignment.LEFT;
+
+    @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard." +
-        "\nUse & for colors." +
+        "\nUse && for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public Property<String> customFooter = Property.of("&ewww.hypixel.net");
+    public String customFooter = "&&ewww.hypixel.net";
+
+    @Expose
+    @ConfigOption(name = "Custom Alpha Footer", desc = "What should be displayed as the footer of the scoreboard when on the Alpha Server." +
+        "\nUse && for colors." +
+        "\nUse \"\\n\" for new line.")
+    @ConfigEditorText
+    public String customAlphaFooter = "&&ealpha.hypixel.net";
 }

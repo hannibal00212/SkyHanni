@@ -70,7 +70,7 @@ public class InventoryConfig {
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
-    @Category(name = "Craftable Item List", desc = "")
+    @Category(name = "Craftable Item List", desc = "Helps to find items to §e/craft.")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
 
@@ -135,9 +135,19 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
+  
+    @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
+
+    @Expose
+    @ConfigOption(name = "Attribute Overlay", desc = "")
+    @Accordion
+    public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -164,8 +174,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
-        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
+        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite)", 15),
         EDITION_NUMBER("§bEdition Number", 16),
         ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
@@ -281,7 +290,7 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
@@ -305,8 +314,21 @@ public class InventoryConfig {
     public boolean hexAsColorInLore = true;
 
     @Expose
+    @ConfigOption(name = "Essence Shop Helper", desc = "Show extra information about remaining upgrades in essence shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean essenceShopHelper = true;
+  
+    @Expose
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean snakeGameKeybinds = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightActiveBeaconEffect = true;
+
 }

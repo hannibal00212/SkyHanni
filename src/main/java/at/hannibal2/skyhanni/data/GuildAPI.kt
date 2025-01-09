@@ -40,5 +40,5 @@ object GuildAPI {
 
     fun isInGuild(name: String) = name in getAllMembers()
 
-    fun getAllMembers() = ProfileStorageData.playerSpecific?.guildMembers ?: emptyList()
+    fun getAllMembers() = ProfileStorageData.playerSpecific?.guildMembers.orEmpty()
 }

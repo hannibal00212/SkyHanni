@@ -43,6 +43,7 @@ class DefaultConfigOptionGui(
     private val resetSuggestionState =
         orderedOptions.keys.associateWith { ResetSuggestionState.LEAVE_DEFAULTS }.toMutableMap()
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.drawScreen(mouseX, mouseY, partialTicks)
         drawDefaultBackground()
@@ -107,19 +108,25 @@ class DefaultConfigOptionGui(
         button("Turn all on", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_ON)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.let { opts ->
+                    opts.forEach { it.toggleOverride = null }
+                }
             }
         }
         button("Turn all off", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.let { opts ->
+                    opts.forEach { it.toggleOverride = null }
+                }
             }
         }
         button("Leave all untouched", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.let { opts ->
+                    opts.forEach { it.toggleOverride = null }
+                }
             }
         }
         button("Cancel", listOf()) {
@@ -165,12 +172,16 @@ class DefaultConfigOptionGui(
                     hoveringTextToDraw = listOf(
                         "§e${cat.name}",
                         "§7${cat.description}",
-                    ) + orderedOptions[cat]!!.map { "§7 - §a" + it.name }
+                    ) + orderedOptions[cat]?.let { opts ->
+                        opts.map { "§7 - §a" + it.name }
+                    }.orEmpty()
                 }
 
                 if (shouldClick) {
                     resetSuggestionState[cat] = suggestionState.next
-                    orderedOptions[cat]!!.forEach { it.toggleOverride = null }
+                    orderedOptions[cat]?.let { opts ->
+                        opts.forEach { it.toggleOverride = null }
+                    }
                 }
             }
 

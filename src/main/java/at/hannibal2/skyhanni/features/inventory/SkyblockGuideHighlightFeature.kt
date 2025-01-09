@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
-val patternGroup = RepoPattern.group("skyblockguide.highlight")
+private val patternGroup = RepoPattern.group("skyblockguide.highlight")
 
 private const val KEY_PREFIX_INVENTORY = "inventory"
 private const val KEY_PREFIX_CONDITION = "condition"
@@ -77,15 +78,17 @@ class SkyblockGuideHighlightFeature private constructor(
         private val objectList = mutableListOf<SkyblockGuideHighlightFeature>()
 
         private var activeObject: SkyblockGuideHighlightFeature? = null
-        private var missing = mutableSetOf<Int>()
+        private val missing = mutableSetOf<Int>()
 
         fun isEnabled() = LorenzUtils.inSkyBlock
         fun close() {
             activeObject = null
         }
 
-        @SubscribeEvent
-        fun onInventoryClose(event: InventoryCloseEvent) = close()
+        @HandleEvent
+        fun onInventoryClose(event: InventoryCloseEvent) {
+            close()
+        }
 
         @SubscribeEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
@@ -113,8 +116,8 @@ class SkyblockGuideHighlightFeature private constructor(
             current.onTooltip.invoke(event)
         }
 
-        @SubscribeEvent
-        fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        @HandleEvent
+        fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             val current =
                 objectList.firstOrNull { it.config.invoke() && it.inventoryPattern.matches(event.inventoryName) }
@@ -175,7 +178,8 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") },
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(
@@ -250,6 +254,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern
             )
+            @Suppress("MaxLineLength")
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",

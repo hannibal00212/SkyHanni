@@ -169,7 +169,7 @@ object SkyHanniConfigSearchResetCommand {
         val elements = findConfigElements(configFilter, classFilter)
         val builder = StringBuilder()
         builder.append("```\n")
-        builder.append("Search config for SkyHanni ${SkyHanniMod.version}\n")
+        builder.append("Search config for SkyHanni ${SkyHanniMod.VERSION}\n")
         builder.append("configSearchTerm: $configSearchTerm\n")
         builder.append("classSearchTerm: $classSearchTerm\n")
         builder.append("\n")
@@ -225,8 +225,10 @@ object SkyHanniConfigSearchResetCommand {
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable &&
                     objectName.startsWith(className) &&
-                    (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                        objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage"))
+                    (
+                        objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
+                            objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage")
+                        )
                 ) {
                     "<category>"
                 } else if (onlyValue) {
@@ -269,10 +271,13 @@ object SkyHanniConfigSearchResetCommand {
             map["$parentName.<end of depth>"] = null
             return map
         }
-        for (field in obj.javaClass.fields) {
+        for (field in obj.javaClass.declaredFields) {
             if ((field.modifiers and Modifier.STATIC) != 0) continue
 
             val name = field.name
+            if (parentName == "playerSpecific" && name == "profiles") continue
+            if (parentName == "config.storage" && name == "players") continue
+            if (parentName == "config" && name == "storage") continue
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
@@ -284,7 +289,10 @@ object SkyHanniConfigSearchResetCommand {
                 newObj !is Int &&
                 newObj !is Double &&
                 newObj !is Position &&
-                !newObj.javaClass.isEnum) {
+                newObj !is Map<*, *> &&
+                newObj !is List<*> &&
+                !newObj.javaClass.isEnum
+            ) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }

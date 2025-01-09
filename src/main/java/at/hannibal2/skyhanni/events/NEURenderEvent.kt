@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import net.minecraftforge.fml.common.eventhandler.Cancelable
+import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 
-@Cancelable
-class NEURenderEvent : LorenzEvent()
+class NEURenderEvent : CancellableSkyHanniEvent()

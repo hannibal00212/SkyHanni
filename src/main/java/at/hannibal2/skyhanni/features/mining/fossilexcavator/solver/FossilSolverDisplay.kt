@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -33,10 +34,18 @@ object FossilSolverDisplay {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+
+    /**
+     * REGEX-TEST: Chisel Charges Remaining: 3
+     */
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
         "Chisel Charges Remaining: (?<charges>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: Fossil Excavation Progress: 8.3%
+     */
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",
         "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
@@ -71,7 +80,7 @@ object FossilSolverDisplay {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
@@ -169,7 +178,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.showPercentage) return
@@ -211,7 +220,7 @@ object FossilSolverDisplay {
         config.position.renderStrings(displayList, posLabel = "Fossil Excavator Solver")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(36, "mining.fossilExcavator", "mining.fossilExcavator2.solver")
         event.move(37, "mining.fossilExcavator2", "mining.fossilExcavator")

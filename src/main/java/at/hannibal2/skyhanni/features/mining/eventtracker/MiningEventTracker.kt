@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.BossbarData
@@ -35,23 +36,37 @@ object MiningEventTracker {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
 
     private val patternGroup = RepoPattern.group("mining.eventtracker")
+
+    /**
+     * REGEX-TEST: §e§lPASSIVE EVENT §b§l§D§LBETTER TOGETHER §e§lRUNNING FOR §a§l06:34§r
+     */
     private val bossbarPassivePattern by patternGroup.pattern(
         "bossbar.passive",
-        "§e§lPASSIVE EVENT (?<event>.+) §e§lRUNNING FOR §a§l(?<time>\\S+)§r"
-    )
-    private val bossbarActivePattern by patternGroup.pattern(
-        "bossbar.active",
-        "§e§lEVENT (?<event>.+) §e§lACTIVE IN (?<area>.+) §e§lfor §a§l(?<time>\\S+)§r"
+        "§e§lPASSIVE EVENT (?<event>.+) §e§lRUNNING FOR §a§l(?<time>\\S+)§r",
     )
 
-    // TODO add test messages
+    /**
+     * REGEX-TEST: §e§lEVENT §6§LRAFFLE §e§lACTIVE IN §b§lFAR RESERVE §e§lfor §a§l01:03§r
+     */
+    private val bossbarActivePattern by patternGroup.pattern(
+        "bossbar.active",
+        "§e§lEVENT (?<event>.+) §e§lACTIVE IN (?<area>.+) §e§lfor §a§l(?<time>\\S+)§r",
+    )
+
+    /**
+     * REGEX-TEST: §f                    §r§d§lBETTER TOGETHER STARTED!
+     */
     private val eventStartedPattern by patternGroup.pattern(
         "started",
-        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) STARTED!"
+        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) STARTED!",
     )
+
+    /**
+     * REGEX-TEST: §f                      §r§d§lBETTER TOGETHER ENDED!
+     */
     private val eventEndedPattern by patternGroup.pattern(
         "ended",
-        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) ENDED!"
+        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) ENDED!",
     )
 
     private val defaultCooldown = 1.minutes
@@ -71,7 +86,7 @@ object MiningEventTracker {
         lastSentEvent = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
@@ -109,6 +124,9 @@ object MiningEventTracker {
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // Option to opt out of data sending
+        if (!config.allowDataSharing) return
+
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
@@ -121,7 +139,7 @@ object MiningEventTracker {
                 "eventName" to eventName,
                 "bossbar" to BossbarData.getBossbar(),
                 "serverType" to LorenzUtils.skyBlockIsland,
-                "fromChat" to (time == null)
+                "fromChat" to (time == null),
             )
             return
         }
@@ -145,7 +163,7 @@ object MiningEventTracker {
             serverId,
             eventType,
             timeRemaining.inWholeMilliseconds,
-            LorenzUtils.getPlayerUuid()
+            LorenzUtils.getPlayerUuid(),
         )
         val miningEventJson = ConfigManager.gson.toJson(miningEventData)
 
@@ -165,7 +183,7 @@ object MiningEventTracker {
             if (LorenzUtils.debug) {
                 ErrorManager.logErrorWithData(
                     e, "Sending mining event data was unsuccessful",
-                    "sentData" to json
+                    "sentData" to json,
                 )
             }
             return
@@ -178,12 +196,12 @@ object MiningEventTracker {
             ErrorManager.logErrorWithData(
                 Exception("PostFailure"), "Sending mining event data was unsuccessful",
                 "cause" to formattedResponse.cause,
-                "sentData" to json
+                "sentData" to json,
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (apiError) {
             canRequestAt = SimpleTimeMark.now()
@@ -210,14 +228,17 @@ object MiningEventTracker {
 
             if (!miningEventData.success) {
                 if (data.toString() == "{}") {
-                    ChatUtils.chat("§cFailed loading Mining Event data!\n" +
-                        "Please wait until the server problem fixes itself! There is nothing else to do at the moment.")
+                    ChatUtils.chat(
+                        "§cFailed loading Mining Event data!\n" +
+                            "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
+                        onlySendOnce = true
+                    )
                 } else {
                     ErrorManager.logErrorWithData(
                         Exception("miningEventData.success = false"),
                         "Failed to load Mining Event data!",
                         "cause" to miningEventData.cause,
-                        "recievedData" to data
+                        "recievedData" to data,
                     )
                 }
                 return@launch
@@ -230,7 +251,7 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(29, "mining.miningEvent.showType") { element ->
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element

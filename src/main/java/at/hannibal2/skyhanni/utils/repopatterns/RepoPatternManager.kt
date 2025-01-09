@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -17,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -44,13 +45,13 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf(),
+            else regexes?.regexes.orEmpty()
         )
 
     /**
      * Map containing the exclusive owner of a regex key
      */
-    private var exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
+    private val exclusivity: MutableMap<String, RepoPatternKeyOwner> = mutableMapOf()
 
     /**
      * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for
@@ -59,11 +60,6 @@ object RepoPatternManager {
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
-    private val isInDevEnv = try {
-        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    } catch (_: Exception) {
-        true
-    }
 
     private val insideTest = Launch.blackboard == null
 
@@ -78,7 +74,8 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    private val localLoading: Boolean
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -86,8 +83,9 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (isInDevEnv || LorenzEvent.isInGuardedEventHandler)
+        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
+        }
     }
 
     /**
@@ -101,7 +99,11 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash(
+                            "Non unique access to regex at \"$key\". " +
+                                "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                        )
                 } else {
                     exclusivity[key] = owner
                 }
@@ -119,7 +121,9 @@ object RepoPatternManager {
                 }
                 val previousParentOwner = previousParentOwnerMutable
 
-                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder &&
+                    !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)
+                ) {
                     if (!config.tolerateDuplicateUsage) crash(
                         "Non unique access to array regex at \"$parent\"." +
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
@@ -151,7 +155,7 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }
@@ -162,7 +166,7 @@ object RepoPatternManager {
         reloadPatterns()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }
@@ -235,13 +239,15 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+[.-])*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
-        require(keyShape.matches(key)) { "pattern key: \"$key\" failed shape requirements" }
+        require(keyShape.matches(key)) {
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers, dots and dashes."
+        }
     }
 
     /**

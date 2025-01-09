@@ -42,24 +42,28 @@ class GuideTab(
 
     private var selectColor = NOT_SELECTED_COLOR
 
-    private val renderable = Renderable.clickAndHover(object : Renderable {
-        override val width = this@GuideTab.width
-        override val height = this@GuideTab.height
-        override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT
-        override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
+    private val renderable = Renderable.clickAndHover(
+        object : Renderable {
+            override val width = this@GuideTab.width
+            override val height = this@GuideTab.height
+            override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT
+            override val verticalAlign: VerticalAlignment = VerticalAlignment.TOP
 
-        val itemRender = Renderable.itemStack(
-            item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
-        )
+            val itemRender = Renderable.itemStack(
+                item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
+            )
 
-        override fun render(posX: Int, posY: Int) {
-            Gui.drawRect(0, 0, width, height, selectColor)
-            itemRender.renderXYAligned(posX, posY, width, height)
+            override fun render(posX: Int, posY: Int) {
+                Gui.drawRect(0, 0, width, height, selectColor)
+                itemRender.renderXYAligned(posX, posY, width, height)
+            }
+        },
+        listOf(tip),
+        onClick = {
+            click()
+            SoundUtils.playClickSound()
         }
-    }, listOf(tip), onClick = {
-        click()
-        SoundUtils.playClickSound()
-    })
+    )
 
     fun render(posX: Int, posY: Int) {
         renderable.render(posX, posY)

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -21,7 +21,7 @@ object HotmAPI {
 
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
-    private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".asInternalName()
+    private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
 
     private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
     val isBlueEggActive
@@ -74,7 +74,7 @@ object HotmAPI {
 
         /** Use when new powder gets collected*/
         fun gain(difference: Long) {
-            ChatUtils.debug("Gained §a${difference.addSeparators()} §e$displayName Powder")
+            ChatUtils.debug("Gained §a${difference.addSeparators()} $color$displayName Powder")
             addTotal(difference)
             addCurrent(difference)
             PowderGainEvent(this, difference).post()

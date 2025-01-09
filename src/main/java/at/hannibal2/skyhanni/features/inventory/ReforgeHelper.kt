@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -44,21 +45,29 @@ object ReforgeHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.reforge
 
-    private val repoGroup = RepoPattern.group("reforge")
+    private val patternGroup = RepoPattern.group("reforge")
 
-    private val reforgeMenu by repoGroup.pattern(
+    private val reforgeMenu by patternGroup.pattern(
         "menu.blacksmith",
         "Reforge Item",
     )
-    private val reforgeHexMenu by repoGroup.pattern(
+    private val reforgeHexMenu by patternGroup.pattern(
         "menu.hex",
         "The Hex ➜ Reforges",
     )
-    private val reforgeChatMessage by repoGroup.pattern(
+
+    /**
+     * REGEX-TEST: §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
+     */
+    private val reforgeChatMessage by patternGroup.pattern(
         "chat.success",
         "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!",
     )
-    private val reforgeChatFail by repoGroup.pattern(
+
+    /**
+     * REGEX-TEST: §cWait a moment before reforging again!
+     */
+    private val reforgeChatFail by patternGroup.pattern(
         "chat.fail",
         "§cWait a moment before reforging again!|§cWhoa! Slow down there!",
     )
@@ -87,7 +96,7 @@ object ReforgeHelper {
 
     private const val EXIT_BUTTON = 40
 
-    private var waitForChat = AtomicBoolean(false)
+    private val waitForChat = AtomicBoolean(false)
 
     /** Gatekeeps instant double switches of the state */
     private var waitDelay = false
@@ -106,7 +115,7 @@ object ReforgeHelper {
             reforgeToSearch = null
         }
         itemToReforge = newItem
-        val newReforgeName = itemToReforge?.getReforgeName() ?: ""
+        val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
         if (newReforgeName == currentReforge?.lowercaseName) return
         currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
         updateDisplay()
@@ -169,8 +178,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         when {
             isHexReforgeMenu(event.inventoryName) -> {
@@ -194,8 +203,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onClose(event: InventoryCloseEvent) {
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isInReforgeMenu) return
         isInReforgeMenu = false
         isInHexReforgeMenu = false
@@ -272,23 +281,25 @@ object ReforgeHelper {
         val addEffectText: String
         val click: List<Renderable>
         if (currentReforge == reforge) {
-            stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
+            stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
             click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
-            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
+            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
-            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
+            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
             click = if (reforgeToSearch != reforge) {
                 listOf(renderableString(""), renderableString("§eClick to select!"))
             } else emptyList()
         }
 
-        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
+        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
+            listOf(renderableString(addEffectText)) + it
+        }.orEmpty()
 
         return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }
@@ -407,22 +418,24 @@ object ReforgeHelper {
         if (slot != null) {
             slot highlight color
         } else {
-            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
-            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
+            inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
         }
     }
 
     private fun SkyblockStatList.print(appliedReforge: SkyblockStatList? = null): List<Renderable> {
         val diff = appliedReforge?.takeIf { config.showDiff }?.let { this - it }
-        val main = ((diff ?: this).mapNotNull {
-            val key = it.key
-            val value = this[key] ?: 0.0
-            buildList<Renderable> {
-                add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                add(renderableString(key.iconWithName))
+        val main = (
+            (diff ?: this).mapNotNull {
+                val key = it.key
+                val value = this[key] ?: 0.0
+                buildList {
+                    add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
+                    diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
+                    add(renderableString(key.iconWithName))
+                }
             }
-        })
+            )
         val table = Renderable.table(main, 5)
         return listOf(table)
     }

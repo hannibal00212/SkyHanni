@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -18,6 +19,9 @@ import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -48,14 +52,14 @@ import net.minecraft.entity.player.EntityPlayer
 @SkyHanniModule
 object MobFilter {
 
-    private val repoGroup = RepoPattern.group("mob.detection")
+    private val patternGroup = RepoPattern.group("mob.detection")
 
     /** REGEX-TEST: Wither Husk 500M❤ */
-    val mobNameFilter by repoGroup.pattern(
+    val mobNameFilter by patternGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
-    val slayerNameFilter by repoGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
+    val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
 
     /** REGEX-TEST: ﴾ Storm ﴿
      *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
@@ -67,43 +71,43 @@ object MobFilter {
      *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
      *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
      *  */
-    val bossMobNameFilter by repoGroup.pattern(
+    val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
     )
-    val dungeonNameFilter by repoGroup.pattern(
+    val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
         "^(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
     )
-    val summonFilter by repoGroup.pattern(
+    val summonFilter by patternGroup.pattern(
         "filter.summon",
         "^(?<owner>\\w+)'s (?<name>.*) \\d+.*",
     )
-    val dojoFilter by repoGroup.pattern(
+    val dojoFilter by patternGroup.pattern(
         "filter.dojo",
         "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$",
     )
-    val jerryPattern by repoGroup.pattern(
+    val jerryPattern by patternGroup.pattern(
         "jerry",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits",
     )
-    val petCareNamePattern by repoGroup.pattern(
+    val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
         "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)",
     )
-    val wokeSleepingGolemPattern by repoGroup.pattern(
+    val wokeSleepingGolemPattern by patternGroup.pattern(
         "pattern.dungeon.woke.golem",
         "(?:§c§lWoke|§5§lSleeping) Golem§r",
     )
-    val jerryMagmaCubePattern by repoGroup.pattern(
+    val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
         "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤",
     )
-    val summonOwnerPattern by repoGroup.pattern(
+    val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
-    val heavyPearlPattern by repoGroup.pattern(
+    val heavyPearlPattern by patternGroup.pattern(
         "pattern.heavypearl.collect",
         "§.§lCOLLECT!",
     )
@@ -115,21 +119,16 @@ object MobFilter {
      * REGEX-TEST: §8[§7Lv49§8] §ePig
      * REGEX-TEST: §8[§7Lv64§8] §eRat
      */
-    val illegalEntitiesPattern by repoGroup.pattern(
+    val illegalEntitiesPattern by patternGroup.pattern(
         "pattern.pet.entities",
         "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$",
     )
 
-    internal const val RAT_SKULL =
-        "ewogICJ0aW1lc3RhbXAiIDogMTYxODQxOTcwMTc1MywKICAicHJvZmlsZUlkIiA6ICI3MzgyZGRmYmU0ODU0NTVjODI1ZjkwMGY4OGZkMzJmOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJCdUlJZXQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYThhYmI0NzFkYjBhYjc4NzAzMDExOTc5ZGM4YjQwNzk4YTk0MWYzYTRkZWMzZWM2MWNiZWVjMmFmOGNmZmU4IiwKICAgICAgIm1ldGFkYXRhIiA6IHsKICAgICAgICAibW9kZWwiIDogInNsaW0iCiAgICAgIH0KICAgIH0KICB9Cn0="
-    private const val HELLWISP_TENTACLE_SKULL =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0OTM4MzAyMTQxNiwKICAicHJvZmlsZUlkIiA6ICIzYjgwOTg1YWU4ODY0ZWZlYjA3ODg2MmZkOTRhMTVkOSIsCiAgInByb2ZpbGVOYW1lIiA6ICJLaWVyYW5fVmF4aWxpYW4iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDI3MDQ2Mzg0OTM2MzhiODVjMzhkZDYzZmZkYmUyMjJmZTUzY2ZkNmE1MDk3NzI4NzU2MTE5MzdhZTViNWUyMiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private const val RIFT_EYE_SKULL1 =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0ODA5MTkzNTcyMiwKICAicHJvZmlsZUlkIiA6ICJhNzdkNmQ2YmFjOWE0NzY3YTFhNzU1NjYxOTllYmY5MiIsCiAgInByb2ZpbGVOYW1lIiA6ICIwOEJFRDUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjI2YmRlNDUwNDljN2I3ZDM0NjA1ZDgwNmEwNjgyOWI2Zjk1NWI4NTZhNTk5MWZkMzNlN2VhYmNlNDRjMDgzNCIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
-    private const val RIFT_EYE_SKULL2 =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTdkYjE5MjNkMDNjNGVmNGU5ZjZlODcyYzVhNmFkMjU3OGIxYWZmMmIyODFmYmMzZmZhNzQ2NmM4MjVmYjkifX19"
-    internal const val NPC_TURD_SKULL =
-        "ewogICJ0aW1lc3RhbXAiIDogMTYzOTUxMjYxNzc5MywKICAicHJvZmlsZUlkIiA6ICIwZjczMDA3NjEyNGU0NGM3YWYxMTE1NDY5YzQ5OTY3OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJPcmVfTWluZXIxMjMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjM2MzBkOWIwMjA4OGVhMTkyNGE4NzIyNDJhYmM3NWI2MjYyYzJhY2E5MmFlY2Y4NzE0YTU3YTQxZWVhMGI5ZCIKICAgIH0KICB9Cn0="
+    internal val RAT_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_RAT") }
+    private val HELLWISP_TENTACLE_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("HELLWISP_TENTACLE") }
+    private val RIFT_EYE_SKULL1_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_1") }
+    private val RIFT_EYE_SKULL2_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_2") }
+    internal val NPC_TURD_SKULL by lazy { SkullTextureHolder.getTexture("NPC_TURD") }
 
     const val MINION_MOB_PREFIX = "Minion Mob "
 
@@ -157,7 +156,7 @@ object MobFilter {
         "anrrtqytsl", // Weaponsmith
     )
 
-    private val displayNPCCompressedNamePattern by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
+    private val displayNPCCompressedNamePattern by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
 
     private fun displayNPCNameCheck(name: String) = name.startsWith('§') ||
         displayNPCCompressedNamePattern.matches(name) ||
@@ -243,8 +242,10 @@ object MobFilter {
                 baseEntity,
                 armorStand,
                 extraEntityList,
-            ) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
-                ?: MobFactories.dojo(baseEntity, armorStand))
+            ) else (
+                MobFactories.basic(baseEntity, armorStand, extraEntityList)
+                    ?: MobFactories.dojo(baseEntity, armorStand)
+                )
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
         baseEntity is EntityBat -> createBat(baseEntity)
@@ -340,13 +341,13 @@ object MobFilter {
         if (baseEntity !is EntityZombie) return null
         when {
             illegalEntitiesPattern.matches(armorStand.name) -> return MobResult.illegal
-            baseEntity.riddenByEntity is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)?.inventory?.get(4)
-                ?.getSkullTexture() == RAT_SKULL -> return MobResult.illegal // Rat Morph
+            baseEntity.getFirstPassenger() is EntityPlayer && MobUtils.getArmorStand(baseEntity, 2)
+                ?.wearingSkullTexture(RAT_SKULL_TEXTURE) ?: false -> return MobResult.illegal // Rat Morph
         }
-        when (armorStand.inventory?.get(4)?.getSkullTexture()) {
-            HELLWISP_TENTACLE_SKULL -> return MobResult.illegal // Hellwisp Tentacle
-            RIFT_EYE_SKULL1 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
-            RIFT_EYE_SKULL2 -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+        when (armorStand.getStandHelmet()?.getSkullTexture()) {
+            HELLWISP_TENTACLE_SKULL_TEXTURE -> return MobResult.illegal // Hellwisp Tentacle
+            RIFT_EYE_SKULL1_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            RIFT_EYE_SKULL2_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
         }
         return null
     }
