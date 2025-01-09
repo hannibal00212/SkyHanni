@@ -907,6 +907,17 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
+    private val brokenGroup = group.group("broken")
+
+    /**
+     * REGEX-TEST:  §e§l⚡ §cRedston
+     * REGEX-TEST:       §ce: §e§b0%
+     */
+    val brokenRedstonePattern by brokenGroup.pattern(
+        "brokenredstone",
+        "\\s*§.§l⚡ §cRedston|\\s*§ce: §e§b0%",
+    )
+
     // Lines from the tablist
     private val tablistGroup = group.group("tablist")
 

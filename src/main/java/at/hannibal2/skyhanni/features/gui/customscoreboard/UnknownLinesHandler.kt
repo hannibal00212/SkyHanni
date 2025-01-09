@@ -152,6 +152,7 @@ object UnknownLinesHandler {
         SbPattern.carnivalCatchStreakPattern,
         SbPattern.carnivalAccuracyPattern,
         SbPattern.carnivalKillsPattern,
+        SbPattern.brokenRedstonePattern,
     )
     private var remoteOnlyPatternsAdded = false
 
