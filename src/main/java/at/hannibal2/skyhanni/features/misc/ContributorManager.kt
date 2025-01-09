@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ContributorManager {
@@ -23,7 +22,7 @@ object ContributorManager {
     var contributorNames = emptyList<String>()
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val map = event.getConstant<ContributorsJson>("Contributors").contributors
         contributors = map.mapKeys { it.key.lowercase() }

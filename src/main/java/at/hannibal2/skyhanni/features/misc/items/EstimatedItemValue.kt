@@ -57,7 +57,7 @@ object EstimatedItemValue {
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
@@ -66,7 +66,8 @@ object EstimatedItemValue {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
-        if (PlatformUtils.isNeuLoaded() && Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
+        if (!PlatformUtils.isNeuLoaded()) return
+        if (Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
@@ -133,7 +134,7 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }

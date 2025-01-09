@@ -42,16 +42,16 @@ object CarnivalReminder {
             storage?.lastClaimedDay = value
         }
 
-    private val repoGroup = RepoPattern.group("carnival.tickets")
+    private val patternGroup = RepoPattern.group("carnival.tickets")
 
     /** REGEX-TEST: §aYou claimed §r§aCarnival Ticket §r§8x25§r§a!
      */
-    private val ticketClaimedPattern by repoGroup.pattern("claimed", "§aYou claimed §r§aCarnival Ticket §r§8x25§r§a!")
+    private val ticketClaimedPattern by patternGroup.pattern("claimed", "§aYou claimed §r§aCarnival Ticket §r§8x25§r§a!")
 
     /** REGEX-TEST: §e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.
      */
     @Suppress("MaxLineLength")
-    private val alreadyClaimedPattern by repoGroup.pattern(
+    private val alreadyClaimedPattern by patternGroup.pattern(
         "already",
         "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
     )

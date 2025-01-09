@@ -163,6 +163,7 @@ object FarmingFortuneDisplay {
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val wrongTabCrop = GardenAPI.cropInHand != null && GardenAPI.cropInHand != currentCrop
+        val ffReduction = getPestFFReduction()
 
         val farmingFortune = if (wrongTabCrop) {
             (displayCrop.getLatestTrueFarmingFortune() ?: -1.0).also {
@@ -170,34 +171,44 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(
-            Renderable.string(
-                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                    farmingFortune.roundTo(0).addSeparators()
-                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
-            ),
-        )
-        add(Renderable.horizontalContainer(list))
+        val farmingFortuneText = if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: "
+        val fortuneColorCode = if (ffReduction > 0) "§c" else "§e"
+        val fortuneAmount = if (!recentlySwitchedTool && farmingFortune != -1.0) {
+            farmingFortune.roundTo(0).addSeparators()
+        } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
 
-        val ffReduction = getPestFFReduction()
-        if (ffReduction > 0) {
-            add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+        val latest = if (farmingFortune != -1.0) " latest" else ""
+        val wrongTabCropText = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see" + latest + " fortune!"
+
+        if (!wrongTabCrop || !config.compactFormat) {
+            list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+        } else {
+            list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
         }
 
-        if (wrongTabCrop) {
-            var text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
-            if (farmingFortune != -1.0) text += " latest"
-            text += " fortune!"
+        add(Renderable.horizontalContainer(list))
 
-            add(Renderable.string(text))
+        if (ffReduction > 0) {
+            if (config.compactFormat) {
+                add(Renderable.string("§cPests: §7-§e$ffReduction%"))
+            } else {
+                add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+            }
+
+        }
+
+        if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
+            add(Renderable.string(wrongTabCropText))
         }
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
+        if (config.hideMissingFortuneWarnings) return@buildList
         if (cropFortune) {
             add(
+
                 Renderable.clickAndHover(
-                    "§cNo Crop Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
@@ -210,7 +221,7 @@ object FarmingFortuneDisplay {
         } else {
             add(
                 Renderable.clickAndHover(
-                    "§cNo Farming Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
