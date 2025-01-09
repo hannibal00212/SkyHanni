@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -169,20 +170,19 @@ object SkyBlockItemModifierUtils {
         }
     }
 
-    fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
+    fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 
-    fun ItemStack.hasJalapenoBook() = getAttributeBoolean("jalapeno_count")
+    fun ItemStack.hasJalapenoBook() = getAttributeInt("jalapeno_count").isPositive()
 
     fun ItemStack.hasEtherwarp() = getAttributeBoolean("ethermerge")
 
-    fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
+    fun ItemStack.hasWoodSingularity() = getAttributeInt("wood_singularity_count").isPositive()
 
     fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
 
-    fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
+    fun ItemStack.hasArtOfWar() = getAttributeInt("art_of_war_count").isPositive()
 
-    // TODO untested
-    fun ItemStack.hasBookOfStats() = getAttributeBoolean("stats_book")
+    fun ItemStack.hasBookOfStats() = getAttributeInt("stats_book") != null
 
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
