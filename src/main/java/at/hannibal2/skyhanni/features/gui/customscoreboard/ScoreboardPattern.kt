@@ -910,11 +910,13 @@ object ScoreboardPattern {
     /**
      * REGEX-TEST:  §e§l⚡ §cRedston
      * REGEX-TEST:       §ce: §e§b0%
+     * REGEX-TEST: Starting in: §a0 §c1:55
      */
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
         "\\s*§ce: §e§b0%",
+        "\\s*Starting in: §a0 §c[\\d:]+",
     )
 
     // Lines from the tablist
