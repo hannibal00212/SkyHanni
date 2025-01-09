@@ -36,8 +36,6 @@ object ToolTooltipTweaks {
         "§7Farming Fortune: §a",
     )
 
-    private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
     private const val ABILITY_DESCRIPTION_START = "§5§o§7These boots gain §a+2❈ Defense"
