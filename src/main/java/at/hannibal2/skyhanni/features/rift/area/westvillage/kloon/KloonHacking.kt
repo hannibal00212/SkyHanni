@@ -54,8 +54,8 @@ object KloonHacking {
         wearingHelmet = InventoryUtils.getHelmet()?.getInternalName() == RETRO_ENCABULATING_VISOR
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
         inColorInventory = false
         nearestTerminal = null
@@ -75,7 +75,7 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
         inColorInventory = false

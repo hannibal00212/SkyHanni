@@ -73,14 +73,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     )
 
     /**
-     * REGEX-TEST: §eClick to start!
-     */
-    val clickToStartPattern by patternGroup.pattern(
-        "clicktostart",
-        "(?:§.)*Click to start!",
-    )
-
-    /**
      * REGEX-TEST: §a§lCOMPLETE
      */
     val completedPattern by patternGroup.pattern(
@@ -91,8 +83,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         questLoader.checkInventory(event)
@@ -232,9 +224,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT ||
-            state == QuestState.NOT_ACCEPTED ||
-            (this is RescueMissionQuest && state == QuestState.ACCEPTED)
+        state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
     fun render(display: MutableList<List<Any>>) {
@@ -279,7 +269,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        val stateText = if (quest !is UnknownQuest) {
+        val stateText = if (quest !is UnknownQuest && quest.state != QuestState.ACCEPTED) {
             "$stateColor[$state] §f"
         } else {
             ""

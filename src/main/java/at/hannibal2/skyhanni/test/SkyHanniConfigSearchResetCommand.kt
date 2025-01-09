@@ -271,10 +271,13 @@ object SkyHanniConfigSearchResetCommand {
             map["$parentName.<end of depth>"] = null
             return map
         }
-        for (field in obj.javaClass.fields) {
+        for (field in obj.javaClass.declaredFields) {
             if ((field.modifiers and Modifier.STATIC) != 0) continue
 
             val name = field.name
+            if (parentName == "playerSpecific" && name == "profiles") continue
+            if (parentName == "config.storage" && name == "players") continue
+            if (parentName == "config" && name == "storage") continue
             val fieldName = "$parentName.$name"
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
@@ -286,6 +289,8 @@ object SkyHanniConfigSearchResetCommand {
                 newObj !is Int &&
                 newObj !is Double &&
                 newObj !is Position &&
+                newObj !is Map<*, *> &&
+                newObj !is List<*> &&
                 !newObj.javaClass.isEnum
             ) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
