@@ -75,7 +75,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
-                "§eOnly enable this setting when you own a mythic Rabbit pet."
+            "§eOnly enable this setting when you own a mythic Rabbit pet."
     )
     @ConfigEditorBoolean
     @FeatureToggle
