@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -33,27 +33,59 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object RiftBloodEffigies {
 
+    enum class EffigyState {
+        UNKNOWN,
+        NOT_BROKEN,
+        BROKEN,
+    }
+
+    private data class Effigy(
+        var state: EffigyState = EffigyState.UNKNOWN,
+        var respawnTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+    ) {
+        fun reset() {
+            state = EffigyState.UNKNOWN
+            respawnTime = SimpleTimeMark.farPast()
+        }
+    }
+
     private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
 
     private var locations: List<LorenzVec> = emptyList()
-    private var effigiesTimes = cleanMap()
+    private val effigies = (0..5).associateWith { Effigy() }
 
     private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
+    /**
+     * REGEX-TEST: §eRespawn §c14m59s §7(or click!)
+     * REGEX-TEST: §eRespawn §c1s §7(or click!)
+     */
     private val effigiesTimerPattern by patternGroup.pattern(
         "respawn",
-        "§eRespawn §c(?<time>.*) §7\\(or click!\\)"
+        "§eRespawn §c(?<time>.*) §7\\(or click!\\)",
     )
+    /**
+     * REGEX-TEST: §eBreak it!
+     */
+    private val effigiesBreakPattern by patternGroup.pattern(
+        "break",
+        "§eBreak it!",
+    )
+    /**
+     * REGEX-TEST: Effigies: §c⧯§c⧯§c⧯§c⧯§c⧯§c⧯
+     * REGEX-TEST: Effigies: §c⧯§c⧯§c⧯§c⧯§c⧯§7⧯
+     */
     val heartsPattern by patternGroup.pattern(
         "heart",
-        "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)"
+        "Effigies: (?<hearts>(?:(?:§[7c])?⧯)*)",
     )
+
+    private fun getIndex(entity: EntityArmorStand): Int? =
+        locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        effigiesTimes = cleanMap()
+        effigies.values.forEach { it.reset() }
     }
-
-    private fun cleanMap() = (0..5).associateWith { SimpleTimeMark.farPast() }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -64,9 +96,9 @@ object RiftBloodEffigies {
             return
         }
         event.addData {
-            for ((number, duration) in effigiesTimes) {
-                val time = duration.timeUntil().format()
-                add("$number: $time ($duration)")
+            for ((i, effigy) in effigies) {
+                val time = effigy.respawnTime.timeUntil().format()
+                add("${i + 1}: ${effigy.state} - $time (${effigy.respawnTime})")
             }
         }
     }
@@ -75,37 +107,37 @@ object RiftBloodEffigies {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
         if (newLocations.size != 6) {
-            error("Invalid rift effigies size: ${newLocations.size} (expected 6)")
+            error("Invalid Rift effigies size: ${newLocations.size} (expected 6)")
         }
         locations = newLocations
     }
 
     @HandleEvent
-    fun onScoreboardChange(event: RawScoreboardUpdateEvent) {
+    fun onRawScoreboardChange(event: RawScoreboardUpdateEvent) {
         if (!isEnabled()) return
 
         val line = event.rawScoreboard.firstOrNull { it.startsWith("Effigies:") } ?: return
+        ChatUtils.debug("Effigies line: $line")
         val hearts = heartsPattern.matchMatcher(line) {
             group("hearts")
         } ?: return
 
         val split = hearts.split("§").drop(1)
         for ((index, s) in split.withIndex()) {
-            val time = effigiesTimes[index] ?: continue
+            val effigy = effigies[index] ?: continue
 
-            if (time.isInPast()) {
-                if (s == "7") {
-                    if (time.isFarPast()) {
-                        ChatUtils.chat("Effigy #${index + 1} respawned!")
-                        effigiesTimes = effigiesTimes.editCopy { this[index] = SimpleTimeMark.farPast() }
-                    }
-                } else {
-                    if (time.isFarPast()) {
-                        ChatUtils.chat("Effigy #${index + 1} is broken!")
-                        val endTime = SimpleTimeMark.now() + 20.minutes
-                        effigiesTimes = effigiesTimes.editCopy { this[index] = endTime }
-                    }
-                }
+            val oldState = effigy.state
+            effigy.state = when (s[0]) {
+                '7' -> EffigyState.NOT_BROKEN
+                'c' -> EffigyState.BROKEN
+                else -> error("Unable to determine Rift effigy state from color code: $s")
+            }
+
+            if (oldState == EffigyState.BROKEN && effigy.state == EffigyState.NOT_BROKEN) {
+                ChatUtils.chat("Effigy #${index + 1} respawned!")
+            } else if (oldState == EffigyState.NOT_BROKEN && effigy.state == EffigyState.BROKEN) {
+                ChatUtils.chat("Effigy #${index + 1} broken!")
+                effigies[index]?.respawnTime = SimpleTimeMark.now() + 20.minutes
             }
         }
     }
@@ -114,14 +146,21 @@ object RiftBloodEffigies {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 6.0)) {
+        for (entity in EntityUtils.getEntitiesNearby<EntityArmorStand>(LocationUtils.playerLocation(), 15.0)) {
             effigiesTimerPattern.matchMatcher(entity.name) {
-                val nearest = locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) } ?: return
-                val index = locations.indexOf(nearest)
+                val index = getIndex(entity) ?: continue
+                val time = TimeUtils.getDuration(group("time"))
+                effigies[index]?.let {
+                    it.state = EffigyState.BROKEN
+                    it.respawnTime = SimpleTimeMark.now() + time
+                }
+                continue
+            }
 
-                val string = group("time")
-                val time = TimeUtils.getDuration(string)
-                effigiesTimes = effigiesTimes.editCopy { this[index] = SimpleTimeMark.now() + time }
+            if (effigiesBreakPattern.matches(entity.name)) {
+                val index = getIndex(entity) ?: continue
+                effigies[index]?.state = EffigyState.NOT_BROKEN
+                continue
             }
         }
     }
@@ -132,31 +171,40 @@ object RiftBloodEffigies {
 
         for ((index, location) in locations.withIndex()) {
             val name = "Effigy #${index + 1}"
-            val duration = effigiesTimes[index] ?: continue
+            val effigy = effigies[index] ?: continue
 
-            if (duration.isFarPast()) {
-                if (config.unknownTime) {
-                    event.drawWaypointFilled(location, LorenzColor.GRAY.toColor(), seeThroughBlocks = true)
-                    event.drawDynamicText(location, "§7Unknown Time ($name)", 1.5)
-                    continue
+            when (effigy.state) {
+                EffigyState.BROKEN -> {
+                    if (effigy.respawnTime.isFarPast()) {
+                        if (config.unknownTime) {
+                            event.drawWaypointFilled(location, LorenzColor.GRAY.toColor(), seeThroughBlocks = true)
+                            event.drawDynamicText(location, "§7Unknown Time ($name)", 1.5)
+                            continue
+                        }
+                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respwningSoonTime.minutes) {
+                        event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
+                        val time = effigy.respawnTime.timeUntil().format()
+                        event.drawDynamicText(location, "§e$name respawning in §b$time", 1.5)
+                        continue
+                    }
                 }
-            } else {
-                if (duration.isFarPast()) {
+
+                EffigyState.NOT_BROKEN -> {
                     event.drawWaypointFilled(location, LorenzColor.RED.toColor(), seeThroughBlocks = true)
                     event.drawDynamicText(location, "§cBreak $name!", 1.5)
                     continue
                 }
 
-                val timeUntil = duration.timeUntil()
-                if (config.respawningSoon && timeUntil <= config.respwningSoonTime.minutes) {
-                    event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
-                    val time = timeUntil.format()
-                    event.drawDynamicText(location, "§e$name is respawning §b$time", 1.5)
-                    continue
+                EffigyState.UNKNOWN -> {
+                    if (config.unknownTime) {
+                        event.drawWaypointFilled(location, LorenzColor.GRAY.toColor(), seeThroughBlocks = true)
+                        event.drawDynamicText(location, "§7Unknown State ($name)", 1.5)
+                        continue
+                    }
                 }
             }
 
-            if (location.distanceToPlayer() < 5) {
+            if (location.distanceToPlayer() <= 15) {
                 event.drawDynamicText(location, "§7$name", 1.5)
             }
         }
