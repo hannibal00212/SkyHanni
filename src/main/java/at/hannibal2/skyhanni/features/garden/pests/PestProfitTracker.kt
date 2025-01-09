@@ -183,7 +183,7 @@ object PestProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
     }
