@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.EPIC_BAL_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.LEGENDARY_BAL_ITEM
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -37,6 +37,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object CrystalNucleusTracker {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+    private val patternGroup = RepoPattern.group("mining.crystalnucleus.tracker")
 
     /**
      * REGEX-TEST: §b[MVP§r§2+§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
