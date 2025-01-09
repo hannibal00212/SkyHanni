@@ -40,7 +40,7 @@ object EnchantedClockHelper {
     /**
      * REGEX-TEST: Enchanted Time Clock
      */
-    private val enchantedClockPattern by patternGroup.pattern(
+    val enchantedClockPattern by patternGroup.pattern(
         "inventory.name",
         "Enchanted Time Clock",
     )
