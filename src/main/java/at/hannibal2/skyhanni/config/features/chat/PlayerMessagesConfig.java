@@ -45,15 +45,15 @@ public class PlayerMessagesConfig {
         BINGO_LEVEL("Bingo Level"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        MessagePart(String str) {
-            this.str = str;
+        MessagePart(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

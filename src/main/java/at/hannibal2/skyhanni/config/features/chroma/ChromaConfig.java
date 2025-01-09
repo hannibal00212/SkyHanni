@@ -51,17 +51,17 @@ public class ChromaConfig {
         BACKWARD_RIGHT("Backward + Right", 2),
         BACKWARD_LEFT("Backward + Left", 3);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        Direction(String str, int legacyId) {
-            this.str = str;
+        Direction(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        Direction(String str) {
-            this(str, -1);
+        Direction(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -71,7 +71,7 @@ public class ChromaConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

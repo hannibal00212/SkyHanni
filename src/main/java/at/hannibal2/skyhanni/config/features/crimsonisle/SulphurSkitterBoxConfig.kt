@@ -19,12 +19,12 @@ class SulphurSkitterBoxConfig {
     @ConfigEditorDropdown
     var boxType: BoxType = BoxType.WIREFRAME
 
-    enum class BoxType(private val str: String) {
+    enum class BoxType(private val displayName: String) {
         FULL("Full"),
         WIREFRAME("Wireframe"),
         ;
 
-        override fun toString() = str
+        override fun toString() = displayName
     }
 
     @Expose

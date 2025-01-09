@@ -37,17 +37,17 @@ public class BlazeHellionConfig {
         SPIRIT_OR_CRYSTAL("Spirit/Crystal", 0),
         ASHEN_OR_AURIC("Ashen/Auric", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        FirstDaggerEntry(String str, int legacyId) {
-            this.str = str;
+        FirstDaggerEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        FirstDaggerEntry(String str) {
-            this(str, -1);
+        FirstDaggerEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -57,7 +57,7 @@ public class BlazeHellionConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
