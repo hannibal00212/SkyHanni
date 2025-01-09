@@ -100,7 +100,7 @@ object OpenLastStorage {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(71, "misc.openLastStorage", "misc.lastStorage.openLastStorage")
     }
 
