@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -96,6 +97,11 @@ object OpenLastStorage {
         }
         lastStorageType = type
         return false
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent){
+        event.move(71, "misc.openLastStorage", "misc.lastStorage.openLastStorage")
     }
 
     private fun isEnabled() = config.openLastStorage
