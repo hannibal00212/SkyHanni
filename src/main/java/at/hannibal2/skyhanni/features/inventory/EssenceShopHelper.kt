@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -48,6 +49,8 @@ object EssenceShopHelper {
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
     private var infoItemStack: ItemStack? = null
+
+    private val patternGroup = RepoPattern.group("inventory.essence-shop-helper")
 
     /**
      * REGEX-TEST: Gold Essence Shop
