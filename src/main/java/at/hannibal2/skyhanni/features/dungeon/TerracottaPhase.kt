@@ -19,12 +19,12 @@ object TerracottaPhase {
 
     private var inTerracottaPhase = false
 
-    private val repoGroup = RepoPattern.group("dungeon.terracotta")
-    private val terracottaStartPattern by repoGroup.pattern(
+    private val patternGroup = RepoPattern.group("dungeon.terracotta")
+    private val terracottaStartPattern by patternGroup.pattern(
         "start",
         "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!",
     )
-    private val terracottaEndPattern by repoGroup.pattern(
+    private val terracottaEndPattern by patternGroup.pattern(
         "end",
         "§c\\[BOSS] Sadan§r§f: ENOUGH!",
     )
