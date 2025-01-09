@@ -66,9 +66,9 @@ object MiningStatsDisplay {
     )
 
     @Suppress("MaxLineLength")
-    private val tooltipFortunePattern by patternGroup.pattern(
-        "tooltip.new",
-        "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
+    private val miningFortunePattern by RepoPattern.pattern(
+        "garden.tooltip.miningfortune",
+        "§7Mining Fortune: §a",
     )
     private val armorAbilityPattern by patternGroup.pattern(
         "armorability",
@@ -100,6 +100,9 @@ object MiningStatsDisplay {
     var reforgeFortune = 0.0
     var gemstoneFortune = 0.0
     var itemBaseFortune = 0.0
+    var fortuneFortune = 0.0
+    var engineFortune = 0.0
+    var omeletteFortune = 0.0
     //var greenThumbFortune = 0.0
     //var pesterminatorFortune = 0.0
 
@@ -195,7 +198,7 @@ object MiningStatsDisplay {
                 25.0
             } else if (string.endsWith("X455")) {
                 40.0
-            } else if (string.endsWith("X555")) {
+            } else if (string.endsWith("3")) {
                 70.0
             } else 120.0
         } else when (string) {
@@ -272,31 +275,31 @@ object MiningStatsDisplay {
         reforgeFortune = 0.0
         gemstoneFortune = 0.0
         itemBaseFortune = 0.0
-        //fortuneFortune = 0.0
-        //engineFortune = 0.0
-        //omeletteFortune = 0.0
+        fortuneFortune = 0.0
+        engineFortune = 0.0
+        omeletteFortune = 0.0
 
         // TODO code cleanup (after ff rework)
 
         val lore = tool?.getLore() ?: return
         for (line in lore) {
-            tooltipFortunePattern.matchMatcher(line) {
+            miningFortunePattern.matchMatcher(line) {
                 displayedFortune = group("display")?.toDouble() ?: 0.0
                 reforgeFortune = groupOrNull("reforge")?.toDouble() ?: 0.0
                 gemstoneFortune = groupOrNull("gemstone")?.toDouble() ?: 0.0
             } ?: continue
 
-            itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
-                5.0
-            } else if (tool.getInternalName().contains("ZORROS_CAPE")) {
-                10.0
-            } else 0.0
+            itemBaseFortune = 10.0 //if ((tool.getInternalName()).itemName.contains("JUNGLE_PICKAXE")) 5 else 0.0
+
+            //}// else if (tool.getInternalName().contains("ZORROS_CAPE")) {
+
+            }
         }
     }
 
-    fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
+    //fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
 
-    fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
+    //fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -304,4 +307,4 @@ object MiningStatsDisplay {
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
     }
-}
+
