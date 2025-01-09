@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.mining;
+package at.hannibal2.skyhanni.config.features.mining.nucleus;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
@@ -14,24 +14,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMBER;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.AMETHYST;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DIAMOND_ESSENCE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.DOUBLE_POWDER;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ELECTRON;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.FTX;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GEMSTONE_POWDER;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GOLD_ESSENCE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.HARD_STONE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.JADE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ROBOTRON;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.RUBY;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_1;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_2;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_3;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOPAZ;
-import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOTAL_CHESTS;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.AMBER;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.AMETHYST;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.DIAMOND_ESSENCE;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.DOUBLE_POWDER;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.ELECTRON;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.FTX;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.GEMSTONE_POWDER;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.GOLD_ESSENCE;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.HARD_STONE;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.JADE;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.ROBOTRON;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.RUBY;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.SPACER_1;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.SPACER_2;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.SPACER_3;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.TOPAZ;
+import static at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry.TOTAL_CHESTS;
 
 public class PowderTrackerConfig {
 

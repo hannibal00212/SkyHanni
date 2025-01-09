@@ -97,6 +97,11 @@ public class DiscordRPCConfig {
     @ConfigEditorBoolean
     public Property<Boolean> showSkyCryptButton = Property.of(true);
 
+    @Expose
+    @ConfigOption(name = "Show Button for EliteBot", desc = "Add a button to the RPC that opens your EliteBot profile.")
+    @ConfigEditorBoolean
+    public Property<Boolean> showEliteBotButton = Property.of(true);
+
     public enum LineEntry implements HasLegacyId {
         NOTHING("Nothing", 0),
         LOCATION("Location", 1),

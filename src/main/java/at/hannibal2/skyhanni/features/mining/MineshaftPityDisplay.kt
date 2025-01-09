@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -196,7 +196,6 @@ object MineshaftPityDisplay {
             }
         }
 
-
         val neededToPityRenderable = Renderable.verticalContainer(
             listOf(
                 Renderable.string("§3Needed to pity:"),
@@ -231,15 +230,19 @@ object MineshaftPityDisplay {
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isDisplayEnabled()) return
-        display.ifEmpty { update() }
-        if (display.isEmpty()) return
-        config.position.renderRenderables(
-            listOf(Renderable.verticalContainer(display, 2)),
-            posLabel = "Mineshaft Pity Display",
-        )
+    init {
+        RenderDisplayHelper(
+            condition = { isDisplayEnabled() },
+            outsideInventory = true,
+        ) {
+            display.ifEmpty { update() }
+            if (display.isNotEmpty()) {
+                config.position.renderRenderables(
+                    listOf(Renderable.verticalContainer(display, 2)),
+                    posLabel = "Mineshaft Pity Display",
+                )
+            }
+        }
     }
 
     private fun resetCounter() {
