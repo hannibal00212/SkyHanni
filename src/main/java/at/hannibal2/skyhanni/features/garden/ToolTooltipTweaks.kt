@@ -13,10 +13,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
@@ -25,6 +27,14 @@ import kotlin.math.roundToInt
 object ToolTooltipTweaks {
 
     private val config get() = GardenAPI.config.tooltipTweak
+
+    /**
+     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     */
+    private val farmingFortunePattern by RepoPattern.pattern(
+        "garden.tooltip.farmingfortune",
+        "§7Farming Fortune: §a",
+    )
 
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
@@ -67,8 +77,7 @@ object ToolTooltipTweaks {
         var removingAbilityDescription = false
 
         for (line in iterator) {
-            val match = tooltipFortunePattern.matchEntire(line)?.groups
-            if (match != null) {
+            if (farmingFortunePattern.find(line)) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
@@ -89,8 +98,10 @@ object ToolTooltipTweaks {
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
                         "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+
                     CropTooltipFortuneEntry.SHOW ->
                         "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+
                     else ->
                         "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
