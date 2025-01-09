@@ -125,6 +125,11 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
+    @ConfigOption(name = "Enchanted Clock", desc = "")
+    @Accordion
+    public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     public boolean resetSearchGuiOnClose = true;

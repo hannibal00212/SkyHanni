@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.BucketData
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
@@ -791,6 +792,7 @@ class ProfileSpecificStorage {
             override fun hashCode(): Int {
                 return Objects.hash(position, percentile)
             }
+
             override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (other == null) return false
@@ -845,4 +847,7 @@ class ProfileSpecificStorage {
         @Expose
         var page: Int? = null
     }
+
+    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> =
+        EnumMap(EnchantedClockHelper.SimpleBoostType::class.java)
 }

@@ -44,7 +44,12 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.keyCode)) {
+                cir.returnValue = false
+            }
+            return
+        }
         cir.returnValue = override.isKeyClicked()
     }
 
