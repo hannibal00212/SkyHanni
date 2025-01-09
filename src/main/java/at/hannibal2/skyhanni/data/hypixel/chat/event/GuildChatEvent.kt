@@ -10,4 +10,7 @@ class GuildChatEvent(
     val guildRank: ComponentSpan?,
     chatComponent: IChatComponent,
     blockedReason: String? = null,
-) : AbstractChatEvent(author, message, chatComponent, blockedReason)
+) : AbstractChatEvent(author, message, chatComponent, blockedReason) {
+    val authorString by lazy { author.getText() }
+    val messageString by lazy { message.getText() }
+}

@@ -34,6 +34,11 @@ public class ChatConfig {
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
 
     @Expose
+    @ConfigOption(name = "Bridge Formatter", desc = "")
+    @Accordion
+    public BridgeFormatterConfig bridgeFormatter = new BridgeFormatterConfig();
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     public List<DungeonMessageTypes> dungeonFilteredMessageTypes = new ArrayList<>();
