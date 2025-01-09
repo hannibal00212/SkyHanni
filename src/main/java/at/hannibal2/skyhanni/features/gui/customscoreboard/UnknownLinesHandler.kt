@@ -152,8 +152,8 @@ object UnknownLinesHandler {
         SbPattern.carnivalCatchStreakPattern,
         SbPattern.carnivalAccuracyPattern,
         SbPattern.carnivalKillsPattern,
-        SbPattern.brokenRedstonePattern,
-    )
+    ) + SbPattern.brokenPatterns
+
     private var remoteOnlyPatternsAdded = false
 
     fun handleUnknownLines() {
