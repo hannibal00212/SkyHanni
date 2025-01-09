@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -14,15 +13,15 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.patternGroup
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.jungleKeyItem
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotPartItems
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.EPIC_BAL_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.JUNGLE_KEY_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.LEGENDARY_BAL_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -50,10 +49,6 @@ object CrystalNucleusTracker {
         "bal.obtained",
         "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!"
     )
-
-    private val EPIC_BAL_ITEM = "BAL;3".toInternalName()
-    private val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
-    private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
@@ -131,7 +126,7 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
 
         if (runsCompleted > 0) {
-            val jungleKeyCost = jungleKeyItem.getPrice() * runsCompleted
+            val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
@@ -144,21 +139,17 @@ object CrystalNucleusTracker {
                 ).toSearchable(),
             )
 
-            val useApparatus = config.professorUsage.get() == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
-            val perRunSapphireCost =
-                if (useApparatus) PRECURSOR_APPARATUS_ITEM.getPrice()
-                else robotPartItems.sumOf {
-                    it.getPrice()
-                }
-            val totalSapphireCost = perRunSapphireCost * runsCompleted
+            val usesApparatus = CrystalNucleusAPI.usesApparatus()
+            val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
+            val totalSapphireCost = partsCost * runsCompleted
             val usageString =
-                if (useApparatus) StringUtils.pluralize(
+                if (usesApparatus) StringUtils.pluralize(
                     runsCompleted.toInt(),
                     config.professorUsage.toString(),
                     "§5Precursor Apparatuses"
                 )
                 else config.professorUsage.toString()
-            val usageTotal = if (useApparatus) runsCompleted else runsCompleted * 6
+            val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
             profit -= totalSapphireCost
             val totalSapphireCostFormat = totalSapphireCost.shortFormat()
