@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -275,7 +276,9 @@ object SackAPI {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            event.blockedReason = "sacks_change"
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
+                event.blockedReason = "sacks_change"
+            }
         }
     }
 
