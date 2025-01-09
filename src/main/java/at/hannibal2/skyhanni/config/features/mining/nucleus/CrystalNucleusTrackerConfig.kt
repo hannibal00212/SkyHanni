@@ -39,7 +39,7 @@ class CrystalNucleusTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Profit Per Minimum",
-        desc = "Only show items above this coin amount in the summary message hover."
+        desc = "Only show items above this coin amount in the summary message hover.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 1000000f, minStep = 5000f)
     var profitPerMinimum: Int = 20000

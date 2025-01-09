@@ -11,7 +11,7 @@ class CrystalNucleusConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Hide or compact messages relating to Crystal Nucleus runs in the Crystal Hollows."
+        desc = "Hide or compact messages relating to Crystal Nucleus runs in the Crystal Hollows.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -33,7 +33,7 @@ class CrystalNucleusConfig {
     @Expose
     @ConfigOption(
         name = "Modified Messages",
-        desc = "Messages that should be hidden or compacted.\n§cImportant information will still appear§7."
+        desc = "Messages that should be hidden or compacted.\n§cImportant information will still appear§7.",
     )
     @ConfigEditorDraggableList
     var modifiedMessages: List<CrystalNucleusMessageTypes> = ArrayList(
@@ -45,7 +45,7 @@ class CrystalNucleusConfig {
             CrystalNucleusMessageTypes.NPC_PROF_ROBOT,
             CrystalNucleusMessageTypes.NPC_KING_YOLKAR,
             CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS,
-            CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE
-        )
+            CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE,
+        ),
     )
 }
