@@ -98,7 +98,7 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
         checkVacuum()

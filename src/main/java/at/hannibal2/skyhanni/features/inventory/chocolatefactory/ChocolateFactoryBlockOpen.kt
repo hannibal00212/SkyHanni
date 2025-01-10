@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -53,6 +55,7 @@ object ChocolateFactoryBlockOpen {
         if (!LorenzUtils.inSkyBlock) return
         val slotDisplayName = event.slot?.stack?.displayName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
+        if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
         if (checkIsBlocked()) event.cancel()
     }

@@ -185,8 +185,8 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()

@@ -142,9 +142,10 @@ object ScoreboardData {
 
     }
 
-    private fun cleanSB(scoreboard: String): String {
-        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
-    }
+    private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
+        // 10735 = Rift Blood Effigies symbol
+        it.code in 21..126 || it.code == 167 || it.code == 10735
+    }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()

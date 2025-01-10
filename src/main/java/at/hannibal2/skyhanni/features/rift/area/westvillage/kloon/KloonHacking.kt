@@ -44,7 +44,7 @@ object KloonHacking {
 
     private val RETRO_ENCABULATING_VISOR = "RETRO_ENCABULATING_VISOR".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
         checkHelmet()

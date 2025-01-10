@@ -33,7 +33,7 @@ object ChocolateFactoryStats {
 
     private var display: Renderable? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
@@ -107,7 +107,7 @@ object ChocolateFactoryStats {
         put(ChocolateFactoryStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
     }
 
-    private fun SimpleTimeMark?.formatIfFuture(): String? = this?.takeIfFuture()?.timeUntil()?.format()
+    private fun SimpleTimeMark?.formatIfFuture(): String? = this?.takeIf { it.isInFuture() }?.timeUntil()?.format()
 
     private fun MutableMap<ChocolateFactoryStat, String>.addHitman() {
         val profileStorage = ChocolateFactoryStats.profileStorage ?: return
