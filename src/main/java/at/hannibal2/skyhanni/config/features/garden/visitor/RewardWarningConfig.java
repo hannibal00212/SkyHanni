@@ -107,7 +107,7 @@ public class RewardWarningConfig {
     public boolean preventRefusingNew = true;
 
     @Expose
-    @ConfigOption(name = "Block Accepting Without Rabbit", desc = "Prevent accepting a visitor without a Rabbit pet equipped. Useful for people who can't afford autopet rules.")
+    @ConfigOption(name = "Block Accepting Without Rabbit", desc = "Prevent accepting a visitor without a Rabbit pet equipped. Useful if you can't afford autopet rules.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventAcceptingWithoutRabbit = false;
