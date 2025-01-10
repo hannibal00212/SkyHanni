@@ -88,7 +88,6 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
-import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -616,11 +615,6 @@ object Commands {
             description = "Reloading the local repo data"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.repo.reloadLocalRepo() }
-        }
-        event.register("shgraph") {
-            description = "Enables the graph editor"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditor.commandIn() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
