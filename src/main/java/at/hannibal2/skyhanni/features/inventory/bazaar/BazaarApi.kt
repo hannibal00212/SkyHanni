@@ -87,7 +87,7 @@ object BazaarApi {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
         val itemName = item.name
@@ -125,7 +125,7 @@ object BazaarApi {
     }
 
     // TODO cache
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!inBazaarInventory) return

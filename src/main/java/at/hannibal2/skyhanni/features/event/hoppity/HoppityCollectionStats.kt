@@ -471,7 +471,7 @@ object HoppityCollectionStats {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inInventory || collectionConfig.highlightRabbits.isEmpty()) return
 

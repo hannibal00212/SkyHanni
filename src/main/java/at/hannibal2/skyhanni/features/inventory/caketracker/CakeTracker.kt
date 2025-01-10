@@ -187,8 +187,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return

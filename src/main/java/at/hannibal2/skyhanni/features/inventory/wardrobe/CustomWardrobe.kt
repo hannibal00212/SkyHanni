@@ -58,7 +58,7 @@ object CustomWardrobe {
     private var lastScreenSize: Pair<Int, Int>? = null
     private const val GUI_NAME = "Custom Wardrobe"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {

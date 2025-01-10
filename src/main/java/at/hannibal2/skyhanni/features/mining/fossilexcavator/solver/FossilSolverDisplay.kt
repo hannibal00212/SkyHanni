@@ -151,7 +151,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
@@ -165,8 +165,8 @@ object FossilSolverDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    @HandleEvent
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return

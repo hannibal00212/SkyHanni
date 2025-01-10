@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.remainingClicksPattern
@@ -69,8 +69,8 @@ object SuperpairDataDisplay {
         config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (ExperimentationTableAPI.getCurrentExperiment() == null) return
 

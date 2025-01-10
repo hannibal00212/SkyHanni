@@ -30,8 +30,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CroesusChestTracker {
@@ -73,7 +71,7 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
@@ -179,7 +177,7 @@ object CroesusChestTracker {
         chestInventory = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return

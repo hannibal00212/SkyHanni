@@ -88,7 +88,7 @@ object ChocolateFactoryStrayWarning {
         else SoundUtils.playBeepSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.partyMode.get()) event.partyModeHighlight()

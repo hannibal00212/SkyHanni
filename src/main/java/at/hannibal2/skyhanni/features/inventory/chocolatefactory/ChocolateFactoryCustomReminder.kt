@@ -90,7 +90,7 @@ object ChocolateFactoryCustomReminder {
         update()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
+    @HandleEvent(receiveCancelled = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return

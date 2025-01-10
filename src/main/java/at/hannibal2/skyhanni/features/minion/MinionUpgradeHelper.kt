@@ -23,8 +23,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MinionUpgradeHelper {
@@ -116,7 +114,7 @@ object MinionUpgradeHelper {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.minionConfigHelper || displayItem == null || event.slotId != 51) return
         event.cancel()

@@ -120,7 +120,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         reputationHelper.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 

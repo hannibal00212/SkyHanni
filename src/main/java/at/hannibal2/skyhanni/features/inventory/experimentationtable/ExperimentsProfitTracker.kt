@@ -149,7 +149,7 @@ object ExperimentsProfitTracker {
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() ||
             InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
