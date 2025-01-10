@@ -90,7 +90,7 @@ object CorpseLocator {
         sharedWaypoints.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
