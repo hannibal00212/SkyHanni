@@ -121,7 +121,7 @@ object ElectionAPI {
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
