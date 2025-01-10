@@ -240,6 +240,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Highlights unowned cakes in AH.
     +  Displays a list of missing cake years.
 + Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
++ Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
 
 </details>
 <details open><summary>
