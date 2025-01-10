@@ -842,7 +842,7 @@ class ProfileSpecificStorage {
 
     class LastStorage {
         @Expose
-        var type: OpenLastStorage.StorageType? = OpenLastStorage.StorageType.ENDER_CHEST
+        var type: OpenLastStorage.StorageType = OpenLastStorage.StorageType.ENDER_CHEST
 
         @Expose
         var page: Int? = null

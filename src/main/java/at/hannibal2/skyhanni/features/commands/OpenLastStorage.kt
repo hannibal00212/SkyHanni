@@ -19,8 +19,8 @@ object OpenLastStorage {
     private val config get() = SkyHanniMod.feature.misc.lastStorage
     private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
 
-    private var lastStorageType: StorageType?
-        get() = storage?.type
+    private var lastStorageType: StorageType
+        get() = storage?.type ?: StorageType.ENDER_CHEST
         set(value) { storage?.type = value }
 
     private var lastStoragePage: Int?
@@ -71,7 +71,7 @@ object OpenLastStorage {
             aliases = listOf("shlo")
             callback {
                 if (isEnabled()) {
-                    lastStorageType?.let { type -> openLastStoragePage(type) }
+                    openLastStoragePage(lastStorageType)
                 } else {
                     ChatUtils.chatAndOpenConfig(
                         "This feature is disabled, enable it in the config if you want to use it.",
