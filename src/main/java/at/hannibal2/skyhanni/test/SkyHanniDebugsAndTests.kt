@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -450,6 +451,22 @@ object SkyHanniDebugsAndTests {
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onShowBaseStats(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showBaseValues) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+
+        val stats = internalName.getBaseStats()
+        if (stats.isEmpty()) return
+
+        event.toolTip.add("§7Base stats:")
+        for ((name, value) in stats) {
+
+            event.toolTip.add("§7$name: $value")
+        }
     }
 
     @SubscribeEvent
