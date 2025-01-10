@@ -2,49 +2,19 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.GardenCropMilestones
-import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.floor
-import kotlin.math.log10
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MiningStatsDisplay {
@@ -105,7 +75,7 @@ object MiningStatsDisplay {
     }
 
     fun getFortuneFortune(tool: ItemStack?) = listOf(0.0, 10.0, 20.0, 30.0, 45.0)[tool?.getEnchantments()?.get("fortune") ?: 0]
-    fun getOmeletteFortune(tool: ItemStack?) : Double {
+    fun getOmeletteFortune(tool: ItemStack?): Double {
         val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
         for (internalName in drillUpgrade) {
             if (internalName.itemName == "SUNNY_SIDE_GOBLIN_OMELETTE") {
@@ -116,8 +86,8 @@ object MiningStatsDisplay {
         }
         return 0.0
     }
-    fun getPolarVoidFortune(tool: ItemStack?) = if ((tool?.getPolarvoidBookCount() ?: 0) > 0 ) 5 else 0
-    fun getEngineFortune(tool: ItemStack?) : Double {
+    fun getPolarVoidFortune(tool: ItemStack?) = if ((tool?.getPolarvoidBookCount() ?: 0) > 0) 5 else 0
+    fun getEngineFortune(tool: ItemStack?): Double {
         val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
         for (internalName in drillUpgrade) {
             if (internalName.itemName.startsWith("MITHRIL")) {
@@ -134,6 +104,7 @@ object MiningStatsDisplay {
         }
         return 0.0
     }
+
     fun getDivanPowderCoatingFortune(tool: ItemStack?) = if (tool?.hasDivanPowderCoating() == true) 10 else 0
 
     //fun getEfficiencySpeed(tool: ItemStack?) = (tool?.getEnchantments()?.get("efficiency") ?: 0) * 20 + 10
@@ -190,18 +161,23 @@ object MiningStatsDisplay {
 
             //}// else if (tool.getInternalName().contains("ZORROS_CAPE")) {
 
-            }
         }
     }
 
-    //fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
+     */
+}
 
-    //fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
+//fun getCurrentFarmingFortune() = tabFortuneUniversal + tabFortuneCrop
 
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
-        event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
-        event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
-    }
+//fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
+
+/*
+
+@HandleEvent
+fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
+    event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
+    event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
+}
+
 
