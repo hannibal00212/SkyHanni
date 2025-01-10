@@ -21,7 +21,6 @@ import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
@@ -52,10 +51,14 @@ object UpdateManager {
         }
     }
 
+    private var hasCheckedForUpdate = false
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
-        MinecraftForge.EVENT_BUS.unregister(this)
+        if (hasCheckedForUpdate) return
+        hasCheckedForUpdate = true
+
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
     }
@@ -179,13 +182,13 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    UpdateManager.checkUpdate(true, updateStream)
+                    checkUpdate(true, updateStream)
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {
-            UpdateManager.checkUpdate(true, updateStream)
+            checkUpdate(true, updateStream)
         }
     }
 }
