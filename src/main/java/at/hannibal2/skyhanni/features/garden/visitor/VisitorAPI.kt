@@ -226,7 +226,11 @@ object VisitorAPI {
         }
     }
 
-    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) { // false = block accepting, true = block refusing
+    enum class VisitorBlockReason(
+        val description: String,
+        val blockRefusing: Boolean // TODO change to enum
+        // false = block accepting, true = block refusing
+    ) {
         NEVER_ACCEPTED("§cNever accepted", true),
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
