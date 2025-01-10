@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -54,4 +55,6 @@ enum class SoundResponseTypes(soundLocation: String, triggersOn: List<String>) {
         "chat.sound.response" + name.lowercase(),
         "$START_PATTERN(?:${triggersOn.joinToString("|")})$END_PATTERN",
     )
+
+    override fun toString(): String = name.firstLetterUppercase()
 }
