@@ -52,7 +52,7 @@ object DungeonLividFinder {
 
     private var color: LorenzColor? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inLividBossRoom()) return
         val mob = event.mob
@@ -71,7 +71,7 @@ object DungeonLividFinder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!inLividBossRoom()) return
         val block = blockLocation.getBlockStateAt()
@@ -79,8 +79,8 @@ object DungeonLividFinder {
         color = block.getValue(BlockStainedGlass.COLOR).toLorenzColor()
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         when (event.mob) {
             livid -> livid = null
             in fakeLivids -> fakeLivids -= event.mob

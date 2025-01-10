@@ -262,6 +262,8 @@ object NumberUtil {
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
 
+    fun Int?.isPositive(): Boolean = (this ?: 0) > 0
+
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
         if (last >= 0 && last != now) {

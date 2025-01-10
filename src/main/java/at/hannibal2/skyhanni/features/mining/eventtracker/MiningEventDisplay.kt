@@ -27,7 +27,7 @@ object MiningEventDisplay {
 
     private val islandEventData = mutableMapOf<IslandType, MiningIslandEventInfo>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }

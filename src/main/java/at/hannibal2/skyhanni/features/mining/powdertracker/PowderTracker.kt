@@ -102,7 +102,7 @@ object PowderTracker {
         PowderChestReward.entries.forEach { it.chatPattern }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         calculateResourceHour(gemstoneInfo)
