@@ -222,6 +222,7 @@ object VisitorAPI {
             preventRefusingLowLoss && loss <= coinsLossThreshold -> VisitorBlockReason.LOW_LOSS
             preventAcceptingHighLoss && loss > coinsLossThreshold -> VisitorBlockReason.HIGH_LOSS
             preventAcceptingWithoutRabbit && !PetAPI.isCurrentPet("Rabbit") -> VisitorBlockReason.NO_RABBIT
+
             else -> null
         }
     }
