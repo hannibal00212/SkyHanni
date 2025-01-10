@@ -59,13 +59,13 @@ object BactePhase {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.name != "Bacte") return
         bacte = event.mob
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob == bacte) {
             currentPhase = BactePhase.NOT_ACTIVE
@@ -73,7 +73,7 @@ object BactePhase {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         val bacte = bacte ?: return
 
