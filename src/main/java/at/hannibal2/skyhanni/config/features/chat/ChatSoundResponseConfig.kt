@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SoundResponseConfig {
+class ChatSoundResponseConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",

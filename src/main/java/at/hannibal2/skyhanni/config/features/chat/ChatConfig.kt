@@ -31,7 +31,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Sound Responses", desc = "")
     @Accordion
-    var soundResponse: SoundResponseConfig = SoundResponseConfig()
+    var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")

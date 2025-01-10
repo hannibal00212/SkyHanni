@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -10,7 +11,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object SoundResponse {
+object ChatSoundResponse {
 
     private val config get() = SkyHanniMod.feature.chat.soundResponse
 
@@ -20,6 +21,8 @@ object SoundResponse {
 
     @SubscribeEvent
     fun onLorenzChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
+
         for (soundType in SoundResponseTypes.entries) {
             if (!config.soundResponses.contains(soundType)) continue
             if (soundType.pattern.matches(event.message)) {
@@ -28,6 +31,8 @@ object SoundResponse {
             }
         }
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
 
 private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"
