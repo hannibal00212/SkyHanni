@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -31,6 +32,10 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis == Long.MAX_VALUE
 
+    fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
+
+    fun absoluteDifference(other: SimpleTimeMark) = abs(millis - other.millis).milliseconds
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
     override fun toString(): String = when (this) {
@@ -52,11 +57,11 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         return localDateTime.format(formatter)
     }
 
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
+
     fun toMillis() = millis
 
     fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
-
-    fun elapsedMinutes() = passedSince().inWholeMinutes
 
     companion object {
 

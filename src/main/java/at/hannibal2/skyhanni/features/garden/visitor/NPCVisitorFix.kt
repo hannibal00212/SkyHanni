@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -32,7 +33,7 @@ object NPCVisitorFix {
         "§aChanging Barn skin to §r.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!GardenAPI.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
@@ -60,7 +61,7 @@ object NPCVisitorFix {
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         lastVisitorOpen = SimpleTimeMark.now()
     }

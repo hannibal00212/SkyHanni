@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendAPI
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
@@ -34,6 +34,11 @@ object AdvancedPlayerList {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList.advancedPlayerList
 
+    /**
+     * REGEX-TEST: §8[§r§9290§r§8] §r§bSkirtwearer §r§6ꀾ§r§7♲
+     * REGEX-TEST: §8[§r§714§r§8] §r§bSrColombianoGood §r§6Ⓑ
+     * REGEX-TEST: §8[§r§b218§r§8] §r§bnightdives
+     */
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
         ".*\\[(?<level>.*)] §r(?<name>.*)",
@@ -195,7 +200,7 @@ object AdvancedPlayerList {
         var suffix = if (config.hideEmblem) {
             if (data.ironman) "§7♲" else data.bingoLevel?.let {
                 BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
-            } ?: ""
+            }.orEmpty()
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -206,13 +211,13 @@ object AdvancedPlayerList {
         }
 
         if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
-            suffix += data.faction.icon ?: ""
+            suffix += data.faction.icon.orEmpty()
         }
 
         return "$level $playerName ${suffix.trim()}"
     }
 
-    private var randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
+    private val randomOrderCache = TimeLimitedCache<String, Int>(20.minutes)
 
     private fun getRandomOrder(name: String) = randomOrderCache.getOrPut(name) {
         (Random.nextDouble() * 500).toInt()
@@ -256,7 +261,7 @@ object AdvancedPlayerList {
         constructor(icon: String, score: Int) : this({ icon }, score)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "misc.compactTabList.advancedPlayerList.playerSortOrder") { element ->
             ConfigUtils.migrateIntToEnum(element, PlayerSortEntry::class.java)

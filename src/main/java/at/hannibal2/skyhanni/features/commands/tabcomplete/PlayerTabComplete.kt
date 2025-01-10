@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
 import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerTabComplete {
@@ -55,9 +55,10 @@ object PlayerTabComplete {
                 parent("kick", "demote", "promote", "transfer") { add(partyMembersEntry) }
                 literal("chat", "disband", "kickoffline", "leave", "list", "mute", "poll", "private", "settings", "warp")
             }
+            add(getExcluding(PlayerCategory.PARTY))
         }
 
-        parent("w", "msg", "tell", "boop") { add(getExcluding()) }
+        parent("w", "msg", "tell", "boop", "boo") { add(getExcluding()) }
 
         parent("visit") {
             add(getExcluding())
@@ -99,15 +100,17 @@ object PlayerTabComplete {
 
     private fun lazyEntry(getter: () -> List<String>) = LazySuggestionEntry { addAll(getter()) }
 
-    fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf { it.isNotEmpty() }?.distinct()
+    fun handleTabComplete(command: String): List<String>? = suggestions.getSuggestions(command).takeIf {
+        it.isNotEmpty()
+    }?.distinct()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<VipVisitsJson>("VipVisits")
         vipVisits = data.vipVisits
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tabCompleteCommands", "commands.tabComplete")
     }

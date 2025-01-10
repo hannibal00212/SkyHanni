@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 
-open class MobEvent(val mob: Mob) : LorenzEvent() {
+open class MobEvent(val mob: Mob) : SkyHanniEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : Spawn(mob)
         class Summon(mob: Mob) : Spawn(mob)
@@ -21,8 +22,6 @@ open class MobEvent(val mob: Mob) : LorenzEvent() {
         class Projectile(mob: Mob) : DeSpawn(mob)
     }
 
-    // TODO replace with "isFirstTime" parameter in the Spawn event. Also create an actual "player sees the mob for the first time" event
-    @Deprecated("Old. Will get replaced soon.")
     open class FirstSeen(mob: Mob) : MobEvent(mob) {
         class SkyblockMob(mob: Mob) : FirstSeen(mob)
         class Summon(mob: Mob) : FirstSeen(mob)

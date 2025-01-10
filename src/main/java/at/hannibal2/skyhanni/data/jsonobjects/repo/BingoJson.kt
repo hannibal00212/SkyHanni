@@ -11,5 +11,5 @@ data class BingoData(
     @Expose val difficulty: String,
     @Expose val note: List<String>,
     @Expose val guide: List<String>,
-    @Expose val found: String,
+    @Expose val found: String?,
 )

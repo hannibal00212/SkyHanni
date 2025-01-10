@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -17,20 +19,26 @@ object TerracottaPhase {
 
     private var inTerracottaPhase = false
 
+    private val patternGroup = RepoPattern.group("dungeon.terracotta")
+    private val terracottaStartPattern by patternGroup.pattern(
+        "start",
+        "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!",
+    )
+    private val terracottaEndPattern by patternGroup.pattern(
+        "end",
+        "§c\\[BOSS] Sadan§r§f: ENOUGH!",
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-
-        if (event.message == "§c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me? Sadan?!") {
+        if (terracottaStartPattern.matches(event.message)) {
             inTerracottaPhase = true
-        }
-
-        if (event.message == "§c[BOSS] Sadan§r§f: ENOUGH!") {
+        } else if (terracottaEndPattern.matches(event.message)) {
             inTerracottaPhase = false
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
@@ -44,8 +52,7 @@ object TerracottaPhase {
         }
     }
 
-    private fun isActive() = isEnabled() && inTerracottaPhase
+    private fun isActive() = inTerracottaPhase && isEnabled()
 
-    private fun isEnabled() =
-        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
+    private fun isEnabled() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
 }

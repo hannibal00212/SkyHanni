@@ -112,19 +112,19 @@ object TrackParticlesCommand {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} particles", 0.8)
 
-                var offset = -0.2
+                var offset = 0.2
                 value.groupBy { it.type }.forEach { (particleType, particles) ->
-                    event.drawDynamicText(key.up(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
-                    offset -= 0.2
+                    event.drawDynamicText(key.down(offset), "§7§l$particleType §7(§e${particles.size}§7)", 0.8)
+                    offset += 0.2
                 }
             } else {
                 val particle = value.first()
 
                 event.drawDynamicText(key, "§7§l${particle.type}", 0.8)
                 event.drawDynamicText(
-                    key.up(-0.2),
+                    key.down(0.2),
                     "§7C: §e${particle.count} §7S: §a${particle.speed.roundTo(2)}",
-                    scaleMultiplier = 0.8
+                    scaleMultiplier = 0.8,
                 )
             }
         }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -23,7 +24,7 @@ object AreaMiniBossFeatures {
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11.seconds
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val type = AreaMiniBossType.entries.find { it.displayName == event.mob.name } ?: return
         miniBossType = type
@@ -100,7 +101,7 @@ object AreaMiniBossFeatures {
             LorenzVec(-573, 51, -353),
         ),
         MILLENNIA_AGED_BLAZE(
-            "Millenia-Aged Blaze", LorenzColor.DARK_RED, 60,
+            "Millennia-Aged Blaze", LorenzColor.DARK_RED, 60,
             LorenzVec(-292, 97, -999),
             LorenzVec(-232, 77, -951),
             LorenzVec(-304, 73, -952),

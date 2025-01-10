@@ -24,7 +24,7 @@ class SuggestionProvider {
 
     fun getSuggestions(command: String): List<String> {
         val arguments = command.lowercase().split(" ")
-        val last = arguments.lastOrNull() ?: ""
+        val last = arguments.lastOrNull().orEmpty()
         val suggestions = mutableListOf<String>()
         if (arguments.size != 1) {
             entry.getEntryForPath(arguments.dropLast(1))?.suggestions?.let { suggestions.addAll(it) }

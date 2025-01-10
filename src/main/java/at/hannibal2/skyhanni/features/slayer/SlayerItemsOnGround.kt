@@ -22,7 +22,7 @@ object SlayerItemsOnGround {
 
     private val config get() = SkyHanniMod.feature.slayer.itemsOnGround
 
-    private var itemsOnGround = TimeLimitedCache<EntityItem, String>(2.seconds)
+    private val itemsOnGround = TimeLimitedCache<EntityItem, String>(2.seconds)
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -42,7 +42,7 @@ object SlayerItemsOnGround {
         if (!isEnabled()) return
 
         for ((item, text) in itemsOnGround) {
-            val location = event.exactLocation(item).add(y = 0.8)
+            val location = event.exactLocation(item).up(0.8)
             event.drawString(location, text)
         }
     }

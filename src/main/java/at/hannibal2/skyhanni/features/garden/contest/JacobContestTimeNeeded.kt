@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -30,7 +30,7 @@ object JacobContestTimeNeeded {
     private var display = emptyList<List<Any>>()
     private var currentBracket = ContestBracket.GOLD
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (FarmingContestAPI.inInventory) {
             update()
@@ -168,16 +168,19 @@ object JacobContestTimeNeeded {
                 showLine = line
             }
         }
-        map[crop] = Renderable.hoverTips(showLine, buildList {
-            add("§7Time Needed for §9${crop.cropName} Medals§7:")
-            addAll(brackets)
-            add("")
-            val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
-            add("§7Latest FF: §e${(latestFF).addSeparators()}")
-            val bps = crop.getBps()?.roundTo(1) ?: 0
-            add("§7${addBpsTitle()}§e${bps.addSeparators()}")
-            addAll(lowBPSWarning)
-        })
+        map[crop] = Renderable.hoverTips(
+            showLine,
+            buildList {
+                add("§7Time Needed for §9${crop.cropName} Medals§7:")
+                addAll(brackets)
+                add("")
+                val latestFF = crop.getLatestTrueFarmingFortune() ?: 0.0
+                add("§7Latest FF: §e${(latestFF).addSeparators()}")
+                val bps = crop.getBps()?.roundTo(1) ?: 0
+                add("§7${addBpsTitle()}§e${bps.addSeparators()}")
+                addAll(lowBPSWarning)
+            }
+        )
     }
 
     private fun addBpsTitle() = if (config.jacobContestCustomBps) "Custom Blocks/Second: " else "Your Blocks/Second: "

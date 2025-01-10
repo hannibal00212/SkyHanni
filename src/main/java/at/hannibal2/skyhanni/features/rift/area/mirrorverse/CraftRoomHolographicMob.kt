@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -32,7 +35,7 @@ object CraftRoomHolographicMob {
         -117.0, 51.0, -128.0,
     )
     private var entitiesList = listOf<HolographicEntities.HolographicEntity<out EntityLivingBase>>()
-    private var entityToHolographicEntity = mapOf(
+    private val entityToHolographicEntity = mapOf(
         EntityZombie::class.java to HolographicEntities.zombie,
         EntitySlime::class.java to HolographicEntities.slime,
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
@@ -65,7 +68,7 @@ object CraftRoomHolographicMob {
                     append("§a$mobName ")
                 }
                 if (config.showHealth) {
-                    append("§c${theMob.health}♥")
+                    append("§c${theMob.health.roundTo(1)}♥")
                 }
             }.trim()
 
@@ -85,12 +88,12 @@ object CraftRoomHolographicMob {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onPlayerRender(event: CheckRenderEntityEvent<*>) {
-        if (!RiftAPI.inRift() || !config.hidePlayers) return
+    @HandleEvent(receiveCancelled = true, onlyOnIsland = IslandType.THE_RIFT)
+    fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+        if (!config.hidePlayers) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && craftRoomArea.isInside(entity.getLorenzVec())) {
+        if (craftRoomArea.isInside(entity.getLorenzVec())) {
             event.cancel()
         }
     }

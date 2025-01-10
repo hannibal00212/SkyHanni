@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -45,12 +45,12 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
-    private var recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
+    private val recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NEUInternalName>()
 
     private var display = emptyList<Renderable>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRIMSON_ISLE) {
             DelayedRun.runDelayed(200.milliseconds) {
@@ -68,14 +68,14 @@ object TrophyFishDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         update()
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
                 enabled,
@@ -93,7 +93,6 @@ object TrophyFishDisplay {
         }
     }
 
-
     fun update() {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
@@ -106,16 +105,23 @@ object TrophyFishDisplay {
     private fun createTable(): List<List<Renderable>> {
         val trophyFishes = TrophyFishManager.fish ?: return emptyList()
         val table = mutableListOf<List<Renderable>>()
+
+        if (trophyFishes.isEmpty()) {
+            table.addSingleString("§cNo Trophy data found!")
+            table.addSingleString("§eTalk to Odger to load the data!")
+            return table
+        }
+
         for ((rawName, data) in getOrder(trophyFishes)) {
             addRow(rawName, data, table)
         }
-        if (table.isEmpty()) {
-            get(config.onlyShowMissing.get())?.let { rarity ->
-                val name = rarity.formattedString
-                table.addSingleString("§eYou caught all $name Trophy Fishes")
-                if (rarity != TrophyRarity.DIAMOND) {
-                    table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
-                }
+        if (table.isNotEmpty()) return table
+
+        get(config.onlyShowMissing.get())?.let { rarity ->
+            val name = rarity.formattedString
+            table.addSingleString("§eYou caught all $name Trophy Fishes")
+            if (rarity != TrophyRarity.DIAMOND) {
+                table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
             }
         }
         return table
@@ -143,7 +149,7 @@ object TrophyFishDisplay {
         val internalName = getInternalName(rawName)
         row[TextPart.ICON] = Renderable.itemStack(internalName.getItemStack())
 
-        val recentlyDroppedRarity = recentlyDroppedTrophies.getOrNull(internalName).takeIf { config.highlightNew.get() }
+        val recentlyDroppedRarity = recentlyDroppedTrophies[internalName]?.takeIf { config.highlightNew.get() }
 
         for (rarity in TrophyRarity.entries) {
             val amount = data[rarity] ?: 0
@@ -177,7 +183,7 @@ object TrophyFishDisplay {
         HideCaught.DIAMOND -> TrophyRarity.DIAMOND
     }
 
-    private fun getOrder(trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
+    private fun getOrder(trophyFishes: Map<String, MutableMap<TrophyRarity, Int>>) = sort(trophyFishes).let {
         if (config.reverseOrder.get()) it.reversed() else it
     }
 
@@ -233,7 +239,7 @@ object TrophyFishDisplay {
 
         ErrorManager.skyHanniError(
             "No Trophy Fishing name found",
-            "name" to name
+            "name" to name,
         )
     }
 
@@ -244,9 +250,9 @@ object TrophyFishDisplay {
                 return internalName
             }
         }
-        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".asInternalName()
-        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".asInternalName()
-        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".asInternalName()
+        if (rawName.endsWith("1")) return "OBFUSCATED_FISH_1_BRONZE".toInternalName()
+        if (rawName.endsWith("2")) return "OBFUSCATED_FISH_2_BRONZE".toInternalName()
+        if (rawName.endsWith("3")) return "OBFUSCATED_FISH_3_BRONZE".toInternalName()
 
         return null
     }
@@ -262,7 +268,7 @@ object TrophyFishDisplay {
         config.position.renderRenderables(
             display,
             extraSpace = config.extraSpace.get(),
-            posLabel = "Trophy Fishing Display"
+            posLabel = "Trophy Fishing Display",
         )
     }
 

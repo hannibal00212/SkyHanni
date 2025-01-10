@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.commands.Commands;
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -17,6 +17,6 @@ public class ModifyWordsConfig {
 
     @ConfigOption(name = "Open Config", desc = "Open the menu to setup the visual words.\n§eCommand: /shwords")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable open = Commands::openVisualWords;
+    public Runnable open = VisualWordGui::onCommand;
 
 }

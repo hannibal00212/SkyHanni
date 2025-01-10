@@ -10,6 +10,7 @@ import net.minecraft.world.IBlockAccess
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 // Taken and modified from Skytils
+@Suppress("UnusedParameter")
 fun modifyGetModelFromBlockState(
     blockRendererDispatcher: BlockRendererDispatcher,
     state: IBlockState?,

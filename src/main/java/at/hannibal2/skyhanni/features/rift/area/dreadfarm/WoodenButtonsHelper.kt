@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
@@ -54,7 +55,7 @@ object WoodenButtonsHelper {
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
         buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
@@ -98,14 +99,14 @@ object WoodenButtonsHelper {
                 IslandGraphs.pathFind(
                     it.position,
                     "Button Spot",
-                    config.color.toChromaColor(),
+                    config.color.toSpecialColor(),
                     condition = { config.showPathFinder && config.showButtonsHelper },
                 )
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!checkButtons()) return
 
@@ -115,7 +116,7 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!checkButtons()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -131,7 +132,8 @@ object WoodenButtonsHelper {
                 blockState.getValue(BlockButtonWood.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
-                !hitButtons.contains(buttonLocation)) {
+                !hitButtons.contains(buttonLocation)
+            ) {
                 lastHitButton = buttonLocation
                 addLastHitButton()
             }
@@ -159,7 +161,7 @@ object WoodenButtonsHelper {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",
-                config.color.toChromaColor(),
+                config.color.toSpecialColor(),
                 condition = { config.showPathFinder },
             )
         }
@@ -179,7 +181,7 @@ object WoodenButtonsHelper {
         val spotName = "${spot.name}:${spot.position}"
         buttonLocations[spotName]?.forEach { button ->
             if (!hitButtons.contains(button)) {
-                event.drawWaypointFilled(button, config.color.toChromaColor(), inverseAlphaScale = true)
+                event.drawWaypointFilled(button, config.color.toSpecialColor(), inverseAlphaScale = true)
             }
         }
     }

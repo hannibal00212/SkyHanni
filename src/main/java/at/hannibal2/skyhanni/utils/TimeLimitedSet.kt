@@ -1,33 +1,71 @@
 package at.hannibal2.skyhanni.utils
 
+import com.google.common.cache.RemovalCause
 import kotlin.time.Duration
 
+@Suppress("UnstableApiUsage")
 class TimeLimitedSet<T : Any>(
     expireAfterWrite: Duration,
-    private val removalListener: (T) -> Unit = {},
-) : Iterable<T> {
+    private val removalListener: ((T?, RemovalCause) -> Unit)? = null,
+) : MutableSet<T> {
 
-    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _ -> key?.let { removalListener(it) } }
-
-    fun add(element: T) {
-        cache[element] = Unit
+    private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _, cause ->
+        removalListener?.let {
+            it(key, cause)
+        }
     }
 
-    operator fun plusAssign(element: T) = add(element)
+    override val size: Int get() = cache.size
+
+    override fun isEmpty(): Boolean = cache.isEmpty()
+
+    override operator fun contains(element: T): Boolean = cache.containsKey(element)
+
+    override fun add(element: T): Boolean {
+        return (element in cache).also { cache[element] = Unit }
+    }
+
+    override fun remove(element: T): Boolean {
+        if (element !in cache) return false
+        cache.remove(element)
+        return true
+    }
 
     fun addIfAbsent(element: T) {
         if (!contains(element)) add(element)
     }
 
-    fun remove(element: T) = cache.remove(element)
+    override fun addAll(elements: Collection<T>): Boolean {
+        var value = false
+        for (element in elements) {
+            if (add(element)) value = true
+        }
+        return value
+    }
 
-    operator fun minusAssign(element: T) = remove(element)
+    override fun clear() = cache.clear()
 
-    operator fun contains(element: T): Boolean = cache.containsKey(element)
+    override fun containsAll(elements: Collection<T>): Boolean {
+        return elements.all { it in cache }
+    }
 
-    fun clear() = cache.clear()
+    override fun iterator(): MutableIterator<T> = cache.keys.iterator()
+    override fun retainAll(elements: Collection<T>): Boolean {
+        var value = false
+        for (key in cache.keys) {
+            if (key !in elements) {
+                remove(key)
+                value = true
+            }
+        }
+        return value
+    }
 
-    fun toSet(): Set<T> = HashSet(cache.keys())
-
-    override fun iterator(): Iterator<T> = toSet().iterator()
+    override fun removeAll(elements: Collection<T>): Boolean {
+        var value = false
+        for (element in elements) {
+            if (remove(element)) value = true
+        }
+        return value
+    }
 }

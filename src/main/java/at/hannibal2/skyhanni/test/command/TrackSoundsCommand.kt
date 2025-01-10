@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -92,7 +93,7 @@ object TrackSoundsCommand {
         isRecording = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (cutOffTime.isInPast()) return
         if (event.soundName == "game.player.hurt" && event.pitch == 0f && event.volume == 0f) return // remove random useless sound
@@ -114,10 +115,10 @@ object TrackSoundsCommand {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} sounds", 0.8)
 
-                var offset = -0.2
+                var offset = 0.2
                 value.groupBy { it.soundName }.forEach { (soundName, sounds) ->
-                    event.drawDynamicText(key.up(offset), "§7§l$soundName §7(§e${sounds.size}§7)", 0.8)
-                    offset -= 0.2
+                    event.drawDynamicText(key.down(offset), "§7§l$soundName §7(§e${sounds.size}§7)", 0.8)
+                    offset += 0.2
                 }
             } else {
                 val sound = value.first()
@@ -129,7 +130,7 @@ object TrackSoundsCommand {
 
                 event.drawDynamicText(key, "§7§l${sound.soundName}", 0.8)
                 event.drawDynamicText(
-                    key.up(-0.2),
+                    key.down(0.2),
                     "§7P: §e${sound.pitch.roundTo(2)} §7V: $volumeColor${sound.volume.roundTo(2)}",
                     scaleMultiplier = 0.8,
                 )

@@ -8,7 +8,7 @@ import kotlin.math.ceil
 
 object RenderableInventory {
 
-    private val inventoryTextures by lazy { ResourceLocation("skyhanni", "gui/slot.png") }
+    private val inventoryTextures = ResourceLocation("skyhanni", "gui/slot.png")
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 
@@ -87,15 +87,20 @@ object RenderableInventory {
             uvRow.map { uv ->
                 val uvArray = uv.getUvCoords()
                 val renderable = if (uv == SlotsUv.CENTER) {
-                    (items[index]?.let { item ->
-                        Renderable.itemStack(
-                            item,
-                            scale,
-                            0,
-                            0,
-                            false,
+                    (
+                        items[index]?.let { item ->
+                            Renderable.itemStack(
+                                item,
+                                scale,
+                                0,
+                                0,
+                                false,
+                            )
+                        } ?: Renderable.placeholder(
+                            (16 * scale).toInt(),
+                            (16 * scale).toInt()
                         )
-                    } ?: Renderable.placeholder((16 * scale).toInt(), (16 * scale).toInt())).also { index++ }
+                        ).also { index++ }
                 } else Renderable.placeholder(0, 0)
                 Renderable.drawInsideFixedSizedImage(
                     renderable,

@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,12 +58,12 @@ object MobDetection {
 
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
-    private var shouldClear: AtomicBoolean = AtomicBoolean(false)
+    private val shouldClear: AtomicBoolean = AtomicBoolean(false)
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
             it.createDeSpawnEvent()
-        }.forEach { it.postAndCatch() }
+        }.forEach { it.post() }
         MobData.retries.clear()
     }
 
@@ -97,8 +97,9 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.worldObj != world || (this.armorStand?.let { it.worldObj != world }
-            ?: false) || this.extraEntities.any { it.worldObj != world }
+        this.baseEntity.worldObj != world || (
+            this.armorStand?.let { it.worldObj != world } ?: false
+            ) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -158,13 +159,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.post()
         }
         return isVisible
     }
@@ -172,7 +175,7 @@ object MobDetection {
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
         when (roughType) {
-            Mob.Type.PLAYER -> MobEvent.Spawn.Player(MobFactories.player(entity)).postAndCatch()
+            Mob.Type.PLAYER -> MobEvent.Spawn.Player(MobFactories.player(entity)).post()
 
             Mob.Type.DISPLAY_NPC -> return MobFilter.createDisplayNPC(entity)
             Mob.Type.BASIC -> {
@@ -194,7 +197,7 @@ object MobDetection {
                             Mob.Type.PROJECTILE -> MobEvent.Spawn.Projectile(mob)
                             Mob.Type.DISPLAY_NPC -> MobEvent.Spawn.DisplayNPC(mob) // Needed for some special cases
                             Mob.Type.PLAYER -> return mobDetectionError("An Player Ended Here. How?")
-                        }.postAndCatch()
+                        }.post()
                     }
                 }
             }
@@ -220,7 +223,7 @@ object MobDetection {
                 val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 removeRetry(entity)
-                MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch()
+                MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).post()
             }
 
             EntityPacketType.VILLAGER -> {
@@ -244,12 +247,12 @@ object MobDetection {
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 if (!entity.powered) return@drainForEach
                 removeRetry(entity)
-                MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch()
+                MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).post()
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
             event.entity is EntityBat && event.health == 6 -> {
@@ -273,7 +276,7 @@ object MobDetection {
     }
 
     private fun entityDeSpawn(entity: EntityLivingBase) {
-        MobData.entityToMob[entity]?.createDeSpawnEvent()?.postAndCatch() ?: removeRetry(entity)
+        MobData.entityToMob[entity]?.createDeSpawnEvent()?.post() ?: removeRetry(entity)
         allEntitiesViaPacketId.remove(entity.entityId)
     }
 
@@ -338,7 +341,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
@@ -352,8 +355,9 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
                 shouldClear.set(true)
                 allEntitiesViaPacketId.clear()
             }
@@ -373,8 +377,8 @@ object MobDetection {
         shouldClear.set(true)
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
         if (forceReset) {
             event.addData("Mob Detection is manually disabled!")

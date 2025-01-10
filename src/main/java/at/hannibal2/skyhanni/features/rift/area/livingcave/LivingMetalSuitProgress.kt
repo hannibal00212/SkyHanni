@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -46,26 +47,33 @@ object LivingMetalSuitProgress {
         if (config.compactWhenMaxed && isMaxed) return@buildList
 
         for ((stack, progress) in progressMap.entries.reversed()) {
-            add(buildList {
-                add("  §7- ")
-                add(stack)
-                add("${stack.displayName}: ")
-                add(progress?.let {
-                    drawProgressBar(progress) + " §b${LorenzUtils.formatPercentage(progress)}"
-                } ?: "§cStart upgrading it!")
-            })
+            add(
+                buildList {
+                    add("  §7- ")
+                    add(stack)
+                    add("${stack.displayName}: ")
+                    add(
+                        progress?.let {
+                            drawProgressBar(progress) + " §b${LorenzUtils.formatPercentage(progress)}"
+                        } ?: "§cStart upgrading it!"
+                    )
+                }
+            )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val old = progressMap
         progressMap = buildMap {
             for (armor in InventoryUtils.getArmor().filterNotNull()) {
-                put(armor, armor.getLivingMetalProgress()?.toDouble()?.let {
-                    it.coerceAtMost(100.0) / 100
-                })
+                put(
+                    armor,
+                    armor.getLivingMetalProgress()?.toDouble()?.let {
+                        it.coerceAtMost(100.0) / 100
+                    }
+                )
             }
         }
         if (old != progressMap) {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints.easter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -29,7 +30,10 @@ object EasterEggWaypoints {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
+        if (message.startsWith("§a§lYou found an Easter Egg! §r") ||
+            message == "§aYou have received the §bsuper reward§a!" ||
+            message == "§cYou already found this egg!"
+        ) {
             val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             egg.found = true
             if (closest == egg) {
@@ -38,7 +42,7 @@ object EasterEggWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEnabled()) return

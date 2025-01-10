@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -26,7 +28,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -35,14 +36,24 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChocolateFactoryAPI {
 
+    private val chromaEnabled get() = ChromaManager.config.enabled.get()
     val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
     val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
-
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
+
+    // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: 46,559,892,200 Chocolate
+     */
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
         "(?<amount>[\\d,]+) Chocolate",
     )
+
+    /**
+     * REGEX-TEST: Hoppity
+     * REGEX-TEST: Chocolate Factory Milestones
+     */
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "Hoppity|Chocolate Factory Milestones",
@@ -67,24 +78,36 @@ object ChocolateFactoryAPI {
         "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*",
     )
 
+    /**
+     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, ...
+     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7
+     */
+    val caughtRabbitPattern by patternGroup.pattern(
+        "rabbit.caught",
+        ".*§7You caught.*"
+    )
+    // </editor-fold>
+
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
     var noPickblockSlots = setOf<Int>()
     var barnIndex = 34
     var infoIndex = 13
     var productionInfoIndex = 45
-    var prestigeIndex = 28
+    var prestigeIndex = 27
     var milestoneIndex = 53
-    var leaderboardIndex = 51
+    var leaderboardIndex = 52
     var handCookieIndex = 38
     var timeTowerIndex = 39
     var shrineIndex = 41
     var coachRabbitIndex = 42
-    var maxRabbits = 395
+    var rabbitHitmanIndex = 51
+    var maxRabbits = 503
+    var hitmanCosts = TreeSet<Long>()
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
-    private var maxPrestige = 5
+    private var maxPrestige = 6
 
     var inChocolateFactory = false
     var chocolateFactoryPaused = false
@@ -95,8 +118,6 @@ object ChocolateFactoryAPI {
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
 
-    var clickRabbitSlot: Int? = null
-
     var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
@@ -104,8 +125,8 @@ object ChocolateFactoryAPI {
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
@@ -126,7 +147,7 @@ object ChocolateFactoryAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
@@ -143,9 +164,11 @@ object ChocolateFactoryAPI {
         timeTowerIndex = data.timeTowerIndex
         shrineIndex = data.shrineIndex
         coachRabbitIndex = data.coachRabbitIndex
+        rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
         chocolateMilestones = data.chocolateMilestones
+        hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
@@ -153,7 +176,7 @@ object ChocolateFactoryAPI {
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val old = "event.chocolateFactory"
         val new = "inventory.chocolateFactory"
@@ -243,4 +266,8 @@ object ChocolateFactoryAPI {
     fun isMax(): Boolean = profileStorage?.let {
         it.maxChocolate == it.currentChocolate
     } ?: false
+
+    fun String.partyModeReplace(): String =
+        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
+        else this
 }

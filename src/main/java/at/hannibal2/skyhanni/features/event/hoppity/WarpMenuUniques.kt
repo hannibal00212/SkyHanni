@@ -27,12 +27,12 @@ object WarpMenuUniques {
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
         get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations
 
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (!config.uniquesWarpMenu) return
+        if (!config.enabled) return
         if (!HoppityAPI.isHoppityEvent()) return
         if (event.slot.inventory.name != "Fast Travel") return
 
@@ -45,13 +45,12 @@ object WarpMenuUniques {
             "The Barn" -> IslandType.THE_FARMING_ISLANDS
             else -> IslandType.getByNameOrNull(name) ?: return
         }
-        if (island == IslandType.DUNGEON_HUB) return
 
         if (HoppityEggLocations.apiEggLocations[island]?.size == null) return
         val maxEggs = 15
         val collectedEggs = collectedEggStorage?.get(island)?.size ?: 0
 
-        if (collectedEggs >= maxEggs && config.uniquesWarpMenuHideMax) return
+        if (collectedEggs >= maxEggs && config.hideWhenMaxed) return
 
         event.toolTip.add(2, "§7Collected Hoppity Eggs: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
     }

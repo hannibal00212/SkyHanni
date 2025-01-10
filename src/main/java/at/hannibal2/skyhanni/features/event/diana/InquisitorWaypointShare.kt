@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,6 +32,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -46,20 +47,40 @@ object InquisitorWaypointShare {
      */
     private val partyOnlyCoordsPattern by patternGroup.pattern(
         "party.onlycoords",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)",
     )
 
     // Support for https://www.chattriggers.com/modules/v/inquisitorchecker
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
+    @Suppress("MaxLineLength")
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
-        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)",
     )
+
+    /**
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     */
+    @Suppress("MaxLineLength")
+    private val odinPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!",
+    )
+
+    /**
+     * REGEX-TEST: §9Party §8> §6[MVP§0++§6] scaryron§f: §rx: -67, y: 75, z: 116 | Minos Inquisitor spawned at [ ⏣ Mountain ]!
+     */
+    @Suppress("MaxLineLength")
+    private val volcaddonsPattern by patternGroup.pattern(
+        "party.volc",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) \\| Minos Inquisitor spawned at (?<area>.*)!",
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
-        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
+        "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!",
     )
 
     /**
@@ -67,7 +88,7 @@ object InquisitorWaypointShare {
      */
     private val inquisitorFoundChatPattern by patternGroup.pattern(
         "inquisitor.dug",
-        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
+        ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
     private var inquisitor = -1
@@ -91,7 +112,7 @@ object InquisitorWaypointShare {
         ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -155,16 +176,17 @@ object InquisitorWaypointShare {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
             val message = "§l§bYou found an Inquisitor! Click §l§chere §l§bor press §c$keyName to share the location!"
             ChatUtils.clickableChat(
-                message, onClick = {
+                message,
+                onClick = {
                     sendInquisitor()
                 },
                 "§eClick to share!",
-                oneTimeClick = true
+                oneTimeClick = true,
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (event.health > 0) return
@@ -178,8 +200,8 @@ object InquisitorWaypointShare {
         }
     }
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode == config.keyBindShare) sendInquisitor()
@@ -230,18 +252,23 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
+        //#if MC<1.12
         if (packet.type.toInt() != 0) return
+        //#else
+        //$$ if (packet.type.id.toInt() != 0) return
+        //#endif
 
-        partyInquisitorCheckerPattern.matchMatcher(message) {
-            if (detectFromChat()) {
-                event.cancel()
-            }
+        if (partyInquisitorCheckerPattern.isDetected(message)) {
+            event.cancel()
         }
-
-        partyOnlyCoordsPattern.matchMatcher(message) {
-            if (detectFromChat()) {
-                event.cancel()
-            }
+        if (odinPattern.isDetected(message)) {
+            event.cancel()
+        }
+        if (partyOnlyCoordsPattern.isDetected(message)) {
+            event.cancel()
+        }
+        if (volcaddonsPattern.isDetected(message)) {
+            event.cancel()
         }
         diedPattern.matchMatcher(message) {
             if (block()) return
@@ -251,6 +278,10 @@ object InquisitorWaypointShare {
             GriffinBurrowHelper.update()
         }
     }
+
+    private fun Pattern.isDetected(message: String): Boolean = matchMatcher(message) {
+        detectFromChat()
+    } ?: false
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
 

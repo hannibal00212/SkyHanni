@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
+@SkyHanniModule
 object SkyBlockIslandTest {
 
     var testIsland: IslandType? = null
@@ -33,8 +37,21 @@ object SkyBlockIslandTest {
 
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Island Test")
+        testIsland?.let {
+            event.addData {
+                add("debug active!")
+                add("island: '$it'")
+            }
+        } ?: run {
+            event.addIrrelevant("not active.")
+        }
+    }
+
     private fun find(search: String): IslandType? {
-        for (type in IslandType.values()) {
+        for (type in IslandType.entries) {
             if (type.name.equals(search, ignoreCase = true)) return type
             if (type.displayName.equals(search, ignoreCase = true)) return type
         }

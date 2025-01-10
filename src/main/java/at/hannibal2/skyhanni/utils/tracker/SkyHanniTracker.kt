@@ -5,18 +5,19 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.toRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -36,8 +37,9 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
+    private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = TextInput()
+    private val textInput = SearchTextInput()
 
     companion object {
 
@@ -83,14 +85,17 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        if (dirty || TrackerManager.dirty) {
+        val searchEnabled = config.trackerSearchEnabled.get()
+        if (dirty || TrackerManager.dirty || (searchEnabled != wasSearchEnabled)) {
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                buildFinalDisplay(searchables.buildSearchBox(textInput))
-            } ?: emptyList()
+                if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+                else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
+            }.orEmpty()
             dirty = false
         }
+        wasSearchEnabled = searchEnabled
 
         position.renderRenderables(display, posLabel = name)
     }
@@ -104,9 +109,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
             add(buildDisplayModeView())
-        }
-        if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
-            add(buildSessionResetButton())
+            if (getDisplayMode() == DisplayMode.SESSION) {
+                add(buildSessionResetButton())
+            }
         }
     }
 

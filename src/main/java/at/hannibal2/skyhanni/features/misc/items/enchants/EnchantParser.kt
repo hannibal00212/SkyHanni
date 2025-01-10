@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
 /**
@@ -39,12 +38,29 @@ object EnchantParser {
     private val config get() = SkyHanniMod.feature.inventory.enchantParsing
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
+    // Pattern to check that the line contains ONLY enchants (and the other bits that come with a valid enchant line)
+    /**
+     * REGEX-TEST: §9Champion VI §81.2M
+     * REGEX-TEST: §9Cultivating VII §83,271,717
+     * REGEX-TEST: §5§o§9Compact X
+     * REGEX-TEST: §5§o§d§l§d§lChimera V§9, §9Champion X§9, §9Cleave VI
+     * REGEX-TEST: §d§l§d§lWisdom V§9, §9Depth Strider III§9, §9Feather Falling X
+     * REGEX-TEST: §9Compact X§9, §9Efficiency V§9, §9Experience IV
+     * REGEX_TEST: §r§d§lUltimate Wise V§r§9, §r§9Champion X§r§9, §r§9Cleave V
+     */
+    val enchantmentExclusivePattern by patternGroup.pattern(
+        "exclusive",
+        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+    )
+
+    // Above regex tests apply to this pattern also
+    @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
+        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
+        "grayenchants", "^(?:Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -70,12 +86,12 @@ object EnchantParser {
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
@@ -113,7 +129,7 @@ object EnchantParser {
     /**
      * For tooltips that are shown when hovering over an item from /show
      */
-    @SubscribeEvent
+    @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
@@ -186,6 +202,30 @@ object EnchantParser {
             return
         }
 
+        val insertEnchants: MutableList<String> = mutableListOf()
+
+        // Format enchants based on format config option
+        try {
+            formatEnchants(insertEnchants)
+        } catch (e: ArithmeticException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Item has enchants in nbt but none were found?",
+                "item" to currentItem,
+                "loreList" to loreList,
+                "nbt" to currentItem?.getExtraAttributes(),
+            )
+            return
+        } catch (e: ConcurrentModificationException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "ConcurrentModificationException whilst formatting enchants",
+                "loreList" to loreList,
+                "format" to config.format.get(),
+                "orderedEnchants" to orderedEnchants.toString(),
+            )
+        }
+
         // Remove enchantment lines so we can insert ours
         try {
             loreList.subList(startEnchant, endEnchant + 1).clear()
@@ -198,30 +238,6 @@ object EnchantParser {
                 "endEnchant" to endEnchant,
             )
             return
-        }
-
-        val insertEnchants: MutableList<String> = mutableListOf()
-
-        // Format enchants based on format config option
-        try {
-            formatEnchants(insertEnchants)
-        } catch (e: ArithmeticException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Item has enchants in nbt but none were found?",
-                "item" to currentItem,
-                "loreList" to loreList,
-                "nbt" to currentItem?.getExtraAttributes()
-            )
-            return
-        } catch (e: ConcurrentModificationException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "ConcurrentModificationException whilst formatting enchants",
-                "loreList" to loreList,
-                "format" to config.format.get(),
-                "orderedEnchants" to orderedEnchants
-            )
         }
 
         // Add our parsed enchants back into the lore
@@ -255,22 +271,18 @@ object EnchantParser {
     private fun orderEnchants(loreList: MutableList<String>) {
         var lastEnchant: FormattedEnchant? = null
 
+        val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
+        val regex = "[\\d,.kKmMbB]+\$".toRegex()
         for (i in startEnchant..endEnchant) {
             val matcher = enchantmentPattern.matcher(loreList[i])
             var containsEnchant = false
             var enchantsOnThisLine = 0
-            var isRoman = true
 
             while (matcher.find()) {
                 // Pull enchant, enchant level and stacking amount if applicable
                 val enchant = this.enchants.getFromLore(matcher.group("enchant"))
-                val level = try {
-                    // If one enchant is not a roman numeral we assume all are not roman numerals (idk a situation where this wouldn't be the case)
-                    matcher.group("levelNumeral").toInt().also { isRoman = false }
-                } catch (e: NumberFormatException) {
-                    matcher.group("levelNumeral").romanToDecimal()
-                }
-                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches("[\\d,]+\$".toRegex())) {
+                val level = matcher.group("levelNumeral").romanToDecimalIfNecessary()
+                val stacking = if (matcher.group("stacking").trimStart().removeColor().matches(regex)) {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
@@ -279,9 +291,9 @@ object EnchantParser {
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
 
                 if (!orderedEnchants.add(lastEnchant)) {
-                    for (e: FormattedEnchant in orderedEnchants) {
-                        if (lastEnchant?.let { e.compareTo(it) } == 0) {
-                            lastEnchant = e
+                    for (formattedEnchant: FormattedEnchant in orderedEnchants) {
+                        if (lastEnchant?.let { formattedEnchant.compareTo(it) } == 0) {
+                            lastEnchant = formattedEnchant
                             break
                         }
                     }
@@ -394,7 +406,7 @@ object EnchantParser {
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
         val chatComponentText = ChatComponentText(text)
-        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent.action, chatComponentText)
+        val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
@@ -415,8 +427,8 @@ object EnchantParser {
         val removeGrayEnchants = config.hideVanillaEnchants.get()
 
         var i = 1
-        for (total in 0 until 2) { // Using the fact that there should be at most 2 vanilla enchants
-            if (i + 1 >= loreList.size) break // In case the tooltip is very short (i.e, hovering over a short chat component)
+        repeat(2) { // Using the fact that there should be at most 2 vanilla enchants
+            if (i + 1 >= loreList.size) return@repeat // In case the tooltip is very short (i.e, hovering over a short chat component)
             val line = loreList[i]
             if (grayEnchantPattern.matcher(line).matches()) {
                 lastGrayEnchant = i

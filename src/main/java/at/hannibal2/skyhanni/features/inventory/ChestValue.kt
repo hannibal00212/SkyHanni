@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
@@ -41,10 +42,9 @@ object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<List<Any>>()
-    private val chestItems = mutableMapOf<String, Item>()
+    private var chestItems = mapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
-    private var compactInventory = true
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -78,7 +78,7 @@ object ChestValue {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (inInventory) {
@@ -86,9 +86,9 @@ object ChestValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        chestItems.clear()
+        chestItems = emptyMap()
     }
 
     private fun update() {
@@ -197,7 +197,7 @@ object ChestValue {
                 put(it.slotIndex, it.stack)
             }
         }
-        chestItems.clear()
+        val items = mutableMapOf<String, Item>()
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -208,13 +208,14 @@ object ChestValue {
                 total /= 2
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
-            val item = chestItems.getOrPut(key) {
+            val item = items.getOrPut(key) {
                 Item(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
             item.total += total * stack.stackSize
         }
+        chestItems = items
     }
 
     private fun Double.formatPrice(): String {
@@ -258,7 +259,9 @@ object ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
-        return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
+        // TODO: Use repo for this
+        return name == "Chest" || name == "Large Chest" || inMinion ||
+            name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
@@ -294,7 +297,7 @@ object ChestValue {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(17, "inventory.chestValueConfig.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -26,7 +26,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
@@ -35,10 +34,10 @@ object HighlightVisitorsOutsideOfGarden {
 
     private val config get() = GardenAPI.config.visitors
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
-            "Garden", GardenJson::class.java
+            "Garden", GardenJson::class.java,
         ).visitors.values.groupBy {
             it.mode
         }
@@ -67,10 +66,10 @@ object HighlightVisitorsOutsideOfGarden {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
-        val color = LorenzColor.DARK_RED.toColor().withAlpha(50)
+        val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
         EntityUtils.getEntities<EntityLivingBase>()
             .filter { it !is EntityArmorStand && isVisitor(it) }
             .forEach {
@@ -100,8 +99,9 @@ object HighlightVisitorsOutsideOfGarden {
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             event.cancel()
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
-                ChatUtils.chatAndOpenConfig("Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    GardenAPI.config.visitors::blockInteracting
+                ChatUtils.chatAndOpenConfig(
+                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                    GardenAPI.config.visitors::blockInteracting,
                 )
             }
         }
