@@ -71,7 +71,6 @@ object FrogMaskDisplay {
         }
     }
 
-
     private fun updateDisplay(): Renderable {
         val until = region.second.timeUntil()
         val timeString = until.format()
