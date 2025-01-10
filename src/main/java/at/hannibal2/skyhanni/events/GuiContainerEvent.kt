@@ -24,7 +24,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container), Cancellable{
+    ) : GuiContainerEvent(gui, container), Cancellable {
         fun drawDefaultBackground() =
             GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
     }
