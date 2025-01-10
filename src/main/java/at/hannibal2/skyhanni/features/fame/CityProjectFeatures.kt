@@ -66,7 +66,7 @@ object CityProjectFeatures {
         "§aProject is (?:being built|released)!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return

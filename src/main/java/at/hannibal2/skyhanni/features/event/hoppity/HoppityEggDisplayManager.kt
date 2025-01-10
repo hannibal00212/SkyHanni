@@ -38,7 +38,7 @@ object HoppityEggDisplayManager {
         return config.playerOpacity < 100
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
 
@@ -53,7 +53,7 @@ object HoppityEggDisplayManager {
         GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
 
@@ -68,7 +68,7 @@ object HoppityEggDisplayManager {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         display = updateDisplay()
     }

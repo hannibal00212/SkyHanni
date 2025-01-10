@@ -126,6 +126,11 @@ public class DevConfig {
     public boolean numberFormatOverride = false;
 
     @Expose
+    @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    @ConfigEditorBoolean
+    public boolean hypixelModApi = true;
+
+    @Expose
     @ConfigOption(name = "Damage Indicator", desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!")
     @ConfigEditorBoolean
     public boolean damageIndicatorBackend = true;

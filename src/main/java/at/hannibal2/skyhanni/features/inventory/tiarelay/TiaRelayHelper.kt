@@ -56,7 +56,7 @@ object TiaRelayHelper {
         tryResult()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return

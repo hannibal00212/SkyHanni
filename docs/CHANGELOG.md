@@ -11,6 +11,10 @@
     + Opens Bazaar if items aren't found in Sacks.
     + Shows the cost of required items and total upgrade cost.
 
+#### Inventory
+
++ Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
+
 #### Misc
 
 + Removed NotEnoughUpdates requirement. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
@@ -33,6 +37,15 @@
 + Sorted mining islands in Mining Event Tracker. - Penguin4life (https://github.com/hannibal002/SkyHanni/pull/3117)
 + Added `/shresetkinghelper` command to reset the King Talisman Helper. - Luna (https://github.com/hannibal002/SkyHanni/pull/3163)
 
+#### Crimson Isle Improvements
+
++ Added auto-accept for Crimson Isle quests. - Donaldino7712 (https://github.com/hannibal002/SkyHanni/pull/3181)
+    + Removed unused "Not Accepted" quest state after 0.20.9 SB update.
+
+#### Garden Improvements
+
++ Added compact display mode to the Farming Fortune Display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3119)
+
 #### Misc Improvements
 
 + Added EliteBot profile button to Discord Rich Presence. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3169)
@@ -45,11 +58,13 @@
 + Fixed Rift-Exportable items incorrectly marked as non-transferable with Hide Not Clickable Items. - Luna (https://github.com/hannibal002/SkyHanni/pull/3144)
     + Items can still be transferred inside the Rift but cannot be sold for motes.
 + Fixed Motes Session incorrectly showing negative changes as gained motes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3166)
++ Fixed Rift Blood Effigies detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/3179)
 
 
 #### Chocolate Factory Bug Fixes
 
 + Fixed Chocolate Factory's "Party Mode" not checking if chroma is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3164)
++ Fixed Rabbit Hitman claim estimates. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3142)
 
 #### Event Bug Fixes
 
@@ -60,15 +75,21 @@
 + Fixed a rare error in Estimated Chest Value calculation. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3150)
 + Fixed auction price comparison not detecting when the inventory is closed. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3165)
 + Fixed Minion Upgrade Feature appearing outside minion menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3175)
++ Fixed Book of Stats not counting in Estimated Item Value for items with 0 kills. - Luna (https://github.com/hannibal002/SkyHanni/pull/3178)
 
 #### Custom Scoreboard Bug Fixes
 
 + Fixed Custom Scoreboard Lines sometimes not showing Kuudra Lines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3157)
 
+#### Garden Bug Fixes
+
++ Fixed Custom Keybinds not working with inventory or chat keybind. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3186)
+
 #### Misc Bug Fixes
 
 + Fixed overflow level-up message not showing and removed dependency on skill progress display. - appable (https://github.com/hannibal002/SkyHanni/pull/3146)
 + Fixed visual words not saving. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3170)
++ Fixed overflow skill level-up messages only appearing above level 60. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3177)
 
 ### Technical Details
 
@@ -85,6 +106,12 @@
 + Replaced `LorenzWorldChangeEvent` with `IslandChangeEvent` in GardenAPI. - Cédric Ab (https://github.com/hannibal002/SkyHanni/pull/3151)
 + Retrieved lowest BIN prices if NEU isn't installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
     + Using NEU's item price data if NEU is installed.
++ Added debug command to navigate all nodes in island graph. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3100)
++ Added HypixelAPIServerChangeEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/2768)
++ Allowed dashes in repo pattern keys for readability. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3115)
++ Fixed some item attributes treated as Boolean instead of Int. - Luna (https://github.com/hannibal002/SkyHanni/pull/3178)
++ Implemented Hypixel Mod API. - Empa (https://github.com/hannibal002/SkyHanni/pull/2768)
++ Moved inventory open/close and repo events to SkyHanni events. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3174)
 
 ### New Features
 
