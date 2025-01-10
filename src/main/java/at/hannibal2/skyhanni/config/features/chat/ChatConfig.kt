@@ -31,7 +31,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
-    var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = listOf()
+    var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = ArrayList()
 
 
     enum class DungeonMessageTypes(private val displayName: String) {

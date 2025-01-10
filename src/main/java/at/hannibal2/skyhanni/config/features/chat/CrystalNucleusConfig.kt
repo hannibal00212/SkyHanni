@@ -36,7 +36,7 @@ class CrystalNucleusConfig {
         desc = "Messages that should be hidden or compacted.\n§cImportant information will still appear§7.",
     )
     @ConfigEditorDraggableList
-    var modifiedMessages: List<CrystalNucleusMessageTypes> = listOf(
+    var modifiedMessages: List<CrystalNucleusMessageTypes> = mutableListOf(
         CrystalNucleusMessageTypes.CRYSTAL_COLLECTED,
         CrystalNucleusMessageTypes.CRYSTAL_PLACED,
         CrystalNucleusMessageTypes.RUN_COMPLETED,
