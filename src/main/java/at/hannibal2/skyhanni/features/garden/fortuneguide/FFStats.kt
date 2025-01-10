@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
@@ -185,7 +185,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
-                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel * if (Minecraft.getMinecraft().theWorld.isDaytime) 1.0 else 3.0
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel * if (SkyBlockTime.isDay()) 1.0 else 3.0
                 else -> 0.0
             }
         }
