@@ -55,7 +55,7 @@ object JyrreTimer {
         config.pos.renderRenderable(display, posLabel = "Refined Jyrre Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
