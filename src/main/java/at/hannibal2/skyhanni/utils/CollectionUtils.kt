@@ -162,6 +162,8 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
+    fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
+
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()

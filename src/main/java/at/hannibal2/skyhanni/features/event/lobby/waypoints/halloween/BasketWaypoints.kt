@@ -62,7 +62,7 @@ object BasketWaypoints {
         "^§a§lCongratulations! You found all Candy Baskets!$"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isActive || !isEnabled()) return
