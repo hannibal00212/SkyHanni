@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -20,10 +20,19 @@ object PurseAPI {
     private val storage get() = ProfileStorageData.profileSpecific
 
     private val patternGroup = RepoPattern.group("data.purse")
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     * REGEX-TEST: Purse: §6423,085,776 §e(+5)
+     */
     val coinsPattern by patternGroup.pattern(
         "coins",
         "(?:§.)*(?:Piggy|Purse): §6(?<coins>[\\d,.]+)(?: ?(?:§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
+
+    /**
+     * REGEX-TEST: Piggy: §6423,085,766
+     */
     val piggyPattern by patternGroup.pattern(
         "piggy",
         "Piggy: (?<coins>.*)",
@@ -36,12 +45,12 @@ object PurseAPI {
             storage?.purse = value
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         coinsPattern.firstMatcher(event.added) {
             val newPurse = group("coins").formatLong()
@@ -49,7 +58,7 @@ object PurseAPI {
             if (diff == 0) return
             currentPurse = newPurse
 
-            PurseChangeEvent(diff, currentPurse, getCause(diff)).postAndCatch()
+            PurseChangeEvent(diff, currentPurse, getCause(diff)).post()
         }
     }
 

@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
@@ -13,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -36,6 +38,10 @@ object GardenVisitorTimer {
 
     private val config get() = GardenAPI.config.visitors.timer
 
+    /**
+     * REGEX-TEST:  Next Visitor: §r§b11m
+     * REGEX-TEST:  Next Visitor: §r§c§lQueue Full!
+     */
     private val timePattern by RepoPattern.pattern(
         "garden.visitor.timer.time.new",
         " Next Visitor: §r(?<info>.*)",
@@ -60,12 +66,12 @@ object GardenVisitorTimer {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
         lastMillis = 0.seconds
@@ -74,7 +80,7 @@ object GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -83,7 +89,7 @@ object GardenVisitorTimer {
         var millis = visitorInterval
         var queueFull = false
 
-        TabListData.getTabList().matchFirst(timePattern) {
+        timePattern.firstMatcher(TabListData.getTabList()) {
             val timeInfo = group("info").removeColor()
             if (timeInfo == "Not Unlocked!") {
                 display = Renderable.string("§cVisitors not unlocked!")
@@ -199,7 +205,7 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
@@ -207,6 +213,16 @@ object GardenVisitorTimer {
         // We only need manually retracting the time when hypixel shows 6 minutes or above
         if (lastMillis > 5.minutes) {
             lastTimerUpdate -= 100.milliseconds
+        }
+    }
+
+    @HandleEvent
+    fun onPestKill(event: PestKillEvent) {
+        if (!isEnabled()) return
+        sixthVisitorArrivalTime -= 30.seconds
+
+        if (lastMillis > 5.minutes) {
+            lastTimerUpdate -= 30.seconds
         }
     }
 
@@ -220,7 +236,7 @@ object GardenVisitorTimer {
     private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")

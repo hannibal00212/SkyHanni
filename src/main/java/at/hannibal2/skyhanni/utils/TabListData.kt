@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC<1.12
+//#if MC < 1.12
 import net.minecraft.world.WorldSettings
 //#else
 //$$ import net.minecraft.world.GameType
@@ -45,6 +47,22 @@ object TabListData {
     fun getHeader() = header
     fun getFooter() = footer
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Tab List")
+        debugCache?.let {
+            event.addData {
+                add("debug active!")
+                add("lines: (${it.size})")
+                for (line in it) {
+                    add(" '$line'")
+                }
+            }
+        } ?: run {
+            event.addIrrelevant("not active.")
+        }
+    }
+
     fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
@@ -63,7 +81,7 @@ object TabListData {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
                 onClick = { toggleDebug() },
-                "§eClick to disable!"
+                "§eClick to disable!",
             )
             return
         }
@@ -98,10 +116,10 @@ object TabListData {
             return ComparisonChain.start().compareTrueFirst(
                 //#if MC<1.12
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
-                o2.gameType != WorldSettings.GameType.SPECTATOR
+                o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
                 //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o2.gameType != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -113,13 +131,17 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft()?.thePlayer ?: return null
+        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
+        //#if MC<1.16
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        //#else
+        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(LorenzUtils.stripVanillaMessage(name))
+            result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
         return result.dropLast(1)
@@ -142,7 +164,7 @@ object TabListData {
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(getTabList()).post()
             if (!LorenzUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
@@ -153,7 +175,7 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
@@ -162,7 +184,7 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (LorenzUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
         }
     }

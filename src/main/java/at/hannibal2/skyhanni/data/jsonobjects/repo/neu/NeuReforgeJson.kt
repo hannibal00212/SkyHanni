@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -44,8 +44,7 @@ data class NeuReforgeJson(
     val itemType: Pair<String, List<NEUInternalName>>
         get() = if (this::itemTypeField.isInitialized) itemTypeField
         else run {
-            val any = this.rawItemTypes
-            return when (any) {
+            return when (val any = this.rawItemTypes) {
                 is String -> {
                     any.replace("/", "_AND_").uppercase() to emptyList()
                 }
@@ -53,9 +52,9 @@ data class NeuReforgeJson(
                 is Map<*, *> -> {
                     val type = "SPECIAL_ITEMS"
                     val map = any as? Map<String, List<String>> ?: return type to emptyList()
-                    val internalNames = map["internalName"]?.map { it.asInternalName() }.orEmpty()
+                    val internalNames = map["internalName"]?.toInternalNames().orEmpty()
                     val itemType = map["itemid"]?.map {
-                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
+                        NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it) ?: return@map emptyList())
                     }?.flatten().orEmpty()
                     type to (internalNames + itemType)
                 }

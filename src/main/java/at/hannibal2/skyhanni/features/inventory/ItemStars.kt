@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -24,13 +25,13 @@ object ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
-    private val repoGroup = RepoPattern.group("inventory.itemstars")
+    private val patternGroup = RepoPattern.group("inventory.itemstars")
 
     /**
      * REGEX-TEST: §6Ancient Terror Leggings §d✪✪§6✪✪✪
      * REGEX-TEST: §dRenowned Burning Crimson Helmet §6✪✪✪✪✪
      */
-    private val starPattern by repoGroup.pattern(
+    private val starPattern by patternGroup.pattern(
         "stars",
         "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)",
     )
@@ -47,7 +48,7 @@ object ItemStars {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!CRIMSON_ARMOR.isSelected()) return

@@ -1,22 +1,22 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.compat.Effects
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HideArmor {
@@ -28,7 +28,7 @@ object HideArmor {
         if (!LorenzUtils.inSkyBlock) return false
         if (entity !is EntityPlayer) return false
         if (entity is FakePlayer) return false
-        if (entity.hasPotionEffect(Effects.invisibility)) return false
+        if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
         if (entity.isNPC()) return false
 
         return when (config.mode) {
@@ -41,7 +41,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
@@ -59,7 +59,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
@@ -70,7 +70,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)

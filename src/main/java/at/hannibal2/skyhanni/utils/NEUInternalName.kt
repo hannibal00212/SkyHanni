@@ -11,17 +11,18 @@ class NEUInternalName private constructor(private val internalName: String) {
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()
 
+        val GEMSTONE_COLLECTION = "GEMSTONE_COLLECTION".toInternalName()
         val JASPER_CRYSTAL = "JASPER_CRYSTAL".toInternalName()
         val RUBY_CRYSTAL = "RUBY_CRYSTAL".toInternalName()
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
         val WISP_POTION = "WISP_POTION".toInternalName()
 
-        @Deprecated("Name changed", ReplaceWith("this.toInternalName()"))
-        fun String.asInternalName() = toInternalName()
-
         fun String.toInternalName(): NEUInternalName = uppercase().replace(" ", "_").let {
             internalNameMap.getOrPut(it) { NEUInternalName(it) }
         }
+
+        fun Set<String>.toInternalNames(): Set<NEUInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
+        fun List<String>.toInternalNames(): List<NEUInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
 
         private val itemNameCache = mutableMapOf<String, NEUInternalName?>()
 
@@ -53,7 +54,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     fun asString() = internalName
 
-    override fun equals(other: Any?) = other is NEUInternalName && internalName == other.internalName
+    override fun equals(other: Any?) = this === other
 
     override fun toString(): String = "internalName:$internalName"
 

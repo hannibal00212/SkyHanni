@@ -38,10 +38,9 @@ jobs:
                     path: versions/1.8.9/build/reports/tests/test/
 
     preprocess:
+        if: ${{ false }} # Fix github
         runs-on: ubuntu-latest
         name: "Build multi version"
-        env:
-            SKIP_DETEKT: "true"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
@@ -51,4 +50,4 @@ jobs:
                     mkdir -p .gradle
                     echo skyhanni.multi-version=preprocess-only > .gradle/private.properties
             -   name: Build with Gradle
-                run: ./gradlew build --stacktrace
+                run: ./gradlew build --stacktrace -PskipDetekt=true

@@ -110,14 +110,13 @@ format like "- #821" to illustrate the dependency.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
       After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
-     `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
+     `baseline.xml` replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
   - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
-- All new classes should be written in Kotlin, with a few exceptions:
-    - Config files in `at.hannibal2.skyhanni.config.features`
+- All new classes should be written in Kotlin, with one exception:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
@@ -125,8 +124,7 @@ format like "- #821" to illustrate the dependency.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
-    - Config files should still be made in Java.
+- JSON data objects are made in kotlin and put into the directory `at.hannibal2.skyhanni.data.jsonobjects`
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -145,6 +143,7 @@ format like "- #821" to illustrate the dependency.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
@@ -152,6 +151,8 @@ for more information and usages.
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 - Use American English spelling conventions (e.g., "color" not "colour").
+- When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
+- Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve readability and maintain encapsulation.
 
 ## Additional Useful Development Tools
 
@@ -289,7 +290,7 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
-operations since the compile will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
+operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
 
 ### Improving mappings
 
@@ -416,7 +417,7 @@ Let's look at the syntax of those `#if` expressions.
 
 First of all, the `#else` block is optional. If you just want code on some versions (for example for adding a method call that is implicitly
 done on newer versions, or simply because the corresponding code for newer versions has to be done in some other place), you can just omit
-the `#else` section and you will simply not compile any code at that spot.
+the `#else` section, and you will simply not compile any code at that spot.
 
 There is also an `#elseif` in case you want to switch behaviour based on multiple version brackets. Again, while we don't actually target
 1.12 or 1.16, making those versions compile will help other parts of the code to upgrade to 1.21 more cleanly and easily. So, making those
@@ -439,3 +440,8 @@ for the variable using `#if FORGE`.
 Sadly, `#if` expressions cannot be applied globally (unlike name changes), so it is often very helpful to create a helper method and call
 that method from various places in the codebase. This is generally already policy in SH for a lot of things. For more complex types that
 change beyond just their name (for example different generics), a `typealias` can be used in combination with `#if` expressions.
+
+These helper methods should generally be placed in the `at.hannibal2.skyhanni.utils.compat` package and should be named after what they are
+compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
+it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files 
+themselves.

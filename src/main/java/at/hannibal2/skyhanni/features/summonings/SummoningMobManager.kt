@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,7 +42,7 @@ object SummoningMobManager {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§aYou have spawned your (.+) §r§asoul! §r§d\\((\\d+) Mana\\)",
+        "§aYou have spawned your .+ §r§asoul! §r§d\\(\\d+ Mana\\)",
     )
 
     /**
@@ -60,7 +60,7 @@ object SummoningMobManager {
      */
     private val seraphRecallPattern by patternGroup.pattern(
         "seraphrecall",
-        "§cThe Seraph recalled your (\\d+) summoned allies!",
+        "§cThe Seraph recalled your \\d+ summoned allies!",
     )
 
     private val despawnPatterns = listOf(
@@ -79,7 +79,7 @@ object SummoningMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.Summon) {
         if (event.mob.owner?.ownerName != LorenzUtils.getPlayerName()) return
 
@@ -87,7 +87,7 @@ object SummoningMobManager {
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
         val mob = event.mob
         if (mob !in mobs) return
@@ -105,7 +105,7 @@ object SummoningMobManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!LorenzUtils.inSkyBlock || !config.summoningMobHideNametag) return
         if (event.entity.mob !in mobs) return
@@ -132,7 +132,7 @@ object SummoningMobManager {
         config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "summonings", "combat.summonings")
     }

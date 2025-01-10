@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.currency.CurrencyChangeEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -56,7 +56,6 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenAPI {
@@ -114,7 +113,7 @@ object GardenAPI {
         checkItemInHand()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
@@ -149,18 +148,14 @@ object GardenAPI {
         }
     }
 
-    // TODO use IslandChangeEvent
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        DelayedRun.runDelayed(2.seconds) {
-            if (inGarden()) {
-                checkItemInHand()
-            }
-        }
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
+        checkItemInHand()
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+        GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
 
     private fun checkItemInHand() {
@@ -202,16 +197,7 @@ object GardenAPI {
 
     fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
 
-    @Deprecated("use renderable list instead", ReplaceWith(""))
-    fun MutableList<Any>.addCropIcon(
-        crop: CropType,
-        scale: Double = NEUItems.itemFontSize,
-        highlight: Boolean = false,
-    ) =
-        addItemIcon(crop.icon.copy(), highlight, scale = scale)
-
-    // TODO rename to addCropIcon
-    fun MutableList<Renderable>.addCropIconRenderable(
+    fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
         scale: Double = NEUItems.itemFontSize,
         highlight: Boolean = false,
@@ -237,7 +223,7 @@ object GardenAPI {
         ChatUtils.chat("Manually reset all crop speed data!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         GardenBestCropTime.reset()
     }
@@ -261,7 +247,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).post()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {
@@ -307,7 +293,7 @@ object GardenAPI {
         return tier
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp

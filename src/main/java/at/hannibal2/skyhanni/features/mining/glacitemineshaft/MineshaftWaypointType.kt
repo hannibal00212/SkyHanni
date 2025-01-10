@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 
 enum class MineshaftWaypointType(
     val displayText: String,
     val color: LorenzColor,
-    private val itemName: String? = null
+    itemName: String? = null
 ) {
     LAPIS("Lapis Corpse", LorenzColor.DARK_BLUE, "LAPIS_ARMOR_HELMET"),
     UMBER("Umber Corpse", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET"),
@@ -17,9 +17,7 @@ enum class MineshaftWaypointType(
     LADDER("Ladder", LorenzColor.YELLOW)
     ;
 
-    val helmet by lazy {
-        itemName?.asInternalName()
-    }
+    val helmet = itemName?.toInternalName()
 
     companion object {
         fun getByHelmetOrNull(internalName: NEUInternalName): MineshaftWaypointType? {

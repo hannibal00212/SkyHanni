@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.InfernoMinionFuelsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -19,25 +20,30 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object InfernoMinionFeatures {
     private val config get() = SkyHanniMod.feature.misc.minions
+
+    /**
+     * REGEX-TEST: Inferno Minion II
+     * REGEX-TEST: Inferno Minion IX
+     */
     private val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
-        "Inferno Minion .*"
+        "Inferno Minion .*",
     )
     private var fuelItemIds = listOf<NEUInternalName>()
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<InfernoMinionFuelsJson>("InfernoMinionFuels")
         fuelItemIds = data.minionFuels
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = infernoMinionTitlePattern.matches(event.inventoryName)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

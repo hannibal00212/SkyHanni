@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints.christmas
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
@@ -117,7 +118,7 @@ object PresentWaypoints {
 
     private fun EventWaypoint.shouldShow(): Boolean = !isFound && (!config.onlyClosest || closest == this)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
         presentLocations = loadEventWaypoints(data.presents)

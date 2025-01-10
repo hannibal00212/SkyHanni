@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -24,10 +25,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestonesCommunityFix {
+
+    /**
+     * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
+     */
     private val amountPattern by RepoPattern.pattern(
         "data.garden.milestonefix.amount",
         ".*§e(?<having>.*)§6/§e(?<max>.*)",
@@ -36,7 +40,7 @@ object GardenCropMilestonesCommunityFix {
     private var showWrongData = false
     private var showWhenAllCorrect = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         val map = data.cropMilestoneCommunityHelp

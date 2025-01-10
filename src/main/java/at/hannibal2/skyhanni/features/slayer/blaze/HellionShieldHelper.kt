@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.EntityLiving
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -15,7 +16,7 @@ object HellionShieldHelper {
 
     val hellionShieldMobs = mutableMapOf<EntityLiving, HellionShield>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeColoredMobs", "slayer.blazes.hellion.coloredMobs")
     }
@@ -30,7 +31,7 @@ object HellionShieldHelper {
             hellionShieldMobs[this] = shield
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 this,
-                shield.color.toColor().withAlpha(80)
+                shield.color.toColor().addAlpha(80),
             ) { LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs }
         } else {
             hellionShieldMobs.remove(this)

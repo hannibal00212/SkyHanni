@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -78,11 +79,11 @@ object ItemPickupLog {
     }
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
-    private val coinIcon = "COIN_TALISMAN".asInternalName()
+    private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
-    private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
-    private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
+    private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
     private var dirty = false
 
@@ -101,7 +102,7 @@ object ItemPickupLog {
         "ELLE_SUPPLIES",
         "ELLE_FUEL_CELL",
     )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
+    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -117,7 +118,7 @@ object ItemPickupLog {
         itemsRemovedFromInventory.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled() || !config.sack) return
 
@@ -129,7 +130,7 @@ object ItemPickupLog {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 

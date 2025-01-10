@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
@@ -41,7 +43,7 @@ object DianaProfitTracker {
     private val patternGroup = RepoPattern.group("diana.chat")
     private val chatDugOutPattern by patternGroup.pattern(
         "burrow.dug",
-        "(§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
+        "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*",
     )
     private val chatDugOutCoinsPattern by patternGroup.pattern(
         "coins",
@@ -51,9 +53,9 @@ object DianaProfitTracker {
     private val tracker = SkyHanniItemTracker(
         "Diana Profit Tracker",
         { Data() },
-        { it.diana.dianaProfitTracker },
+        { it.diana.profitTracker },
         SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.dianaProfitTrackerPerElectionSeason.getOrPut(
+            it.diana.profitTrackerPerElection.getOrPut(
                 SkyBlockTime.now().getElectionYear(), ::Data,
             )
         },
@@ -107,7 +109,7 @@ object DianaProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!(DianaAPI.isDoingDiana() && config.enabled)) return
 
@@ -168,12 +170,27 @@ object DianaProfitTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }
 
     fun resetCommand() {
         tracker.resetCommand()
+    }
+
+    private val migrationMapping by lazy {
+        mapOf(
+            "dianaProfitTracker" to "profitTracker",
+            "dianaProfitTrackerPerElectionSeason" to "profitTrackerPerElection",
+            "mythologicalMobTrackerPerElectionSeason" to "mythologicalMobTrackerPerElection",
+        )
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        migrationMapping.forEach { (old, new) ->
+            event.move(70, "#profile.diana.$old", "#profile.diana.$new")
+        }
     }
 }

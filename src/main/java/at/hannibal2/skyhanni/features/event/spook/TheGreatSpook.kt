@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -23,7 +25,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -45,6 +46,12 @@ object TheGreatSpook {
 
     private var timeUntilNextMob = SimpleTimeMark.farPast()
 
+    private val publicSpeakingSolutions = CircularList(
+        "I looove SkyHanni!",
+        "Do you know SkyHanni? A cool mod for SkyBlock!",
+        "Today is a good day to kill Spooky monsters.",
+    )
+
     private val patternGroup = RepoPattern.group("event.greatspook")
 
     /**
@@ -60,7 +67,7 @@ object TheGreatSpook {
      */
     private val speakingFearMessagePattern by patternGroup.pattern(
         "chat.speaking",
-        "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
+        "§4\\[FEAR] Public Speaking Demon§r§f: (?:Speak|Say something interesting) (?<name>.*)!",
     )
 
     /**
@@ -71,7 +78,7 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
@@ -109,7 +116,7 @@ object TheGreatSpook {
         displayGreatSpookEnd = Renderable.string(timeLeftString)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
@@ -129,8 +136,8 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: IslandChangeEvent) {
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         val currentTime = SimpleTimeMark.now()
         val timeRange = greatSpookTimeRange ?: run {
             isGreatSpookActive = false
@@ -178,13 +185,15 @@ object TheGreatSpook {
     }
 
     private fun publicSpeakingSolver() {
+        val solution = publicSpeakingSolutions.next()
         ChatUtils.clickToActionOrDisable(
             "Solving Public Speaking puzzle for you.",
             config.primalFearSolver::publicSpeaking,
             actionName = "send a random string",
             action = {
-                HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
+                HypixelCommands.allChat(solution)
             },
+            oneTimeClick = true
         )
     }
 
@@ -221,7 +230,7 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 
@@ -232,7 +241,7 @@ object TheGreatSpook {
         greatSpookEndTime = if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Great Spook")
 

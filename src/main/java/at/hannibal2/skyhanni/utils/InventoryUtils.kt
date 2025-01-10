@@ -1,17 +1,24 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.12
+//$$ import net.minecraft.inventory.ClickType
+//#endif
 
 object InventoryUtils {
 
@@ -69,7 +76,7 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.inventory.armorInventory
+    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
@@ -77,14 +84,17 @@ object InventoryUtils {
     fun getBoots(): ItemStack? = getArmor()[0]
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
+        if (!PlatformUtils.isNeuLoaded()) {
+            return@RecalculatingValue false
+        }
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 
             val storageField = config.javaClass.getDeclaredField("storageGUI")
-            val storage = storageField.get(config)
+            val storage = storageField[config]
 
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
-            booleanField.get(storage) as Boolean
+            booleanField[storage] as Boolean
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false
@@ -121,15 +131,30 @@ object InventoryUtils {
         }
     }
 
+    fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            this[slot] = slot.stack
+        }
+    }
+
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
-    fun clickSlot(slot: Int) {
-        val windowId = getWindowId() ?: return
+    fun clickSlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
+        windowId ?: return
         val controller = Minecraft.getMinecraft().playerController
-        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
+        //#if MC < 1.12
+        controller.windowClick(windowId, slot, mouseButton, mode, Minecraft.getMinecraft().thePlayer)
+        //#else
+        //$$ controller.windowClick(windowId, slot, mouseButton, ClickType.entries[mode], Minecraft.getMinecraft().player)
+        //#endif
     }
+
+    fun Slot.isTopInventory() = inventory.isTopInventory()
+
+    fun IInventory.isTopInventory() = this is ContainerLocalMenu
 }

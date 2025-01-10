@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,16 +16,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -37,10 +39,15 @@ object ChocolateShopPrice {
     private var display = emptyList<Renderable>()
     private var products = emptyList<Product>()
 
-    private val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val menuNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.title",
         "Chocolate Shop",
     )
+
+    /**
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
+     * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
+     */
     private val itemBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
@@ -61,15 +68,15 @@ object ChocolateShopPrice {
     private const val MILESTONE_INDEX = 50
     private var chocolateSpent = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (inInventory) {
             update()
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val isInShop = menuNamePattern.matches(event.inventoryName)
         val isInShopOptions = UtilsPatterns.shopOptionsPattern.matches(event.inventoryName)
@@ -93,7 +100,7 @@ object ChocolateShopPrice {
             val lore = item.getLore()
 
             if (slot == MILESTONE_INDEX) {
-                lore.matchFirst(chocolateSpentPattern) {
+                chocolateSpentPattern.firstMatcher(lore) {
                     chocolateSpent = group("amount").formatLong()
                 }
             }
@@ -102,8 +109,9 @@ object ChocolateShopPrice {
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
             val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
+            val canBeBought = lore.any { it == "§eClick to trade!" }
 
-            newProducts.add(Product(slot, item.itemName, internalName, chocolate, itemPrice, otherItemsPrice))
+            newProducts.add(Product(slot, item.itemName, internalName, chocolate, itemPrice, otherItemsPrice, canBeBought))
         }
         products = newProducts
     }
@@ -136,10 +144,15 @@ object ChocolateShopPrice {
                 add("")
                 val formattedTimeUntilGoal = ChocolateAmount.CURRENT.formattedTimeUntilGoal(product.chocolate)
                 add("§7Time until affordable: §6$formattedTimeUntilGoal ")
+
+                if (!product.canBeBought) {
+                    add("")
+                    add("§cCannot be bought!")
+                }
             }
             table.add(
                 DisplayTableEntry(
-                    "${product.name}§f:",
+                    product.name.addStrikethorugh(!product.canBeBought),
                     "§6§l$perFormat",
                     factor,
                     product.item,
@@ -160,7 +173,7 @@ object ChocolateShopPrice {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         callUpdate = false
@@ -200,5 +213,6 @@ object ChocolateShopPrice {
         val chocolate: Long,
         val itemPrice: Double,
         val otherItemPrice: Double?,
+        val canBeBought: Boolean,
     )
 }

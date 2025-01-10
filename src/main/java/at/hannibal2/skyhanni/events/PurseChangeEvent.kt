@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.events
 
-class PurseChangeEvent(val coins: Int, val purse: Long, val reason: PurseChangeCause) : LorenzEvent() {
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class PurseChangeEvent(val coins: Int, val purse: Long, val reason: PurseChangeCause) : SkyHanniEvent() {
     val oldCoins: Double get() = coins.toDouble()
 }
 

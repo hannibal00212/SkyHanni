@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -17,7 +18,7 @@ object BlazeSlayerClearView {
 
     private var nearBlaze = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.repeatSeconds(3)) return
@@ -44,13 +45,10 @@ object BlazeSlayerClearView {
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityFireball>) {
         if (isEnabled()) {
-            val entity = event.entity
-            if (entity is EntityFireball) {
-                event.cancel()
-            }
+            event.cancel()
         }
     }
 
@@ -58,7 +56,7 @@ object BlazeSlayerClearView {
         return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeClearView", "slayer.blazes.clearView")
     }

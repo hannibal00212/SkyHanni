@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -30,10 +31,10 @@ import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
+import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.
@@ -58,7 +59,7 @@ object PlayerNameFormatter {
         "(?<emblem>(?:§.){0,2}.) (?<author>.*)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
@@ -86,7 +87,7 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCoopChat(event: CoopChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -99,7 +100,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuildChat(event: GuildChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -112,7 +113,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyChat(event: PartyChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -125,7 +126,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -139,7 +140,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -242,7 +243,9 @@ object PlayerNameFormatter {
         if (author.getText().contains("ADMIN")) return author
         if (config.ignoreYouTube && author.getText().contains("YOUTUBE")) return author
         val (rank, name) = author.splitPlayerNameAndExtras()
-        val coloredName = createColoredName(name, levelColor, name.getText().removeColor())
+        val rankColor =
+            if (rank != null && rank.sampleAtStart() === name.sampleAtStart()) FontRenderer.getFormatFromString(rank.getText()) else ""
+        val coloredName = createColoredName(name, levelColor, name.getText().removeColor(), rankColor)
         return if (config.playerRankHider || rank == null) coloredName else rank + coloredName
     }
 
@@ -250,9 +253,10 @@ object PlayerNameFormatter {
         name: ComponentSpan,
         levelColor: String?,
         removeColor: String,
+        rankColor: String,
     ): ComponentSpan = when {
         MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
-            ChatComponentText(MarkedPlayerManager.replaceInChat(removeColor))
+            ChatComponentText(MarkedPlayerManager.replaceInChat(rankColor + removeColor))
                 .setChatStyle(name.sampleStyleAtStart()).intoSpan()
 
         levelColor != null && config.useLevelColorForName ->
@@ -266,12 +270,16 @@ object PlayerNameFormatter {
                 .style { color = EnumChatFormatting.AQUA }
                 .intoSpan()
 
-        else -> name
+        else ->
+            if (rankColor.isEmpty()) name
+            else ChatComponentText(rankColor + removeColor)
+                .setChatStyle(name.sampleStyleAtStart())
+                .intoSpan()
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(41, "chat.PlayerMessagesConfig.partsOrder") { element ->
             val newList = JsonArray()
