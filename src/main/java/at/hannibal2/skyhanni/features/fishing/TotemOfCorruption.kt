@@ -65,7 +65,7 @@ object TotemOfCorruption {
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return
