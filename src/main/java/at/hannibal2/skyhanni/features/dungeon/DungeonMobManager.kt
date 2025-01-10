@@ -58,15 +58,15 @@ object DungeonMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)

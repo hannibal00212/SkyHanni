@@ -34,7 +34,7 @@ object LivingCaveDefenseBlocks {
 
     class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }

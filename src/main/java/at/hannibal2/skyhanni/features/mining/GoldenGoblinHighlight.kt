@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
@@ -42,7 +43,7 @@ object GoldenGoblinHighlight {
         handle()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobEvent(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         if (!goblinPattern.matches(event.mob.name)) return
