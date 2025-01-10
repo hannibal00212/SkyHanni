@@ -194,7 +194,7 @@ object MobFilter {
             listOfClickArmorStand.contains(armorStand.name)
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
-        MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand, clickArmorStand)).postAndCatch()
+        MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand, clickArmorStand)).post()
         return true
     }
 
