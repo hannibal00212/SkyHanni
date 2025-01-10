@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getBaseStats
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,6 +32,8 @@ object MiningStatsDisplay {
         "§7Mining Fortune: §a",
     )
 
+    /*
+
     var displayedFortune = 0.0
     var reforgeFortune = 0.0
     var gemstoneFortune = 0.0
@@ -40,47 +42,29 @@ object MiningStatsDisplay {
     var engineFortune = 0.0
     var omeletteFortune = 0.0
 
-    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
+     */
 
-    //fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
     fun getBaseFortune(internalName: NEUInternalName?): Double {
         if (internalName == null) return 0.0
-        val string = internalName.asString()
-        if (string == "THEORETICAL_HOE") {
-            return 0.0
-        }
-        return if (string.contains("MITHRIL_PICKAXE")) {
-            if (string.contains("FRACTURED")) {
-                2.0
-            } else if (string.contains("BANDAGED")) {
-                4.0
-            } else if (string.contains("REFINED")) {
-                10.0
-            } else {
-                7.0
-            }
-        } else if (string.contains("TITANIUM_DRILL")) {
-            if (string.endsWith("1")) {
-                25.0
-            } else if (string.endsWith("2")) {
-                40.0
-            } else if (string.endsWith("3")) {
-                70.0
-            } else 120.0
-        } else when (string) {
-            "BINGO NIMBUS_2000" -> 100.0
-            "DIVANS_DRILL" -> 150.0
-            else -> 0.0
-        }
-    }
 
+        val stats = internalName.getBaseStats()
+
+        for ((name,value) in stats ) {
+            if (name == "mining_fortune") {
+                return value.toDouble()
+            }
+        }
+        return 0.0
+    }
     fun getFortuneFortune(tool: ItemStack?) = listOf(0.0, 10.0, 20.0, 30.0, 45.0)[tool?.getEnchantments()?.get("fortune") ?: 0]
     fun getOmeletteFortune(tool: ItemStack?): Double {
         val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
+
         for (internalName in drillUpgrade) {
-            if (internalName.itemName == "SUNNY_SIDE_GOBLIN_OMELETTE") {
+            val string = internalName.asString()
+            if (string == "GOBLIN_OMELETTE_SUNNY_SIDE") {
                 return 50.0
-            } else if (internalName.itemName == "STARFALL_SEASONING") {
+            } else  if (string == "STARFALL_SEASONING") {
                 return 10.0
             }
         }
@@ -90,16 +74,17 @@ object MiningStatsDisplay {
     fun getEngineFortune(tool: ItemStack?): Double {
         val drillUpgrade = tool?.getDrillUpgrades() ?: return 0.0
         for (internalName in drillUpgrade) {
-            if (internalName.itemName.startsWith("MITHRIL")) {
-                return 5.0
-            } else if (internalName.itemName.startsWith("TITANIUM")) {
-                return 15.0
-            } else if (internalName.itemName.startsWith("RUBY")) {
-                return 30.0
-            } else if (internalName.itemName.startsWith("SAPPHIRE")) {
-                return 50.0
-            } else if (internalName.itemName.startsWith("AMBER")) {
-                return 100.0
+            val string = internalName.asString()
+            if(string.startsWith("MITHRIL")) {
+                5.0
+            } else  if (string.startsWith("TITANIUM")) {
+                 return 15.0
+            } else  if (string.startsWith("RUBY")) {
+                 return 30.0
+            } else  if (string.startsWith("SAPPHIRE")) {
+                 return 50.0
+            } else  if (string.startsWith("AMBER")) {
+                 return 100.0
             }
         }
         return 0.0
@@ -136,6 +121,8 @@ object MiningStatsDisplay {
     //    return 0.0
     //}
     //fun getDivanPowderCoatingSpeed(tool: ItemStack?) = if (tool?.hasDivanPowderCoating() == true) 500 else 0
+
+    /*
 
     fun loadFortuneLineData(tool: ItemStack?) {
         displayedFortune = 0.0
@@ -181,3 +168,4 @@ fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 }
 
 
+ */
