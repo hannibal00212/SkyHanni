@@ -36,16 +36,14 @@ class CrystalNucleusConfig {
         desc = "Messages that should be hidden or compacted.\n§cImportant information will still appear§7.",
     )
     @ConfigEditorDraggableList
-    var modifiedMessages: List<CrystalNucleusMessageTypes> = ArrayList(
-        Arrays.asList(
-            CrystalNucleusMessageTypes.CRYSTAL_COLLECTED,
-            CrystalNucleusMessageTypes.CRYSTAL_PLACED,
-            CrystalNucleusMessageTypes.RUN_COMPLETED,
-            CrystalNucleusMessageTypes.NPC_DIVAN_KEEPERS,
-            CrystalNucleusMessageTypes.NPC_PROF_ROBOT,
-            CrystalNucleusMessageTypes.NPC_KING_YOLKAR,
-            CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS,
-            CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE,
-        ),
+    var modifiedMessages: List<CrystalNucleusMessageTypes> = listOf(
+        CrystalNucleusMessageTypes.CRYSTAL_COLLECTED,
+        CrystalNucleusMessageTypes.CRYSTAL_PLACED,
+        CrystalNucleusMessageTypes.RUN_COMPLETED,
+        CrystalNucleusMessageTypes.NPC_DIVAN_KEEPERS,
+        CrystalNucleusMessageTypes.NPC_PROF_ROBOT,
+        CrystalNucleusMessageTypes.NPC_KING_YOLKAR,
+        CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS,
+        CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE,
     )
 }
