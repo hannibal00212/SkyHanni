@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ItemProfitTrackerConfig {
+class SlayerProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -19,6 +19,6 @@ class ItemProfitTrackerConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigLink(owner = ItemProfitTrackerConfig::class, field = "enabled")
+    @ConfigLink(owner = SlayerProfitTrackerConfig::class, field = "enabled")
     var pos: Position = Position(20, 20, false, true)
 }

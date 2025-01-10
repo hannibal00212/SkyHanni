@@ -30,7 +30,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(name = "Item Profit Tracker", desc = "")
     @Accordion
-    var itemProfitTracker: ItemProfitTrackerConfig = ItemProfitTrackerConfig()
+    var itemProfitTracker: SlayerProfitTrackerConfig = SlayerProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Items on Ground", desc = "")
