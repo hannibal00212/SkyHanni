@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.command.CommandBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -93,7 +92,7 @@ object SkillAPI {
     var showDisplay = false
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return

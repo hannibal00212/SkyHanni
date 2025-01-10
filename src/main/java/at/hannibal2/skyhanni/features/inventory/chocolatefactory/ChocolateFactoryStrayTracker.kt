@@ -278,8 +278,8 @@ object ChocolateFactoryStrayTracker {
         return true
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)

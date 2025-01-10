@@ -102,8 +102,8 @@ object BeaconPower {
         config.beaconPowerPosition.renderString(display, posLabel = "Beacon Power")
     }
 
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         display = drawDisplay()
     }

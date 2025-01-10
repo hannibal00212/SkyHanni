@@ -89,7 +89,7 @@ object CrimsonMinibossRespawnTimer {
         config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         updateArea()
