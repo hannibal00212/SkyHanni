@@ -189,7 +189,7 @@ object GardenNextJacobContest {
         return diffA < 30.minutes || diffB < 30.minutes
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 

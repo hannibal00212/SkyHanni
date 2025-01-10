@@ -116,8 +116,7 @@ format like "- #821" to illustrate the dependency.
   - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
-- All new classes should be written in Kotlin, with a few exceptions:
-    - Config files in `at.hannibal2.skyhanni.config.features`
+- All new classes should be written in Kotlin, with one exception:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
@@ -125,8 +124,7 @@ format like "- #821" to illustrate the dependency.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
-    - Config files should still be made in Java.
+- JSON data objects are made in kotlin and put into the directory `at.hannibal2.skyhanni.data.jsonobjects`
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
