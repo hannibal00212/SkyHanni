@@ -115,7 +115,7 @@ object NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
