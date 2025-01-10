@@ -35,7 +35,7 @@ object DianaFixChat {
     private var lastGuessPoint = SimpleTimeMark.farPast()
     private var foundGuess = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastSpadeUse.passedSince() > 1.minutes) return
