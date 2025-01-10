@@ -290,6 +290,7 @@ object SkyHanniConfigSearchResetCommand {
                 newObj !is Double &&
                 newObj !is Position &&
                 newObj !is Map<*, *> &&
+                newObj !is List<*> &&
                 !newObj.javaClass.isEnum
             ) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))

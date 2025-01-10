@@ -17,7 +17,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HideArmor {
@@ -42,7 +41,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
@@ -60,7 +59,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return

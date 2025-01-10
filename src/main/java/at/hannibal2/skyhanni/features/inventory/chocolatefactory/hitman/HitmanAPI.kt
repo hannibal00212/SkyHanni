@@ -129,7 +129,9 @@ object HitmanAPI {
      * menu, and only gives cooldown timers...
      */
     fun HitmanStatsStorage.getOpenSlots(): Int {
-        val allSlotsCooldownDuration = allSlotsCooldownMark?.takeIfFuture()?.timeUntil() ?: return purchasedHitmanSlots
+        val allSlotsCooldownDuration = allSlotsCooldownMark?.takeIf {
+            it.isInFuture()
+        }?.timeUntil() ?: return purchasedHitmanSlots
         val slotsOnCooldown = ceil(allSlotsCooldownDuration.inPartialMinutes / MINUTES_PER_DAY).toInt()
         return purchasedHitmanSlots - slotsOnCooldown - availableHitmanEggs
     }
