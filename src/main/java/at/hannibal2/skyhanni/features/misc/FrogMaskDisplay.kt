@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -41,7 +42,7 @@ object FrogMaskDisplay {
         "§7Today's region: (?<region>.+)",
     )
 
-    private val frogMask by lazy { "FROG_MASK".asInternalName().getItemStack() }
+    private val frogMask by lazy { "FROG_MASK".toInternalName().getItemStack() }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -50,7 +51,7 @@ object FrogMaskDisplay {
         config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -59,7 +60,7 @@ object FrogMaskDisplay {
         if (region.second.isInFuture()) return
 
         val helmet = InventoryUtils.getHelmet() ?: return
-        if (helmet.getInternalName() != "FROG_MASK".asInternalName()) return
+        if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
 
         activeRegionPattern.matchAll(helmet.getLore()) {
             val nextRegion = group("region")
