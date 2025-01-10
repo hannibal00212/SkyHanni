@@ -45,9 +45,12 @@ import kotlin.time.Duration.Companion.seconds
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
+    var itemBaseStats = mapOf<NEUInternalName, Map<String, Int>>()
 
     private val missingRepoItems = mutableSetOf<String>()
     private var lastRepoWarning = SimpleTimeMark.farPast()
+
+    fun NEUInternalName.getBaseStats(): Map<String, Int> = itemBaseStats[this].orEmpty()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {

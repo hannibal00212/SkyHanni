@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig;
 import at.hannibal2.skyhanni.config.features.mining.caverns.DeepCavernsGuideConfig;
 import at.hannibal2.skyhanni.config.features.mining.dwarves.KingTalismanConfig;
 import at.hannibal2.skyhanni.config.features.mining.glacite.ColdOverlayConfig;
@@ -128,4 +129,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPrecisionMiningParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Tool Tweaks", desc = "")
+    @Accordion
+    public MiningToolTweaksConfig MiningToolTweaks = new MiningToolTweaksConfig();
+
 }

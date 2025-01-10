@@ -17,7 +17,7 @@ public class TooltipTweaksConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean compactToolTooltips = false;
+    public boolean compactToolTooltips = true;
 
     @Expose
     @ConfigOption(
