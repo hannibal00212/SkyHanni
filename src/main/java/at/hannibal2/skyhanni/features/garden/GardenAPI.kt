@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.addItemIcon
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -124,9 +123,8 @@ object GardenAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-        if (!inGarden()) return
         copperPattern.firstMatcher(event.added) {
             val newCopper = group("copper").formatLong()
             val difference = (newCopper - copper).toInt()

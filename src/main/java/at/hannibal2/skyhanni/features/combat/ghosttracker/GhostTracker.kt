@@ -212,8 +212,8 @@ object GhostTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
-        if (event.coins !in 200.0..2_000.0) return
-        tracker.addCoins(event.coins.toInt(), false)
+        if (event.oldCoins !in 200.0..2_000.0) return
+        tracker.addCoins(event.oldCoins.toInt(), false)
     }
 
     @SubscribeEvent

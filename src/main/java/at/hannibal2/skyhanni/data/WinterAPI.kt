@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.currency.CurrencyChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.Month
 
 @SkyHanniModule
@@ -33,9 +33,8 @@ object WinterAPI {
 
     fun isDecember() = TimeUtils.getCurrentLocalDate().month == Month.DECEMBER
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.WINTER)
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-        if (!inWorkshop()) return
         northstarsPattern.firstMatcher(event.added) {
             val newNorthStars = group("northstars").formatLong()
             val difference = (newNorthStars - northStars).toInt()
