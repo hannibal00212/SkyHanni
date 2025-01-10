@@ -68,7 +68,7 @@ object BingoCardDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasHiddenPersonalGoals) {
             update()
