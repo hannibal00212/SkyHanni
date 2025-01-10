@@ -11,7 +11,8 @@ class StorageRuleSetProvider : RuleSetProvider {
 
     override fun instance(config: Config): RuleSet {
         return RuleSet(ruleSetId, listOf(
-            EnforceConfigMutableCollections(config)
+            EnforceConfigMutableCollections(config),
+            EnforceStorageExpose(config)
         ))
     }
 }

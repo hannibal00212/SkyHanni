@@ -5,9 +5,9 @@ import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.Debt
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
+import io.gitlab.arturbosch.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.KtModifierListOwner
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 
@@ -20,7 +20,7 @@ class EnforceConfigMutableCollections(config: Config): SkyHanniRule(config) {
     )
 
     companion object {
-        private const val CONFIG_PACKAGE = "at.hannibal2.skyhanni.config.features"
+        const val CONFIG_PACKAGE = "at.hannibal2.skyhanni.config.features"
 
         private val badListInitializers = setOf(
             "listOf",
@@ -85,15 +85,5 @@ class EnforceConfigMutableCollections(config: Config): SkyHanniRule(config) {
         in badSetInitializers -> "mutableSetOf"
         in badMapInitializers -> "mutableMapOf"
         else -> ""
-    }
-
-    /**
-     * Helper function to check if a property has a specific annotation.
-     */
-    private fun KtModifierListOwner.hasAnnotation(annotationName: String): Boolean {
-        // shortName?.asString() should normally be 'Expose' even with @field:Expose
-        return annotationEntries.any {
-            it.shortName?.asString() == annotationName
-        }
     }
 }
