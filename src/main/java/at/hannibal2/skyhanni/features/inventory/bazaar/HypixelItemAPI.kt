@@ -28,14 +28,14 @@ class HypixelItemAPI {
             val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
-            val stats = mutableMapOf<NEUInternalName, Map<String, Int>>()
+            val allStats = mutableMapOf<NEUInternalName, Map<String, Int>>()
             for (item in itemsData.items) {
                 val neuItemId = NEUItems.transHypixelNameToInternalName(item.id ?: continue)
                 item.npcPrice?.let { list[neuItemId] = it }
                 item.motesPrice?.let { motesPrice[neuItemId] = it }
-                item.stats?.let { stats[neuItemId] = it }
+                item.stats?.let { stats -> allStats[neuItemId] = stats.mapKeys { it.key.lowercase() } }
             }
-            ItemUtils.itemBaseStats = stats
+            ItemUtils.itemBaseStats = allStats
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
