@@ -172,16 +172,16 @@
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.noselectedpower", "(?:§.)*Visit Maxwell in the Hub to learn", )</ID>
     <ID>RepoPatternRegexTest:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.thaumaturgy.data", "§(?&lt;color&gt;.)\\+(?&lt;amount&gt;[^ ]+)(?&lt;icon&gt;.) (?&lt;name&gt;.+)", )</ID>
     <ID>RepoPatternRegexTest:MinionCraftHelper.kt$MinionCraftHelper$by RepoPattern.pattern( "bingo.minion.name", "(?&lt;name&gt;.*) Minion (?&lt;number&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "jerry", "(?:\\[\\w+(?&lt;level&gt;\\d+)\\] )?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerry) \\d+ Hits", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.heavypearl.collect", "§.§lCOLLECT!", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.jerry.magma.cube", "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.petcare", "^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
-    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by repoGroup.pattern("filter.slayer", "^. (?&lt;name&gt;.*) (?&lt;tier&gt;[IV]+) \\d+.*")</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "jerry", "(?:\\[\\w+(?&lt;level&gt;\\d+)\\] )?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerry) \\d+ Hits", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.heavypearl.collect", "§.§lCOLLECT!", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.jerry.magma.cube", "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.petcare", "^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
+    <ID>RepoPatternRegexTest:MobFilter.kt$MobFilter$by patternGroup.pattern("filter.slayer", "^. (?&lt;name&gt;.*) (?&lt;tier&gt;[IV]+) \\d+.*")</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "gaiaconstruct", ".* §r§eYou dug out a §r§2Gaia Construct§r§e!", )</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoschampion", ".* §r§eYou dug out a §r§2Minos Champion§r§e!", )</ID>
     <ID>RepoPatternRegexTest:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minoshunter", ".* §r§eYou dug out a §r§2Minos Hunter§r§e!", )</ID>
@@ -221,7 +221,7 @@
     <ID>RepoPatternRegexTest:TabListReader.kt$TabListReader$by patternGroup.pattern( "winterpowerups", "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*" )</ID>
     <ID>RepoPatternRegexTest:TabListRenderer.kt$TabListRenderer$by RepoPattern.pattern( "tablist.firesaletitle", "§.§lFire Sales: §r§f\\([0-9]+\\)" )</ID>
     <ID>RepoPatternRegexTest:TeleportPadInventoryNumber.kt$TeleportPadInventoryNumber$by RepoPattern.pattern( "misc.teleportpad.number", "§.(?&lt;number&gt;.*) teleport pad" )</ID>
-    <ID>RepoPatternRegexTest:TerracottaPhase.kt$TerracottaPhase$by repoGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
+    <ID>RepoPatternRegexTest:TerracottaPhase.kt$TerracottaPhase$by patternGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
     <ID>RepoPatternRegexTest:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "dungeon", "§7Dungeon Score: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
     <ID>RepoPatternRegexTest:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "slayer", "§7Slayer XP: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
