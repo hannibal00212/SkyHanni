@@ -54,7 +54,7 @@ object NewYearCakeReminder {
         return playerSpecific.winter.cakeCollectedYear == SkyBlockTime.now().year
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.newYearCakeReminder) return
