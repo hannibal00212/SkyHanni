@@ -42,7 +42,7 @@ object TpsCounter {
     private val tilCalculated: String get() =
         "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (shouldIgnore()) {
             updateDisplay()

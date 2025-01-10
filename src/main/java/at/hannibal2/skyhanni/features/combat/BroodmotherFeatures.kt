@@ -159,7 +159,7 @@ object BroodmotherFeatures {
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 
