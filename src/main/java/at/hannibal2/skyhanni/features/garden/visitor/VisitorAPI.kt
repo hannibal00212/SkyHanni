@@ -238,6 +238,6 @@ object VisitorAPI {
         EXPENSIVE_COPPER("§cExpensive copper", false),
         LOW_LOSS("§aLow Loss", true),
         HIGH_LOSS("§cHigh Loss", false),
-        NO_RABBIT("§cNo Rabbit", false)
+        NO_RABBIT("§cNo Rabbit", false),
     }
 }
