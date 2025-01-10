@@ -263,7 +263,7 @@ object HoppityEventSummary {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         checkLbUpdateWarning()
