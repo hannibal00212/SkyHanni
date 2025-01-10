@@ -55,7 +55,7 @@ class PowderMiningFilterConfig {
     @Expose
     @ConfigOption(name = "Common Items", desc = "Hide reward messages for listed items.")
     @ConfigEditorDraggableList
-    var simplePowderMiningTypes: List<SimplePowderMiningRewardTypes> = listOf(
+    var simplePowderMiningTypes: List<SimplePowderMiningRewardTypes> = mutableListOf(
         SimplePowderMiningRewardTypes.ASCENSION_ROPE,
         SimplePowderMiningRewardTypes.WISHING_COMPASS,
         SimplePowderMiningRewardTypes.OIL_BARREL,
