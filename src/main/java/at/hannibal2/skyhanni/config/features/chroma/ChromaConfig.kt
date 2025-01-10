@@ -59,7 +59,7 @@ class ChromaConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all chroma settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    var resetSettings: Runnable = Runnable { ChromaManager::resetChromaSettings }
+    var resetSettings: Runnable = Runnable { ChromaManager.resetChromaSettings() }
 
     @Expose
     @ConfigOption(
