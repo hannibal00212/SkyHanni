@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorLeftEvent
@@ -220,17 +221,19 @@ object VisitorAPI {
             preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice -> VisitorBlockReason.EXPENSIVE_COPPER
             preventRefusingLowLoss && loss <= coinsLossThreshold -> VisitorBlockReason.LOW_LOSS
             preventAcceptingHighLoss && loss > coinsLossThreshold -> VisitorBlockReason.HIGH_LOSS
-
+            preventAcceptingWithoutRabbit && !PetAPI.isCurrentPet("Rabbit") -> VisitorBlockReason.NO_RABBIT
             else -> null
         }
     }
 
-    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) {
+    enum class VisitorBlockReason(val description: String, val blockRefusing: Boolean) // false = block accepting, true = block refusing
+    {
         NEVER_ACCEPTED("§cNever accepted", true),
         RARE_REWARD("§aRare visitor reward found", true),
         CHEAP_COPPER("§aCheap copper", true),
         EXPENSIVE_COPPER("§cExpensive copper", false),
         LOW_LOSS("§aLow Loss", true),
-        HIGH_LOSS("§cHigh Loss", false)
+        HIGH_LOSS("§cHigh Loss", false),
+        NO_RABBIT("§cNo Rabbit", false);
     }
 }
