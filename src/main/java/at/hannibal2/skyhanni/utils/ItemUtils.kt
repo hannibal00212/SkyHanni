@@ -50,7 +50,7 @@ object ItemUtils {
     private val missingRepoItems = mutableSetOf<String>()
     private var lastRepoWarning = SimpleTimeMark.farPast()
 
-    fun NEUInternalName.getBaseStats(): Map<String, Int> = itemBaseStats[this] ?: emptyMap()
+    fun NEUInternalName.getBaseStats(): Map<String, Int> = itemBaseStats[this].orEmpty()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
