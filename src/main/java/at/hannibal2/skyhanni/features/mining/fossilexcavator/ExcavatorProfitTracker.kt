@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -211,7 +210,7 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest

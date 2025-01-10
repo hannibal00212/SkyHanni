@@ -40,7 +40,7 @@ object ChocolateFactoryTooltipCompact {
         onCompactClick(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.tooltipMove) {

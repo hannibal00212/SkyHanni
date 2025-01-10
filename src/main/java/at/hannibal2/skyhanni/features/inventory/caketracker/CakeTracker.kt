@@ -177,7 +177,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()

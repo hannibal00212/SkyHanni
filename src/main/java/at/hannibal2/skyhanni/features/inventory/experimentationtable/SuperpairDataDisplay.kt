@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
@@ -55,8 +54,8 @@ object SuperpairDataDisplay {
         found.clear()
     }
 
-    @SubscribeEvent
-    fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.

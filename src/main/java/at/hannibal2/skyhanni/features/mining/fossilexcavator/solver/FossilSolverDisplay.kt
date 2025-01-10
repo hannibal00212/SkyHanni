@@ -191,7 +191,7 @@ object FossilSolverDisplay {
         event.offsetY = 10
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

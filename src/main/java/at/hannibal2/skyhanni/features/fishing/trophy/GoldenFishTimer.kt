@@ -180,7 +180,7 @@ object GoldenFishTimer {
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         config.position.renderRenderable(display, posLabel = "Golden Fish Timer")

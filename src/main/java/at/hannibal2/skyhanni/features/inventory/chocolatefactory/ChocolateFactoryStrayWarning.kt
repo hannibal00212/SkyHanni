@@ -30,8 +30,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
 @SkyHanniModule
@@ -158,8 +156,8 @@ object ChocolateFactoryStrayWarning {
         flashScreen = false
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()

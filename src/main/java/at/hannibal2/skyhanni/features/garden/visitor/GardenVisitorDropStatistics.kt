@@ -317,7 +317,7 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!GardenAPI.inGarden()) return
