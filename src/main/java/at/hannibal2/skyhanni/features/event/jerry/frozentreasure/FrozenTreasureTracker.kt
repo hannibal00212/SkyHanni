@@ -77,7 +77,7 @@ object FrozenTreasureTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onJerryWorkshop()) return
 
