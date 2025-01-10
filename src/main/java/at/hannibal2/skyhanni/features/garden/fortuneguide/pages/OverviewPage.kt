@@ -31,7 +31,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             0,
             FFInfos.UNIVERSAL.bar(
                 "§6Universal Farming Fortune",
-                "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page",
+                "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
+                    "§eSee on the grass block page",
             ),
         )
 
@@ -57,7 +58,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.GARDEN_PLOTS.bar(
                 "§2Garden Plots",
-                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n" + "§eOpen /desk and view your plots to set it!"
+                if (FFTypes.PLOTS.notSaved()) "§cUnlocked plot count not saved\n" +
+                    "§eOpen /desk and view your plots to set it!"
                 else "§7§2Fortune for unlocking garden plots\n§2You get 3☘ per plot unlocked",
             ),
         )
@@ -75,7 +77,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.COMMUNITY_SHOP.bar(
                 "§2Community upgrades",
-                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n" + "§eVisit Elizabeth to set it!"
+                if (FFTypes.COMMUNITY_SHOP.notSaved()) "§cCommunity upgrade level not saved\n" +
+                    "§eVisit Elizabeth to set it!"
                 else "§7§2Fortune for community shop upgrades\n§2You get 4☘ per upgrade tier",
             ),
         )
@@ -85,11 +88,15 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.CAKE_BUFF.bar(
                 "§2Cake Buff",
                 when {
-                    FFStats.cakeExpireTime.isFarPast() -> "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
+                    FFStats.cakeExpireTime.isFarPast() ->
+                        "§eYou have not eaten a cake since\n§edownloading this update, assuming the\n§ebuff is active!"
 
-                    FFStats.cakeExpireTime.isInPast() -> "§cYour cake buff has run out\nGo eat some cake!"
+                    FFStats.cakeExpireTime.isInPast() ->
+                        "§cYour cake buff has run out\nGo eat some cake!"
 
-                    else -> "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n" + "§2Time until cake buff runs out: $timeUntilCakes"
+                    else ->
+                        "§7§2Fortune for eating cake\n§2You get 5☘ for eating cake\n" +
+                            "§2Time until cake buff runs out: $timeUntilCakes"
                 },
             ),
         )
