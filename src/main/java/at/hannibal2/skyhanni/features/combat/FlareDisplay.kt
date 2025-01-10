@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -80,8 +81,8 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondsPassed(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         flares.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {

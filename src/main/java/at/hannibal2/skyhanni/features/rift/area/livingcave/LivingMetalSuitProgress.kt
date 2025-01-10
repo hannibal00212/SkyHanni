@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -61,7 +62,7 @@ object LivingMetalSuitProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val old = progressMap
