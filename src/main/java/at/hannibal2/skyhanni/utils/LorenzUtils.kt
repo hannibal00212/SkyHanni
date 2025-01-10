@@ -225,34 +225,6 @@ object LorenzUtils {
         }
     }
 
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
-    inline fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        add(
-            buildList {
-                add(prefix)
-                add("§a[")
-                if (tips.isEmpty()) {
-                    add(Renderable.link("§e$getName", false, onClick))
-                } else {
-                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                }
-                add("§a]")
-            },
-        )
-    }
-
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
