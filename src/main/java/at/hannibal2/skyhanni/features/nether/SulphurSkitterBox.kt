@@ -42,7 +42,7 @@ object SulphurSkitterBox {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         calculateSpongeLocations()

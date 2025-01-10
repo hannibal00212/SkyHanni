@@ -25,7 +25,7 @@ object RiftLarva {
 
     private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 

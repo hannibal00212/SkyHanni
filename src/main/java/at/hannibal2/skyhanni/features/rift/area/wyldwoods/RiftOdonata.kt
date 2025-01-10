@@ -24,7 +24,7 @@ object RiftOdonata {
     private val ODONATA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_ODONATA") }
     private val emptyBottle = "EMPTY_ODONATA_BOTTLE".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
