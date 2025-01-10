@@ -70,7 +70,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     companion object {
         var display: Renderable? = null
 
-        @SubscribeEvent
+        @HandleEvent
         fun onSecondPassed(event: SecondPassedEvent) {
             if (!isEnabled()) return
             with(config) {
