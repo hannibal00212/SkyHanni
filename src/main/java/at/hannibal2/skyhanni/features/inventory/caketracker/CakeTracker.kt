@@ -250,7 +250,7 @@ object CakeTracker {
         searchingForCakes = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val sbTimeNow = SkyBlockTime.now()
