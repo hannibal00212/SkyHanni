@@ -217,6 +217,7 @@ object CustomScoreboard {
             .filter { it.showIsland() }
             .flatMap { it.elementPatterns }
             .distinct()
+        activePatterns += ScoreboardPattern.brokenPatterns
     }
 
     @HandleEvent
