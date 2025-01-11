@@ -101,7 +101,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.REPUTATION)) return
 
-        TabWidget.REPUTATION.matchMatcherFirstLine() {
+        TabWidget.REPUTATION.matchMatcherFirstLine {
             factionType = FactionType.fromName(group("faction"))
         }
     }
