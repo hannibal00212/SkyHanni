@@ -162,11 +162,15 @@ object ComputerEnvDebug {
 
         var important = false
         if (maxMemoryMB < 3_500) {
-            text.add(0, "Less than 3.5 GB of RAM! Change this! (Only ${maxMemoryMB.addSeparators()} MB RAM)")
+            text.add(
+                0,
+                "Minecraft has less than 3.5 GB of RAM to work with! Change this to 4-6GB! " +
+                    "(Currently at ${maxMemoryMB.addSeparators()} MB RAM)",
+            )
             important = true
         }
         if (usedPhysicalPercentage > 90) {
-            text.add(0, "Less than 10% of system memory free! ($usedPhysicalPercentage% used)")
+            text.add(0, "The computer has less than 10% of system memory free! ($usedPhysicalPercentage% used)")
             important = true
         }
 
