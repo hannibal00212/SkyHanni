@@ -509,4 +509,23 @@ object CollectionUtils {
     fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
         this[pair.first] = pair.second
     }
+
+    fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
+        val iterator = this.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+            }
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {
+        val iterator = this.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next().key)) {
+                iterator.remove()
+            }
+        }
+    }
+
 }
