@@ -20,5 +20,5 @@ class ChatSoundResponseConfig {
     @Expose
     @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.")
     @ConfigEditorDraggableList
-    var soundResponses = mutableListOf(SoundResponseTypes.entries)
+    var soundResponses = SoundResponseTypes.entries.toMutableList()
 }
