@@ -44,10 +44,15 @@ enum class SkyblockStat(
         hypxelId = "CRITICAL_CHANCE",
     ),
     FEROCITY("§c⫽", " Ferocity: §r§c⫽(?<value>\\d+)(?: .*)?", " §c⫽ Ferocity §f(?<value>\\d+)(?: .*)?"),
-    BONUS_ATTACK_SPEED("§e⚔", " Attack Speed: §r§e⚔(?<value>\\d+)(?: .*)?", " §e⚔ Bonus Attack Speed §f(?<value>\\d+)(?: .*)?"),
+    BONUS_ATTACK_SPEED(
+        "§e⚔",
+        " Attack Speed: §r§e⚔(?<value>\\d+)(?: .*)?",
+        " §e⚔ Bonus Attack Speed §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "ATTACK_SPEED",
+    ),
     ABILITY_DAMAGE(
         "§c๑", " Ability Damage: §r§c๑(?<value>\\d+)(?: .*)?", " §c๑ Ability Damage §f(?<value>\\d+)(?: .*)?",
-        hypxelId = "WEAPON_ABILITY_DAMAGE",
+        hypxelId = "ABILITY_DAMAGE_PERCENT",
     ),
     HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>\\d+)(?: .*)?", " §c❣ Health Regen §f(?<value>\\d+)(?: .*)?", "HEALTH_REGENERATION"),
     VITALITY("§4♨", " Vitality: §r§4♨(?<value>\\d+)(?: .*)?", " §4♨ Vitality §f(?<value>\\d+)(?: .*)?"),
@@ -64,6 +69,7 @@ enum class SkyblockStat(
     MAGIC_FIND("§b✯", " Magic Find: §r§b✯(?<value>\\d+)(?: .*)?", " §b✯ Magic Find §f(?<value>\\d+)(?: .*)?"),
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>\\d+)(?: .*)?", " §d♣ Pet Luck §f(?<value>\\d+)(?: .*)?"),
     FISHING_SPEED("§b☂", " Fishing Speed: §r§b☂(?<value>\\d+)(?: .*)?", " §b☂ Fishing Speed §f(?<value>\\d+)(?: .*)?"),
+    TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔(?<value>\\d+)(?: .*)?", " §6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>\\d+)(?: .*)?", ""),
     BONUS_PEST_CHANCE(
         "§2ൠ",
