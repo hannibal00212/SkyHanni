@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLo
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -45,7 +45,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     var factionType = FactionType.NONE
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var dirty = true
     var tabListQuestsMissing = false
 
@@ -121,23 +121,28 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     private fun updateRender() {
-        val newList = mutableListOf<List<Any>>()
+        display = buildList {
+            addString("§e§lReputation Helper")
+            if (factionType == FactionType.NONE) {
+                addString("§cFaction not found!")
+                return
+            }
 
-        // TODO test
-        if (factionType == FactionType.NONE) return
-
-        newList.addAsSingletonList("§e§lReputation Helper")
-        if (tabListQuestsMissing) {
-            newList.addAsSingletonList("§cFaction Quests Widget not found!")
-            newList.addAsSingletonList("§7Open §e/tab §7and enable it!")
-        } else {
-            questHelper.render(newList)
-            miniBossHelper.render(newList)
-            kuudraBossHelper.render(newList)
+            if (tabListQuestsMissing) {
+                addString("§cFaction Quests Widget not found!")
+                addString("§7Open §e/tab §7and enable it!")
+            } else {
+                questHelper.run {
+                    addQuests()
+                }
+                miniBossHelper.run {
+                    addDailyMiniBoss()
+                }
+                kuudraBossHelper.run {
+                    addKuudraBoss()
+                }
+            }
         }
-
-
-        display = newList
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -149,7 +154,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             return
         }
 
-        config.position.renderStringsAndItems(
+        config.position.renderRenderables(
             display,
             posLabel = "Crimson Isle Reputation Helper",
         )

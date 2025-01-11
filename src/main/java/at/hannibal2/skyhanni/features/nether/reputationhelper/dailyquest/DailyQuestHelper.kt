@@ -29,7 +29,8 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -45,6 +46,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -227,23 +229,23 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
-    fun render(display: MutableList<List<Any>>) {
+    fun MutableList<Renderable>.addQuests() {
         if (greatSpook) {
-            display.addAsSingletonList("")
-            display.addAsSingletonList("§7Daily Quests (§cdisabled§7)")
-            display.addAsSingletonList(" §5§lThe Great Spook §7happened :O")
+            addString("")
+            addString("§7Daily Quests (§cdisabled§7)")
+            addString(" §5§lThe Great Spook §7happened :O")
             return
         }
         val done = quests.count { it.state == QuestState.COLLECTED }
-        display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
+        addString("")
+        addString("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
             val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
-            filteredQuests.mapTo(display) { renderQuest(it) }
+            addAll(filteredQuests.map { renderQuest(it) })
         }
     }
 
-    private fun renderQuest(quest: Quest): List<Any> {
+    private fun renderQuest(quest: Quest): Renderable {
         val category = quest.category
         val state = quest.state.displayName
         val stateColor = quest.state.color
@@ -275,7 +277,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        val result = mutableListOf<Any>()
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
@@ -287,10 +288,13 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        result.add("  $stateText$categoryName: ")
-        result.add(item)
-        result.add("§f$displayName$progressText$sacksText")
-        return result
+        return Renderable.horizontalContainer(
+            buildList {
+                addString("  $stateText$categoryName: ")
+                addItemStack(item)
+                addString("§f$displayName$progressText$sacksText")
+            },
+        )
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
