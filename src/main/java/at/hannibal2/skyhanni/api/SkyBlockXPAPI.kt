@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -50,7 +49,7 @@ object SkyBlockXPAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
-        TabWidget.SB_LEVEL.matchMatcherFirstLine(){
+        TabWidget.SB_LEVEL.matchMatcherFirstLine() {
             level = group("level")?.toIntOrNull()
             xp = group("xp")?.toIntOrNull()
         }
