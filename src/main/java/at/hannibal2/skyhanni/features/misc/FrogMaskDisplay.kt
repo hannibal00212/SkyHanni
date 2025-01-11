@@ -28,9 +28,10 @@ object FrogMaskDisplay {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private var display = Renderable.verticalContainer(listOf())
+    private var display: Renderable? = null
 
-    private var region: Pair<String, SimpleTimeMark> = "" to SimpleTimeMark.farPast()
+    private var currentRegion: String? = null
+    private var timeRemaining = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("misc.frogmask")
 
@@ -46,7 +47,7 @@ object FrogMaskDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() && display != null) return
 
         config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
     }
@@ -55,31 +56,32 @@ object FrogMaskDisplay {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        display = if (region.first.isNotEmpty()) updateDisplay() else Renderable.verticalContainer(listOf())
-
-        if (region.second.isInFuture()) return
+        if (timeRemaining.isInFuture()) return
 
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
 
         activeRegionPattern.matchAll(helmet.getLore()) {
-            val nextRegion = group("region")
+            currentRegion = group("region")
             val now = SkyBlockTime.now()
-            val nextRegionTime = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-
-            region = nextRegion to nextRegionTime
+            timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+        } ?: run {
+            currentRegion = null
+            timeRemaining = SimpleTimeMark.farPast()
         }
+
+        display = if (currentRegion != null) updateDisplay() else null
     }
 
     private fun updateDisplay(): Renderable {
-        val until = region.second.timeUntil()
+        val until = timeRemaining.timeUntil()
         val timeString = until.format()
 
         return Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(frogMask),
                 Renderable.string(
-                    "§5Frog Mask§6 - ${region.first} §6for §e$timeString",
+                    "§5Frog Mask§6 - $currentRegion §6for §e$timeString",
                 ),
             ),
             spacing = 1,
