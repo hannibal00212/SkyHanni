@@ -63,7 +63,7 @@ object ItemUtils {
         for ((internalName, rawStats) in allRawStats) {
             val stats = mutableMapOf<SkyblockStat, Int>()
             for ((rawStat, value) in rawStats) {
-                val stat = SkyblockStat.getValueOrNull(rawStat)
+                val stat = SkyblockStat.getValueOrNull(rawStat.uppercase())
                 if (stat == null) {
                     unknownStats["`$rawStat`"] = "on '$internalName'"
                 } else {
