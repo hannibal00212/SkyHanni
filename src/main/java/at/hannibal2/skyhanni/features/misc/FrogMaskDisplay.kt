@@ -47,7 +47,7 @@ object FrogMaskDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() && display != null) return
+        if (!isEnabled() && currentRegion != null) return
 
         config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
     }
@@ -55,6 +55,7 @@ object FrogMaskDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+        currentRegion = null
 
         if (timeRemaining.isInFuture()) return
 
@@ -65,9 +66,6 @@ object FrogMaskDisplay {
             currentRegion = group("region")
             val now = SkyBlockTime.now()
             timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-        } ?: run {
-            currentRegion = null
-            timeRemaining = SimpleTimeMark.farPast()
         }
 
         display = if (currentRegion != null) updateDisplay() else null
