@@ -93,7 +93,9 @@ object ItemUtils {
         itemBaseStats = allItems
     }
 
+    // Might not contain all actual item stats, compare with getRawBaseStats()
     fun NEUInternalName.getBaseStats(): Map<SkyblockStat, Int> = itemBaseStats[this].orEmpty()
+
     fun NEUInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
     @HandleEvent
