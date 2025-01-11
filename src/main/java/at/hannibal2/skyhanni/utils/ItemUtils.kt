@@ -65,7 +65,7 @@ object ItemUtils {
             for ((rawStat, value) in rawStats) {
                 val stat = SkyblockStat.getValueOrNull(rawStat.uppercase())
                 if (stat == null) {
-                    unknownStats["`$rawStat`"] = "on '$internalName'"
+                    unknownStats[rawStat.uppercase()] = "on ${internalName.asString()}"
                 } else {
                     stats[stat] = value
                 }
