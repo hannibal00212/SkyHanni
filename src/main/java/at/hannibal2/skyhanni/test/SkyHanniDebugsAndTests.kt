@@ -56,7 +56,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -71,9 +70,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
-import java.lang.management.ManagementFactory
-import kotlin.math.roundToInt
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -143,52 +139,6 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("EmptyFunctionBlock")
     private fun asyncTest(args: Array<String>) {
-        val runtime = Runtime.getRuntime()
-        // Retrieve memory values in bytes
-        val totalMemory = runtime.totalMemory() // Total memory currently allocated to JVM
-        val maxMemory = runtime.maxMemory() // Maximum memory JVM can use
-        val freeMemory = runtime.freeMemory() // Free memory within currently allocated memory
-        val usedMemory = totalMemory - freeMemory // Memory currently in use
-
-        // Calculate percentages
-        val allocatedPercentage = (totalMemory.toDouble() / maxMemory * 100).toInt() // Allocated percentage
-        val usedPercentage = (usedMemory.toDouble() / maxMemory * 100).toInt() // Used percentage
-
-        // Convert memory values to MB for readability
-        val totalMemoryMB = totalMemory / (1024 * 1024)
-        val maxMemoryMB = maxMemory / (1024 * 1024)
-        val usedMemoryMB = usedMemory / (1024 * 1024)
-
-        // Clear the console (optional, for better readability)
-        println("Mem: $usedPercentage% ${usedMemoryMB.addSeparators()}/${maxMemoryMB.addSeparators()} MB")
-        println("Allocated: $allocatedPercentage% ${totalMemoryMB.addSeparators()} MB")
-        println(" ")
-
-        if (maxMemoryMB < 3_500) {
-            println("Less than 3.5 GB of RAM! Change this! (Only ${maxMemoryMB.addSeparators()} MB RAM)")
-        }
-        println(" ")
-
-        // Get total system memory using OS-specific APIs
-        val osBean = ManagementFactory.getOperatingSystemMXBean()
-        val totalPhysicalMemory = (osBean as com.sun.management.OperatingSystemMXBean).totalPhysicalMemorySize
-        val freePhysicalMemory = osBean.freePhysicalMemorySize
-        val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
-
-
-        // Convert system memory to MB
-        val totalPhysicalMB = totalPhysicalMemory / (1024 * 1024)
-        val usedPhysicalMB = usedPhysicalMemory / (1024 * 1024)
-        val usedPhysicalPercentage = (usedPhysicalMemory.toDouble() / totalPhysicalMemory * 100).roundToInt()
-
-        // System Memory Usage
-        println("System Mem: $usedPhysicalPercentage% ${usedPhysicalMB.addSeparators()} / ${totalPhysicalMB.addSeparators()} MB")
-
-
-        println(" ")
-        val uptimeMillis = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
-        println("Uptime: ${uptimeMillis.format()}")
-
     }
 
     fun findNullConfig(args: Array<String>) {
