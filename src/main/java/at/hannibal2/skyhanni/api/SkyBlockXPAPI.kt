@@ -50,7 +50,7 @@ object SkyBlockXPAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
-        event.widget.pattern.firstMatcher(event.lines) {
+        TabWidget.SB_LEVEL.matchMatcherFirstLine(){
             level = group("level")?.toIntOrNull()
             xp = group("xp")?.toIntOrNull()
         }
