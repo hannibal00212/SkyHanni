@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -177,7 +179,7 @@ object ComputerEnvDebug {
 
     private fun uptime(event: DebugDataCollectEvent) {
         event.title("Minecraft Uptime")
-        val uptime = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+        val uptime = getUptime()
         val info = "The game is running for ${uptime.format()}"
         if (uptime > 5.hours) {
             event.addData {
@@ -186,6 +188,20 @@ object ComputerEnvDebug {
             }
         } else {
             event.addIrrelevant(info)
+        }
+    }
+
+    private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shuptime") {
+            description = "Shows the time since the start of minecraft"
+            category = CommandCategory.USERS_RESET
+            callback {
+                val uptime = getUptime()
+                ChatUtils.chat("Minecraft is running for §b${uptime.format()}§e.")
+            }
         }
     }
 }
