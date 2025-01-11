@@ -11,10 +11,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
-class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) :
-    GuideTablePage(
-        sizeX, sizeY, paddingX, paddingY, footerSpacing,
-    ) {
+class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7, footerSpacing: Int = 6) : GuideTablePage(
+    sizeX, sizeY, paddingX, paddingY, footerSpacing,
+) {
 
     override fun onEnter() {
         val (content, footer) = getPage()
@@ -209,20 +208,17 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        footer.add(
-            Renderable.horizontalContainer(
-                FarmingItems.getPetsDisplay(true),
-                4,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ),
+        val petFooter = Renderable.horizontalContainer(
+            FarmingItems.getPetsDisplay(true),
+            4,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
         footer.add(
             FFInfos.TOTAL_PET.bar(
                 "§2Total Pet Fortune",
                 "§7§2The total fortune from your pet and its item",
-                72,
             ),
         )
 
@@ -230,7 +226,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.PET_BASE.bar(
                 "§2Base Pet Fortune",
                 "§7§2The base fortune from your pet",
-                72,
             ),
         )
 
@@ -243,7 +238,6 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                     "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
                     else -> "No fortune boosting pet item"
                 },
-                72,
             ),
         )
 
@@ -268,7 +262,21 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             ),
         )
 
-        return content to footer
+        val realFooter = Renderable.verticalContainer(
+            listOf(
+                petFooter,
+                Renderable.horizontalContainer(
+                    footer,
+                    spacing = 15,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER, verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ),
+            ),
+            spacing = 2,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        )
+
+        return content to listOf(realFooter)
     }
 
     private fun FFTypes.notSaved(): Boolean = FFStats.baseFF[this]?.let {

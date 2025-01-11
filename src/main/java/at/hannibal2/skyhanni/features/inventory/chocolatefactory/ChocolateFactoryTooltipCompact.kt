@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -28,7 +29,7 @@ object ChocolateFactoryTooltipCompact {
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
                 lastHover = SimpleTimeMark.now()
-                tooltipToHover = event.toolTip.toList()
+                tooltipToHover = event.toolTip.toList().map { it.partyModeReplace() }
                 event.cancel()
             } else {
                 lastHover = SimpleTimeMark.farPast()
