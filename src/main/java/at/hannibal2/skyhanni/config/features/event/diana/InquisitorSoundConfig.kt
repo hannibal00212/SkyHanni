@@ -21,10 +21,12 @@ class InquisitorSoundConfig {
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
-    var testSound : Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
+    var testSound: Runnable = Runnable { InquisitorWaypointShare.playUserSound() }
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
     var listOfSounds: Runnable =
-        Runnable { openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments") }
+        Runnable {
+            openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments")
+        }
 }
