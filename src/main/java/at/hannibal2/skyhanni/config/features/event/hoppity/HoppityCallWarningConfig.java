@@ -44,7 +44,7 @@ public class HoppityCallWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    public Runnable sounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
+    public Runnable sounds = OSUtils::openSoundsListInBrowser;
 
     @Expose
     @ConfigOption(name = "Ensure Coins Pre-Trade", desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse.")
