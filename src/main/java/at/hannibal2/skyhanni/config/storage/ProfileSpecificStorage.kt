@@ -753,5 +753,6 @@ class ProfileSpecificStorage {
     }
 
     @Expose
+    @Suppress("PropertyWrapping")
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
 }
