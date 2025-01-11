@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
+import at.hannibal2.skyhanni.config.features.garden.keybinds.KeyBindConfig;
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
@@ -38,8 +39,7 @@ public class GardenConfig {
 
     // TODO moulconfig runnable support
     @Expose
-    @ConfigOption(name = "Custom Keybinds", desc = "")
-    @Accordion
+    @Category(name = "Custom Keybinds", desc = "Custom Keybind Settings")
     public KeyBindConfig keyBind = new KeyBindConfig();
 
     @Expose
