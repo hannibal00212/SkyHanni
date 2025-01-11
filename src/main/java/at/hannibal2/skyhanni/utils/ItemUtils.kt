@@ -79,6 +79,7 @@ object ItemUtils {
                 "found $name via Hypixel Item API that are not in enum SkyblockStat",
                 // TODO logErrorStateWithData should accept a map of extra data directly
                 extraData = unknownStats.map { it.key to it.value }.toTypedArray(),
+                betaOnly = true,
             )
         }
         itemBaseStats = allItems
