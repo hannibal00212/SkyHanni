@@ -107,7 +107,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.loadFromTabList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
