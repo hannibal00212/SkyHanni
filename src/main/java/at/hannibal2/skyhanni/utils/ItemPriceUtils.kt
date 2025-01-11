@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -92,7 +92,7 @@ object ItemPriceUtils {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        return BazaarDataHolder.getNpcPrice(this)
+        return HypixelItemAPI.getNpcPrice(this)
     }
 
     fun debugItemPrice(args: Array<String>) {

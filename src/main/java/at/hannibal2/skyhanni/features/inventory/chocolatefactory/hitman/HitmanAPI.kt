@@ -64,7 +64,7 @@ object HitmanAPI {
      */
     private fun getNextHuntedMeal(
         previousMeal: HoppityEggType,
-        duration: Duration
+        duration: Duration,
     ): HoppityEggType = sortedEntries
         .filter { it.willBeClaimableAfter(duration) }
         .let { passingEggs ->
