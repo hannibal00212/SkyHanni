@@ -168,6 +168,13 @@ object ComputerEnvDebug {
                     "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
             )
             important = true
+        } else if (maxMemoryGB > 6) {
+            text.add("")
+            text.add(
+                "Minecraft has more than 6 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
+            )
+            important = true
         }
         if (usedPhysicalPercentage > 90) {
             text.add("")
