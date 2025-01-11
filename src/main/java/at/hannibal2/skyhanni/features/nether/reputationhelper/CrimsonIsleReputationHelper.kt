@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -102,7 +101,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.REPUTATION)) return
 
-        TabWidget.REPUTATION.matchMatcherFirstLine(){
+        TabWidget.REPUTATION.matchMatcherFirstLine() {
             factionType = FactionType.fromName(group("faction"))
         }
     }
