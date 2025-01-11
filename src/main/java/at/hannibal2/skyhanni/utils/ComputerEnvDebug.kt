@@ -175,9 +175,9 @@ object ComputerEnvDebug {
         }
 
         if (important) {
-            event.addIrrelevant(text)
-        } else {
             event.addData(text)
+        } else {
+            event.addIrrelevant(text)
         }
     }
 
