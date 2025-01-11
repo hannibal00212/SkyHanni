@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -24,6 +26,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -95,6 +98,15 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         dirty = true
     }
 
+    @HandleEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.REPUTATION)) return
+
+        event.widget.pattern.firstMatcher(event.lines) {
+            factionType = FactionType.fromName(group("faction"))
+        }
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
@@ -105,19 +117,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (dirty) {
             dirty = false
             updateRender()
-        }
-
-        if (event.repeatSeconds(3)) {
-            val list = TabListData.getTabList().filter { it.contains("Reputation:") }
-            for (line in list) {
-                factionType = if (line.contains("Mage")) {
-                    FactionType.MAGE
-                } else if (line.contains("Barbarian")) {
-                    FactionType.BARBARIAN
-                } else {
-                    FactionType.NONE
-                }
-            }
         }
     }
 
