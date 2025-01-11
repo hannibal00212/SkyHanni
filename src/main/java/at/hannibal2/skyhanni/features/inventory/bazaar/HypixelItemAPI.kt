@@ -33,14 +33,14 @@ class HypixelItemAPI {
                 val neuItemId = NEUItems.transHypixelNameToInternalName(item.id ?: continue)
                 item.npcPrice?.let { list[neuItemId] = it }
                 item.motesPrice?.let { motesPrice[neuItemId] = it }
-                item.stats?.let { stats -> allStats[neuItemId] = stats.mapKeys { it.key.lowercase() } }
+                item.stats?.let { stats -> allStats[neuItemId] = stats }
             }
-            ItemUtils.itemBaseStats = allStats
+            ItemUtils.updateBaseStats(allStats)
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error getting npc sell prices",
-                "hypixelApiResponse" to apiResponse
+                "hypixelApiResponse" to apiResponse,
             )
         }
         return list
