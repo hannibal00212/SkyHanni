@@ -25,6 +25,7 @@ class InquisitorSoundConfig {
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
+    @Suppress("MaxLineLength")
     var listOfSounds: Runnable =
         Runnable {
             openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments")
