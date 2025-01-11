@@ -82,13 +82,9 @@ object HitmanAPI {
         var huntsToPerform = (targetHuntCount - availableHitmanEggs)
         if (huntsToPerform <= 0) return Duration.ZERO
 
-        // Store the initial meal to hunt
-        var nextHuntMeal = getFirstHuntedMeal()
-        huntsToPerform-- // -1 to account for the initial meal
-
         // Determine which pre-available meals we have, to determine better the first hunt
         val initialClaimable = sortedEntries.filter {
-            !it.isClaimed() && it != nextHuntMeal
+            !it.isClaimed()
         }.sortedBy {
             it.timeUntil()
         }.toMutableList()
@@ -96,10 +92,14 @@ object HitmanAPI {
         // If the claimable eggs will cover the number of hunts we need to perform, just return the time until the last meal
         if (huntsToPerform <= initialClaimable.size) return initialClaimable.take(huntsToPerform).last().timeUntil()
 
-        nextHuntMeal = initialClaimable.take(initialClaimable.size).maxByOrNull {
+        // Determine the next (first) meal to hunt
+        var nextHuntMeal = initialClaimable.maxByOrNull {
             it.timeUntil()
-        } ?: nextHuntMeal
-        huntsToPerform -= initialClaimable.size // -X to account for the initial meals we can claim
+        } ?: getFirstHuntedMeal()
+
+        // -1 as default to account for the initial meal
+        val initialRemoval = initialClaimable.size.takeIf { it > 0 } ?: 1
+        huntsToPerform -= initialRemoval
 
         // Will store the total time until the given number of meals can be hunted
         var tilSpawnDuration =
