@@ -54,7 +54,7 @@ object CrownOfAvariceCounter {
         render?.let { config.position.renderRenderable(it, posLabel = "Crown of Avarice Counter") }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return
