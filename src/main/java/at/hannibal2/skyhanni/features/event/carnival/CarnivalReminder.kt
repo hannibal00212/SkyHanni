@@ -56,8 +56,8 @@ object CarnivalReminder {
         "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
     )
 
-    @SubscribeEvent
-    fun onSecondPassedEvent(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled() || nextCheckTime.isInFuture()) return
         check()
     }

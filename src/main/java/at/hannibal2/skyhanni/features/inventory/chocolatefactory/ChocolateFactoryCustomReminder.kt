@@ -84,7 +84,7 @@ object ChocolateFactoryCustomReminder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()

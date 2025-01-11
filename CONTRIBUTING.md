@@ -126,7 +126,8 @@ format like "- #821" to illustrate the dependency.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
 - Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
-    - Config files should still be made in Java.
+- Config files should be made in **Kotlin**.
+    - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.

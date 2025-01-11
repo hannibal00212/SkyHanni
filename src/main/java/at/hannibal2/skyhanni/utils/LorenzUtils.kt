@@ -286,7 +286,7 @@ object LorenzUtils {
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
-        TitleManager.sendTitle(text, duration, height, fontSize)
+        TitleManager.setTitle(text, duration, height, fontSize)
     }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
