@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -136,15 +137,14 @@ object ComputerEnvDebug {
         val allocatedPercentage = (totalMemory.toDouble() / maxMemory * 100).toInt() // Allocated percentage
         val usedPercentage = (usedMemory.toDouble() / maxMemory * 100).toInt() // Used percentage
 
-        // Convert memory values to MB for readability
-        val totalMemoryMB = totalMemory / (1024 * 1024)
-        val maxMemoryMB = maxMemory / (1024 * 1024)
-        val usedMemoryMB = usedMemory / (1024 * 1024)
+        // Convert memory values to GB for readability
+        val totalMemoryGB = totalMemory.toDouble() / (1024 * 1024 * 1024)
+        val maxMemoryGB = maxMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedMemoryGB = usedMemory.toDouble() / (1024 * 1024 * 1024)
 
         // Clear the console (optional, for better readability)
-        text.add("Mem: $usedPercentage% ${usedMemoryMB.addSeparators()}/${maxMemoryMB.addSeparators()} MB")
-        text.add("Allocated: $allocatedPercentage% ${totalMemoryMB.addSeparators()} MB")
-        text.add(" ")
+        text.add("Minecraft Memory: $usedPercentage% ${usedMemoryGB.formatGB()}/${maxMemoryGB.formatGB()} GB")
+        text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
 
         // Get total system memory using OS-specific APIs
         val osBean = ManagementFactory.getOperatingSystemMXBean()
@@ -152,25 +152,29 @@ object ComputerEnvDebug {
         val freePhysicalMemory = osBean.freePhysicalMemorySize
         val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
 
-        // Convert system memory to MB
-        val totalPhysicalMB = totalPhysicalMemory / (1024 * 1024)
-        val usedPhysicalMB = usedPhysicalMemory / (1024 * 1024)
+        // Convert system memory to GB
+        val totalPhysicalGB = totalPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedPhysicalGB = usedPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
         val usedPhysicalPercentage = (usedPhysicalMemory.toDouble() / totalPhysicalMemory * 100).roundToInt()
 
         // System Memory Usage
-        text.add("System Mem: $usedPhysicalPercentage% ${usedPhysicalMB.addSeparators()} / ${totalPhysicalMB.addSeparators()} MB")
+        text.add("System Memory: $usedPhysicalPercentage% ${usedPhysicalGB.formatGB()}/${totalPhysicalGB.formatGB()} GB")
 
         var important = false
-        if (maxMemoryMB < 3_500) {
+        if (maxMemoryGB < 3.5) {
+            text.add("")
             text.add(
-                0,
-                "Minecraft has less than 3.5 GB of RAM to work with! Change this to 4-6GB! " +
-                    "(Currently at ${maxMemoryMB.addSeparators()} MB RAM)",
+                "Minecraft has less than 3.5 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
             )
             important = true
         }
         if (usedPhysicalPercentage > 90) {
-            text.add(0, "The computer has less than 10% of system memory free! ($usedPhysicalPercentage% used)")
+            text.add("")
+            text.add(
+                "The computer uses more than 90% of system memory. Maybe close background apps! " +
+                    "($usedPhysicalPercentage% used)",
+            )
             important = true
         }
 
@@ -179,6 +183,10 @@ object ComputerEnvDebug {
         } else {
             event.addIrrelevant(text)
         }
+    }
+
+    private fun Double.formatGB(): String {
+        return roundTo(1).addSeparators()
     }
 
     private fun uptime(event: DebugDataCollectEvent) {
