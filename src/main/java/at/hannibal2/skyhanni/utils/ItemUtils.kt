@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -46,6 +47,8 @@ import kotlin.time.Duration.Companion.seconds
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
+
+    // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
     private var itemBaseStats = mapOf<NEUInternalName, Map<SkyblockStat, Int>>()
     private var itemBaseStatsRaw = mapOf<NEUInternalName, Map<String, Int>>()
 
@@ -72,6 +75,11 @@ object ItemUtils {
             }
             allItems[internalName] = stats
         }
+
+        // TODO maybe create a new enum for item stats?
+        unknownStats.remove("WEAPON_ABILITY_DAMAGE") // stat exists only on items, not as player stat
+        unknownStats.removeIfKey { it.startsWith("RIFT_") } // rift stats are not in SkyblockStat enum
+
         if (unknownStats.isNotEmpty()) {
             val name = StringUtils.pluralize(unknownStats.size, "stat", withNumber = true)
             ErrorManager.logErrorStateWithData(
