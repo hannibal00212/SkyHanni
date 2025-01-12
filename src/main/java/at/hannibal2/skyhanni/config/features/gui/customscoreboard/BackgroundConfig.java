@@ -9,6 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
+import java.awt.Color;
+
 public class BackgroundConfig {
     @Expose
     @ConfigOption(
@@ -24,7 +26,7 @@ public class BackgroundConfig {
         desc = "The color of the background."
     )
     @ConfigEditorColour
-    public CustomColor color = CustomColor.fromString("0:80:0:0:0");
+    public CustomColor color = new CustomColor(Color.BLACK, 80);
 
     @Expose
     @ConfigOption(
