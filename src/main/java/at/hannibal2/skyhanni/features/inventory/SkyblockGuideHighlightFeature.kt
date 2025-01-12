@@ -90,7 +90,7 @@ class SkyblockGuideHighlightFeature private constructor(
             close()
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
@@ -98,7 +98,7 @@ class SkyblockGuideHighlightFeature private constructor(
             current.onSlotClicked.invoke(event)
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
             if (!isEnabled()) return
             if (activeObject == null) return

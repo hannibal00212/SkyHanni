@@ -29,7 +29,7 @@ object RenderData {
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         GlStateManager.translate(0f, 0f, -3f)
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.GuiOverlayRenderEvent().post()
         GlStateManager.translate(0f, 0f, 3f)
     }
 
@@ -46,11 +46,11 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             GlStateManager.translate(0f, 0f, -3f)
-            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+            GuiRenderEvent.GuiOverlayRenderEvent().post()
             GlStateManager.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
 
         GlStateManager.popMatrix()
     }
