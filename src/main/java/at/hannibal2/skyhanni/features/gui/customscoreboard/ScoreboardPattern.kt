@@ -907,6 +907,24 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
+    /**
+     * Somtimes when the scoreboard updates, it only updates half way,
+     * causing some lines to become mixed with other lines -> broken.
+     * This should already get handled fine but sometimes these errors still occur with some lines way too often.
+     * This pattern is to catch those lines.
+     */
+    /**
+     * REGEX-TEST:  §e§l⚡ §cRedston
+     * REGEX-TEST:       §ce: §e§b0%
+     * REGEX-TEST: Starting in: §a0 §c1:55
+     */
+    val brokenPatterns by group.list(
+        "broken",
+        "\\s*§.§l⚡ §cRedston",
+        "\\s*§ce: §e§b0%",
+        "\\s*Starting in: §a0 §c[\\d:]+",
+    )
+
     // Lines from the tablist
     private val tablistGroup = group.group("tablist")
 
