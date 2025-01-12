@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 private val config get() = SkyHanniMod.feature.gui.mayorOverlay
 
@@ -79,7 +78,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
