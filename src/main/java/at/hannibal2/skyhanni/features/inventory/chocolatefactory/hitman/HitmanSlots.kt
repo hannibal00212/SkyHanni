@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HitmanSlots {
@@ -45,7 +44,7 @@ object HitmanSlots {
         handleSlotStorageUpdate(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
         if (!inInventory) return

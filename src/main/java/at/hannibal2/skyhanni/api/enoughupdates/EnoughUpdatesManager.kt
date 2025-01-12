@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -363,6 +364,19 @@ object EnoughUpdatesManager {
         }
     }
 
+    private fun itemCountInRepoFolder(): Int {
+        val itemsFolder = File(repoLocation, "items")
+        return itemsFolder.listFiles()?.size ?: 0
+    }
+
+    @HandleEvent
+    fun onHypixelJoin(event: HypixelJoinEvent) {
+        if (itemMap.isEmpty() && itemCountInRepoFolder() > 0) {
+            reloadRepo()
+            println("No loaded items in NEU repo, attempting to reload the repo.")
+        }
+    }
+
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         neuPetsJson = event.readConstant<NeuPetsJson>("pets")
@@ -383,6 +397,24 @@ object EnoughUpdatesManager {
                 description = "Redownload the NEU repo"
                 category = CommandCategory.DEVELOPER_TEST
                 callback { downloadRepo() }
+            }
+        }
+
+        event.register("shneurepostatus") {
+            description = "Get the status of the NEU repo"
+            category = CommandCategory.DEVELOPER_TEST
+            callback {
+                val loadedItems = itemMap.size
+                val directorySize = itemCountInRepoFolder()
+
+                ChatUtils.chat("NEU Repo Status:")
+                when {
+                    directorySize == 0 -> ChatUtils.chat("§cNo items directory found!", prefix = false)
+                    loadedItems == 0 -> ChatUtils.chat("§cNo items loaded!", prefix = false)
+                    loadedItems < directorySize -> ChatUtils.chat("§eLoaded $loadedItems/$directorySize items", prefix = false)
+                    loadedItems > directorySize -> ChatUtils.chat("§eLoaded Items: $loadedItems (more than directory size)", prefix = false)
+                    else -> ChatUtils.chat("§aLoaded all $loadedItems items!", prefix = false)
+                }
             }
         }
     }

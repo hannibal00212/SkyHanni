@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -32,7 +31,7 @@ object MiningEventDisplay {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")

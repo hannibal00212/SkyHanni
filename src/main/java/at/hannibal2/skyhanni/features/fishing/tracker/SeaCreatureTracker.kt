@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SeaCreatureTracker {
@@ -180,7 +179,7 @@ object SeaCreatureTracker {
         tracker.firstUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!FishingAPI.isFishing(checkRodInHand = false)) return

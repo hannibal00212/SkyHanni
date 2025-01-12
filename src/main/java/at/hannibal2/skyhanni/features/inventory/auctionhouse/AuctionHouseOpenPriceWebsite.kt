@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.seconds
 
@@ -79,7 +77,7 @@ object AuctionHouseOpenPriceWebsite {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         displayItem ?: return

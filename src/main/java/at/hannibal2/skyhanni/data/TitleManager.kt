@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -66,7 +65,7 @@ object TitleManager {
         endTime = SimpleTimeMark.farPast()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (endTime.isInPast()) return
 

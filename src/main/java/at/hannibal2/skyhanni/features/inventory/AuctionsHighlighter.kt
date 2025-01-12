@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AuctionsHighlighter {
@@ -34,7 +33,7 @@ object AuctionsHighlighter {
         "§7(?:Starting bid|Top bid): §6(?<coins>.*) coins"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.highlightAuctions) return
