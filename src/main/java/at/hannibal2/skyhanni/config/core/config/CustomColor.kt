@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.core.config
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import java.awt.Color
 
 class CustomColor {
@@ -10,9 +11,11 @@ class CustomColor {
     private val alpha: Int
     private val chroma: Int
 
+    private val cachedrgb: Int // Cached rgb value, used for creating the string and for toInt() if the color isn't chroma
+
     fun toInt(): Int {
-        val adjustedHue = if (chroma <= 0) hue
-        else (hue + (startTime.passedSince().inWholeMilliseconds / 1000f / chromaSpeed(chroma) % 1)).let {
+        if (chroma == 0) return cachedrgb
+        val adjustedHue = (hue + (startTime.passedSince().inPartialSeconds.toFloat() / chromaSpeed(chroma) % 1)).let {
             if (it < 0) it + 1f else it
         }
 
@@ -22,21 +25,10 @@ class CustomColor {
     fun toColor(): Color = Color(toInt(), true)
 
     val asString get(): String {
-        val color = Color.HSBtoRGB(hue, saturation, brightness)
-        val red = color shr 16 and 0xFF
-        val green = color shr 8 and 0xFF
-        val blue = color and 0xFF
+        val red = cachedrgb shr 16 and 0xFF
+        val green = cachedrgb shr 8 and 0xFF
+        val blue = cachedrgb and 0xFF
         return "$chroma:$alpha:$red:$green:$blue"
-    }
-
-    // Constructors
-    @Suppress("unused")
-    constructor(hue: Float, saturation: Float, brightness: Float, alpha: Int, chroma: Int) {
-        this.hue = hue
-        this.saturation = saturation
-        this.brightness = brightness
-        this.alpha = alpha
-        this.chroma = chroma
     }
 
     @JvmOverloads constructor(color: Color, alpha: Int = color.alpha, chroma: Int = 0) {
@@ -46,25 +38,32 @@ class CustomColor {
         this.brightness = brightness
         this.alpha = alpha
         this.chroma = chroma
+        this.cachedrgb = color.rgb
     }
 
-    constructor(csv: String) {
-        val list = csv.split(":").mapNotNull { it.toIntOrNull() }
+    constructor(string: String) {
+        val list = string.split(":").mapNotNull { it.toIntOrNull() }
         if (list.size != 5) {
             this.hue = 0.0f
             this.saturation = 0.0f
             this.brightness = 0.0f
             this.alpha = 0
             this.chroma = 0
+            this.cachedrgb = 0
         } else {
             this.chroma = list[0]
             this.alpha = list[1]
 
-            val array = Color.RGBtoHSB(list[2], list[3], list[4], null)
+            val red = list[2]
+            val green = list[3]
+            val blue = list[4]
+
+            val array = Color.RGBtoHSB(red, green, blue, null)
 
             this.hue = array[0]
             this.saturation = array[1]
             this.brightness = array[2]
+            this.cachedrgb = ((alpha and 0xFF) shl 24) or ((red and 0xFF) shl 16) or ((green and 0xFF) shl 8) or (blue and 0xFF)
         }
     }
 
