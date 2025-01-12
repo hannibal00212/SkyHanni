@@ -96,6 +96,7 @@ object MinionCraftHelper {
         return newDisplay
     }
 
+    @Suppress("FunctionReturnTypeSpacing")
     private fun loadFromInventory(mainInventory: List<ItemStack>):
         Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
