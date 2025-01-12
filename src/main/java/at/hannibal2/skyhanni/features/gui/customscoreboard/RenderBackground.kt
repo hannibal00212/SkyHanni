@@ -13,7 +13,7 @@ import net.minecraft.util.ResourceLocation
 
 object RenderBackground {
 
-    private val textureLocation by lazy { ResourceLocation("skyhanni", "scoreboard.png") }
+    private val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(backgroundConfig) {

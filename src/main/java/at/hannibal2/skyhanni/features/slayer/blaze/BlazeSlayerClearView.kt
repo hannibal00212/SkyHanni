@@ -18,7 +18,7 @@ object BlazeSlayerClearView {
 
     private var nearBlaze = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.repeatSeconds(3)) return

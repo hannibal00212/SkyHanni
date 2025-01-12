@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryCustomReminder {
@@ -83,13 +83,13 @@ object ChocolateFactoryCustomReminder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
+    @HandleEvent(receiveCancelled = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return
@@ -127,7 +127,7 @@ object ChocolateFactoryCustomReminder {
         return cost to nextLevelName
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inChocolateMenu()) return
@@ -136,7 +136,7 @@ object ChocolateFactoryCustomReminder {
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
@@ -182,7 +182,7 @@ object ChocolateFactoryCustomReminder {
             return "§aGoal Reached! §eBuy §f$targetName"
         }
         val format = duration.format(maxUnits = 2)
-        return "§f$targetName §ein §b$format"
+        return "§f$targetName §ein §b$format".partyModeReplace()
     }
 
     private fun warn() {

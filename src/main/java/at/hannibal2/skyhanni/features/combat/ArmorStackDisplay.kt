@@ -75,7 +75,7 @@ object ArmorStackDisplay {
         resetStack()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStrings(display, posLabel = "Armor Stack Display")
