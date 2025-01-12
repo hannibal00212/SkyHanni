@@ -61,7 +61,7 @@ object MythologicalCreatureTracker {
     private val tracker = SkyHanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
         SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(
+            it.diana.mythologicalMobTrackerPerElection.getOrPut(
                 SkyBlockTime.now().getElectionYear(), ::Data,
             )
         },
@@ -133,7 +133,7 @@ object MythologicalCreatureTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return

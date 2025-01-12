@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.DijkstraTree
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -114,8 +115,21 @@ object GraphUtils {
         )
     }
 
-    fun findAllShortestDistances(start: GraphNode): DijkstraTree {
-        return findDijkstraDistances(start) { false }
+    fun findAllShortestDistancesOnCurrentIsland(
+        start: LorenzVec,
+        bailout: (GraphNode) -> Boolean = { false },
+    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
+
+    fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
+        val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
+        return graph.nodes.minBy { it.position.distanceSq(location) }
+    }
+
+    fun findAllShortestDistances(
+        start: GraphNode,
+        bailout: (GraphNode) -> Boolean = { false },
+    ): DijkstraTree {
+        return findDijkstraDistances(start, bailout)
     }
 
     fun findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {

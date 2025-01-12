@@ -22,7 +22,7 @@ object RiftOdonata {
     private var hasBottleInHand = false
 
     private val ODONATA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_ODONATA") }
-    private val emptyBottle by lazy { "EMPTY_ODONATA_BOTTLE".toInternalName() }
+    private val emptyBottle = "EMPTY_ODONATA_BOTTLE".toInternalName()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

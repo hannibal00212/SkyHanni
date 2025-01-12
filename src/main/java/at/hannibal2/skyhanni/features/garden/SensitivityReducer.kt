@@ -104,7 +104,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return

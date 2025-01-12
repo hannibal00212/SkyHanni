@@ -121,7 +121,7 @@ object ElectionAPI {
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
@@ -162,8 +162,8 @@ object ElectionAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventory(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
