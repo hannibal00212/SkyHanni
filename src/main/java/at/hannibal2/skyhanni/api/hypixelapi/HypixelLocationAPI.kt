@@ -166,9 +166,9 @@ object HypixelLocationAPI {
     }
 
     fun checkIsland(otherIsland: IslandType) {
+        if (otherIsland == IslandType.NONE) return
         runNextSecond {
             if (otherIsland == island) return@runNextSecond
-            if (otherIsland == IslandType.NONE) return@runNextSecond
             sendError("Island")
         }
     }
