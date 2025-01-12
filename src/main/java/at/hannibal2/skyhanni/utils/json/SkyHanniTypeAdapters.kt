@@ -86,7 +86,7 @@ object SkyHanniTypeAdapters {
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
-    val CUSTOM_COLOR: TypeAdapter<CustomColor> = SimpleStringTypeAdapter(CustomColor::asString, ::CustomColor)
+    val CUSTOM_COLOR: TypeAdapter<CustomColor> = SimpleStringTypeAdapter(CustomColor::asString, CustomColor::fromString)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()

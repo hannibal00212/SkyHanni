@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.EventHandler
+import at.hannibal2.skyhanni.config.core.config.CustomColor
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
-import at.hannibal2.skyhanni.config.core.editors.ConfigCustomColor
 import at.hannibal2.skyhanni.config.core.editors.GuiOptionEditorCustomColor
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -27,7 +27,9 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.TypeAdapterFactory
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.gui.editors.GuiOptionEditorColour
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -111,8 +113,9 @@ class ConfigManager {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
-        processor.registerConfigEditor(ConfigCustomColor::class.java) { option, _ ->
-            GuiOptionEditorCustomColor(option)
+        processor.registerConfigEditor(ConfigEditorColour::class.java) { option, _ ->
+            if (option.type == CustomColor::class.java) GuiOptionEditorCustomColor(option)
+            else GuiOptionEditorColour(option)
         }
     }
 

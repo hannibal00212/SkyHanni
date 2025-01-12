@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.core.config
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.awt.Color
 
-data class CustomColor(
+class CustomColor(
     private val hue: Float,
     private val saturation: Float,
     private val brightness: Float,
@@ -11,23 +11,16 @@ data class CustomColor(
     private val chroma: Int,
 ) {
 
-
-
-
-
-
-
-
-
     fun toInt(): Int {
-        val adjustedHue = if (chroma > 0) (hue + (startTime.passedSince().inWholeMilliseconds / 1000f / chromaSpeed(chroma) % 1)).let {
+        val adjustedHue = if (chroma <= 0) hue
+        else (hue + (startTime.passedSince().inWholeMilliseconds / 1000f / chromaSpeed(chroma) % 1)).let {
             if (it < 0) it + 1f else it
-        } else hue
+        }
 
         return (alpha and 0xFF) shl 24 or (Color.HSBtoRGB(adjustedHue, saturation, brightness) and 0x00FFFFFF)
     }
 
-    fun toColor() = Color(toInt(), true)
+    fun toColor(): Color = Color(toInt(), true)
 
     val asString get(): String {
         val color = Color.HSBtoRGB(hue, saturation, brightness)
@@ -58,19 +51,5 @@ data class CustomColor(
             return CustomColor(hue, saturation, brightness, alpha, chroma)
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
