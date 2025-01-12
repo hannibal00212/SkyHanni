@@ -58,6 +58,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
++ Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
+    + Plays meow sound when 'meow' appears in chat.
+    + Plays bark sound when 'woof' appears in chat.
 
 </details>
 <details open><summary>

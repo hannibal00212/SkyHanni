@@ -30,8 +30,8 @@ object GuiData {
         if (preDrawEventCancelled) event.cancel()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (preDrawEventCancelled) event.cancel()
     }
 

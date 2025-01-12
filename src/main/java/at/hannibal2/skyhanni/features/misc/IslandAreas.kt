@@ -105,8 +105,8 @@ object IslandAreas {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
@@ -116,8 +116,8 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
 
