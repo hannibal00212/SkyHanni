@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -81,7 +81,7 @@ object PestParticleLine {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         // TODO time in config
         if (lastPestTrackerUse.passedSince() > 10.seconds) {
@@ -95,7 +95,7 @@ object PestParticleLine {
         showMiddle(event)
     }
 
-    private fun showMiddle(event: LorenzRenderWorldEvent) {
+    private fun showMiddle(event: RenderWorldEvent) {
         if (!config.showMiddle) return
         if (locations.size <= 0) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
@@ -106,7 +106,7 @@ object PestParticleLine {
         event.drawDynamicText(middle, "Middle", 1.0)
     }
 
-    private fun draw(event: LorenzRenderWorldEvent, list: List<ParticleLocation>) {
+    private fun draw(event: RenderWorldEvent, list: List<ParticleLocation>) {
         val color = LorenzColor.YELLOW.toColor()
         for ((prev, next) in list.asSequence().zipWithNext()) {
             // TODO time in config
