@@ -218,8 +218,8 @@ object PunchcardHighlight {
         display = drawDisplay()
     }
 
-    @SubscribeEvent
-    fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
         if (!RiftAPI.inRift()) return
 

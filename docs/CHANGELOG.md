@@ -15,6 +15,12 @@
 
 + Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
 
+#### Chat
+
++ Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
+    + Plays meow sound when 'meow' appears in chat.
+    + Plays bark sound when 'woof' appears in chat.
+
 #### Misc
 
 + Removed NotEnoughUpdates requirement. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
@@ -76,6 +82,7 @@
 + Fixed auction price comparison not detecting when the inventory is closed. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3165)
 + Fixed Minion Upgrade Feature appearing outside minion menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3175)
 + Fixed Book of Stats not counting in Estimated Item Value for items with 0 kills. - Luna (https://github.com/hannibal002/SkyHanni/pull/3178)
++ Fixed copy option in `/playtimedetailed` not working unless Limbo Playtime Detailed is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/3193)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -84,12 +91,16 @@
 #### Garden Bug Fixes
 
 + Fixed Custom Keybinds not working with inventory or chat keybind. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3186)
++ Fixed Farming Fortune Breakdown not showing in itooltips for Armor or Farming Tools with Gemstones applied. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3184)
++ Fixed missing visuals in /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3196)
 
 #### Misc Bug Fixes
 
 + Fixed overflow level-up message not showing and removed dependency on skill progress display. - appable (https://github.com/hannibal002/SkyHanni/pull/3146)
 + Fixed visual words not saving. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3170)
 + Fixed overflow skill level-up messages only appearing above level 60. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3177)
++ Fixed autoupdater not working with new backport updates in certain situations. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3171)
++ Fixed item information not loading occasionally due to NEU errors. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3191)
 
 ### Technical Details
 
@@ -112,6 +123,12 @@
 + Fixed some item attributes treated as Boolean instead of Int. - Luna (https://github.com/hannibal002/SkyHanni/pull/3178)
 + Implemented Hypixel Mod API. - Empa (https://github.com/hannibal002/SkyHanni/pull/2768)
 + Moved inventory open/close and repo events to SkyHanni events. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3174)
++ Added `/shneurepostatus` to show status of loaded items from the NEU repo. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3191)
++ Added Item Base Stats support. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3197)
+    + Read item base stats from Hypixel Item API, provide utility functions, and display stats in item lore via debug toggle.
++ Cleaned up code in Bestiary display class. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3155)
++ Fixed bug in /shgraphfindall. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3198)
++ Migrated more events from LorenzEvent to SkyHanniEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3188)
 
 ### New Features
 
