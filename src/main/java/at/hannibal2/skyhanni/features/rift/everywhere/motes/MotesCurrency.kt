@@ -17,6 +17,9 @@ object MotesCurrency {
 
     private val patternGroup = RepoPattern.group("rift.motes")
 
+    /**
+     * REGEX-TEST: Motes: §5137,242
+     */
     val motesPattern by patternGroup.pattern(
         "scoreboard",
         "^(?:§.)*Motes: (?:§.)*(?<motes>[\\d,]+)",

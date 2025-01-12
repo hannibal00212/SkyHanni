@@ -18,6 +18,9 @@ object WinterAPI {
 
     private val patternGroup = RepoPattern.group("winter")
 
+    /**
+     * REGEX-TEST: North Stars: §d1,539
+     */
     val northstarsPattern by patternGroup.pattern(
         "northstars",
         "North Stars: §d(?<northstars>[\\w,]+).*",

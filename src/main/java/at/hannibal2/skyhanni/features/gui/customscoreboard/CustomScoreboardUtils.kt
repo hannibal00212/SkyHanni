@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.skyhanni.features.rift.everywhere.motes.MotesCurrency
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -44,7 +47,7 @@ object CustomScoreboardUtils {
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
-    internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, getSbLines(), "motes") ?: "0"
+    internal fun getMotes() = formatNumber(MotesCurrency.motes.coerceAtLeast(0))
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
@@ -62,13 +65,13 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSbLines(), "copper") ?: "0"
+    internal fun getCopper() = formatNumber(GardenAPI.copper.coerceAtLeast(0))
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
     internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSbLines(), "heat")
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = formatNumber(WinterAPI.northStars.coerceAtLeast(0))
 
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSbLines(), "symbol").orEmpty()
 

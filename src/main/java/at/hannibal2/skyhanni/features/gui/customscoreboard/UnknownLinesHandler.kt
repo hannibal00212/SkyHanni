@@ -5,9 +5,12 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.features.rift.everywhere.motes.MotesCurrency
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -41,10 +44,10 @@ object UnknownLinesHandler {
      **/
     private val patternsToExclude = mutableListOf(
         PurseAPI.coinsPattern,
-        SbPattern.motesPattern,
+        MotesCurrency.motesPattern,
         BitsAPI.bitsScoreboardPattern,
         SbPattern.heatPattern,
-        SbPattern.copperPattern,
+        GardenAPI.copperPattern,
         SbPattern.locationPattern,
         SbPattern.lobbyCodePattern,
         SbPattern.datePattern,
@@ -53,7 +56,7 @@ object UnknownLinesHandler {
         SbPattern.yearVotesPattern,
         SbPattern.votesPattern,
         SbPattern.waitingForVotePattern,
-        SbPattern.northstarsPattern,
+        WinterAPI.northstarsPattern,
         SbPattern.profileTypePattern,
         SbPattern.autoClosingPattern,
         SbPattern.startingInPattern,
