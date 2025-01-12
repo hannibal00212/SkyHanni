@@ -130,8 +130,8 @@ object GraphEditor {
         )
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
     }
