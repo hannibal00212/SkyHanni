@@ -155,7 +155,7 @@ object DianaProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return

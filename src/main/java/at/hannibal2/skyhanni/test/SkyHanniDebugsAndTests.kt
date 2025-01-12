@@ -511,7 +511,7 @@ object SkyHanniDebugsAndTests {
     fun onChat(event: LorenzChatEvent) {
     }
 
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -549,9 +549,9 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("ConstantConditionIf")
-    fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (false) {
             dragAbleTest()
         }

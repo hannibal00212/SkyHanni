@@ -94,7 +94,7 @@ object CurrentPetDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (RiftAPI.inRift()) return
