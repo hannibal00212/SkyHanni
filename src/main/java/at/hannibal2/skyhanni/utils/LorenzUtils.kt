@@ -260,6 +260,16 @@ object LorenzUtils {
         return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
     }
 
+    fun GuiEditSign.isMousematSign(): Boolean {
+        if (this !is AccessorGuiEditSign) return false
+
+        val tileSign = (this as AccessorGuiEditSign).tileSign
+        return (
+            tileSign.signText[1].unformattedText.removeColor() == "Set Yaw Above!" &&
+                tileSign.signText[2].unformattedText.removeColor() == "Set Pitch Below!"
+            )
+    }
+
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
