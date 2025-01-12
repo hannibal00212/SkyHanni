@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
-import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
 import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
@@ -61,12 +60,6 @@ object UpdateManager {
 
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
-    }
-
-    fun injectConfigProcessor(processor: MoulConfigProcessor<*>) {
-        processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
-            GuiOptionEditorUpdateCheck(option)
-        }
     }
 
     private val config get() = SkyHanniMod.feature.about
