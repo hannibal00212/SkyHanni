@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CustomTextBox {
@@ -29,7 +28,7 @@ object CustomTextBox {
 
     private fun String.format() = replace("&", "§").split("\\n").toList()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.onlyInGUI) return
         if (!isEnabled()) return
@@ -37,7 +36,7 @@ object CustomTextBox {
         config.position.renderStrings(display, posLabel = "Custom Text Box")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (config.onlyInGUI) return
         if (!isEnabled()) return

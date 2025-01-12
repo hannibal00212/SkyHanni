@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.launch
 
-class BazaarDataHolder {
+class HypixelItemAPI {
 
     companion object {
 
@@ -27,16 +28,19 @@ class BazaarDataHolder {
             val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 
             val motesPrice = mutableMapOf<NEUInternalName, Double>()
+            val allStats = mutableMapOf<NEUInternalName, Map<String, Int>>()
             for (item in itemsData.items) {
                 val neuItemId = NEUItems.transHypixelNameToInternalName(item.id ?: continue)
                 item.npcPrice?.let { list[neuItemId] = it }
                 item.motesPrice?.let { motesPrice[neuItemId] = it }
+                item.stats?.let { stats -> allStats[neuItemId] = stats }
             }
+            ItemUtils.updateBaseStats(allStats)
             RiftAPI.motesPrice = motesPrice
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
                 e, "Error getting npc sell prices",
-                "hypixelApiResponse" to apiResponse
+                "hypixelApiResponse" to apiResponse,
             )
         }
         return list
