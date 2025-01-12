@@ -82,20 +82,6 @@ object FlareDisplay {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
-        if (!isEnabled()) return
-        if (config.displayType == FlareConfig.DisplayType.GUI) return
-
-        for (flare in flares) {
-            val location = flare.location.add(-0.5, 0.0, -0.5)
-            val name = flare.type.displayName
-            val time = "§b${getRemainingTime(flare).format()}"
-            event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-            event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
-        }
-    }
-
-    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         flares.removeIf { !it.entity.isEntityAlive }
@@ -175,6 +161,17 @@ object FlareDisplay {
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
+
+        if (config.displayType != FlareConfig.DisplayType.GUI) {
+            for (flare in flares) {
+                val location = flare.location.add(-0.5, 0.0, -0.5)
+                val name = flare.type.displayName
+                val time = "§b${getRemainingTime(flare).format()}"
+                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+            }
+        }
+
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
         for (flare in flares) {
