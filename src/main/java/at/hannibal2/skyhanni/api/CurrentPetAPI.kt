@@ -181,16 +181,6 @@ object CurrentPetAPI {
     )
 
     /**
-     * REGEX-TEST: §e⭐ §7[Lvl 100] §6Ender Dragon
-     * REGEX-TEST: §e⭐ §7[Lvl 100] §dBlack Cat§d ✦
-     * REGEX-TEST: §7[Lvl 100] §6Mole
-     */
-    val petNameMenuPattern by patternGroup.pattern(
-        "menu.pet.name",
-        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$",
-    )
-
-    /**
      * REGEX-TEST: §7§cClick to despawn!
      */
     val petDespawnMenuPattern by patternGroup.pattern(
@@ -387,7 +377,7 @@ object CurrentPetAPI {
         inPetMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inPetMenu) return
         if (event.clickTypeEnum != GuiContainerEvent.ClickType.NORMAL) return

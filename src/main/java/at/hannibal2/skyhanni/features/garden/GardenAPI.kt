@@ -164,7 +164,7 @@ object GardenAPI {
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
+    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,

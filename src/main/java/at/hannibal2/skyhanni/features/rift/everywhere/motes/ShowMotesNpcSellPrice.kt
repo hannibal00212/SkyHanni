@@ -43,7 +43,7 @@ object ShowMotesNpcSellPrice {
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {

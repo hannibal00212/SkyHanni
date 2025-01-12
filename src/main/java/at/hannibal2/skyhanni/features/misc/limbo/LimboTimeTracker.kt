@@ -95,7 +95,7 @@ object LimboTimeTracker {
         leaveLimbo()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return

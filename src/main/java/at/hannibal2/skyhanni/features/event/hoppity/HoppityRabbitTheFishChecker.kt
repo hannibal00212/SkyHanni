@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 @SkyHanniModule
@@ -55,7 +54,7 @@ object HoppityRabbitTheFishChecker {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -75,7 +74,7 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 

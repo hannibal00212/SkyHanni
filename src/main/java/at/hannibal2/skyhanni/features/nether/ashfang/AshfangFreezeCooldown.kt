@@ -32,7 +32,7 @@ object AshfangFreezeCooldown {
         if (cryogenicBlastPattern.matches(event.message)) unfrozenTime = SimpleTimeMark.now() + duration
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!isCurrentlyFrozen()) return

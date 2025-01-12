@@ -11,14 +11,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
-
-    @Suppress("PropertyWrapping")
-    private val mathCrops = setOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
-    private val dicerCrops = setOf(CropType.PUMPKIN, CropType.MELON)
 
     private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
@@ -64,7 +61,7 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
-            in mathCrops -> {
+            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
                 FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
@@ -73,7 +70,7 @@ object FFStats {
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
-            in dicerCrops -> {
+            CropType.PUMPKIN, CropType.MELON -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
@@ -188,7 +185,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
-                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel * if (SkyBlockTime.isDay()) 1.0 else 3.0
                 else -> 0.0
             }
         }

@@ -120,7 +120,7 @@ object OwnInventoryData {
         ignoreItem(500.milliseconds) { it == internalNameOrNull }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
