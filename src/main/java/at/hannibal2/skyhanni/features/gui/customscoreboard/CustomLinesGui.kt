@@ -118,7 +118,7 @@ object CustomLinesGui : GuiScreen() {
             ),
         )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
