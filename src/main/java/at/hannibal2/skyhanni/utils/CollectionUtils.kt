@@ -162,6 +162,8 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
+    fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
+
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
@@ -507,4 +509,23 @@ object CollectionUtils {
     fun <K, V> MutableMap<K, V>.add(pair: Pair<K, V>) {
         this[pair.first] = pair.second
     }
+
+    fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
+        val iterator = this.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next())) {
+                iterator.remove()
+            }
+        }
+    }
+
+    fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {
+        val iterator = this.entries.iterator()
+        while (iterator.hasNext()) {
+            if (predicate(iterator.next().key)) {
+                iterator.remove()
+            }
+        }
+    }
+
 }

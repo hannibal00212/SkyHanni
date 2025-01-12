@@ -182,7 +182,7 @@ object NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
@@ -270,7 +270,7 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftAPI.inRift()) return

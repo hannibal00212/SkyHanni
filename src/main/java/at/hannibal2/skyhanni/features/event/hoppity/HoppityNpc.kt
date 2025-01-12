@@ -51,7 +51,7 @@ object HoppityNpc {
         inShop = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
@@ -99,7 +99,7 @@ object HoppityNpc {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isHighlightEnabled()) return
         if (!inShop) return

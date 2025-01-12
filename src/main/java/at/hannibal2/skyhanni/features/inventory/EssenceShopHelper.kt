@@ -28,9 +28,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,6 +48,8 @@ object EssenceShopHelper {
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
     private var infoItemStack: ItemStack? = null
+
+    private val patternGroup = RepoPattern.group("inventory.essence-shop-helper")
 
     /**
      * REGEX-TEST: Gold Essence Shop
@@ -116,7 +118,7 @@ object EssenceShopHelper {
         infoItemStack?.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
         val currentEssenceItem = currentEssenceItem ?: return

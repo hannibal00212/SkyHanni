@@ -160,7 +160,7 @@ object DiscordRPCManager : IPCListener {
         updateDebugStatus("Discord RPC Ready.")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isConnected()) return
         if (event.repeatSeconds(5)) {

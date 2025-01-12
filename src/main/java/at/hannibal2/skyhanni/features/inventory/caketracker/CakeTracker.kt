@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -37,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -49,6 +49,8 @@ private typealias DisplayType = CakeTrackerDisplayType
 
 @SkyHanniModule
 object CakeTracker {
+
+    private val patternGroup = RepoPattern.group("inventory.cake-tracker")
 
     // <editor-fold desc="Patterns">
     /**
@@ -175,7 +177,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
@@ -185,8 +187,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
@@ -248,7 +250,7 @@ object CakeTracker {
         searchingForCakes = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val sbTimeNow = SkyBlockTime.now()

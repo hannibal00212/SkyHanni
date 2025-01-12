@@ -97,7 +97,7 @@ object KingTalismanHelper {
         LorenzUtils.skyBlockArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val storage = storage ?: return
@@ -222,7 +222,7 @@ object KingTalismanHelper {
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

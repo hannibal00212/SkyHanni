@@ -45,13 +45,13 @@ object ReforgeHelper {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.reforge
 
-    private val repoGroup = RepoPattern.group("reforge")
+    private val patternGroup = RepoPattern.group("reforge")
 
-    private val reforgeMenu by repoGroup.pattern(
+    private val reforgeMenu by patternGroup.pattern(
         "menu.blacksmith",
         "Reforge Item",
     )
-    private val reforgeHexMenu by repoGroup.pattern(
+    private val reforgeHexMenu by patternGroup.pattern(
         "menu.hex",
         "The Hex ➜ Reforges",
     )
@@ -59,7 +59,7 @@ object ReforgeHelper {
     /**
      * REGEX-TEST: §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
      */
-    private val reforgeChatMessage by repoGroup.pattern(
+    private val reforgeChatMessage by patternGroup.pattern(
         "chat.success",
         "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!",
     )
@@ -67,7 +67,7 @@ object ReforgeHelper {
     /**
      * REGEX-TEST: §cWait a moment before reforging again!
      */
-    private val reforgeChatFail by repoGroup.pattern(
+    private val reforgeChatFail by patternGroup.pattern(
         "chat.fail",
         "§cWait a moment before reforging again!|§cWhoa! Slow down there!",
     )
@@ -121,8 +121,8 @@ object ReforgeHelper {
         updateDisplay()
     }
 
-    @SubscribeEvent
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
             if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
@@ -367,13 +367,13 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (currentReforge == null) return
@@ -383,8 +383,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")

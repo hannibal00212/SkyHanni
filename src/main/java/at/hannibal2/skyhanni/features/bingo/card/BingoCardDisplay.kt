@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -68,7 +67,7 @@ object BingoCardDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasHiddenPersonalGoals) {
             update()
@@ -214,7 +213,7 @@ object BingoCardDisplay {
     private var lastSneak = false
     private var inventoryOpen = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return

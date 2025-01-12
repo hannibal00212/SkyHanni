@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -65,9 +65,15 @@ object FishingTimer {
     private var currentCount = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+
+        if (babyMagmaSlugsToFind != 0 && lastMagmaSlugTime.passedSince() > 3.seconds) {
+            babyMagmaSlugsToFind = 0
+            lastMagmaSlugLocation = null
+        }
+
         rightLocation = updateLocation()
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
             playSound()
@@ -84,7 +90,7 @@ object FishingTimer {
 
     private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -100,8 +106,8 @@ object FishingTimer {
         handle()
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         recentBabyMagmaSlugs -= event.mob
         if (mob in mobDespawnTime) {
@@ -191,15 +197,6 @@ object FishingTimer {
     }
 
     @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (babyMagmaSlugsToFind == 0) return
-        if (lastMagmaSlugTime.passedSince() < 3.seconds) return
-        babyMagmaSlugsToFind = 0
-        lastMagmaSlugLocation = null
-    }
-
-    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
@@ -209,7 +206,7 @@ object FishingTimer {
         display = createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
