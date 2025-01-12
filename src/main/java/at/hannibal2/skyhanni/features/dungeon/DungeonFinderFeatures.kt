@@ -372,7 +372,7 @@ object DungeonFinderFeatures {
         event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return

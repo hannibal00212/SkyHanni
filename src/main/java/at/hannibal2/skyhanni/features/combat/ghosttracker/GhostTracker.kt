@@ -283,7 +283,7 @@ object GhostTracker {
         parseBestiaryWidget(event.lines)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 

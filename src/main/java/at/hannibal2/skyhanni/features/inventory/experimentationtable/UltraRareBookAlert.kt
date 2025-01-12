@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -43,8 +42,8 @@ object UltraRareBookAlert {
         ChatUtils.chat("You have uncovered a §d§kXX§5 ULTRA-RARE BOOK! §d§kXX§e! You found: §9$enchantsName")
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (lastNotificationTime.passedSince() > 5.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
