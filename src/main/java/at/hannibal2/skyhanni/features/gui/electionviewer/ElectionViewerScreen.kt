@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -35,7 +36,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
      */
     var display: Renderable? = null
 
-    @SubscribeEvent
+    @HandleEvent
     open fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
