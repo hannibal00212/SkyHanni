@@ -10,7 +10,6 @@ class CustomColor(
     private val alpha: Int,
     private val chroma: Int,
 ) {
-
     fun toInt(): Int {
         val adjustedHue = if (chroma <= 0) hue
         else (hue + (startTime.passedSince().inWholeMilliseconds / 1000f / chromaSpeed(chroma) % 1)).let {
@@ -31,15 +30,24 @@ class CustomColor(
     }
 
     companion object {
-        // Sneaky workaround to make it look like it has a constructor with a string parameter, because actually making a constructor
-        // like that is more complicated than its worth it. Does not work when called from java code.
+        // Sneaky workaround to make it look like it has other constructors, because actually making other constructors
+        // like these is more complicated than its worth it. Does not work when called from java code.
         operator fun invoke(csv: String): CustomColor = fromString(csv)
+
+        @JvmOverloads
+        operator fun invoke(color: Color, alpha: Int = color.alpha): CustomColor = fromColor(color, alpha)
 
         private val DEFAULT = CustomColor(0.0f, 0.0f, 0.0f, 0, 0)
         private val startTime = SimpleTimeMark.now()
         private const val MIN_CHROMA_SECS = 1
         private const val MAX_CHROMA_SECS = 60
         private fun chromaSpeed(speed: Int) = (255 - speed) / 254f * (MAX_CHROMA_SECS - MIN_CHROMA_SECS) + MIN_CHROMA_SECS
+
+        @JvmStatic @JvmOverloads
+        fun fromColor(color: Color, alpha: Int = color.alpha): CustomColor {
+            val (hue, saturation, brightness) = Color.RGBtoHSB(color.red, color.green, color.blue, null)
+            return CustomColor(hue, saturation, brightness, alpha, 0)
+        }
 
         @JvmStatic
         fun fromString(csv: String): CustomColor {

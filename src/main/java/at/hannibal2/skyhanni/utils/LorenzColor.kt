@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.core.config.CustomColor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.EnumChatFormatting
@@ -50,7 +51,10 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
+    @Deprecated("Use CustomColor instead", ReplaceWith("toCustomColor()"))
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+
+    fun toCustomColor(): CustomColor = CustomColor(color)
 
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE
