@@ -123,7 +123,7 @@ object CropSpeedMeter {
         startCrops = emptyMap()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
