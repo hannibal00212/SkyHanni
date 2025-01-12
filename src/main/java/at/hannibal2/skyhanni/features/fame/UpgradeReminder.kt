@@ -136,7 +136,7 @@ object UpgradeReminder {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory) return
         val item = event.item ?: return
