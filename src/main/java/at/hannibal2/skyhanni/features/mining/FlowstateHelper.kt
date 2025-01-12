@@ -74,7 +74,7 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return

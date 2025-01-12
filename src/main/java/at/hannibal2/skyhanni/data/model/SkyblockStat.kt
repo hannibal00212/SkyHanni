@@ -24,29 +24,58 @@ enum class SkyblockStat(
     val icon: String,
     @Language("RegExp") tabListPatternS: String,
     @Language("RegExp") menuPatternS: String,
+    private val hypxelId: String? = null,
 ) {
     DAMAGE("§c❁", "", ""), // Weapon only
     HEALTH("§c❤", " Health: §r§c❤(?<value>\\d+)(?: .*)?", " §c❤ Health §f(?<value>\\d+)(?: .*)?"), // TODO get from action bar
     DEFENSE("§a❈", " Defense: §r§a❈(?<value>\\d+)(?: .*)?", " §a❈ Defense §f(?<value>\\d+)(?: .*)?"), // TODO get from action bar
     STRENGTH("§c❁", " Strength: §r§c❁(?<value>\\d+)(?: .*)?", " §c❁ Strength §f(?<value>\\d+)(?: .*)?"),
-    INTELLIGENCE("§b✎", " Intelligence: §r§b✎(?<value>\\d+)(?: .*)?", " §b✎ Intelligence §f(?<value>\\d+)(?: .*)?"), // TODO get from action bar
-    CRIT_DAMAGE("§9☠", " Crit Damage: §r§9☠(?<value>\\d+)(?: .*)?", " §9☠ Crit Damage §f(?<value>\\d+)(?: .*)?"),
-    CRIT_CHANCE("§9☣", " Crit Chance: §r§9☣(?<value>\\d+)(?: .*)?", " §9☣ Crit Chance §f(?<value>\\d+)(?: .*)?"),
+    INTELLIGENCE(
+        "§b✎",
+        " Intelligence: §r§b✎(?<value>\\d+)(?: .*)?",
+        " §b✎ Intelligence §f(?<value>\\d+)(?: .*)?",
+    ), // TODO get from action bar
+    CRIT_DAMAGE(
+        "§9☠", " Crit Damage: §r§9☠(?<value>\\d+)(?: .*)?", " §9☠ Crit Damage §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "CRITICAL_DAMAGE",
+    ),
+    CRIT_CHANCE(
+        "§9☣", " Crit Chance: §r§9☣(?<value>\\d+)(?: .*)?", " §9☣ Crit Chance §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "CRITICAL_CHANCE",
+    ),
     FEROCITY("§c⫽", " Ferocity: §r§c⫽(?<value>\\d+)(?: .*)?", " §c⫽ Ferocity §f(?<value>\\d+)(?: .*)?"),
-    BONUS_ATTACK_SPEED("§e⚔", " Attack Speed: §r§e⚔(?<value>\\d+)(?: .*)?", " §e⚔ Bonus Attack Speed §f(?<value>\\d+)(?: .*)?"),
-    ABILITY_DAMAGE("§c๑", " Ability Damage: §r§c๑(?<value>\\d+)(?: .*)?", " §c๑ Ability Damage §f(?<value>\\d+)(?: .*)?"),
-    HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>\\d+)(?: .*)?", " §c❣ Health Regen §f(?<value>\\d+)(?: .*)?"),
+    BONUS_ATTACK_SPEED(
+        "§e⚔",
+        " Attack Speed: §r§e⚔(?<value>\\d+)(?: .*)?",
+        " §e⚔ Bonus Attack Speed §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "ATTACK_SPEED",
+    ),
+    ABILITY_DAMAGE(
+        "§c๑", " Ability Damage: §r§c๑(?<value>\\d+)(?: .*)?", " §c๑ Ability Damage §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "ABILITY_DAMAGE_PERCENT",
+    ),
+    HEALTH_REGEN("§c❣", " Health Regen: §r§c❣(?<value>\\d+)(?: .*)?", " §c❣ Health Regen §f(?<value>\\d+)(?: .*)?", "HEALTH_REGENERATION"),
     VITALITY("§4♨", " Vitality: §r§4♨(?<value>\\d+)(?: .*)?", " §4♨ Vitality §f(?<value>\\d+)(?: .*)?"),
     MENDING("§a☄", " Mending: §r§a☄(?<value>\\d+)(?: .*)?", " §a☄ Mending §f(?<value>\\d+)(?: .*)?"),
     TRUE_DEFENSE("§7❂", " True Defense: §r§f❂(?<value>\\d+)(?: .*)?", " §f❂ True Defense §f(?<value>\\d+)(?: .*)?"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>\\d+)(?: .*)?", " §eⓈ Swing Range §f(?<value>\\d+)(?: .*)?"),
-    SPEED("§f✦", " Speed: §r§f✦(?<value>\\d+)(?: .*)?", " §f✦ Speed §f(?<value>\\d+)(?: .*)?"), // TODO add the way sba did get it (be careful with 500+ Speed)
+
+    // TODO add the way sba did get it (be careful with 500+ Speed)
+    SPEED(
+        "§f✦", " Speed: §r§f✦(?<value>\\d+)(?: .*)?", " §f✦ Speed §f(?<value>\\d+)(?: .*)?",
+        hypxelId = "WALK_SPEED",
+    ),
     SEA_CREATURE_CHANCE("§3α", " Sea Creature Chance: §r§3α(?<value>\\d+)(?: .*)?", " §3α Sea Creature Chance §f(?<value>\\d+)(?: .*)?"),
     MAGIC_FIND("§b✯", " Magic Find: §r§b✯(?<value>\\d+)(?: .*)?", " §b✯ Magic Find §f(?<value>\\d+)(?: .*)?"),
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>\\d+)(?: .*)?", " §d♣ Pet Luck §f(?<value>\\d+)(?: .*)?"),
     FISHING_SPEED("§b☂", " Fishing Speed: §r§b☂(?<value>\\d+)(?: .*)?", " §b☂ Fishing Speed §f(?<value>\\d+)(?: .*)?"),
+    TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔(?<value>\\d+)(?: .*)?", " §6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
     DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>\\d+)(?: .*)?", ""),
-    BONUS_PEST_CHANCE("§2ൠ", " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>\\d+)(?: .*)?", " (?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?(?<value>\\d+)(?: .*)?"),
+    BONUS_PEST_CHANCE(
+        "§2ൠ",
+        " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>\\d+)(?: .*)?",
+        " (?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?(?<value>\\d+)(?: .*)?",
+    ),
     COMBAT_WISDOM("§3☯", " Combat Wisdom: §r§3☯(?<value>\\d+)(?: .*)?", " §3☯ Combat Wisdom §f(?<value>\\d+)(?: .*)?"),
     MINING_WISDOM("§3☯", " Mining Wisdom: §r§3☯(?<value>\\d+)(?: .*)?", " §3☯ Mining Wisdom §f(?<value>\\d+)(?: .*)?"),
     FARMING_WISDOM("§3☯", " Farming Wisdom: §r§3☯(?<value>\\d+)(?: .*)?", " §3☯ Farming Wisdom §f(?<value>\\d+)(?: .*)?"),
@@ -62,7 +91,11 @@ enum class SkyblockStat(
     BREAKING_POWER("§2Ⓟ", "", " §2Ⓟ Breaking Power §f(?<value>\\d+)(?: .*)?"),
     PRISTINE("§5✧", " Pristine: §r§5✧(?<value>\\d+)(?: .*)?", " §5✧ Pristine §f(?<value>\\d+)(?: .*)?"),
     FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Foraging Fortune §f(?<value>\\d+)(?: .*)?"),
-    FARMING_FORTUNE("§6☘", " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>\\d+)(?: .*)?", " (?:§7§m|§6)☘ Farming Fortune (?:§f)?(?<value>\\d+)(?: .*)?"),
+    FARMING_FORTUNE(
+        "§6☘",
+        " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>\\d+)(?: .*)?",
+        " (?:§7§m|§6)☘ Farming Fortune (?:§f)?(?<value>\\d+)(?: .*)?",
+    ),
     MINING_FORTUNE("§6☘", " Mining Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Mining Fortune §f(?<value>\\d+)(?: .*)?"),
     FEAR("§5☠", " Fear: §r§5☠(?<value>\\d+)(?: .*)?", " §5☠ Fear §f(?<value>\\d+)(?: .*)?"),
     COLD_RESISTANCE("§b❄", " Cold Resistance: §r§b❄(?<value>\\d+)(?: .*)?", ""),
@@ -77,10 +110,22 @@ enum class SkyblockStat(
     COCOA_BEANS_FORTUNE("§7☘", "", " §7§m☘ Cocoa Beans Fortune (?<value>\\d+)(?: .*)?"),
     SUGAR_CANE_FORTUNE("§7☘", "", " §7§m☘ Sugar Cane Fortune (?<value>\\d+)(?: .*)?"),
 
-    MINING_SPREAD("§e▚", " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>\\d+)(?: .*)?", " (§7§m|§e)▚ Mining Spread (§f)?(?<value>\\d+)(?: .*)?"),
-    GEMSTONE_SPREAD("§e▚", " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>\\d+)(?: .*)?", " (§7§m|§e)▚ Gemstone Spread (§f)?(?<value>\\d+)(?: .*)?"),
+    MINING_SPREAD(
+        "§e▚",
+        " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>\\d+)(?: .*)?",
+        " (§7§m|§e)▚ Mining Spread (§f)?(?<value>\\d+)(?: .*)?",
+    ),
+    GEMSTONE_SPREAD(
+        "§e▚",
+        " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>\\d+)(?: .*)?",
+        " (§7§m|§e)▚ Gemstone Spread (§f)?(?<value>\\d+)(?: .*)?",
+    ),
     ORE_FORTUNE("§6☘", " Ore Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Ore Fortune §f103"),
-    DWARVEN_METAL_FORTUNE("§6☘", " Dwarven Metal Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Dwarven Metal Fortune §f(?<value>\\d+)(?: .*)?"),
+    DWARVEN_METAL_FORTUNE(
+        "§6☘",
+        " Dwarven Metal Fortune: §r§6☘(?<value>\\d+)(?: .*)?",
+        " §6☘ Dwarven Metal Fortune §f(?<value>\\d+)(?: .*)?",
+    ),
     BLOCK_FORTUNE("§6☘", " Block Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Block Fortune §f(?<value>\\d+)(?: .*)?"),
     GEMSTONE_FORTUNE("§6☘", " Gemstone Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Gemstone Fortune §f(?<value>\\d+)(?: .*)?"),
     HEAT_RESISTANCE("§c♨", " Heat Resistance: §r§c♨(?<value>\\d+)(?: .*)?", " §c♨ Heat Resistance §f(?<value>\\d+)(?: .*)?"),
@@ -116,7 +161,7 @@ enum class SkyblockStat(
             entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
         }
 
-        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string }
+        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypxelId == string }
 
         fun getValue(string: String): SkyblockStat = getValueOrNull(string) ?: UNKNOWN
 
