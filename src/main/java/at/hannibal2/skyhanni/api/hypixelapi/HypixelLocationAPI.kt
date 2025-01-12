@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -148,24 +150,34 @@ object HypixelLocationAPI {
     }
 
     fun checkHypixel(hypixel: Boolean) {
-        if (hypixel == inHypixel) return
-        sendError("Hypixel")
+        runNextSecond {
+            if (hypixel == inHypixel) return@runNextSecond
+            sendError("Hypixel")
+        }
     }
 
+    private fun runNextSecond(run: () -> Unit) = DelayedRun.runDelayed(1.seconds, run)
+
     fun checkSkyblock(skyblock: Boolean) {
-        if (skyblock == inSkyblock) return
-        sendError("SkyBlock")
+        runNextSecond {
+            if (skyblock == inSkyblock) return@runNextSecond
+            sendError("SkyBlock")
+        }
     }
 
     fun checkIsland(otherIsland: IslandType) {
-        if (otherIsland == island) return
         if (otherIsland == IslandType.NONE) return
-        sendError("Island")
+        runNextSecond {
+            if (otherIsland == island) return@runNextSecond
+            sendError("Island")
+        }
     }
 
     fun checkServerId(otherId: String?) {
-        if (serverId == otherId) return
-        sendError("ServerId")
+        runNextSecond {
+            if (serverId == otherId) return@runNextSecond
+            sendError("ServerId")
+        }
     }
 
     private fun sendError(message: String) {
