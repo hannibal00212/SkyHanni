@@ -242,7 +242,7 @@ object GiftProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         tracker.renderDisplay(config.position)
