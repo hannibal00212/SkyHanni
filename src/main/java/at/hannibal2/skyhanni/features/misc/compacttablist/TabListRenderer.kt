@@ -46,7 +46,7 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
