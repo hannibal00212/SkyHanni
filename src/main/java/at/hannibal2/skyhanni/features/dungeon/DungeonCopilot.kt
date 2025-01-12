@@ -148,7 +148,7 @@ object DungeonCopilot {
 
     private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

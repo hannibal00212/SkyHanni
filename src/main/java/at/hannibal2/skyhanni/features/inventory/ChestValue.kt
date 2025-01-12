@@ -46,7 +46,7 @@ object ChestValue {
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (DungeonAPI.inDungeon() && !config.enableInDungeons) return

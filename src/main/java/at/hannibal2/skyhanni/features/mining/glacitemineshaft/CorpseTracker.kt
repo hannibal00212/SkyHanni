@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.EnumMap
 
 @SkyHanniModule
 object CorpseTracker {
@@ -130,7 +130,7 @@ object CorpseTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         tracker.renderDisplay(config.position)

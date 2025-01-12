@@ -111,7 +111,7 @@ object CarryTracker {
         slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
