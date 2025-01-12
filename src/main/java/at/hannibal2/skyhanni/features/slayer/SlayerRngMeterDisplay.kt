@@ -243,7 +243,7 @@ object SlayerRngMeterDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!SlayerAPI.isInCorrectArea) return

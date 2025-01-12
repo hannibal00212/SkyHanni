@@ -47,7 +47,7 @@ object CrownOfAvariceCounter {
     private var lastCoinUpdate = SimpleTimeMark.farPast()
     private val isSessionActive get(): Boolean = sessionStart.passedSince() < 10.seconds
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return

@@ -282,7 +282,7 @@ object HoppityAPI {
     }
 
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
