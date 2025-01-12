@@ -59,7 +59,7 @@ object CustomScoreboard {
 
     private var dirty = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return

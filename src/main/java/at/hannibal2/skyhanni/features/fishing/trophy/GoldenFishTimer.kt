@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -180,7 +179,7 @@ object GoldenFishTimer {
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         config.position.renderRenderable(display, posLabel = "Golden Fish Timer")
@@ -256,7 +255,7 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        TitleManager.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

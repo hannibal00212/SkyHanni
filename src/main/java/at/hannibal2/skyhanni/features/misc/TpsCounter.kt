@@ -101,7 +101,7 @@ object TpsCounter {
         hasReceivedPacket = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
