@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -28,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
 
@@ -53,7 +54,7 @@ object VisitorRewardWarning {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         val stack = event.slot?.stack ?: return

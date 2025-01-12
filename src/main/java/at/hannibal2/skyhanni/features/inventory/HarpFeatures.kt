@@ -151,7 +151,7 @@ object HarpFeatures {
         isGUIScaled = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
