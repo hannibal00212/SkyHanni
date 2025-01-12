@@ -43,7 +43,7 @@ object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    val holder = BazaarDataHolder()
+    val holder = HypixelItemAPI()
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 

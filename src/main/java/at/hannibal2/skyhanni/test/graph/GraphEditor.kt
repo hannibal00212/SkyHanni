@@ -42,6 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("LargeClass")
 @SkyHanniModule
@@ -221,6 +222,8 @@ object GraphEditor {
         if (nodesToFind.isEmpty()) {
             currentNodeToFind = null
             ChatUtils.chat("Found all nodes on this island")
+            LorenzUtils.sendTitle("§eAll Found!", 3.seconds)
+            active = false
             return
         }
 
