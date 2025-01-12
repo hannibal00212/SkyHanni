@@ -95,7 +95,7 @@ object StereoHarmonyDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!GardenAPI.isCurrentlyFarming() && !config.alwaysShow) return

@@ -99,7 +99,7 @@ object HoppityNpc {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isHighlightEnabled()) return
         if (!inShop) return
