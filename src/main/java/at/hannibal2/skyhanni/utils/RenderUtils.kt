@@ -13,12 +13,10 @@ import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -36,7 +34,6 @@ import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
@@ -649,25 +646,6 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    /**
-     * Accepts a single line to print.
-     * This line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<Renderable>", ReplaceWith(""))
-    fun Position.renderSingleLineWithItems(
-        list: List<Any?>,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-        renderRenderable(
-            Renderable.horizontalContainer(
-                list.mapNotNull { Renderable.fromAny(it) },
-            ),
-            posLabel = posLabel,
-        )
-        // TODO Future write that better
-    }
-
     private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
@@ -684,27 +662,6 @@ object RenderUtils {
         }
         GlStateManager.popMatrix()
         return offsetX
-    }
-
-    @Deprecated("use renderable item list", ReplaceWith(""))
-    fun MutableList<Any>.addItemIcon(
-        item: ItemStack,
-        highlight: Boolean = false,
-        scale: Double = NEUItems.itemFontSize,
-    ) {
-        try {
-            if (highlight) {
-                // Hack to add enchant glint, like Hypixel does it
-                item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
-            }
-            add(Renderable.itemStack(item, scale))
-        } catch (e: NullPointerException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Add item icon to renderable list",
-                "item" to item,
-            )
-        }
     }
 
     // totally not modified Autumn Client's TargetStrafe
@@ -1938,7 +1895,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
 
-        drawGradientRect(
+        GuiRenderUtils.drawGradientRect(
             x - borderAdjustment,
             y - borderAdjustment,
             x + width + borderAdjustment,
@@ -1949,46 +1906,6 @@ object RenderUtils {
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
-    }
-
-    // todo merge with the one in GuiRenderUtils
-    fun drawGradientRect(
-        left: Int,
-        top: Int,
-        right: Int,
-        bottom: Int,
-        startColor: Int = -0xfeffff0,
-        endColor: Int = -0xfeffff0,
-    ) {
-        val startAlpha = (startColor shr 24 and 255).toFloat() / 255.0f
-        val startRed = (startColor shr 16 and 255).toFloat() / 255.0f
-        val startGreen = (startColor shr 8 and 255).toFloat() / 255.0f
-        val startBlue = (startColor and 255).toFloat() / 255.0f
-        val endAlpha = (endColor shr 24 and 255).toFloat() / 255.0f
-        val endRed = (endColor shr 16 and 255).toFloat() / 255.0f
-        val endGreen = (endColor shr 8 and 255).toFloat() / 255.0f
-        val endBlue = (endColor and 255).toFloat() / 255.0f
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.shadeModel(7425)
-        val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos(right.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), top.toDouble(), 0.0)
-            .color(startRed, startGreen, startBlue, startAlpha).endVertex()
-        worldrenderer.pos(left.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        worldrenderer.pos(right.toDouble(), bottom.toDouble(), 0.0)
-            .color(endRed, endGreen, endBlue, endAlpha).endVertex()
-        tessellator.draw()
-        GlStateManager.shadeModel(7424)
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
     }
 
     fun getAlpha(): Float {

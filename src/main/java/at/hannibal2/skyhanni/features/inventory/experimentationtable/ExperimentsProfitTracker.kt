@@ -167,18 +167,26 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (isEnabled() && event.clickType == ClickType.RIGHT_CLICK) {
-            val item = event.itemInHand ?: return
-            if (item.getInternalName().isExpBottle()) {
-                lastSplashTime = SimpleTimeMark.now()
-                lastSplashes.add(item)
+        if (!isEnabled() || event.clickType != ClickType.RIGHT_CLICK) return
+        val item = event.itemInHand ?: return
+        val internalName = item.getInternalName()
+        if (!internalName.isExpBottle()) return
+
+        lastSplashTime = SimpleTimeMark.now()
+
+        if (ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 15.0)) {
+            tracker.modify {
+                it.startCost -= calculateBottlePrice(internalName)
             }
+            DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(false) }
+        } else {
+            lastSplashes.add(item)
         }
     }
 
     private fun NEUInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
 
@@ -200,11 +208,10 @@ object ExperimentsProfitTracker {
     private fun calculateBottlePrice(internalName: NEUInternalName): Int {
         val price = internalName.getPrice()
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
-        val maxPrice = npcPrice.coerceAtLeast(price)
-        return maxPrice.toInt()
+        return npcPrice.coerceAtLeast(price).toInt()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
@@ -267,22 +274,20 @@ object ExperimentsProfitTracker {
         for ((internalName, amount) in currentBottlesInInventory) {
             val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
             if (lastInInv >= amount) {
-                currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
                 continue
             }
 
             if (lastInInv == 0) {
-                currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
                 if (addToTracker) tracker.addItem(internalName, amount, false)
                 continue
             }
 
-            currentBottlesInInventory[internalName] = 0
             lastBottlesInInventory[internalName] = amount
             if (addToTracker) tracker.addItem(internalName, amount - lastInInv, false)
         }
+        currentBottlesInInventory.clear()
     }
 
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)

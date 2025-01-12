@@ -34,7 +34,7 @@ object LivingCaveDefenseBlocks {
 
     class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }
@@ -174,7 +174,7 @@ object LivingCaveDefenseBlocks {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
     }

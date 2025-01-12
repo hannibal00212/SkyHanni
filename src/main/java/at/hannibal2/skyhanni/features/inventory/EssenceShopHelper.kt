@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -29,6 +28,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -38,7 +39,7 @@ object EssenceShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private val GOLD_NUGGET_ITEM by lazy { "GOLD_NUGGET".toInternalName().getItemStack().item }
+    private inline val GOLD_NUGGET_ITEM get() = Items.gold_nugget
 
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
@@ -48,6 +49,8 @@ object EssenceShopHelper {
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
     private var infoItemStack: ItemStack? = null
+
+    private val patternGroup = RepoPattern.group("inventory.essence-shop-helper")
 
     /**
      * REGEX-TEST: Gold Essence Shop
@@ -113,7 +116,7 @@ object EssenceShopHelper {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
         if (!essenceShopPattern.matches(event.inventory.name)) return
-        infoItemStack.let { event.replace(it) }
+        infoItemStack?.let { event.replace(it) }
     }
 
     @SubscribeEvent
@@ -135,7 +138,7 @@ object EssenceShopHelper {
         }.toMutableList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEssenceType = ""
@@ -144,12 +147,12 @@ object EssenceShopHelper {
         essenceNeeded = 0
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         processInventoryEvent(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         processInventoryEvent(event)
     }

@@ -185,7 +185,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
@@ -243,7 +243,7 @@ object EndermanSlayerFeatures {
         logger.log("Reset everything (world change)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             3,

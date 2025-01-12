@@ -78,7 +78,7 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
@@ -116,7 +116,7 @@ object TheGreatSpook {
         displayGreatSpookEnd = Renderable.string(timeLeftString)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
@@ -230,7 +230,7 @@ object TheGreatSpook {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 
@@ -241,7 +241,7 @@ object TheGreatSpook {
         greatSpookEndTime = if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Great Spook")
 

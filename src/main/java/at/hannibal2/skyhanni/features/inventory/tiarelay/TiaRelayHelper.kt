@@ -56,7 +56,7 @@ object TiaRelayHelper {
         tryResult()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
@@ -141,7 +141,7 @@ object TiaRelayHelper {
         lastClickTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tiaRelayMute", "inventory.helper.tiaRelay.tiaRelayMute")
         event.move(2, "misc.tiaRelayHelper", "inventory.helper.tiaRelay.soundHelper")

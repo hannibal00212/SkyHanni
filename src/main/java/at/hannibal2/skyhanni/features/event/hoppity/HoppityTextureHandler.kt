@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityRabbitTextureEntry
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityRabbitTexturesJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HoppityTextureHandler {
 
     private var hoppityRabbitTextures = mutableMapOf<LorenzRarity, List<HoppityRabbitTextureEntry>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityRabbitTexturesJson>("HoppityRabbitTextures")
         hoppityRabbitTextures = data.textures.mapNotNull { (key, entries) ->

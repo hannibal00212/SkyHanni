@@ -16,6 +16,9 @@ import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.12
+//$$ import net.minecraft.inventory.ClickType
+//#endif
 
 object InventoryUtils {
 
@@ -128,16 +131,27 @@ object InventoryUtils {
         }
     }
 
+    fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            this[slot] = slot.stack
+        }
+    }
+
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
-    fun clickSlot(slot: Int) {
-        val windowId = getWindowId() ?: return
+    fun clickSlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
+        windowId ?: return
         val controller = Minecraft.getMinecraft().playerController
-        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
+        //#if MC < 1.12
+        controller.windowClick(windowId, slot, mouseButton, mode, Minecraft.getMinecraft().thePlayer)
+        //#else
+        //$$ controller.windowClick(windowId, slot, mouseButton, ClickType.entries[mode], Minecraft.getMinecraft().player)
+        //#endif
     }
 
     fun Slot.isTopInventory() = inventory.isTopInventory()

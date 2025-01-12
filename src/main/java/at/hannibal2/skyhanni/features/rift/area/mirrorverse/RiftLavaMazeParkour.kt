@@ -22,7 +22,7 @@ object RiftLavaMazeParkour {
     private var parkourHelper: ParkourHelper? = null
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
@@ -55,7 +55,7 @@ object RiftLavaMazeParkour {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()

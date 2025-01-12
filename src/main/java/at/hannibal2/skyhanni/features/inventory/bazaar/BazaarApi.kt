@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
@@ -42,7 +43,7 @@ object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    val holder = BazaarDataHolder()
+    val holder = HypixelItemAPI()
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 
@@ -76,8 +77,8 @@ object BazaarApi {
         currentSearchedItem = displayName.removeColor()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
@@ -176,12 +177,12 @@ object BazaarApi {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(25, "bazaar", "inventory.bazaar")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inBazaarInventory = false
         currentlyOpenedProduct = null

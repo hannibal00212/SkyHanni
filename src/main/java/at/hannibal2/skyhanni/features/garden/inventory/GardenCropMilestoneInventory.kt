@@ -39,7 +39,7 @@ object GardenCropMilestoneInventory {
         average = (tiers.sum() / CropType.entries.size).roundTo(2)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         average = -1.0
     }
@@ -82,7 +82,7 @@ object GardenCropMilestoneInventory {
         event.toolTip.add(index, "§7Progress to Tier $maxTier: §e$percentageFormat")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.numberAverageCropMilestone", "garden.number.averageCropMilestone")
         event.move(3, "garden.cropMilestoneTotalProgress", "garden.tooltipTweak.cropMilestoneTotalProgress")

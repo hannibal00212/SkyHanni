@@ -33,7 +33,7 @@ object NPCVisitorFix {
         "§aChanging Barn skin to §r.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!GardenAPI.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return

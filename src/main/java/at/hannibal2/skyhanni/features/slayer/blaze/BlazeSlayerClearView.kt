@@ -18,7 +18,7 @@ object BlazeSlayerClearView {
 
     private var nearBlaze = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.repeatSeconds(3)) return
@@ -56,7 +56,7 @@ object BlazeSlayerClearView {
         return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeClearView", "slayer.blazes.clearView")
     }

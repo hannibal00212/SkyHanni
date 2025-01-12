@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
 import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
@@ -24,25 +26,25 @@ object PartyCommands {
 
     private val config get() = SkyHanniMod.feature.misc.commands
 
-    fun kickOffline() {
+    private fun kickOffline() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         HypixelCommands.partyKickOffline()
     }
 
-    fun disband() {
+    private fun disband() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         HypixelCommands.partyDisband()
     }
 
-    fun warp() {
+    private fun warp() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         HypixelCommands.partyWarp()
     }
 
-    fun kick(args: Array<String>) {
+    private fun kick(args: Array<String>) {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
@@ -54,7 +56,7 @@ object PartyCommands {
         HypixelCommands.partyKick(kickedPlayer)
     }
 
-    fun transfer(args: Array<String>) {
+    private fun transfer(args: Array<String>) {
         if (args.isEmpty()) {
             if (LimboTimeTracker.inLimbo) {
                 LimboTimeTracker.printStats(true)
@@ -68,14 +70,14 @@ object PartyCommands {
         HypixelCommands.partyTransfer(args[0])
     }
 
-    fun promote(args: Array<String>) {
+    private fun promote(args: Array<String>) {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         HypixelCommands.partyPromote(args[0])
     }
 
-    fun reverseTransfer() {
+    private fun reverseTransfer() {
         if (!config.reversePT.command) return
         if (PartyAPI.partyMembers.isEmpty()) return
         val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
@@ -117,7 +119,7 @@ object PartyCommands {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
 
@@ -138,5 +140,44 @@ object PartyCommands {
             onClick = { autoPartyTransfer(prevPartyLeader) },
             prefix = false,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("pko") {
+            description = "Kicks offline party members"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { kickOffline() }
+        }
+        event.register("pw") {
+            description = "Warps your party"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { warp() }
+        }
+        event.register("pk") {
+            description = "Kick a specific party member"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { kick(it) }
+        }
+        event.register("pt") {
+            description = "Transfer the party to another party member"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { transfer(it) }
+        }
+        event.register("pp") {
+            description = "Promote a specific party member"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { promote(it) }
+        }
+        event.register("pd") {
+            description = "Disbands the party"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { disband() }
+        }
+        event.register("rpt") {
+            description = "Reverse transfer party to the previous leader"
+            category = CommandCategory.SHORTENED_COMMANDS
+            callback { reverseTransfer() }
+        }
     }
 }

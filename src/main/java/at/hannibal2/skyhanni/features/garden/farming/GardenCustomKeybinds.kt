@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -36,14 +37,25 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.keyCode)) {
+                cir.returnValue = false
+            }
+            return
+        }
+
         cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.keyCode)) {
+                cir.returnValue = false
+            }
+            return
+        }
         cir.returnValue = override.isKeyClicked()
     }
 
@@ -55,7 +67,7 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
@@ -66,7 +78,7 @@ object GardenCustomKeybinds {
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
@@ -140,7 +152,7 @@ object GardenCustomKeybinds {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
         event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")

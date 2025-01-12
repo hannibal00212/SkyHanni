@@ -166,7 +166,7 @@ object DanceRoomHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         instructions = event.getConstant<DanceRoomInstructionsJson>("DanceRoomInstructions").instructions
     }
@@ -183,7 +183,7 @@ object DanceRoomHelper {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.mirrorVerseConfig", "rift.area.mirrorverse")
     }

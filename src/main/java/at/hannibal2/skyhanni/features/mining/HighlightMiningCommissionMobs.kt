@@ -20,7 +20,6 @@ import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -56,7 +55,7 @@ object HighlightMiningCommissionMobs {
         // new commissions
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
@@ -103,7 +102,7 @@ object HighlightMiningCommissionMobs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.mining", "mining")
     }

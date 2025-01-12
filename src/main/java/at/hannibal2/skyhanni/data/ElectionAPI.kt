@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.getMayorFromPerk
 import at.hannibal2.skyhanni.data.ElectionCandidate.Companion.setAssumeMayorJson
@@ -120,7 +121,7 @@ object ElectionAPI {
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
@@ -161,8 +162,8 @@ object ElectionAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventory(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
@@ -242,8 +243,8 @@ object ElectionAPI {
 
     private fun List<MayorCandidate>.bestCandidate() = maxBy { it.votes }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.assumeMayor
         config.onToggle {
             val mayor = config.get()
@@ -257,8 +258,8 @@ object ElectionAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mayor")
         event.addIrrelevant {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")

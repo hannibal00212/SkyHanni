@@ -258,7 +258,7 @@ object GardenVisitorDropStatistics {
     }
 
     // todo this should just save when changed not once a second
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()
     }
@@ -298,7 +298,7 @@ object GardenVisitorDropStatistics {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = GardenAPI.storage?.visitorDrops ?: return
         val visitorRarities = storage.visitorRarities
@@ -326,7 +326,7 @@ object GardenVisitorDropStatistics {
         config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val originalPrefix = "garden.visitorDropsStatistics."
         val newPrefix = "garden.visitors.dropsStatistics."

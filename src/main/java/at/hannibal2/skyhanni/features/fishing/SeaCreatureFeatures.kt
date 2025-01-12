@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,7 +37,7 @@ object SeaCreatureFeatures {
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -50,7 +50,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         var shouldHighlight = config.highlight
-        if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
             val seaCreaturesBosses =
                 BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
             if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
@@ -69,8 +69,8 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         rareSeaCreatures.remove(event.mob)
     }
 
@@ -101,7 +101,7 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }

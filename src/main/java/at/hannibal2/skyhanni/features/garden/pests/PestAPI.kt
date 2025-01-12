@@ -202,8 +202,8 @@ object PestAPI {
         updatePests()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
@@ -383,8 +383,8 @@ object PestAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenAPI.inGarden()) {

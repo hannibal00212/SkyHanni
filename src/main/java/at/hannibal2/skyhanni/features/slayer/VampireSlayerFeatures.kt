@@ -242,7 +242,7 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
@@ -251,7 +251,7 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityOtherPlayerMP>) {
         if (!isEnabled()) return
         if (!config.seeThrough) return
@@ -349,7 +349,7 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }

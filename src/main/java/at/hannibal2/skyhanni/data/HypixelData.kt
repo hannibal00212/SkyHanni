@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationAPI
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -24,6 +25,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -89,11 +92,11 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:           §r§b§lCoop §r§f(4)
+     * REGEX-TEST: §8[§r§a§r§8] §r§bBpoth §r§6§l℻
      */
-    private val playerAmountCoopPattern by patternGroup.pattern(
-        "playeramount.coop",
-        "^\\s*(?:§.)*Coop (?:§.)*\\((?<amount>\\d+)\\)\\s*$",
+    private val playerAmountOnIslandPattern by patternGroup.pattern(
+        "playeramount.onisland",
+        "^§.\\[[§\\w]{6,11}] §r.*",
     )
 
     /**
@@ -110,14 +113,6 @@ object HypixelData {
     private val dungeonPartyAmountPattern by patternGroup.pattern(
         "playeramount.dungeonparty",
         "^\\s*(?:§.)+Party (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
-    )
-
-    /**
-     * REGEX-TEST:            §r§b§lIsland
-     */
-    private val soloProfileAmountPattern by patternGroup.pattern(
-        "solo.profile.amount",
-        "^\\s*(?:§.)*Island\\s*$",
     )
 
     /**
@@ -178,6 +173,8 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
+    var playerAmountOnIsland = 0
+
     // Data from locraw
     var locrawData: JsonObject? = null
     private val locraw: MutableMap<String, String> = listOf(
@@ -204,6 +201,7 @@ object HypixelData {
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
+            HypixelLocationAPI.checkServerId(serverId)
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "tab list"
             failedServerIdFetchCounter = 0
@@ -213,6 +211,7 @@ object HypixelData {
         serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
+            HypixelLocationAPI.checkServerId(serverId)
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "scoreboard"
             failedServerIdFetchCounter = 0
@@ -233,8 +232,8 @@ object HypixelData {
         )
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Server ID")
         if (!LorenzUtils.inSkyBlock) {
             event.addIrrelevant("not in sb")
@@ -263,7 +262,6 @@ object HypixelData {
         var amount = 0
         val playerPatternList = mutableListOf(
             playerAmountPattern,
-            playerAmountCoopPattern,
             playerAmountGuestingPattern,
         )
         if (DungeonAPI.inDungeon()) {
@@ -278,14 +276,17 @@ object HypixelData {
                 }
             }
         }
-        amount += TabListData.getTabList().count { soloProfileAmountPattern.matches(it) }
 
-        return amount
+        if (!inAnyIsland(IslandType.GARDEN, IslandType.GARDEN_GUEST, IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST)) {
+            playerAmountOnIsland = 0
+        }
+
+        return amount + playerAmountOnIsland
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
-            return group("maxamount").toInt()
+            return group("maxamount").toInt() + playerAmountOnIsland
         }
 
         return when (skyBlockIsland) {
@@ -435,6 +436,7 @@ object HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+        HypixelLocationAPI.checkSkyblock(skyBlock)
     }
 
     private fun sendLocraw() {
@@ -449,6 +451,8 @@ object HypixelData {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
+            TabWidget.COOP -> countPlayersOnIsland(event)
+            TabWidget.ISLAND -> countPlayersOnIsland(event)
             else -> Unit
         }
     }
@@ -492,6 +496,7 @@ object HypixelData {
         }
 
         hypixelLive = hypixel && !hypixelAlpha
+        HypixelLocationAPI.checkHypixel(hypixelLive)
     }
 
     private fun checkSidebar() {
@@ -539,6 +544,7 @@ object HypixelData {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
+            HypixelLocationAPI.checkIsland(skyBlockIsland)
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
@@ -569,5 +575,10 @@ object HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
+    }
+
+    private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
+        if (event.isClear()) return
+        playerAmountOnIsland = playerAmountOnIslandPattern.allMatches(event.lines).size
     }
 }

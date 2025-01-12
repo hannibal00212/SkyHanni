@@ -69,8 +69,8 @@ object GriffinBurrowHelper {
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaAPI.isDoingDiana()) {
@@ -88,7 +88,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
@@ -354,7 +354,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "diana", "event.diana")
     }

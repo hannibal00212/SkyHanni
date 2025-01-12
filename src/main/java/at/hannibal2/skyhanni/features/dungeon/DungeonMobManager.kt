@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -29,7 +30,7 @@ object DungeonMobManager {
     private val staredInvisible = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             starredConfig.highlight,
@@ -57,15 +58,15 @@ object DungeonMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)

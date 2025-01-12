@@ -214,7 +214,7 @@ object HoppityEggsManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isActive()) return
         HoppityEggType.checkClaimed()
@@ -257,7 +257,7 @@ object HoppityEggsManager {
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             44,

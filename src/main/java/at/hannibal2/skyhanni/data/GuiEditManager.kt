@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -38,8 +39,8 @@ object GuiEditManager {
     private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
     private var lastMovedGui: String? = null
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
@@ -94,7 +95,7 @@ object GuiEditManager {
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
-            currentPositions.values().toList(),
+            currentPositions.values.toList(),
             2,
             Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
