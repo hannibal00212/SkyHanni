@@ -115,7 +115,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !started || !config.lampTimer) return
 
