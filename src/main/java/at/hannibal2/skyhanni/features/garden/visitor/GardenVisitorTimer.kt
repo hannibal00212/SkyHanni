@@ -186,7 +186,7 @@ object GardenVisitorTimer {
         onClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
