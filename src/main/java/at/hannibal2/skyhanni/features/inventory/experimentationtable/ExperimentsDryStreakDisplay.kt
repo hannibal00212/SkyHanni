@@ -32,8 +32,8 @@ object ExperimentsDryStreakDisplay {
 
     private var didJustFind = false
 
-    @SubscribeEvent
-    fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!ExperimentationTableAPI.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
 

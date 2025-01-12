@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.system
 data class ModVersion(val stable: Int, val beta: Int, val bugfix: Int) : Comparable<ModVersion> {
 
     val isBeta get() = beta != 0
+    val isBackport get() = beta == 0 && bugfix != 0
 
     inline val asString get() = toString()
 

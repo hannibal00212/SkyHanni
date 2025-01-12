@@ -64,7 +64,7 @@ object HitmanAPI {
      */
     private fun getNextHuntedMeal(
         previousMeal: HoppityEggType,
-        duration: Duration
+        duration: Duration,
     ): HoppityEggType = sortedEntries
         .filter { it.willBeClaimableAfter(duration) }
         .let { passingEggs ->
@@ -88,6 +88,17 @@ object HitmanAPI {
         }?.minus(1 + initialAvailable.size) ?: return Duration.ZERO
 
         val initialCeiling = initialAvailable.size.coerceAtMost(huntsToPerform)
+        if (initialCeiling < 0) {
+            ErrorManager.logErrorStateWithData(
+                "Error in Hitman Time, PLEASE report this on discord",
+                "HitmanStatsStorage.getTimeToHuntCount is using a negative take()",
+                "initialCeiling" to initialCeiling,
+                "initialAvailable.size" to initialAvailable.size,
+                "huntsToPerform" to huntsToPerform,
+                "targetHuntCount" to targetHuntCount,
+            )
+            return Duration.ZERO
+        }
         nextHuntMeal = initialAvailable.sortedBy { it.timeUntil() }.take(initialCeiling).maxByOrNull {
             it.timeUntil()
         } ?: nextHuntMeal
