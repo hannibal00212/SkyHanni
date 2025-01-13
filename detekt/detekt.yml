@@ -14,7 +14,9 @@ FormattingRules:
 RepoRules:
     SkullTexturesUseRepo:
         active: true
-    RepoPatternRegexTest:
+    RepoPatternRegexTestMissing:
+        active: true
+    RepoPatternRegexTestFailed:
         active: true
     RepoPatternUnnamedGroup:
         active: true

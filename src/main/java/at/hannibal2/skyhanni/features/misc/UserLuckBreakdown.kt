@@ -215,8 +215,8 @@ object UserLuckBreakdown {
         else string
     }
 
-    @SubscribeEvent
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userluckEnabled) return
         if (!inMiscStats) return
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f

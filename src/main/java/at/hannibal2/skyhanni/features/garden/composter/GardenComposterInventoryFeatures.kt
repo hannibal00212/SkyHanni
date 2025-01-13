@@ -74,7 +74,7 @@ object GardenComposterInventoryFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.highlightUpgrade) return

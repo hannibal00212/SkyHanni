@@ -46,7 +46,7 @@ object PowerStoneGuideFeatures {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
@@ -56,7 +56,7 @@ object PowerStoneGuideFeatures {
             .forEach { it highlight LorenzColor.RED }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
