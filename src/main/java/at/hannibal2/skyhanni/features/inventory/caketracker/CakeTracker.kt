@@ -387,7 +387,7 @@ object CakeTracker {
                 condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
             ),
         )
-        add(Renderable.string(" "))
+        addString(" ")
         add(
             Renderable.optionalLink(
                 "$oldestColor[Oldest First]",
