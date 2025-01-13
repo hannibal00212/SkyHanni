@@ -126,10 +126,10 @@ internal object RenderableUtils {
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+}
 
-    fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
-        add(Renderable.horizontalContainer(buildList { builderAction() }))
-    }
+fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
+    add(Renderable.horizontalContainer(buildList { builderAction() }))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
