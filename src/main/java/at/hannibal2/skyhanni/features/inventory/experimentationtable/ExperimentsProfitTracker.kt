@@ -149,7 +149,7 @@ object ExperimentsProfitTracker {
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() ||
             InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
@@ -186,7 +186,7 @@ object ExperimentsProfitTracker {
 
     private fun NEUInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
 
@@ -211,7 +211,7 @@ object ExperimentsProfitTracker {
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
@@ -246,7 +246,7 @@ object ExperimentsProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 

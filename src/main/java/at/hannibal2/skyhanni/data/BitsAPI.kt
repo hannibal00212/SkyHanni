@@ -253,8 +253,8 @@ object BitsAPI {
 
     fun bitsPerCookie(): Int = (DEFAULT_COOKIE_BITS * (fameRank?.bitsMultiplier ?: 1.0)).toInt()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         val stacks = event.inventoryItems

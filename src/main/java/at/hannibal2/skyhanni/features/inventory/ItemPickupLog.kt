@@ -104,7 +104,7 @@ object ItemPickupLog {
     )
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }

@@ -53,7 +53,7 @@ object SprayDisplay {
         sendExpiredPlotsToChat(true)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden() || !config.displayEnabled) return
         val display = display ?: return
