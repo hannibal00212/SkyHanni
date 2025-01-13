@@ -150,6 +150,10 @@ object GardenAPI {
         return internalName.asString() in otherToolsList
     }
 
+    fun isHoldingTool(): Boolean {
+        return GardenAPI.toolInHand != null
+    }
+
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
     fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
