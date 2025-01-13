@@ -94,8 +94,8 @@ object VisitorListener {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[INFO_SLOT] ?: return
         val lore = npcItem.getLore()
@@ -121,7 +121,7 @@ object VisitorListener {
         VisitorOpenEvent(visitor).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         VisitorAPI.inInventory = false
     }

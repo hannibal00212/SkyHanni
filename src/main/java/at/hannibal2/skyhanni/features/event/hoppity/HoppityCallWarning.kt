@@ -103,8 +103,8 @@ object HoppityCallWarning {
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!activeWarning) return
         if (nextWarningTime == null || finalWarningTime == null) return

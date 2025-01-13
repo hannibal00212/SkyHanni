@@ -111,8 +111,8 @@ object GardenLevelDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val item = when (event.inventoryName) {
             "Desk" -> event.inventoryItems[4] ?: return

@@ -66,7 +66,7 @@ object CityProjectFeatures {
         "§aProject is (?:being built|released)!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
@@ -97,13 +97,13 @@ object CityProjectFeatures {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         inInventory = false

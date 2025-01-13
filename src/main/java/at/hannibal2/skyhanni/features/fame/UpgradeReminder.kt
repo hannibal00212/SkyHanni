@@ -82,7 +82,7 @@ object UpgradeReminder {
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: (for 0.27) merge this logic with reminder manager
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
@@ -95,8 +95,8 @@ object UpgradeReminder {
         lastReminderSend = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
         if (!inInventory) return
@@ -131,7 +131,7 @@ object UpgradeReminder {
         return false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

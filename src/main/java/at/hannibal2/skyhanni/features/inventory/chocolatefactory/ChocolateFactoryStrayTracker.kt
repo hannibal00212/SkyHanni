@@ -278,8 +278,8 @@ object ChocolateFactoryStrayTracker {
         return true
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
@@ -309,15 +309,15 @@ object ChocolateFactoryStrayTracker {
         tracker.renderDisplay(config.strayRabbitTrackerPosition)
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         // Force a refresh for party mode
         if (ChocolateFactoryAPI.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
         tracker.update() // Make sure we don't stay in party mode

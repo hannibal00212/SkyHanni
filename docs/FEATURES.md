@@ -58,6 +58,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
++ Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
+    + Plays meow sound when 'meow' appears in chat.
+    + Plays bark sound when 'woof' appears in chat.
 
 </details>
 <details open><summary>
@@ -240,6 +243,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Highlights unowned cakes in AH.
     +  Displays a list of missing cake years.
 + Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
++ Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
 
 </details>
 <details open><summary>
@@ -303,6 +307,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Minion name display with minion tier.
 - **Minion Craft Helper** - Show how many more items you need to upgrade the minion in your inventory. Especially useful
   for bingo.
++ Added Minion Upgrade Helper. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2589)
+    + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
+    + Opens Bazaar if items aren't found in Sacks.
+    + Shows the cost of required items and total upgrade cost.
 
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
 

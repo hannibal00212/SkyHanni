@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -58,7 +59,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -174,14 +174,28 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!minionTitlePattern.find(event.inventoryName)) return
+        val inventoryName = event.inventoryName
+        if (!minionTitlePattern.find(inventoryName)) {
+            // This should never happen, but somehow it still does. Therefore the workaround
+            if (minionInventoryOpen) {
+                minionInventoryOpen = false
+                MinionCloseEvent().post()
+                ErrorManager.logErrorStateWithData(
+                    "Detected unexpected minion menu closing",
+                    "minionInventoryOpen = true without minion title in InventoryFullyOpenedEvent()",
+                    "current inventoryName" to inventoryName,
+                    betaOnly = true,
+                )
+            }
+            return
+        }
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
+                MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
         }
@@ -190,7 +204,7 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
@@ -254,7 +268,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.reopenSameName) return
 
@@ -395,7 +409,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return

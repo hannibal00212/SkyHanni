@@ -28,9 +28,9 @@ import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
 class Features : Config() {
-    private val discord = MyResourceLocation("notenoughupdates", "social/discord.png")
-    private val github = MyResourceLocation("notenoughupdates", "social/github.png")
-    private val patreon = MyResourceLocation("notenoughupdates", "social/patreon.png")
+    private val discord = MyResourceLocation("skyhanni", "social/discord.png")
+    private val github = MyResourceLocation("skyhanni", "social/github.png")
+    private val patreon = MyResourceLocation("skyhanni", "social/patreon.png")
 
     // in moulconfig, this value is currently bugged (version 3.5.0)
     override fun shouldAutoFocusSearchbar(): Boolean {
