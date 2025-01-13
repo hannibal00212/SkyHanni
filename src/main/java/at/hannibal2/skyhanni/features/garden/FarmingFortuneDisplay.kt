@@ -139,7 +139,7 @@ object FarmingFortuneDisplay {
         lastToolSwitch = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return

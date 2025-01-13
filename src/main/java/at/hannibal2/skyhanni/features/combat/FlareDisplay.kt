@@ -60,9 +60,23 @@ object FlareDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+
+        if (config.flashScreen && activeWarning) {
+            val minecraft = Minecraft.getMinecraft()
+            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+            Gui.drawRect(
+                0,
+                0,
+                minecraft.displayWidth,
+                minecraft.displayHeight,
+                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+            )
+            GlStateManager.color(1F, 1F, 1F, 1F)
+        }
+
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
@@ -189,21 +203,6 @@ object FlareDisplay {
                 else -> {}
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.flashScreen || !activeWarning) return
-        val minecraft = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        Gui.drawRect(
-            0,
-            0,
-            minecraft.displayWidth,
-            minecraft.displayHeight,
-            (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
-        )
-        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @SubscribeEvent

@@ -175,7 +175,7 @@ object EnderNodeTracker {
         miteGelInInventory = newMiteGelInInventory
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
