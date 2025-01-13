@@ -38,7 +38,7 @@ object MinionCraftHelper {
 
     private val minionNamePattern by RepoPattern.pattern(
         "bingo.minion.name",
-        "(?<name>.*) Minion (?<number>.*)"
+        "(?<name>.*) Minion (?<number>.*)",
     )
 
     private var display = emptyList<String>()
@@ -96,9 +96,9 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    @Suppress("FunctionReturnTypeSpacing")
-    private fun loadFromInventory(mainInventory: List<ItemStack>):
-        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(
+        mainInventory: List<ItemStack>,
+    ): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
