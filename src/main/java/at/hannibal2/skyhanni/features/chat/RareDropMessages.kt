@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.lang.Integer.parseInt
 
 @SkyHanniModule
 object RareDropMessages {
@@ -81,5 +83,40 @@ object RareDropMessages {
                 "$start§$rarityColor§l$rarityName §$rarityColor$petName$end"
             )
         }
+    }
+
+
+
+    /**
+     * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lPET DROP! §r§9Enderman §r§b(+§r§b322% §r§b✯ Magic Find§r§b)
+     */
+    private val petDropsWithMagicFindPattern by chatGroup.pattern(
+        "pet.petdropmessage", // TODO: Improve name
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)((?:§.)*\\(\\+(?:§.)*(?<magicFind>\\d+)% (?:§.)*(?<mfMessage>✯ Magic Find)(?:§.)*\\))"
+        // TODO: ugly regex gotta fix
+    )
+
+    @SubscribeEvent
+    fun onChatting(event: LorenzChatEvent) {
+        // if (!isEnabled()) return // TODO: implement config toggle
+        if (!LorenzUtils.inSkyBlock) return
+        val matcher = petDropsWithMagicFindPattern.matcher(event.message)
+
+        if (!matcher.matches()) return
+
+        val start = matcher.group("start")
+        val rarityColor = matcher.group("rarityColor")
+        val rarityName = colorCodeToRarity(rarityColor.first()).uppercase()
+        val petName = matcher.group("petName")
+        val magicFind: String = matcher.group("magicFind") ?: return
+        val mfMessage = matcher.group("mfMessage")
+
+        val petLuck = SkyblockStat.PET_LUCK.lastKnownValue
+
+        event.chatComponent = ChatComponentText(
+            // TODO: extremely fragile
+            "$start§$rarityColor§l$rarityName §$rarityColor$petName§r§b(+§r§b${parseInt(magicFind)}% §r§b$mfMessage) §d(+${petLuck.toInt()} ♣ Pet Luck)",
+        )
     }
 }
