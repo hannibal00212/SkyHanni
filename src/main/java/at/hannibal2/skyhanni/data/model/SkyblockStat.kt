@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -141,6 +142,8 @@ enum class SkyblockStat(
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
 
+    var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
+
     private val capitalizedName = name.lowercase().allLettersFirstUppercase()
 
     val iconWithName = "$icon $capitalizedName"
@@ -214,6 +217,7 @@ enum class SkyblockStat(
                 } ?: continue
                 entry.lastKnownValue = matchResult
                 entry.lastSource = type
+                entry.lastAssignment = SimpleTimeMark.now()
                 break // Exit the inner loop once a match is found
             }
         }

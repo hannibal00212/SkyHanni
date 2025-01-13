@@ -52,7 +52,7 @@ class GuiPositionEditor(
         for (position in positions) {
             position.clicked = false
         }
-        OtherInventoryData.close()
+        OtherInventoryData.close("ShPositionEditor")
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
