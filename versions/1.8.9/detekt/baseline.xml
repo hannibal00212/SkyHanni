@@ -57,6 +57,7 @@
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NEUInternalName, Int&gt;, minions: MutableMap&lt;String, NEUInternalName&gt;, tierOneMinions: MutableList&lt;NEUInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NEUInternalName&gt;, )</ID>
     <ID>MemberNameEqualsClassName:LastServers.kt$LastServers$private val lastServers = mutableMapOf&lt;String, SimpleTimeMark&gt;()</ID>
     <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
+    <ID>MemberNameEqualsClassName:ReplaceRomanNumerals.kt$ReplaceRomanNumerals$fun replaceRomanNumerals(string: String): String</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
     <ID>MemberNameEqualsClassName:Text.kt$Text$fun text(text: String, init: IChatComponent.() -&gt; Unit = {})</ID>
@@ -74,7 +75,6 @@
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posY</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;${ it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }</ID>
     <ID>NoNameShadowing:RenderableUtils.kt$RenderableUtils${ it != null }</ID>
-    <ID>NoNameShadowing:ReplaceRomanNumerals.kt$ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
