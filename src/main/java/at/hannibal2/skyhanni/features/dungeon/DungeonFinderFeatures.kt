@@ -115,19 +115,12 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST: Floor: Floor VII
-     */
-    private val floorFloorPattern by patternGroup.pattern(
-        "floor.floor",
-        "Floor: .*",
-    )
-
-    /**
      * REGEX-TEST: Floor VII
+     * REGEX-TEST: Floor: Floor VII
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "Floor .*",
+        "Floor:? .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
@@ -219,7 +212,7 @@ object DungeonFinderFeatures {
             val name = stack.displayName.removeColor()
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getLore()
-            val floor = lore.find { floorFloorPattern.matches(it.removeColor()) } ?: continue
+            val floor = lore.find { floorPattern.matches(it.removeColor()) } ?: continue
             val dungeon = lore.find { dungeonFloorPattern.matches(it.removeColor()) } ?: continue
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
