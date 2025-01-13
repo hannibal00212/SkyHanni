@@ -69,7 +69,7 @@ object ConfigUpdaterMigrator {
                     move(
                         since,
                         "$realPrefix.${oldPath.substringAfter('.')}",
-                        "$realPrefix.${newPath.substringAfter('.')}", transform
+                        "$realPrefix.${newPath.substringAfter('.')}", transform,
                     )
                     return
                 }
@@ -83,7 +83,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be relocated to $new, " +
-                        "since another element already inhabits that path"
+                        "since another element already inhabits that path",
                 )
                 return
             }
@@ -140,7 +140,7 @@ object ConfigUpdaterMigrator {
                 JsonObject().also {
                     it.add("lastVersion", JsonPrimitive(i + 1))
                 },
-                i, 0, dynamicPrefix
+                i, 0, dynamicPrefix,
             ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)

@@ -98,8 +98,8 @@ class GuiPositionEditor(
         }
 
         val pos = positions[displayPos]
-        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
+        val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
+        GuiRenderUtils.drawStringCentered("§b ${pos.internalName}", getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
         if (pos.canJumpToConfigOptions())
             GuiRenderUtils.drawStringCentered(
@@ -228,7 +228,7 @@ class GuiPositionEditor(
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-            GuiEditManager.handleGuiPositionMoved(position.internalName)
+            GuiEditManager.handleGuiPositionMoved(position.internalName ?: continue)
         }
     }
 
