@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
@@ -110,6 +111,8 @@ open class TextInput {
             }
         }
 
+        var lastTextInputTime = SimpleTimeMark.farPast()
+
         private fun handleTextInput() {
             if (KeyboardManager.isCopyingKeysDown()) {
                 OSUtils.copyToClipboard(textBox)
@@ -166,6 +169,7 @@ open class TextInput {
                 }
             }
             updated()
+            lastTextInputTime = SimpleTimeMark.now()
         }
 
         private fun onRemove(): String = carriage?.let {

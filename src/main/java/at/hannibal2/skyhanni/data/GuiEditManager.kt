@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -60,7 +62,10 @@ object GuiEditManager {
         if (NEUItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
-        openGuiPositionEditor(hotkeyReminder = false)
+        DelayedRun.runDelayed(150.milliseconds) {
+            if (TextInput.lastTextInputTime.passedSince() < 1.seconds) return@runDelayed
+            openGuiPositionEditor(hotkeyReminder = false)
+        }
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
