@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -209,6 +209,7 @@ object SlayerProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
+    // TODO reintroduce this? whats going on?
     val coinFormat: (ItemTrackerData.TrackedItem) -> Pair<String, List<String>> = { item ->
         val mobKillCoinsFormat = item.totalAmount.shortFormat()
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"
@@ -220,12 +221,22 @@ object SlayerProfitTracker {
         text to lore
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                getTracker()?.renderDisplay(config.pos)
+            },
+        )
+    }
 
-        getTracker()?.renderDisplay(config.pos)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!SlayerAPI.isInCorrectArea) return false
+
+        return true
     }
 
     @HandleEvent

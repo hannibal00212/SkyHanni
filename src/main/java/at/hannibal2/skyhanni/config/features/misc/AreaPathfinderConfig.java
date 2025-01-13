@@ -18,7 +18,7 @@ public class AreaPathfinderConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Show Always", desc = "Show the list always, not only while inside the inventory.")
+    @ConfigOption(name = "Show Always", desc = "Show the list always, also while outside of an inventory.")
     @ConfigEditorBoolean
     public boolean showAlways = false;
 

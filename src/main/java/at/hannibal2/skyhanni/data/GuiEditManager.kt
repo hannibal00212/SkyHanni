@@ -115,7 +115,7 @@ object GuiEditManager {
 
         GlStateManager.translate(0f, 0f, 200f)
 
-        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        RenderData.renderOverlay()
 
         GlStateManager.pushMatrix()
         GlStateManager.enableDepth()

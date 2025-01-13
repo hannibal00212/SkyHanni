@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
@@ -13,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -104,15 +104,19 @@ object HoppityEggDisplayManager {
                 container,
                 tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
                 onClick = { HypixelCommands.warp(config.warpDestination) },
-            ) else container
+            ) else container,
         )
     }
 
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!HoppityEggsManager.isActive()) return
-        config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { HoppityEggsManager.isActive() },
+            onRender = {
+                config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+            },
+        )
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =

@@ -32,7 +32,9 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -110,6 +112,8 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
@@ -120,6 +124,8 @@ object IslandAreas {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")

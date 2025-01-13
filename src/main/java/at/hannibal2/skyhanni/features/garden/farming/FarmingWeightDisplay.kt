@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -44,13 +44,24 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FarmingWeightDisplay {
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (GardenAPI.hideExtraGuis()) return
-        val shouldShow = apiError || (config.ignoreLow || weight >= 200)
-        if (isEnabled() && shouldShow) {
-            config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
-        }
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                val shouldShow = apiError || (config.ignoreLow || weight >= 200)
+                if (isEnabled() && shouldShow) {
+                    config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
+                }
+            },
+        )
+    }
+
+    private fun shouldShowDisplay(): Boolean {
+        if (GardenAPI.hideExtraGuis()) return false
+
+        return true
     }
 
     @HandleEvent
