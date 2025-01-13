@@ -390,18 +390,16 @@ object CollectionUtils {
             }
         }
         add(
-            Renderable.horizontalContainer(
-                buildList {
-                    addString(prefix)
-                    addString("§a[")
-                    if (tips.isEmpty()) {
-                        add(Renderable.link("§e$getName", false, onClick))
-                    } else {
-                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                    }
-                    addString("§a]")
-                },
-            ),
+            Renderable.line {
+                addString(prefix)
+                addString("§a[")
+                if (tips.isEmpty()) {
+                    add(Renderable.link("§e$getName", false, onClick))
+                } else {
+                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                }
+                addString("§a]")
+            },
         )
     }
 
