@@ -29,6 +29,11 @@ public class DisplayConfig {
     public ChunkedStatsConfig chunkedStats = new ChunkedStatsConfig();
 
     @Expose
+    @ConfigOption(name = "Custom Lines", desc = "")
+    @Accordion
+    public CustomLinesConfig customLines = new CustomLinesConfig();
+
+    @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
     public EventsConfig events = new EventsConfig();
