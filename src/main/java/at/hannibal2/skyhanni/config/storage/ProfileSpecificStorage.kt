@@ -55,12 +55,16 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
+import java.util.EnumMap
+import java.util.Objects
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
     @Expose
     var currentPet: String = ""
+
+    @Expose
+    var purse: Long = -1
 
     @Expose
     var experimentation: ExperimentationStorage = ExperimentationStorage()
@@ -326,6 +330,9 @@ class ProfileSpecificStorage {
         var experience: Long? = null
 
         @Expose
+        var copper: Long = -1
+
+        @Expose
         var cropCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
 
         @Expose
@@ -544,6 +551,7 @@ class ProfileSpecificStorage {
     @Expose
     var powderTracker: PowderTracker.Data = PowderTracker.Data()
 
+    // TODO: move to WinterStorage
     @Expose
     var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()
 
@@ -551,9 +559,20 @@ class ProfileSpecificStorage {
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
 
     @Expose
+    var winter: WinterStorage = WinterStorage()
+
+    class WinterStorage {
+        @Expose
+        var northStars: Long = -1
+    }
+
+    @Expose
     var rift: RiftStorage = RiftStorage()
 
     class RiftStorage {
+        @Expose
+        var motes: Long = -1
+
         @Expose
         var completedKloonTerminals: MutableList<KloonTerminal> = ArrayList()
 
@@ -823,7 +842,7 @@ class ProfileSpecificStorage {
                 rabbitTheFishFinds,
                 initialLeaderboardPosition,
                 finalLeaderboardPosition,
-                summarized
+                summarized,
             )
         }
 

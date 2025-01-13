@@ -148,7 +148,7 @@ object PestProfitTracker {
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
-        val coins = event.coins
+        val coins = event.oldCoins
         if (coins > 1000) return
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
             tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)

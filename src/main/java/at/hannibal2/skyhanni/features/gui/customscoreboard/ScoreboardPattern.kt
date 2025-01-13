@@ -21,27 +21,11 @@ object ScoreboardPattern {
     private val mainSb = scoreboardGroup.group("main")
 
     /**
-     * REGEX-TEST: Motes: §5137,242
-     */
-    val motesPattern by mainSb.pattern(
-        "motes",
-        "(?:§.)*Motes: (?:§.)*(?<motes>[\\d,]+).*",
-    )
-
-    /**
      * REGEX-TEST: Heat: §c1♨
      */
     val heatPattern by mainSb.pattern(
         "heat",
         "Heat: (?<heat>.*)",
-    )
-
-    /**
-     * REGEX-TEST: Copper: §c3,416
-     */
-    val copperPattern by mainSb.pattern(
-        "copper",
-        "(?:§.)*Copper: (?:§.)*(?<copper>[\\d,]+).*",
     )
 
     /**
@@ -110,14 +94,6 @@ object ScoreboardPattern {
     val waitingForVotePattern by mainSb.pattern(
         "waitingforvote",
         "§7Waiting for|§7your vote\\.\\.\\.",
-    )
-
-    /**
-     * REGEX-TEST: North Stars: §d1,539
-     */
-    val northstarsPattern by mainSb.pattern(
-        "northstars",
-        "North Stars: §d(?<northstars>[\\w,]+).*",
     )
 
     /**
