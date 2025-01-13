@@ -47,7 +47,7 @@ object FrogMaskDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || currentRegion == null) return
 
-        config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
+        config.frogMaskDisplayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
     @HandleEvent
@@ -75,7 +75,7 @@ object FrogMaskDisplay {
             listOf(
                 Renderable.itemStack(frogMask),
                 Renderable.string(
-                    "§5Frog Mask§6 - $currentRegion §6for §e$timeString",
+                    "§5Frog Mask§6 - $currentRegion §6for §b$timeString",
                 ),
             ),
             spacing = 1,

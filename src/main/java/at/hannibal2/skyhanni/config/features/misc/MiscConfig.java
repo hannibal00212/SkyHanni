@@ -230,7 +230,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
-    public Position frogMaskDisplayPos = new Position(25, 25, false, true);
+    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
