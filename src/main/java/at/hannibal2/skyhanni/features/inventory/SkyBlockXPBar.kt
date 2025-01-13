@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkyBlockXPBar {
+    private val config get() = SkyHanniMod.feature.inventory
 
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Pre) {
@@ -20,6 +21,5 @@ object SkyBlockXPBar {
         Minecraft.getMinecraft().thePlayer.setXPStats(xp / 100f, 100, level)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.Companion.feature.inventory.skyblockXpBar
-
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.skyblockXpBar
 }
