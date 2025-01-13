@@ -147,6 +147,19 @@ public class GardenConfig {
     public PersonalBestsConfig personalBests = new PersonalBestsConfig();
 
     @Expose
+    @ConfigOption(
+        name = "Bonus Chance Display",
+        desc = "Displays your bonus pest chance and if it is enabled or not."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean pestChanceDisplay = false;
+
+    @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "pestChanceDisplay")
+    public Position pestChanceDisplayPosition = new Position(5, -115, false, true);
+
+    @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
