@@ -245,13 +245,17 @@ interface Renderable {
 
             val isGuiScreen = guiScreen != null
 
-            // never support grayed out inventories
-            if (isGuiScreen && RenderData.outsideInventory) {
+            if (!isGuiScreen) {
+                return false
+            }
+
+//             never support grayed out inventories
+            if (RenderData.outsideInventory) {
                 return false
             }
 
             if (bypassChecks) {
-                return isGuiScreen
+                return true
             }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor

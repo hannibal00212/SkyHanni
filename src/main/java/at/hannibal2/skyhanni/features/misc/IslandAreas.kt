@@ -112,6 +112,8 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
