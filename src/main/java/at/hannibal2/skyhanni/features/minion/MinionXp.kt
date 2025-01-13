@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -96,7 +97,7 @@ object MinionXp {
     private val listWithMissingName = listOf(21..26, 30..35, 39..44)
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
-        val xpTotal = EnumMap<SkillType, Double>(SkillType::class.java)
+        val xpTotal = enumMapOf<SkillType, Double>()
         val list = inventoryItems.filter {
             it.value.getLore().isNotEmpty() &&
                 (!isMinion || it.key in listWithMissingName.flatten())
