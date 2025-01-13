@@ -28,9 +28,6 @@ object FrogMaskDisplay {
 
     private var display: Renderable? = null
 
-    private var currentRegion: String? = null
-    private var timeRemaining = SimpleTimeMark.farPast()
-
     private val patternGroup = RepoPattern.group("misc.frogmask")
 
     /**
@@ -45,7 +42,7 @@ object FrogMaskDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || currentRegion == null) return
+        if (!isEnabled()) return
 
         config.frogMaskDisplayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
@@ -53,21 +50,20 @@ object FrogMaskDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        currentRegion = null
+        display = null
 
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
 
-        activeRegionPattern.matchAll(helmet.getLore()) {
-            currentRegion = group("region")
+        display = activeRegionPattern.matchAll(helmet.getLore()) {
+            val currentRegion = group("region")
             val now = SkyBlockTime.now()
-            timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+            val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+            updateDisplay(currentRegion, timeRemaining)
         }
-
-        display = if (currentRegion != null) updateDisplay() else null
     }
 
-    private fun updateDisplay(): Renderable {
+    private fun updateDisplay(currentRegion: String, timeRemaining: SimpleTimeMark): Renderable {
         val until = timeRemaining.timeUntil()
         val timeString = until.format()
 
