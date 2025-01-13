@@ -11,8 +11,10 @@ object SpecialColor {
     private const val MAX_CHROMA_SECS = 60
     private val startTime = SimpleTimeMark.now()
 
+    @Deprecated("Use CustomColor instead")
     fun String.toSpecialColor() = Color(toSpecialColorInt(), true)
 
+    @Deprecated("Use CustomColor instead")
     fun String.toSpecialColorInt(): Int {
         val (chroma, alpha, red, green, blue) = decompose(this)
         val (hue, sat, bri) = Color.RGBtoHSB(red, green, blue, null)
