@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
@@ -71,4 +72,9 @@ public class ReputationHelperConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Rescue Mission Waypoints", desc = "")
+    @Accordion
+    public RescueMissionConfig rescueMissionConfig = new RescueMissionConfig();
 }
