@@ -21,6 +21,11 @@ public class DungeonConfig {
     public SecretChimeConfig secretChime = new SecretChimeConfig();
 
     @Expose
+    @ConfigOption(name = "Spirit Leap", desc = "Configure the Spirit Leap feature to modify its behavior in-game.")
+    @Accordion
+    public SpiritLeapConfig spiritLeapOverlay = new SpiritLeapConfig();
+
+    @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
