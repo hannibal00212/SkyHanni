@@ -36,4 +36,10 @@ public class BingoConfig {
     @Expose
     @ConfigLink(owner = BingoConfig.class, field = "minionCraftHelperEnabled")
     public Position minionCraftHelperPos = new Position(10, 10, false, true);
+
+    @Expose
+    @ConfigOption(name = "Boop Party", desc = "Send party invite to players that boop you while you are on a Bingo profile.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean boopParty = false;
 }
