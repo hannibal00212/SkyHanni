@@ -15,10 +15,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SignUtils
+import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -94,7 +95,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { SignUtils.setTextIntoSign("$speed") })
             }
         } else {
             crops.map { (crop, speed) ->
@@ -106,7 +107,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { SignUtils.setTextIntoSign("$speed") })
             }
         }
     }
