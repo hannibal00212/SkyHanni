@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -71,7 +71,7 @@ object SlayerRngMeterDisplay {
 
     var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -142,8 +142,8 @@ object SlayerRngMeterDisplay {
 
     private fun getCurrentSlayer() = SlayerAPI.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         readRngMeterInventory(event)
@@ -222,8 +222,6 @@ object SlayerRngMeterDisplay {
         ) {
             return ""
         }
-        val latestSlayerCategory = SlayerAPI.latestSlayerCategory
-        latestSlayerCategory.endsWith(" I")
 
         with(storage) {
             if (itemGoal == "?") return "§cOpen RNG Meter Inventory!"

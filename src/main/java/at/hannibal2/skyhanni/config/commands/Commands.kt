@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
-import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
@@ -55,7 +54,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -90,7 +88,6 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
-import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -114,7 +111,6 @@ object Commands {
         devTest(event)
         devDebug(event)
         internalCommands(event)
-        shortenedCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
@@ -455,11 +451,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { SkyHanniMod.repo.displayRepoStatus(false) }
         }
-        event.register("shkingfix") {
-            description = "Resets the local King Talisman Helper offset."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { KingTalismanHelper.kingFix() }
-        }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
@@ -625,11 +616,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.repo.reloadLocalRepo() }
         }
-        event.register("shgraph") {
-            description = "Enables the graph editor"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditor.commandIn() }
-        }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
             category = CommandCategory.DEVELOPER_TEST
@@ -760,44 +746,6 @@ object Commands {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
             callback { ChatClickActionManager.onCommand(it) }
-        }
-    }
-
-    private fun shortenedCommands(event: CommandRegistrationEvent) {
-        event.register("pko") {
-            description = "Kicks offline party members"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kickOffline() }
-        }
-        event.register("pw") {
-            description = "Warps your party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.warp() }
-        }
-        event.register("pk") {
-            description = "Kick a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kick(it) }
-        }
-        event.register("pt") {
-            description = "Transfer the party to another party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.transfer(it) }
-        }
-        event.register("pp") {
-            description = "Promote a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.promote(it) }
-        }
-        event.register("pd") {
-            description = "Disbands the party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.disband() }
-        }
-        event.register("rpt") {
-            description = "Reverse transfer party to the previous leader"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.reverseTransfer() }
         }
     }
 }

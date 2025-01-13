@@ -35,6 +35,15 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
     FIRE_SALE(null, TabWidget.FIRE_SALE),
     RAIN("Park Rain", TabWidget.RAIN),
     PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS),
+    FULL_PROFILE_WIDGET(
+        "Profile Widget",
+        TabWidget.PROFILE,
+        TabWidget.SB_LEVEL,
+        TabWidget.BANK,
+        TabWidget.INTEREST,
+        TabWidget.SOULFLOW,
+        TabWidget.FAIRY_SOULS,
+    )
     ;
 
     val position get() = config.displayPositions[ordinal]

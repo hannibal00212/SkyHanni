@@ -65,18 +65,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
      * REGEX-TEST: §7Kill the §cAshfang §7miniboss §a2 §7times!
      * REGEX-TEST: §7Kill the §cMage Outlaw §7miniboss §a1 §7time!
      * REGEX-TEST: §7miniboss §a1 §7time!
+     * REGEX-TEST: §7Kill the §cBarbarian Duke X §7miniboss §a2
      */
     val minibossAmountPattern by patternGroup.pattern(
         "minibossamount",
-        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!",
-    )
-
-    /**
-     * REGEX-TEST: §eClick to start!
-     */
-    val clickToStartPattern by patternGroup.pattern(
-        "clicktostart",
-        "(?:§.)*Click to start!",
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d)(?: §7times?!)?",
     )
 
     /**
@@ -90,8 +83,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         questLoader.checkInventory(event)
@@ -114,7 +107,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.loadFromTabList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -231,9 +224,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT ||
-            state == QuestState.NOT_ACCEPTED ||
-            (this is RescueMissionQuest && state == QuestState.ACCEPTED)
+        state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
     fun render(display: MutableList<List<Any>>) {
@@ -278,7 +269,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        val stateText = if (quest !is UnknownQuest) {
+        val stateText = if (quest !is UnknownQuest && quest.state != QuestState.ACCEPTED) {
             "$stateColor[$state] §f"
         } else {
             ""

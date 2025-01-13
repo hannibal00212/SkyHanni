@@ -121,7 +121,7 @@ object CustomWardrobe {
             .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         DelayedRun.runDelayed(300.milliseconds) {
@@ -147,8 +147,8 @@ object CustomWardrobe {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled() || editMode) return
         DelayedRun.runNextTick {
             update()

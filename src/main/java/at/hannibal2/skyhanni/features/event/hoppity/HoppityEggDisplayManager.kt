@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -37,7 +38,7 @@ object HoppityEggDisplayManager {
         return config.playerOpacity < 100
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
 
@@ -52,7 +53,7 @@ object HoppityEggDisplayManager {
         GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         if (!canChangeOpacity(event.entity)) return
 
@@ -67,7 +68,7 @@ object HoppityEggDisplayManager {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         display = updateDisplay()
     }
@@ -94,7 +95,7 @@ object HoppityEggDisplayManager {
                 val collectedFormat = formatEggsCollected(collectedEggs)
                 add("§7Locations: $collectedFormat$collectedEggs§7/§a$totalEggs")
             }
-        }
+        }.map { it.partyModeReplace() }
 
         if (displayList.size == 1) return emptyList()
 

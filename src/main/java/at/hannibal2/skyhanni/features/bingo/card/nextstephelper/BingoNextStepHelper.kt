@@ -39,23 +39,31 @@ object BingoNextStepHelper {
     private val patternGroup = RepoPattern.group("bingo.steps")
     private val crystalObtainedPattern by patternGroup.pattern(
         "crystal.obtained",
-        " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal"
+        " *§r§e(?<crystalName>Topaz|Sapphire|Jade|Amethyst|Amber) Crystal",
     )
+
+    /**
+     * REGEX-TEST: §7§7Reach §a1,000 §7Ink Sac Collection.
+     */
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\."
+        "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.",
     )
     private val crystalPattern by patternGroup.pattern(
         "crystal.obtain",
-        "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\."
+        "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.",
     )
+
+    /**
+     * REGEX-TEST: §7§7Obtain level §e10§7 in the §6Foraging §7Skill.
+     */
     private val skillPattern by patternGroup.pattern(
         "skill",
-        "Obtain level (?<level>.*) in the (?<skill>.*) Skill."
+        "Obtain level (?<level>.*) in the (?<skill>.*) Skill.",
     )
     private val crystalFoundPattern by patternGroup.pattern(
         "crystal.found",
-        " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)"
+        " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)",
     )
 
     private val itemIslandRequired = mutableMapOf<String, IslandVisitStep>()
@@ -276,7 +284,7 @@ object BingoNextStepHelper {
                     "32x Enchanted Emerald",
                     "Emerald",
                     160 * 32,
-                    mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
+                    mapOf("Emerald" to 1, "Enchanted Emerald" to 160),
                 ) requires IslandType.DWARVEN_MINES.getStep()
                 )
         }
@@ -287,7 +295,7 @@ object BingoNextStepHelper {
                     "32x Jacob's Ticket",
                     "Jacob's Ticket",
                     32,
-                    mapOf("Jacob's Ticket" to 1)
+                    mapOf("Jacob's Ticket" to 1),
                 ).addItemRequirements() requires IslandType.GARDEN.getStep()
                 )
         }
@@ -344,7 +352,7 @@ object BingoNextStepHelper {
         rhys()
         IslandType.DWARVEN_MINES.getStep() requires SkillLevelStep(
             "Mining",
-            12
+            12,
         ).also { it requires IslandType.THE_FARMING_ISLANDS.getStep() }
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
@@ -361,7 +369,7 @@ object BingoNextStepHelper {
         ChatMessageStep("Get Ender Armor").makeFinalStep() requires IslandType.THE_END.getStep()
         IslandType.THE_END.getStep() requires SkillLevelStep(
             "Combat",
-            12
+            12,
         ).also { it requires IslandType.DEEP_CAVERNS.getStep() }
 //        enchantedCharcoal(7)
 //        compactor(7)
@@ -372,7 +380,7 @@ object BingoNextStepHelper {
             RHYS_TASK_NAME,
             "Redstone",
             160 * 10,
-            mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
+            mapOf("Redstone" to 1, "Enchanted Redstone" to 160),
         )
         redstoneForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
@@ -380,7 +388,7 @@ object BingoNextStepHelper {
             RHYS_TASK_NAME,
             "Lapis Lazuli",
             160 * 10,
-            mapOf("Lapis Lazuli" to 1, "Enchanted Lapis Lazuli" to 160)
+            mapOf("Lapis Lazuli" to 1, "Enchanted Lapis Lazuli" to 160),
         )
         lapisForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
@@ -388,7 +396,7 @@ object BingoNextStepHelper {
             RHYS_TASK_NAME,
             "Coal",
             160 * 10,
-            mapOf("Coal" to 1, "Enchanted Coal" to 160)
+            mapOf("Coal" to 1, "Enchanted Coal" to 160),
         )
         coalForRhys requires IslandType.DEEP_CAVERNS.getStep()
 
@@ -403,25 +411,25 @@ object BingoNextStepHelper {
             "Compactor (for Minions)",
             "Compactor",
             amount,
-            mapOf("Compactor" to 1)
+            mapOf("Compactor" to 1),
         ).apply { finalSteps.add(this) }
 
         compactorForMinions requires CollectionStep(
             "Cobblestone",
-            2_500
+            2_500,
         ).apply { this requires IslandType.HUB.getStep() }
 
         compactorForMinions requires ItemsStep(
             "" + (7 * amount) + " Enchanted Cobblestone (For Minions)",
             "Enchanted Cobblestone",
             amount * 7 * 160,
-            mapOf("Cobblestone" to 1, "Enchanted Cobblestone" to 160)
+            mapOf("Cobblestone" to 1, "Enchanted Cobblestone" to 160),
         )
         compactorForMinions requires ItemsStep(
             "$amount Enchanted Redstone (For Minions)",
             "Enchanted Redstone",
             amount * 160,
-            mapOf("Redstone" to 1, "Enchanted Redstone" to 160)
+            mapOf("Redstone" to 1, "Enchanted Redstone" to 160),
         )
     }
 
@@ -430,25 +438,25 @@ object BingoNextStepHelper {
             "Enchanted Charcoal (for Minions)",
             "Enchanted Charcoal",
             amount,
-            mapOf("Enchanted Charcoal" to 1)
+            mapOf("Enchanted Charcoal" to 1),
         ).apply { finalSteps.add(this) }
 
         enchantedCharcoalForMinions requires CollectionStep(
             "Coal",
-            2_500
+            2_500,
         ).apply { this requires IslandType.GOLD_MINES.getStep() }
 
         enchantedCharcoalForMinions requires ItemsStep(
             "Oak Wood (For Minions)",
             "Oak Wood",
             amount * 32,
-            mapOf("Oak Wood" to 1)
+            mapOf("Oak Wood" to 1),
         )
         enchantedCharcoalForMinions requires ItemsStep(
             "Coal (For Minions)",
             "Coal",
             amount * 64 * 2,
-            mapOf("Coal" to 1)
+            mapOf("Coal" to 1),
         )
     }
 

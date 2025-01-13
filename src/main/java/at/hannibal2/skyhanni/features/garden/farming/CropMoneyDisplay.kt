@@ -62,8 +62,8 @@ object CropMoneyDisplay {
     private val toolHasBountiful get() = GardenAPI.storage?.toolWithBountiful
 
     private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
-    private val SEEDS by lazy { "SEEDS".toInternalName() }
-    private val ENCHANTED_SEEDS by lazy { "ENCHANTED_SEEDS".toInternalName() }
+    private val SEEDS = "SEEDS".toInternalName()
+    private val ENCHANTED_SEEDS = "ENCHANTED_SEEDS".toInternalName()
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -84,7 +84,7 @@ object CropMoneyDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(5)) return
