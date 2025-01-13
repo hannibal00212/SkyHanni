@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.jsonobjects.local.DungeonReplaysJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -240,7 +241,8 @@ class ConfigManager {
             val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(data))
+                if (fileName == "dungeon_replays") writer.write(GsonBuilder().create().toJson(data)) else
+                    writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
             move(unit, file, reason)
@@ -286,6 +288,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    DUNGEON_REPLAY("dungeon_replays", DungeonReplaysJson::class.java, SkyHanniMod::dungeonReplayData),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

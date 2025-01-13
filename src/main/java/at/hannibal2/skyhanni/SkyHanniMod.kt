@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.data.jsonobjects.local.DungeonReplaysJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -123,6 +124,7 @@ class SkyHanniMod {
         lateinit var knownFeaturesData: KnownFeaturesJson
         lateinit var jacobContestsData: JacobContestsJson
         lateinit var visualWordsData: VisualWordsJson
+        lateinit var dungeonReplayData: DungeonReplaysJson
 
         lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
