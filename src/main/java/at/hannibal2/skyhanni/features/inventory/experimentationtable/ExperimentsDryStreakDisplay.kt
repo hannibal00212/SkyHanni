@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -31,8 +32,8 @@ object ExperimentsDryStreakDisplay {
 
     private var didJustFind = false
 
-    @SubscribeEvent
-    fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!ExperimentationTableAPI.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
 
@@ -43,12 +44,12 @@ object ExperimentsDryStreakDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName == "Experimentation Table" && didJustFind) didJustFind = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled() || didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
 
@@ -70,7 +71,7 @@ object ExperimentsDryStreakDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
 

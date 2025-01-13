@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -19,7 +18,7 @@ object AshfangHider {
 
     private val config get() = AshfangManager.config.hide
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!AshfangManager.active || !config.damageSplash) return
 

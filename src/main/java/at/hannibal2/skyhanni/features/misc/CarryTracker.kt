@@ -105,13 +105,13 @@ object CarryTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CarryTrackerJson>("CarryTracker")
         slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 

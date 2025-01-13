@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -32,6 +31,9 @@ object BingoAPI {
     val communityGoals get() = bingoGoals.values.filter { it.type == GoalType.COMMUNITY }
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
+    /**
+     * REGEX-TEST:  §9Ⓑ §9Bingo
+     */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
         " §.Ⓑ §.Bingo"
@@ -68,7 +70,7 @@ object BingoAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         ranks = event.getConstant<BingoRanksJson>("BingoRanks").ranks
         data = event.getConstant<BingoJson>("Bingo").bingoTips

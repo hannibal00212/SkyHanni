@@ -9,15 +9,16 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,11 +49,12 @@ object ChocolateFactoryBlockOpen {
 
     private var commandSentTimer = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val slotDisplayName = event.slot?.stack?.displayName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
+        if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
         if (checkIsBlocked()) event.cancel()
     }

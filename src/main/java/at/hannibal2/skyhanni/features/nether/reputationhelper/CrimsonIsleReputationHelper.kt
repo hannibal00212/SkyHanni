@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
@@ -62,7 +61,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(kuudraBossHelper)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         miniBossHelper.onRepoReload(data.MINIBOSS)
@@ -141,7 +140,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         display = newList
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return

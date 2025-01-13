@@ -125,6 +125,11 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
+    @ConfigOption(name = "Enchanted Clock", desc = "")
+    @Accordion
+    public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     public boolean resetSearchGuiOnClose = true;
@@ -305,7 +310,7 @@ public class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean replaceRomanNumerals = false;
+    public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")

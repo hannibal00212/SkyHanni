@@ -12,14 +12,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -32,9 +29,8 @@ object GardenVisitorSupercraft {
     private var lastSuperCraftMaterial = ""
 
     private val superCraftItem by lazy {
-        val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
-            neuItem.item,
+            Items.golden_pickaxe,
             "§bSupercraft",
             "§8(From SkyHanni)",
             "",
@@ -43,7 +39,7 @@ object GardenVisitorSupercraft {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (hasIngredients) {
             hasIngredients = false
@@ -103,7 +99,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!hasIngredients) return
 

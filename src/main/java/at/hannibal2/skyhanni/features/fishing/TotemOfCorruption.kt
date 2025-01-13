@@ -59,13 +59,13 @@ object TotemOfCorruption {
         "§7Owner: §e(?<owner>.+)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isOverlayEnabled() || display.isEmpty()) return
         config.position.renderStrings(display, posLabel = "Totem of Corruption")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isOverlayEnabled()) return

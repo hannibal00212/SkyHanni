@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -32,7 +33,7 @@ object SprayFeatures {
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
 
-    private val SPRAYONATOR by lazy { "SPRAYONATOR".toInternalName() }
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
 
     private fun SprayType?.getSprayEffect(): String =
         this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
@@ -54,7 +55,7 @@ object SprayFeatures {
         lastChangeTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
