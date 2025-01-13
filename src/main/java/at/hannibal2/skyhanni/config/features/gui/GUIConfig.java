@@ -72,6 +72,11 @@ public class GUIConfig {
     public XPBarConfig xpBar = new XPBarConfig();
 
     @Expose
+    @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")
+    @Accordion
+    public MayorOverlayConfig mayorOverlay = new MayorOverlayConfig();
+
+    @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     @Accordion
     public MarkedPlayerConfig markedPlayers = new MarkedPlayerConfig();
