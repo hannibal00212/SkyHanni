@@ -104,23 +104,20 @@ object BestiaryData {
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (inInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                val stack = slot.stack
-                val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                    slot highlight LorenzColor.GREEN
-                }
-                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                    slot highlight LorenzColor.RED
-                }
+        if (!isEnabled() || !inInventory) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                slot highlight LorenzColor.GREEN
+            }
+            if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
+                slot highlight LorenzColor.RED
             }
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
         val items = event.inventoryItems
@@ -134,7 +131,7 @@ object BestiaryData {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         mobList.clear()
         stackList.clear()
@@ -171,7 +168,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = stack.displayName
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
@@ -200,7 +196,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
             val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0

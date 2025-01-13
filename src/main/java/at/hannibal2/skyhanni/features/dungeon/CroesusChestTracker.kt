@@ -94,8 +94,8 @@ object CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
             croesusPattern.matches(event.inventoryName)
@@ -173,7 +173,7 @@ object CroesusChestTracker {
         kismetUsed = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCroesusInventory = false
         chestInventory = null

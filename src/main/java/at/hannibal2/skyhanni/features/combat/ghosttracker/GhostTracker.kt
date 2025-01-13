@@ -185,8 +185,8 @@ object GhostTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
@@ -290,7 +290,7 @@ object GhostTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
     }

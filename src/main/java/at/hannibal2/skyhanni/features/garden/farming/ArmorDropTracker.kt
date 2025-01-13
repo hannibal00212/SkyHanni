@@ -116,7 +116,7 @@ object ArmorDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
@@ -131,7 +131,7 @@ object ArmorDropTracker {
         hasArmor = armorPieces > 1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
         armorDropInfo = data.specialCrops
