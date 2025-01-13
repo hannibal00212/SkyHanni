@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -27,8 +29,8 @@ object HotmAPI {
     val isBlueEggActive
         get() = InventoryUtils.getItemInHand()?.let {
             blueEggCache.getOrPut(it) {
-                it.getItemCategoryOrNull() == ItemCategory.DRILL && it.getDrillUpgrades()
-                    ?.contains(blueGoblinEgg) == true
+                it.getItemCategoryOrNull() == ItemCategory.DRILL &&
+                    it.getDrillUpgrades()?.contains(blueGoblinEgg) == true
             }
         } == true
 
@@ -50,39 +52,48 @@ object HotmAPI {
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
 
-        fun getStorage() = ProfileStorageData.profileSpecific?.mining?.powder?.get(this)
+        private val storage: ProfileSpecificStorage.MiningConfig.PowderStorage?
+            get() = ProfileStorageData.profileSpecific?.mining?.powder?.getOrPut(this, ProfileSpecificStorage.MiningConfig::PowderStorage)
 
-        fun getCurrent() = getStorage()?.available ?: 0L
+        var current: Long
+            get() = storage?.available ?: 0L
+            private set(value) {
+                storage?.available = value
+            }
 
-        fun setCurrent(value: Long) {
-            getStorage()?.available = value
+        var total: Long
+            get() = storage?.total ?: 0L
+            set(value) {
+                storage?.total = value
+            }
+
+        fun setAmount(value: Long) {
+            val diff = value - current
+            if (diff == 0L) return
+            total += diff
+            current = value
+            if (diff > 0) {
+                if (shouldSendDebug) ChatUtils.debug("Gained §a${diff.addSeparators()} $color$displayName Powder")
+                PowderEvent.Gain(this, diff).post()
+            } else {
+                if (shouldSendDebug) ChatUtils.debug("Spent §a${diff.addSeparators()} $color$displayName Powder")
+                PowderEvent.Spent(this, diff).post()
+            }
         }
 
-        fun addCurrent(value: Long) {
-            setCurrent(getCurrent() + value)
+        fun resetTree() {
+            current = total
+            PowderEvent(this).post()
         }
 
-        fun getTotal() = getStorage()?.total ?: 0L
-
-        fun setTotal(value: Long) {
-            getStorage()?.total = value
+        fun resetFull() {
+            current = 0L
+            total = 0L
+            PowderEvent(this).post()
         }
 
-        fun addTotal(value: Long) {
-            setTotal(getTotal() + value)
-        }
-
-        /** Use when new powder gets collected*/
-        fun gain(difference: Long) {
-            ChatUtils.debug("Gained §a${difference.addSeparators()} $color$displayName Powder")
-            addTotal(difference)
-            addCurrent(difference)
-            PowderGainEvent(this, difference).post()
-        }
-
-        fun reset() {
-            setCurrent(0)
-            setTotal(0)
+        companion object {
+            private val shouldSendDebug: Boolean get() = SkyHanniMod.feature.dev.debug.powderMessages
         }
     }
 
