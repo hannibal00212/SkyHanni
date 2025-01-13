@@ -3,19 +3,21 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurseEarned
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
 // internal
 // purse change event (add total purse to event)
-object ScoreboardElementPurse : ScoreboardElement() {
-    override fun getDisplay(): String? {
-        var purse = formatNumber(PurseAPI.currentPurse)
+object ScoreboardElementPurse : ScoreboardElement(), CustomScoreboardNumberTrackingElement {
+    override var previousAmount: Long = PurseAPI.currentPurse.toLong()
+    override var temporaryChangeDisplay: String? = null
+    override val numberColor = "§6"
 
-        if (!displayConfig.hideCoinsDifference) {
-            purse += getPurseEarned().orEmpty()
-        }
+    override fun getDisplay(): String? {
+        val currentPurse = PurseAPI.currentPurse.toLong()
+        checkDifference(currentPurse)
+        val purse = formatNumber(currentPurse) + temporaryChangeDisplay.orEmpty()
 
         return when {
             informationFilteringConfig.hideEmptyLines && purse == "0" -> null
