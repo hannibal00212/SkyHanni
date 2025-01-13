@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
@@ -56,8 +55,6 @@ class SkyHanniMod {
         loadModule(this)
         LoadedModules.modules.forEach { loadModule(it) }
 
-        loadModule(CrimsonIsleReputationHelper(this))
-
         SkyHanniEvents.init(modules)
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
@@ -74,22 +71,12 @@ class SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        repo = RepoManager(ConfigManager.configDirectory)
-        loadModule(repo)
         try {
-            repo.loadRepoInformation()
+            RepoManager.loadRepoInformation()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
         loadedClasses.clear()
-    }
-
-    private val loadedClasses = mutableSetOf<String>()
-
-    fun loadModule(obj: Any) {
-        if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
-        modules.add(obj)
-        MinecraftForge.EVENT_BUS.register(obj)
     }
 
     @SubscribeEvent
@@ -124,12 +111,13 @@ class SkyHanniMod {
         lateinit var jacobContestsData: JacobContestsJson
         lateinit var visualWordsData: VisualWordsJson
 
-        lateinit var repo: RepoManager
         lateinit var configManager: ConfigManager
         val logger: Logger = LogManager.getLogger("SkyHanni")
         fun getLogger(name: String): Logger {
             return LogManager.getLogger("SkyHanni.$name")
         }
+
+        private val loadedClasses = mutableSetOf<String>()
 
         val modules: MutableList<Any> = ArrayList()
         private val globalJob: Job = Job(null)
@@ -150,6 +138,12 @@ class SkyHanniMod {
                     ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
                 }
             }
+        }
+
+        fun loadModule(obj: Any) {
+            if (!loadedClasses.add(obj.javaClass.name)) throw IllegalStateException("Module ${obj.javaClass.name} is already loaded")
+            modules.add(obj)
+            MinecraftForge.EVENT_BUS.register(obj)
         }
     }
 }
