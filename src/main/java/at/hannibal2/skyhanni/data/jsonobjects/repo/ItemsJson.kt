@@ -10,5 +10,6 @@ data class ItemsJson(
     @Expose @SerializedName("enchant_multiplier") val enchantMultiplier: Map<String, Float>,
     @Expose @SerializedName("lava_fishing_rods") val lavaFishingRods: List<NEUInternalName>,
     @Expose @SerializedName("water_fishing_rods") val waterFishingRods: List<NEUInternalName>,
+    @Expose @SerializedName("dungeon_secret_items") val dungeonSecretItems: Set<NEUInternalName>,
     @Expose @SerializedName("book_bundle_amount") val bookBundleAmount: Map<String, Int>,
 )

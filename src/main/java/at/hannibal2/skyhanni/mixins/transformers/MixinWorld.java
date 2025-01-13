@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent;
 import at.hannibal2.skyhanni.data.EntityData;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
@@ -21,5 +22,6 @@ public class MixinWorld {
     @Inject(method = "onEntityRemoved", at = @At("HEAD"))
     private void onEntityRemoved(Entity entityIn, CallbackInfo ci) {
         EntityData.despawnEntity(entityIn);
+        new EntityRemovedEvent(entityIn).post();
     }
 }

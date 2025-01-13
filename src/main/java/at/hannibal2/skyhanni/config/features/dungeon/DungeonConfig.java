@@ -16,7 +16,7 @@ public class DungeonConfig {
     public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
 
     @Expose
-    @ConfigOption(name = "Secret Chime", desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.")
+    @ConfigOption(name = "Secret Chime", desc = "Play a sound when a secret is found in dungeons.")
     @Accordion
     public SecretChimeConfig secretChime = new SecretChimeConfig();
 
