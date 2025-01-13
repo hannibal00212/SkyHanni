@@ -63,7 +63,7 @@ object GuiEditManager {
         lastHotkeyPressed = SimpleTimeMark.now()
 
         DelayedRun.runDelayed(150.milliseconds) {
-            if (TextInput.lastTextInputTime.passedSince() < 1.seconds) return@runDelayed
+            if (TextInput.isActive()) return@runDelayed
             openGuiPositionEditor(hotkeyReminder = false)
         }
     }
