@@ -32,6 +32,10 @@ public class GUIConfig {
     public CustomScoreboardConfig customScoreboard = new CustomScoreboardConfig();
 
     @Expose
+    @Category(name = "Health Display", desc = "Health Display Settings")
+    public HealthDisplay healthDisplay = new HealthDisplay();
+
+    @Expose
     @Category(name = "Chroma", desc = "Settings for Chroma text (Credit to SBA).")
     @Accordion
     public ChromaConfig chroma = new ChromaConfig();
