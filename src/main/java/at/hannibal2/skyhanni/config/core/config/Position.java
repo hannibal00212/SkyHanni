@@ -244,7 +244,7 @@ public class Position {
         if (option == null) return;
         editor.search("");
         if (!editor.goToOption(option)) return;
-        SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+        SkyHanniMod.INSTANCE.setScreenToOpen(new GuiScreenElementWrapper(editor));
     }
 
     public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
