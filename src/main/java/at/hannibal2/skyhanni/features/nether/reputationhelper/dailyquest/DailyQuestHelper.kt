@@ -215,11 +215,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private fun renderTownBoard(event: LorenzRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = when (reputationHelper.factionType) {
+        val location = when (reputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
             FactionType.MAGE -> townBoardMage
-
-            FactionType.NONE -> return
         }
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)

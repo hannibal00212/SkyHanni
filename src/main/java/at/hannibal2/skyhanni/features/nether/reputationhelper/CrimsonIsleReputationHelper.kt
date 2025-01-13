@@ -41,7 +41,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     val miniBossHelper = DailyMiniBossHelper(this)
     val kuudraBossHelper = DailyKuudraBossHelper(this)
 
-    var factionType = FactionType.NONE
+    var factionType: FactionType? = null
 
     private var display = emptyList<Renderable>()
     private var dirty = true
@@ -121,7 +121,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     private fun updateRender() {
         display = buildList {
             addString("§e§lReputation Helper")
-            if (factionType == FactionType.NONE) {
+            if (factionType == null) {
                 addString("§cFaction not found!")
                 return
             }
