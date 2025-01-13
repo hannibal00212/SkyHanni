@@ -104,7 +104,7 @@ object FishingProfitTracker {
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
     }
@@ -216,7 +216,7 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 

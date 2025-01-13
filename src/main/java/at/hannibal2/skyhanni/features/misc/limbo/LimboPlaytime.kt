@@ -104,8 +104,8 @@ object LimboPlaytime {
         remakeList(event.toolTip, minutesList, hoursList)
     }
 
-    @SubscribeEvent
-    fun onRenderGUI(event: InventoryOpenEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return

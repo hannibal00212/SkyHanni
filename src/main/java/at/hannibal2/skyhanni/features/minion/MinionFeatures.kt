@@ -58,7 +58,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -174,14 +173,15 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!minionTitlePattern.find(event.inventoryName)) return
+        val inventoryName = event.inventoryName
+        if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
+                MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
         }
@@ -190,7 +190,7 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
@@ -254,7 +254,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.reopenSameName) return
 
@@ -267,6 +267,7 @@ object MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
+        MinionCloseEvent().post()
         if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
@@ -274,7 +275,6 @@ object MinionFeatures {
                 minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
-        MinionCloseEvent().post()
     }
 
     @SubscribeEvent
@@ -395,7 +395,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
@@ -418,7 +418,7 @@ object MinionFeatures {
 
     private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!minionInventoryOpen) return

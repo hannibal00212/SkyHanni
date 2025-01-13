@@ -13,8 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -36,8 +34,8 @@ object ChocolateFactoryShortcut {
         )
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.inAnyIsland(
                 IslandType.THE_RIFT,
@@ -49,7 +47,7 @@ object ChocolateFactoryShortcut {
         showItem = config.hoppityMenuShortcut && event.inventoryName == "SkyBlock Menu"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         showItem = false
     }
@@ -61,7 +59,7 @@ object ChocolateFactoryShortcut {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!showItem || event.slotId != 15) return
         event.cancel()

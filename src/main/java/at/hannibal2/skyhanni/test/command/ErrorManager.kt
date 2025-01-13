@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -54,6 +54,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
+        "at at.hannibal2.skyhanni.test.command.ErrorManager.skyHanniError",
         "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
@@ -65,7 +66,7 @@ object ErrorManager {
     }
 
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message)
+        val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
         println("extraData: \n${buildExtraDataString(extraData)}")
@@ -203,7 +204,7 @@ object ErrorManager {
         return if (hideError) null else finalMessage
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
         val version = SkyHanniMod.modVersion

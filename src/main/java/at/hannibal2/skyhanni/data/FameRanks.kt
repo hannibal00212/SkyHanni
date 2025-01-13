@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FameRankJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FameRanks {
@@ -14,7 +14,7 @@ object FameRanks {
 
     fun getByInternalName(internalName: String) = fameRanksMap[internalName]
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ranks = event.getConstant<FameRankJson>("FameRank")
         fameRanksMap = ranks.fameRank.map { (internalName, rank) ->

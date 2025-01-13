@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LogBookStats {
@@ -55,8 +54,8 @@ object LogBookStats {
     private var inInventory = false
     private var currentPage = 0
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
         val inventoryName = event.inventoryName
         if (inventoryName != "Visitor's Logbook") return
@@ -92,7 +91,7 @@ object LogBookStats {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
         if (inInventory && config.showLogBookStats) {
@@ -112,7 +111,7 @@ object LogBookStats {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

@@ -148,7 +148,7 @@ object BroodmotherFeatures {
         display = ""
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display.isEmpty()) return
@@ -159,7 +159,7 @@ object BroodmotherFeatures {
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 

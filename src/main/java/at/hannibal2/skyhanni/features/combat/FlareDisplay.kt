@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -59,9 +60,23 @@ object FlareDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+
+        if (config.flashScreen && activeWarning) {
+            val minecraft = Minecraft.getMinecraft()
+            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+            Gui.drawRect(
+                0,
+                0,
+                minecraft.displayWidth,
+                minecraft.displayHeight,
+                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+            )
+            GlStateManager.color(1F, 1F, 1F, 1F)
+        }
+
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
@@ -80,8 +95,8 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondsPassed(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         flares.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
@@ -188,21 +203,6 @@ object FlareDisplay {
                 else -> {}
             }
         }
-    }
-
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.flashScreen || !activeWarning) return
-        val minecraft = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        Gui.drawRect(
-            0,
-            0,
-            minecraft.displayWidth,
-            minecraft.displayHeight,
-            (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
-        )
-        GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -34,11 +35,11 @@ object BingoCardTips {
      */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "(§.)+Reward",
+        "(?:§.)+Reward",
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "(§.)+Contribution Rewards.*",
+        "(?:§.)+Contribution Rewards.*",
     )
 
     /**
@@ -46,7 +47,7 @@ object BingoCardTips {
      */
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "(§.)+Row #.*",
+        "(?:§.)+Row #.*",
     )
 
     @SubscribeEvent
@@ -94,7 +95,7 @@ object BingoCardTips {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return

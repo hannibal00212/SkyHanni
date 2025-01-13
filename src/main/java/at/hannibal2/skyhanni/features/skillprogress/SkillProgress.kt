@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.skillprogress
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.defaultSkillCap
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
@@ -39,7 +38,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -61,7 +59,7 @@ object SkillProgress {
     private var maxWidth = 182
     var hideInActionBar = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
@@ -79,8 +77,8 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -143,7 +141,7 @@ object SkillProgress {
         skillExpPercentage = 0.0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
@@ -404,7 +402,7 @@ object SkillProgress {
         val targetLevel = skill.customGoalLevel
         val xp = skill.totalXp
         val lvl = skill.level
-        val cap = defaultSkillCap[activeSkill.lowercaseName] ?: 60
+        val cap = activeSkill.maxLevel
         val add = if (lvl >= 50) {
             when (cap) {
                 50 -> XP_NEEDED_FOR_50
