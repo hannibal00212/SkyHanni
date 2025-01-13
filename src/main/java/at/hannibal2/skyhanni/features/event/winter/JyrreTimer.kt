@@ -72,18 +72,16 @@ object JyrreTimer {
     fun drawDisplay(): Renderable {
         duration -= 1.seconds
 
-        return Renderable.horizontalContainer(
-            buildList {
-                addItemStack(displayIcon)
-                addString("§aJyrre Boost: ")
+        return Renderable.line {
+            addItemStack(displayIcon)
+            addString("§aJyrre Boost: ")
 
-                if (duration <= 0.seconds && config.showInactive) {
-                    addString("§cInactive!")
-                } else {
-                    addString("§b${duration.format()}")
-                }
-            },
-        )
+            if (duration <= 0.seconds && config.showInactive) {
+                addString("§cInactive!")
+            } else {
+                addString("§b${duration.format()}")
+            }
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

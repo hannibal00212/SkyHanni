@@ -203,14 +203,12 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
-        buildList {
-            val displayLayout: List<DisplayLayout> = config.displayLayout
-            for (item in displayLayout) {
-                add(item.renderable(entry, prefix))
-            }
-        },
-    )
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+        val displayLayout: List<DisplayLayout> = config.displayLayout
+        for (item in displayLayout) {
+            add(item.renderable(entry, prefix))
+        }
+    }
 
     private fun checkForDuplicateItems(
         list: MutableMap<Int, Pair<ItemStack, Int>>,

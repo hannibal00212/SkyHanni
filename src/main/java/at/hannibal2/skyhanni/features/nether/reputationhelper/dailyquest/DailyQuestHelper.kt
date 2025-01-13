@@ -287,13 +287,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        return Renderable.horizontalContainer(
-            buildList {
-                addString("  $stateText$categoryName: ")
-                addItemStack(item)
-                addString("§f$displayName$progressText$sacksText")
-            },
-        )
+        return Renderable.line {
+            addString("  $stateText$categoryName: ")
+            addItemStack(item)
+            addString("§f$displayName$progressText$sacksText")
+        }
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {

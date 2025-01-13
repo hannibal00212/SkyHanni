@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -112,23 +111,25 @@ internal object RenderableUtils {
             }
         }
         add(
-            Renderable.horizontalContainer(
-                buildList {
-                    addString(prefix)
-                    addString("§a[")
-                    if (tips.isEmpty()) {
-                        add(Renderable.link("§e$getName", false, onClick))
-                    } else {
-                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                    }
-                    addString("§a]")
-                },
-            ).toSearchable(),
+            Renderable.line {
+                addString(prefix)
+                addString("§a[")
+                if (tips.isEmpty()) {
+                    add(Renderable.link("§e$getName", false, onClick))
+                } else {
+                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                }
+                addString("§a]")
+            }.toSearchable(),
         )
     }
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
-        this.add(Renderable.string(string, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER))
+        this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+}
+
+fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
+    add(Renderable.horizontalContainer(buildList { builderAction() }))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
