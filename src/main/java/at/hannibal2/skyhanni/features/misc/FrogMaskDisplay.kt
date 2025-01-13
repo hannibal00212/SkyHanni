@@ -53,8 +53,6 @@ object FrogMaskDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (timeRemaining.isInFuture()) return
-
         currentRegion = null
 
         val helmet = InventoryUtils.getHelmet() ?: return
