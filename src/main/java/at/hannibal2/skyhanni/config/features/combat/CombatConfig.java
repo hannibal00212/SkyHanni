@@ -31,10 +31,9 @@ public class CombatConfig {
     public QuiverConfig quiverConfig = new QuiverConfig();
 
     @Expose
-    @ConfigOption(name = "Armor Stack Display", desc = "")
+    @ConfigOption(name = "Armor Stack", desc = "")
     @Accordion
-    // TODO rename to armor stack display
-    public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
+    public ArmorStackDisplayConfig armorStackDisplay = new ArmorStackDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")
