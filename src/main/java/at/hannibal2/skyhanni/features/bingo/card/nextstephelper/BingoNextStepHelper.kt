@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ChatMessageStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CollectionStep
@@ -140,15 +142,18 @@ object BingoNextStepHelper {
         reset()
     }
 
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+
+        update()
+        updateIslandsVisited()
+    }
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            update()
-            updateIslandsVisited()
-        }
         if (event.isMod(5)) {
             updateCurrentSteps()
         }
@@ -158,8 +163,7 @@ object BingoNextStepHelper {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.isBingoProfile) return
-        if (!config.enabled) return
+        if (!isEnabled()) return
 
         for (currentStep in currentSteps) {
             if (currentStep is ObtainCrystalStep) {
@@ -260,9 +264,7 @@ object BingoNextStepHelper {
         for (goal in personalGoals) {
             val description = goal.description
             val bingoCardStep = readDescription(description.removeColor())
-            if (bingoCardStep == null) {
-//                 println("Warning: Could not find bingo steps for $description")
-            } else {
+            if (bingoCardStep != null) {
                 finalSteps.add(bingoCardStep)
             }
         }
@@ -467,4 +469,6 @@ object BingoNextStepHelper {
         }
         return this
     }
+
+    private fun isEnabled() = LorenzUtils.isBingoProfile && config.enabled
 }
