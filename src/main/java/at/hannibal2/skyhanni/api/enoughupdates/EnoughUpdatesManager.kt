@@ -30,6 +30,7 @@ import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
+import net.minecraftforge.common.util.Constants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -148,10 +149,10 @@ object EnoughUpdatesManager {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
         val lore = mutableListOf<String>()
-        if (tag.hasKey("display", 10)) {
+        if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
             val display = tag.getCompoundTag("display")
-            if (display.hasKey("Lore", 9)) {
-                val loreList = display.getTagList("Lore", 8)
+            if (display.hasKey("Lore", Constants.NBT.TAG_LIST)) {
+                val loreList = display.getTagList("Lore", Constants.NBT.TAG_STRING)
                 for (i in 0 until loreList.tagCount()) {
                     lore.add(loreList.getStringTagAt(i))
                 }

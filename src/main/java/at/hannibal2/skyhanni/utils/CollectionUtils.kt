@@ -528,4 +528,7 @@ object CollectionUtils {
         }
     }
 
+    fun <T> MutableList<T>.addIfAbsent(element: T) {
+        if (!contains(element)) add(element)
+    }
 }

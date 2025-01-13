@@ -116,7 +116,7 @@ object ItemUtils {
 
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()
-        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
+        val tagList = this.getCompoundTag("display").getTagList("Lore", Constants.NBT.TAG_STRING)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {
             list.add(tagList.getStringTagAt(i))
