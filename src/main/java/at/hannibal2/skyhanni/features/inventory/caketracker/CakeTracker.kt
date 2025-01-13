@@ -361,7 +361,7 @@ object CakeTracker {
                 condition = { config.displayType != DisplayType.OWNED_CAKES },
             ),
         )
-        add(Renderable.string(" "))
+        addString(" ")
         add(
             Renderable.optionalLink(
                 "$missingColor[Missing]",
