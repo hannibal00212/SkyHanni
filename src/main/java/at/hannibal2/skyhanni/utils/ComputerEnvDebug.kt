@@ -1,11 +1,20 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import java.lang.management.ManagementFactory
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ComputerEnvDebug {
@@ -15,6 +24,8 @@ object ComputerEnvDebug {
         os(event)
         java(event)
         launcher(event)
+        ram(event)
+        uptime(event)
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -107,6 +118,109 @@ object ComputerEnvDebug {
             }
         } else {
             event.addData("Unknwon OS: '$exactName'")
+        }
+    }
+
+    private fun ram(event: DebugDataCollectEvent) {
+        event.title("Computer RAM")
+        val runtime = Runtime.getRuntime()
+
+        val text = mutableListOf<String>()
+
+        // Retrieve memory values in bytes
+        val totalMemory = runtime.totalMemory() // Total memory currently allocated to JVM
+        val maxMemory = runtime.maxMemory() // Maximum memory JVM can use
+        val freeMemory = runtime.freeMemory() // Free memory within currently allocated memory
+        val usedMemory = totalMemory - freeMemory // Memory currently in use
+
+        // Calculate percentages
+        val allocatedPercentage = (totalMemory.toDouble() / maxMemory * 100).toInt() // Allocated percentage
+        val usedPercentage = (usedMemory.toDouble() / maxMemory * 100).toInt() // Used percentage
+
+        // Convert memory values to GB for readability
+        val totalMemoryGB = totalMemory.toDouble() / (1024 * 1024 * 1024)
+        val maxMemoryGB = maxMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedMemoryGB = usedMemory.toDouble() / (1024 * 1024 * 1024)
+
+        // Clear the console (optional, for better readability)
+        text.add("Minecraft Memory: $usedPercentage% ${usedMemoryGB.formatGB()}/${maxMemoryGB.formatGB()} GB")
+        text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
+
+        // Get total system memory using OS-specific APIs
+        val osBean = ManagementFactory.getOperatingSystemMXBean()
+        val totalPhysicalMemory = (osBean as com.sun.management.OperatingSystemMXBean).totalPhysicalMemorySize
+        val freePhysicalMemory = osBean.freePhysicalMemorySize
+        val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
+
+        // Convert system memory to GB
+        val totalPhysicalGB = totalPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedPhysicalGB = usedPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedPhysicalPercentage = (usedPhysicalMemory.toDouble() / totalPhysicalMemory * 100).roundToInt()
+
+        // System Memory Usage
+        text.add("System Memory: $usedPhysicalPercentage% ${usedPhysicalGB.formatGB()}/${totalPhysicalGB.formatGB()} GB")
+
+        var important = false
+        if (maxMemoryGB < 3.5) {
+            text.add("")
+            text.add(
+                "Minecraft has less than 3.5 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
+            )
+            important = true
+        } else if (maxMemoryGB > 6) {
+            text.add("")
+            text.add(
+                "Minecraft has more than 6 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
+            )
+            important = true
+        }
+        if (usedPhysicalPercentage > 90) {
+            text.add("")
+            text.add(
+                "The computer uses more than 90% of system memory. Maybe close background apps! " +
+                    "($usedPhysicalPercentage% used)",
+            )
+            important = true
+        }
+
+        if (important) {
+            event.addData(text)
+        } else {
+            event.addIrrelevant(text)
+        }
+    }
+
+    private fun Double.formatGB(): String {
+        return roundTo(1).addSeparators()
+    }
+
+    private fun uptime(event: DebugDataCollectEvent) {
+        event.title("Minecraft Uptime")
+        val uptime = getUptime()
+        val info = "The game is running for ${uptime.format()}"
+        if (uptime > 5.hours) {
+            event.addData {
+                add("The game runs for more than 5 hours, memory leaks may accumulate to dangerous levels.")
+                add(info)
+            }
+        } else {
+            event.addIrrelevant(info)
+        }
+    }
+
+    private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shuptime") {
+            description = "Shows the time since the start of minecraft"
+            category = CommandCategory.USERS_RESET
+            callback {
+                val uptime = getUptime()
+                ChatUtils.chat("Minecraft is running for §b${uptime.format()}§e.")
+            }
         }
     }
 }
