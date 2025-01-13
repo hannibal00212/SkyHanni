@@ -18,6 +18,16 @@ class ChatConfig {
 
     // TODO move into own sub category
     @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
+            "message with Shwords applied, and holding Ctrl will copy only one line."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean copyChat = false;
+
+    @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
     var filterType: FilterTypesConfig = FilterTypesConfig()
@@ -32,6 +42,11 @@ class ChatConfig {
     @ConfigOption(name = "Sound Responses", desc = "")
     @Accordion
     var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
+
+    @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    public RareDropMessagesConfig rareDropMessages = new RareDropMessagesConfig();
 
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
