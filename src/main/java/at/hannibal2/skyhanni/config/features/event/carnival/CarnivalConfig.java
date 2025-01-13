@@ -42,4 +42,9 @@ public class CarnivalConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tokenShopHelper = true;
+
+    @Expose
+    @ConfigOption(name = "Fruit Digging", desc = "")
+    @Accordion
+    public FruitDiggingConfig fruitDigging = new FruitDiggingConfig();
 }
