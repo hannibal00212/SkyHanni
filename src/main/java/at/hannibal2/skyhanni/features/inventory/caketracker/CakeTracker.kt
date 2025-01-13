@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -316,7 +317,7 @@ object CakeTracker {
             return if (!config.priceOnHover) Renderable.string(displayString)
             else Renderable.hoverTips(
                 displayString,
-                getPriceHoverTooltip(displayType, colorCode)
+                getPriceHoverTooltip(displayType, colorCode),
             )
         }
 
@@ -442,8 +443,8 @@ object CakeTracker {
                 getCakeRanges(cakeList, config.displayOrderType, config.displayType),
                 height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
-                showScrollableTipsInList = true
-            )
+                showScrollableTipsInList = true,
+            ),
         )
     }
 
