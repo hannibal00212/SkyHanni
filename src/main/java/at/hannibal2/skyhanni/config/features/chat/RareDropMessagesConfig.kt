@@ -1,12 +1,11 @@
-package at.hannibal2.skyhanni.config.features.chat;
+package at.hannibal2.skyhanni.config.features.chat
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class RareDropMessagesConfig {
-
+class RareDropMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Pet Drop Rarity",
@@ -15,7 +14,7 @@ public class RareDropMessagesConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean petRarity = true;
+    var petRarity: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -24,6 +23,5 @@ public class RareDropMessagesConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enchantedBook = true;
-
+    var enchantedBook: Boolean = true
 }

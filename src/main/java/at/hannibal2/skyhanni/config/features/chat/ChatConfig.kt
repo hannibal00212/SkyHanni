@@ -36,7 +36,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Rare Drop Messages", desc = "")
     @Accordion
-    public RareDropMessagesConfig rareDropMessages = new RareDropMessagesConfig();
+    var rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")

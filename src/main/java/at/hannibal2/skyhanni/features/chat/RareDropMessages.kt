@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
@@ -119,9 +120,8 @@ object RareDropMessages {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemAdd(event: ItemAddEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.amount != 1 || event.source != ItemAddManager.Source.ITEM_ADD) return
         if (!config.enchantedBook) return
         val internalName = event.internalName
@@ -152,8 +152,8 @@ object RareDropMessages {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(47, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
+        event.move(71, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
     }
 }
