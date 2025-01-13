@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FrogMaskDisplay {
-
     private val config get() = SkyHanniMod.feature.misc
 
     private var display: Renderable? = null
@@ -54,9 +53,9 @@ object FrogMaskDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        currentRegion = null
-
         if (timeRemaining.isInFuture()) return
+
+        currentRegion = null
 
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
