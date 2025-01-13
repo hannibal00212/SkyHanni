@@ -46,7 +46,7 @@ object FrogMaskDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() && currentRegion != null) return
+        if (!isEnabled() || currentRegion == null) return
 
         config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
     }
