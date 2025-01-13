@@ -159,13 +159,13 @@ class Position @JvmOverloads constructor(
 
     fun canJumpToConfigOptions(): Boolean {
         val field = linkField ?: return false
-        return getEditorInstance().processedConfig.getOptionFromField(field) != null
+        return getEditorInstance().getOptionFromField(field) != null
     }
 
     fun jumpToConfigOptions() {
         val editor = getEditorInstance()
         val field = linkField ?: return
-        val option = editor.processedConfig.getOptionFromField(field) ?: return
+        val option = editor.getOptionFromField(field) ?: return
         editor.search("")
         if (!editor.goToOption(option)) return
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
