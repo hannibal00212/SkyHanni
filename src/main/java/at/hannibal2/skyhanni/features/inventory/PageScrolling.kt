@@ -8,13 +8,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Mouse
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PageScrolling {
@@ -49,20 +46,19 @@ object PageScrolling {
 
     private val scroll = ScrollValue()
 
-    private var cooldown = SimpleTimeMark.farPast()
-
     @SubscribeEvent
     fun onLorenzTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
-        if (cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 
         val inventoryName = InventoryUtils.openInventoryName()
         if (inventoryName.isEmpty()) return
         if (illegalInventory.matches(inventoryName)) return
 
-        if (((ToolTipData.lastSlot != null) xor config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        if (ToolTipData.lastSlot != null) {
+            if (!(config.invertBypass xor config.bypassKey.isKeyHeld())) return
+        }
 
         val dWheel = Mouse.getEventDWheel()
         if (dWheel == 0) return
@@ -71,7 +67,6 @@ object PageScrolling {
             patterns.matches(it.stack?.displayName)
         } ?: return
         InventoryUtils.clickSlot(slot.slotNumber)
-        cooldown = 1.0.seconds.fromNow() // 1 second is not specific it is just a reasonable cooldown
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
