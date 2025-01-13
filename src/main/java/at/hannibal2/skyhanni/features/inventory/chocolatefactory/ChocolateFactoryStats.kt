@@ -184,7 +184,7 @@ object ChocolateFactoryStats {
             } else {
                 "§eFull Tower Charges: §b${
                     timeTowerFull.timeUntil().format()
-                }\n" + "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                }\n" + "§eHappens at: §b${timeTowerFull.formattedDate()}"
             },
         )
     }

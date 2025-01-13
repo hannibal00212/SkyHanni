@@ -105,6 +105,8 @@ enum class ElectionCandidate(
 
     val activePerks get() = this.perks.filter { it.isActive }
 
+    val isSpecial by lazy { this in listOf(SCORPIUS, JERRY, DERPY) }
+
     override fun toString() = mayorName
 
     fun addPerks(perks: List<Perk>) {
@@ -121,7 +123,8 @@ enum class ElectionCandidate(
 
     companion object {
 
-        fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name }
+        fun getMayorFromName(name: String): ElectionCandidate? =
+            entries.firstOrNull { it.mayorName == name || it.name == name }
 
         fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
 

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwnerId
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -74,7 +74,7 @@ object TestCopyBestiaryValues {
         val obj = BestiaryObject()
         obj.name = titleName
         obj.texture = titleItem.getSkullTexture() ?: "no texture found"
-        obj.skullOwner = titleItem.getSkullOwner() ?: "no skullOwner found"
+        obj.skullOwner = titleItem.getSkullOwnerId() ?: "no skullOwner found"
 
         val lore = titleItem.getLore()
         val overallProgress = lore.find { it.contains("Overall Progress") }

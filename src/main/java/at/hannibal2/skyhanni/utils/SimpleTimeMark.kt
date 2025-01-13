@@ -5,6 +5,7 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -44,7 +45,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         else -> Instant.ofEpochMilli(millis).toString()
     }
 
-    fun formattedDate(pattern: String): String {
+    fun formattedDate(pattern: String = "EEEE, MMM d h:mm a"): String {
         val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
             pattern.replace("h", "H").replace("a", "")
         } else {
@@ -53,7 +54,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
+        val formatter = DateTimeFormatter.ofPattern(newPattern.trim(), Locale.ENGLISH)
         return localDateTime.format(formatter)
     }
 
