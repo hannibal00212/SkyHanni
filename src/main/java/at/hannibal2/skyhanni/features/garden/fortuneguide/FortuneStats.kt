@@ -60,7 +60,10 @@ enum class FortuneStats(
 
     companion object {
 
-        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair { it.current to it.max }
+        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair(
+            selector = { it.current to it.max },
+            resultConverter = { it }
+        )
 
         fun reset() = entries.forEach { it.reset() }
     }
