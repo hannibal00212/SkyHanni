@@ -42,7 +42,7 @@ object TpsCounter {
     private val tilCalculated: String get() =
         "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (shouldIgnore()) {
             updateDisplay()
@@ -101,7 +101,7 @@ object TpsCounter {
         hasReceivedPacket = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

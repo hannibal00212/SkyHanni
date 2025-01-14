@@ -1,14 +1,19 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -43,10 +48,64 @@ object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
 
+    // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
+    private var itemBaseStats = mapOf<NEUInternalName, Map<SkyblockStat, Int>>()
+    private var itemBaseStatsRaw = mapOf<NEUInternalName, Map<String, Int>>()
+
     private val missingRepoItems = mutableSetOf<String>()
     private var lastRepoWarning = SimpleTimeMark.farPast()
 
-    private val SKYBLOCK_MENU by lazy { "SKYBLOCK_MENU".toInternalName() }
+    fun updateBaseStats(rawStats: Map<NEUInternalName, Map<String, Int>>) {
+        verifyStats(rawStats)
+        itemBaseStatsRaw = rawStats
+    }
+
+    private fun verifyStats(allRawStats: Map<NEUInternalName, Map<String, Int>>) {
+        val allItems = mutableMapOf<NEUInternalName, Map<SkyblockStat, Int>>()
+        val unknownStats = mutableMapOf<String, String>()
+        for ((internalName, rawStats) in allRawStats) {
+            val stats = mutableMapOf<SkyblockStat, Int>()
+            for ((rawStat, value) in rawStats) {
+                val stat = SkyblockStat.getValueOrNull(rawStat.uppercase())
+                if (stat == null) {
+                    unknownStats[rawStat.uppercase()] = "on ${internalName.asString()}"
+                } else {
+                    stats[stat] = value
+                }
+            }
+            allItems[internalName] = stats
+        }
+
+        // TODO maybe create a new enum for item stats?
+        unknownStats.remove("WEAPON_ABILITY_DAMAGE") // stat exists only on items, not as player stat
+        unknownStats.removeIfKey { it.startsWith("RIFT_") } // rift stats are not in SkyblockStat enum
+
+        if (unknownStats.isNotEmpty()) {
+            val name = StringUtils.pluralize(unknownStats.size, "stat", withNumber = true)
+            ErrorManager.logErrorStateWithData(
+                "Found unknown skyblock stats on items, please report this in disocrd",
+                "found $name via Hypixel Item API that are not in enum SkyblockStat",
+                // TODO logErrorStateWithData should accept a map of extra data directly
+                extraData = unknownStats.map { it.key to it.value }.toTypedArray(),
+                betaOnly = true,
+            )
+        }
+        itemBaseStats = allItems
+    }
+
+    // Might not contain all actual item stats, compare with getRawBaseStats()
+    fun NEUInternalName.getBaseStats(): Map<SkyblockStat, Int> = itemBaseStats[this].orEmpty()
+
+    fun NEUInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
+            itemNameCache.clear()
+        }
+    }
+
+    private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -192,6 +251,7 @@ object ItemUtils {
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
         val nbt = tagCompound ?: return null
+
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
     }
@@ -227,6 +287,7 @@ object ItemUtils {
     // Overload to avoid spread operators
     fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
         createItemStack(item, displayName, loreArray.toList(), amount, damage)
+
     // Taken from NEU
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
         val stack = ItemStack(item, amount, damage)
@@ -500,15 +561,20 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return itemStack.getLore()[0]
+            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
         }
         if (name.endsWith("Enchanted Book Bundle")) {
-            return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
         }
 
         // obfuscated trophy fish
         if (name.contains("§kObfuscated")) {
             return name.replace("§kObfuscated", "Obfuscated")
+        }
+
+        // remove roman runic tier
+        if (isRune()) {
+            return ReplaceRomanNumerals.replaceLine(name)
         }
 
         // hide pet level

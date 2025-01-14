@@ -58,7 +58,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -174,14 +173,15 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
-        if (!minionTitlePattern.find(event.inventoryName)) return
+        val inventoryName = event.inventoryName
+        if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
-                MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
+                MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
         }
@@ -190,7 +190,7 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!enableWithHub()) return
         if (minionInventoryOpen) {
@@ -210,7 +210,7 @@ object MinionFeatures {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
-                    lastClicked = 0
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
         } else {
@@ -254,7 +254,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.reopenSameName) return
 
@@ -267,14 +267,14 @@ object MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
+        MinionCloseEvent().post()
         if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
             if (location !in minions) {
-                minions[location]?.lastClicked = 0
+                minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
-        MinionCloseEvent().post()
     }
 
     @SubscribeEvent
@@ -305,17 +305,17 @@ object MinionFeatures {
 
         val duration = minions?.get(loc)?.let {
             val lastClicked = it.lastClicked
-            if (lastClicked == 0L) {
+            if (lastClicked.isFarPast()) {
                 return "§cCan't calculate coins/day: No time data available!"
             }
-            System.currentTimeMillis() - lastClicked
+            SimpleTimeMark.now() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
         // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 
-        val coinsPerDay = (coins / (duration.toDouble())) * 1000 * 60 * 60 * 24
+        val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
         return "§7Coins/day with ${stack.name}§7: §6$format coins"
@@ -337,7 +337,7 @@ object MinionFeatures {
         val message = event.message
         if (minionCoinPattern.matches(message) && System.currentTimeMillis() - lastInventoryClosed < 2_000) {
             minions?.get(lastMinion)?.let {
-                it.lastClicked = System.currentTimeMillis()
+                it.lastClicked = SimpleTimeMark.now()
             }
         }
         if (message.startsWith("§aYou picked up a minion!") && lastMinion != null) {
@@ -349,8 +349,8 @@ object MinionFeatures {
         if (message.startsWith("§bYou placed a minion!") && newMinion != null) {
             minions = minions?.editCopy {
                 this[newMinion!!] = ProfileSpecificStorage.MinionConfig().apply {
-                    displayName = newMinionName
-                    lastClicked = 0
+                    displayName = newMinionName.orEmpty()
+                    lastClicked = SimpleTimeMark.farPast()
                 }
             }
             newMinion = null
@@ -387,16 +387,15 @@ object MinionFeatures {
                 event.drawString(location.up(0.65), name, true)
             }
 
-            if (config.emptiedTime.display && lastEmptied != 0L) {
-                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
-                val format = passedSince.format(longName = true) + " ago"
+            if (config.emptiedTime.display && !lastEmptied.isFarPast()) {
+                val format = lastEmptied.passedSince().format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.up(1.15), text, true)
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
@@ -419,7 +418,7 @@ object MinionFeatures {
 
     private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!minionInventoryOpen) return

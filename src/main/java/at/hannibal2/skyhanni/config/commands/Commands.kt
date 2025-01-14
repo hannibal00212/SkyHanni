@@ -54,7 +54,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -89,7 +88,6 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
-import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -453,11 +451,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { SkyHanniMod.repo.displayRepoStatus(false) }
         }
-        event.register("shkingfix") {
-            description = "Resets the local King Talisman Helper offset."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { KingTalismanHelper.kingFix() }
-        }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
@@ -622,11 +615,6 @@ object Commands {
             description = "Reloading the local repo data"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.repo.reloadLocalRepo() }
-        }
-        event.register("shgraph") {
-            description = "Enables the graph editor"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditor.commandIn() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"

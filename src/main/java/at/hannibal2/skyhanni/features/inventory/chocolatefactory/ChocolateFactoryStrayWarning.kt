@@ -30,8 +30,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
 @SkyHanniModule
@@ -88,15 +86,18 @@ object ChocolateFactoryStrayWarning {
         else SoundUtils.playBeepSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.partyMode.get()) event.partyModeHighlight()
         else event.strayHighlight()
     }
 
+    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
+        gui.inventorySlots as? ContainerChest
+
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
-        val eventChest = (gui.inventorySlots as ContainerChest)
+        val eventChest = getEventChest() ?: return
         eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
@@ -106,15 +107,16 @@ object ChocolateFactoryStrayWarning {
     }
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
-        (gui.inventorySlots as ContainerChest).getUpperItems().keys.filter {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
             it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) {
             flashScreen = false
             return
@@ -143,7 +145,7 @@ object ChocolateFactoryStrayWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }
@@ -154,8 +156,8 @@ object ChocolateFactoryStrayWarning {
         flashScreen = false
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()

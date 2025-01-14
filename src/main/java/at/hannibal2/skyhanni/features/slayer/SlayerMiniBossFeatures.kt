@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -18,7 +19,7 @@ object SlayerMiniBossFeatures {
     private val config get() = SkyHanniMod.feature.slayer
     private var miniBosses = mutableSetOf<Mob>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
         if (!SlayerMiniBossType.isMiniboss(mob.name)) return
@@ -26,8 +27,8 @@ object SlayerMiniBossFeatures {
         if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         miniBosses -= event.mob
     }
 

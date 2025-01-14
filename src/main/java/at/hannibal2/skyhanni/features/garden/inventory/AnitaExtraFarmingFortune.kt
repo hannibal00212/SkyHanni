@@ -81,7 +81,7 @@ object AnitaExtraFarmingFortune {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
         levelPrice = data.levelPrice

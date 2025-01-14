@@ -22,6 +22,12 @@ public class MinionsConfig {
     public boolean nameOnlyTier = false;
 
     @Expose
+    @ConfigOption(name = "Minion Upgrade Helper", desc = "Add a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean minionConfigHelper = true;
+
+    @Expose
     @ConfigOption(name = "Last Clicked", desc = "")
     @Accordion
     public LastClickedMinionConfig lastClickedMinion = new LastClickedMinionConfig();
