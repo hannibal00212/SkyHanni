@@ -19,11 +19,7 @@ object SkullTextureHolder {
     }
 
     fun getTexture(name: String): String {
-        val skullTexture = skullTextures[name].orEmpty()
-        if (skullTexture.isEmpty()) {
-            return ALEX_SKIN_TEXTURE
-        }
-        return skullTexture
+        return skullTextures[name] ?: ALEX_SKIN_TEXTURE
     }
 
     // Any classes that rely on textures that cannot make use of by lazy or other late initializers
