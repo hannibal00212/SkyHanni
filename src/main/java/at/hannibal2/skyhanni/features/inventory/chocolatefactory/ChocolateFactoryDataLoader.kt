@@ -230,7 +230,7 @@ object ChocolateFactoryDataLoader {
 
     // </editor-fold>
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
@@ -242,7 +242,7 @@ object ChocolateFactoryDataLoader {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
@@ -436,7 +436,7 @@ object ChocolateFactoryDataLoader {
 
         for (line in item.getLore()) {
             hitmanAvailableEggsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.availableEggs = group("amount").formatInt()
+                profileStorage.hitmanStats.availableHitmanEggs = group("amount").formatInt()
             }
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
@@ -449,7 +449,7 @@ object ChocolateFactoryDataLoader {
                 profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
             }
             hitmanPurchasedSlotsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
+                profileStorage.hitmanStats.purchasedHitmanSlots = group("amount").formatInt()
             }
         }
     }

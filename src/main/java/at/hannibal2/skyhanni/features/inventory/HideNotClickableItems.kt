@@ -87,7 +87,7 @@ object HideNotClickableItems {
 
     private val netherWart = "NETHER_STALK".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
@@ -109,7 +109,7 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
@@ -158,7 +158,7 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return

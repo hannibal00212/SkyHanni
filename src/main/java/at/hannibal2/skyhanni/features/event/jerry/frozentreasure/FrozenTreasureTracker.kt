@@ -77,7 +77,7 @@ object FrozenTreasureTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onJerryWorkshop()) return
 
@@ -169,7 +169,7 @@ object FrozenTreasureTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return

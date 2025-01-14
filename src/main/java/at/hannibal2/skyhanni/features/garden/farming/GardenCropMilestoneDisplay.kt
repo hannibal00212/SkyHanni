@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -70,7 +69,7 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
@@ -112,8 +111,7 @@ object GardenCropMilestoneDisplay {
 
         try {
             val item = event.itemStack
-            val counter = GardenAPI.readCounter(item)
-            if (counter == -1L) return
+            val counter = GardenAPI.readCounter(item) ?: return
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
@@ -206,7 +204,7 @@ object GardenCropMilestoneDisplay {
                 val speedText = "§7In §b$duration"
                 lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
                 GardenAPI.itemInHand?.let {
-                    if (GardenAPI.readCounter(it) == -1L) {
+                    if (GardenAPI.readCounter(it) == null) {
                         lineMap[MilestoneTextEntry.TIME] = Renderable.string("$speedText §7Inaccurate!")
                     }
                 }

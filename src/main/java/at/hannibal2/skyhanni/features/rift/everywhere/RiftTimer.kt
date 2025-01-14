@@ -28,11 +28,11 @@ object RiftTimer {
 
     private val config get() = RiftAPI.config.timer
 
-    private val repoGroup = RepoPattern.group("rift.everywhere")
+    private val patternGroup = RepoPattern.group("rift.everywhere")
     /**
      * REGEX-TEST: 3150 §aф
      */
-    private val nametagPattern by repoGroup.pattern(
+    private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
         "(?<time>\\d+) §aф"
     )
@@ -123,7 +123,7 @@ object RiftTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (RiftAPI.inMirrorVerse) return

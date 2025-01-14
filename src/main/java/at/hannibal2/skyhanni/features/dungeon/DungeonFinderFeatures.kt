@@ -115,11 +115,12 @@ object DungeonFinderFeatures {
     )
 
     /**
+     * REGEX-TEST: Floor VII
      * REGEX-TEST: Floor: Floor VII
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "Floor .*",
+        "Floor:? .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
@@ -170,7 +171,7 @@ object DungeonFinderFeatures {
     private var toolTipMap = mapOf<Int, List<String>>()
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
@@ -372,7 +373,7 @@ object DungeonFinderFeatures {
         event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
@@ -382,7 +383,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         floorStackSize = emptyMap()
