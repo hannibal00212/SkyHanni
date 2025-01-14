@@ -66,7 +66,7 @@ object ErrorManager {
     }
 
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message)
+        val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
         println("extraData: \n${buildExtraDataString(extraData)}")
