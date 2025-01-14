@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,13 +55,16 @@ object CustomScoreboard {
     var currentIslandEvents = listOf<ScoreboardEvent>()
         private set
 
+    var activePatterns = listOf<Pattern>()
+        private set
+
     private const val GUI_NAME = "Custom Scoreboard"
 
     private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
 
     private var dirty = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
@@ -117,7 +121,8 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+            UnknownLinesHandler.handleUnknownLines()
     }
 
     @HandleEvent
@@ -207,6 +212,12 @@ object CustomScoreboard {
     private fun updateIslandEntries() {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
+
+        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
+            .filter { it.showIsland() }
+            .flatMap { it.elementPatterns }
+            .distinct()
+        activePatterns += ScoreboardPattern.brokenPatterns
     }
 
     @HandleEvent
@@ -221,6 +232,9 @@ object CustomScoreboard {
 
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
+
+                add("Active Patterns:")
+                activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")

@@ -25,13 +25,13 @@ object ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
-    private val repoGroup = RepoPattern.group("inventory.itemstars")
+    private val patternGroup = RepoPattern.group("inventory.itemstars")
 
     /**
      * REGEX-TEST: §6Ancient Terror Leggings §d✪✪§6✪✪✪
      * REGEX-TEST: §dRenowned Burning Crimson Helmet §6✪✪✪✪✪
      */
-    private val starPattern by repoGroup.pattern(
+    private val starPattern by patternGroup.pattern(
         "stars",
         "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)",
     )

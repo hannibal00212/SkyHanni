@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -12,8 +12,8 @@ object ScoreboardPattern {
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
-    @SubscribeEvent
-    fun onRepositoryReload(event: RepositoryReloadEvent) {
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
         UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
     }
 
@@ -416,8 +416,8 @@ object ScoreboardPattern {
         "nearbyplayers",
         "Nearby Players: §.(?:\\d+|N/A)",
     )
-    val uselessGoblinPattern by miningSb.pattern(
-        "uselessgoblin",
+    val goblinUselessPattern by miningSb.pattern(
+        "goblinguseless",
         "§7Kill goblins!",
     )
 
@@ -905,6 +905,24 @@ object ScoreboardPattern {
     val carnivalKillsPattern by carnivalSb.pattern(
         "kills",
         "(?:§f)?Kills: §.\\d+",
+    )
+
+    /**
+     * Somtimes when the scoreboard updates, it only updates half way,
+     * causing some lines to become mixed with other lines -> broken.
+     * This should already get handled fine but sometimes these errors still occur with some lines way too often.
+     * This pattern is to catch those lines.
+     */
+    /**
+     * REGEX-TEST:  §e§l⚡ §cRedston
+     * REGEX-TEST:       §ce: §e§b0%
+     * REGEX-TEST: Starting in: §a0 §c1:55
+     */
+    val brokenPatterns by group.list(
+        "broken",
+        "\\s*§.§l⚡ §cRedston",
+        "\\s*§ce: §e§b0%",
+        "\\s*Starting in: §a0 §c[\\d:]+",
     )
 
     // Lines from the tablist

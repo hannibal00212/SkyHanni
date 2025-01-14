@@ -70,5 +70,27 @@ object ScoreboardEventMining : ScoreboardEvent() {
 
     override val configLine = "§7(All Mining Event Lines)"
 
+    override val elementPatterns = listOf(
+        ScoreboardPattern.windCompassPattern,
+        ScoreboardPattern.windCompassArrowPattern,
+        ScoreboardPattern.nearbyPlayersPattern,
+        ScoreboardPattern.miningEventPattern,
+        ScoreboardPattern.miningEventZonePattern,
+        ScoreboardPattern.mithrilRemainingPattern,
+        ScoreboardPattern.mithrilYourMithrilPattern,
+        ScoreboardPattern.raffleTicketsPattern,
+        ScoreboardPattern.rafflePoolPattern,
+        ScoreboardPattern.yourGoblinKillsPattern,
+        ScoreboardPattern.remainingGoblinPattern,
+        ScoreboardPattern.fortunateFreezingBonusPattern,
+        ScoreboardPattern.fossilDustPattern,
+        ScoreboardPattern.powderGreedyPattern,
+        ScoreboardPattern.raffleUselessPattern,
+        ScoreboardPattern.mithrilUselessPattern,
+        ScoreboardPattern.goblinUselessPattern,
+        ScoreboardPattern.mineshaftNotStartedPattern,
+
+    )
+
     override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
 }

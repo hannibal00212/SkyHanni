@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
-    override val sizeY = 200
+    override val sizeY = 225
 
     companion object {
 
@@ -66,10 +66,10 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             },
             vTab(
                 ItemStack(Items.map),
-                Renderable.string("§eUpgrades")
+                Renderable.string("§eUpgrades"),
             ) {
                 currentPage = FortuneGuidePage.UPGRADES
-            }
+            },
         )
         horizontalTabs = buildList {
             add(
@@ -77,7 +77,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                     currentCrop = null
 
                     it.pageSwitchHorizontal()
-                }
+                },
             )
             for (crop in CropType.entries) {
                 add(
@@ -85,7 +85,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
                         currentCrop = crop
 
                         it.pageSwitchHorizontal()
-                    }
+                    },
                 )
             }
         }

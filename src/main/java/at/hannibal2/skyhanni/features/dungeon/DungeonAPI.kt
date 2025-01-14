@@ -121,7 +121,7 @@ object DungeonAPI {
         WISDOM(0),
         TIME(0);
 
-        val displayName by lazy { name.firstLetterUppercase() }
+        val displayName = name.firstLetterUppercase()
 
         companion object {
             fun reset() {
@@ -281,8 +281,8 @@ object DungeonAPI {
     }
 
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
         if (event.inventoryName == "Boss Collections") {
