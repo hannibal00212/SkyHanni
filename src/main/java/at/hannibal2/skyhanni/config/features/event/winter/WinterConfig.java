@@ -17,16 +17,6 @@ public class WinterConfig {
 
     @Accordion
     @Expose
-    @ConfigOption(name = "Unique Gifting Opportunities", desc = "Highlight players who you haven't given gifts to yet.")
-    public GiftingOpportunitiesConfig giftingOpportunities = new GiftingOpportunitiesConfig();
-
-    @Accordion
-    @Expose
-    @ConfigOption(name = "Unique Gift Counter", desc = "Keep track of how many unique players you have given gifts to.")
-    public UniqueGiftConfig uniqueGiftCounter = new UniqueGiftConfig();
-
-    @Accordion
-    @Expose
     @ConfigOption(name = "Refined Bottle of Jyrre Timer", desc = "")
     public JyrreTimerConfig jyrreTimer = new JyrreTimerConfig();
 
