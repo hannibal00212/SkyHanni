@@ -157,4 +157,8 @@ object InventoryUtils {
     fun Slot.isTopInventory() = inventory.isTopInventory()
 
     fun IInventory.isTopInventory() = this is ContainerLocalMenu
+
+    fun closeInventory() {
+        Minecraft.getMinecraft().currentScreen = null
+    }
 }

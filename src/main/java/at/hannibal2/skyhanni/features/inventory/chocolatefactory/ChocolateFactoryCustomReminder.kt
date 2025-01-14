@@ -109,8 +109,7 @@ object ChocolateFactoryCustomReminder {
     private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
         val list = item.getLore()
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(list)
-        if (cost == null) {
-            milestoneCostLorePattern.matchAll(list) {
+            ?: return milestoneCostLorePattern.matchAll(list) {
                 // math needed to get from "time until current chocolate" to "time until all time chocolate"
                 val amount = group("amount").formatLong()
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
@@ -118,10 +117,8 @@ object ChocolateFactoryCustomReminder {
                 val current = ChocolateAmount.CURRENT.chocolate()
                 val missing = missingAllTime + current
 
-                return missing to "§6${amount.shortFormat()} Chocolate Milestone"
+                missing to "§6${amount.shortFormat()} Chocolate Milestone"
             }
-            return null
-        }
 
         val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: item.name
         return cost to nextLevelName
