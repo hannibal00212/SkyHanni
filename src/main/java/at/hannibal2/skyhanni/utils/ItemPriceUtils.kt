@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -65,6 +65,8 @@ object ItemPriceUtils {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
     }
 
+    fun NEUInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
+
     private fun NEUInternalName.getLowestBinOrNull(): Double? {
         val result = if (PlatformUtils.isNeuLoaded()) {
             getNeuLowestBin(this)
@@ -94,7 +96,7 @@ object ItemPriceUtils {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        return BazaarDataHolder.getNpcPrice(this)
+        return HypixelItemAPI.getNpcPrice(this)
     }
 
     fun debugItemPrice(args: Array<String>) {
@@ -158,7 +160,7 @@ object ItemPriceUtils {
         return -1L
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return

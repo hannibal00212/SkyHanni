@@ -64,7 +64,7 @@ object HitmanAPI {
      */
     private fun getNextHuntedMeal(
         previousMeal: HoppityEggType,
-        duration: Duration
+        duration: Duration,
     ): HoppityEggType = sortedEntries
         .filter { it.willBeClaimableAfter(duration) }
         .let { passingEggs ->
@@ -78,19 +78,28 @@ object HitmanAPI {
      * Return the time until the given number of rabbits can be hunted.
      */
     private fun HitmanStatsStorage.getTimeToHuntCount(targetHuntCount: Int): Duration {
-        // Store the initial meal to hunt
-        var nextHuntMeal = getFirstHuntedMeal()
-        // Determine how many pre-available meals we have, to determine better the first hunt
-        val initialAvailable = sortedEntries.filter { !it.isClaimed() && it != nextHuntMeal }.toMutableList()
-        // Determine how many hunts we need to perform - 1 is added to account for the initial meal calculation above
-        val huntsToPerform = (targetHuntCount - availableHitmanEggs).takeIf {
-            it > 0
-        }?.minus(1 + initialAvailable.size) ?: return Duration.ZERO
+        // Determine how many hunts we need to perform
+        var huntsToPerform = (targetHuntCount - availableHitmanEggs)
+        if (huntsToPerform <= 0) return Duration.ZERO
 
-        val initialCeiling = initialAvailable.size.coerceAtMost(huntsToPerform)
-        nextHuntMeal = initialAvailable.sortedBy { it.timeUntil() }.take(initialCeiling).maxByOrNull {
+        // Determine which pre-available meals we have, to determine better the first hunt
+        val initialClaimable = sortedEntries.filter {
+            !it.isClaimed()
+        }.sortedBy {
             it.timeUntil()
-        } ?: nextHuntMeal
+        }.toMutableList()
+
+        // If the claimable eggs will cover the number of hunts we need to perform, just return the time until the last meal
+        if (huntsToPerform <= initialClaimable.size) return initialClaimable.take(huntsToPerform).last().timeUntil()
+
+        // Determine the next (first) meal to hunt
+        var nextHuntMeal = initialClaimable.maxByOrNull {
+            it.timeUntil()
+        } ?: getFirstHuntedMeal()
+
+        // -1 as default to account for the initial meal
+        val initialRemoval = initialClaimable.size.takeIf { it > 0 } ?: 1
+        huntsToPerform -= initialRemoval
 
         // Will store the total time until the given number of meals can be hunted
         var tilSpawnDuration =

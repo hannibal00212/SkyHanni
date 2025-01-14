@@ -177,7 +177,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
@@ -187,8 +187,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
@@ -250,7 +250,7 @@ object CakeTracker {
         searchingForCakes = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val sbTimeNow = SkyBlockTime.now()

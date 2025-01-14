@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryCustomReminder {
@@ -84,13 +83,13 @@ object ChocolateFactoryCustomReminder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
+    @HandleEvent(receiveCancelled = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return
@@ -110,8 +109,7 @@ object ChocolateFactoryCustomReminder {
     private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
         val list = item.getLore()
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(list)
-        if (cost == null) {
-            milestoneCostLorePattern.matchAll(list) {
+            ?: return milestoneCostLorePattern.matchAll(list) {
                 // math needed to get from "time until current chocolate" to "time until all time chocolate"
                 val amount = group("amount").formatLong()
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
@@ -119,16 +117,14 @@ object ChocolateFactoryCustomReminder {
                 val current = ChocolateAmount.CURRENT.chocolate()
                 val missing = missingAllTime + current
 
-                return missing to "§6${amount.shortFormat()} Chocolate Milestone"
+                missing to "§6${amount.shortFormat()} Chocolate Milestone"
             }
-            return null
-        }
 
         val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: item.name
         return cost to nextLevelName
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inChocolateMenu()) return
@@ -137,7 +133,7 @@ object ChocolateFactoryCustomReminder {
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return

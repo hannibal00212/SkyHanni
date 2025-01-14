@@ -196,8 +196,8 @@ enum class CarnivalGoal(
         private var display = emptyList<Renderable>()
         private var inCarnival = false
 
-        @SubscribeEvent
-        fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        @HandleEvent
+        fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (dirty) {
                 display = buildList {

@@ -68,6 +68,8 @@ enum class ScoreboardConfigEventElement(val event: ScoreboardEvent) {
     override fun toString() = event.configLine
 
     companion object {
+        fun getEvents() = entries.map { it.event }
+
         @JvmField
         val defaultOption = listOf(
             VOTING,

@@ -10,13 +10,15 @@ import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -52,21 +54,25 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         reputationHelper.update()
     }
 
-    fun render(display: MutableList<List<Any>>) {
+    fun MutableList<Renderable>.addKuudraBoss() {
         val done = kuudraTiers.count { it.doneToday }
-        display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
+        addString("")
+        addString("§7Daily Kuudra (§e$done§8/§e5 killed§7)")
         if (done < 5) {
             for (tier in kuudraTiers) {
                 if (config.hideComplete.get() && tier.doneToday) continue
                 val result = if (tier.doneToday) "§aDone" else "§bTodo"
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
-                val lineList = mutableListOf<Any>()
-                lineList.add(" ")
-                lineList.add(displayItem.getItemStack())
-                lineList.add("$displayName: $result")
-                display.add(lineList)
+
+                val row = Renderable.horizontalContainer(
+                    buildList {
+                        addString(" ")
+                        addItemStack(displayItem.getItemStack())
+                        addString("$displayName: $result")
+                    },
+                )
+                add(row)
             }
         }
     }

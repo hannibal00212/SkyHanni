@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeMap
 import at.hannibal2.skyhanni.data.mob.Mob.Type as MobType
 
@@ -89,66 +89,66 @@ object MobData {
             }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobEventSpawn(event: MobEvent.Spawn) {
         entityToMob.putAll(event.mob.makeEntityToMobAssociation())
         currentMobs.add(event.mob)
         notSeenMobs.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobEventDeSpawn(event: MobEvent.DeSpawn) {
         event.mob.fullEntityList().forEach { entityToMob.remove(it) }
         currentMobs.remove(event.mob)
         notSeenMobs.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSkyblockMobSpawnEvent(event: MobEvent.Spawn.SkyblockMob) {
         skyblockMobs.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSkyblockMobDeSpawnEvent(event: MobEvent.DeSpawn.SkyblockMob) {
         skyblockMobs.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSummonSpawnEvent(event: MobEvent.Spawn.Summon) {
         summoningMobs.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSummonDeSpawnEvent(event: MobEvent.DeSpawn.Summon) {
         summoningMobs.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSpecialSpawnEvent(event: MobEvent.Spawn.Special) {
         special.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSpecialDeSpawnEvent(event: MobEvent.DeSpawn.Special) {
         special.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisplayNPCSpawnEvent(event: MobEvent.Spawn.DisplayNPC) {
         displayNPCs.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisplayNPCDeSpawnEvent(event: MobEvent.DeSpawn.DisplayNPC) {
         displayNPCs.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRealPlayerSpawnEvent(event: MobEvent.Spawn.Player) {
         players.add(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRealPlayerDeSpawnEvent(event: MobEvent.DeSpawn.Player) {
         players.remove(event.mob)
     }

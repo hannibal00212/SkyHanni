@@ -99,7 +99,7 @@ object ArmorDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return
@@ -116,7 +116,7 @@ object ArmorDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.enabled) return

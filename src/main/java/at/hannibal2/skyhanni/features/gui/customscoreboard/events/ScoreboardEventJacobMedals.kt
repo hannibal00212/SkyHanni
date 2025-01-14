@@ -13,5 +13,7 @@ object ScoreboardEventJacobMedals : ScoreboardEvent() {
 
     override val configLine = "§6§lGOLD §fmedals: §613\n§f§lSILVER §fmedals: §f3\n§c§lBRONZE §fmedals: §c4"
 
+    override val elementPatterns = listOf(ScoreboardPattern.medalsPattern)
+
     override fun showIsland() = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
 }

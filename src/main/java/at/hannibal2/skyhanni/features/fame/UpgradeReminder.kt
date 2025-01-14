@@ -82,7 +82,7 @@ object UpgradeReminder {
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: (for 0.27) merge this logic with reminder manager
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
@@ -136,7 +136,7 @@ object UpgradeReminder {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory) return
         val item = event.item ?: return
