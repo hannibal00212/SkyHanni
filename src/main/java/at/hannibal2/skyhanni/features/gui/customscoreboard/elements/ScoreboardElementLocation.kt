@@ -15,5 +15,5 @@ object ScoreboardElementLocation : ScoreboardElement() {
 
     override val configLine = "§7⏣ §bVillage"
 
-    override val elementPatterns = listOf(ScoreboardPattern.locationPattern)
+    override val elementPatterns = listOf(ScoreboardPattern.locationPattern, ScoreboardPattern.plotPattern)
 }

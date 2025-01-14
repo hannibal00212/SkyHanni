@@ -43,24 +43,26 @@ object BingoNextStepHelper {
     )
 
     /**
-     * REGEX-TEST: §7§7Reach §a1,000 §7Ink Sac Collection.
+     * REGEX-TEST: Reach 1,000 Ink Sac Collection.
      */
     private val collectionPattern by patternGroup.pattern(
         "collection",
         "Reach (?<amount>[0-9]+(?:,\\d+)*) (?<name>.*) Collection\\.",
     )
+
     private val crystalPattern by patternGroup.pattern(
         "crystal.obtain",
         "Obtain a (?<name>\\w+) Crystal in the Crystal Hollows\\.",
     )
 
     /**
-     * REGEX-TEST: §7§7Obtain level §e10§7 in the §6Foraging §7Skill.
+     * REGEX-TEST: Obtain level 10 in the Foraging Skill.
      */
     private val skillPattern by patternGroup.pattern(
         "skill",
         "Obtain level (?<level>.*) in the (?<skill>.*) Skill.",
     )
+
     private val crystalFoundPattern by patternGroup.pattern(
         "crystal.found",
         " *§r§5§l✦ CRYSTAL FOUND §r§7\\(.§r§7/5§r§7\\)",

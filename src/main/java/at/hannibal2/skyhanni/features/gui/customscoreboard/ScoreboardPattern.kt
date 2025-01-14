@@ -321,15 +321,6 @@ object ScoreboardPattern {
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)",
     )
 
-    /**
-     * REGEX-TEST: §2᠅ §fMithril§f:§695
-     * REGEX-TEST: §d᠅ §fGemstone§f
-     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
-     */
-    val powderGreedyPattern by miningSb.pattern(
-        "powdergreedy",
-        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
-    )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
         "§9Wind Compass",
@@ -917,12 +908,16 @@ object ScoreboardPattern {
      * REGEX-TEST:  §e§l⚡ §cRedston
      * REGEX-TEST:       §ce: §e§b0%
      * REGEX-TEST: Starting in: §a0 §c1:55
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
      */
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
         "\\s*§ce: §e§b0%",
         "\\s*Starting in: §a0 §c[\\d:]+",
+        "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )
 
     // Lines from the tablist
