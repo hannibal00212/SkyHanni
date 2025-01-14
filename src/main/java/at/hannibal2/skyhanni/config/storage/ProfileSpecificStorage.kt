@@ -207,6 +207,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var hitmanStats: HitmanStatsStorage = HitmanStatsStorage()
+
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
     }
 
     @Expose
@@ -271,6 +274,9 @@ class ProfileSpecificStorage {
         @Expose
         var boosterCookieExpiryTime: SimpleTimeMark? = null
     }
+
+    @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
 
     @Expose
     var minions: Map<LorenzVec, MinionConfig>? = HashMap()
