@@ -18,17 +18,17 @@ public class HideArmorConfig {
         OWN("Own Armor", 1),
         OTHERS("Other's Armor", 2),
         OFF("Off", 3);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ModeEntry(String str, int legacyId) {
-            this.str = str;
+        ModeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ModeEntry(String str) {
-            this(str, -1);
+        ModeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -38,7 +38,7 @@ public class HideArmorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

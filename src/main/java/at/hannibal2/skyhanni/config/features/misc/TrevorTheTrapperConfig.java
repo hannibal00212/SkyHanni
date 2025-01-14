@@ -83,17 +83,17 @@ public class TrevorTheTrapperConfig {
         ELUSIVE("§b12 §6Elusive Animals", 11),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        TrackerEntry(String str, int legacyId) {
-            this.str = str;
+        TrackerEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        TrackerEntry(String str) {
-            this(str, -1);
+        TrackerEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -103,7 +103,7 @@ public class TrevorTheTrapperConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

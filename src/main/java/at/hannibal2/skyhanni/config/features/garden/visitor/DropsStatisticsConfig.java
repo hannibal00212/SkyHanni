@@ -94,17 +94,17 @@ public class DropsStatisticsConfig {
         COPPER_DYE("§b1 §8Copper Dye"),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DropsStatisticsTextEntry(String str, int legacyId) {
-            this.str = str;
+        DropsStatisticsTextEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DropsStatisticsTextEntry(String str) {
-            this(str, -1);
+        DropsStatisticsTextEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -114,7 +114,7 @@ public class DropsStatisticsConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

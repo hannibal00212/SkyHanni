@@ -23,15 +23,15 @@ public class SensitivityReducerConfig {
         OFF("Disabled"),
         TOOL("Holding farming tool"),
         KEYBIND("Holding Keybind");
-        private final String str;
+        private final String displayName;
 
-        Mode(String str) {
-            this.str = str;
+        Mode(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

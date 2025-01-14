@@ -35,17 +35,17 @@ public class ComposterConfig {
         BAZAAR("Bazaar", 0),
         SACKS("Sacks", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        RetrieveFromEntry(String str, int legacyId) {
-            this.str = str;
+        RetrieveFromEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        RetrieveFromEntry(String str) {
-            this(str, -1);
+        RetrieveFromEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -55,7 +55,7 @@ public class ComposterConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

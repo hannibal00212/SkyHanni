@@ -51,15 +51,15 @@ public class MiningEventConfig {
         DWARVEN("Dwarven Mines Only"),
         CURRENT("Current Island Only");
 
-        private final String str;
+        private final String displayName;
 
-        ShowType(String str) {
-            this.str = str;
+        ShowType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

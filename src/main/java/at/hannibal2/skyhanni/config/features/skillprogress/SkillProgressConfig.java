@@ -31,11 +31,11 @@ public class SkillProgressConfig {
         RIGHT("Right", RenderUtils.HorizontalAlignment.RIGHT),
         ;
 
-        private final String str;
+        private final String displayName;
         private final RenderUtils.HorizontalAlignment alignment;
 
-        TextAlignment(String str, RenderUtils.HorizontalAlignment alignment) {
-            this.str = str;
+        TextAlignment(String displayName, RenderUtils.HorizontalAlignment alignment) {
+            this.displayName = displayName;
             this.alignment = alignment;
         }
 
@@ -45,7 +45,7 @@ public class SkillProgressConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

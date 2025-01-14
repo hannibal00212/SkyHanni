@@ -62,17 +62,17 @@ public class ChestValueConfig {
         DESCENDING("Descending", 0),
         ASCENDING("Ascending", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        SortingTypeEntry(String str, int legacyId) {
-            this.str = str;
+        SortingTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        SortingTypeEntry(String str) {
-            this(str, -1);
+        SortingTypeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -82,7 +82,7 @@ public class ChestValueConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -95,17 +95,17 @@ public class ChestValueConfig {
         SHORT("Short", 0),
         LONG("Long", 1);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -115,7 +115,7 @@ public class ChestValueConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

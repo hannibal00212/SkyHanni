@@ -82,17 +82,17 @@ public class FrozenTreasureConfig {
         EINARY_RED_HOODIE("§b1 §cEinary's Red Hoodie"),
         SPACER_2(" ", 16);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        FrozenTreasureDisplayEntry(String str, int legacyId) {
-            this.str = str;
+        FrozenTreasureDisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        FrozenTreasureDisplayEntry(String str) {
-            this(str, -1);
+        FrozenTreasureDisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -102,7 +102,7 @@ public class FrozenTreasureConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
