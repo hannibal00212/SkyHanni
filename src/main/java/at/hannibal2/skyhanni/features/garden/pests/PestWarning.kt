@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -79,8 +81,8 @@ object PestWarning {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.inventoryName == "Your Equipment and Stats") {
@@ -93,13 +95,13 @@ object PestWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         sprayMultiplier = checkSpray()
         cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
         warningShown = false
         wardrobeOpened = false
@@ -127,7 +129,7 @@ object PestWarning {
         return if (plot.currentSpray == null) 1.0 else if (Perk.PEST_ERADICATOR.isActive) 0.25 else 0.5
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun warn(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (cooldown == null) return

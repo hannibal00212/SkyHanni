@@ -108,7 +108,7 @@ object WardrobeAPI {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inventoryPattern.matches(event.inventoryName).let {
             inWardrobe = it
@@ -116,7 +116,7 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -169,7 +169,7 @@ object WardrobeAPI {
         return foundCurrentSlot
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inWardrobe) return
         DelayedRun.runDelayed(250.milliseconds) {
