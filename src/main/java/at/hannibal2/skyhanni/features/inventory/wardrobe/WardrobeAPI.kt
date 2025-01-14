@@ -30,12 +30,12 @@ object WardrobeAPI {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
-    private val patternGroup = RepoPattern.group("inventory.wardrobe")
+    private val repoGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
      * REGEX-TEST: Wardrobe (2/2)
      */
-    private val inventoryPattern by patternGroup.pattern(
+    val inventoryPattern by repoGroup.pattern(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
     )
@@ -43,7 +43,7 @@ object WardrobeAPI {
     /**
      * REGEX-TEST: §7Slot 4: §aEquipped
      */
-    private val equippedSlotPattern by patternGroup.pattern(
+    private val equippedSlotPattern by repoGroup.pattern(
         "equippedslot",
         "§7Slot \\d+: §aEquipped",
     )
@@ -115,7 +115,7 @@ object WardrobeAPI {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         inventoryPattern.matchMatcher(event.inventoryName) {

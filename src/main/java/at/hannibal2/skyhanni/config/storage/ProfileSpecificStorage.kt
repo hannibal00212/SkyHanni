@@ -498,6 +498,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var activeVinyl: VinylType? = null
+
+        @Expose
+        var equipmentPestCooldown: Int = 0
     }
 
     @Expose
