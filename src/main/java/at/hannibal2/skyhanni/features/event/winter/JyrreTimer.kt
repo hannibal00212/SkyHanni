@@ -49,13 +49,13 @@ object JyrreTimer {
         duration = 60.minutes
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.pos.renderRenderable(display, posLabel = "Refined Jyrre Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 

@@ -258,7 +258,7 @@ object GardenVisitorDropStatistics {
     }
 
     // todo this should just save when changed not once a second
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()
     }
@@ -317,7 +317,7 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
         if (!GardenAPI.inGarden()) return

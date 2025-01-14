@@ -14,7 +14,7 @@ object FixedRateTimerManager {
         fixedRateTimer(name = "skyhanni-fixed-rate-timer-manager", period = 1000L) {
             DelayedRun.onThread.execute {
                 if (!LorenzUtils.onHypixel) return@execute
-                SecondPassedEvent(totalSeconds).postAndCatch()
+                SecondPassedEvent(totalSeconds).post()
                 totalSeconds++
             }
         }

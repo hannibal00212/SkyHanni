@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -37,7 +39,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -276,8 +277,8 @@ object ChocolateFactoryStrayTracker {
         return true
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
@@ -301,21 +302,21 @@ object ChocolateFactoryStrayTracker {
         incrementGoldenType("sidedish")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         tracker.renderDisplay(config.strayRabbitTrackerPosition)
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         // Force a refresh for party mode
         if (ChocolateFactoryAPI.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
         tracker.update() // Make sure we don't stay in party mode
@@ -345,6 +346,11 @@ object ChocolateFactoryStrayTracker {
         event.transform(58, "chocolateFactory.strayTracker.straysExtraChocMs") { element ->
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)
         }
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.partyMode.onToggle(tracker::update)
     }
 
     fun resetCommand() {

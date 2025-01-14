@@ -108,7 +108,7 @@ object MarkedPlayerManager {
         config.entityColor.onToggle(::refreshColors)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
