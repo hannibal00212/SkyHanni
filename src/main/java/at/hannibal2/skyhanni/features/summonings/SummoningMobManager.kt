@@ -112,7 +112,7 @@ object SummoningMobManager {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock || !config.summoningMobDisplay) return
         if (mobs.isEmpty()) return

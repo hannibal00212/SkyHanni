@@ -116,8 +116,8 @@ object HoppityCallWarning {
         if (currentTime >= finalWarningTime) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         val minecraft = Minecraft.getMinecraft()
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
