@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.DUNG_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -49,6 +51,7 @@ object PestAPI {
 
     val config get() = GardenAPI.config.pests
     val storage get() = GardenAPI.storage
+    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -56,7 +59,7 @@ object PestAPI {
             storage?.scoreboardPests = value
         }
 
-    var lastPestKillTime = SimpleTimeMark.farPast()
+    private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
@@ -69,8 +72,9 @@ object PestAPI {
     )
 
     fun hasVacuumInHand() = InventoryUtils.itemInHandId in vacuumVariants
+    fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
-    fun SprayType.getPests() = PestType.entries.filter { it.spray == this }
+    fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
     private val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
@@ -252,7 +256,13 @@ object PestAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.inGarden()) return
-        if (pestDeathChatPattern.matches(event.message)) {
+        pestDeathChatPattern.matchMatcher(event.message) {
+            val pest = PestType.getByNameOrNull(group("pest")) ?: return
+            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+
+            // Field Mice drop 6 separate items, but we only want to count the kill once
+            if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return
+
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
             PestKillEvent.post()

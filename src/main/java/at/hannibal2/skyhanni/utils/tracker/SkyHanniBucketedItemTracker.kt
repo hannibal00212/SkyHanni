@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,36 +36,47 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
+    private fun getSelectedBucket(): E? {
+        var selectedBucket: E? = null
+        modify { data ->
+            selectedBucket = data.selectedBucket
+        }
+        return selectedBucket
+    }
+
+    fun addItem(event: ItemAddEvent) {
+        getSelectedBucket()?.let { bucket ->
+            modify {
+                it.addItem(bucket, event.internalName, event.amount)
+            }
+            if (event.source == ItemAddManager.Source.COMMAND) {
+                TrackerManager.commandEditTrackerSuccess = true
+                ChatUtils.chat(
+                    "Added ${event.internalName.itemName} §e${event.amount}§7x to ($bucket§7)"
+                )
+            }
+        } ?: run {
+            ChatUtils.userError(
+                "No bucket selected for §b$name§c.\nSelect one in the §b$name §cGUI, then try again."
+            )
+            event.cancel()
+        }
+    }
+
     fun addItem(bucket: E, internalName: NEUInternalName, amount: Int) {
         modify {
             it.addItem(bucket, internalName, amount)
         }
         getSharedTracker()?.let {
-            val hidden = it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!.hidden
-            it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!.hidden = hidden
+            val totalProp = it.get(DisplayMode.TOTAL).getSelectedBucketItems().getOrPut(internalName) {
+                ItemTrackerData.TrackedItem()
+            }
+            val sessionProp = it.get(DisplayMode.SESSION).getSelectedBucketItems().getOrPut(internalName) {
+                ItemTrackerData.TrackedItem()
+            }
+            sessionProp.hidden = totalProp.hidden
         }
-
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
-        }
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
-        }
-    }
-
-    fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addSearchableSelector<ItemPriceSource>(
-                "",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
-                onChange = {
-                    config.priceSource = it.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
-                    update()
-                },
-            )
-        }
+        handlePossibleRareDrop(internalName, amount)
     }
 
     fun addBucketSelector(
@@ -77,10 +88,11 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (isInventoryOpen()) {
             lists.addButton(
                 prefix = "§7$sourceStringPrefix: ",
-                getName = data.getSelectedBucket()?.toString() ?: nullBucketLabel,
+                getName = data.selectedBucket?.toString() ?: nullBucketLabel,
                 onChange = {
-                    data.selectNextSequentialBucket()
-                    update()
+                    // We need to make sure the selected bucket syncs with the shared tracker
+                    val newBucket: E? = data.selectNextSequentialBucket()
+                    modifyEachMode { it.selectedBucket = newBucket }
                 },
             )
         }
@@ -92,7 +104,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
-        val dataItems = data.getItemsProp()
+        val dataItems = data.getSelectedBucketItems()
         val items = mutableMapOf<NEUInternalName, Long>()
         for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
@@ -114,13 +126,13 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         var pos = 0
         val hiddenItemTexts = mutableListOf<String>()
         for ((internalName, price) in items.sortedDesc()) {
-            val itemProfit = data.getItemsProp()[internalName] ?: error("Item not found for $internalName")
+            val itemProfit = data.getSelectedBucketItems()[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
             val cleanName = if (internalName == SKYBLOCK_COIN) {
-                data.getCoinName(data.getSelectedBucket(), itemProfit)
+                data.getCoinName(data.selectedBucket, itemProfit)
             } else {
                 internalName.itemName
             }
@@ -150,15 +162,15 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 displayName, lore,
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
-                        data.removeItem(data.getSelectedBucket(), internalName)
+                        data.removeItem(data.selectedBucket, internalName)
                         ChatUtils.chat(
                             "Removed $cleanName §efrom $name" +
-                                if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})"
+                                if (data.selectedBucket != null) " (${data.selectedBucket})"
                                 else ""
                         )
                     } else {
                         modify {
-                            it.toggleItemHide(data.getSelectedBucket(), internalName)
+                            it.toggleItemHide(data.selectedBucket, internalName)
                         }
                     }
                     update()
@@ -184,7 +196,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         internalName: NEUInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
-            addAll(data.getCoinDescription(data.getSelectedBucket(), item))
+            addAll(data.getCoinDescription(data.selectedBucket, item))
         } else {
             addAll(data.getDescription(item.timesGained))
         }

@@ -119,7 +119,7 @@ enum class BossType(
     GARDEN_PEST_RAT("§cRat", Type.GARDEN_PESTS),
     GARDEN_PEST_SLUG("§cSlug", Type.GARDEN_PESTS),
     GARDEN_PEST_EARTHWORM("§cEarthworm", Type.GARDEN_PESTS),
-    GARDEN_PEST_MOUSE("§c§lField Mouse", Type.GARDEN_PESTS),
+    GARDEN_PEST_FIELD_MOUSE("§c§lField Mouse", Type.GARDEN_PESTS),
 
     // TODO Corleone
     // TODO bal

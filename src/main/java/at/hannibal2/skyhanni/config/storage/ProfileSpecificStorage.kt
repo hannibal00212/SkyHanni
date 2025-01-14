@@ -494,7 +494,7 @@ class ProfileSpecificStorage {
         var customGoalMilestone: MutableMap<CropType, Int> = EnumMap(CropType::class.java)
 
         @Expose
-        var pestProfitTracker: PestProfitTracker.Data = PestProfitTracker.Data()
+        var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
 
         @Expose
         var activeVinyl: VinylType? = null

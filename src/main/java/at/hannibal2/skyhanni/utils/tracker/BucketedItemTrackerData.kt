@@ -19,6 +19,8 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
 
     open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
 
+    abstract fun E.isBucketSelectable(): Boolean
+
     override fun reset() {
         bucketedItems.clear()
         selectedBucket = null
@@ -63,33 +65,24 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     }
 
     @Expose
-    private var selectedBucket: E? = null
+    var selectedBucket: E? = null
     @Expose
     private val bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
-    private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
-        it.value.isNotEmpty()
-    }.keys.toMutableList()
-    fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let {
-        getBucket(it)
-    } ?: flattenBuckets()
-    fun getSelectedBucket() = selectedBucket
-    fun selectNextSequentialBucket() {
-        // Move to the next ordinal, or wrap to null if at the last value
-        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
-        selectedBucket = when {
-            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
-            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
-            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
-            else -> selectedBucket // Fallback, shouldn't happen
+    fun selectNextSequentialBucket(): E? {
+        selectedBucket = if (selectedBucket == null) buckets.first { it.isBucketSelectable() }
+        else selectedBucket?.let { sb ->
+            buckets.filter { it.ordinal > sb.ordinal && it.isBucketSelectable() }.minByOrNull { it.ordinal }
         }
+        return selectedBucket
     }
 
-    private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
+    private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
+    fun getSelectedBucketItems() = selectedBucket?.let { getBucketItems(it) } ?: flattenBucketsItems()
+    private fun flattenBucketsItems(): MutableMap<NEUInternalName, TrackedItem> {
         val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()
-        getPoppedBuckets().distinct().forEach { bucket ->
-            getBucket(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
+        buckets.distinct().forEach { bucket ->
+            getBucketItems(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
                 flatMap.merge(key, value) { existing, new ->
                     existing.copy(
                         hidden = false,
