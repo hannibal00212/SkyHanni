@@ -380,7 +380,7 @@ object CurrentPetAPI {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inPetMenu) return
-        if (event.clickTypeEnum != GuiContainerEvent.ClickType.NORMAL) return
+        if (event.clickType != GuiContainerEvent.ClickType.NORMAL) return
         val category = event.item?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.PET) return
 
