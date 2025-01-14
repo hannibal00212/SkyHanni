@@ -10,14 +10,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkyBlockXPBar {
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.misc
 
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Pre) {
         if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
-        val xp = SkyBlockXPAPI.xp ?: return
-        val level = SkyBlockXPAPI.level ?: return
+        val (level, xp) = SkyBlockXPAPI.levelXpPair ?: return
         Minecraft.getMinecraft().thePlayer.setXPStats(xp / 100f, 100, level)
     }
 

@@ -30,19 +30,16 @@ object SkyBlockXPAPI {
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
 
-    private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
+    val levelXpPair get() = storage?.toLevelXpPair()
 
-    var level: Int?
-        get() = storage?.level
+    // Stored as 12345, 123 is the level, 45 is the xp
+    private var storage
+        get() = ProfileStorageData.profileSpecific?.totalSkyBlockXP
         set(value) {
-            storage?.let { it.level = value }
+            ProfileStorageData.profileSpecific?.totalSkyBlockXP = value
         }
 
-    var xp: Int?
-        get() = storage?.xp
-        set(value) {
-            storage?.let { it.xp = value }
-        }
+    private fun Int.toLevelXpPair() = this / 100 to this % 100
 
 
     @HandleEvent
@@ -50,8 +47,12 @@ object SkyBlockXPAPI {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
         TabWidget.SB_LEVEL.matchMatcherFirstLine {
-            level = group("level")?.toIntOrNull()
-            xp = group("xp")?.toIntOrNull()
+            val level = group("level")?.toIntOrNull()
+            val xp = group("xp")?.toIntOrNull()
+
+            if (level != null && xp != null) {
+                storage = level * 100 + xp
+            }
         }
     }
 
@@ -63,6 +64,8 @@ object SkyBlockXPAPI {
 
         var foundLevel = false
         var foundXp = false
+        var level: Int? = null
+        var xp: Int? = null
 
         loop@ for (line in stack.getLore()) {
             if (foundLevel && foundXp) break@loop
@@ -82,6 +85,10 @@ object SkyBlockXPAPI {
                     continue@loop
                 }
             }
+        }
+
+        if (level != null && xp != null) {
+            storage = level * 100 + xp
         }
     }
 
