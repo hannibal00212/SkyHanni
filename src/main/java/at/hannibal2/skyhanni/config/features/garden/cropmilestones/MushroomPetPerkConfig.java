@@ -51,17 +51,17 @@ public class MushroomPetPerkConfig {
         PERCENTAGE("§7Percentage: §e12.34%", 4),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        MushroomTextEntry(String str, int legacyId) {
-            this.str = str;
+        MushroomTextEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        MushroomTextEntry(String str) {
-            this(str, -1);
+        MushroomTextEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -71,7 +71,7 @@ public class MushroomPetPerkConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

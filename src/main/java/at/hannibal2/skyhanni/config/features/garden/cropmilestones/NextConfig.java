@@ -30,17 +30,17 @@ public class NextConfig {
         GARDEN_EXP("Garden Exp", 0),
         SKYBLOCK_EXP("SkyBlock Exp", 1),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        BestTypeEntry(String str, int legacyId) {
-            this.str = str;
+        BestTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        BestTypeEntry(String str) {
-            this(str, -1);
+        BestTypeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -50,7 +50,7 @@ public class NextConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

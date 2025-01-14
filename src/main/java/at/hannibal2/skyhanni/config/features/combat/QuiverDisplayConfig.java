@@ -39,15 +39,15 @@ public class QuiverDisplayConfig {
         ONLY_BOW_HAND("Bow in hand"),
 
         ;
-        private final String str;
+        private final String displayName;
 
-        ShowWhen(String str) {
-            this.str = str;
+        ShowWhen(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }

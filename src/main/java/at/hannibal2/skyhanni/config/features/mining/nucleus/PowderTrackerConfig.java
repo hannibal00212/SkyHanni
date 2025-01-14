@@ -108,17 +108,17 @@ public class PowderTrackerConfig {
         OIL_BARREL("§b25 §aOil Barrel", 32),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        PowderDisplayEntry(String str, int legacyId) {
-            this.str = str;
+        PowderDisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PowderDisplayEntry(String str) {
-            this(str, -1);
+        PowderDisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -128,7 +128,7 @@ public class PowderTrackerConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

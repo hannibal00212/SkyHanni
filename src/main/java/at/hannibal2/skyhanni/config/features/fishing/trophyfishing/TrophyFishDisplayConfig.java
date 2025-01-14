@@ -40,15 +40,15 @@ public class TrophyFishDisplayConfig {
         ONLY_WITH_KEYBIND("On keybind"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        WhenToShow(String str) {
-            this.str = str;
+        WhenToShow(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -97,15 +97,15 @@ public class TrophyFishDisplayConfig {
         NAME("Name Alphabetical"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TrophySorting(String str) {
-            this.str = str;
+        TrophySorting(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -143,15 +143,15 @@ public class TrophyFishDisplayConfig {
         TOTAL("Amount Total"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TextPart(String str) {
-            this.str = str;
+        TextPart(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -184,15 +184,15 @@ public class TrophyFishDisplayConfig {
         DIAMOND("Diamond"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HideCaught(String str) {
-            this.str = str;
+        HideCaught(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

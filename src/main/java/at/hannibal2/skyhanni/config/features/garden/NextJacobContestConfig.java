@@ -48,17 +48,17 @@ public class NextJacobContestConfig {
         DISABLED("Disabled", 2),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ShareContestsEntry(String str, int legacyId) {
-            this.str = str;
+        ShareContestsEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ShareContestsEntry(String str) {
-            this(str, -1);
+        ShareContestsEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -68,7 +68,7 @@ public class NextJacobContestConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

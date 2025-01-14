@@ -59,17 +59,17 @@ public class VisitorConfig {
         NAME("Name Only", 1),
         BOTH("Both", 2),
         DISABLED("Disabled", 3);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        HighlightMode(String str, int legacyId) {
-            this.str = str;
+        HighlightMode(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        HighlightMode(String str) {
-            this(str, -1);
+        HighlightMode(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -79,7 +79,7 @@ public class VisitorConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -132,15 +132,15 @@ public class VisitorConfig {
     public enum VisitorBlockBehaviour {
         DONT("Don't"), ALWAYS("Always"), ONLY_ON_BINGO("Only on Bingo");
 
-        final String str;
+        final String displayName;
 
-        VisitorBlockBehaviour(String str) {
-            this.str = str;
+        VisitorBlockBehaviour(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
