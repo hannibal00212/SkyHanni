@@ -55,7 +55,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
+import java.util.EnumMap
+import java.util.Objects
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
@@ -826,7 +827,7 @@ class ProfileSpecificStorage {
                 rabbitTheFishFinds,
                 initialLeaderboardPosition,
                 finalLeaderboardPosition,
-                summarized
+                summarized,
             )
         }
 
