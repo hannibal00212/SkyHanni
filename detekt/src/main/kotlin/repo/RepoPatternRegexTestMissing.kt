@@ -8,11 +8,11 @@ import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTest(config: Config) : SkyHanniRule(config) {
+class RepoPatternRegexTestMissing(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
-        "RepoPatternRegexTest",
+        "RepoPatternRegexTestMissing",
         Severity.Style,
-        "All repo patterns must be accompanied by a passing regex test.",
+        "All repo patterns must be accompanied by one or more regex test.",
         Debt.FIVE_MINS,
     )
 
@@ -28,20 +28,6 @@ class RepoPatternRegexTest(config: Config) : SkyHanniRule(config) {
         if (repoPatternElement.regexTests.isEmpty()) {
             delegate.reportIssue("Repo pattern `${variableName}` must have a regex test.")
             return
-        }
-
-        repoPatternElement.regexTests.forEach { test ->
-            if (!repoPatternElement.pattern.matcher(test).find()) {
-                delegate.reportIssue("Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`. " +
-                    "[View on Regex101](${repoPatternElement.regex101Url})")
-            }
-        }
-
-        repoPatternElement.failingRegexTests.forEach { test ->
-            if (repoPatternElement.pattern.matcher(test).find()) {
-                delegate.reportIssue("Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
-                    "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})")
-            }
         }
     }
 

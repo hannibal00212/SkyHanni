@@ -54,6 +54,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
+        "at at.hannibal2.skyhanni.test.command.ErrorManager.skyHanniError",
         "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
@@ -65,7 +66,7 @@ object ErrorManager {
     }
 
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message)
+        val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
         println("extraData: \n${buildExtraDataString(extraData)}")

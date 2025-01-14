@@ -26,4 +26,6 @@ object ScoreboardEventSpooky : ScoreboardEvent() {
     // TODO: Add isSpookyActive() somewhere
 
     override val configLine = "§6Spooky Festival§f 50:54\n§7Your Candy:\n§a1 Green§7, §50 Purple §7(§61 §7pts.)"
+
+    override val elementPatterns = listOf(ScoreboardPattern.spookyPattern)
 }
