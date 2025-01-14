@@ -39,8 +39,8 @@ object SkyHanniTypeAdapters {
     )
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
-        { "$x:$y:$z" },
-        { LorenzVec.decodeFromString(this) },
+        LorenzVec::asStoredString,
+        LorenzVec::decodeFromString,
     )
 
     val TROPHY_RARITY: TypeAdapter<TrophyRarity> = SimpleStringTypeAdapter(
