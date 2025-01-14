@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.data.IslandType
+import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class HandleEvent(
+    /**
+     * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
+     */
+    val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
+
     /**
      * If the event should only be received while on SkyBlock.
      */
@@ -32,7 +38,6 @@ annotation class HandleEvent(
      */
     val receiveCancelled: Boolean = false,
 ) {
-
     companion object {
         const val HIGHEST = -2
         const val HIGH = -1

@@ -18,29 +18,63 @@ class EventListeners private constructor(val name: String, private val isGeneric
     )
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
-        require(method.parameterCount == 1)
-        val generic: Class<*>? = if (isGeneric) {
+        val name = buildListenerName(method)
+        val eventConsumer = createEventConsumer(method, instance, options)
+        val generic = if (isGeneric) resolveGenericType(method) else null
+
+        listeners.add(Listener(name, eventConsumer, options, generic))
+    }
+
+    private fun buildListenerName(method: Method): String {
+        val paramTypesString = method.parameterTypes.joinTo(
+            StringBuilder(),
+            prefix = "(",
+            postfix = ")",
+            separator = ", ",
+            transform = Class<*>::getTypeName
+        ).toString()
+
+        return "${method.declaringClass.name}.${method.name}$paramTypesString"
+    }
+
+    private fun createEventConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
+        return when (method.parameterCount) {
+            0 -> createZeroParameterConsumer(method, instance, options)
+            1 -> createSingleParameterConsumer(method, instance)
+            else -> throw IllegalArgumentException(
+                "Method ${method.name} must have either 0 or 1 parameters."
+            )
+        }
+    }
+
+    private fun createZeroParameterConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
+        require(options.eventType != SkyHanniEvent::class) {
+            "Method ${method.name} has no parameters but no eventType was provided in the annotation."
+        }
+        val eventType = options.eventType.java
+        require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+            "eventType in @HandleEvent must extend SkyHanniEvent. Provided: $eventType"
+        }
+        return { _: Any -> method.invoke(instance) }
+    }
+
+    private fun createSingleParameterConsumer(method: Method, instance: Any): (Any) -> Unit {
+        require(SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
+            "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
+        }
+        return { event -> method.invoke(instance, event) }
+    }
+
+    private fun resolveGenericType(method: Method): Class<*> =
+        method.genericParameterTypes.getOrNull(0)?.let { genericType ->
             ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
-                method.genericParameterTypes[0],
-                GenericSkyHanniEvent::class.java.typeParameters[0],
+                genericType,
+                GenericSkyHanniEvent::class.java.typeParameters[0]
             ) ?: error(
                 "Generic event handler type parameter is not present in " +
-                    "event class hierarchy for type ${method.genericParameterTypes[0]}",
+                    "event class hierarchy for type $genericType"
             )
-        } else {
-            null
-        }
-        val name = "${method.declaringClass.name}.${method.name}${
-            method.parameterTypes.joinTo(
-                StringBuilder(),
-                prefix = "(",
-                postfix = ")",
-                separator = ", ",
-                transform = Class<*>::getTypeName,
-            )
-        }"
-        listeners.add(Listener(name, createEventConsumer(name, instance, method), options, generic))
-    }
+        } ?: error("Method ${method.name} does not have a generic parameter type.")
 
     /**
      * Creates a consumer using LambdaMetafactory, this is the most efficient way to reflectively call
