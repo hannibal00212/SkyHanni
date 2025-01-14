@@ -158,7 +158,7 @@ object HarpFeatures {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
-                if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+                if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
                     event.cancel()
                     return
                 }
@@ -172,8 +172,9 @@ object HarpFeatures {
         event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
+            val clickType = event.clickType?.id ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, event.clickType)
+            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
         }
     }
 
