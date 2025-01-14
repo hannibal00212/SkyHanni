@@ -102,7 +102,7 @@ object DungeonCleanEnd {
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (config.F3IgnoreGuardians &&
+        if (config.f3IgnoreGuardians &&
             DungeonAPI.isOneOf("F3", "M3") &&
             entity is EntityGuardian &&
             entity.entityId != lastBossId &&
@@ -136,5 +136,6 @@ object DungeonCleanEnd {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
+        event.move(71, "dungeon.cleanEnd.F3IgnoreGuardians", "dungeon.cleanEnd.f3IgnoreGuardians")
     }
 }

@@ -33,5 +33,5 @@ public class LaneSwitchSoundSettings {
 
     @ConfigOption(name = "List of Sounds", desc = "A list of available sounds.")
     @ConfigEditorButton(buttonText = "Open")
-    public Runnable listOfSounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
+    public Runnable listOfSounds = OSUtils::openSoundsListInBrowser;
 }
