@@ -162,10 +162,10 @@ object FFStats {
         FFGuideGUI.updateDisplay()
     }
 
-    fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
+    private fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
 
-    fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
-    fun combineFFData(value: List<Map<FFTypes, Double>>) =
+    private fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
+    private fun combineFFData(value: List<Map<FFTypes, Double>>) =
         value.map { it.toList() }.flatten().groupBy({ it.first }, { it.second })
             .mapValues { (_, values) -> values.sum() }
 

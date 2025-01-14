@@ -22,6 +22,11 @@ public class PetConfig {
     public boolean display = false;
 
     @Expose
+    @ConfigOption(name = "Rarity Circle", desc = "Display a circle around the pet icon based on rarity.")
+    @ConfigEditorBoolean
+    public boolean rarityCircle = true;
+
+    @Expose
     @ConfigLink(owner = PetConfig.class, field = "display")
     public Position displayPos = new Position(-330, -15, false, true);
 
