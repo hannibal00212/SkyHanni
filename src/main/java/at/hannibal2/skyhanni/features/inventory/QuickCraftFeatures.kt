@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -57,7 +56,7 @@ object QuickCraftFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
@@ -73,7 +72,7 @@ object QuickCraftFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot?.slotNumber)) return
