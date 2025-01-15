@@ -47,7 +47,7 @@ _Frequently Asked Questions_
 > 2. Do you want to **reset the current session**?
 >   - Open the inventory (Press E) and hover over the display.
 >   - Then click on `Reset Session!`.
-> 3. (For Diana Trackers only) Do you want to **view only the current mayor**?
+> 3. (**For Diana Trackers only**) Do you want to **view only the current mayor**?
 >   - Open the inventory (Press E) and hover over the display.
 >   - Then click on `[This Mayor]`.
 > 4. Do you want to **remove one specific item** from the tracker?
