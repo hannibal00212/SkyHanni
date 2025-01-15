@@ -99,4 +99,19 @@ object RegexUtils {
             }
         }
     }
+
+    /** Replaces all occurrences of the pattern in the input string with the result of the [transform] function. */
+    fun Pattern.replace(input: String, transform: Matcher.() -> String): String {
+        val matcher = matcher(input)
+        var lastEnd = 0
+        return buildString {
+            while (matcher.find()) {
+                append(input, lastEnd, matcher.start())
+                append(transform(matcher))
+                lastEnd = matcher.end()
+            }
+
+            if (lastEnd < input.length) append(input, lastEnd, input.length)
+        }
+    }
 }
