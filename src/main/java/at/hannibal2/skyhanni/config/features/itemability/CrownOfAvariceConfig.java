@@ -26,15 +26,19 @@ public class CrownOfAvariceConfig {
     @ConfigOption(name = "Crown Coins Per Hour",
         desc = "Show coins per hour in the Avarice Counter.")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean perHour = false;
 
     @Expose
     @ConfigOption(name = "Time until Max Crown",
         desc = "Shows the time until you reach max coins (1B coins).")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean time = false;
+
+    @Expose
+    @ConfigOption(name = "Last coins gained",
+        desc = "Shows the amount of last amount of coins gained.")
+    @ConfigEditorBoolean
+    public boolean coinDiff = false;
 
     @Expose
     @ConfigLink(owner = CrownOfAvariceConfig.class,field = "enable")
