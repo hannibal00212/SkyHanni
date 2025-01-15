@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -36,8 +37,8 @@ object ShortenCoins {
     fun onChat(event: LorenzChatEvent) {
         if (!config.shortenCoinAmounts) return
         val message = event.message
-        val modifiedMessage = coinsPattern.toRegex().replace(message) { match ->
-            val amount = match.groups["amount"]?.value ?: return@replace match.value
+        val modifiedMessage = coinsPattern.replace(message) {
+            val amount = group("amount")
             val amountAsDouble = amount.formatDouble()
             val displayAmount = amountAsDouble.shortFormat(preciseBillions = true)
             "§6$displayAmount"
