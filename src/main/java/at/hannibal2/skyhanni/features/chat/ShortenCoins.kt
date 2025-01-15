@@ -38,10 +38,7 @@ object ShortenCoins {
         if (!config.shortenCoinAmounts) return
         val message = event.message
         val modifiedMessage = coinsPattern.replace(message) {
-            val amount = group("amount")
-            val amountAsDouble = amount.formatDouble()
-            val displayAmount = amountAsDouble.shortFormat(preciseBillions = true)
-            "§6$displayAmount"
+            "§6${group("amount").formatDouble().shortFormat(preciseBillions = true)}"
         }.takeIf { it != message } ?: return
 
         event.chatComponent = ChatComponentText(modifiedMessage)
