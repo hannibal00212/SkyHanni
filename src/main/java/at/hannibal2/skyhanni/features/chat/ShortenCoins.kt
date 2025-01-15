@@ -16,20 +16,11 @@ object ShortenCoins {
     private val patternGroup = RepoPattern.group("chat.coins")
 
     /**
-     * Because this regex isn't matching the whole message but parts of it, the real regex
-     * tests can't be included here. The regex tests are just the coins section of the message.
-     *
-     * §6[Auction] §aEuropaPlus §ebought §fAtmospheric Filter §efor §62,650,000 coins §lCLICK
-     * §aYou sold §r§aCicada Symphony Vinyl§r§8 x1 §r§afor §r§650,000 Coins§r§a!
-     * §6§lALLOWANCE! §r§eYou earned §r§650,000 coins§r§e!
-     * §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
-     *
-     * Should not match:
-     * §aYou have withdrawn §r§610.5k coins§r§a! You now have §r§6991.1M coins §r§ain your account!
-     *
-     * REGEX-TEST: §62,650,000
-     * REGEX-TEST: §650,000
-     * REGEX-TEST: §6250,303
+     * REGEX-TEST: §6[Auction] §aEuropaPlus §ebought §fAtmospheric Filter §efor §62,650,000 coins §lCLICK
+     * REGEX-TEST: §aYou sold §r§aCicada Symphony Vinyl§r§8 x1 §r§afor §r§650,000 Coins§r§a!
+     * REGEX-TEST: §6§lALLOWANCE! §r§eYou earned §r§650,000 coins§r§e!
+     * REGEX-TEST: §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
+     * REGEX-FAIL: §aYou have withdrawn §r§610.5k coins§r§a! You now have §r§6991.1M coins §r§ain your account!
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
