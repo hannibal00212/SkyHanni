@@ -49,11 +49,11 @@ class CrystalNucleusTrackerConfig {
     @ConfigEditorDropdown
     var professorUsage: Property<ProfessorUsageType> = Property.of(ProfessorUsageType.ROBOT_PARTS)
 
-    enum class ProfessorUsageType(private val str: String) {
+    enum class ProfessorUsageType(private val displayName: String) {
         ROBOT_PARTS("§9Robot Parts"),
         PRECURSOR_APPARATUS("§5Precursor Apparatus"),
         ;
 
-        override fun toString(): String = str
+        override fun toString(): String = displayName
     }
 }

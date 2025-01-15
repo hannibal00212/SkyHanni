@@ -143,13 +143,14 @@ object CrystalNucleusTracker {
             val usesApparatus = CrystalNucleusAPI.usesApparatus()
             val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
             val totalSapphireCost = partsCost * runsCompleted
+            val rawConfigString = config.professorUsage.get().toString()
             val usageString =
                 if (usesApparatus) StringUtils.pluralize(
                     runsCompleted.toInt(),
-                    config.professorUsage.toString(),
+                    rawConfigString,
                     "§5Precursor Apparatuses"
                 )
-                else config.professorUsage.toString()
+                else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
             profit -= totalSapphireCost
