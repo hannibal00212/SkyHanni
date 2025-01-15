@@ -20,7 +20,7 @@ object ShortenCoins {
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
-        ".*§6(?<amount>[\\d,]+).*"
+        "§6(?<amount>[\\d,]+)"
     )
 
     @SubscribeEvent
