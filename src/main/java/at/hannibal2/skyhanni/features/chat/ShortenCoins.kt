@@ -24,12 +24,12 @@ object ShortenCoins {
      * §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
      *
      * REGEX-TEST: §62,650,000
-     * REGEX-TEST: §r§650,000
-     * REGEX-TEST: §r§6250,303
+     * REGEX-TEST: §650,000
+     * REGEX-TEST: §6250,303
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
-        "(?:§.)*§6(?<amount>[\\d,]+)"
+        "§6(?<amount>[\\d,.]+)"
     )
 
     @SubscribeEvent
