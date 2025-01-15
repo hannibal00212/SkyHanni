@@ -24,13 +24,16 @@ object ShortenCoins {
      * §6§lALLOWANCE! §r§eYou earned §r§650,000 coins§r§e!
      * §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
      *
+     * Should not match:
+     * §aYou have withdrawn §r§610.5k coins§r§a! You now have §r§6991.1M coins §r§ain your account!
+     *
      * REGEX-TEST: §62,650,000
      * REGEX-TEST: §650,000
      * REGEX-TEST: §6250,303
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
-        "§6(?<amount>[\\d,.]+)"
+        "§6(?<amount>[\\d,.]+)(?![\\d.,kMB])"
     )
 
     @SubscribeEvent
@@ -38,7 +41,7 @@ object ShortenCoins {
         if (!config.shortenCoinAmounts) return
         val message = event.message
         val modifiedMessage = coinsPattern.replace(message) {
-            "§6${group("amount").formatDouble().shortFormat(preciseBillions = true)}"
+            "§6${group("amount").formatDouble().shortFormat()}"
         }.takeIf { it != message } ?: return
 
         event.chatComponent = ChatComponentText(modifiedMessage)
