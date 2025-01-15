@@ -73,13 +73,11 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
-        @Deprecated("old", ReplaceWith("clickTypeEnum"))
-        val clickType: Int,
-        val clickTypeEnum: ClickType? = ClickType.getTypeById(clickType),
+        val clickType: ClickType?,
     ) : GuiContainerEvent(gui, container), Cancellable {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.MIDDLE) return
+            if (this.clickedButton == 2 && this.clickType == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
                 InventoryUtils.clickSlot(slotNumber, container.windowId, 2, 3)
                 cancel()

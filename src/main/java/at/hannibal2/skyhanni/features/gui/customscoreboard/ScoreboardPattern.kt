@@ -416,8 +416,8 @@ object ScoreboardPattern {
         "nearbyplayers",
         "Nearby Players: §.(?:\\d+|N/A)",
     )
-    val uselessGoblinPattern by miningSb.pattern(
-        "uselessgoblin",
+    val goblinUselessPattern by miningSb.pattern(
+        "goblinguseless",
         "§7Kill goblins!",
     )
 
