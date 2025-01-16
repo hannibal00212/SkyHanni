@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -37,7 +36,7 @@ object NotificationManager {
         lastNotificationClosed = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         val notification = getCurrentNotification() ?: return
 

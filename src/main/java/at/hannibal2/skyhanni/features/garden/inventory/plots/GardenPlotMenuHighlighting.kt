@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenPlotMenuHighlighting {
@@ -46,7 +45,7 @@ object GardenPlotMenuHighlighting {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || highlightedPlots.isEmpty()) return
 

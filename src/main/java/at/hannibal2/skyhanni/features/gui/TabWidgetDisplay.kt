@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 enum class TabWidgetDisplay(private val configName: String?, vararg val widgets: TabWidget) {
     SOULFLOW(null, TabWidget.SOULFLOW),
@@ -59,7 +58,7 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
 
         private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config?.displayPositions == null) return

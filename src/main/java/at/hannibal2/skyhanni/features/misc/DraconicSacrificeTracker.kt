@@ -130,8 +130,8 @@ object DraconicSacrificeTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return
 

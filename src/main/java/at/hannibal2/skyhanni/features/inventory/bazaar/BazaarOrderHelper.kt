@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BazaarOrderHelper {
@@ -48,7 +48,7 @@ object BazaarOrderHelper {
         "§7Price per unit: §6(?<number>.*) coins",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.inventory.bazaar.orderHelper) return

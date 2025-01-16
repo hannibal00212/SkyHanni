@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -117,7 +116,7 @@ object JacobContestFFNeededDisplay {
         return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
