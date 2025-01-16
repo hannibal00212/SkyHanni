@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -64,8 +63,8 @@ object PatcherSendCoordinates {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!config.enabled) return
 
         for (beacon in patcherBeacon) {
