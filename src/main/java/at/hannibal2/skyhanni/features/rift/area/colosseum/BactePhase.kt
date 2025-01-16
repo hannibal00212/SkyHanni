@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BactePhase.BactePhase.entries
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -19,6 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object BactePhase {
 
     private val group = RepoPattern.group("rift.colosseum.bacte")
+
     /**
      * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c❤ §2﴿
      */
@@ -60,13 +63,13 @@ object BactePhase {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.name != "Bacte") return
         bacte = event.mob
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob == bacte) {
             currentPhase = BactePhase.NOT_ACTIVE
@@ -74,7 +77,7 @@ object BactePhase {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
         val bacte = bacte ?: return
 
@@ -88,8 +91,8 @@ object BactePhase {
         currentPhase = BactePhase.NOT_ACTIVE
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @@HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onWorldRender(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (currentPhase == BactePhase.NOT_ACTIVE) return
         val bacte = bacte ?: return
@@ -100,6 +103,6 @@ object BactePhase {
         )
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
+    fun isEnabled() = RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
 
 }

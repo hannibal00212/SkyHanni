@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -50,8 +50,8 @@ object TentacleWaypoint {
         tentacles[event.entity]?.let { tentacles[event.entity] = it + 1 }
     }
 
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onRender(event: RenderWorldEvent) {
         if (!isEnabled()) return
         tentacles = tentacles.filterNot { it.key.isDead || it.key.health == 0f }.toMutableMap()
 
@@ -87,6 +87,6 @@ object TentacleWaypoint {
         tentacles.clear()
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inColosseum() && config.tentacleWaypoints
+    fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
 
 }
