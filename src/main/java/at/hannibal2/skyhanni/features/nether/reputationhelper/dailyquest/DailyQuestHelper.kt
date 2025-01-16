@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -197,8 +197,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         update()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -214,7 +214,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: LorenzRenderWorldEvent) {
+    private fun renderTownBoard(event: RenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
         val location = when (reputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
