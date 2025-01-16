@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -51,6 +52,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -81,7 +83,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         "complete",
         "(?:§.)*COMPLETE",
     )
-
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
@@ -299,6 +300,32 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
         if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
             updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
+            if (miniBossQuest.haveAmount == 1) {
+                fixMiniBossByTabWidget(miniBossQuest)
+            }
+        }
+    }
+
+    private fun fixMiniBossByTabWidget(oldQuest: MiniBossQuest) {
+        oldQuest.state = QuestState.ACCEPTED
+        DelayedRun.runDelayed(5.seconds) {
+            if (oldQuest.state == QuestState.ACCEPTED) {
+                ChatUtils.debug(
+                    "Daily Minibosss Quest is still not ready to accept even though we have one miniboss kill," +
+                        "we now assume there are two to kill.",
+                )
+                val newQuest = MiniBossQuest(oldQuest.miniBoss, oldQuest.state, 2)
+                newQuest.haveAmount = oldQuest.haveAmount
+                DelayedRun.runNextTick {
+                    quests.remove(oldQuest)
+                    quests.add(newQuest)
+                    ChatUtils.chat("Fixed wrong miniboss amount from Tab Widget.")
+                    update()
+                }
+            } else {
+                oldQuest.state = QuestState.READY_TO_COLLECT
+            }
+            reputationHelper.update()
         }
     }
 
