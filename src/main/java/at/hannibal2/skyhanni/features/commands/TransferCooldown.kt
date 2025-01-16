@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,8 +20,8 @@ object TransferCooldown {
     private var lastRunCompleted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var action: (() -> Unit)? = null
 
-    @SubscribeEvent
-    fun onWorldLoad(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!config.transferCooldown || lastRunCompleted.isInFuture()) return
         lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
             if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) {

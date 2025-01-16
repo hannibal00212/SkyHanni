@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -439,8 +439,8 @@ enum class TabWidget(
             }
         }
 
-        @SubscribeEvent
-        fun onWorldChange(event: LorenzWorldChangeEvent) {
+        @HandleEvent
+        fun onWorldChange(event: WorldChangeEvent) {
             sentSinceWorldChange = false
         }
 

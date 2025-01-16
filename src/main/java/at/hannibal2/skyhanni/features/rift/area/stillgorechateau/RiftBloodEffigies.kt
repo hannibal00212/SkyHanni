@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -55,6 +55,7 @@ object RiftBloodEffigies {
     private val effigies = (0..5).associateWith { Effigy() }
 
     private val patternGroup = RepoPattern.group("rift.area.stillgore.effegies")
+
     /**
      * REGEX-TEST: §eRespawn §c14m59s §7(or click!)
      * REGEX-TEST: §eRespawn §c1s §7(or click!)
@@ -63,6 +64,7 @@ object RiftBloodEffigies {
         "respawn",
         "§eRespawn §c(?<time>.*) §7\\(or click!\\)",
     )
+
     /**
      * REGEX-TEST: §eBreak it!
      */
@@ -70,6 +72,7 @@ object RiftBloodEffigies {
         "break",
         "§eBreak it!",
     )
+
     /**
      * REGEX-TEST: Effigies: §c⧯§c⧯§c⧯§c⧯§c⧯§c⧯
      * REGEX-TEST: Effigies: §c⧯§c⧯§c⧯§c⧯§c⧯§7⧯
@@ -82,8 +85,8 @@ object RiftBloodEffigies {
     private fun getIndex(entity: EntityArmorStand): Int? =
         locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         effigies.values.forEach { it.reset() }
     }
 

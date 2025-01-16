@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,7 +25,6 @@ import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
 @SkyHanniModule
@@ -135,7 +134,7 @@ object MinionXp {
     private fun getHasStorage(minionPosition: LorenzVec): Boolean {
         val positionsToCheck = listOf(
             LorenzVec(1, 0, 0), LorenzVec(0, 0, 1),
-            LorenzVec(-1, 0, 0), LorenzVec(0, 0, -1)
+            LorenzVec(-1, 0, 0), LorenzVec(0, 0, -1),
         )
 
         return positionsToCheck.any { position ->
@@ -145,8 +144,8 @@ object MinionXp {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.xpDisplay) return
         when {
@@ -165,7 +164,7 @@ object MinionXp {
         }
     }
 
-    private fun addXpInfoToTooltip(event: LorenzToolTipEvent) {
+    private fun addXpInfoToTooltip(event: ToolTipEvent) {
         xpItemMap[toPrimitiveItemStack(event.itemStack)]?.let {
             event.toolTip.add("")
             event.toolTip.add(it)
