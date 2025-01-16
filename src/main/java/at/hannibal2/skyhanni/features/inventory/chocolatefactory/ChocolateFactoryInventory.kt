@@ -100,7 +100,7 @@ object ChocolateFactoryInventory {
         ) return
 
         // this would break ChocolateFactoryKeybinds otherwise
-        if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) return
+        if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) return
 
         // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
         if (KeyboardManager.isShiftKeyDown() && slotNumber in ChocolateFactoryAPI.rabbitSlots.keys) return

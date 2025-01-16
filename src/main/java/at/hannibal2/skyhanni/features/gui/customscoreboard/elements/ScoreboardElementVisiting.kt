@@ -13,6 +13,8 @@ object ScoreboardElementVisiting : ScoreboardElement() {
 
     override val configLine = " §a✌ §7(§a1§7/6)"
 
+    override val elementPatterns = listOf(ScoreboardPattern.visitingPattern)
+
     override fun showIsland() = inAnyIsland(
         IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST,
         IslandType.GARDEN, IslandType.GARDEN_GUEST,

@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -178,20 +177,7 @@ object MinionFeatures {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
         val inventoryName = event.inventoryName
-        if (!minionTitlePattern.find(inventoryName)) {
-            // This should never happen, but somehow it still does. Therefore the workaround
-            if (minionInventoryOpen) {
-                minionInventoryOpen = false
-                MinionCloseEvent().post()
-                ErrorManager.logErrorStateWithData(
-                    "Detected unexpected minion menu closing",
-                    "minionInventoryOpen = true without minion title in InventoryFullyOpenedEvent()",
-                    "current inventoryName" to inventoryName,
-                    betaOnly = true,
-                )
-            }
-            return
-        }
+        if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
@@ -281,6 +267,7 @@ object MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
+        MinionCloseEvent().post()
         if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
@@ -288,7 +275,6 @@ object MinionFeatures {
                 minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
-        MinionCloseEvent().post()
     }
 
     @SubscribeEvent

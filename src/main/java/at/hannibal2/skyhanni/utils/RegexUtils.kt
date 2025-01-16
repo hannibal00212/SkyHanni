@@ -29,9 +29,11 @@ object RegexUtils {
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
         firstMatcherWithIndex(list.asSequence(), consumer)
 
+    // TODO rename to matchFirst / why is this different to firstMatcher?
+    //  if this is intentional checking all (that doesnt make sense) then the return should be void and not null
     inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
         for (line in list) {
-            matcher(line).let { if (it.find()) consumer(it) }
+            matcher(line).let { if (it.find()) return consumer(it) }
         }
         return null
     }
