@@ -100,8 +100,10 @@ object CarryTracker {
         rawNamePattern.matchMatcher(event.message) {
             val player = lastTradedPlayer ?: return
             val coinsGained = group("coins").formatDouble()
-            getCustomer(player).alreadyPaid += coinsGained
-            update()
+            getCustomerOrNull(player)?.let {
+                it.alreadyPaid += coinsGained
+                update()
+            }
         }
     }
 
@@ -111,7 +113,7 @@ object CarryTracker {
         slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -142,7 +144,7 @@ object CarryTracker {
         }
         if (args[0] == "remove") {
             val customerName = args[1]
-            val customer = customers.find { it.name.equals(customerName, true) } ?: run {
+            val customer = getCustomerOrNull(customerName) ?: run {
                 ChatUtils.userError("Customer not found: §b$customerName")
                 return
             }
@@ -159,18 +161,7 @@ object CarryTracker {
         val amountRequested = amount.formatIntOrUserError() ?: return
         val newCarry = Carry(carryType, amountRequested)
 
-        val customer = customers.find { it.name.equals(customerName, true) }
-        if (customer == null) {
-            if (amountRequested < 1) {
-                ChatUtils.userError("Carry amount requested must be positive!")
-                return
-            }
-
-            getCustomer(customerName).carries.add(newCarry)
-            update()
-            ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
-            return
-        }
+        val customer = getCustomer(customerName)
         val carries = customer.carries
         for (carry in carries.toList()) {
             if (newCarry.type != carry.type) continue
@@ -187,6 +178,14 @@ object CarryTracker {
             ChatUtils.chat("Updated carry: §b$customerName §8x$newAmountRequested ${newCarry.type}")
             return
         }
+
+        if (amountRequested < 1) {
+            ChatUtils.userError("Carry amount requested must be positive!")
+            return
+        }
+        customer.carries.add(newCarry)
+        update()
+        ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
     }
 
     private fun getCarryType(rawType: String): CarryType? = carryTypes.getOrPut(rawType) {
@@ -205,11 +204,12 @@ object CarryTracker {
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
-    private fun getCustomer(customerName: String): Customer = customers.find {
+    private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)
-    } ?: Customer(customerName).also {
-        customers.add(it)
     }
+
+    private fun getCustomer(customerName: String): Customer =
+        getCustomerOrNull(customerName) ?: Customer(customerName).also { customers.add(it) }
 
     private fun createDisplay(
         carry: Carry,

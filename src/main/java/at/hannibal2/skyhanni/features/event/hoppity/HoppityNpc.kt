@@ -55,6 +55,8 @@ object HoppityNpc {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
+        if (LorenzUtils.isStrandedProfile) return
+
         if (hoppityYearOpened == SkyBlockTime.now().year) return
         if (!HoppityAPI.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 2.minutes) return
@@ -99,7 +101,7 @@ object HoppityNpc {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isHighlightEnabled()) return
         if (!inShop) return

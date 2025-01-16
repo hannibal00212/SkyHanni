@@ -61,7 +61,7 @@ object ChocolateFactoryStrayTimer {
         } ?: SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!eventConfig.enabled || timer <= Duration.ZERO) return

@@ -105,8 +105,8 @@ object GetFromSackAPI {
         inventoryMap.clear()
     }
 
-    @SubscribeEvent
-    fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
