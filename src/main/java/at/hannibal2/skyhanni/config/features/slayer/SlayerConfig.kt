@@ -48,6 +48,15 @@ class SlayerConfig {
     var slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
 
     @Expose
+    @ConfigOption(
+        name = "Block Not Spawnable",
+        desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var blockNotSpawnable: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Mini-Boss in blue color.")
     @ConfigEditorBoolean
     @FeatureToggle
