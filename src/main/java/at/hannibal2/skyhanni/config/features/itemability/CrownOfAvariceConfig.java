@@ -23,6 +23,12 @@ public class CrownOfAvariceConfig {
     public boolean shortFormat = true;
 
     @Expose
+    @ConfigOption(name = "Coins Per Hour Format",
+        desc = "Have the Coins Per Hour show as short format instead of every digit.")
+    @ConfigEditorBoolean
+    public boolean shortFormatCPH = true;
+
+    @Expose
     @ConfigOption(name = "Crown Coins Per Hour",
         desc = "Show coins per hour in the Avarice Counter.")
     @ConfigEditorBoolean
