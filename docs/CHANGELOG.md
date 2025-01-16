@@ -21,11 +21,17 @@
     + Plays meow sound when 'meow' appears in chat.
     + Plays bark sound when 'woof' appears in chat.
 
+#### Slayer
+
++ Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
+
 #### Misc
 
 + Removed NotEnoughUpdates requirement. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2909)
     + SkyHanni no longer requires NEU to run, preparing for updates to modern Minecraft versions.
     + Using NEU is still recommended.
++ Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
+    + Displays current buffed region and duration until next change.
 
 ### Improvements
 
@@ -51,6 +57,11 @@
 #### Garden Improvements
 
 + Added compact display mode to the Farming Fortune Display. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3119)
+
+#### Event Improvements
+
++ Added custom sound to the Inquisitor Share feature. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3160)
++ Replaced old hoppity ready reminder messages when clickable is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3215)
 
 #### Misc Improvements
 
@@ -83,6 +94,8 @@
 + Fixed Minion Upgrade Feature appearing outside minion menus. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3175)
 + Fixed Book of Stats not counting in Estimated Item Value for items with 0 kills. - Luna (https://github.com/hannibal002/SkyHanni/pull/3178)
 + Fixed copy option in `/playtimedetailed` not working unless Limbo Playtime Detailed is enabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/3193)
++ Fixed missing label on Partyfinder ItemStack. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3219)
++ Fixed showing minion upgrade helper outside the minion menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3223)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -93,6 +106,19 @@
 + Fixed Custom Keybinds not working with inventory or chat keybind. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3186)
 + Fixed Farming Fortune Breakdown not showing in itooltips for Armor or Farming Tools with Gemstones applied. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3184)
 + Fixed missing visuals in /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3196)
++ Fixed opening AH for items not in AH in Visitor Shopping List. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3222)
+
+#### Combat Bug Fixes
+
++ Fixed /shcarry tracker not working when reusing the same customer name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3221)
+
+#### Crimson Isle Bug Fixes
+
++ Fixed Crimson Quests with two mini-bosses via Tab Widget. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3224)
+
+#### Event Bug Fixes
+
++ Fixed issue with Hitman statistics. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3210)
 
 #### Misc Bug Fixes
 
@@ -129,6 +155,14 @@
 + Cleaned up code in Bestiary display class. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3155)
 + Fixed bug in /shgraphfindall. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3198)
 + Migrated more events from LorenzEvent to SkyHanniEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3188)
++ Delayed HypixelData comparison with HypixelLocationAPI. - Empa (https://github.com/hannibal002/SkyHanni/pull/3212)
++ Improved Custom Scoreboard to check only active patterns on the current island. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2927)
++ Removed deprecated clickType field. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3207)
++ Rewrote ReputationHelper to use Renderables & TabWidgetUpdateEvent. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3207)
++ Split RegexTestMissing Detekt Rule. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3220)
++ Transferred more events to SkyHanniEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3199)
+
+## Version 1.0.0
 
 ### New Features
 

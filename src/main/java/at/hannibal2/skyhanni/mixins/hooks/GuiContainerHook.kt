@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -68,7 +69,7 @@ class GuiContainerHook(guiAny: Any) {
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
         val item = gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
-        if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, clickType).post()
+        if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, ClickType.getTypeById(clickType)).post()
         ) ci.cancel()
     }
 
