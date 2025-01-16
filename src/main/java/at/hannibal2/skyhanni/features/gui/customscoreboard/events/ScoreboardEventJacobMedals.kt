@@ -13,5 +13,5 @@ object ScoreboardEventJacobMedals : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.medalsPattern)
 
-    // Can appear in any island when calling Anita through the AbiPhone
+    // Can appear on any island when calling Anita through the AbiPhone
 }
