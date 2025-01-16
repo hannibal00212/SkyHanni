@@ -519,6 +519,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
     + Shows a large display with a timer when the Fire Pillar is about to explode.
     + Also displays for other players' bosses.
++ Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
 
 </details>
 <details open><summary>
@@ -1470,6 +1471,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Automatically tracks coins received from customers via `/trade`.
 + Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
     +  Tracks items and profit while using the Draconic Altar in the End.
++ Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
+    + Displays current buffed region and duration until next change.
 
 </details>
 <details open><summary>

@@ -224,7 +224,7 @@ enum class TabWidget(
     ),
     REPUTATION(
         // language=RegExp
-        "(?:§.)*(Barbarian|Mage) Reputation:",
+        "(?:§.)*(?<faction>Barbarian|Mage) Reputation:",
     ),
     FACTION_QUESTS(
         // language=RegExp
