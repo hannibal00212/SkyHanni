@@ -123,7 +123,7 @@ object RiftTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (RiftAPI.inMirrorVerse) return

@@ -599,7 +599,7 @@ object ComposterOverlay {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
