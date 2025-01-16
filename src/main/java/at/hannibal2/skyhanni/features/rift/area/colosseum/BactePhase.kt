@@ -91,7 +91,7 @@ object BactePhase {
         currentPhase = BactePhase.NOT_ACTIVE
     }
 
-    @@HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onWorldRender(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (currentPhase == BactePhase.NOT_ACTIVE) return
