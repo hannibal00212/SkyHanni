@@ -168,7 +168,6 @@
     <ID>RepoPatternRegexTestMissing:MaxPurseItems.kt$MaxPurseItems$by patternGroup.pattern( "order", ".*§6(?&lt;coins&gt;[\\d.,]+) coins §7each.*", )</ID>
     <ID>RepoPatternRegexTestMissing:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.noselectedpower", "(?:§.)*Visit Maxwell in the Hub to learn", )</ID>
     <ID>RepoPatternRegexTestMissing:MaxwellAPI.kt$MaxwellAPI$by patternGroup.pattern( "gui.thaumaturgy.data", "§(?&lt;color&gt;.)\\+(?&lt;amount&gt;[^ ]+)(?&lt;icon&gt;.) (?&lt;name&gt;.+)", )</ID>
-    <ID>RepoPatternRegexTestMissing:MinionCraftHelper.kt$MinionCraftHelper$by RepoPattern.pattern( "bingo.minion.name", "(?&lt;name&gt;.*) Minion (?&lt;number&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "jerry", "(?:\\[\\w+(?&lt;level&gt;\\d+)\\] )?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerry) \\d+ Hits", )</ID>
