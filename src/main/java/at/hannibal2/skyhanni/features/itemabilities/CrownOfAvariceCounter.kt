@@ -109,7 +109,7 @@ object CrownOfAvariceCounter {
             if (config.perHour) {
                 add(
                     Renderable.string(
-                        "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..." 
+                        "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..."
                         else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()} " +
                             if (isSessionAFK()) "§c(RESET)" else "",
                     ),
