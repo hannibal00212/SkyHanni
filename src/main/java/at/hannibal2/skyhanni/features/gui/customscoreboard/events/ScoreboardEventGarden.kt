@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventGarden : ScoreboardEvent() {
 
-    private val patterns = listOf(ScoreboardPattern.pastingPattern, ScoreboardPattern.cleanUpPattern)
-
-    override fun getDisplay() = patterns.allMatches(getSbLines()).map { it.trim() }
+    override fun getDisplay() = elementPatterns.allMatches(getSbLines()).map { it.trim() }
 
     override val configLine = "§7(All Garden Lines)"
+
+    override val elementPatterns = listOf(ScoreboardPattern.pastingPattern, ScoreboardPattern.cleanUpPattern)
 
     override fun showIsland() = GardenAPI.inGarden()
 }

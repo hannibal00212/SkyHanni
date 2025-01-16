@@ -36,9 +36,13 @@ object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
+    /**
+     * REGEX-TEST: Sheep Minion X
+     * REGEX-TEST: Wheat Minion IV
+     */
     private val minionNamePattern by RepoPattern.pattern(
         "bingo.minion.name",
-        "(?<name>.*) Minion (?<number>.*)"
+        "(?<name>.*) Minion (?<number>.*)",
     )
 
     private var display = emptyList<String>()
@@ -96,8 +100,9 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: List<ItemStack>):
-        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(
+        mainInventory: List<ItemStack>,
+    ): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -239,7 +244,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
