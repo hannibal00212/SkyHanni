@@ -43,7 +43,8 @@ enum class HoppityEggType(
     val coloredName get() = "$mealColor$mealName"
 
     val timeUntil: Duration get() = nextSpawn.timeUntil()
-    private val nextSpawn: SimpleTimeMark get() = nextSpawnCache.getOrPut(this) { calculateNextSpawn() }
+    private val nextSpawn: SimpleTimeMark get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
+        ?: calculateNextSpawn()
 
     private fun calculateNextSpawn(): SimpleTimeMark {
         if (resetsAt == -1) return SimpleTimeMark.farFuture()
@@ -61,7 +62,9 @@ enum class HoppityEggType(
             hour = resetsAt,
             minute = 0,
             second = 0
-        ).asTimeMark()
+        ).asTimeMark().also {
+            nextSpawnCache[this] = it
+        }
     }
 
     fun markClaimed(mark: SimpleTimeMark? = null) {
@@ -98,7 +101,7 @@ enum class HoppityEggType(
             onUpdate = { type, markOrNull ->
                 val mark = markOrNull ?: return@ObservableMutableMap
                 profileStorage?.mealNextSpawn?.set(type, mark)
-            }
+            },
         )
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
