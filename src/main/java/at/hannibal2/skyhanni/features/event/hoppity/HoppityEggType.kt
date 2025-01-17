@@ -39,15 +39,6 @@ enum class HoppityEggType(
     STRAY("Stray", "§a", -1)
     ;
 
-    private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
-        enumMapOf(),
-        onUpdate = { type, markOrNull ->
-            val mark = markOrNull ?: return@ObservableMutableMap
-            val profileStorage = profileStorage ?: return@ObservableMutableMap
-            profileStorage.mealNextSpawn[type] = mark
-        }
-    )
-
     fun timeUntil(): Duration {
         if (resetsAt == -1) return Duration.INFINITE
         nextSpawnCache[this]?.takeIf { it.isInFuture() }?.let { return it.timeUntil() }
@@ -100,6 +91,15 @@ enum class HoppityEggType(
     @SkyHanniModule
     companion object {
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
+
+        private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
+            enumMapOf(),
+            onUpdate = { type, markOrNull ->
+                val mark = markOrNull ?: return@ObservableMutableMap
+                val profileStorage = profileStorage ?: return@ObservableMutableMap
+                profileStorage.mealNextSpawn[type] = mark
+            }
+        )
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
