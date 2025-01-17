@@ -42,8 +42,9 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.keyCode)) {
+        val override = currentLayout?.get(keyBinding) ?: run {
+            val layout = currentLayout ?: return
+            if (layout.containsValue(keyBinding.keyCode)) {
                 cir.returnValue = false
             }
             return
