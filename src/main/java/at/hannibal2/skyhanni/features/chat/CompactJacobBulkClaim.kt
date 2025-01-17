@@ -115,6 +115,7 @@ object CompactJacobBulkClaim {
     fun onChat(event: LorenzChatEvent) {
         if (!config.compactJacobBulkClaim) return
         val message = event.message
+        var eventDelay = 300.milliseconds
 
         openingPattern.matchMatcher(message) {
             inLoop = true
@@ -138,7 +139,10 @@ object CompactJacobBulkClaim {
         }
 
         bookPattern.matchMatcher(message) {
-            val crop = CropType.getByName(group("crop"))
+            val crop = CropType.getByNameOrNull(group("crop")) ?: when (group("crop").lowercase()) {
+                "cacti" -> CropType.CACTUS
+                else -> return
+            }
             val amount = group("amount").formatInt()
             rewardSet = rewardSet.copy(books = rewardSet.books + (crop to amount))
         }
@@ -153,12 +157,13 @@ object CompactJacobBulkClaim {
         bitsPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             rewardSet = rewardSet.copy(bits = amount)
+            eventDelay = 0.milliseconds
         }
 
         if (rewardSet.hashCode() != startingHash) event.block("compact_jacob_bulk_claim")
 
         val hashNow = rewardSet.hashCode()
-        DelayedRun.runDelayed(300.milliseconds) {
+        DelayedRun.runDelayed(eventDelay) {
             if (rewardSet.hashCode() == hashNow) {
                 inLoop = false
                 publishEvent()
@@ -187,10 +192,10 @@ object CompactJacobBulkClaim {
     private fun ContestRewardsClaimedEvent.getTicketsFormat() = buildString {
         if (rewards.jacobTickets == 0 && rewards.carnivalTickets == 0) return@buildString
         val ticketList = listOf(
-            "§a${rewards.jacobTickets} §7Jacob's Ticket".takeIf { rewards.jacobTickets > 0 }.orEmpty(),
-            "§a${rewards.carnivalTickets} §7Carnival Ticket".takeIf { rewards.carnivalTickets > 0 }.orEmpty()
+            "§a${rewards.jacobTickets} Ja".takeIf { rewards.jacobTickets > 0 }.orEmpty(),
+            "§a${rewards.carnivalTickets} Ca".takeIf { rewards.carnivalTickets > 0 }.orEmpty()
         ).filterNot { it.isEmpty() }
-        "Tickets: " + ticketList.joinToString(separator = "§7, ") { it }
+        append("Tickets: " + ticketList.joinToString(separator = "§7, ") { it })
     }
 
     private fun ContestRewardsClaimedEvent.getBooksFormat() = buildString {
@@ -199,7 +204,7 @@ object CompactJacobBulkClaim {
             val (color, shortName) = shorteningMap[crop] ?: return@map ""
             "${color.getChatColor()}$amount $shortName".takeIf { amount > 0 }.orEmpty()
         }.filterNot { it.isEmpty() }.sortedBy { it.removeColor() }
-        "Books: " + bookList.joinToString(separator = "§7, ") { it }
+        append("Books: " + bookList.joinToString(separator = "§7, ") { it })
     }
 
     private fun ContestRewardsClaimedEvent.getMedalsFormat() = buildString {
@@ -207,11 +212,11 @@ object CompactJacobBulkClaim {
         val medalList = medals.toSortedMap(compareBy { it.ordinal }).map { (medalType, amount) ->
             "${medalType.color.getChatColor()}$amount".takeIf { amount > 0 }.orEmpty()
         }.filterNot { it.isEmpty() }
-        "Medals: " + medalList.joinToString(separator = "§7, ") { it }
+        append("Medals: " + medalList.joinToString(separator = "§7, ") { it })
     }
 
     private fun ContestRewardsClaimedEvent.getBitsFormat() = buildString {
         if (rewards.bits == 0) return@buildString
-        "Bits: §b${rewards.bits}"
+        append("Bits: §b${rewards.bits}")
     }
 }
