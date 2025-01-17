@@ -42,7 +42,10 @@ object PowderPerHotmPerk {
         val powderFor10Levels =
             perk.calculateTotalCost((perk.rawLevel + 10).coerceAtMost(perk.maxLevel)) - perk.calculateTotalCost(perk.rawLevel)
 
-        event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
+        val numberOfLevels = (perk.maxLevel - perk.rawLevel).coerceAtMost(10)
+        val s = if (numberOfLevels != 1) "s" else ""
+
+        event.toolTip.add(indexOfCost + 2, "§7Powder for $numberOfLevels level$s §e${powderFor10Levels.addSeparators()}")
     }
 
     private fun handlePowderSpend(perk: HotmData): String {
