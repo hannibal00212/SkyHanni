@@ -169,7 +169,7 @@ object FrozenTreasureTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.enabled) return
         if (!onJerryWorkshop()) return

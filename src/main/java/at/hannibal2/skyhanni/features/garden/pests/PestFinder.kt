@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -124,7 +123,7 @@ object PestFinder {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!config.showDisplay) return
@@ -139,8 +138,8 @@ object PestFinder {
     private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
 
     // priority to low so that this happens after other renderPlot calls.
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (heldItemDisabled() && timePassedDisabled()) return
@@ -168,7 +167,7 @@ object PestFinder {
     private fun drawName(
         plot: GardenPlotAPI.Plot,
         playerLocation: LorenzVec,
-        event: LorenzRenderWorldEvent,
+        event: RenderWorldEvent,
     ) {
         val pests = plot.pests
         val pestsName = StringUtils.pluralize(pests, "pest")

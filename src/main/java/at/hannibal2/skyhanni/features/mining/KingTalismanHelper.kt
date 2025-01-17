@@ -222,7 +222,7 @@ object KingTalismanHelper {
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

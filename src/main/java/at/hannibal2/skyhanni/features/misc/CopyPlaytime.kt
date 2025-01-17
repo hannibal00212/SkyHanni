@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
@@ -25,8 +26,8 @@ object CopyPlaytime {
         event.toolTip.add("§eClick to Copy!")
     }
 
-    @SubscribeEvent
-    fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slotId != 4) return
         if (event.clickedButton != 0) return
