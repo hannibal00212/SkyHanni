@@ -103,7 +103,7 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var compactJacobBulkClaim: Boolean = true
+    var compactJacobBulkClaim: Boolean = false
 
     @Expose
     @ConfigOption(
