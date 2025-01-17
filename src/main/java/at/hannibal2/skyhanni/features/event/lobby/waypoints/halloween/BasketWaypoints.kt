@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -62,7 +62,7 @@ object BasketWaypoints {
         "^§a§lCongratulations! You found all Candy Baskets!$"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isActive || !isEnabled()) return
@@ -95,8 +95,8 @@ object BasketWaypoints {
         startPathfind()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
         if (!config.allWaypoints) return
@@ -110,7 +110,7 @@ object BasketWaypoints {
         }
     }
 
-    private fun EventWaypoint?.render(event: LorenzRenderWorldEvent) {
+    private fun EventWaypoint?.render(event: RenderWorldEvent) {
         if (this == null) return
         event.drawDynamicText(position, "§dBasket", 1.0)
     }

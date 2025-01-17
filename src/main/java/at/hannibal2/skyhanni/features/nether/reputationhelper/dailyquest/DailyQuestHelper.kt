@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -29,8 +29,10 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -45,10 +47,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -80,7 +84,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         "(?:§.)*COMPLETE",
     )
 
-
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
@@ -107,7 +110,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.loadFromTabList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -120,7 +123,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         reputationHelper.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -194,8 +197,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         update()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -211,13 +214,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: LorenzRenderWorldEvent) {
+    private fun renderTownBoard(event: RenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = when (reputationHelper.factionType) {
+        val location = when (reputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
             FactionType.MAGE -> townBoardMage
-
-            FactionType.NONE -> return
         }
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
@@ -227,23 +228,23 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
-    fun render(display: MutableList<List<Any>>) {
+    fun MutableList<Renderable>.addQuests() {
         if (greatSpook) {
-            display.addAsSingletonList("")
-            display.addAsSingletonList("§7Daily Quests (§cdisabled§7)")
-            display.addAsSingletonList(" §5§lThe Great Spook §7happened :O")
+            addString("")
+            addString("§7Daily Quests (§cdisabled§7)")
+            addString(" §5§lThe Great Spook §7happened :O")
             return
         }
         val done = quests.count { it.state == QuestState.COLLECTED }
-        display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
+        addString("")
+        addString("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
             val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
-            filteredQuests.mapTo(display) { renderQuest(it) }
+            addAll(filteredQuests.map { renderQuest(it) })
         }
     }
 
-    private fun renderQuest(quest: Quest): List<Any> {
+    private fun renderQuest(quest: Quest): Renderable {
         val category = quest.category
         val state = quest.state.displayName
         val stateColor = quest.state.color
@@ -275,7 +276,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        val result = mutableListOf<Any>()
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
@@ -287,16 +287,45 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        result.add("  $stateText$categoryName: ")
-        result.add(item)
-        result.add("§f$displayName$progressText$sacksText")
-        return result
+        return Renderable.horizontalContainer(
+            buildList {
+                addString("  $stateText$categoryName: ")
+                addItemStack(item)
+                addString("§f$displayName$progressText$sacksText")
+            },
+        )
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
         if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
             updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
+            if (miniBossQuest.haveAmount == 1) {
+                fixMiniBossByTabWidget(miniBossQuest)
+            }
+        }
+    }
+
+    private fun fixMiniBossByTabWidget(oldQuest: MiniBossQuest) {
+        oldQuest.state = QuestState.ACCEPTED
+        DelayedRun.runDelayed(5.seconds) {
+            if (oldQuest.state == QuestState.ACCEPTED) {
+                ChatUtils.debug(
+                    "Daily Minibosss Quest is still not ready to accept even though we have one miniboss kill," +
+                        "we now assume there are two to kill.",
+                )
+                val newQuest = MiniBossQuest(oldQuest.miniBoss, oldQuest.state, 2)
+                newQuest.haveAmount = oldQuest.haveAmount
+                DelayedRun.runNextTick {
+                    quests.remove(oldQuest)
+                    quests.add(newQuest)
+                    ChatUtils.chat("Fixed wrong miniboss amount from Tab Widget.")
+                    update()
+                }
+            } else {
+                oldQuest.state = QuestState.READY_TO_COLLECT
+            }
+            reputationHelper.update()
         }
     }
 

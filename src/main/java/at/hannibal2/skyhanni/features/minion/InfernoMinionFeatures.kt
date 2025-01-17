@@ -48,7 +48,7 @@ object InfernoMinionFeatures {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.infernoFuelBlocker) return

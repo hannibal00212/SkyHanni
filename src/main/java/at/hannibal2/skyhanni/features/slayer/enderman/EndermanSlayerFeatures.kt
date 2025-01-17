@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -100,8 +100,8 @@ object EndermanSlayerFeatures {
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
         if (beaconConfig.highlightBeacon) {
@@ -117,7 +117,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: LorenzRenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: RenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -143,7 +143,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawFlyingBeacon(event: RenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -163,7 +163,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawSittingBeacon(event: RenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
@@ -185,7 +185,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 

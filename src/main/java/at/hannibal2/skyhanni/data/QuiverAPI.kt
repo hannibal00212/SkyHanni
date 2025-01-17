@@ -97,7 +97,7 @@ object QuiverAPI {
     )
 
     /**
-     * REGEX-TEST: §c§lQUIVER! §r§cYou have run out of §r§fFlint Arrows§r§c!
+     * REGEX-TEST: §c§lQUIVER! §cYou have run out of §fFlint Arrows§c!
      */
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
@@ -293,7 +293,7 @@ object QuiverAPI {
         QuiverUpdateEvent(arrowType, currentAmount).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {

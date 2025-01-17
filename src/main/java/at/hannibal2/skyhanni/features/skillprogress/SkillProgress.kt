@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -60,7 +59,7 @@ object SkillProgress {
     private var maxWidth = 182
     var hideInActionBar = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
@@ -78,8 +77,8 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -142,7 +141,7 @@ object SkillProgress {
         skillExpPercentage = 0.0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()

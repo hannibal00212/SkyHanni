@@ -115,11 +115,12 @@ object DungeonFinderFeatures {
     )
 
     /**
+     * REGEX-TEST: Floor VII
      * REGEX-TEST: Floor: Floor VII
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "Floor .*",
+        "Floor:? .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
@@ -372,7 +373,7 @@ object DungeonFinderFeatures {
         event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return

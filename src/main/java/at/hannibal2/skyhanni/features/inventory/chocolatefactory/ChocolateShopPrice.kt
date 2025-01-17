@@ -68,7 +68,7 @@ object ChocolateShopPrice {
     private const val MILESTONE_INDEX = 50
     private var chocolateSpent = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (inInventory) {
             update()
@@ -179,7 +179,7 @@ object ChocolateShopPrice {
         callUpdate = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
             config.position.renderRenderables(

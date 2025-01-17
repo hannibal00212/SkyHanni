@@ -229,7 +229,7 @@ object HoppityEventSummary {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
 
@@ -263,7 +263,7 @@ object HoppityEventSummary {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         checkLbUpdateWarning()

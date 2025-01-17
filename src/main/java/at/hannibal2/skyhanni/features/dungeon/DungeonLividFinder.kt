@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -52,7 +52,7 @@ object DungeonLividFinder {
 
     private var color: LorenzColor? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inLividBossRoom()) return
         val mob = event.mob
@@ -71,7 +71,7 @@ object DungeonLividFinder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!inLividBossRoom()) return
         val block = blockLocation.getBlockStateAt()
@@ -79,8 +79,8 @@ object DungeonLividFinder {
         color = block.getValue(BlockStainedGlass.COLOR).toLorenzColor()
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         when (event.mob) {
             livid -> livid = null
             in fakeLivids -> fakeLivids -= event.mob
@@ -107,8 +107,8 @@ object DungeonLividFinder {
         return armorStand?.name?.startsWith("$chatColor﴾ $chatColor§lLivid") ?: false
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!inLividBossRoom() || !config.enabled) return
         if (isBlind) return
 
