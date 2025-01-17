@@ -1,17 +1,22 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Mouse
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PageScrolling {
@@ -46,10 +51,14 @@ object PageScrolling {
 
     private val scroll = ScrollValue()
 
+    private var currentlyScrollable = false
+    private var cooldown = SimpleTimeMark.farPast()
+
     @SubscribeEvent
     fun onLorenzTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
+        if (!currentlyScrollable && !cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 
         val inventoryName = InventoryUtils.openInventoryName()
@@ -67,6 +76,17 @@ object PageScrolling {
             patterns.matches(it.stack?.displayName)
         } ?: return
         InventoryUtils.clickSlot(slot.slotNumber)
+
+        currentlyScrollable = false
+        println("set currentlyScrollable to false")
+        cooldown = 1.0.seconds.fromNow()
+    }
+
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (!isEnabled()) return
+        currentlyScrollable = true
+        println("set currentlyScrollable to true")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
