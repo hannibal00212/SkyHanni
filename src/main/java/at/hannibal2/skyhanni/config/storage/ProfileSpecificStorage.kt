@@ -752,15 +752,23 @@ class ProfileSpecificStorage {
         @Expose
         var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = EnumMap(LorenzRarity::class.java)
 
-        class RabbitData {
-            @Expose
-            var uniques: Int = 0
+        @Expose
+        var typeCountSnapshot: RabbitData = RabbitData()
 
-            @Expose
-            var dupes: Int = 0
+        @Expose
+        var typeCountsSince: RabbitData = RabbitData()
 
-            @Expose
-            var strays: Int = 0
+        data class RabbitData(
+            @Expose var uniques: Int = 0,
+            @Expose var dupes: Int = 0,
+            @Expose var strays: Int = 0,
+        ) {
+            fun getByIndex(index: Int) = when (index) {
+                0 -> uniques
+                1 -> dupes
+                2 -> strays
+                else -> 0
+            }
 
             override fun hashCode(): Int {
                 return Objects.hash(uniques, dupes, strays)
