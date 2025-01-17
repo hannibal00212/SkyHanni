@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
@@ -96,7 +96,7 @@ object GardenAPI {
         checkItemInHand()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
@@ -119,15 +119,11 @@ object GardenAPI {
         }
     }
 
-    // TODO use IslandChangeEvent
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        DelayedRun.runDelayed(2.seconds) {
-            if (inGarden()) {
-                checkItemInHand()
-                checkCurrentPlot()
-            }
-        }
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland != IslandType.GARDEN) return
+        checkItemInHand()
+        checkCurrentPlot()
     }
 
     private fun updateGardenTool() {
@@ -171,7 +167,7 @@ object GardenAPI {
         return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
     }
 
-    fun readCounter(itemStack: ItemStack): Long = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter() ?: -1L
+    fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
@@ -269,7 +265,7 @@ object GardenAPI {
         return tier
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp

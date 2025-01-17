@@ -111,8 +111,8 @@ object GardenLevelDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val item = when (event.inventoryName) {
             "Desk" -> event.inventoryItems[4] ?: return
@@ -210,7 +210,7 @@ object GardenLevelDisplay {
         return if (useRomanNumerals) this.toRoman() else this.toString()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return

@@ -49,13 +49,13 @@ object JacobFarmingContestsInventory {
         "§7§7You placed in the (?<medal>.*) §7bracket!"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         realTime.clear()
         hideEverything = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return
@@ -83,7 +83,7 @@ object JacobFarmingContestsInventory {
         realTime[slot] = "$dayFormat $startTimeFormat-$endTimeFormat"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         // TODO add tooltip line "click + press <keybind> to open on elite website
         if (!config.openOnElite.isKeyHeld()) return
@@ -161,7 +161,7 @@ object JacobFarmingContestsInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return

@@ -155,7 +155,7 @@ object DianaProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -170,7 +170,7 @@ object DianaProfitTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }

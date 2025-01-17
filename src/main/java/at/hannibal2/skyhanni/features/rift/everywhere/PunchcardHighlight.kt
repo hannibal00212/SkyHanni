@@ -79,7 +79,7 @@ object PunchcardHighlight {
     private val displayIcon by lazy { PUNCHCARD_ARTIFACT.getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         if (!config.highlight.get()) return
         if (!IslandType.THE_RIFT.isInIsland()) return
@@ -218,8 +218,8 @@ object PunchcardHighlight {
         display = drawDisplay()
     }
 
-    @SubscribeEvent
-    fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
         if (!RiftAPI.inRift()) return
 

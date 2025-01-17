@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,8 +30,8 @@ object GuardianReminder {
     private var lastInventoryOpen = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onInventory(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Experimentation Table") return
         lastInventoryOpen = SimpleTimeMark.now()
@@ -51,8 +50,8 @@ object GuardianReminder {
         )
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return

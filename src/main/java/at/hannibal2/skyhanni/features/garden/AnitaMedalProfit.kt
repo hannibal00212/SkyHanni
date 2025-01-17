@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AnitaMedalProfit {
@@ -43,13 +42,13 @@ object AnitaMedalProfit {
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
         if (VisitorAPI.inInventory) return
@@ -218,7 +217,7 @@ object AnitaMedalProfit {
         return items
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory || VisitorAPI.inInventory) return
         config.medalProfitPos.renderRenderables(

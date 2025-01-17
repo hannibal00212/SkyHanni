@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -43,7 +44,7 @@ object SackAPI {
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
-    var inSackInventory = false
+    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
 
     private val patternGroup = RepoPattern.group("data.sacks")
 
@@ -102,9 +103,8 @@ object SackAPI {
     var sackListNames = emptySet<String>()
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inSackInventory = false
         isRuneSack = false
         isGemstoneSack = false
         isTrophySack = false
@@ -114,19 +114,17 @@ object SackAPI {
         stackList.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
-        val match = sackPattern.matches(inventoryName)
-        if (!match) return
+        if (!inventory.isInside()) return
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
         sackRarity = inventoryName.getTrophyRarity()
-        inSackInventory = true
         stackList.putAll(stacks)
         SackDisplay.update(isNewInventory)
     }

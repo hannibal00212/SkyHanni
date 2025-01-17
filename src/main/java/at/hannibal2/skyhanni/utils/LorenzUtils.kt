@@ -88,10 +88,6 @@ object LorenzUtils {
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
-    // TODO replace all calls with regex
-    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
-    fun String.between(start: String, end: String): String = this.split(start, end)[1]
-
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
@@ -290,7 +286,7 @@ object LorenzUtils {
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
-        TitleManager.sendTitle(text, duration, height, fontSize)
+        TitleManager.setTitle(text, duration, height, fontSize)
     }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {

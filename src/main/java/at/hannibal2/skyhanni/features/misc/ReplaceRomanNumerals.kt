@@ -85,7 +85,7 @@ object ReplaceRomanNumerals {
         event.applyIfPossible { it.tryReplace() }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onRepoReload(event: RepositoryReloadEvent) {
         cachedStrings.clear()
     }

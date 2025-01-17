@@ -34,7 +34,6 @@ import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
@@ -57,7 +56,7 @@ object EstimatedItemValue {
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
@@ -66,7 +65,8 @@ object EstimatedItemValue {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
-        if (PlatformUtils.isNeuLoaded() && Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
+        if (!PlatformUtils.isNeuLoaded()) return
+        if (Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
@@ -83,7 +83,7 @@ object EstimatedItemValue {
      */
     private var renderedItems = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
@@ -117,7 +117,7 @@ object EstimatedItemValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
@@ -133,7 +133,7 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }

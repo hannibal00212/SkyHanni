@@ -26,11 +26,11 @@ object CarnivalQuickStart {
      * */
     private val chatPattern by RepoPattern.pattern("carnival.select.option.chat", "§eSelect an option:.*")
 
-    private val repoGroup = RepoPattern.group("carnival.npcs")
+    private val patternGroup = RepoPattern.group("carnival.npcs")
 
-    private val pirate by repoGroup.pattern("pirate", "Carnival Pirateman")
-    private val fisher by repoGroup.pattern("fisher", "Carnival Fisherman")
-    private val cowboy by repoGroup.pattern("cowboy", "Carnival Cowboy")
+    private val pirate by patternGroup.pattern("pirate", "Carnival Pirateman")
+    private val fisher by patternGroup.pattern("fisher", "Carnival Fisherman")
+    private val cowboy by patternGroup.pattern("cowboy", "Carnival Cowboy")
 
     private var lastChat = SimpleTimeMark.farPast()
     private var lastClicked = SimpleTimeMark.farPast()

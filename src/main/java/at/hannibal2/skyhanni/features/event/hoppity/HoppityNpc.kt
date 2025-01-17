@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
@@ -40,8 +41,8 @@ object HoppityNpc {
     private val slotsToHighlight = mutableSetOf<Int>()
     private var inShop = false
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Hoppity") return
         // TODO maybe we could add an annoying chat message that tells you how many years you have skipped
         //  or the last year you have opened the shop before.
@@ -50,10 +51,12 @@ object HoppityNpc {
         inShop = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
+        if (LorenzUtils.isStrandedProfile) return
+
         if (hoppityYearOpened == SkyBlockTime.now().year) return
         if (!HoppityAPI.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 2.minutes) return
@@ -77,7 +80,7 @@ object HoppityNpc {
         lastReminderSent = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clear()
     }
@@ -87,7 +90,7 @@ object HoppityNpc {
         clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inShop) return
         slotsToHighlight.clear()
@@ -98,7 +101,7 @@ object HoppityNpc {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isHighlightEnabled()) return
         if (!inShop) return

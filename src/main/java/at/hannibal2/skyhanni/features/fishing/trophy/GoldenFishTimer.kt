@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.FishingAPI.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -167,8 +166,8 @@ object GoldenFishTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isActive()) return
         if (!config.nametag) return
         val entity = confirmedGoldenFishEntity ?: return
@@ -180,7 +179,7 @@ object GoldenFishTimer {
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isActive()) return
         config.position.renderRenderable(display, posLabel = "Golden Fish Timer")
@@ -235,7 +234,7 @@ object GoldenFishTimer {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         hasLavaRodInInventory = InventoryUtils.containsInLowerInventory { it.getInternalNameOrNull()?.isLavaRod() == true }
@@ -256,7 +255,7 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        TitleManager.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
