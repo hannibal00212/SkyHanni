@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -23,11 +24,28 @@ public class DianaConfig {
     public String color = "0:127:85:255:255";
 
     @Expose
-    @ConfigOption(name = "Guess Next Burrow", desc = "Use math from §eSoopy's Guess Logic §7to find the next burrow.\n" +
-        "§eDoes not require SoopyV2 or ChatTriggers to be installed.")
+    @ConfigOption(name = "Guess Next Burrow", desc = "Whether to guess the next burrow when using the Ancestral Spade")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean burrowsSoopyGuess = false;
+    public boolean burrowsGuess = false;
+
+    public enum BurrowGuessType {
+        SOOPY_GUESS("Soopy"),
+        PRECISE_GUESS("Precise");
+
+        private final String str;
+        BurrowGuessType(String string) {
+            str = string;
+        }
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Guessing technique", desc = "Which guesser to use.")
+    @ConfigEditorDropdown
+    public BurrowGuessType burrowsGuessType = BurrowGuessType.SOOPY_GUESS;
 
     @Expose
     @ConfigOption(name = "Nearby Detection", desc = "Show burrows near you.")

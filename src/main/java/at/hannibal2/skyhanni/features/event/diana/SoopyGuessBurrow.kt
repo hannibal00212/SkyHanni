@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -25,6 +26,7 @@ import kotlin.math.sin
  */
 @SkyHanniModule
 object SoopyGuessBurrow {
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var dingIndex = 0
     private var hasDinged = false
@@ -284,5 +286,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.SOOPY_GUESS
 }

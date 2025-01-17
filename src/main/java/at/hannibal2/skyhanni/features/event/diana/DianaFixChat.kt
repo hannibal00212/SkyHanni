@@ -147,5 +147,5 @@ object DianaFixChat {
         successfulCounter = 0
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
+    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsGuess
 }

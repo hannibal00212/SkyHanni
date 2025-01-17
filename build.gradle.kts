@@ -217,6 +217,9 @@ dependencies {
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
 
+    // Polynomial Regression
+    shadowImpl("org.apache.commons:commons-math4-legacy:4.0-beta1")
+
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
@@ -347,6 +350,10 @@ tasks.shadowJar {
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
     relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
+    relocate("org.apache.commons.math4", "at.hannibal2.skyhanni.deps.commons.math")
+    relocate("org.apache.commons.numbers", "at.hannibal2.skyhanni.deps.commons.numbers")
+    relocate("org.apache.commons.rng", "at.hannibal2.skyhanni.deps.commons.rng")
+    relocate("org.apache.commons.statistics", "at.hannibal2.skyhanni.deps.commons.statistics")
     relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
