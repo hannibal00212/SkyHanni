@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.EnumMap
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -282,6 +283,22 @@ object CollectionUtils {
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
+    inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
+        return EnumMap<K, V>(K::class.java)
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: (K) -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize(it) } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: () -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize() } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { putAll(pairs) }
+    }
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,
@@ -532,6 +549,30 @@ object CollectionUtils {
             if (predicate(iterator.next().key)) {
                 iterator.remove()
             }
+        }
+    }
+
+    class ObservableMutableMap<K, V>(
+        private val map: MutableMap<K, V> = mutableMapOf(),
+        private val onUpdate: (K, V?) -> Unit = { _, _ -> },
+        private val onGet: (K, V?) -> Unit = { _, _ -> },
+    ) : MutableMap<K, V> by map {
+
+        override fun put(key: K, value: V): V? {
+            onUpdate(key, value)
+            return map.put(key, value)
+        }
+
+        override fun remove(key: K): V? {
+            val removedValue = map.remove(key)
+            onUpdate(key, null)
+            return removedValue
+        }
+
+        override fun get(key: K): V? {
+            val value = map[key]
+            onGet(key, value)
+            return value
         }
     }
 

@@ -82,9 +82,9 @@ object HoppityEggDisplayManager {
             HoppityEggType.resettingEntries.filter {
                 it.hasRemainingSpawns() // Only show eggs that have future spawns
             }.let { entries ->
-                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
+                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
                 else entries
-            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
+            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil.format()}") }
 
             if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
