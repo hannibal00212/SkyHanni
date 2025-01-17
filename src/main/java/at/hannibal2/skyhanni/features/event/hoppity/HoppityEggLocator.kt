@@ -83,6 +83,10 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
+    fun mealSpawned(meal: HoppityEggType) {
+        if (currentEggType == meal) resetData()
+    }
+
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
