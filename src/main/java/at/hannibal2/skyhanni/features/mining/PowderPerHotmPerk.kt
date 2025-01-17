@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
@@ -43,9 +44,9 @@ object PowderPerHotmPerk {
             perk.calculateTotalCost((perk.rawLevel + 10).coerceAtMost(perk.maxLevel)) - perk.calculateTotalCost(perk.rawLevel)
 
         val numberOfLevels = (perk.maxLevel - perk.rawLevel).coerceAtMost(10)
-        val s = if (numberOfLevels != 1) "s" else ""
+        val levelsFormat = StringUtils.pluralize(numberOfLevels, "level")
 
-        event.toolTip.add(indexOfCost + 2, "§7Powder for $numberOfLevels level$s §e${powderFor10Levels.addSeparators()}")
+        event.toolTip.add(indexOfCost + 2, "§7Powder for $numberOfLevels $levelsFormat §e${powderFor10Levels.addSeparators()}")
     }
 
     private fun handlePowderSpend(perk: HotmData): String {
