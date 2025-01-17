@@ -222,7 +222,7 @@ object HoppityEggsManager {
     }
 
     private fun checkWarn() {
-        val allEggsRemaining = HoppityEggType.allEggsRemaining()
+        val allEggsRemaining = HoppityEggType.allEggsUnclaimed()
         if (!warningActive) {
             warningActive = !allEggsRemaining
         }

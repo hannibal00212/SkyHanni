@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -37,8 +39,19 @@ enum class HoppityEggType(
     STRAY("Stray", "§a", -1)
     ;
 
+    private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
+        enumMapOf(),
+        onUpdate = { type, markOrNull ->
+            val mark = markOrNull ?: return@ObservableMutableMap
+            val profileStorage = profileStorage ?: return@ObservableMutableMap
+            profileStorage.mealNextSpawn[type] = mark
+        }
+    )
+
     fun timeUntil(): Duration {
         if (resetsAt == -1) return Duration.INFINITE
+        nextSpawnCache[this]?.takeIf { it.isInFuture() }?.let { return it.timeUntil() }
+
         val now = SkyBlockTime.now()
         val isEggDayToday = altDay == now.isAlternateDay()
 
@@ -48,20 +61,21 @@ enum class HoppityEggType(
             else -> 1
         }
 
-        return now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark().timeUntil()
+        val nextSpawn = now.copy(day = now.day + daysToAdd, hour = resetsAt, minute = 0, second = 0).asTimeMark()
+        nextSpawnCache[this] = nextSpawn
+        return nextSpawn.timeUntil()
     }
 
-    fun nextTime(): SimpleTimeMark {
-        return SimpleTimeMark.now() + timeUntil()
-    }
-
-    fun markClaimed(mark: SimpleTimeMark? = null) {
-        mealLastFound[this] = mark ?: SimpleTimeMark.now()
+    fun markClaimed(mark: SimpleTimeMark? = null, setMark: Boolean = true) {
         claimed = true
+        if (!setMark) return
+        val profileStorage = profileStorage ?: return
+        profileStorage.mealLastFound[this] = mark ?: SimpleTimeMark.now()
     }
 
     fun markSpawned() {
         claimed = false
+        nextSpawnCache.remove(this)
     }
 
     private fun hasNotFirstSpawnedYet(): Boolean {
@@ -85,21 +99,23 @@ enum class HoppityEggType(
 
     @SkyHanniModule
     companion object {
-        private val mealLastFound
-            get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
+        private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            mealLastFound.forEach { (meal, mark) ->
-                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
-                else meal.markSpawned()
+            val spawnMap = profileStorage?.mealNextSpawn ?: return
+            val findMap = profileStorage?.mealLastFound ?: return
+            for ((meal, mark) in spawnMap) {
+                val lastFound = findMap[meal] ?: continue
+                if (mark.isInPast()) meal.markSpawned()
+                else if (lastFound.passedSince() <= 40.minutes) meal.markClaimed(lastFound)
             }
         }
 
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
 
-        fun allFound() = resettingEntries.forEach { it.markClaimed() }
+        fun allFound() = resettingEntries.forEach { it.markClaimed(setMark = false) }
 
         private fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
 
@@ -129,11 +145,11 @@ enum class HoppityEggType(
             }
         }
 
-        fun eggsRemaining(): Boolean {
+        fun anyEggsUnclaimed(): Boolean {
             return resettingEntries.any { !it.claimed }
         }
 
-        fun allEggsRemaining(): Boolean {
+        fun allEggsUnclaimed(): Boolean {
             return resettingEntries.all { !it.claimed }
         }
     }

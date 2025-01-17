@@ -56,7 +56,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
@@ -191,6 +190,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
         class HitmanStatsStorage {
             @Expose
