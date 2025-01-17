@@ -51,70 +51,70 @@ object CopyNearbyEntitiesCommand {
                 val vec = position.toLorenzVec()
                 val distance = start.distance(vec)
                 val mob = MobData.entityToMob[entity]
-                if (distance < searchRadius) {
-                    val simpleName = entity.javaClass.simpleName
-                    add("entity: $simpleName")
-                    val displayName = entity.displayName
-                    add("name: '" + entity.name + "'")
-                    if (entity is EntityArmorStand) add("cleanName: '" + entity.cleanName() + "'")
-                    add("displayName: '${displayName.formattedText}'")
-                    add("entityId: ${entity.entityId}")
-                    add("Type of Mob: ${getType(entity, mob)}")
-                    add("uuid version: ${entity.uniqueID.version()} (${entity.uniqueID})")
-                    add("location data:")
-                    add("-  vec: $vec")
-                    add("-  distance: $distance")
+                if (distance >= searchRadius) continue
 
-                    val rotationYaw = entity.rotationYaw
-                    val rotationPitch = entity.rotationPitch
-                    add("-  rotationYaw: $rotationYaw")
-                    add("-  rotationPitch: $rotationPitch")
+                val simpleName = entity.javaClass.simpleName
+                add("entity: $simpleName")
+                val displayName = entity.displayName
+                add("name: '" + entity.name + "'")
+                if (entity is EntityArmorStand) add("cleanName: '" + entity.cleanName() + "'")
+                add("displayName: '${displayName.formattedText}'")
+                add("entityId: ${entity.entityId}")
+                add("Type of Mob: ${getType(entity, mob)}")
+                add("uuid version: ${entity.uniqueID.version()} (${entity.uniqueID})")
+                add("location data:")
+                add("-  vec: $vec")
+                add("-  distance: $distance")
 
-                    val firstPassenger = entity.getFirstPassenger()
-                    add("firstPassenger: $firstPassenger")
-                    val ridingEntity = entity.ridingEntity
-                    add("ridingEntity: $ridingEntity")
+                val rotationYaw = entity.rotationYaw
+                val rotationPitch = entity.rotationPitch
+                add("-  rotationYaw: $rotationYaw")
+                add("-  rotationPitch: $rotationPitch")
 
-                    if (entity.isInvisible) {
-                        add("Invisible: true")
-                    }
+                val firstPassenger = entity.getFirstPassenger()
+                add("firstPassenger: $firstPassenger")
+                val ridingEntity = entity.ridingEntity
+                add("ridingEntity: $ridingEntity")
 
-                    if (entity is EntityLivingBase) {
-                        add("EntityLivingBase:")
-                        val baseMaxHealth = entity.baseMaxHealth
-                        val health = entity.health.toInt()
-                        add("-  baseMaxHealth: $baseMaxHealth")
-                        add("-  health: $health")
-                    }
+                if (entity.isInvisible) {
+                    add("Invisible: true")
+                }
 
-                    if (entity is EntityPlayer) {
-                        val inventory = entity.inventory
-                        if (inventory != null) {
-                            add("armor:")
-                            for ((i, itemStack) in inventory.armorInventory.withIndex()) {
-                                val name = itemStack?.name ?: "null"
-                                add("-  at: $i: $name")
-                            }
+                if (entity is EntityLivingBase) {
+                    add("EntityLivingBase:")
+                    val baseMaxHealth = entity.baseMaxHealth
+                    val health = entity.health.toInt()
+                    add("-  baseMaxHealth: $baseMaxHealth")
+                    add("-  health: $health")
+                }
+
+                if (entity is EntityPlayer) {
+                    val inventory = entity.inventory
+                    if (inventory != null) {
+                        add("armor:")
+                        for ((i, itemStack) in inventory.armorInventory.withIndex()) {
+                            val name = itemStack?.name ?: "null"
+                            add("-  at: $i: $name")
                         }
                     }
-
-                    when (entity) {
-                        is EntityArmorStand -> addArmorStand(entity)
-                        is EntityEnderman -> addEnderman(entity)
-                        is EntityMagmaCube -> addMagmaCube(entity)
-                        is EntityItem -> addItem(entity)
-                        is EntityOtherPlayerMP -> addOtherPlayer(entity)
-                        is EntityCreeper -> addCreeper(entity)
-                        is EntityWither -> addWither(entity)
-                    }
-                    if (mob != null && mob.mobType != Mob.Type.PLAYER) {
-                        add("MobInfo: ")
-                        addAll(getMobInfo(mob).map { "-  $it" })
-                    }
-                    add("")
-                    add("")
-                    counter++
                 }
+
+                when (entity) {
+                    is EntityArmorStand -> addArmorStand(entity)
+                    is EntityEnderman -> addEnderman(entity)
+                    is EntityMagmaCube -> addMagmaCube(entity)
+                    is EntityItem -> addItem(entity)
+                    is EntityOtherPlayerMP -> addOtherPlayer(entity)
+                    is EntityCreeper -> addCreeper(entity)
+                    is EntityWither -> addWither(entity)
+                }
+                if (mob != null && mob.mobType != Mob.Type.PLAYER) {
+                    add("MobInfo: ")
+                    addAll(getMobInfo(mob).map { "-  $it" })
+                }
+                add("")
+                add("")
+                counter++
             }
         }
 
