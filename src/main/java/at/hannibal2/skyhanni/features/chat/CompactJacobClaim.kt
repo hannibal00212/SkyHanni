@@ -19,10 +19,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
-object CompactJacobBulkClaim {
+object CompactJacobClaim {
 
     private val config get() = SkyHanniMod.feature.chat
-    private val patternGroup = RepoPattern.group("chat.compactJacobBulkClaim")
+    private val patternGroup = RepoPattern.group("chat.jacobcompact")
 
     // <editor-fold desc="Patterns">
 
@@ -113,7 +113,7 @@ object CompactJacobBulkClaim {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.compactJacobBulkClaim) return
+        if (!config.compactJacobClaim) return
         val message = event.message
         var eventDelay = 300.milliseconds
 
@@ -173,7 +173,7 @@ object CompactJacobBulkClaim {
 
     @HandleEvent
     fun onContestRewardsClaimed(event: ContestRewardsClaimedEvent) {
-        if (!config.compactJacobBulkClaim) return
+        if (!config.compactJacobClaim) return
         event.sendCompact()
     }
 

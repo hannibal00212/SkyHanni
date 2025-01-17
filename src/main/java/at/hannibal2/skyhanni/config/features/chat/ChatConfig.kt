@@ -98,12 +98,12 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Compact Jacob Bulk Claim",
-        desc = "Compact the Jacob Bulk Claim message, only showing additional information when hovering."
+        name = "Compact Jacob Claim",
+        desc = "Compact the Jacob Claim message, only showing full information when hovering."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var compactJacobBulkClaim: Boolean = false
+    var compactJacobClaim: Boolean = false
 
     @Expose
     @ConfigOption(
