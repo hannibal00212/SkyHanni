@@ -16,6 +16,7 @@ enum class CropType(
     val simpleName: String,
     val farmingItem: FarmingItems,
     val replenish: Boolean = false,
+    val enchantName: String = simpleName
 ) {
 
     WHEAT(
@@ -44,7 +45,8 @@ enum class CropType(
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { ItemStack(Items.dye, 1, EnumDyeColor.BROWN.dyeDamage) }, "cocoa", FarmingItems.COCOA_BEANS, replenish = true
+        { ItemStack(Items.dye, 1, EnumDyeColor.BROWN.dyeDamage) }, "cocoa",
+        FarmingItems.COCOA_BEANS, replenish = true, enchantName = "coco"
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
@@ -56,7 +58,8 @@ enum class CropType(
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItems.MUSHROOM
+        { ItemStack(Blocks.red_mushroom_block) }, "mushroom", FarmingItems.MUSHROOM,
+        enchantName = "mushrooms"
     ),
     ;
 

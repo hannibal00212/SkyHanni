@@ -19,10 +19,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 
@@ -34,10 +37,20 @@ object AnitaMedalProfit {
 
     var inInventory = false
 
-    enum class MedalType(val displayName: String, val factorBronze: Int) {
-        GOLD("§6Gold medal", 8),
-        SILVER("§fSilver medal", 2),
-        BRONZE("§cBronze medal", 1),
+    enum class MedalType(
+        val displayName: String,
+        val simpleName: String = displayName.removeColor().split(" ")[0],
+        val factorBronze: Int,
+        val color: LorenzColor = displayName.substring(1, 2)[0].toLorenzColor() ?: LorenzColor.WHITE,
+    ) {
+        GOLD("§6Gold medal", "gold", 8),
+        SILVER("§fSilver medal", "silver", 2),
+        BRONZE("§cBronze medal", "bronze", 1),
+        ;
+
+        companion object {
+            fun bySimpleNameOrNull(name: String) = entries.firstOrNull { it.simpleName == name }
+        }
     }
 
     private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
