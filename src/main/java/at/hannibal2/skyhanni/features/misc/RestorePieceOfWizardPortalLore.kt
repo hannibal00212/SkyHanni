@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRecipientName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RestorePieceOfWizardPortalLore {
@@ -21,7 +20,7 @@ object RestorePieceOfWizardPortalLore {
 
     private val earnedPattern by RepoPattern.pattern(
         "misc.restore.wizard.portal.earned",
-        "§7Earned by:.*",
+        "§7Earned by:.*"
     )
 
     @HandleEvent

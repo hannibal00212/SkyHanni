@@ -35,7 +35,7 @@ object ShowMotesNpcSellPrice {
 
     private val burgerPattern by RepoPattern.pattern(
         "rift.everywhere.burger",
-        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*",
+        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*"
     )
 
     private var display = emptyList<List<Any>>()

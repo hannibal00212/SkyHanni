@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -52,11 +52,11 @@ object TotemOfCorruption {
     )
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
-        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s",
+        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s"
     )
     private val ownerPattern by patternGroup.pattern(
         "owner",
-        "§7Owner: §e(?<owner>.+)",
+        "§7Owner: §e(?<owner>.+)"
     )
 
     @HandleEvent
