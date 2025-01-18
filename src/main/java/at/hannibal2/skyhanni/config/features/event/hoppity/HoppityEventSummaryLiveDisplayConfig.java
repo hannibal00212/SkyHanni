@@ -83,6 +83,14 @@ public class HoppityEventSummaryLiveDisplayConfig {
     public HoppityDateTimeFormat dateTimeFormat = HoppityDateTimeFormat.RELATIVE;
 
     @Expose
+    @ConfigOption(
+        name = "Show All-Time",
+        desc = "Add a dummy \"All-Time\" entry after the last set of stats, showing the total stats for all recorded events."
+    )
+    @ConfigEditorBoolean
+    public boolean showAllTime = true;
+
+    @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int toggleKeybind = Keyboard.KEY_NONE;
