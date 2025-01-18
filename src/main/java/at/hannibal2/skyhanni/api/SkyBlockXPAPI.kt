@@ -30,7 +30,6 @@ object SkyBlockXPAPI {
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
-
     val levelXpPair get() = storage?.toLevelXpPair()
 
     // Stored as 12345, 123 is the level, 45 is the xp
@@ -71,9 +70,7 @@ object SkyBlockXPAPI {
             val level = group("level")?.toIntOrNull()
             val xp = group("xp")?.toIntOrNull()
 
-            if (level != null && xp != null) {
-                storage = level * 100 + xp
-            }
+            updateStorage(level, xp)
         }
     }
 
@@ -83,34 +80,34 @@ object SkyBlockXPAPI {
 
         val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.displayName) } ?: return
 
-        var foundLevel = false
-        var foundXp = false
         var level: Int? = null
         var xp: Int? = null
 
         loop@ for (line in stack.getLore()) {
-            if (foundLevel && foundXp) break@loop
+            if (level != null && xp != null) break@loop
 
-            if (!foundLevel) {
+            if (level == null) {
                 levelPattern.matchMatcher(line) {
                     level = group("level")?.toIntOrNull()
-                    foundLevel = true
                     continue@loop
                 }
             }
 
-            if (!foundXp) {
+            if (xp == null) {
                 xpPattern.matchMatcher(line) {
                     xp = group("xp")?.toIntOrNull()
-                    foundXp = true
                     continue@loop
                 }
             }
         }
 
-        if (level != null && xp != null) {
-            storage = level * 100 + xp
-        }
+        updateStorage(level, xp)
     }
+
+    private fun updateStorage(level: Int?, xp: Int?) {
+        storage = calculateTotalXp(level ?: return, xp ?: return)
+    }
+
+    fun calculateTotalXp(level: Int, xp: Int): Int = level * 100 + xp
 
 }
