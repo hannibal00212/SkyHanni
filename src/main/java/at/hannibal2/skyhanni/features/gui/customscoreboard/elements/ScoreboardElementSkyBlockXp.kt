@@ -7,11 +7,11 @@ object ScoreboardElementSkyBlockXp : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val (level, xp) = SkyBlockXPAPI.levelXpPair ?: return@buildList
         if (CustomScoreboard.displayConfig.displayNumbersFirst) {
-            add("${SkyBlockXPAPI.getLevelColor().getChatColor()}${level} SB Level")
-            add("§b${xp}§3/§b100 XP")
+            add("${SkyBlockXPAPI.getLevelColor().getChatColor()}$level SB Level")
+            add("§b$xp§3/§b100 XP")
         } else {
-            add("SB Level: ${SkyBlockXPAPI.getLevelColor().getChatColor()}${level}")
-            add("XP: §b${xp}§3/§b100")
+            add("SB Level: ${SkyBlockXPAPI.getLevelColor().getChatColor()}$level")
+            add("XP: §b$xp§3/§b100")
         }
     }
 
