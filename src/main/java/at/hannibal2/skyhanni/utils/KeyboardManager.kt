@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object KeyboardManager {
@@ -71,21 +73,20 @@ object KeyboardManager {
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
-            KeyPressEvent(key).post()
+            postEvent(key)
             lastClickedMouseButton = key
             return
         }
 
         if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
-            val key = Keyboard.getEventKey()
-            KeyPressEvent(key).post()
+            postEvent(Keyboard.getEventKey())
             lastClickedMouseButton = -1
             return
         }
 
         if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
-                KeyPressEvent(lastClickedMouseButton).post()
+                postEvent(lastClickedMouseButton)
                 return
             }
             lastClickedMouseButton = -1
@@ -93,7 +94,14 @@ object KeyboardManager {
 
         // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
-            KeyPressEvent(Keyboard.getEventCharacter().code + 256).post()
+            postEvent(Keyboard.getEventCharacter().code + 256)
+        }
+    }
+
+    private fun postEvent(keyCode: Int) {
+        DelayedRun.runDelayed(150.milliseconds) {
+            if (TextInput.isActive()) return@runDelayed
+            KeyPressEvent(keyCode).post()
         }
     }
 

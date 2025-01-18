@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -259,17 +260,25 @@ object PestProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenAPI.isCurrentlyFarming()) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                tracker.renderDisplay(config.position)
+            },
+        )
+    }
+
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (GardenAPI.isCurrentlyFarming()) return false
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
         val notHoldingTool = !PestAPI.hasVacuumInHand() && !PestAPI.hasSprayonatorInHand()
-        if (allInactive && notHoldingTool) return
-
-        tracker.renderDisplay(config.position)
+        return !(allInactive && notHoldingTool)
     }
 
     @HandleEvent
