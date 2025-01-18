@@ -59,7 +59,7 @@ object SkyBlockXPAPI {
     )
 
 
-    fun getLevelColor() = level?.let { getLevelColor(it) } ?: LorenzColor.BLACK
+    fun getLevelColor() = levelXpPair?.let { getLevelColor(it.first) } ?: LorenzColor.BLACK
 
     fun getLevelColor(level: Int) = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
 
