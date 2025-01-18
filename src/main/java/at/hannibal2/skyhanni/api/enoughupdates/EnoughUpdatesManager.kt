@@ -149,11 +149,9 @@ object EnoughUpdatesManager {
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
-        val lore = mutableListOf<String>()
-        if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
-            val display = tag.getCompoundTag("display")
-            lore.addAll(display.getStringList("Lore"))
-        }
+        val lore = if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
+            tag.getCompoundTag("display").getStringList("Lore")
+        } else emptyList()
 
         val json = JsonObject()
         json.addProperty("itemid", stack.item.registryName.toString())
