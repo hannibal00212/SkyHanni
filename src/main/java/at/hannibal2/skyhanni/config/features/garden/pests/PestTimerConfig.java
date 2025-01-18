@@ -37,16 +37,16 @@ public class PestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Warn Before Spawn",
-        desc = "Warn before pest cooldown is about to expire"
+        desc = "Warn before pest cooldown is about to expire."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean pestSpawnWarning = true;
+    public boolean pestSpawnWarning = false;
 
     @Expose
     @ConfigOption(
         name = "Warning Time",
-        desc = "How many seconds to warn before pest cooldown is over"
+        desc = "How many seconds to warn before pest cooldown is over."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
     public int pestSpawnWarningTime = 5;

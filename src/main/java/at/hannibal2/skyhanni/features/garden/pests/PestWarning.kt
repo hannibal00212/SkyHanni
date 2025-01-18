@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -36,7 +38,7 @@ object PestWarning {
     private val config get() = PestAPI.config.pestTimer
     private val storage get() = GardenAPI.storage
 
-    private const val BASE_PEST_COOLDOWN = 300.0
+    private val BASE_PEST_COOLDOWN = 5.minutes
 
     private var warningShown = false
     private var wardrobeOpened = false
@@ -48,7 +50,7 @@ object PestWarning {
         }
     var repellentMultiplier: Int = 1
     private var sprayMultiplier: Double = 1.0
-    private var cooldown: Double? = null
+    private var cooldown: Duration? = null
 
     // TODO : move to EquipmentAPI
     /**
@@ -97,7 +99,7 @@ object PestWarning {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         sprayMultiplier = checkSpray()
-        cooldown = BASE_PEST_COOLDOWN * sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier
+        cooldown = BASE_PEST_COOLDOWN * (sprayMultiplier * (1 - equipmentPestCooldown.div(100.0)) * repellentMultiplier)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -131,26 +133,24 @@ object PestWarning {
     @HandleEvent
     fun warn(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (cooldown == null) return
         if (warningShown) return
 
-        val timeSinceLastPest = PestSpawnTimer.lastSpawnTime.passedSince().inWholeSeconds
         val cooldownValue = cooldown ?: return
-        if (timeSinceLastPest >= cooldownValue - config.pestSpawnWarningTime) {
-            LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
+        val timeSinceLastPest = PestSpawnTimer.lastSpawnTime.passedSince()
+        if (timeSinceLastPest < cooldownValue - config.pestSpawnWarningTime.seconds) return
+        LorenzUtils.sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
 
-            ChatUtils.clickableChat(
-                "§cPest spawn cooldown has expired",
-                onClick = {
-                    HypixelCommands.wardrobe()
-                },
-                "§eClick to open your wardrobe!"
-            )
+        ChatUtils.clickableChat(
+            "§cPest spawn cooldown has expired",
+            onClick = {
+                HypixelCommands.wardrobe()
+            },
+            "§eClick to open your wardrobe!"
+        )
 
-            playUserSound()
+        playUserSound()
 
-            warningShown = true
-        }
+        warningShown = true
     }
 
     @SubscribeEvent
@@ -199,5 +199,5 @@ object PestWarning {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.pestSpawnWarning
+    private fun isEnabled() = GardenAPI.inGarden() && config.pestSpawnWarning
 }
