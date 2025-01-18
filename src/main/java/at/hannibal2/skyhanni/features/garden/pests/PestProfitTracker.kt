@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
