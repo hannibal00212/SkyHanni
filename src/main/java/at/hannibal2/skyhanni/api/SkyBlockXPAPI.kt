@@ -29,7 +29,6 @@ object SkyBlockXPAPI {
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
-
     val levelXpPair get() = storage?.toLevelXpPair()
 
     // Stored as 12345, 123 is the level, 45 is the xp
@@ -41,7 +40,6 @@ object SkyBlockXPAPI {
 
     private fun Int.toLevelXpPair() = this / 100 to this % 100
 
-
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
@@ -50,9 +48,7 @@ object SkyBlockXPAPI {
             val level = group("level")?.toIntOrNull()
             val xp = group("xp")?.toIntOrNull()
 
-            if (level != null && xp != null) {
-                storage = level * 100 + xp
-            }
+            updateStorage(level, xp)
         }
     }
 
@@ -87,9 +83,13 @@ object SkyBlockXPAPI {
             }
         }
 
-        if (level != null && xp != null) {
-            storage = level * 100 + xp
-        }
+        updateStorage(level, xp)
     }
+
+    private fun updateStorage(level: Int?, xp: Int?) {
+        storage = calculateTotalXp(level ?: return, xp ?: return)
+    }
+
+    fun calculateTotalXp(level: Int, xp: Int): Int = level * 100 + xp
 
 }
