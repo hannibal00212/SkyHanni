@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -32,19 +31,16 @@ object SkyBlockXPAPI {
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
 
-    private val storage get() = ProfileStorageData.profileSpecific?.skyblockXP
+    val levelXpPair get() = storage?.toLevelXpPair()
 
-    var level: Int?
-        get() = storage?.level
+    // Stored as 12345, 123 is the level, 45 is the xp
+    private var storage
+        get() = ProfileStorageData.profileSpecific?.totalSkyBlockXP
         set(value) {
-            storage?.let { it.level = value }
+            ProfileStorageData.profileSpecific?.totalSkyBlockXP = value
         }
 
-    var xp: Int?
-        get() = storage?.xp
-        set(value) {
-            storage?.let { it.xp = value }
-        }
+    private fun Int.toLevelXpPair() = this / 100 to this % 100
 
     private val levelColors = mapOf(
         0..39 to LorenzColor.GRAY,
@@ -71,9 +67,13 @@ object SkyBlockXPAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SB_LEVEL)) return
 
-        event.widget.pattern.firstMatcher(event.lines) {
-            level = group("level")?.toIntOrNull()
-            xp = group("xp")?.toIntOrNull()
+        TabWidget.SB_LEVEL.matchMatcherFirstLine {
+            val level = group("level")?.toIntOrNull()
+            val xp = group("xp")?.toIntOrNull()
+
+            if (level != null && xp != null) {
+                storage = level * 100 + xp
+            }
         }
     }
 
@@ -85,6 +85,8 @@ object SkyBlockXPAPI {
 
         var foundLevel = false
         var foundXp = false
+        var level: Int? = null
+        var xp: Int? = null
 
         loop@ for (line in stack.getLore()) {
             if (foundLevel && foundXp) break@loop
@@ -104,6 +106,10 @@ object SkyBlockXPAPI {
                     continue@loop
                 }
             }
+        }
+
+        if (level != null && xp != null) {
+            storage = level * 100 + xp
         }
     }
 

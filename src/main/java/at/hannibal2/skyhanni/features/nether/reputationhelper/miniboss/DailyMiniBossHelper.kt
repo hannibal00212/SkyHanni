@@ -1,16 +1,18 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -37,8 +40,8 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -64,10 +67,12 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
         reputationHelper.update()
     }
 
-    fun render(display: MutableList<List<Any>>) {
+    fun MutableList<Renderable>.addDailyMiniBoss() {
         val done = miniBosses.count { it.doneToday }
-        display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Bosses (§e$done§8/§e5 killed§7)")
+
+        addString("")
+        addString("§7Daily Bosses (§e$done§8/§e5 killed§7)")
+
         if (done != 5) {
             for (miniBoss in miniBosses) {
                 if (config.hideComplete.get() && miniBoss.doneToday) continue
@@ -75,11 +80,14 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
 
-                val lineList = mutableListOf<Any>()
-                lineList.add(" ")
-                lineList.add(displayItem.getItemStack())
-                lineList.add("§5$displayName§7: $result")
-                display.add(lineList)
+                val row = Renderable.horizontalContainer(
+                    buildList {
+                        addString(" ")
+                        addItemStack(displayItem.getItemStack())
+                        addString("§5$displayName§7: $result")
+                    },
+                )
+                add(row)
             }
         }
     }
