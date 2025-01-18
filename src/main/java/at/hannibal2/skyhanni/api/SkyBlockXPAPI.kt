@@ -58,26 +58,22 @@ object SkyBlockXPAPI {
 
         val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.displayName) } ?: return
 
-        var foundLevel = false
-        var foundXp = false
         var level: Int? = null
         var xp: Int? = null
 
         loop@ for (line in stack.getLore()) {
-            if (foundLevel && foundXp) break@loop
+            if (level != null && xp != null) break@loop
 
-            if (!foundLevel) {
+            if (level == null) {
                 levelPattern.matchMatcher(line) {
                     level = group("level")?.toIntOrNull()
-                    foundLevel = true
                     continue@loop
                 }
             }
 
-            if (!foundXp) {
+            if (xp == null) {
                 xpPattern.matchMatcher(line) {
                     xp = group("xp")?.toIntOrNull()
-                    foundXp = true
                     continue@loop
                 }
             }
