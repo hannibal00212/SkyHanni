@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
@@ -135,7 +136,7 @@ object SkyBlockItemModifierUtils {
         return "${name.uppercase()}_RUNE;$tier".toInternalName()
     }
 
-    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
+    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let { compound ->
         val ultimateWitherScroll = "ULTIMATE_WITHER_SCROLL".toInternalName()
         val implosion = "IMPLOSION_SCROLL".toInternalName()
         val witherShield = "WITHER_SHIELD_SCROLL".toInternalName()
@@ -143,18 +144,14 @@ object SkyBlockItemModifierUtils {
 
         val scrolls = mutableSetOf<NEUInternalName>()
 
-        if (it.hasKey("ability_scroll", Constants.NBT.TAG_LIST)) {
-            val tagList = it.getTagList("ability_scroll", Constants.NBT.TAG_STRING)
-            for (i in 0 until tagList.tagCount()) {
-                val scroll = tagList.getStringTagAt(i).toInternalName()
-                if (scroll == ultimateWitherScroll) {
-                    scrolls.add(implosion)
-                    scrolls.add(witherShield)
-                    scrolls.add(shadowWarp)
-                    continue
-                }
-                scrolls.add(scroll)
+        for (scroll in compound.getStringList("ability_scroll").map { it.toInternalName() }) {
+            if (scroll == ultimateWitherScroll) {
+                scrolls.add(implosion)
+                scrolls.add(witherShield)
+                scrolls.add(shadowWarp)
+                continue
             }
+            scrolls.add(scroll)
         }
 
         scrolls.toList()

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
@@ -151,12 +152,7 @@ object EnoughUpdatesManager {
         val lore = mutableListOf<String>()
         if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
             val display = tag.getCompoundTag("display")
-            if (display.hasKey("Lore", Constants.NBT.TAG_LIST)) {
-                val loreList = display.getTagList("Lore", Constants.NBT.TAG_STRING)
-                for (i in 0 until loreList.tagCount()) {
-                    lore.add(loreList.getStringTagAt(i))
-                }
-            }
+            lore.addAll(display.getStringList("Lore"))
         }
 
         val json = JsonObject()
