@@ -294,7 +294,7 @@ object ExperimentsProfitTracker {
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        LorenzUtils.inSkyBlock && config.enabled && IslandType.PRIVATE_ISLAND.isInIsland() &&
+        IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
             (!checkDistanceToExperimentationTable || ExperimentationTableAPI.inDistanceToTable(5.0))
 
 }
