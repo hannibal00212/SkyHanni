@@ -465,16 +465,19 @@ object HoppityEventSummary {
         val storage = storage ?: return null
         val statsStorage = storage.hoppityEventStats
 
+        val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
+        val isAllTimeEnabled = liveDisplayConfig.showAllTime
+
         val isAllTime = currentStatYear == Int.MAX_VALUE
         val nextYear = getCurrentSBYear() + 1
         val isAlreadyNextEvent = currentStatYear == nextYear
-        val predecessorYear = statsStorage.keys.filter { it < currentStatYear }.maxOrNull()
+        val predecessorYear = statsStorage.keys.filter {
+            it < currentStatYear &&
+                (it != nextYear || isNextEventEnabled)
+        }.maxOrNull()
         val successorYear =
             if (isAllTime) null
             else statsStorage.keys.filter { it in (currentStatYear + 1)..<nextYear }.minOrNull()
-
-        val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
-        val isAllTimeEnabled = liveDisplayConfig.showAllTime
 
         val predecessorButton = predecessorYear?.let {
             buildStatYearSwitcher(
