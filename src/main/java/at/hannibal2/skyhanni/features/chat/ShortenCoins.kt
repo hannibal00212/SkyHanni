@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
@@ -24,11 +25,12 @@ object ShortenCoins {
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
-        "§6(?<amount>[\\d,.]+)(?![\\d.,kMB])"
+        "§6(?<amount>[\\d,.]+)(?![\\d.,kMB])",
     )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.shortenCoinAmounts) return
         val message = event.message
         val modifiedMessage = coinsPattern.replace(message) {
