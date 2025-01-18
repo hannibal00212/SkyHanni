@@ -68,8 +68,8 @@ object GardenNextJacobContest {
     private val patternGroup = RepoPattern.group("garden.nextcontest")
 
     /**
-     * REGEX-TEST: Day 1
-     * REGEX-TEST: Day 31
+     * REGEX-TEST: §aDay 1
+     * REGEX-TEST: §aDay 31
      */
     val dayPattern by patternGroup.pattern(
         "day",

@@ -77,9 +77,6 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
-    <ID>RepoPatternRegexTestFailed:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "collection", "Reach (?&lt;amount&gt;[0-9]+(?:,\\d+)*) (?&lt;name&gt;.*) Collection\\.", )</ID>
-    <ID>RepoPatternRegexTestFailed:BingoNextStepHelper.kt$BingoNextStepHelper$by patternGroup.pattern( "skill", "Obtain level (?&lt;level&gt;.*) in the (?&lt;skill&gt;.*) Skill.", )</ID>
-    <ID>RepoPatternRegexTestFailed:GardenNextJacobContest.kt$GardenNextJacobContest$by patternGroup.pattern( "day", "§aDay (?&lt;day&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "auction", "§7(?:Starting bid|Top bid): §6(?&lt;coins&gt;.*) coins" )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "buyitnow", "§7Buy it now: §6(?&lt;coins&gt;.*) coins" )</ID>
