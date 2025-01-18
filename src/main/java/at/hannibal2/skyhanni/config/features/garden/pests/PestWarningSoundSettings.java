@@ -17,7 +17,11 @@ public class PestWarningSoundSettings {
     public String name = "random.orb";
 
     @Expose
-    @ConfigOption(name = "Repeat Sound Notification", desc = "Repeat the sound notification until wardrobe is opened or pests spawn" + "§eRecommended §lonly §rif you're pest farming!")
+    @ConfigOption(
+        name = "Repeat Sound Notification",
+        desc = "Repeat the sound notification until wardrobe is opened or pests spawn" +
+            "§eRecommended §lonly §rif you're pest farming!"
+    )
     @ConfigEditorBoolean
     public boolean repeatSound = false;
 
