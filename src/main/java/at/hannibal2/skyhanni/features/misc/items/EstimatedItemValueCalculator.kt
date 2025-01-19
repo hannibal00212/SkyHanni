@@ -609,7 +609,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(drillUpgrades)
         if (names.isNotEmpty()) {
-            list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
+            list.add("§7Drill upgrades: " + totalPrice.format())
             list += names
         }
         return totalPrice
@@ -623,7 +623,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun Number.formatWithBrackets(gray: Boolean = false): String {
-        return "§7(§6" + format(gray) + "§7)"
+        return "§7(" + format(gray) + "§7)"
     }
 
     fun Number.format(gray: Boolean = false): String {
@@ -685,7 +685,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(abilityScrolls)
         if (names.isNotEmpty()) {
-            list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
+            list.add("§7Ability Scrolls: " + totalPrice.format())
             list += names
         }
         return totalPrice
@@ -737,7 +737,7 @@ object EstimatedItemValueCalculator {
         val (totalPrice, names) = getTotalAndNames(items)
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
-        list.add("§7Enchantments: §6" + totalPrice.shortFormat())
+        list.add("§7Enchantments: " + totalPrice.format())
         var i = 0
         for (name in names) {
             if (i == enchantmentsCap) {
@@ -815,7 +815,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(items)
         if (names.isNotEmpty()) {
-            list.add("§7Gemstones Applied: §6" + totalPrice.shortFormat())
+            list.add("§7Gemstones Applied: " + totalPrice.format())
             list += names
         }
         return totalPrice
@@ -878,7 +878,7 @@ object EstimatedItemValueCalculator {
         if (slotNames.isEmpty()) return 0.0
 
         val (totalPrice, names) = getTotalAndNames(items)
-        list.add("§7Gemstone Slot Unlock Cost: §6" + totalPrice.shortFormat())
+        list.add("§7Gemstone Slot Unlock Cost: " + totalPrice.format())
 
         list += names
 
@@ -890,7 +890,7 @@ object EstimatedItemValueCalculator {
 
     private fun NEUInternalName.getPriceName(amount: Number): String {
         val price = getPrice() * amount.toDouble()
-        if (this == SKYBLOCK_COIN) return " §6${price.shortFormat()} coins"
+        if (this == SKYBLOCK_COIN) return " ${price.format()} coins"
 
         return " ${getNumberedName(amount)} ${price.formatWithBrackets()}"
     }
