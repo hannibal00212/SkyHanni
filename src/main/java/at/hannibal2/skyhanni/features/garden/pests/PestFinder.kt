@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -123,15 +123,25 @@ object PestFinder {
         update()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showDisplay) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                if (GardenAPI.inGarden() && config.showDisplay) {
+                    config.position.renderRenderables(display, posLabel = "Pest Finder")
+                }
+            },
+        )
+    }
 
-        if (GardenAPI.inGarden() && config.showDisplay) {
-            config.position.renderRenderables(display, posLabel = "Pest Finder")
-        }
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showDisplay) return false
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return false
+
+        return true
     }
 
     private fun heldItemDisabled() = config.onlyWithVacuum && !PestAPI.hasVacuumInHand()
