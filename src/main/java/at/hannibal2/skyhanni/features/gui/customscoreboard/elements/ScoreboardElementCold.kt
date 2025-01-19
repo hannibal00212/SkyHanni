@@ -16,6 +16,8 @@ object ScoreboardElementCold : ScoreboardElement() {
 
     override val configLine = "Cold: §b0❄"
 
+    override val elementPatterns = listOf(MiningAPI.coldPattern)
+
     override fun showIsland() = MiningAPI.inColdIsland()
 }
 

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
 // scoreboard
 // scoreboard update event
@@ -17,6 +18,8 @@ object ScoreboardElementNorthStars : ScoreboardElement() {
     }
 
     override val configLine = "North Stars: §d756"
+
+    override val elementPatterns = listOf(ScoreboardPattern.northstarsPattern)
 
     override fun showIsland() = WinterAPI.inWorkshop()
 }
