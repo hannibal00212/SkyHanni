@@ -462,11 +462,11 @@ object EstimatedItemValueCalculator {
         val (price, stars) = calculateStarPrice(internalName, totalStars) ?: return 0.0
         val (havingStars, maxStars) = stars
 
-        val items = mutableMapOf<NEUInternalName, Long>()
+        val items = mutableMapOf<NEUInternalName, Number>()
         price.essencePrice.let {
             val essenceName = "ESSENCE_${it.essenceType}".toInternalName()
             val amount = it.essenceAmount
-            items[essenceName] = amount.toLong()
+            items[essenceName] = amount
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
@@ -474,7 +474,7 @@ object EstimatedItemValueCalculator {
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
-            items[materialInternalName] = amount.toLong()
+            items[materialInternalName] = amount
         }
         val (totalPrice, names) = getTotalAndNames(items)
 
