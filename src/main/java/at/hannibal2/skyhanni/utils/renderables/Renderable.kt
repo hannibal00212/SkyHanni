@@ -878,6 +878,10 @@ interface Renderable {
             }
         }
 
+        fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return horizontalContainer(buildList { builderAction() })
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
