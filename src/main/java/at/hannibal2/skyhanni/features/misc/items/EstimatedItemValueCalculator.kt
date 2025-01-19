@@ -380,12 +380,12 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
 
         val hpbPrice = HOT_POTATO_BOOK.getPrice() * hpb
-        list.add("§7HPB's: §e$hpb§7/§e10 ${hpbPrice.formatWithBrackets()}")
+        list.add(formatProgress("HPB's", hpb, max = 10, hpbPrice))
         totalPrice += hpbPrice
 
         if (fuming > 0) {
             val fumingPrice = FUMING_POTATO_BOOK.getPrice() * fuming
-            list.add("§7Fuming: §e$fuming§7/§e5 ${fumingPrice.formatWithBrackets()}")
+            list.add(formatProgress("Fuming", fuming, max = 5, fumingPrice))
             totalPrice += fumingPrice
         }
 
@@ -396,7 +396,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getFarmingForDummiesCount() ?: return 0.0
 
         val price = FARMING_FOR_DUMMIES.getPrice() * count
-        list.add("§7Farming for Dummies: §e$count§7/§e5 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Farming for Dummies", count, max = 5, price))
         return price
     }
 
@@ -404,15 +404,19 @@ object EstimatedItemValueCalculator {
         val count = stack.getPolarvoidBookCount() ?: return 0.0
 
         val price = POLARVOID_BOOK.getPrice() * count
-        list.add("§7Polarvoid: §e$count§7/§e5 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Polarvoid", count, max = 5, price))
         return price
+    }
+
+    private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
+        return "§7$label: §e$have§7/§e$max ${price.formatWithBrackets()}"
     }
 
     private fun addPocketSackInASack(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getAppliedPocketSackInASack() ?: return 0.0
 
         val price = POCKET_SACK_IN_A_SACK.getPrice() * count
-        list.add("§7Pocket Sack-in-a-Sack: §e$count§7/§e3 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Pocket Sack-in-a-Sack", count, max = 3, price))
         return price
     }
 
@@ -420,7 +424,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getBookwormBookCount() ?: return 0.0
 
         val price = BOOKWORM_BOOK.getPrice() * count
-        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Bookworm's Favorite Book", count, max = 5, price))
         return price
     }
 
@@ -431,7 +435,7 @@ object EstimatedItemValueCalculator {
         val maxTier = if (internalName == STONK_PICKAXE) 4 else 5
 
         val price = SILEX.getPrice() * tier
-        list.add("§7Silex: §e$tier§7/§e$maxTier ${price.formatWithBrackets()}")
+        list.add(formatProgress("Silex", tier, maxTier, price))
         return price
     }
 
@@ -439,7 +443,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getTransmissionTunerCount() ?: return 0.0
 
         val price = TRANSMISSION_TUNER.getPrice() * count
-        list.add("§7Transmission Tuners: §e$count§7/§e4 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Transmission Tuners", count, max = 4, price))
         return price
     }
 
@@ -447,7 +451,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getManaDisintegrators() ?: return 0.0
 
         val price = MANA_DISINTEGRATOR.getPrice() * count
-        list.add("§7Mana Disintegrators: §e$count§7/§e10 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Mana Disintegrators", count, max = 10, price))
         return price
     }
 
@@ -479,7 +483,7 @@ object EstimatedItemValueCalculator {
         }
         val (totalPrice, names) = getTotalAndNames(items)
 
-        list.add("§7Stars: §e$havingStars§7/§e$maxStars ${totalPrice.formatWithBrackets()}")
+        list.add(formatProgress("Stars", havingStars, maxStars, totalPrice))
         val starMaterialCap: Int = config.starMaterialCap.get()
         list.addAll(names.take(starMaterialCap))
         return totalPrice
@@ -579,7 +583,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        list.add("§7Master Stars: §e$masterStars§7/§e5 ${price.formatWithBrackets()}")
+        list.add(formatProgress("Master Stars", masterStars, max = 5, price))
         return price
     }
 
