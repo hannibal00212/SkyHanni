@@ -308,13 +308,9 @@ object EstimatedItemValueCalculator {
 
     private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasEtherwarp()) return 0.0
-
-        val (totalPrice, names) = getTotalAndNames(listOf(ETHERWARP_CONDUIT, ETHERWARP_MERGER))
-        if (names.isNotEmpty()) {
-            list.add("§7Etherwarp §e" + totalPrice.shortFormat())
-            list += names
-        }
-        return totalPrice
+        val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
+        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
+        return price
     }
 
     private fun addWoodSingularity(stack: ItemStack, list: MutableList<String>): Double {
