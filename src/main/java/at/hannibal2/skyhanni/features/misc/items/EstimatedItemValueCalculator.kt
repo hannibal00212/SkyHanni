@@ -306,13 +306,6 @@ object EstimatedItemValueCalculator {
         return list.formatHaving("Jalapeno Book", JALAPENO_BOOK)
     }
 
-    private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
-        if (!stack.hasEtherwarp()) return 0.0
-        val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
-        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
-        return price
-    }
-
     private fun addWoodSingularity(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasWoodSingularity()) return 0.0
 
@@ -349,9 +342,52 @@ object EstimatedItemValueCalculator {
         return list.formatHaving("The Art Of Peace", ART_OF_PEACE)
     }
 
+    private fun addPowerScrolls(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getPowerScroll() ?: return 0.0
+
+        val name = internalName.itemNameWithoutColor
+        return list.formatHaving(name, internalName)
+    }
+
     private fun MutableList<String>.formatHaving(label: String, internalName: NEUInternalName): Double {
         val price = internalName.getPrice()
         add("§7$label: §a§l✔ ${price.formatWithBrackets()}")
+        return price
+    }
+
+    private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.hasEtherwarp()) return 0.0
+        val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
+        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
+        return price
+    }
+
+    private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
+        var totalStars = stack.getDungeonStarCount() ?: return 0.0
+        starChange.takeIf { it != 0 }?.let {
+            totalStars += it
+        }
+
+        val masterStars = (totalStars - 5).coerceAtMost(5)
+        if (masterStars < 1) return 0.0
+
+        var price = 0.0
+
+        val stars = mapOf(
+            "FIRST" to 1,
+            "SECOND" to 2,
+            "THIRD" to 3,
+            "FOURTH" to 4,
+            "FIFTH" to 5,
+        )
+
+        for ((prefix, number) in stars) {
+            if (masterStars >= number) {
+                price += "${prefix}_MASTER_STAR".toInternalName().getPrice()
+            }
+        }
+
+        list.add(formatProgress("Master Stars", masterStars, max = 5, price))
         return price
     }
 
@@ -399,10 +435,6 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
-        return "§7$label: §e$have§7/§e$max ${price.formatWithBrackets()}"
-    }
-
     private fun addPocketSackInASack(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getAppliedPocketSackInASack() ?: return 0.0
 
@@ -444,6 +476,10 @@ object EstimatedItemValueCalculator {
         val price = MANA_DISINTEGRATOR.getPrice() * count
         list.add(formatProgress("Mana Disintegrators", count, max = 10, price))
         return price
+    }
+
+    private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
+        return "§7$label: §e$have§7/§e$max ${price.formatWithBrackets()}"
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
@@ -549,35 +585,6 @@ object EstimatedItemValueCalculator {
         return EssenceUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
     }
 
-    private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
-        var totalStars = stack.getDungeonStarCount() ?: return 0.0
-        starChange.takeIf { it != 0 }?.let {
-            totalStars += it
-        }
-
-        val masterStars = (totalStars - 5).coerceAtMost(5)
-        if (masterStars < 1) return 0.0
-
-        var price = 0.0
-
-        val stars = mapOf(
-            "FIRST" to 1,
-            "SECOND" to 2,
-            "THIRD" to 3,
-            "FOURTH" to 4,
-            "FIFTH" to 5,
-        )
-
-        for ((prefix, number) in stars) {
-            if (masterStars >= number) {
-                price += "${prefix}_MASTER_STAR".toInternalName().getPrice()
-            }
-        }
-
-        list.add(formatProgress("Master Stars", masterStars, max = 5, price))
-        return price
-    }
-
     private fun getTotalAndNames(
         singleItems: List<NEUInternalName>,
     ): Pair<Double, List<String>> {
@@ -611,13 +618,6 @@ object EstimatedItemValueCalculator {
             list += names
         }
         return totalPrice
-    }
-
-    private fun addPowerScrolls(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getPowerScroll() ?: return 0.0
-
-        val name = internalName.itemNameWithoutColor
-        return list.formatHaving(name, internalName)
     }
 
     private fun Number.formatWithBrackets(gray: Boolean = false): String {
