@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
 // scoreboard
 // scoreboard update event
@@ -27,6 +28,8 @@ object ScoreboardElementCopper : ScoreboardElement(), CustomScoreboardNumberTrac
     }
 
     override val configLine = "Copper: §c23,495"
+
+    override val elementPatterns = listOf(ScoreboardPattern.copperPattern)
 
     override fun showIsland() = GardenAPI.inGarden()
 }
