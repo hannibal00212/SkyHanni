@@ -130,12 +130,11 @@ object SoopyGuessBurrow {
         changes = changes.map { o -> o / lineDist }
 
         lastSoundPoint?.let {
-            guessPoint =
-                LorenzVec(
-                    it.x + changes[0] * distance!!,
-                    it.y + changes[1] * distance!!,
-                    it.z + changes[2] * distance!!
-                )
+            guessPoint = LorenzVec(
+                it.x + changes[0] * distance!!,
+                it.y + changes[1] * distance!!,
+                it.z + changes[2] * distance!!,
+            )
         }
     }
 
@@ -183,8 +182,8 @@ object SoopyGuessBurrow {
                         LorenzVec(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
-                            slopeThing[slopeThing.size - 1]
-                        )
+                            slopeThing[slopeThing.size - 1],
+                        ),
                     )
 
                     val pr1 = mutableListOf<LorenzVec>()
@@ -198,7 +197,7 @@ object SoopyGuessBurrow {
 
                     val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
                         locations[locations.size - 1].x - locations[locations.size - 2].x,
-                        locations[locations.size - 1].z - locations[locations.size - 2].x
+                        locations[locations.size - 1].z - locations[locations.size - 2].x,
                     )
 
                     var i = start + 1
@@ -276,12 +275,11 @@ object SoopyGuessBurrow {
             changes = changes.map { o -> o / lineDist }
 
             lastParticlePoint?.let {
-                guessPoint =
-                    LorenzVec(
-                        it.x + changes[0] * distance!!,
-                        it.y + changes[1] * distance!!,
-                        it.z + changes[2] * distance!!
-                    )
+                guessPoint = LorenzVec(
+                    it.x + changes[0] * distance!!,
+                    it.y + changes[1] * distance!!,
+                    it.z + changes[2] * distance!!,
+                )
             }
         }
     }

@@ -34,12 +34,14 @@ object PreciseGuessBurrow {
 
     private val particleLocations = mutableListOf<LorenzVec>()
     private var guessPoint: LorenzVec? = null
+
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
         guessPoint = null
         particleLocations.clear()
     }
+
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onReceiveParticle(event: PacketReceivedEvent) {
         if (!isEnabled()) return
@@ -77,7 +79,7 @@ object PreciseGuessBurrow {
         val startPointDerivative = LorenzVec(
             coefficientsX[1],
             coefficientsY[1],
-            coefficientsZ[1]
+            coefficientsZ[1],
         )
         // How far away from the first point the control point is
         val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
@@ -87,11 +89,12 @@ object PreciseGuessBurrow {
         val guessPosition = LorenzVec(
             floor(coefficientsX[0] + coefficientsX[1] * t + coefficientsX[2] * t.pow(2) + coefficientsX[3] * t.pow(3)),
             floor(coefficientsY[0] + coefficientsY[1] * t + coefficientsY[2] * t.pow(2) + coefficientsY[3] * t.pow(3) - 0.5),
-            floor(coefficientsZ[0] + coefficientsZ[1] * t + coefficientsZ[2] * t.pow(2) + coefficientsZ[3] * t.pow(3))
+            floor(coefficientsZ[0] + coefficientsZ[1] * t + coefficientsZ[2] * t.pow(2) + coefficientsZ[3] * t.pow(3)),
         )
 
         BurrowGuessEvent(guessPosition).post()
     }
+
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {
         val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
         val pitchRadians = -atan2(derivative.y, xzLength)
@@ -113,8 +116,10 @@ object PreciseGuessBurrow {
         }
         return guessPitch
     }
+
     private var lastDianaSpade = SimpleTimeMark.farPast()
     private var spadeUsePosition: LorenzVec? = null
+
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onUseAbility(event: ItemClickEvent) {
         if (!isEnabled()) return
