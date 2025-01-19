@@ -93,7 +93,7 @@ object PreciseGuessBurrow {
         var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
         var windowMax = PI / 2
         var windowMin = -PI / 2
-        for (i in 0 until 100) {
+        repeat(100) {
             if (resultPitch < pitchRadians) {
                 windowMin = guessPitch
                 guessPitch = (windowMin + windowMax) / 2
