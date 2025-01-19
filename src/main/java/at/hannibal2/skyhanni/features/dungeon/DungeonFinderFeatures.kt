@@ -115,11 +115,12 @@ object DungeonFinderFeatures {
     )
 
     /**
+     * REGEX-TEST: Floor VII
      * REGEX-TEST: Floor: Floor VII
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        "Floor .*",
+        "Floor:? .*",
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",

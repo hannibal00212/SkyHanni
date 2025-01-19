@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
@@ -46,6 +47,7 @@ import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
+@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int
@@ -242,8 +244,18 @@ interface Renderable {
             val guiScreen = Minecraft.getMinecraft().currentScreen
 
             val isGuiScreen = guiScreen != null
+
+            if (!isGuiScreen) {
+                return false
+            }
+
+//             never support grayed out inventories
+            if (RenderData.outsideInventory) {
+                return false
+            }
+
             if (bypassChecks) {
-                return isGuiScreen
+                return true
             }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
@@ -866,6 +878,10 @@ interface Renderable {
             }
         }
 
+        fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return horizontalContainer(buildList { builderAction() })
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
@@ -975,7 +991,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-            showScrollableTipsInList: Boolean = false
+            showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")

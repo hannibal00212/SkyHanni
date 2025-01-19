@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
@@ -15,6 +16,7 @@ import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.common.util.Constants
 import java.util.Locale
 
 object SkyBlockItemModifierUtils {
@@ -134,23 +136,29 @@ object SkyBlockItemModifierUtils {
         return "${name.uppercase()}_RUNE;$tier".toInternalName()
     }
 
-    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
-        val list = mutableListOf<NEUInternalName>()
-        for (attributes in it.keySet) {
-            if (attributes == "ability_scroll") {
-                val tagList = it.getTagList(attributes, 8)
-                for (i in 0..3) {
-                    val text = tagList.get(i).toString()
-                    if (text == "END") break
-                    list.add(text.replace("\"", "").toInternalName())
-                }
+    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let { compound ->
+        val ultimateWitherScroll = "ULTIMATE_WITHER_SCROLL".toInternalName()
+        val implosion = "IMPLOSION_SCROLL".toInternalName()
+        val witherShield = "WITHER_SHIELD_SCROLL".toInternalName()
+        val shadowWarp = "SHADOW_WARP_SCROLL".toInternalName()
+
+        val scrolls = mutableSetOf<NEUInternalName>()
+
+        for (scroll in compound.getStringList("ability_scroll").map { it.toInternalName() }) {
+            if (scroll == ultimateWitherScroll) {
+                scrolls.add(implosion)
+                scrolls.add(witherShield)
+                scrolls.add(shadowWarp)
+                continue
             }
+            scrolls.add(scroll)
         }
-        list.toList()
+
+        scrolls.toList()
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.hasKey("attributes", Constants.NBT.TAG_COMPOUND) }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {

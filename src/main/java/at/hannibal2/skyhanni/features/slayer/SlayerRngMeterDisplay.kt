@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -243,13 +243,23 @@ object SlayerRngMeterDisplay {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-        if (!SlayerAPI.hasActiveSlayerQuest()) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
+            },
+        )
+    }
 
-        config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!SlayerAPI.isInCorrectArea) return false
+        if (!SlayerAPI.hasActiveSlayerQuest()) return false
+
+        return true
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
