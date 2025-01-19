@@ -727,6 +727,28 @@ object EstimatedItemValueCalculator {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
         val internalName = stack.getInternalName()
+        val items = fetchEnchantmentItems(enchantments, internalName)
+        val (totalPrice, names) = getTotalAndNames(items)
+        val enchantmentsCap: Int = config.enchantmentsCap.get()
+        if (names.isEmpty()) return 0.0
+        list.add("§7Enchantments: §6" + totalPrice.shortFormat())
+        var i = 0
+        for (name in names) {
+            if (i == enchantmentsCap) {
+                val missing = names.size - enchantmentsCap
+                list.add(" §7§o$missing more enchantments..")
+                break
+            }
+            list.add(name)
+            i++
+        }
+        return totalPrice
+    }
+
+    private fun fetchEnchantmentItems(
+        enchantments: Map<String, Int>,
+        internalName: NEUInternalName,
+    ): MutableMap<NEUInternalName, Int> {
         val items = mutableMapOf<NEUInternalName, Int>()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
@@ -770,21 +792,7 @@ object EstimatedItemValueCalculator {
 
             items[enchantmentName] = multiplier
         }
-        val (totalPrice, names) = getTotalAndNames(items)
-        val enchantmentsCap: Int = config.enchantmentsCap.get()
-        if (names.isEmpty()) return 0.0
-        list.add("§7Enchantments: §6" + totalPrice.shortFormat())
-        var i = 0
-        for (name in names) {
-            if (i == enchantmentsCap) {
-                val missing = names.size - enchantmentsCap
-                list.add(" §7§o$missing more enchantments..")
-                break
-            }
-            list.add(name)
-            i++
-        }
-        return totalPrice
+        return items
     }
 
     private fun addGemstones(stack: ItemStack, list: MutableList<String>): Double {
