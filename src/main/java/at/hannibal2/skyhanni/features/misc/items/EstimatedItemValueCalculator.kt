@@ -594,10 +594,14 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
         for ((internalName, amount) in items) {
-            val price = internalName.getPriceOrNull() ?: continue
-
-            totalPrice += price * amount.toDouble()
-            map[internalName.getPriceName(amount)] = price
+            val price = internalName.getPriceOrNull()
+            if (price != null) {
+                totalPrice += price * amount.toDouble()
+                map[internalName.getPriceName(amount)] = price
+            } else {
+                val name = internalName.getNumberedName(amount)
+                map[" $name §cUnknwon price!"] = Double.MAX_VALUE
+            }
         }
         return totalPrice to map.sortedDesc().keys.toList()
     }
@@ -872,8 +876,12 @@ object EstimatedItemValueCalculator {
         val price = getPrice() * amount.toDouble()
         if (this == SKYBLOCK_COIN) return " §6${price.shortFormat()} coins"
 
+        return " ${getNumberedName(amount)} §7(§6${price.shortFormat()}§7)"
+    }
+
+    private fun NEUInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
-        return " $prefix§r$itemName §7(§6${price.shortFormat()}§7)"
+        return "$prefix§r$itemName"
     }
 
     private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
