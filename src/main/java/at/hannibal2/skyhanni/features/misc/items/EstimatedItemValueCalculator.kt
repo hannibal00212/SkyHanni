@@ -607,10 +607,10 @@ object EstimatedItemValueCalculator {
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
-        val (totalPrice, b) = getTotalAndNames(drillUpgrades)
-        if (b.isNotEmpty()) {
+        val (totalPrice, names) = getTotalAndNames(drillUpgrades)
+        if (names.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
-            list += b
+            list += names
         }
         return totalPrice
     }
@@ -677,10 +677,10 @@ object EstimatedItemValueCalculator {
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
-        val (totalPrice, items) = getTotalAndNames(abilityScrolls)
-        if (items.isNotEmpty()) {
+        val (totalPrice, names) = getTotalAndNames(abilityScrolls)
+        if (names.isNotEmpty()) {
             list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
-            list += items
+            list += names
         }
         return totalPrice
     }
