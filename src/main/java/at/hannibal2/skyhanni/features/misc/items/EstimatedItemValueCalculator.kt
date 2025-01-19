@@ -172,8 +172,8 @@ object EstimatedItemValueCalculator {
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
-            list.add("§7Attribute Combo: ($color${comboPrice.shortFormat()}§7)")
+            val gray = comboPrice <= basePrice || useless
+            list.add("§7Attribute Combo: ${comboPrice.formatWithBrackets(gray)}")
             if (!useless) {
                 subTotal += addAttributePrice(comboPrice, basePrice)
             }
@@ -183,13 +183,13 @@ object EstimatedItemValueCalculator {
         for (attr in attributes) {
             val attributeName = "$genericName+ATTRIBUTE_${attr.first}"
             val price = getPriceOrCompositePriceForAttribute(attributeName, attr.second)
-            var priceColor = "§7"
+            var gray = true
             val useless = isUselessAttribute(attributeName)
             val nameColor = if (!useless) "§9" else "§7"
             if (price != null) {
                 if (price > basePrice && !useless) {
                     subTotal += addAttributePrice(price, basePrice)
-                    priceColor = "§6"
+                    gray = false
                 }
 
             }
@@ -197,7 +197,7 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: $priceColor${price?.shortFormat() ?: "Unknown"}",
+                } ${attr.second}§7: ${price?.format(gray) ?: "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
@@ -622,8 +622,13 @@ object EstimatedItemValueCalculator {
         return list.formatHaving(name, internalName)
     }
 
-    private fun Number.formatWithBrackets(): String {
-        return "§7(§6" + this.shortFormat() + "§7)"
+    private fun Number.formatWithBrackets(gray: Boolean = false): String {
+        return "§7(§6" + format(gray) + "§7)"
+    }
+
+    fun Number.format(gray: Boolean = false): String {
+        val color = if (gray) "§7" else "§6"
+        return color + shortFormat()
     }
 
     private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
@@ -645,8 +650,9 @@ object EstimatedItemValueCalculator {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
         val displayName = name ?: "§c${internalName.asString()}"
-        val color = if (shouldIgnorePrice.get()) "§7" else "§6"
-        list.add("§7$label: $displayName §7($color" + price.shortFormat() + "§7)")
+        val gray = shouldIgnorePrice.get()
+
+        list.add("§7$label: $displayName " + price.formatWithBrackets(gray))
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
