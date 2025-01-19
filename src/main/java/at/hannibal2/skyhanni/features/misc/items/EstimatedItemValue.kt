@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -62,11 +63,19 @@ object EstimatedItemValue {
         bookBundleAmount = data.bookBundleAmount
     }
 
+    private fun isInNeuOverlay(): Boolean {
+        val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
+        val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
+        val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+
+        return inPv || inNeuTrade
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
         if (!PlatformUtils.isNeuLoaded()) return
-        if (Minecraft.getMinecraft().currentScreen !is GuiProfileViewer) return
+        if (!isInNeuOverlay()) return
 
         if (renderedItems == 0) {
             updateItem(event.itemStack)
@@ -112,7 +121,7 @@ object EstimatedItemValue {
             ErrorManager.logErrorWithData(
                 ex, "Error in Estimated Item Value renderer",
                 "display" to display,
-                "posLabel" to "Estimated Item Value"
+                "posLabel" to "Estimated Item Value",
             )
         }
     }
