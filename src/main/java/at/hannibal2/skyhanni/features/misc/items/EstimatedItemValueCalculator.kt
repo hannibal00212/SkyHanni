@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.intPow
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
@@ -754,39 +755,30 @@ object EstimatedItemValueCalculator {
     private fun fetchEnchantmentItems(
         enchantments: Map<String, Int>,
         internalName: NEUInternalName,
-    ): MutableMap<NEUInternalName, Int> {
+    ): Map<NEUInternalName, Int> {
+        val data = EstimatedItemValue.itemValueCalculationData ?: return emptyMap()
+
         val items = mutableMapOf<NEUInternalName, Int>()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            val isAlwaysActive = EstimatedItemValue.itemValueCalculationData?.alwaysActiveEnchants.orEmpty().entries.any {
+            val isAlwaysActive = data.alwaysActiveEnchants.entries.any {
                 it.key == rawName && it.value.level == rawLevel && it.value.internalNames.contains(internalName)
             }
             if (isAlwaysActive) continue
-
             var level = rawLevel
             var multiplier = 1
-            if (rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierOnePrices.orEmpty()) {
 
-                when (rawLevel) {
-                    2 -> multiplier = 2
-                    3 -> multiplier = 4
-                    4 -> multiplier = 8
-                    5 -> multiplier = 16
+            when {
+                rawName in data.onlyTierOnePrices && rawLevel in 2..5 -> {
+                    multiplier = 2.intPow(rawLevel - 1)
+                    level = 1
                 }
-                level = 1
-            }
-            if (rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierFivePrices.orEmpty()) {
-                when (rawLevel) {
-                    6 -> multiplier = 2
-                    7 -> multiplier = 4
-                    8 -> multiplier = 8
-                    9 -> multiplier = 16
-                    10 -> multiplier = 32
-                }
-                if (multiplier > 1) {
-                    level = 5
+
+                rawName in data.onlyTierFivePrices && rawLevel in 6..10 -> {
+                    multiplier = 2.intPow(rawLevel - 5)
+                    if (multiplier > 1) level = 5
                 }
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
