@@ -390,7 +390,7 @@ object BestiaryData {
         if (catList.isEmpty()) return
         addString("§7Category")
         for (cat in catList) {
-            val thing = when {
+            val info = when {
                 cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
                 cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
                 cat.familiesFound < cat.totalFamilies ->
@@ -400,7 +400,7 @@ object BestiaryData {
                 else -> continue
             }
 
-            addString(" §7- ${cat.name}§7: $thing")
+            addString(" §7- ${cat.name}§7: $info")
         }
     }
 
