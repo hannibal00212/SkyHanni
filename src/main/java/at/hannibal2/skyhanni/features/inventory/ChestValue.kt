@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -120,26 +121,20 @@ object ChestValue {
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
             val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
-            val text = if (config.alignedDisplay)
-                "$name $price"
-            else
-                "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
+            val text = if (config.alignedDisplay) "$name $price"
+            else "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
 
-            add(
-                Renderable.horizontalContainer(
-                    buildList {
-                        val renderable = Renderable.hoverTips(
-                            text,
-                            tips,
-                            stack = stack,
-                            highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList(),
-                        )
-                        addString(" §7- ")
-                        if (config.showStacks) addItemStack(stack)
-                        add(renderable)
-                    }
+            addLine {
+                val renderable = Renderable.hoverTips(
+                    text,
+                    tips,
+                    stack = stack,
+                    highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList(),
                 )
-            )
+                addString(" §7- ")
+                if (config.showStacks) addItemStack(stack)
+                add(renderable)
+            }
             rendered++
         }
         addString("§aTotal value: §6${totalPrice.formatPrice()} coins")
