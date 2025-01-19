@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 abstract class ElectionViewerScreen : GuiScreen() {
@@ -46,7 +45,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     open fun onSecondPassed(event: SecondPassedEvent) {
         if (!isInGui()) return
         updateDisplay()
