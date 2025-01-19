@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
@@ -10,8 +11,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.EssenceItemUtils
-import at.hannibal2.skyhanni.utils.EssenceItemUtils.getEssencePrices
+import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -491,7 +492,7 @@ object EstimatedItemValueCalculator {
     private fun calculateStarPrice(
         internalName: NEUInternalName,
         inputStars: Int,
-    ): Pair<EssenceItemUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
+    ): Pair<EssenceUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
             val tier = (internalName.getKuudraTier() ?: 0) - 1
@@ -501,17 +502,17 @@ object EstimatedItemValueCalculator {
 
             val removed = internalName.removeKuudraTier().asString()
             var maxStars = 0
-            var finalPrice: EssenceItemUtils.EssenceUpgradePrice? = null
+            var finalPrice: EssenceUtils.EssenceUpgradePrice? = null
 
             val tiers = mutableMapOf<NEUInternalName, Int>()
 
-            for ((id, _) in EssenceItemUtils.itemPrices) {
+            for ((id, _) in EssenceUtils.itemPrices) {
                 if (!id.contains(removed)) continue
                 tiers[id] = (id.getKuudraTier() ?: 0) - 1
 
             }
             for ((id, _) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id].orEmpty()
+                val prices = EssenceUtils.itemPrices[id].orEmpty()
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 
@@ -523,9 +524,8 @@ object EstimatedItemValueCalculator {
 
             finalPrice to maxStars
         } else {
-            if (totalStars == 0) return null
-
-            val prices = internalName.getEssencePrices() ?: return null
+            val prices = internalName.getEssencePrices()
+            if (totalStars == 0 || prices == null) return null
 
             (getPriceFor(prices, totalStars) ?: return null) to prices.size
         }
@@ -535,10 +535,10 @@ object EstimatedItemValueCalculator {
     }
 
     private fun getPriceFor(
-        prices: Map<Int, EssenceItemUtils.EssenceUpgradePrice>,
+        prices: Map<Int, EssenceUtils.EssenceUpgradePrice>,
         totalStars: Int,
-    ): EssenceItemUtils.EssenceUpgradePrice? {
-        var totalEssencePrice: EssenceItemUtils.EssencePrice? = null
+    ): EssenceUtils.EssenceUpgradePrice? {
+        var totalEssencePrice: EssenceUtils.EssencePrice? = null
         var totalCoinPrice = 0L
         val totalItemPrice = mutableMapOf<NEUInternalName, Int>()
 
@@ -555,7 +555,7 @@ object EstimatedItemValueCalculator {
             }
         }
         totalEssencePrice ?: return null
-        return EssenceItemUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
+        return EssenceUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
     }
 
     private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
@@ -587,18 +587,25 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    private fun getMapAndTotalFromExtra(
+        extraList: List<NEUInternalName>,
+    ): Pair<Double, MutableMap<String, Double>> {
+        var totalPrice = 0.0
+        val map = mutableMapOf<String, Double>()
+        for (internalName in extraList) {
+            val price = internalName.getPriceOrNull() ?: continue
+
+            totalPrice += price
+            map[internalName.getPriceName(amount = 1)] = price
+        }
+        return totalPrice to map
+    }
+
+
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
-        val map = mutableMapOf<String, Double>()
-        for (internalName in drillUpgrades) {
-            val name = internalName.itemName
-            val price = internalName.getPriceOrNull() ?: continue
-
-            val format = price.shortFormat()
-            map[" $name §7(§6$format§7)"] = price
-        }
-        val totalPrice = map.values.sum()
+        val (totalPrice, map) = getMapAndTotalFromExtra(drillUpgrades)
         if (map.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
@@ -666,13 +673,7 @@ object EstimatedItemValueCalculator {
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
-        val map = mutableMapOf<String, Double>()
-        for (internalName in abilityScrolls) {
-            val price = internalName.getPriceOrNull() ?: continue
-
-            map[internalName.getPriceName(amount = 1)] = price
-        }
-        val totalPrice = map.values.sum()
+        val (totalPrice, map) = getMapAndTotalFromExtra(abilityScrolls)
         if (map.isNotEmpty()) {
             list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
             list += map.sortedDesc().keys
@@ -718,51 +719,24 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    // TODO repo
-    private val hasAlwaysScavenger = listOf(
-        "CRYPT_DREADLORD_SWORD".toInternalName(),
-        "ZOMBIE_SOLDIER_CUTLASS".toInternalName(),
-        "CONJURING_SWORD".toInternalName(),
-        "EARTH_SHARD".toInternalName(),
-        "ZOMBIE_KNIGHT_SWORD".toInternalName(),
-        "SILENT_DEATH".toInternalName(),
-        "ZOMBIE_COMMANDER_WHIP".toInternalName(),
-        "ICE_SPRAY_WAND".toInternalName(),
-    )
-
-    private val hasAlwaysReplenish = listOf(
-        "ADVANCED_GARDENING_HOE".toInternalName(),
-        "ADVANCED_GARDENING_AXE".toInternalName(),
-    )
-
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
         val map = mutableMapOf<String, Double>()
-
-        // todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-
-        @Suppress("PropertyWrapping")
-        val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
-        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            if (rawName == "scavenger" && rawLevel == 5 && internalName in hasAlwaysScavenger) {
-                continue
+            val isAlwaysActive = EstimatedItemValue.itemValueCalculationData?.alwaysActiveEnchants.orEmpty().entries.any {
+                it.key == rawName && it.value.level == rawLevel && it.value.internalNames.contains(internalName)
             }
-
-            if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
-                continue
-            }
+            if (isAlwaysActive) continue
 
             var level = rawLevel
             var multiplier = 1
-            if (rawName in onlyTierOnePrices) {
+            if (rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierOnePrices.orEmpty()) {
 
                 when (rawLevel) {
                     2 -> multiplier = 2
@@ -772,7 +746,7 @@ object EstimatedItemValueCalculator {
                 }
                 level = 1
             }
-            if (rawName in onlyTierFivePrices) {
+            if (rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierFivePrices.orEmpty()) {
                 when (rawLevel) {
                     6 -> multiplier = 2
                     7 -> multiplier = 4
@@ -787,7 +761,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            if (rawName in tieredEnchants) level = 1
+            if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
             val singlePrice = enchantmentName.getPriceOrNull() ?: continue
