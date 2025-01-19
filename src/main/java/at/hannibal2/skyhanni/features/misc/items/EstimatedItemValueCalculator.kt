@@ -585,30 +585,6 @@ object EstimatedItemValueCalculator {
         return EssenceUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
     }
 
-    private fun getTotalAndNames(
-        singleItems: List<NEUInternalName>,
-    ): Pair<Double, List<String>> {
-        return getTotalAndNames(singleItems.associateWith { 1 })
-    }
-
-    private fun getTotalAndNames(
-        items: Map<NEUInternalName, Number>,
-    ): Pair<Double, List<String>> {
-        var totalPrice = 0.0
-        val map = mutableMapOf<String, Double>()
-        for ((internalName, amount) in items) {
-            val price = internalName.getPriceOrNull()
-            if (price != null) {
-                totalPrice += price * amount.toDouble()
-                map[internalName.getPriceName(amount)] = price
-            } else {
-                val name = internalName.getNumberedName(amount)
-                map[" $name §cUnknown price!"] = Double.MAX_VALUE
-            }
-        }
-        return totalPrice to map.sortedDesc().keys.toList()
-    }
-
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
@@ -620,64 +596,6 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun Number.formatWithBrackets(gray: Boolean = false): String {
-        return "§7(" + format(gray) + "§7)"
-    }
-
-    private fun Number.format(gray: Boolean = false): String {
-        val color = if (gray) "§7" else "§6"
-        return color + shortFormat()
-    }
-
-    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getHelmetSkin() ?: return 0.0
-        return addCosmetic(internalName, list, "Skin", config.ignoreHelmetSkins)
-    }
-
-    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getArmorDye() ?: return 0.0
-        return addCosmetic(internalName, list, "Dye", config.ignoreArmorDyes)
-    }
-
-    private fun addCosmetic(
-        internalName: NEUInternalName,
-        list: MutableList<String>,
-        label: String,
-        shouldIgnorePrice: Property<Boolean>,
-    ): Double {
-        val price = internalName.getPrice()
-        val name = internalName.getNameOrRepoError()
-        val displayName = name ?: "§c${internalName.asString()}"
-        val gray = shouldIgnorePrice.get()
-
-        list.add("§7$label: $displayName " + price.formatWithBrackets(gray))
-        if (name == null) {
-            list.add("   §8(Not yet in NEU Repo)")
-        }
-
-        return if (shouldIgnorePrice.get()) 0.0 else price
-    }
-
-    private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
-
-        val enrichmentName = stack.getEnrichment() ?: return 0.0
-        val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".toInternalName()
-
-        val price = internalName.getPrice()
-        val name = internalName.itemName
-        list.add("§7Enrichment: $name ${price.formatWithBrackets()}")
-        return price
-    }
-
-    private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
-        if (stack.getInternalName().isRune()) return 0.0
-        val internalName = stack.getRune() ?: return 0.0
-
-        return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
-    }
-
-    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
-
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
@@ -687,44 +605,6 @@ object EstimatedItemValueCalculator {
             list += names
         }
         return totalPrice
-    }
-
-    private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalName().removeKuudraTier()
-
-        stack.getAttributeFromShard()?.let {
-            val price = it.getAttributePrice()
-            if (price != null) {
-                val name = it.getAttributeName()
-                list.add("§7Base item: $name ${price.formatWithBrackets()}")
-                return price
-            }
-        }
-
-        var price = internalName.getPrice()
-        if (price == -1.0) {
-            price = 0.0
-        }
-
-        // If craft cost price is greater than npc price, and there is no ah/bz price, use craft cost instead
-        internalName.getNpcPriceOrNull()?.let { npcPrice ->
-            if (price == npcPrice) {
-                internalName.getRawCraftCostOrNull()?.let { rawCraftPrice ->
-                    if (rawCraftPrice > npcPrice) {
-                        price = rawCraftPrice
-                    }
-                }
-            }
-        }
-
-        val name = internalName.itemName
-        if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
-            list.add("§7Base item: $name")
-            return 0.0
-        }
-
-        list.add("§7Base item: $name ${price.formatWithBrackets()}")
-        return price
     }
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
@@ -814,34 +694,6 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-        ?: "no tag compound"
-
-    private fun ItemStack.readUnlockedSlots(): String? {
-        // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
-        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
-
-        // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
-//        if (unlockedSlots == "null") return 0.0
-
-        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return null
-
-        val internalName = getInternalName()
-        if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
-            ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for $name",
-                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
-                "internal name" to internalName,
-                "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to name,
-                "item nbt" to readNbtDump(),
-            )
-            return null
-        }
-
-        return unlockedSlots
-    }
-
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val unlockedSlots = stack.readUnlockedSlots() ?: return 0.0
 
@@ -881,6 +733,30 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun getTotalAndNames(
+        singleItems: List<NEUInternalName>,
+    ): Pair<Double, List<String>> {
+        return getTotalAndNames(singleItems.associateWith { 1 })
+    }
+
+    private fun getTotalAndNames(
+        items: Map<NEUInternalName, Number>,
+    ): Pair<Double, List<String>> {
+        var totalPrice = 0.0
+        val map = mutableMapOf<String, Double>()
+        for ((internalName, amount) in items) {
+            val price = internalName.getPriceOrNull()
+            if (price != null) {
+                totalPrice += price * amount.toDouble()
+                map[internalName.getPriceName(amount)] = price
+            } else {
+                val name = internalName.getNumberedName(amount)
+                map[" $name §cUnknown price!"] = Double.MAX_VALUE
+            }
+        }
+        return totalPrice to map.sortedDesc().keys.toList()
+    }
+
     private fun NEUInternalName.getPriceName(amount: Number): String {
         val price = getPrice() * amount.toDouble()
         if (this == SKYBLOCK_COIN) return " ${price.format()} coins"
@@ -891,6 +767,130 @@ object EstimatedItemValueCalculator {
     private fun NEUInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
         return "$prefix§r$itemName"
+    }
+
+    private fun Number.formatWithBrackets(gray: Boolean = false): String {
+        return "§7(" + format(gray) + "§7)"
+    }
+
+    private fun Number.format(gray: Boolean = false): String {
+        val color = if (gray) "§7" else "§6"
+        return color + shortFormat()
+    }
+
+    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getHelmetSkin() ?: return 0.0
+        return addCosmetic(internalName, list, "Skin", config.ignoreHelmetSkins)
+    }
+
+    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getArmorDye() ?: return 0.0
+        return addCosmetic(internalName, list, "Dye", config.ignoreArmorDyes)
+    }
+
+    private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
+        if (stack.getInternalName().isRune()) return 0.0
+        val internalName = stack.getRune() ?: return 0.0
+
+        return addCosmetic(internalName, list, "Rune", config.ignoreRunes)
+    }
+
+    private fun addCosmetic(
+        internalName: NEUInternalName,
+        list: MutableList<String>,
+        label: String,
+        shouldIgnorePrice: Property<Boolean>,
+    ): Double {
+        val price = internalName.getPrice()
+        val name = internalName.getNameOrRepoError()
+        val displayName = name ?: "§c${internalName.asString()}"
+        val gray = shouldIgnorePrice.get()
+
+        list.add("§7$label: $displayName " + price.formatWithBrackets(gray))
+        if (name == null) {
+            list.add("   §8(Not yet in NEU Repo)")
+        }
+
+        return if (shouldIgnorePrice.get()) 0.0 else price
+    }
+
+    private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
+
+        val enrichmentName = stack.getEnrichment() ?: return 0.0
+        val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".toInternalName()
+
+        val price = internalName.getPrice()
+        val name = internalName.itemName
+        list.add("§7Enrichment: $name ${price.formatWithBrackets()}")
+        return price
+    }
+
+    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
+
+    private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalName().removeKuudraTier()
+
+        stack.getAttributeFromShard()?.let {
+            val price = it.getAttributePrice()
+            if (price != null) {
+                val name = it.getAttributeName()
+                list.add("§7Base item: $name ${price.formatWithBrackets()}")
+                return price
+            }
+        }
+
+        var price = internalName.getPrice()
+        if (price == -1.0) {
+            price = 0.0
+        }
+
+        // If craft cost price is greater than npc price, and there is no ah/bz price, use craft cost instead
+        internalName.getNpcPriceOrNull()?.let { npcPrice ->
+            if (price == npcPrice) {
+                internalName.getRawCraftCostOrNull()?.let { rawCraftPrice ->
+                    if (rawCraftPrice > npcPrice) {
+                        price = rawCraftPrice
+                    }
+                }
+            }
+        }
+
+        val name = internalName.itemName
+        if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
+            list.add("§7Base item: $name")
+            return 0.0
+        }
+
+        list.add("§7Base item: $name ${price.formatWithBrackets()}")
+        return price
+    }
+
+    private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
+        ?: "no tag compound"
+
+    private fun ItemStack.readUnlockedSlots(): String? {
+        // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
+        val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
+
+        // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
+//        if (unlockedSlots == "null") return 0.0
+
+        if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return null
+
+        val internalName = getInternalName()
+        if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
+            ErrorManager.logErrorStateWithData(
+                "Could not find gemstone slot price for $name",
+                "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
+                "internal name" to internalName,
+                "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
+                "item name" to name,
+                "item nbt" to readNbtDump(),
+            )
+            return null
+        }
+
+        return unlockedSlots
     }
 
     private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
