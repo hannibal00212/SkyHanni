@@ -66,10 +66,11 @@ object PreciseGuessBurrow {
         val xFitter = PolynomialFitter(3)
         val yFitter = PolynomialFitter(3)
         val zFitter = PolynomialFitter(3)
-        for (i in 0 until particleLocations.size) {
-            xFitter.addPoint(i.toDouble(), particleLocations[i].x)
-            yFitter.addPoint(i.toDouble(), particleLocations[i].y)
-            zFitter.addPoint(i.toDouble(), particleLocations[i].z)
+        for ((index, location) in particleLocations.withIndex()) {
+            val x = index.toDouble()
+            xFitter.addPoint(x, location.x)
+            yFitter.addPoint(x, location.y)
+            zFitter.addPoint(x, location.z)
         }
 
         val coefficientsX = xFitter.fit()
