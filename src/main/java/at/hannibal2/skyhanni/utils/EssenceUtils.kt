@@ -154,6 +154,5 @@ object EssenceUtils {
                 put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
             }
         }
-    }.toMutableMap()
-
+    }
 }

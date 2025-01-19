@@ -589,7 +589,6 @@ object EstimatedItemValueCalculator {
 
     private fun getMapAndTotalFromExtra(
         extraList: List<NEUInternalName>,
-        amount: Int = 1
     ): Pair<Double, MutableMap<String, Double>> {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
@@ -597,7 +596,7 @@ object EstimatedItemValueCalculator {
             val price = internalName.getPriceOrNull() ?: continue
 
             totalPrice += price
-            map[internalName.getPriceName(amount)] = price
+            map[internalName.getPriceName(amount = 1)] = price
         }
         return totalPrice to map
     }
