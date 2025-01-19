@@ -61,6 +61,8 @@ open class TextInput {
     companion object {
         private var activeInstance: TextInput? = null
 
+        fun isActive() = activeInstance != null
+
         fun activate(instance: TextInput) {
             activeInstance = instance
             timeSinceKeyEvent = Keyboard.getEventNanoseconds()

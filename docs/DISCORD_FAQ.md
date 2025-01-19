@@ -32,7 +32,7 @@ _Frequently Asked Questions_
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
 > 2. If it does, enable the sack pickup chat message from Hypixel:
->  - Go to `Hypixel Settings --> Personal -> Chat Feedback` and enable `Sack Notifications`.
+>   - Go to `Hypixel Settings -> Personal -> Chat Feedback` and enable `Sack Notifications`.
 > 3. If you want the [Sacks] messages to be hidden, do `/sh sacks hider` and enable that.
 
 > **10: How do I remove SkyHanni GUI elements?**
@@ -42,17 +42,20 @@ _Frequently Asked Questions_
   
 > **11: How do I reset a SkyHanni tracker?**
 > 1. Do you want to **view only the current session**? 
->  - Open the inventory (Press E) and hover over the display. 
->  - Then click on `[This Session]`.
+>   - Open the inventory (Press E) and hover over the display. 
+>   - Then click on `[This Session]`.
 > 2. Do you want to **reset the current session**?
->  - Open the inventory (Press E) and hover over the display.
->  - Then click on `Reset Session!`.
-> 3. Do you want to **remove one specific item** from the tracker?
->  - Open the inventory (Press E) and hover over the display.
->  - Then shift-click on an item in the list to remove it.
-> 4. Do you want to reset the total stats of a tracker?
->  - To reset a tracker, use the in-game command `/shcommands <tracker type>`.
->  - Execute the obtained command to reset the tracker.
+>   - Open the inventory (Press E) and hover over the display.
+>   - Then click on `Reset Session!`.
+> 3. (**For Diana Trackers only**) Do you want to **view only the current mayor**?
+>   - Open the inventory (Press E) and hover over the display.
+>   - Then click on `[This Mayor]`.
+> 4. Do you want to **remove one specific item** from the tracker?
+>   - Open the inventory (Press E) and hover over the display.
+>   - Then shift-click on an item in the list to remove it.
+> 5. Do you want to reset the total stats of a tracker?
+>   - To reset a tracker, use the in-game command `/shcommands <tracker type>`.
+>   - Execute the obtained command to reset the tracker.
 
 > **12: Why can I still see the normal Scoreboard when using Custom Scoreboard?**
 > Most of the time, this is a mod conflict.
@@ -72,5 +75,5 @@ _Frequently Asked Questions_
 > If you are using [VolcAddons](https://github.com/zhenga8533/VolcAddons), disable Hide Far/Hide Close Entities.
 
 
-*This FAQ was last updated on November 24th, 2024.
+*This FAQ was last updated on January 18th, 2025.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

@@ -230,7 +230,7 @@ object SuperpairDataDisplay {
         val pairs = found.entries.firstOrNull { it.key == FoundType.PAIR }?.value ?: mutableListOf()
         val possiblePairs = calculatePossiblePairs(currentExperiment)
 
-        if (pairs.isNotEmpty()) add("§2Found")
+        if (pairs.isNotEmpty()) add("§2Collected")
         for (pair in pairs) {
             val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
             add(" $prefix §a${pair.first?.reward.orEmpty()}")
@@ -252,7 +252,7 @@ object SuperpairDataDisplay {
 
         if (toAdd.isNotEmpty()) {
             add("")
-            add("§4Not found")
+            add("§4Not collected")
         }
         for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
