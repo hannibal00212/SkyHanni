@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
@@ -123,6 +124,11 @@ object PreciseGuessBurrow {
         particleLocations.clear()
         lastDianaSpade = SimpleTimeMark.now()
         spadeUsePosition = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0F).toLorenzVec()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(71, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.PRECISE_GUESS
