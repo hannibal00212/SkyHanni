@@ -51,6 +51,8 @@ object PageScrolling {
 
     private val scroll = ScrollValue()
 
+//     currentlyScrollable is the primary check, to see if the player is currently able to scroll,
+//     with cooldown beeing a fallback to still allow for scrolling if currentlyScrollable is stuck
     private var currentlyScrollable = false
     private var cooldown = SimpleTimeMark.farPast()
 
