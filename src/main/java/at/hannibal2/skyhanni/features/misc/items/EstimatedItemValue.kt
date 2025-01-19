@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
@@ -67,8 +68,9 @@ object EstimatedItemValue {
         val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
         val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+        val inNeuOverlay = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
 
-        return inPv || inNeuTrade
+        return inPv || inNeuTrade || inNeuOverlay
     }
 
     fun onNeuDrawEquipment(stack: ItemStack) {
@@ -85,7 +87,20 @@ object EstimatedItemValue {
         if (renderedItems == 0) {
             updateItem(event.itemStack)
         }
+
+        // revert the offset of the neu storage overlay
+        neuStorageOffset?.let {
+            GlStateManager.translate(-it.first.toFloat(), -it.second.toFloat(), 0f)
+        }
+
+        // render the estimated item value above neu storage or pv
+        GlStateManager.translate(0f, 0f, 200f)
         tryRendering()
+        neuStorageOffset?.let {
+            GlStateManager.translate(it.first.toFloat(), it.second.toFloat(), 0f)
+        }
+        GlStateManager.translate(0f, 0f, -200f)
+
         renderedItems++
     }
 
@@ -130,6 +145,9 @@ object EstimatedItemValue {
             )
         }
     }
+
+    // guiLeft and guiTop values from the NEU storage overlay
+    var neuStorageOffset: Pair<Int, Int>? = null
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
