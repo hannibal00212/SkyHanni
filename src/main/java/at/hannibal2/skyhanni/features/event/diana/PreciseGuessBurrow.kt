@@ -89,11 +89,11 @@ object PreciseGuessBurrow {
 
         val guessPosition = LorenzVec(
             floor(coefficientsX[0] + coefficientsX[1] * t + coefficientsX[2] * t.pow(2) + coefficientsX[3] * t.pow(3)),
-            floor(coefficientsY[0] + coefficientsY[1] * t + coefficientsY[2] * t.pow(2) + coefficientsY[3] * t.pow(3) - 0.5),
+            floor(coefficientsY[0] + coefficientsY[1] * t + coefficientsY[2] * t.pow(2) + coefficientsY[3] * t.pow(3)),
             floor(coefficientsZ[0] + coefficientsZ[1] * t + coefficientsZ[2] * t.pow(2) + coefficientsZ[3] * t.pow(3)),
         )
 
-        BurrowGuessEvent(guessPosition).post()
+        BurrowGuessEvent(guessPosition.down(0.5)).post()
     }
 
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {
