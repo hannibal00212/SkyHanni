@@ -802,7 +802,7 @@ object EstimatedItemValueCalculator {
         shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
-        val name = internalName.getNameOrRepoError()
+        val name = internalName.getItemStackOrNull()?.itemName
         val displayName = name ?: "§c${internalName.asString()}"
         val gray = shouldIgnorePrice.get()
 
@@ -815,7 +815,6 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
-
         val enrichmentName = stack.getEnrichment() ?: return 0.0
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".toInternalName()
 
@@ -824,8 +823,6 @@ object EstimatedItemValueCalculator {
         list.add("§7Enrichment: $name ${price.formatWithBrackets()}")
         return price
     }
-
-    private fun NEUInternalName.getNameOrRepoError(): String? = getItemStackOrNull()?.itemName
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
