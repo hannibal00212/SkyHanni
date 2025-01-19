@@ -78,7 +78,6 @@ object PageScrolling {
         InventoryUtils.clickSlot(slot.slotNumber)
 
         currentlyScrollable = false
-        println("set currentlyScrollable to false")
         cooldown = 1.0.seconds.fromNow()
     }
 
@@ -86,7 +85,6 @@ object PageScrolling {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         currentlyScrollable = true
-        println("set currentlyScrollable to true")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable && InventoryUtils.inInventory()
