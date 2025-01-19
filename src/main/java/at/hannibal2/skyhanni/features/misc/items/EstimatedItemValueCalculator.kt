@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
@@ -731,11 +732,8 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
-        val enchantments = stack.getEnchantments() ?: return 0.0
+        val (totalPrice, names) = stack.getEnchantmentItems() ?: return 0.0
 
-        val internalName = stack.getInternalName()
-        val items = fetchEnchantmentItems(enchantments, internalName)
-        val (totalPrice, names) = getTotalAndNames(items)
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
         list.add("§7Enchantments: " + totalPrice.format())
@@ -752,11 +750,18 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
+        val enchantments = getEnchantments() ?: return null
+        val data = EstimatedItemValue.itemValueCalculationData ?: return null
+        val items = fetchEnchantmentItems(enchantments, getInternalName(), data)
+        return getTotalAndNames(items)
+    }
+
     private fun fetchEnchantmentItems(
         enchantments: Map<String, Int>,
         internalName: NEUInternalName,
+        data: ItemValueCalculationDataJson,
     ): Map<NEUInternalName, Int> {
-        val data = EstimatedItemValue.itemValueCalculationData ?: return emptyMap()
 
         val items = mutableMapOf<NEUInternalName, Int>()
         for ((rawName, rawLevel) in enchantments) {
