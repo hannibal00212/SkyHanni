@@ -468,12 +468,12 @@ object EstimatedItemValueCalculator {
             val essenceName = "ESSENCE_${it.essenceType}".toInternalName()
             val amount = it.essenceAmount
             val essencePrice = essenceName.getPrice() * amount
-            map["  §8${amount.addSeparators()}x ${essenceName.itemName} §7(§6${essencePrice.shortFormat()}§7)"] = essencePrice
+            map[essenceName.getPriceName(amount)] = essencePrice
             totalPrice += essencePrice
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
-            map["  §6${it.shortFormat()} coins"] = it.toDouble()
+            map[SKYBLOCK_COIN.getPriceName(it)] = it.toDouble()
             totalPrice += it
         }
 
@@ -766,15 +766,8 @@ object EstimatedItemValueCalculator {
             val enchantmentName = "$rawName;$level".toInternalName()
             val singlePrice = enchantmentName.getPriceOrNull() ?: continue
 
-            var name = enchantmentName.itemName
-            // TODO find a way to use this here "".toInternalName().getPriceName(multiplier)
-            if (multiplier > 1) {
-                name = "§8${multiplier}x $name"
-            }
             val price = singlePrice * multiplier
-            val format = price.shortFormat()
-
-            map[" $name §7(§6$format§7)"] = price
+            map[enchantmentName.getPriceName(multiplier)] = price
         }
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (map.isEmpty()) return 0.0
@@ -888,11 +881,11 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun NEUInternalName.getPriceName(amount: Int): String {
-        val price = getPrice() * amount
+    private fun NEUInternalName.getPriceName(amount: Number): String {
+        val price = getPrice() * amount.toDouble()
         if (this == SKYBLOCK_COIN) return " §6${price.shortFormat()} coins"
 
-        val prefix = if (amount == 1) "" else "§8${amount.addSeparators()}x "
+        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
         return " $prefix§r$itemName §7(§6${price.shortFormat()}§7)"
     }
 
