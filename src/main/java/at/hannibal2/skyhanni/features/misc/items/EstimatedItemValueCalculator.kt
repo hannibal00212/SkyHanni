@@ -295,22 +295,18 @@ object EstimatedItemValueCalculator {
     private fun addRecombobulator(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.isRecombobulated()) return 0.0
 
-        val price = RECOMBOBULATOR_3000.getPrice()
-        list.add("§7Recombobulated: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Recombobulated", RECOMBOBULATOR_3000)
     }
 
     private fun addJalapenoBook(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasJalapenoBook()) return 0.0
 
-        val price = JALAPENO_BOOK.getPrice()
-        list.add("§7Jalapeno Book: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Jalapeno Book", JALAPENO_BOOK)
     }
 
     private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasEtherwarp()) return 0.0
-
+        // TODO use list function
         val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
         list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
         return price
@@ -319,48 +315,42 @@ object EstimatedItemValueCalculator {
     private fun addWoodSingularity(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasWoodSingularity()) return 0.0
 
-        val price = WOOD_SINGULARITY.getPrice()
-        list.add("§7Wood Singularity: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Wood Singularity", WOOD_SINGULARITY)
     }
 
     private fun addDivanPowderCoating(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasDivanPowderCoating()) return 0.0
 
-        val price = DIVAN_POWDER_COATING.getPrice()
-        list.add("§7Divan Powder Coating: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Divan Powder Coating", DIVAN_POWDER_COATING)
     }
 
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
-        val price = MITHRIL_INFUSION.getPrice()
-        list.add("§7Mithril Infusion: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Mithril Infusion", MITHRIL_INFUSION)
     }
 
     private fun addArtOfWar(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfWar()) return 0.0
 
-        val price = ART_OF_WAR.getPrice()
-        list.add("§7The Art of War: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("The Art of War", ART_OF_WAR)
     }
 
     private fun addStatsBook(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasBookOfStats()) return 0.0
 
-        val price = BOOK_OF_STATS.getPrice()
-        list.add("§7Book of Stats: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving("Book of Stats", BOOK_OF_STATS)
     }
 
     // TODO untested
     private fun addArtOfPeace(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfPeace()) return 0.0
 
-        val price = ART_OF_PEACE.getPrice()
-        list.add("§7The Art Of Peace: §a§l✔ ${price.formatWithBrackets()}")
+        return list.formatHaving("The Art Of Peace", ART_OF_PEACE)
+    }
+
+    private fun MutableList<String>.formatHaving(label: String, internalName: NEUInternalName): Double {
+        val price = internalName.getPrice()
+        add("§7$label: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -625,10 +615,8 @@ object EstimatedItemValueCalculator {
     private fun addPowerScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getPowerScroll() ?: return 0.0
 
-        val price = internalName.getPrice()
         val name = internalName.itemNameWithoutColor
-        list.add("§7$name: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+        return list.formatHaving(name, internalName)
     }
 
     private fun Number.formatWithBrackets(): String {
