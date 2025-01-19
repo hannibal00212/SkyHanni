@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.intPow
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
@@ -759,29 +760,18 @@ object EstimatedItemValueCalculator {
             if (rawName == "replenish" && rawLevel == 1 && internalName in hasAlwaysReplenish) {
                 continue
             }
-
             var level = rawLevel
             var multiplier = 1
-            if (rawName in onlyTierOnePrices) {
 
-                when (rawLevel) {
-                    2 -> multiplier = 2
-                    3 -> multiplier = 4
-                    4 -> multiplier = 8
-                    5 -> multiplier = 16
+            when {
+                rawName in onlyTierOnePrices && rawLevel in 2..5 -> {
+                    multiplier = 2.intPow(rawLevel - 1)
+                    level = 1
                 }
-                level = 1
-            }
-            if (rawName in onlyTierFivePrices) {
-                when (rawLevel) {
-                    6 -> multiplier = 2
-                    7 -> multiplier = 4
-                    8 -> multiplier = 8
-                    9 -> multiplier = 16
-                    10 -> multiplier = 32
-                }
-                if (multiplier > 1) {
-                    level = 5
+
+                rawName in onlyTierFivePrices && rawLevel in 6..10 -> {
+                    multiplier = 2.intPow(rawLevel - 5)
+                    if (multiplier > 1) level = 5
                 }
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
