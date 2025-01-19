@@ -163,10 +163,10 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
         if (attributes.size != 2) return 0.0
-        val basePrice = internalName.getPriceOrNull(config.priceSource.get()) ?: 0.0
+        val basePrice = internalName.getPrice()
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
-        val comboPrice = combo.toInternalName().getPriceOrNull(config.priceSource.get())
+        val comboPrice = combo.toInternalName().getPriceOrNull()
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
@@ -224,7 +224,7 @@ object EstimatedItemValueCalculator {
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
         return intRange.mapNotNull { lowerLevel ->
-            "$attributeName;$lowerLevel".toInternalName().getPriceOrNull(config.priceSource.get())?.let {
+            "$attributeName;$lowerLevel".toInternalName().getPriceOrNull()?.let {
                 it / (1 shl lowerLevel) * (1 shl level).toDouble()
             }
         }.minOrNull()
@@ -593,7 +593,7 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
         for (internalName in drillUpgrades) {
             val name = internalName.itemName
-            val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
+            val price = internalName.getPriceOrNull() ?: continue
 
             val format = price.shortFormat()
             map[" $name §7(§6$format§7)"] = price
@@ -668,11 +668,9 @@ object EstimatedItemValueCalculator {
 
         val map = mutableMapOf<String, Double>()
         for (internalName in abilityScrolls) {
-            val name = internalName.itemName
-            val price = internalName.getPriceOrNull(config.priceSource.get()) ?: continue
+            val price = internalName.getPriceOrNull() ?: continue
 
-            val format = price.shortFormat()
-            map[" $name §7(§6$format§7)"] = price
+            map[internalName.getPriceName(amount = 1)] = price
         }
         val totalPrice = map.values.sum()
         if (map.isNotEmpty()) {
@@ -734,7 +732,7 @@ object EstimatedItemValueCalculator {
 
     private val hasAlwaysReplenish = listOf(
         "ADVANCED_GARDENING_HOE".toInternalName(),
-        "ADVANCED_GARDENING_AXE".toInternalName()
+        "ADVANCED_GARDENING_AXE".toInternalName(),
     )
 
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
@@ -792,7 +790,7 @@ object EstimatedItemValueCalculator {
             if (rawName in tieredEnchants) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
-            val singlePrice = enchantmentName.getPriceOrNull(config.priceSource.get()) ?: continue
+            val singlePrice = enchantmentName.getPriceOrNull() ?: continue
 
             var name = enchantmentName.itemName
             // TODO find a way to use this here "".toInternalName().getPriceName(multiplier)
@@ -924,7 +922,8 @@ object EstimatedItemValueCalculator {
         return " $prefix§r$itemName §7(§6${price.shortFormat()}§7)"
     }
 
-    private fun NEUInternalName.getPrice(): Double = getPriceOrNull(config.priceSource.get()) ?: 0.0
+    private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
+    private fun NEUInternalName.getPriceOrNull(): Double? = getPriceOrNull(config.priceSource.get())
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()

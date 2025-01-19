@@ -169,6 +169,13 @@ public class MiscConfig {
     @ConfigEditorBoolean
     public boolean crashOnDeath = false;
 
+    @Expose
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.")
+    @SearchTag("skyblockxp")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean skyblockXpBar = false;
+
     // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
