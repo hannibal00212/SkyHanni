@@ -71,6 +71,11 @@ object EstimatedItemValue {
         return inPv || inNeuTrade
     }
 
+    fun onNeuDrawEquipment(stack: ItemStack) {
+        renderedItems++
+        updateItem(stack)
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!config.enabled) return
