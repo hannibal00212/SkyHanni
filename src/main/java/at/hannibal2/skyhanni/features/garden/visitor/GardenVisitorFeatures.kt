@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -67,6 +68,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
@@ -225,8 +227,11 @@ object GardenVisitorFeatures {
                         } else {
                             if (internalName.isBazaarItem()) {
                                 BazaarApi.searchForBazaarItem(name, amount)
-                            } else {
+                            } else if (internalName.isAuctionHouseItem()) {
                                 HypixelCommands.auctionSearch(name.removeColor())
+                            } else {
+                                val itemName = internalName.itemName
+                                ChatUtils.chat("Could not find $itemName§e on AH or BZ!", replaceSameMessage = true)
                             }
                         }
                     },
@@ -645,7 +650,7 @@ object GardenVisitorFeatures {
 
         if (config.shoppingList.onlyWhenClose && !GardenAPI.onBarnPlot) return
 
-        if (!hideExtraGuis()) {
+        if (!hideExtraGuis() && shouldShowShoppingList()) {
             config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
     }
@@ -656,9 +661,19 @@ object GardenVisitorFeatures {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
 
-        if (showGui()) {
+        if (showGui() && shouldShowShoppingList()) {
             config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
+    }
+
+    private fun shouldShowShoppingList(): Boolean {
+        if (VisitorAPI.inInventory) return true
+        if (BazaarApi.inBazaarInventory) return true
+        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
+        val isInOwnInventory = currentScreen is GuiInventory
+        if (isInOwnInventory) return true
+
+        return false
     }
 
     private fun showGui(): Boolean {

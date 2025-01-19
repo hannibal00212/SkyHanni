@@ -63,6 +63,8 @@ object ItemPriceUtils {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull(priceSource, pastRecipes)
     }
 
+    fun NEUInternalName.isAuctionHouseItem(): Boolean = getLowestBinOrNull() != null
+
     private fun NEUInternalName.getLowestBinOrNull(): Double? {
         val result = if (PlatformUtils.isNeuLoaded()) {
             getNeuLowestBin(this)

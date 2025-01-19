@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -167,14 +167,15 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (!isEnabled() || event.clickType != ClickType.RIGHT_CLICK) return
+        if (!isEnabled(checkDistanceToExperimentationTable = false)) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         val internalName = item.getInternalName()
         if (!internalName.isExpBottle()) return
 
         lastSplashTime = SimpleTimeMark.now()
 
-        if (ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 15.0)) {
+        if (ExperimentationTableAPI.inDistanceToTable(15.0)) {
             tracker.modify {
                 it.startCost -= calculateBottlePrice(internalName)
             }
@@ -292,6 +293,8 @@ object ExperimentsProfitTracker {
 
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 5.0)
+    private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
+        IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
+            (!checkDistanceToExperimentationTable || ExperimentationTableAPI.inDistanceToTable(5.0))
+
 }
