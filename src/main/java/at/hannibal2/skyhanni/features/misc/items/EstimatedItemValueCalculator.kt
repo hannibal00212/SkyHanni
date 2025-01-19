@@ -726,11 +726,12 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         val internalName = stack.getInternalName()
+        val data = EstimatedItemValue.itemValueCalculationData ?: return 0.0
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
 
-            val isAlwaysActive = EstimatedItemValue.itemValueCalculationData?.alwaysActiveEnchants.orEmpty().entries.any {
+            val isAlwaysActive = data.alwaysActiveEnchants.entries.any {
                 it.key == rawName && it.value.level == rawLevel && it.value.internalNames.contains(internalName)
             }
             if (isAlwaysActive) continue
@@ -738,12 +739,12 @@ object EstimatedItemValueCalculator {
             var multiplier = 1
 
             when {
-                rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierOnePrices.orEmpty() && rawLevel in 2..5 -> {
+                rawName in data.onlyTierOnePrices && rawLevel in 2..5 -> {
                     multiplier = 2.intPow(rawLevel - 1)
                     level = 1
                 }
 
-                rawName in EstimatedItemValue.itemValueCalculationData?.onlyTierFivePrices.orEmpty() && rawLevel in 6..10 -> {
+                rawName in data.onlyTierFivePrices && rawLevel in 6..10 -> {
                     multiplier = 2.intPow(rawLevel - 5)
                     if (multiplier > 1) level = 5
                 }
