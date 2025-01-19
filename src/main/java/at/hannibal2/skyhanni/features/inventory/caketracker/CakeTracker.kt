@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -316,7 +317,7 @@ object CakeTracker {
             return if (!config.priceOnHover) Renderable.string(displayString)
             else Renderable.hoverTips(
                 displayString,
-                getPriceHoverTooltip(displayType, colorCode)
+                getPriceHoverTooltip(displayType, colorCode),
             )
         }
 
@@ -350,56 +351,52 @@ object CakeTracker {
         lastKnownCakeDataHash = 0
     }
 
-    private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
-            val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
+    private fun buildDisplayTypeToggle(): Renderable = Renderable.line {
+        val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
+        val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
 
-            add(
-                Renderable.optionalLink(
-                    "$ownedColor[Owned]",
-                    { setDisplayType(DisplayType.OWNED_CAKES) },
-                    condition = { config.displayType != DisplayType.OWNED_CAKES },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$missingColor[Missing]",
-                    { setDisplayType(DisplayType.MISSING_CAKES) },
-                    condition = { config.displayType != DisplayType.MISSING_CAKES },
-                ),
-            )
-        },
-    )
+        add(
+            Renderable.optionalLink(
+                "$ownedColor[Owned]",
+                { setDisplayType(DisplayType.OWNED_CAKES) },
+                condition = { config.displayType != DisplayType.OWNED_CAKES },
+            ),
+        )
+        addString(" ")
+        add(
+            Renderable.optionalLink(
+                "$missingColor[Missing]",
+                { setDisplayType(DisplayType.MISSING_CAKES) },
+                condition = { config.displayType != DisplayType.MISSING_CAKES },
+            ),
+        )
+    }
 
     private fun setDisplayOrderType(type: DisplayOrder) {
         config.displayOrderType = type
         lastKnownCakeDataHash = 0
     }
 
-    private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
-            val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
+    private fun buildOrderTypeToggle(): Renderable = Renderable.line {
+        val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
+        val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
 
-            add(
-                Renderable.optionalLink(
-                    "$newestColor[Newest First]",
-                    { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$oldestColor[Oldest First]",
-                    { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
-                ),
-            )
-        },
-    )
+        add(
+            Renderable.optionalLink(
+                "$newestColor[Newest First]",
+                { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
+                condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
+            ),
+        )
+        addString(" ")
+        add(
+            Renderable.optionalLink(
+                "$oldestColor[Oldest First]",
+                { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
+                condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
+            ),
+        )
+    }
 
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
@@ -446,8 +443,8 @@ object CakeTracker {
                 getCakeRanges(cakeList, config.displayOrderType, config.displayType),
                 height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
-                showScrollableTipsInList = true
-            )
+                showScrollableTipsInList = true,
+            ),
         )
     }
 

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntitySkull
-import net.minecraftforge.common.util.Constants
 
 object BlockUtils {
 
@@ -19,9 +19,7 @@ object BlockUtils {
 
     fun getTextureFromSkull(position: LorenzVec?): String? {
         val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
-        val serializeNBT = entity.serializeNBT()
-        return serializeNBT.getCompoundTag("Owner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
     }
 
     fun IBlockState.isBabyCrop(): Boolean {
