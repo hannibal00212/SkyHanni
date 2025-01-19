@@ -13,7 +13,11 @@ object ScoreboardEventGarden : ScoreboardEvent() {
 
     override val configLine = "§7(All Garden Lines)"
 
-    override val elementPatterns = listOf(ScoreboardPattern.pastingPattern, ScoreboardPattern.cleanUpPattern)
+    override val elementPatterns = listOf(
+        ScoreboardPattern.lockedPattern,
+        ScoreboardPattern.pastingPattern,
+        ScoreboardPattern.cleanUpPattern,
+    )
 
     override fun showIsland() = GardenAPI.inGarden()
 }
