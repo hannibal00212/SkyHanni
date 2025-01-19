@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
@@ -600,7 +601,7 @@ object EstimatedItemValueCalculator {
                 map[internalName.getPriceName(amount)] = price
             } else {
                 val name = internalName.getNumberedName(amount)
-                map[" $name §cUnknwon price!"] = Double.MAX_VALUE
+                map[" $name §cUnknown price!"] = Double.MAX_VALUE
             }
         }
         return totalPrice to map.sortedDesc().keys.toList()
@@ -794,7 +795,9 @@ object EstimatedItemValueCalculator {
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
-            items[enchantmentName] = multiplier
+            if (enchantmentName.isBazaarItem()) {
+                items[enchantmentName] = multiplier
+            }
         }
         return items
     }
