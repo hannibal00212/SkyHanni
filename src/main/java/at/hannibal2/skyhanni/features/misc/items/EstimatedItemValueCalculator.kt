@@ -306,10 +306,13 @@ object EstimatedItemValueCalculator {
 
     private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasEtherwarp()) return 0.0
-        // TODO use list function
-        val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
-        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
-        return price
+
+        val (totalPrice, names) = getTotalAndNames(listOf(ETHERWARP_CONDUIT, ETHERWARP_MERGER))
+        if (names.isNotEmpty()) {
+            list.add("§7Etherwarp §e" + totalPrice.shortFormat())
+            list += names
+        }
+        return totalPrice
     }
 
     private fun addWoodSingularity(stack: ItemStack, list: MutableList<String>): Double {
@@ -604,10 +607,10 @@ object EstimatedItemValueCalculator {
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
-        val (totalPrice, items) = getTotalAndNames(drillUpgrades)
-        if (items.isNotEmpty()) {
+        val (totalPrice, b) = getTotalAndNames(drillUpgrades)
+        if (b.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
-            list += items
+            list += b
         }
         return totalPrice
     }
