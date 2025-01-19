@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.PolynomialFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -22,7 +23,6 @@ import net.minecraft.util.EnumParticleTypes
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -63,35 +63,24 @@ object PreciseGuessBurrow {
         // A Degree n polynomial can be solved with n+1 unique points
         // The Bézier curve used is a degree 3, so four points are needed to solve
         if (particleLocations.size <= 3) return
-        val xFitter = PolynomialFitter(3)
-        val yFitter = PolynomialFitter(3)
-        val zFitter = PolynomialFitter(3)
+        val fitters = arrayOf(PolynomialFitter(3), PolynomialFitter(3), PolynomialFitter(3))
         for ((index, location) in particleLocations.withIndex()) {
             val x = index.toDouble()
-            xFitter.addPoint(x, location.x)
-            yFitter.addPoint(x, location.y)
-            zFitter.addPoint(x, location.z)
+            val locationArray = location.toDoubleArray()
+            for ((i, fitter) in fitters.withIndex()) {
+                fitter.addPoint(x, locationArray[i])
+            }
         }
 
-        val coefficientsX = xFitter.fit()
-        val coefficientsY = yFitter.fit()
-        val coefficientsZ = zFitter.fit()
+        val coefficients = fitters.map { it.fit() }
+        val startPointDerivative = coefficients.map { it[1] }.toLorenzVec()
 
-        val startPointDerivative = LorenzVec(
-            coefficientsX[1],
-            coefficientsY[1],
-            coefficientsZ[1],
-        )
         // How far away from the first point the control point is
         val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
 
         val t = 3 * controlPointDistance / startPointDerivative.length()
 
-        val guessPosition = LorenzVec(
-            floor(coefficientsX[0] + coefficientsX[1] * t + coefficientsX[2] * t.pow(2) + coefficientsX[3] * t.pow(3)),
-            floor(coefficientsY[0] + coefficientsY[1] * t + coefficientsY[2] * t.pow(2) + coefficientsY[3] * t.pow(3)),
-            floor(coefficientsZ[0] + coefficientsZ[1] * t + coefficientsZ[2] * t.pow(2) + coefficientsZ[3] * t.pow(3)),
-        )
+        val guessPosition = coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) }.toLorenzVec()
 
         BurrowGuessEvent(guessPosition.down(0.5)).post()
     }

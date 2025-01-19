@@ -223,6 +223,12 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
+        fun List<Double>.toLorenzVec(): LorenzVec {
+            if (size !=  3) error("Can not transform a list of size $size to LorenzVec")
+
+            return LorenzVec(this[0], this[1], this[2])
+        }
+
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
 
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
