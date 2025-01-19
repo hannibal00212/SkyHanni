@@ -170,11 +170,17 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nBest used with the option below.")
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean skyblockXpBar = false;
+
+    @Expose
+    @ConfigOption(name = "Xp in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpInInventory = true;
 
     // TODO move into scoreboard accordion
     @Expose

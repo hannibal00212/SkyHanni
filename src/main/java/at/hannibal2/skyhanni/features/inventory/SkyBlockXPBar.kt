@@ -13,7 +13,7 @@ object SkyBlockXPBar {
     private val config get() = SkyHanniMod.feature.misc
 
     @SubscribeEvent
-    fun onRenderScoreboard(event: RenderGameOverlayEvent.Pre) {
+    fun onRenderExperienceBar(event: RenderGameOverlayEvent.Pre) {
         if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         val (level, xp) = SkyBlockXPAPI.levelXpPair ?: return
