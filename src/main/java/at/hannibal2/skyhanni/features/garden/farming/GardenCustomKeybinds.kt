@@ -191,13 +191,22 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.keyBindEnabled", "garden.keyBind.enabled")
-        event.move(3, "garden.keyBindAttack", "garden.keyBind.attack")
-        event.move(3, "garden.keyBindUseItem", "garden.keyBind.useItem")
-        event.move(3, "garden.keyBindLeft", "garden.keyBind.left")
-        event.move(3, "garden.keyBindRight", "garden.keyBind.right")
-        event.move(3, "garden.keyBindForward", "garden.keyBind.forward")
-        event.move(3, "garden.keyBindBack", "garden.keyBind.back")
-        event.move(3, "garden.keyBindJump", "garden.keyBind.jump")
-        event.move(3, "garden.keyBindSneak", "garden.keyBind.sneak")
+        event.move(3, "garden.keyBindAttack", "garden.keyBind.layout1.attack")
+        event.move(3, "garden.keyBindUseItem", "garden.keyBind.layout1.useItem")
+        event.move(3, "garden.keyBindLeft", "garden.keyBind.layout1.left")
+        event.move(3, "garden.keyBindRight", "garden.keyBind.layout1.right")
+        event.move(3, "garden.keyBindForward", "garden.keyBind.layout1.forward")
+        event.move(3, "garden.keyBindBack", "garden.keyBind.layout1.back")
+        event.move(3, "garden.keyBindJump", "garden.keyBind.layout1.jump")
+        event.move(3, "garden.keyBindSneak", "garden.keyBind.layout1.sneak")
+
+        event.move(71, "garden.keyBind.attack", "garden.keyBind.layout1.attack")
+        event.move(71, "garden.keyBind.useItem", "garden.keyBind.layout1.useItem")
+        event.move(71, "garden.keyBind.left", "garden.keyBind.layout1.left")
+        event.move(71, "garden.keyBind.right", "garden.keyBind.layout1.right")
+        event.move(71, "garden.keyBind.forward", "garden.keyBind.layout1.forward")
+        event.move(71, "garden.keyBind.back", "garden.keyBind.layout1.back")
+        event.move(71, "garden.keyBind.jump", "garden.keyBind.layout1.jump")
+        event.move(71, "garden.keyBind.sneak", "garden.keyBind.layout1.sneak")
     }
 }
