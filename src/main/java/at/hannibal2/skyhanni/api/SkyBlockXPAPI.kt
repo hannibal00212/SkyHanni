@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -39,6 +40,27 @@ object SkyBlockXPAPI {
         }
 
     private fun Int.toLevelXpPair() = this / 100 to this % 100
+
+    private val levelColors = mapOf(
+        0..39 to LorenzColor.GRAY,
+        40..79 to LorenzColor.WHITE,
+        80..119 to LorenzColor.YELLOW,
+        120..159 to LorenzColor.GREEN,
+        160..199 to LorenzColor.DARK_GREEN,
+        200..239 to LorenzColor.AQUA,
+        240..279 to LorenzColor.DARK_AQUA,
+        280..319 to LorenzColor.BLUE,
+        320..359 to LorenzColor.LIGHT_PURPLE,
+        360..399 to LorenzColor.DARK_PURPLE,
+        400..439 to LorenzColor.GOLD,
+        440..479 to LorenzColor.RED,
+        480..Int.MAX_VALUE to LorenzColor.DARK_RED,
+    )
+
+
+    fun getLevelColor(): LorenzColor = levelXpPair?.let { getLevelColor(it.first) } ?: LorenzColor.BLACK
+
+    fun getLevelColor(level: Int): LorenzColor = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
