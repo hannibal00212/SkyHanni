@@ -626,7 +626,7 @@ object EstimatedItemValueCalculator {
         return "§7(" + format(gray) + "§7)"
     }
 
-    fun Number.format(gray: Boolean = false): String {
+    private fun Number.format(gray: Boolean = false): String {
         val color = if (gray) "§7" else "§6"
         return color + shortFormat()
     }
@@ -903,6 +903,7 @@ object EstimatedItemValueCalculator {
     private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
     private fun NEUInternalName.getPriceOrNull(): Double? = getPriceOrNull(config.priceSource.get())
 
+    // TODO create attribute class and use this instead of pair, sync with getAttributeFromShard()
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
         return "§b$name $second Shard"
