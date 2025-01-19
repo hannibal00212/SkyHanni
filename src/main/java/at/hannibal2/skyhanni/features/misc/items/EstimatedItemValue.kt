@@ -68,9 +68,9 @@ object EstimatedItemValue {
         val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
         val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
-        val inNeuOverlay = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
+        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
 
-        return inPv || inNeuTrade || inNeuOverlay
+        return inPv || inNeuTrade || inStorage
     }
 
     fun onNeuDrawEquipment(stack: ItemStack) {
@@ -87,18 +87,13 @@ object EstimatedItemValue {
         if (renderedItems == 0) {
             updateItem(event.itemStack)
         }
+        val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
+        // we use renderInNeuStorageOverlay() for this
+        if (inStorage) return
 
-        // revert the offset of the neu storage overlay
-        neuStorageOffset?.let {
-            GlStateManager.translate(-it.first.toFloat(), -it.second.toFloat(), 0f)
-        }
-
-        // render the estimated item value above neu storage or pv
+        // render the estimated item value over NEU PV
         GlStateManager.translate(0f, 0f, 200f)
         tryRendering()
-        neuStorageOffset?.let {
-            GlStateManager.translate(it.first.toFloat(), it.second.toFloat(), 0f)
-        }
         GlStateManager.translate(0f, 0f, -200f)
 
         renderedItems++
@@ -145,9 +140,6 @@ object EstimatedItemValue {
             )
         }
     }
-
-    // guiLeft and guiTop values from the NEU storage overlay
-    var neuStorageOffset: Pair<Int, Int>? = null
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -289,5 +281,15 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+    }
+
+    fun renderInNeuStorageOverlay() {
+        if (!config.enabled) return
+
+        // render the estimated item value over NEU Storage
+        GlStateManager.translate(0f, 0f, 200f)
+        tryRendering()
+        GlStateManager.translate(0f, 0f, -200f)
+        renderedItems++
     }
 }
