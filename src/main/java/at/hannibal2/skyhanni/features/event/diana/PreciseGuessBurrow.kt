@@ -7,18 +7,17 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PolynomialFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.apache.commons.math4.legacy.fitting.PolynomialCurveFitter
-import org.apache.commons.math4.legacy.fitting.WeightedObservedPoints
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -36,23 +35,22 @@ object PreciseGuessBurrow {
     private var guessPoint: LorenzVec? = null
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
+        if (!isEnabled()) return
         guessPoint = null
         particleLocations.clear()
     }
-    @SubscribeEvent
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onReceiveParticle(event: PacketReceivedEvent) {
         if (!isEnabled()) return
-        val type = event.type
+        if (event.packet !is S2APacketParticles) return
+        val packet: S2APacketParticles = event.packet
+        val type = packet.particleType
         if (type != EnumParticleTypes.DRIP_LAVA) return
-        val currLoc = event.location
+        val currLoc = packet.toLorenzVec()
         if (lastDianaSpade.passedSince() > 3.seconds) return
         if (particleLocations.isEmpty()) {
-            var run = false
             // First particle spawns exactly 1 block away from the player
-            spadeUsePosition?.let {
-                run = it.distance(currLoc) < 1.1555
-            } ?: return
-            if (!run) return
+            if ((spadeUsePosition?.distance(currLoc) ?: 10.0) > 1.1555) return
             particleLocations.add(currLoc)
             return
         }
@@ -62,26 +60,24 @@ object PreciseGuessBurrow {
         // A Degree n polynomial can be solved with n+1 unique points
         // The Bézier curve used is a degree 3, so four points are needed to solve
         if (particleLocations.size <= 3) return
-        val observedXPoints = WeightedObservedPoints()
-        val observedYPoints = WeightedObservedPoints()
-        val observedZPoints = WeightedObservedPoints()
+        val xFitter = PolynomialFitter(3)
+        val yFitter = PolynomialFitter(3)
+        val zFitter = PolynomialFitter(3)
         for (i in 0 until particleLocations.size) {
-            observedXPoints.add(i.toDouble(), particleLocations[i].x)
-            observedYPoints.add(i.toDouble(), particleLocations[i].y)
-            observedZPoints.add(i.toDouble(), particleLocations[i].z)
+            xFitter.addPoint(i.toDouble(), particleLocations[i].x)
+            yFitter.addPoint(i.toDouble(), particleLocations[i].y)
+            zFitter.addPoint(i.toDouble(), particleLocations[i].z)
         }
-        val fitter = PolynomialCurveFitter.create(3)
 
-        val coefficientsX = fitter.fit(observedXPoints.toList())
-        val coefficientsY = fitter.fit(observedYPoints.toList())
-        val coefficientsZ = fitter.fit(observedZPoints.toList())
+        val coefficientsX = xFitter.fit()
+        val coefficientsY = yFitter.fit()
+        val coefficientsZ = zFitter.fit()
 
         val startPointDerivative = LorenzVec(
             coefficientsX[1],
             coefficientsY[1],
             coefficientsZ[1]
         )
-
         // How far away from the first point the control point is
         val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
 
@@ -120,6 +116,7 @@ object PreciseGuessBurrow {
     private var spadeUsePosition: LorenzVec? = null
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onUseAbility(event: ItemClickEvent) {
+        if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
