@@ -243,8 +243,8 @@ object EstimatedItemValueCalculator {
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
-        list.add(" §7Stone: $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
-        list.add(" §7Apply cost: (§6" + applyCost.shortFormat() + "§7)")
+        list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatWithBrackets()}")
+        list.add(" §7Apply cost: ${applyCost.formatWithBrackets()}")
         return reforgeStonePrice + applyCost
     }
 
@@ -295,7 +295,7 @@ object EstimatedItemValueCalculator {
         if (!stack.isRecombobulated()) return 0.0
 
         val price = RECOMBOBULATOR_3000.getPrice()
-        list.add("§7Recombobulated: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Recombobulated: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -303,7 +303,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasJalapenoBook()) return 0.0
 
         val price = JALAPENO_BOOK.getPrice()
-        list.add("§7Jalapeno Book: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Jalapeno Book: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -311,7 +311,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasEtherwarp()) return 0.0
 
         val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
-        list.add("§7Etherwarp: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -319,7 +319,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasWoodSingularity()) return 0.0
 
         val price = WOOD_SINGULARITY.getPrice()
-        list.add("§7Wood Singularity: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Wood Singularity: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -327,14 +327,14 @@ object EstimatedItemValueCalculator {
         if (!stack.hasDivanPowderCoating()) return 0.0
 
         val price = DIVAN_POWDER_COATING.getPrice()
-        list.add("§7Divan Powder Coating: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Divan Powder Coating: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
     private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         val price = MITHRIL_INFUSION.getPrice()
-        list.add("§7Mithril Infusion: §a§l✔ §7(§6${price.shortFormat()}§7)")
+        list.add("§7Mithril Infusion: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -342,7 +342,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasArtOfWar()) return 0.0
 
         val price = ART_OF_WAR.getPrice()
-        list.add("§7The Art of War: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7The Art of War: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -350,7 +350,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasBookOfStats()) return 0.0
 
         val price = BOOK_OF_STATS.getPrice()
-        list.add("§7Book of Stats: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Book of Stats: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -359,7 +359,7 @@ object EstimatedItemValueCalculator {
         if (!stack.hasArtOfPeace()) return 0.0
 
         val price = ART_OF_PEACE.getPrice()
-        list.add("§7The Art Of Peace: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7The Art Of Peace: §a§l✔ ${price.formatWithBrackets()}")
         return price
     }
 
@@ -379,12 +379,12 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
 
         val hpbPrice = HOT_POTATO_BOOK.getPrice() * hpb
-        list.add("§7HPB's: §e$hpb§7/§e10 §7(§6" + hpbPrice.shortFormat() + "§7)")
+        list.add("§7HPB's: §e$hpb§7/§e10 ${hpbPrice.formatWithBrackets()}")
         totalPrice += hpbPrice
 
         if (fuming > 0) {
             val fumingPrice = FUMING_POTATO_BOOK.getPrice() * fuming
-            list.add("§7Fuming: §e$fuming§7/§e5 §7(§6" + fumingPrice.shortFormat() + "§7)")
+            list.add("§7Fuming: §e$fuming§7/§e5 ${fumingPrice.formatWithBrackets()}")
             totalPrice += fumingPrice
         }
 
@@ -395,7 +395,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getFarmingForDummiesCount() ?: return 0.0
 
         val price = FARMING_FOR_DUMMIES.getPrice() * count
-        list.add("§7Farming for Dummies: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Farming for Dummies: §e$count§7/§e5 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -403,7 +403,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getPolarvoidBookCount() ?: return 0.0
 
         val price = POLARVOID_BOOK.getPrice() * count
-        list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Polarvoid: §e$count§7/§e5 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -411,7 +411,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getAppliedPocketSackInASack() ?: return 0.0
 
         val price = POCKET_SACK_IN_A_SACK.getPrice() * count
-        list.add("§7Pocket Sack-in-a-Sack: §e$count§7/§e3 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Pocket Sack-in-a-Sack: §e$count§7/§e3 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -419,7 +419,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getBookwormBookCount() ?: return 0.0
 
         val price = BOOKWORM_BOOK.getPrice() * count
-        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -430,7 +430,7 @@ object EstimatedItemValueCalculator {
         val maxTier = if (internalName == STONK_PICKAXE) 4 else 5
 
         val price = SILEX.getPrice() * tier
-        list.add("§7Silex: §e$tier§7/§e$maxTier §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Silex: §e$tier§7/§e$maxTier ${price.formatWithBrackets()}")
         return price
     }
 
@@ -438,7 +438,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getTransmissionTunerCount() ?: return 0.0
 
         val price = TRANSMISSION_TUNER.getPrice() * count
-        list.add("§7Transmission Tuners: §e$count§7/§e4 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Transmission Tuners: §e$count§7/§e4 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -446,7 +446,7 @@ object EstimatedItemValueCalculator {
         val count = stack.getManaDisintegrators() ?: return 0.0
 
         val price = MANA_DISINTEGRATOR.getPrice() * count
-        list.add("§7Mana Disintegrators: §e$count§7/§e10 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Mana Disintegrators: §e$count§7/§e10 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -478,7 +478,7 @@ object EstimatedItemValueCalculator {
         }
         val (totalPrice, names) = getTotalAndNames(items)
 
-        list.add("§7Stars: §e$havingStars§7/§e$maxStars §7(§6" + totalPrice.shortFormat() + "§7)")
+        list.add("§7Stars: §e$havingStars§7/§e$maxStars ${totalPrice.formatWithBrackets()}")
         val starMaterialCap: Int = config.starMaterialCap.get()
         list.addAll(names.take(starMaterialCap))
         return totalPrice
@@ -578,7 +578,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        list.add("§7Master Stars: §e$masterStars§7/§e5 §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Master Stars: §e$masterStars§7/§e5 ${price.formatWithBrackets()}")
         return price
     }
 
@@ -622,8 +622,12 @@ object EstimatedItemValueCalculator {
 
         val price = internalName.getPrice()
         val name = internalName.itemNameWithoutColor
-        list.add("§7$name: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7$name: §a§l✔ ${price.formatWithBrackets()}")
         return price
+    }
+
+    private fun Number.formatWithBrackets(): String {
+        return "§7(§6" + this.shortFormat() + "§7)"
     }
 
     private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
@@ -661,7 +665,7 @@ object EstimatedItemValueCalculator {
 
         val price = internalName.getPrice()
         val name = internalName.itemName
-        list.add("§7Enrichment: $name §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Enrichment: $name ${price.formatWithBrackets()}")
         return price
     }
 
@@ -692,7 +696,7 @@ object EstimatedItemValueCalculator {
             val price = it.getAttributePrice()
             if (price != null) {
                 val name = it.getAttributeName()
-                list.add("§7Base item: $name §7(§6" + price.shortFormat() + "§7)")
+                list.add("§7Base item: $name ${price.formatWithBrackets()}")
                 return price
             }
         }
@@ -719,7 +723,7 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
 
-        list.add("§7Base item: $name §7(§6" + price.shortFormat() + "§7)")
+        list.add("§7Base item: $name ${price.formatWithBrackets()}")
         return price
     }
 
@@ -884,7 +888,7 @@ object EstimatedItemValueCalculator {
         val price = getPrice() * amount.toDouble()
         if (this == SKYBLOCK_COIN) return " §6${price.shortFormat()} coins"
 
-        return " ${getNumberedName(amount)} §7(§6${price.shortFormat()}§7)"
+        return " ${getNumberedName(amount)} ${price.formatWithBrackets()}"
     }
 
     private fun NEUInternalName.getNumberedName(amount: Number): String {
