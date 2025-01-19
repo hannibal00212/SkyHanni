@@ -462,30 +462,25 @@ object EstimatedItemValueCalculator {
         val (price, stars) = calculateStarPrice(internalName, totalStars) ?: return 0.0
         val (havingStars, maxStars) = stars
 
-        var totalPrice = 0.0
-        val map = mutableMapOf<String, Double>()
+        val items = mutableMapOf<NEUInternalName, Long>()
         price.essencePrice.let {
             val essenceName = "ESSENCE_${it.essenceType}".toInternalName()
             val amount = it.essenceAmount
-            val essencePrice = essenceName.getPrice() * amount
-            map[essenceName.getPriceName(amount)] = essencePrice
-            totalPrice += essencePrice
+            items[essenceName] = amount.toLong()
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
-            map[SKYBLOCK_COIN.getPriceName(it)] = it.toDouble()
-            totalPrice += it
+            items[SKYBLOCK_COIN] = it
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
-            val itemPrice = materialInternalName.getPrice()
-            map[materialInternalName.getPriceName(amount)] = itemPrice
-            totalPrice += itemPrice
+            items[materialInternalName] = amount.toLong()
         }
+        val (totalPrice, names) = getTotalAndNames(items)
 
         list.add("§7Stars: §e$havingStars§7/§e$maxStars §7(§6" + totalPrice.shortFormat() + "§7)")
         val starMaterialCap: Int = config.starMaterialCap.get()
-        list.addAll(map.sortedDesc().keys.take(starMaterialCap))
+        list.addAll(names.take(starMaterialCap))
         return totalPrice
     }
 
@@ -587,28 +582,33 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun getMapAndTotalFromExtra(
-        extraList: List<NEUInternalName>,
-    ): Pair<Double, MutableMap<String, Double>> {
-        var totalPrice = 0.0
-        val map = mutableMapOf<String, Double>()
-        for (internalName in extraList) {
-            val price = internalName.getPriceOrNull() ?: continue
-
-            totalPrice += price
-            map[internalName.getPriceName(amount = 1)] = price
-        }
-        return totalPrice to map
+    private fun getTotalAndNames(
+        singleItems: List<NEUInternalName>,
+    ): Pair<Double, List<String>> {
+        return getTotalAndNames(singleItems.associateWith { 1 })
     }
 
+    private fun getTotalAndNames(
+        items: Map<NEUInternalName, Number>,
+    ): Pair<Double, List<String>> {
+        var totalPrice = 0.0
+        val map = mutableMapOf<String, Double>()
+        for ((internalName, amount) in items) {
+            val price = internalName.getPriceOrNull() ?: continue
+
+            totalPrice += price * amount.toDouble()
+            map[internalName.getPriceName(amount)] = price
+        }
+        return totalPrice to map.sortedDesc().keys.toList()
+    }
 
     private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
-        val (totalPrice, map) = getMapAndTotalFromExtra(drillUpgrades)
-        if (map.isNotEmpty()) {
+        val (totalPrice, items) = getTotalAndNames(drillUpgrades)
+        if (items.isNotEmpty()) {
             list.add("§7Drill upgrades: §6" + totalPrice.shortFormat())
-            list += map.sortedDesc().keys
+            list += items
         }
         return totalPrice
     }
@@ -673,10 +673,10 @@ object EstimatedItemValueCalculator {
     private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
-        val (totalPrice, map) = getMapAndTotalFromExtra(abilityScrolls)
-        if (map.isNotEmpty()) {
+        val (totalPrice, items) = getTotalAndNames(abilityScrolls)
+        if (items.isNotEmpty()) {
             list.add("§7Ability Scrolls: §6" + totalPrice.shortFormat())
-            list += map.sortedDesc().keys
+            list += items
         }
         return totalPrice
     }
@@ -722,9 +722,8 @@ object EstimatedItemValueCalculator {
     private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
         val enchantments = stack.getEnchantments() ?: return 0.0
 
-        val map = mutableMapOf<String, Double>()
-
         val internalName = stack.getInternalName()
+        val items = mutableMapOf<NEUInternalName, Int>()
         for ((rawName, rawLevel) in enchantments) {
             // efficiency 1-5 is cheap, 6-10 is handled by silex
             if (rawName == "efficiency") continue
@@ -764,23 +763,21 @@ object EstimatedItemValueCalculator {
             if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
 
             val enchantmentName = "$rawName;$level".toInternalName()
-            val singlePrice = enchantmentName.getPriceOrNull() ?: continue
 
-            val price = singlePrice * multiplier
-            map[enchantmentName.getPriceName(multiplier)] = price
+            items[enchantmentName] = multiplier
         }
+        val (totalPrice, names) = getTotalAndNames(items)
         val enchantmentsCap: Int = config.enchantmentsCap.get()
-        if (map.isEmpty()) return 0.0
-        val totalPrice = map.values.sum()
+        if (names.isEmpty()) return 0.0
         list.add("§7Enchantments: §6" + totalPrice.shortFormat())
         var i = 0
-        for (entry in map.sortedDesc().keys) {
+        for (name in names) {
             if (i == enchantmentsCap) {
-                val missing = map.size - enchantmentsCap
+                val missing = names.size - enchantmentsCap
                 list.add(" §7§o$missing more enchantments..")
                 break
             }
-            list.add(entry)
+            list.add(name)
             i++
         }
         return totalPrice
@@ -789,22 +786,17 @@ object EstimatedItemValueCalculator {
     private fun addGemstones(stack: ItemStack, list: MutableList<String>): Double {
         val gemstones = stack.getGemstones() ?: return 0.0
 
-        val counterMap = mutableMapOf<NEUInternalName, Int>()
+        val items = mutableMapOf<NEUInternalName, Int>()
         for (gemstone in gemstones) {
             val internalName = gemstone.getInternalName()
-            val old = counterMap[internalName] ?: 0
-            counterMap[internalName] = old + 1
+            val old = items[internalName] ?: 0
+            items[internalName] = old + 1
         }
 
-        val priceMap = mutableMapOf<String, Double>()
-        for ((internalName, amount) in counterMap) {
-            val text = internalName.getPriceName(amount)
-            priceMap[text] = internalName.getPrice() * amount
-        }
-        val totalPrice = priceMap.values.sum()
-        if (priceMap.isNotEmpty()) {
+        val (totalPrice, names) = getTotalAndNames(items)
+        if (names.isNotEmpty()) {
             list.add("§7Gemstones Applied: §6" + totalPrice.shortFormat())
-            list += priceMap.sortedDesc().keys
+            list += names
         }
         return totalPrice
     }
@@ -840,7 +832,7 @@ object EstimatedItemValueCalculator {
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val unlockedSlots = stack.readUnlockedSlots() ?: return 0.0
 
-        val materials = mutableMapOf<NEUInternalName, Int>()
+        val items = mutableMapOf<NEUInternalName, Int>()
         val slots = EstimatedItemValue.gemstoneUnlockCosts[stack.getInternalName()] ?: return 0.0
         val slotNames = mutableListOf<String>()
         for ((key, value) in slots) {
@@ -849,7 +841,7 @@ object EstimatedItemValueCalculator {
             for (ingredients in value) {
                 val ingredient = PrimitiveIngredient(ingredients)
                 val amount = ingredient.count.toInt()
-                materials.addOrPut(ingredient.internalName, amount)
+                items.addOrPut(ingredient.internalName, amount)
             }
 
             val splitSlot = key.split("_") // eg. SAPPHIRE_1
@@ -865,15 +857,10 @@ object EstimatedItemValueCalculator {
 
         if (slotNames.isEmpty()) return 0.0
 
-        val priceMap = mutableMapOf<String, Double>()
-        for ((material, amount) in materials) {
-            val price = material.getPrice() * amount
-            priceMap[material.getPriceName(amount)] = price
-        }
-        val totalPrice = priceMap.values.sum()
+        val (totalPrice, names) = getTotalAndNames(items)
         list.add("§7Gemstone Slot Unlock Cost: §6" + totalPrice.shortFormat())
 
-        list += priceMap.sortedDesc().keys
+        list += names
 
         // TODO add toggle that is default enabled "show unlocked gemstone slot name
         list.add(" §7Unlocked slots: " + slotNames.joinToString("§7, "))
