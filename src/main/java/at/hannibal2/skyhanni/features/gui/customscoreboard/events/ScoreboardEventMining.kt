@@ -84,7 +84,6 @@ object ScoreboardEventMining : ScoreboardEvent() {
         ScoreboardPattern.remainingGoblinPattern,
         ScoreboardPattern.fortunateFreezingBonusPattern,
         ScoreboardPattern.fossilDustPattern,
-        ScoreboardPattern.powderGreedyPattern,
         ScoreboardPattern.raffleUselessPattern,
         ScoreboardPattern.mithrilUselessPattern,
         ScoreboardPattern.goblinUselessPattern,

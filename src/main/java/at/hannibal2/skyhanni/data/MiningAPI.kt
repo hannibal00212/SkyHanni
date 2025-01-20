@@ -192,12 +192,10 @@ object MiningAPI {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!inCustomMiningIsland()) return
+        if (!inColdIsland()) return
 
         dungeonRoomPattern.firstMatcher(event.added) {
             mineshaftRoomId = group("roomId")
-        } ?: run {
-            mineshaftRoomId = null
         }
 
         val newCold = coldPattern.firstMatcher(event.added) {
@@ -372,6 +370,8 @@ object MiningAPI {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
+
+        mineshaftRoomId = null
     }
 
     private fun runEvent() {
