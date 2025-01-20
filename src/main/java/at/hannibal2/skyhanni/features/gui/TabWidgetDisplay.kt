@@ -19,7 +19,7 @@ import java.util.regex.Pattern
 enum class TabWidgetDisplay(
     private val configName: String?,
     vararg val widgets: TabWidget,
-    var expectedLinePattern: Pattern? = null,
+    var expectedLinePattern: Pattern? = null, // Todo: Remove when TabWidget data is no longer bad
 ) {
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
@@ -66,6 +66,7 @@ enum class TabWidgetDisplay(
         private val config get() = SkyHanniMod.feature.gui.tabWidget
         private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
+        // Todo: Remove when TabWidget data is no longer bad
         // <editor-fold desc="Patterns">
         /**
          * REGEX-TEST: §6§lBestiary:
@@ -94,6 +95,7 @@ enum class TabWidgetDisplay(
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->
                         subWidget.lines.filter { line ->
+                            // Todo: Remove when TabWidget data is no longer bad
                             widget.expectedLinePattern?.matches(line) ?: true
                         }
                     },
