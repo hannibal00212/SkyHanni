@@ -699,6 +699,9 @@ class ProfileSpecificStorage {
     }
 
     @Expose
+    var totalSkyBlockXP: Int? = null
+
+    @Expose
     var draconicSacrificeTracker: DraconicSacrificeTracker.Data = DraconicSacrificeTracker.Data()
 
     @Expose
@@ -755,6 +758,5 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    @Suppress("PropertyWrapping")
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
 }

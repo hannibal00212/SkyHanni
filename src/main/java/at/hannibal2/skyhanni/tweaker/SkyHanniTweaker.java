@@ -12,10 +12,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class SkyHanniTweaker implements ITweaker {
 
-    public SkyHanniTweaker() {
-        DownloadSourceChecker.init();
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
