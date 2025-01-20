@@ -224,7 +224,7 @@ data class LorenzVec(
         }
 
         fun List<Double>.toLorenzVec(): LorenzVec {
-            if (size !=  3) error("Can not transform a list of size $size to LorenzVec")
+            if (size != 3) error("Can not transform a list of size $size to LorenzVec")
 
             return LorenzVec(this[0], this[1], this[2])
         }
