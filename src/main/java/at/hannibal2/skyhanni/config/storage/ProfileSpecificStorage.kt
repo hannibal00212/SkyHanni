@@ -755,7 +755,7 @@ class ProfileSpecificStorage {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
-                @Expose var strays: Int = 0,
+                @Expose var strays: Int = 0
             ) {
                 fun getByIndex(index: Int): Int = when (index) {
                     0 -> uniques
