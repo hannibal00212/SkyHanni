@@ -333,7 +333,7 @@ object HoppityEventSummary {
 
     private fun checkStatsTypeCountInit() {
         val stats = getYearStats() ?: return
-        for (i in 1..3) {
+        for (i in 0..2) {
             if (stats.typeCountSnapshot.getByIndex(i) != 0) return
         }
         stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()

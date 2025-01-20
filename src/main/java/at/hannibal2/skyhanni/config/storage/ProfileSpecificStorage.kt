@@ -756,7 +756,14 @@ class ProfileSpecificStorage {
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
                 @Expose var strays: Int = 0
-            )
+            ) {
+                fun getByIndex(index: Int): Int = when (index) {
+                    0 -> uniques
+                    1 -> dupes
+                    2 -> strays
+                    else -> throw IllegalArgumentException("Invalid index: $index")
+                }
+            }
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }

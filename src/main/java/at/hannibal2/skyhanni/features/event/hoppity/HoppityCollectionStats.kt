@@ -627,7 +627,7 @@ object HoppityCollectionStats {
         return newList
     }
 
-    fun getTypeCountSnapshot(): ProfileSpecificStorage.HoppityEventStats.RabbitData {
+    fun getTypeCountSnapshot(): ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData {
         val (uniqueCount, duplicateCount) = RabbitCollectionRarity.entries.sumOfPair(
             selector = { rarity ->
                 val foundOfRarity = loggedRabbits.filterKeys {
@@ -640,7 +640,7 @@ object HoppityCollectionStats {
             resultConverter = Double::toInt
         )
 
-        return ProfileSpecificStorage.HoppityEventStats.RabbitData(
+        return ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData(
             uniques = uniqueCount,
             dupes = duplicateCount,
             strays = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0,
