@@ -59,7 +59,6 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import kotlin.time.Duration
 
-
 class ProfileSpecificStorage {
     @Expose
     var currentPet: String = ""
