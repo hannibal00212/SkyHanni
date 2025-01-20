@@ -118,7 +118,7 @@ object EnchantedClockHelper {
                         color = LorenzColor.valueOf(it.color),
                         displaySlot = it.displaySlot,
                         statusSlot = it.statusSlot,
-                        cooldown = it.cooldownHours.hours,
+                        cooldown = (it.cooldownHours.takeIf { cdh -> cdh > 0 } ?: 48).hours
                     )
                 }
             }
@@ -158,8 +158,8 @@ object EnchantedClockHelper {
         for ((type, status) in storage.filter { !it.value.warned }) {
             val inConfig = config.reminderBoosts.contains(type)
             val isProperState = status.state == State.CHARGING
-            val inFuture = status.availableAt?.isInFuture() == true
-            if (!inConfig || !isProperState || inFuture) continue
+            val inPast = status.availableAt?.isInPast() ?: false
+            if (!inConfig || !isProperState || !inPast) continue
 
             val complexType = BoostType.bySimpleBoostType(type) ?: continue
 
