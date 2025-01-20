@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -103,10 +102,9 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
-    // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
         val internalName = hypixelId.replace(':', '-')
-        return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+        return internalName.toInternalName().takeIf { it.getItemStackOrNull() != null }
     }
 
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
