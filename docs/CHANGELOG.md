@@ -102,7 +102,7 @@
 + Fixed missing label on Partyfinder ItemStack. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3219)
 + Fixed showing minion upgrade helper outside the minion menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3223)
 + Fixed Estimated Item Value for Wither Blades with Ultimate Wither Scroll. - Luna (https://github.com/hannibal002/SkyHanni/pull/3227)
-+ Fixed Experimentation Table Tracker appearing on other islands at correct coordinates. - hannibal (https://github.com/hannibal002/SkyHanni/pull/3239)
++ Fixed Experimentation Table Tracker appearing on other islands at correct coordinates. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3239)
 + Fixed Experimentation Table Tracker not detecting Exp Bottles thrown over 5 blocks away. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3239)
     + Limited Experimentation Table Tracker checks to within 15 blocks around the table.
 + Fixed some items not rendering in personal compactor/deletor overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3243)

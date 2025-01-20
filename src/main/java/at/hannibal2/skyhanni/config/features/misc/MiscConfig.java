@@ -170,7 +170,7 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.")
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
