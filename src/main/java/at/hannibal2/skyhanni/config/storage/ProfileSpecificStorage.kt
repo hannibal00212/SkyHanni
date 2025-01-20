@@ -57,7 +57,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
@@ -766,9 +765,6 @@ class ProfileSpecificStorage {
         @Expose
         var page: Int? = null
     }
-
-    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> =
-        EnumMap(EnchantedClockHelper.SimpleBoostType::class.java)
 
     @Suppress("PropertyWrapping")
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
