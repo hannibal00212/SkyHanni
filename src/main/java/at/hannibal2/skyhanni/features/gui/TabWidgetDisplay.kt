@@ -73,6 +73,7 @@ enum class TabWidgetDisplay(
          * REGEX-TEST:  §r§6Golden Ghoul 13§r§f: §r§b2,409/3,000
          * REGEX-TEST:  Old Wolf 10§r§f: §r§b332/600
          * REGEX-TEST:  Wolf 7§r§f: §r§b834/1,400
+         * REGEX-FAIL: §8[§d326§8] §boBlazin §6✿
          */
         private val bestiaryLinePattern by patternGroup.pattern(
             "lines.bestiary",
