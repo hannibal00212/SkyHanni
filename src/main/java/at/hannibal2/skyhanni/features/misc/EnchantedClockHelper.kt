@@ -28,6 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EnchantedClockHelper {
@@ -70,10 +71,12 @@ object EnchantedClockHelper {
 
     /**
      * REGEX-TEST: §7§cOn cooldown: 20 hours
+     * REGEX-TEST: §7§cOn cooldown: 41 minutes
+     * REGEX-TEST: §7§cOn cooldown: 0 minutes
      */
     private val cooldownLorePattern by patternGroup.pattern(
         "inventory.cooldown",
-        "(?:§.)*On cooldown: (?<hours>\\d+) hours?",
+        "(?:§.)*On cooldown: (?<count>[\\d,]+) (?<type>[A-Za-z]+?)s?\\b",
     )
     // </editor-fold>
 
@@ -212,6 +215,7 @@ object EnchantedClockHelper {
             val timeAlreadyExact = storage[simpleType]?.exactTime == true
             if (boostType == null || simpleType == null || currentBoostState == null || timeAlreadyExact) continue
 
+            var exactUpdate = false
             val parsedCooldown: SimpleTimeMark? = when (currentBoostState) {
                 State.READY, State.PROBLEM -> {
                     storage[simpleType]?.availableAt = SimpleTimeMark.now()
@@ -219,19 +223,18 @@ object EnchantedClockHelper {
                 }
 
                 else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
-                    group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
+                    val count = group("count").toInt()
+                    val type = group("type")
+                    if (type == "minute") exactUpdate = true
+                    SimpleTimeMark.now() + when (type) {
+                        "hour" -> count.hours
+                        "minute" -> count.minutes
+                        else -> 0.seconds
+                    }
                 }
             }
 
-            // Because the times provided by the clock UI is inaccurate (we only get hour count)
-            //  We only want to set it if the current time is horribly incorrect.
-            storage[simpleType]?.availableAt?.let { existing ->
-                parsedCooldown?.let { parsed ->
-                    if (existing.absoluteDifference(parsed) < 2.hours) return
-                }
-            }
-
-            storage[simpleType] = Status(currentBoostState, parsedCooldown)
+            storage[simpleType] = Status(currentBoostState, parsedCooldown, exactTime = exactUpdate)
         }
     }
 
