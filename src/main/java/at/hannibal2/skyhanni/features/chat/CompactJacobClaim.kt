@@ -56,6 +56,7 @@ object CompactJacobClaim {
      * REGEX-TEST:     §r§7§81x §9Turbo-Pumpkin I Book
      * REGEX-TEST:     §r§7§84x §9Turbo-Wheat I Book
      * REGEX-TEST:     §r§7§86x §9Turbo-Mushrooms I Book
+     * REGEX-TEST:     §r§7§81x §9Turbo-Warts I Book
      */
     private val bookPattern by patternGroup.pattern(
         "book",

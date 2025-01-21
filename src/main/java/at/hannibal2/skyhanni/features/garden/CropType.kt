@@ -16,7 +16,7 @@ enum class CropType(
     val simpleName: String,
     val farmingItem: FarmingItems,
     val replenish: Boolean = false,
-    val enchantName: String = simpleName
+    val enchantName: String = cropName.lowercase()
 ) {
 
     WHEAT(
@@ -33,7 +33,8 @@ enum class CropType(
     ),
     NETHER_WART(
         "Nether Wart", "THEORETICAL_HOE_WARTS", "FERMENTO", 2.5,
-        { ItemStack(Items.nether_wart) }, "wart", FarmingItems.NETHER_WART, replenish = true
+        { ItemStack(Items.nether_wart) }, "wart", FarmingItems.NETHER_WART, replenish = true,
+        enchantName = "warts"
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -50,7 +51,7 @@ enum class CropType(
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
-        { ItemStack(Items.reeds) }, "cane", FarmingItems.SUGAR_CANE
+        { ItemStack(Items.reeds) }, "cane", FarmingItems.SUGAR_CANE, enchantName = "cane"
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
@@ -79,7 +80,8 @@ enum class CropType(
             if (itemName == "Seeds") return WHEAT
             return entries.firstOrNull {
                 it.cropName.equals(itemName, ignoreCase = true) ||
-                    it.simpleName.equals(itemName, ignoreCase = true)
+                    it.simpleName.equals(itemName, ignoreCase = true) ||
+                    it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
 
@@ -101,14 +103,6 @@ enum class CropType(
             }
         }
 
-        fun CropType.getTurboCrop(): String {
-            return when (this) {
-                COCOA_BEANS -> "turbo_coco"
-                SUGAR_CANE -> "turbo_cane"
-                NETHER_WART -> "turbo_warts"
-                MUSHROOM -> "turbo_mushrooms"
-                else -> "turbo_${this.cropName.lowercase()}"
-            }
-        }
+        fun CropType.getTurboCrop() = "turbo_${this.enchantName.lowercase()}"
     }
 }
