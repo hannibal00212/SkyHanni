@@ -183,7 +183,7 @@ object EnchantedClockHelper {
         val boostType = BoostType.byUsageStringOrNull(usageString) ?: return
         val simpleType = boostType.toSimple() ?: return
         val storage = storage ?: return
-        storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow())
+        storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow(), exactTime = true)
     }
 
     private fun ItemStack.getTypePair(): Pair<BoostType?, SimpleBoostType?> {
@@ -209,7 +209,8 @@ object EnchantedClockHelper {
         for ((_, stack) in statusStacks) {
             val (boostType, simpleType) = stack.getTypePair()
             val currentBoostState = stack.getBoostState()
-            if (boostType == null || simpleType == null || currentBoostState == null) continue
+            val timeAlreadyExact = storage[simpleType]?.exactTime == true
+            if (boostType == null || simpleType == null || currentBoostState == null || timeAlreadyExact) continue
 
             val parsedCooldown: SimpleTimeMark? = when (currentBoostState) {
                 State.READY, State.PROBLEM -> {
@@ -235,9 +236,10 @@ object EnchantedClockHelper {
     }
 
     class Status(
-        @field:Expose var state: State,
-        @field:Expose var availableAt: SimpleTimeMark?,
-        @field:Expose var warned: Boolean = false,
+        @Expose var state: State,
+        @Expose var availableAt: SimpleTimeMark?,
+        @Expose var exactTime: Boolean = false,
+        @Expose var warned: Boolean = false,
     ) {
         override fun toString(): String = "Status(state=$state, availableAt=$availableAt, warned=$warned)"
     }
