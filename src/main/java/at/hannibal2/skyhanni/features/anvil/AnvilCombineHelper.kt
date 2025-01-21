@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
-import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,12 +29,16 @@ object AnvilCombineHelper {
 
         val matchLore = mutableListOf<String>()
 
-        for ((slot, stack) in chest.getUpperItems()) {
-            if (slot.slotNumber == 29) {
-                val lore = stack.getLore()
-                matchLore.addAll(lore)
-                break
-            }
+        val leftStack = chest.getSlot(29)?.stack
+        val rightStack = chest.getSlot(33)?.stack
+
+        // don't highlight if both slots have items
+        if (leftStack != null && rightStack != null) return
+
+        if (leftStack != null) {
+            matchLore.addAll(leftStack.getLore())
+        } else if (rightStack != null) {
+            matchLore.addAll(rightStack.getLore())
         }
 
         if (matchLore.isEmpty()) return
