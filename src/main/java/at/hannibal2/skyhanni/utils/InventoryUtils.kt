@@ -164,7 +164,7 @@ object InventoryUtils {
         Minecraft.getMinecraft().currentScreen = null
     }
 
-    fun Collection<Slot>.highlightAll(color: Any) =
+    infix fun Collection<Slot>.highlightAll(color: Any) =
         when (color) {
             is LorenzColor -> forEach { it.highlight(color) }
             is Color -> forEach { it.highlight(color) }

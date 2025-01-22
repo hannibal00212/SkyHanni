@@ -134,11 +134,11 @@ object BestiaryData {
 
         items.filter {
             it.slotNumber in greenHighlights
-        }.highlightAll(LorenzColor.GREEN)
+        } highlightAll LorenzColor.GREEN
 
         items.filter {
             it.slotNumber in redHighlights
-        }.highlightAll(LorenzColor.RED)
+        } highlightAll LorenzColor.RED
     }
 
     @HandleEvent

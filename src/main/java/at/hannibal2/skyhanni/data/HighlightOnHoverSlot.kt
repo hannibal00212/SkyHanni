@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
 @SkyHanniModule
 object HighlightOnHoverSlot {
@@ -31,6 +29,6 @@ object HighlightOnHoverSlot {
 
         InventoryUtils.getItemsInOpenChest().filter {
             it.slotNumber in list
-        }.highlightAll(LorenzColor.GREEN)
+        } highlightAll LorenzColor.GREEN
     }
 }

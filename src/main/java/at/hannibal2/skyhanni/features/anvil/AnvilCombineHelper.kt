@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
 @SkyHanniModule
 object AnvilCombineHelper {
@@ -51,6 +50,6 @@ object AnvilCombineHelper {
 
         InventoryUtils.getItemsInOpenChest().filter {
             it.slotNumber in highlightSlots
-        }.highlightAll(LorenzColor.GREEN)
+        } highlightAll LorenzColor.GREEN
     }
 }
