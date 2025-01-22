@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
 private val patternGroup = RepoPattern.group("skyblockguide.highlight")
@@ -30,7 +29,7 @@ class SkyblockGuideHighlightFeature private constructor(
     inventory: RepoPattern,
     loreCondition: RepoPattern,
     private val onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-    private val onTooltip: (LorenzToolTipEvent) -> Unit = {},
+    private val onTooltip: (ToolTipEvent) -> Unit = {},
 ) {
 
     private val inventoryPattern by inventory
@@ -42,13 +41,13 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp") inventory: String,
         @Language("RegExp") loreCondition: String,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-        onTooltip: (LorenzToolTipEvent) -> Unit = {},
+        onTooltip: (ToolTipEvent) -> Unit = {},
     ) : this(
         config,
         patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
         patternGroup.pattern("$key.$KEY_PREFIX_CONDITION", loreCondition),
         onSlotClicked,
-        onTooltip
+        onTooltip,
     )
 
     private constructor(
@@ -57,13 +56,13 @@ class SkyblockGuideHighlightFeature private constructor(
         @Language("RegExp") inventory: String,
         loreCondition: RepoPattern,
         onSlotClicked: (GuiContainerEvent.SlotClickEvent) -> Unit = {},
-        onTooltip: (LorenzToolTipEvent) -> Unit = {},
+        onTooltip: (ToolTipEvent) -> Unit = {},
     ) : this(
         config,
         patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
         loreCondition,
         onSlotClicked,
-        onTooltip
+        onTooltip,
     )
 
     init {
@@ -108,8 +107,8 @@ class SkyblockGuideHighlightFeature private constructor(
                 .forEach { it highlight LorenzColor.RED }
         }
 
-        @SubscribeEvent
-        fun onTooltip(event: LorenzToolTipEvent) {
+        @HandleEvent
+        fun onTooltip(event: ToolTipEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
             if (!missing.contains(event.slot.slotNumber)) return
@@ -142,7 +141,7 @@ class SkyblockGuideHighlightFeature private constructor(
         private val categoryProgressPattern =
             patternGroup.pattern(
                 "$KEY_PREFIX_CONDITION.category",
-                "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
+                "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%",
             )
 
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
@@ -152,7 +151,7 @@ class SkyblockGuideHighlightFeature private constructor(
             }
         }
 
-        private val openWikiTooltip: (LorenzToolTipEvent) -> Unit = { event ->
+        private val openWikiTooltip: (ToolTipEvent) -> Unit = { event ->
             event.toolTip.add("")
             event.toolTip.add("§7§eClick to view on the SkyBlock Wiki!")
         }
@@ -162,16 +161,16 @@ class SkyblockGuideHighlightFeature private constructor(
                 { SkyHanniMod.feature.inventory.highlightMissingSkyBlockLevelGuide },
                 "level.guide",
                 ".*Guide ➜.*",
-                xPattern
+                xPattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.abiphoneGuide },
                 "abiphone",
                 "Miscellaneous ➜ Abiphone Contac",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.oneTimeCompletion }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern
+                { skyblockGuideConfig.oneTimeCompletion }, "bank", "Core ➜ Bank Upgrades", taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.storyGuide },
@@ -180,56 +179,56 @@ class SkyblockGuideHighlightFeature private constructor(
                 taskOnlyCompleteOncePattern,
                 // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
                 { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") },
-                openWikiTooltip
+                openWikiTooltip,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "spooky",
                 "Event ➜ Spooky Festival",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "belt",
                 "Miscellaneous ➜ The Dojo",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.jacobGuide },
                 "jacob",
                 "Event ➜ Jacob's Farming Contest",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "slaying",
                 "Slaying ➜ .*",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.storyGuide }, "story", "Story ➜ Complete Objectives", taskOnlyCompleteOncePattern
+                { skyblockGuideConfig.storyGuide }, "story", "Story ➜ Complete Objectives", taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "pet.rock",
                 "Mining ➜ Rock Milestones",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "pet.dolphin",
                 "Fishing ➜ Dolphin Milestones",
-                taskOnlyCompleteOncePattern
+                taskOnlyCompleteOncePattern,
             )
             SkyblockGuideHighlightFeature({ skyblockGuideConfig.essenceGuide }, "essence", "Essence Shop ➜.*", xPattern)
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.minionGuide },
                 "minion",
                 "Crafted Minions",
-                "§c ?✖.*|§7You haven't crafted this minion."
+                "§c ?✖.*|§7You haven't crafted this minion.",
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.storyGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern
+                { skyblockGuideConfig.storyGuide }, "harp", "Miscellaneous ➜ Harp Songs", xPattern,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.consumableGuide },
@@ -237,29 +236,29 @@ class SkyblockGuideHighlightFeature private constructor(
                 "Miscellaneous ➜ Consumable Items",
                 "§7§eThis task can be completed \\d+ times!",
                 openWikiOnClick,
-                openWikiTooltip
+                openWikiTooltip,
             )
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.oneTimeCompletion },
                 "dungeon.floor",
                 "Complete Dungeons ➜.*",
-                "§7§eThis task can only be completed once!|§7§7You have not unlocked the content"
+                "§7§eThis task can only be completed once!|§7§7You have not unlocked the content",
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.oneTimeCompletion }, "dungeon.layers", "Dungeon ➜ Complete Dungeons", xPattern
+                { skyblockGuideConfig.oneTimeCompletion }, "dungeon.layers", "Dungeon ➜ Complete Dungeons", xPattern,
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.menuGuide }, "tasks", "Tasks ➜ .*", totalProgressPattern
+                { skyblockGuideConfig.menuGuide }, "tasks", "Tasks ➜ .*", totalProgressPattern,
             )
             SkyblockGuideHighlightFeature(
-                { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern
+                { skyblockGuideConfig.menuGuide }, "tasks.skill", "Skill Related Tasks", categoryProgressPattern,
             )
             @Suppress("MaxLineLength")
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.collectionGuide },
                 "collections",
                 "\\w+ Collections|Collections",
-                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*"
+                "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*",
             )
         }
     }
