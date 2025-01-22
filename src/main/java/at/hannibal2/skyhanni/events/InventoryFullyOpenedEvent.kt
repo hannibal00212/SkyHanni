@@ -41,3 +41,5 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
+
+class InventoryHashChangedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
