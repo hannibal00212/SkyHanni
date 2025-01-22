@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryHashChangedEvent
+import at.hannibal2.skyhanni.events.InventoryHashUpdatedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -82,7 +82,7 @@ object OtherInventoryData {
 
     private fun recheckHash(inventory: Inventory) {
         if (inventory.itemHash == inventory.items.hashCode()) return
-        lateEvents.add(InventoryHashChangedEvent(inventory))
+        lateEvents.add(InventoryHashUpdatedEvent(inventory))
     }
 
     private fun done(inventory: Inventory) {

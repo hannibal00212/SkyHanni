@@ -42,4 +42,4 @@ class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : Inven
 
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
-class InventoryHashChangedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
+class InventoryHashUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
