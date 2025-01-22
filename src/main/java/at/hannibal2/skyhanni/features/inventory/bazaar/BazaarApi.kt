@@ -164,6 +164,7 @@ object BazaarApi {
         }
 
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
+        if (event.inventoryName.endsWith(" ➜ Instant Buy")) return true
         return when (event.inventoryName) {
             "How many do you want?" -> true
             "How much do you want to pay?" -> true
