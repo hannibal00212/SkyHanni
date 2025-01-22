@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 enum class HoppityEggType(
     val mealName: String,
@@ -46,10 +48,15 @@ enum class HoppityEggType(
     private val nextSpawn: SimpleTimeMark get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
         ?: calculateNextSpawn()
 
+    private fun spawnsToday(): Boolean {
+        val sbTimeNow = SkyBlockTime.now()
+        return altDay == sbTimeNow.isAlternateDay()
+    }
+
     private fun calculateNextSpawn(): SimpleTimeMark {
         if (resetsAt == -1) return SimpleTimeMark.farFuture()
         val sbTimeNow = SkyBlockTime.now()
-        val isEggDayToday = altDay == sbTimeNow.isAlternateDay()
+        val isEggDayToday = spawnsToday()
 
         val daysToAdd = when {
             isEggDayToday && sbTimeNow.hour < resetsAt -> 0
@@ -118,6 +125,22 @@ enum class HoppityEggType(
                 val lastFound = findMap[meal] ?: continue
                 if (mark.isInPast()) meal.markSpawned()
                 else if (lastFound.passedSince() <= 40.minutes) meal.markClaimed(lastFound)
+            }
+        }
+
+        // This is a backup in case the chat messages change, or more commonly
+        // if a user is on an island where eggs don't spawn
+        @HandleEvent
+        fun onSecondPassed(event: SecondPassedEvent) {
+            if (!HoppityAPI.isHoppityEvent()) return
+            val mealLastSpawn = profileStorage?.mealLastFound ?: return
+            val sbTimeNow = SkyBlockTime.now()
+            resettingEntries.filter {
+                it.claimed && it.spawnsToday() && sbTimeNow.hour >= it.resetsAt &&
+                    (mealLastSpawn[it]?.passedSince() ?: 0.seconds) > 39.minutes
+            }.forEach {
+                it.markSpawned()
+                profileStorage?.mealLastSpawn?.set(it, sbTimeNow.asTimeMark())
             }
         }
 
