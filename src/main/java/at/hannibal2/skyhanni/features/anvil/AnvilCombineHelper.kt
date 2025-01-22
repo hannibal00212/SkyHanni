@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 object AnvilCombineHelper {
 
     private var lastInventoryHash = 0
-    private var highlightSlots = mutableListOf<Int>()
+    private var highlightSlots = setOf<Int>()
 
     @HandleEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
@@ -29,11 +29,11 @@ object AnvilCombineHelper {
 
         val leftStack = event.inventoryItems[29]
         val rightStack = event.inventoryItems[33]
-        val stackLore = leftStack?.getLore()?.takeIfNotEmpty() ?: rightStack?.getLore()?.takeIfNotEmpty() ?: return
+        val stackInternalName = leftStack?.getInternalNameOrNull() ?: rightStack?.getInternalNameOrNull() ?: return
 
         highlightSlots = event.inventoryItems.filterKeys { it in 27..54 }.filter {
-            it.value.getLore() == stackLore
-        }.keys.toMutableList()
+            it.value.getInternalNameOrNull() == stackInternalName
+        }.keys
     }
 
     private fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper && LorenzUtils.inSkyBlock
@@ -42,18 +42,15 @@ object AnvilCombineHelper {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         lastInventoryHash = 0
-        highlightSlots.clear()
+        highlightSlots = emptySet()
     }
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        val filteredSlots = InventoryUtils.getItemsInOpenChest().filter {
+        InventoryUtils.getItemsInOpenChest().filter {
             it.slotNumber in highlightSlots
-        }
-        for (slot in filteredSlots) {
-            slot highlight LorenzColor.GREEN
-        }
+        }.highlightAll(LorenzColor.GREEN)
     }
 }

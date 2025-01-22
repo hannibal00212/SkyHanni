@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -15,6 +16,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.12
 //$$ import net.minecraft.inventory.ClickType
@@ -161,4 +163,11 @@ object InventoryUtils {
     fun closeInventory() {
         Minecraft.getMinecraft().currentScreen = null
     }
+
+    fun Collection<Slot>.highlightAll(color: Any) =
+        when (color) {
+            is LorenzColor -> forEach { it.highlight(color) }
+            is Color -> forEach { it.highlight(color) }
+            else -> throw IllegalArgumentException("Unsupported color type: $color")
+        }
 }

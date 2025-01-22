@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -105,7 +106,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             event.gui.inventorySlots.inventorySlots
                 .filter { missing.contains(it.slotNumber) }
-                .forEach { it highlight LorenzColor.RED }
+                .highlightAll(LorenzColor.RED)
         }
 
         @SubscribeEvent

@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,7 +28,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -101,18 +102,43 @@ object BestiaryData {
         }
     }
 
+    private const val OVERALL_PROGRESS_STRING = "§7Overall Progress: §b100% §7(§c§lMAX!§7)"
+    private const val FAMILIES_COMPLETED_STRING = "§7Families Completed: §a100%"
+    private const val OVERALL_PROGRESS_HIDDEN_STRING = "§7Overall Progress: §cHIDDEN"
+
+    private var greenHighlights: Set<Int> = setOf()
+    private var redHighlights: Set<Int> = setOf()
+    private var lastInventoryHash = 0
+
+    @HandleEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!isEnabled() || !inInventory) return
+        val inventoryHash = event.inventoryItems.hashCode()
+        if (inventoryHash == lastInventoryHash) return
+        lastInventoryHash = inventoryHash
+        val items = InventoryUtils.getItemsInOpenChest()
+
+        greenHighlights = items.filter { slot ->
+            slot.stack.getLore().any { it == OVERALL_PROGRESS_STRING || it == FAMILIES_COMPLETED_STRING }
+        }.map { it.slotNumber }.toSet()
+
+        redHighlights = items.filter { slot ->
+            slot.stack.getLore().any { it == OVERALL_PROGRESS_HIDDEN_STRING }
+        }.map { it.slotNumber }.toSet()
+    }
+
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
-            if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                slot highlight LorenzColor.GREEN
-            }
-            if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                slot highlight LorenzColor.RED
-            }
-        }
+        val items = InventoryUtils.getItemsInOpenChest()
+
+        items.filter {
+            it.slotNumber in greenHighlights
+        }.highlightAll(LorenzColor.GREEN)
+
+        items.filter {
+            it.slotNumber in redHighlights
+        }.highlightAll(LorenzColor.RED)
     }
 
     @HandleEvent
@@ -135,6 +161,9 @@ object BestiaryData {
         mobList.clear()
         stackList.clear()
         inInventory = false
+        lastInventoryHash = 0
+        greenHighlights = setOf()
+        redHighlights = setOf()
     }
 
     @HandleEvent

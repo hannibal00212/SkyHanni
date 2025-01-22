@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -53,7 +54,7 @@ object PowerStoneGuideFeatures {
 
         event.gui.inventorySlots.inventorySlots
             .filter { missing.containsKey(it.slotNumber) }
-            .forEach { it highlight LorenzColor.RED }
+            .highlightAll(LorenzColor.RED)
     }
 
     @HandleEvent

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -35,13 +36,12 @@ object HighlightMissingRepoItems {
 
     private fun highlightItems(slots: Iterable<Slot>) {
         if (NEUItems.allInternalNames.isEmpty()) return
-        for (slot in slots) {
-            val internalName = slot.stack?.getInternalNameOrNull() ?: continue
-            if (NEUItems.allInternalNames.contains(internalName)) continue
-            if (NEUItems.ignoreItemsFilter.match(internalName.asString())) continue
-
-            slot highlight LorenzColor.RED
+        val filteredSlots = slots.filter {
+            val internalName = it.stack?.getInternalNameOrNull() ?: return@filter false
+            it.stack != null && NEUItems.allInternalNames.contains(internalName) &&
+                !NEUItems.ignoreItemsFilter.match(internalName.asString())
         }
+        filteredSlots.highlightAll(LorenzColor.RED)
     }
 
     @HandleEvent

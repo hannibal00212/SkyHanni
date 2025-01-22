@@ -475,12 +475,8 @@ object HoppityCollectionStats {
         if (!inInventory || collectionConfig.highlightRabbits.isEmpty()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val name = slot.stack.displayName
-
-            if (name.isEmpty()) continue
-            highlightMap[name]?.let {
-                slot highlight it
-            }
+            val highlightColor = highlightMap[slot.stack.displayName] ?: continue
+            slot highlight highlightColor
         }
     }
 
