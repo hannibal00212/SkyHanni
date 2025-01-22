@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
@@ -80,14 +81,11 @@ class DailyMiniBossHelper(private val reputationHelper: CrimsonIsleReputationHel
                 val displayName = miniBoss.displayName
                 val displayItem = miniBoss.displayItem
 
-                val row = Renderable.horizontalContainer(
-                    buildList {
-                        addString(" ")
-                        addItemStack(displayItem.getItemStack())
-                        addString("§5$displayName§7: $result")
-                    },
-                )
-                add(row)
+                addLine {
+                    addString(" ")
+                    addItemStack(displayItem.getItemStack())
+                    addString("§5$displayName§7: $result")
+                }
             }
         }
     }

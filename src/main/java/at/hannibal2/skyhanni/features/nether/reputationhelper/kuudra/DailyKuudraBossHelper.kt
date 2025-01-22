@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -64,14 +65,11 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
                 val displayName = tier.getDisplayName()
                 val displayItem = tier.displayItem
 
-                val row = Renderable.horizontalContainer(
-                    buildList {
-                        addString(" ")
-                        addItemStack(displayItem.getItemStack())
-                        addString("$displayName: $result")
-                    },
-                )
-                add(row)
+                addLine {
+                    addString(" ")
+                    addItemStack(displayItem.getItemStack())
+                    addString("$displayName: $result")
+                }
             }
         }
     }
