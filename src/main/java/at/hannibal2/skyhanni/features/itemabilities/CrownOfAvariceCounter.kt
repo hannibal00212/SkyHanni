@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.billion
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -35,7 +36,7 @@ object CrownOfAvariceCounter {
     private val internalName = "CROWN_OF_AVARICE".toInternalName()
 
     private var render: Renderable? = null
-    private const val MAX_AVARICE = 1_000_000_000L
+    private val MAX_AVARICE = 1.billion
     private val MAX_AFK_TIME = 2.minutes
 
     private val isWearingCrown by RecalculatingValue(1.seconds) {
