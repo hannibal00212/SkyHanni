@@ -2,13 +2,12 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -103,13 +102,7 @@ enum class HoppityEggType(
     @SkyHanniModule
     companion object {
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
-        private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
-            enumMapOf(),
-            onUpdate = { type, markOrNull ->
-                val mark = markOrNull ?: return@ObservableMutableMap
-                profileStorage?.mealNextSpawn?.set(type, mark)
-            },
-        )
+        private val nextSpawnCache: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
 
@@ -117,15 +110,16 @@ enum class HoppityEggType(
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
         fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
+        private var onLoadInitialized = false
+
         @HandleEvent
-        fun onProfileJoin(event: ProfileJoinEvent) {
-            val spawnMap = profileStorage?.mealNextSpawn ?: return
-            val findMap = profileStorage?.mealLastFound ?: return
-            for ((meal, mark) in spawnMap) {
-                val lastFound = findMap[meal] ?: continue
-                if (mark.isInPast()) meal.markSpawned()
-                else if (lastFound.passedSince() <= 40.minutes) meal.markClaimed(lastFound)
+        fun onIslandChange(event: IslandChangeEvent) {
+            if (onLoadInitialized || !HoppityAPI.isHoppityEvent()) return
+            val storedClaimedEggs = profileStorage?.mealLastFound?.filter { it.value.passedSince() <= 40.minutes } ?: return
+            storedClaimedEggs.forEach { (meal, mark) ->
+                meal.markClaimed(mark)
             }
+            onLoadInitialized = true
         }
 
         // This is a backup in case the chat messages change, or more commonly

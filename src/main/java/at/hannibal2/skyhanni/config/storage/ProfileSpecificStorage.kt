@@ -194,9 +194,6 @@ class ProfileSpecificStorage {
         @Expose
         var mealLastSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
-        @Expose
-        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
-
         class HitmanStatsStorage {
             @Expose
             var availableHitmanEggs: Int = 0

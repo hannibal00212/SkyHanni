@@ -541,29 +541,4 @@ object CollectionUtils {
             }
         }
     }
-
-    class ObservableMutableMap<K, V>(
-        private val map: MutableMap<K, V> = mutableMapOf(),
-        private val onUpdate: (K, V?) -> Unit = { _, _ -> },
-        private val onGet: (K, V?) -> Unit = { _, _ -> },
-    ) : MutableMap<K, V> by map {
-
-        override fun put(key: K, value: V): V? {
-            onUpdate(key, value)
-            return map.put(key, value)
-        }
-
-        override fun remove(key: K): V? {
-            val removedValue = map.remove(key)
-            onUpdate(key, null)
-            return removedValue
-        }
-
-        override fun get(key: K): V? {
-            val value = map[key]
-            onGet(key, value)
-            return value
-        }
-    }
-
 }
