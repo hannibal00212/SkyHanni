@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -97,34 +99,27 @@ object CrownOfAvariceCounter {
         val coinsPerHour = calculateCoinsPerHour().toLong()
         val timeUntilMax = calculateTimeUntilMax()
         val list = buildList {
-            add(
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.itemStack(internalName.getItemStack()),
-                        Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
-                    ),
-                ),
-            )
+            addLine {
+                Renderable.itemStack(internalName.getItemStack())
+                Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
+            }
 
             if (config.perHour) {
-                add(
-                    Renderable.string(
-                        "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..."
-                        else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()} " +
-                            if (isSessionAFK()) "§c(RESET)" else "",
-                    ),
+                addString(
+                    "§aCoins Per Hour: §6${
+                        if (isSessionActive) "Calculating..."
+                        else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
+                    } " + if (isSessionAFK()) "§c(RESET)" else "",
                 )
+
             }
             if (config.time) {
-                add(
-                    Renderable.string(
-                        "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " +
-                            if (isSessionAFK()) "§c(RESET)" else ""
-                    )
+                addString(
+                    "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
                 )
             }
             if (config.coinDiff) {
-                add(Renderable.string("§aLast coins gained: §6$coinsDifference"))
+                ("§aLast coins gained: §6$coinsDifference")
             }
         }
         render = Renderable.verticalContainer(list)
