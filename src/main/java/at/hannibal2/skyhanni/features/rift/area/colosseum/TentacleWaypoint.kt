@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntitySlime
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
 
@@ -82,11 +81,10 @@ object TentacleWaypoint {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldSwitch(event: WorldChangeEvent) {
         tentacles.clear()
     }
 
     fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
-
 }
