@@ -100,6 +100,7 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
+    private val currentSbYear get() = SkyBlockTime.now().year
 
     private var allowedHoppityIslands: Set<IslandType> = setOf()
     private var displayCardRenderables = listOf<Renderable>()
@@ -110,7 +111,7 @@ object HoppityEventSummary {
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
-    private var statYear: Int = getCurrentSBYear()
+    private var statYear: Int = currentSbYear
     private var currentTimerActive = false
     private var onHoppityIsland = false
 
@@ -350,7 +351,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSBYear())
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(currentSbYear)
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -426,11 +427,10 @@ object HoppityEventSummary {
             }
 
             val eventEnd = getEventEndMark(statYear)
-            val yearNow = getCurrentSBYear()
             val isHoppity = HoppityAPI.isHoppityEvent()
 
-            val isCurrentEvent = isHoppity && statYear == yearNow
-            val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
+            val isCurrentEvent = isHoppity && statYear == currentSbYear
+            val isPastEvent = statYear < currentSbYear || (statYear == currentSbYear && !isHoppity)
 
             val configMatches = when {
                 isCurrentEvent -> liveDisplayConfig.dateTimeDisplay.contains(CURRENT)
@@ -469,7 +469,7 @@ object HoppityEventSummary {
         val isAllTimeEnabled = liveDisplayConfig.showAllTime
 
         val isAllTime = currentStatYear == Int.MAX_VALUE
-        val nextYear = getCurrentSBYear() + 1
+        val nextYear = currentSbYear + 1
         val isAlreadyNextEvent = currentStatYear == nextYear
         val predecessorYear = statsStorage.keys.filter {
             it < currentStatYear &&
@@ -521,7 +521,7 @@ object HoppityEventSummary {
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
         storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
-    private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
+    private fun getYearStats(year: Int = currentSbYear): HoppityEventStats? =
         if (year == Int.MAX_VALUE) getAllTimeStats()
         else storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
 
@@ -540,8 +540,6 @@ object HoppityEventSummary {
         return allTimeStats
     }
 
-    private fun getCurrentSBYear() = SkyBlockTime.now().year
-
     private fun checkAddCfTime() {
         if (!ChocolateFactoryAPI.inChocolateFactory) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
@@ -556,11 +554,12 @@ object HoppityEventSummary {
 
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
-        val currentYear = getCurrentSBYear()
-        val isSpring = SkyblockSeason.SPRING.isSeason()
+        val sbTimeNow = SkyBlockTime.now()
+        if (sbTimeNow.isSeasonBorder()) return
 
         getUnsummarizedYearStats().filter {
-            it.key < currentYear || (it.key == currentYear && !isSpring)
+            it.key < currentSbYear || (it.key == currentSbYear && !SkyblockSeason.SPRING.isSeason()) &&
+                (it.key != currentSbYear || !HoppityAPI.isHoppityEvent()) // Secondary sanity check
         }.forEach { (year, stats) ->
             storage?.hoppityEventStats?.get(year)?.let {
                 // Only send the message if we're going to be able to set the stats as summarized
@@ -786,7 +785,7 @@ object HoppityEventSummary {
             statList.clear()
             statList.addEmptyLine()
             statList.addStr("§c§lNothing to show!")
-            val isCurrentEvent = HoppityAPI.isHoppityEvent() && eventYear == getCurrentSBYear()
+            val isCurrentEvent = HoppityAPI.isHoppityEvent() && eventYear == currentSbYear
             val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
@@ -823,7 +822,7 @@ object HoppityEventSummary {
     private fun getAllTimeSpawnedEggCount(): Int {
         val negativeOffset = if (HoppityAPI.isHoppityEvent()) 1 else 0
         val completedEvents = storage?.hoppityEventStats?.size?.minus(negativeOffset) ?: 0
-        val spawnedThisEvent = if (HoppityAPI.isHoppityEvent()) getSpawnedEggCount(getCurrentSBYear()) else 0
+        val spawnedThisEvent = if (HoppityAPI.isHoppityEvent()) getSpawnedEggCount(currentSbYear) else 0
         return completedEvents * 279 + spawnedThisEvent
     }
 
