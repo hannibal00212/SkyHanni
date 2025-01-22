@@ -17,6 +17,7 @@ import net.minecraft.inventory.ContainerChest
 @SkyHanniModule
 object AnvilCombineHelper {
 
+    // TODO use InventoryUpdatedEvent and item id instead of no cache and lore comparison
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -27,15 +28,20 @@ object AnvilCombineHelper {
         val chestName = chest.getInventoryName()
 
         if (chestName != "Anvil") return
+        if (chest.getUpperItems().size < 52) return
 
         val matchLore = mutableListOf<String>()
 
-        for ((slot, stack) in chest.getUpperItems()) {
-            if (slot.slotNumber == 29) {
-                val lore = stack.getLore()
-                matchLore.addAll(lore)
-                break
-            }
+        val leftStack = chest.getSlot(29)?.stack
+        val rightStack = chest.getSlot(33)?.stack
+
+        // don't highlight if both slots have items
+        if (leftStack != null && rightStack != null) return
+
+        if (leftStack != null) {
+            matchLore.addAll(leftStack.getLore())
+        } else if (rightStack != null) {
+            matchLore.addAll(rightStack.getLore())
         }
 
         if (matchLore.isEmpty()) return
