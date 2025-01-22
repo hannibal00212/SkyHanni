@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
@@ -167,6 +167,7 @@ object CrimsonMinibossRespawnTimer {
                             if (end.timeUntil().isNegative()) append("§eNow")
                             else append("§e${end.timeUntil().format()}")
                         }
+
                         else -> append("§cUnknown")
                     }
                 },
@@ -175,8 +176,8 @@ object CrimsonMinibossRespawnTimer {
         return Renderable.verticalContainer(lines)
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         MiniBoss.entries.forEach {
             it.nextSpawnTime = null
             it.possibleSpawnTime = null

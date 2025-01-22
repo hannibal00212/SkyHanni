@@ -224,9 +224,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         event.drawDynamicText(location, "Town Board", 1.5)
     }
 
-    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
-    }
+    private fun Quest.needsTownBoardLocation() =
+        state == QuestState.READY_TO_COLLECT ||
+            (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
     fun MutableList<Renderable>.addQuests() {
         if (greatSpook) {
@@ -287,13 +287,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        return Renderable.horizontalContainer(
-            buildList {
-                addString("  $stateText$categoryName: ")
-                addItemStack(item)
-                addString("§f$displayName$progressText$sacksText")
-            },
-        )
+        return Renderable.line {
+            addString("  $stateText$categoryName: ")
+            addItemStack(item)
+            addString("§f$displayName$progressText$sacksText")
+        }
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {

@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
@@ -15,5 +13,5 @@ object ScoreboardEventJacobMedals : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.medalsPattern)
 
-    override fun showIsland() = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
+    // Can appear on any island when calling Anita through the AbiPhone
 }
