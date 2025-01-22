@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -14,14 +13,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import java.util.regex.Matcher
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 enum class HoppityEggType(
     val mealName: String,
     private val mealColor: String,
     val resetsAt: Int,
     private var claimed: Boolean = false,
+    private var lastReset: SkyBlockTime = SkyBlockTime.fromSbYear(0),
     val altDay: Boolean = false
 ) {
     BREAKFAST("Breakfast", "§6", 7),
@@ -52,6 +50,16 @@ enum class HoppityEggType(
         return altDay == sbTimeNow.isAlternateDay()
     }
 
+    fun spawnedToday(): Boolean {
+        val sbTimeNow = SkyBlockTime.now()
+        return altDay == sbTimeNow.isAlternateDay() && sbTimeNow.hour >= resetsAt
+    }
+
+    fun alreadyResetToday(): Boolean {
+        val sbTimeNow = SkyBlockTime.now()
+        return lastReset.day == sbTimeNow.day && lastReset.month == sbTimeNow.month
+    }
+
     private fun calculateNextSpawn(): SimpleTimeMark {
         if (resetsAt == -1) return SimpleTimeMark.farFuture()
         val sbTimeNow = SkyBlockTime.now()
@@ -80,7 +88,6 @@ enum class HoppityEggType(
 
     fun markSpawned() {
         claimed = false
-        HoppityEggLocator.mealSpawned(this)
     }
 
     fun isClaimed() = claimed || hasNotFirstSpawnedYet()
@@ -110,32 +117,10 @@ enum class HoppityEggType(
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
         fun allEggsUnclaimed(): Boolean = resettingEntries.all { !it.claimed }
 
-        private var onLoadInitialized = false
-
         @HandleEvent
-        fun onIslandChange(event: IslandChangeEvent) {
-            if (onLoadInitialized || !HoppityAPI.isHoppityEvent()) return
-            val storedClaimedEggs = profileStorage?.mealLastFound?.filter { it.value.passedSince() <= 40.minutes } ?: return
-            storedClaimedEggs.forEach { (meal, mark) ->
-                meal.markClaimed(mark)
-            }
-            onLoadInitialized = true
-        }
-
-        // This is a backup in case the chat messages change, or more commonly
-        // if a user is on an island where eggs don't spawn
-        @HandleEvent
-        fun onSecondPassed(event: SecondPassedEvent) {
-            if (!HoppityAPI.isHoppityEvent()) return
-            val mealLastSpawn = profileStorage?.mealLastFound ?: return
-            val sbTimeNow = SkyBlockTime.now()
-            resettingEntries.filter {
-                it.claimed && it.spawnsToday() && sbTimeNow.hour >= it.resetsAt &&
-                    (mealLastSpawn[it]?.passedSince() ?: 0.seconds) > 39.minutes
-            }.forEach {
-                it.markSpawned()
-                profileStorage?.mealLastSpawn?.set(it, sbTimeNow.asTimeMark())
-            }
+        fun onEggSpawned(event: EggSpawnedEvent) {
+            event.eggType.markSpawned()
+            event.eggType.lastReset = SkyBlockTime.now()
         }
 
         internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
