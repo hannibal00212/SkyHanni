@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.billion
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -35,7 +36,7 @@ object CrownOfAvariceCounter {
 
     private val internalName = "CROWN_OF_AVARICE".toInternalName()
 
-    private var render: Renderable? = null
+    private var display: List<Renderable> = emptyList()
     private val MAX_AVARICE_COINS = 1.billion
     private val MAX_AFK_TIME = 2.minutes
 
@@ -54,7 +55,7 @@ object CrownOfAvariceCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return
-        render?.let { config.position.renderRenderable(it, posLabel = "Crown of Avarice Counter") }
+        config.position.renderRenderables(display, posLabel = "Crown of Avarice Counter")
     }
 
     @HandleEvent
@@ -97,7 +98,7 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        render = Renderable.verticalContainer(buildList())
+        display = buildList()
     }
 
     private fun buildList(): List<Renderable> = buildList {
@@ -123,7 +124,7 @@ object CrownOfAvariceCounter {
             )
         }
         if (config.coinDiff) {
-            ("§aLast coins gained: §6$coinsDifference")
+            addString("§aLast coins gained: §6$coinsDifference")
         }
     }
 

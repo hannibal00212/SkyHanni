@@ -23,8 +23,8 @@ public class CrownOfAvariceConfig {
     public boolean shortFormat = true;
 
     @Expose
-    @ConfigOption(name = "Coins Per Hour Format",
-        desc = "Have the Coins Per Hour show as short format instead of every digit.")
+    @ConfigOption(name = "Coins Per Hour format",
+        desc = "Shows the coins per hour gained as short format i.e. 7.3M.")
     @ConfigEditorBoolean
     public boolean shortFormatCPH = true;
 
@@ -42,7 +42,7 @@ public class CrownOfAvariceConfig {
 
     @Expose
     @ConfigOption(name = "Last coins gained",
-        desc = "Shows the amount of last amount of coins gained.")
+        desc = "Shows the amount of scavenger coins gained by last killed mob.")
     @ConfigEditorBoolean
     public boolean coinDiff = false;
 
