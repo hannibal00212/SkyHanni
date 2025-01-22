@@ -121,7 +121,7 @@ object EnchantedClockHelper {
                         color = LorenzColor.valueOf(it.color),
                         displaySlot = it.displaySlot,
                         statusSlot = it.statusSlot,
-                        cooldown = (it.cooldownHours.takeIf { cdh -> cdh > 0 } ?: 48).hours
+                        cooldown = (it.cooldownHours.takeIf { cdh -> cdh > 0 } ?: 48).hours,
                     )
                 }
             }
