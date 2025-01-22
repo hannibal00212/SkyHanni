@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -40,7 +40,7 @@ object StereoHarmonyDisplay {
      */
     private val selectVinylPattern by vinylTypeGroup.pattern(
         "select",
-        "§aYou are now playing §r§e(?<type>.*)§r§a!"
+        "§aYou are now playing §r§e(?<type>.*)§r§a!",
     )
 
     /**
@@ -48,7 +48,7 @@ object StereoHarmonyDisplay {
      */
     private val unselectVinylPattern by vinylTypeGroup.pattern(
         "unselect",
-        "§aYou are no longer playing §r§e.*§r§a!"
+        "§aYou are no longer playing §r§e.*§r§a!",
     )
 
     private var display = emptyList<Renderable>()
@@ -57,7 +57,7 @@ object StereoHarmonyDisplay {
         ItemUtils.createSkull(
             displayName = "§c?",
             uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
-            value = SkullTextureHolder.getTexture("QUESTION_MARK")
+            value = SkullTextureHolder.getTexture("QUESTION_MARK"),
         )
     }
 
@@ -108,8 +108,8 @@ object StereoHarmonyDisplay {
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
     }
 
