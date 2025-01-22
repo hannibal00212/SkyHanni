@@ -96,8 +96,6 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        val coinsPerHour = calculateCoinsPerHour().toLong()
-        val timeUntilMax = calculateTimeUntilMax()
         val list = buildList {
             addLine {
                 Renderable.itemStack(internalName.getItemStack())
@@ -105,6 +103,7 @@ object CrownOfAvariceCounter {
             }
 
             if (config.perHour) {
+                val coinsPerHour = calculateCoinsPerHour().toLong()
                 addString(
                     "§aCoins Per Hour: §6${
                         if (isSessionActive) "Calculating..."
@@ -114,6 +113,7 @@ object CrownOfAvariceCounter {
 
             }
             if (config.time) {
+                val timeUntilMax = calculateTimeUntilMax()
                 addString(
                     "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
                 )
