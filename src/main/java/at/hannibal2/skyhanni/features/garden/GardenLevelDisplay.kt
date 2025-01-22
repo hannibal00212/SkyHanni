@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -145,8 +145,8 @@ object GardenLevelDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.overflow.get()) return
         val slotIndex = event.slot.slotIndex

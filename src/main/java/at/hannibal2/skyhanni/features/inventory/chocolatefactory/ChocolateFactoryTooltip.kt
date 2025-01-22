@@ -1,20 +1,19 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryTooltip {
 
     private val config get() = ChocolateFactoryAPI.config
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onTooltip(event: ToolTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.extraTooltipStats) return
 

@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {
@@ -56,8 +55,8 @@ object GardenCropMilestoneInventory {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
