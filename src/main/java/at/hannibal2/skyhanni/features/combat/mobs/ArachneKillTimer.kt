@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.chat.ArachneChatMessageHider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -27,28 +28,31 @@ object ArachneKillTimer {
      */
     private val arachneCallingSpawnedPattern by patternGroup.pattern(
         "calling.spawned",
-        "§c\\[BOSS] Arachne§r§f: A befitting welcome!"
+        "§c\\[BOSS] Arachne§r§f: A befitting welcome!",
     )
+
     /**
      * REGEX-TEST: §c[BOSS] Arachne§r§f: With your sacrifice.
      */
     private val arachneCrystalSpawnedPattern by patternGroup.pattern(
         "crystal.spawned",
-        "§c\\[BOSS] Arachne§r§f: With your sacrifice."
+        "§c\\[BOSS] Arachne§r§f: With your sacrifice.",
     )
+
     /**
      * REGEX-TEST: §f                              §r§6§lARACHNE DOWN!
      */
     private val arachneDeathPattern by patternGroup.pattern(
         "dead",
-        "§f.*§r§6§lARACHNE DOWN!"
+        "§f.*§r§6§lARACHNE DOWN!",
     )
+
     /**
      * REGEX-TEST: §f                 §r§eYour Damage: §r§a1,155,000 §r§7(Position #1)
      */
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",
-        "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)"
+        "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)",
     )
 
     private var arachneSpawnedTime = SimpleTimeMark.farPast()
@@ -79,8 +83,8 @@ object ArachneKillTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         arachneSpawnedTime = SimpleTimeMark.farPast()
     }
 
