@@ -27,8 +27,8 @@ data class SkyBlockTime(
         calculateTimeInSkyBlockMillis(year, month, day, hour, minute, second) + SKYBLOCK_EPOCH_START_MILLIS
 
     private val seasonBorders: List<List<IntRange>> = listOf(
-        listOf(1..1, 1..1, 0..0, 0..0, 0..5),  // First border set
-        listOf(12..12, 31..31, 23..23, 59..59, 55..59)  // End border set
+        listOf(1..1, 1..1, 0..0, 0..0, 0..5), // First border set
+        listOf(12..12, 31..31, 23..23, 59..59, 55..59) // End border set
     )
 
     fun isSeasonBorder(): Boolean {
