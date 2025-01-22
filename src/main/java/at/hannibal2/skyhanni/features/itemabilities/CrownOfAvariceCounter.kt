@@ -96,33 +96,34 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        val list = buildList {
-            addLine {
-                Renderable.itemStack(internalName.getItemStack())
-                Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
-            }
+        render = Renderable.verticalContainer(buildList())
+    }
 
-            if (config.perHour) {
-                val coinsPerHour = calculateCoinsPerHour().toLong()
-                addString(
-                    "§aCoins Per Hour: §6${
-                        if (isSessionActive) "Calculating..."
-                        else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
-                    } " + if (isSessionAFK()) "§c(RESET)" else "",
-                )
-
-            }
-            if (config.time) {
-                val timeUntilMax = calculateTimeUntilMax()
-                addString(
-                    "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
-                )
-            }
-            if (config.coinDiff) {
-                ("§aLast coins gained: §6$coinsDifference")
-            }
+    private fun buildList(): List<Renderable> = buildList {
+        addLine {
+            Renderable.itemStack(internalName.getItemStack())
+            Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
         }
-        render = Renderable.verticalContainer(list)
+
+        if (config.perHour) {
+            val coinsPerHour = calculateCoinsPerHour().toLong()
+            addString(
+                "§aCoins Per Hour: §6${
+                    if (isSessionActive) "Calculating..."
+                    else if (config.shortFormatCPH) coinsPerHour.shortFormat() else coinsPerHour.addSeparators()
+                } " + if (isSessionAFK()) "§c(RESET)" else "",
+            )
+
+        }
+        if (config.time) {
+            val timeUntilMax = calculateTimeUntilMax()
+            addString(
+                "§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax} " + if (isSessionAFK()) "§c(RESET)" else "",
+            )
+        }
+        if (config.coinDiff) {
+            ("§aLast coins gained: §6$coinsDifference")
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
