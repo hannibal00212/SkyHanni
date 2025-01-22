@@ -12,14 +12,12 @@ class FireVeilWandConfig {
     @ConfigEditorDropdown
     var display: DisplayEntry = DisplayEntry.PARTICLES
 
-    enum class DisplayEntry(private val displayName: String, private val legacyId: Int) : HasLegacyId {
+    enum class DisplayEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         PARTICLES("Particles", 0),
         LINE("Line", 1),
         OFF("Off", 2),
         ;
 
-        // Constructor if new enum elements are added post-migration
-        constructor(displayName: String) : this(displayName, -1)
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }

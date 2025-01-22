@@ -43,13 +43,11 @@ class ReputationHelperConfig {
     @ConfigEditorDropdown
     var showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
 
-    enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int) : HasLegacyId {
+    enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         ALWAYS("Always", 0),
         ONLY_HOTKEY("Only With Hotkey", 1),
         NEVER("Never", 2);
 
-        // Constructor if new enum elements are added post-migration
-        constructor(displayName: String) : this(displayName, -1)
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
