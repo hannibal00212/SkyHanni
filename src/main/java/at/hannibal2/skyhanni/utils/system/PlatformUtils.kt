@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.system
 
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.ModContainer
@@ -61,7 +62,7 @@ object PlatformUtils {
             "§ccompatibility with some of our features.",
             "§cPlease update NotEnoughUpdates",
         )
-        NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
+        DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
     }
 
 }

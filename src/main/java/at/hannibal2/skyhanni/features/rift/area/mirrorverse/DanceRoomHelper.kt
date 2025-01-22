@@ -161,7 +161,7 @@ object DanceRoomHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (config.enabled && inRoom) {
+        if (config.hidePlayers && inRoom) {
             event.cancel()
         }
     }
