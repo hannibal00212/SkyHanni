@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -50,8 +50,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -128,8 +126,8 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 

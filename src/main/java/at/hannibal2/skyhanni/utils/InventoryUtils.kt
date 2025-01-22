@@ -39,7 +39,7 @@ object InventoryUtils {
     }
 
     // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun openInventoryName() = Minecraft.getMinecraft().currentScreen.let {
+    fun openInventoryName(): String = Minecraft.getMinecraft().currentScreen.let {
         if (it is GuiChest) {
             val chest = it.inventorySlots as ContainerChest
             chest.getInventoryName()
