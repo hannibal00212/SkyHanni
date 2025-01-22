@@ -3,13 +3,21 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
+import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object EssenceItemUtils {
+object EssenceUtils {
     var itemPrices = mapOf<NEUInternalName, Map<Int, EssenceUpgradePrice>>()
 
     @HandleEvent
@@ -127,4 +135,24 @@ object EssenceItemUtils {
         }
     }
 
+    fun extractPurchasedUpgrades(
+        inventoryItems: Map<Int, ItemStack>,
+        keyRange: IntRange,
+    ) = extractPurchasedUpgrades(
+        inventoryItems.filter { it.key in keyRange && it.value.item != null }
+    )
+
+    private fun extractPurchasedUpgrades(inventoryItems: Map<Int, ItemStack>) = buildMap {
+        for (value in inventoryItems.values) {
+            // Right now Carnival and Essence Upgrade patterns are 'in-sync'
+            // This may change in the future, and this would then need its own pattern
+            essenceUpgradePattern.matchMatcher(value.displayName) {
+                val upgradeName = groupOrNull("upgrade") ?: continue
+                val nextUpgradeRoman = groupOrNull("tier") ?: continue
+                val nextUpgrade = nextUpgradeRoman.romanToDecimal()
+                val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
+                put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
+            }
+        }
+    }
 }

@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkillTooltip {
@@ -21,8 +21,8 @@ object SkillTooltip {
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
