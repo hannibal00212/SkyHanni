@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -67,8 +67,10 @@ object RiftAgaricusCap {
         return null
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) = reset()
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        reset()
+    }
 
     private fun reset() {
         startTime = SimpleTimeMark.farPast()
