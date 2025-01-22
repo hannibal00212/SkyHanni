@@ -44,14 +44,11 @@ class ChromaConfig {
     @ConfigEditorDropdown
     var chromaDirection: Direction = Direction.FORWARD_RIGHT
 
-    enum class Direction(private val displayName: String, private val legacyId: Int) : HasLegacyId {
+    enum class Direction(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         FORWARD_RIGHT("Forward + Right", 0),
         FORWARD_LEFT("Forward + Left", 1),
         BACKWARD_RIGHT("Backward + Right", 2),
         BACKWARD_LEFT("Backward + Left", 3);
-
-        // Constructor if new enum elements are added post-migration
-        constructor(displayName: String) : this(displayName, -1)
 
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
