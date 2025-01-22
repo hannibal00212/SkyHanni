@@ -10,11 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventRift : ScoreboardEvent() {
 
-    override fun getDisplay() = elementPatterns.allMatches(getSbLines())
-
-    override val configLine = "§7(All Rift Lines)"
-
-    override val elementPatterns = listOf(
+    private val importantPatterns = listOf(
         RiftBloodEffigies.heartsPattern,
         ScoreboardPattern.riftHotdogTitlePattern,
         ScoreboardPattern.timeLeftPattern,
@@ -24,10 +20,15 @@ object ScoreboardEventRift : ScoreboardEvent() {
         ScoreboardPattern.cluesPattern,
         ScoreboardPattern.barryProtestorsQuestlinePattern,
         ScoreboardPattern.barryProtestorsHandledPattern,
-        ScoreboardPattern.riftDimensionPattern,
         ScoreboardPattern.timeSlicedPattern,
         ScoreboardPattern.bigDamagePattern,
     )
+
+    override fun getDisplay() = importantPatterns.allMatches(getSbLines())
+
+    override val configLine = "§7(All Rift Lines)"
+
+    override val elementPatterns = importantPatterns + listOf(ScoreboardPattern.riftDimensionPattern)
 
     override fun showIsland() = RiftAPI.inRift()
 }
