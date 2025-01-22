@@ -19,7 +19,7 @@ public class HoppityCallWarningConfig {
     @ConfigOption(name = "Hoppity Call Warning", desc = "Warn when hoppity is calling you.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(
@@ -49,7 +49,7 @@ public class HoppityCallWarningConfig {
     @Expose
     @ConfigOption(name = "Ensure Coins Pre-Trade", desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse.")
     @ConfigEditorBoolean
-    public boolean ensureCoins = true;
+    public boolean ensureCoins = false;
 
     @Expose
     @ConfigOption(name = "Coin Threshold", desc = "The amount of coins you need to have in your purse to be able to open Hoppity's abiphone trade menu.")

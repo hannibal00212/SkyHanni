@@ -300,6 +300,9 @@ class ItemResolutionQuery {
         if (guiName.startsWith("Choose Pet")) {
             return findInternalNameByDisplayName(displayName, false)
         }
+        if (guiName.endsWith("Experimentation Table RNG")) {
+            return resolveEnchantmentByName(displayName)
+        }
         return null
     }
 
