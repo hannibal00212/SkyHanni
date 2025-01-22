@@ -232,9 +232,8 @@ object HoppityAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
         checkNextInvOpen = true
     }

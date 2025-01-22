@@ -135,9 +135,8 @@ object IslandGraphs {
         "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         loadIsland(LorenzUtils.skyBlockIsland)
     }

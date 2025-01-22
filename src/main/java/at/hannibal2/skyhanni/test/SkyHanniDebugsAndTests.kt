@@ -511,11 +511,9 @@ object SkyHanniDebugsAndTests {
     fun onChat(event: LorenzChatEvent) {
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         if (false) {
             itemRenderDebug()
         }

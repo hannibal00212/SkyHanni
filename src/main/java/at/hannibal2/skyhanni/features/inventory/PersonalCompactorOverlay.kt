@@ -106,9 +106,8 @@ object PersonalCompactorOverlay {
         compactorEnabledMap.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showToggle) return
         val itemStack = event.stack
         val internalName = itemStack.getInternalNameOrNull() ?: return

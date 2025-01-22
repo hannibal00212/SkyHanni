@@ -95,9 +95,8 @@ object UpgradeReminder {
         lastReminderSend = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
         if (!inInventory) return
 

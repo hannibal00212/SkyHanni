@@ -114,10 +114,10 @@ object MiningEventTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isMiningIsland())) return
+        if (!config.outsideMining && !isMiningIsland()) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()

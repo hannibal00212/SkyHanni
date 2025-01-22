@@ -129,6 +129,7 @@ object ElectionAPI {
             getTimeTillNextMayor()
         }
 
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock) return
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
@@ -162,9 +163,8 @@ object ElectionAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 

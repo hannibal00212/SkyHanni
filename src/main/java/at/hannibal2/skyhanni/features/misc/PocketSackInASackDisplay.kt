@@ -18,10 +18,9 @@ object PocketSackInASackDisplay {
     private val config get() = SkyHanniMod.feature.inventory.pocketSackInASack
     private const val MAX_STITCHES = 3
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack ?: return
-        if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
+        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
         if (!config.showOverlay) return
         val pocketSackInASackApplied = stack.getAppliedPocketSackInASack() ?: return
 

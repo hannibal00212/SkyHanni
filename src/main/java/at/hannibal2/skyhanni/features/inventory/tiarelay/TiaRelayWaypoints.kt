@@ -44,9 +44,8 @@ object TiaRelayWaypoints {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         if (config.allWaypoints) {
             for (relay in Relay.entries) {
