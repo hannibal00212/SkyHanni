@@ -36,7 +36,7 @@ object CrownOfAvariceCounter {
     private val internalName = "CROWN_OF_AVARICE".toInternalName()
 
     private var render: Renderable? = null
-    private val MAX_AVARICE = 1.billion
+    private val MAX_AVARICE_COINS = 1.billion
     private val MAX_AFK_TIME = 2.minutes
 
     private val isWearingCrown by RecalculatingValue(1.seconds) {
@@ -146,7 +146,7 @@ object CrownOfAvariceCounter {
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
         if (coinsPerHour == 0.0) return "Forever..."
-        val timeUntilMax = ((MAX_AVARICE - count) / coinsPerHour).hours
+        val timeUntilMax = ((MAX_AVARICE_COINS - count) / coinsPerHour).hours
         return timeUntilMax.format()
     }
 }
