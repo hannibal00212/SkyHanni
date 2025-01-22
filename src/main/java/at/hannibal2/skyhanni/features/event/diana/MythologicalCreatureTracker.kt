@@ -122,8 +122,8 @@ object MythologicalCreatureTracker {
                 searchText = creatureType.displayName,
             )
         }
-        addSearchString(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
-        addSearchString(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
+        addSearchString("§7Total Mythological Creatures: §e${total.addSeparators()}")
+        addSearchString("§7Creatures since last Minos Inquisitor: §e${data.creaturesSinceLastInquisitor.addSeparators()} ")
     }
 
     @HandleEvent

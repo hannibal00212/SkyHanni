@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -143,8 +143,8 @@ object ComposterOverlay {
         update()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
@@ -505,7 +505,7 @@ object ComposterOverlay {
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
             return
         }

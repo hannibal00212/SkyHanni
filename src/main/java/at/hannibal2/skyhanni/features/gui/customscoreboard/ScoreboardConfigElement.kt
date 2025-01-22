@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementProfile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementQuiver
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSkyBlockXp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSlayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSoulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTime
@@ -64,6 +65,7 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     SLAYER(ScoreboardElementSlayer),
     QUIVER(ScoreboardElementQuiver),
     POWDER(ScoreboardElementPowder),
+    SKYBLOCK_XP(ScoreboardElementSkyBlockXp),
     EVENTS(ScoreboardElementEvents),
     MAYOR(ScoreboardElementMayor),
     PARTY(ScoreboardElementParty),
