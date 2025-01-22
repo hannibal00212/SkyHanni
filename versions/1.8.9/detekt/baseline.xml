@@ -30,13 +30,9 @@
     <ID>InjectDispatcher:ElectionAPI.kt$ElectionAPI$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
-    <ID>LongMethod:CopyNearbyEntitiesCommand.kt$CopyNearbyEntitiesCommand$fun command(args: Array&lt;String&gt;)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
-    <ID>LongMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
-    <ID>LongMethod:RenderableTooltips.kt$RenderableTooltips$private fun drawHoveringText()</ID>
-    <ID>LongMethod:TabListRenderer.kt$TabListRenderer$private fun drawTabList()</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>

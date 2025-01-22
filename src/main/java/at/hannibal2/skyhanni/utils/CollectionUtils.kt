@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.EnumMap
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -282,6 +283,22 @@ object CollectionUtils {
     fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
+        return EnumMap<K, V>(K::class.java)
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: (K) -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize(it) } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: () -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize() } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { putAll(pairs) }
+    }
 
     // TODO add cache
     fun MutableList<Renderable>.addString(
