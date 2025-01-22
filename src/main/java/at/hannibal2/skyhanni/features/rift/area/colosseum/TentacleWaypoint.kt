@@ -73,11 +73,7 @@ object TentacleWaypoint {
                 "$hpColor${maxHp - hits}§a/$maxHp§c❤"
             }
 
-            event.drawDynamicText(
-                tentacle.getLorenzVec().up(1.0),
-                text,
-                1.0,
-            )
+            event.drawDynamicText(tentacle.getLorenzVec().up(1.0), text, 1.0)
         }
     }
 
