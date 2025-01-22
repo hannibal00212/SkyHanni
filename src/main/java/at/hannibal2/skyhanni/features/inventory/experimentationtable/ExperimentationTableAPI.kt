@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ExperimentationTableAPI {
@@ -25,15 +25,17 @@ object ExperimentationTableAPI {
 
     val inTable get() = inventoriesPattern.matches(openInventoryName())
 
-    fun inDistanceToTable(vec: LorenzVec, max: Double): Boolean =
-        storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    fun inDistanceToTable(max: Double): Boolean {
+        val vec = LorenzVec.getBlockBelowPlayer()
+        return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    }
 
     fun getCurrentExperiment(): Experiment? =
         superpairsPattern.matchMatcher(openInventoryName()) {
             Experiment.entries.find { it.nameString == group("experiment") }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 

@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BestiaryData {
@@ -48,7 +47,7 @@ object BestiaryData {
      */
     private val tierProgressPattern by patternGroup.pattern(
         "tierprogress",
-        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%"
+        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%",
     )
 
     /**
@@ -57,7 +56,7 @@ object BestiaryData {
      */
     private val overallProgressPattern by patternGroup.pattern(
         "overallprogress",
-        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
+        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?",
     )
 
     /**
@@ -66,7 +65,7 @@ object BestiaryData {
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
+        "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)",
     )
 
     /**
@@ -75,7 +74,7 @@ object BestiaryData {
      */
     private val titlePattern by patternGroup.pattern(
         "title",
-        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$"
+        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$",
     )
 
     private var display = emptyList<List<Any>>()
@@ -92,35 +91,32 @@ object BestiaryData {
         37..43,
     ).flatten()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderStringsAndItems(
-                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data"
+                display, extraSpace = -1, itemScale = 0.7, posLabel = "Bestiary Data",
             )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (inInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                val stack = slot.stack
-                val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                    slot highlight LorenzColor.GREEN
-                }
-                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                    slot highlight LorenzColor.RED
-                }
+        if (!isEnabled() || !inInventory) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                slot highlight LorenzColor.GREEN
+            }
+            if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
+                slot highlight LorenzColor.RED
             }
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
         val items = event.inventoryItems
@@ -134,7 +130,7 @@ object BestiaryData {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         mobList.clear()
         stackList.clear()
@@ -171,7 +167,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = stack.displayName
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
@@ -200,7 +195,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
             val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
@@ -237,8 +231,8 @@ object BestiaryData {
                     currentTotalKill,
                     totalKillToTier,
                     currentKillToTier,
-                    actualRealTotalKill
-                )
+                    actualRealTotalKill,
+                ),
             )
         }
     }
@@ -293,7 +287,7 @@ object BestiaryData {
                     buildList {
                         add(" §7- ")
                         add("${mob.name}: §cNot unlocked!")
-                    }
+                    },
                 )
                 continue
             }
@@ -316,7 +310,7 @@ object BestiaryData {
         "§6Percent to max: §b${mob.percentToMaxFormatted()}",
         "§6Percent to tier: §b${mob.percentToTierFormatted()}",
         "",
-        "§7More info thing"
+        "§7More info thing",
     )
 
     private fun getMobLine(mob: BestiaryMob, isMaxed: Boolean): String {
@@ -370,7 +364,7 @@ object BestiaryData {
                 // todo: avoid ordinal
                 config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
-            }
+            },
         )
 
         newDisplay.addButton(
@@ -380,7 +374,7 @@ object BestiaryData {
                 // todo: avoid ordinal
                 config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
-            }
+            },
         )
 
         newDisplay.addButton(
@@ -389,7 +383,7 @@ object BestiaryData {
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()
-            }
+            },
         )
 
         newDisplay.addButton(
@@ -398,30 +392,29 @@ object BestiaryData {
             onChange = {
                 config.hideMaxed = !config.hideMaxed
                 update()
-            }
+            },
         )
     }
 
     private fun addCategories(newDisplay: MutableList<List<Any>>) {
-        if (catList.isNotEmpty()) {
-            newDisplay.addAsSingletonList("§7Category")
-            for (cat in catList) {
-                newDisplay.add(
-                    buildList {
-                        add(" §7- ${cat.name}§7: ")
-                        val element = when {
-                            cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
-                            cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                            cat.familiesFound < cat.totalFamilies ->
-                                "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
-                                    "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+        if (catList.isEmpty()) return
+        newDisplay.addAsSingletonList("§7Category")
+        for (cat in catList) {
+            newDisplay.add(
+                buildList {
+                    add(" §7- ${cat.name}§7: ")
+                    val element = when {
+                        cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
+                        cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
+                        cat.familiesFound < cat.totalFamilies ->
+                            "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
+                                "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
 
-                            else -> continue
-                        }
-                        add(element)
+                        else -> continue
                     }
-                )
-            }
+                    add(element)
+                },
+            )
         }
     }
 

@@ -3,12 +3,11 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isPestCountInaccurate
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -124,23 +123,33 @@ object PestFinder {
         update()
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showDisplay) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() },
+            onRender = {
+                if (GardenAPI.inGarden() && config.showDisplay) {
+                    config.position.renderRenderables(display, posLabel = "Pest Finder")
+                }
+            },
+        )
+    }
 
-        if (GardenAPI.inGarden() && config.showDisplay) {
-            config.position.renderRenderables(display, posLabel = "Pest Finder")
-        }
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showDisplay) return false
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand()) return false
+
+        return true
     }
 
     private fun heldItemDisabled() = config.onlyWithVacuum && !PestAPI.hasVacuumInHand()
     private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
 
     // priority to low so that this happens after other renderPlot calls.
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (heldItemDisabled() && timePassedDisabled()) return
@@ -168,7 +177,7 @@ object PestFinder {
     private fun drawName(
         plot: GardenPlotAPI.Plot,
         playerLocation: LorenzVec,
-        event: LorenzRenderWorldEvent,
+        event: RenderWorldEvent,
     ) {
         val pests = plot.pests
         val pestsName = StringUtils.pluralize(pests, "pest")

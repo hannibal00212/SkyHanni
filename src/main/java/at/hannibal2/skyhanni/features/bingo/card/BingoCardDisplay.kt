@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -68,7 +68,7 @@ object BingoCardDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasHiddenPersonalGoals) {
             update()
@@ -123,7 +123,7 @@ object BingoCardDisplay {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
-        add(Renderable.string(" "))
+        addString(" ")
     }
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
@@ -214,7 +214,7 @@ object BingoCardDisplay {
     private var lastSneak = false
     private var inventoryOpen = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return

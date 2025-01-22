@@ -6,13 +6,17 @@ import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.common.util.Constants
 import java.util.Locale
 
 object SkyBlockItemModifierUtils {
@@ -34,6 +38,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
+
+    fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
@@ -73,21 +79,21 @@ object SkyBlockItemModifierUtils {
         return data.heldItem
     }
 
-    fun ItemStack.isRiftTransferable(): Boolean? {
+    fun ItemStack.isRiftTransferable(): Boolean {
         val data = cachedData
-        if (data.riftTransferable == null) {
-            data.riftTransferable = getLore().any { it == "§5§kX§5 Rift-Transferable §kX" }
-        }
         return data.riftTransferable
+            ?: UtilsPatterns.riftTransferablePattern.anyMatches(getLore())
+                .also { data.riftTransferable = it }
     }
 
-    fun ItemStack.isRiftExportable(): Boolean? {
+    fun ItemStack.isRiftExportable(): Boolean {
         val data = cachedData
-        if (data.riftExportable == null) {
-            data.riftExportable = getLore().any { it == "§5§kX§5 Rift-Exportable §kX" }
-        }
         return data.riftExportable
+            ?: UtilsPatterns.riftExportablePattern.anyMatches(getLore())
+                .also { data.riftExportable = it }
     }
+
+    fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
     private fun ItemStack.getPetInfo() =
         ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
@@ -130,23 +136,29 @@ object SkyBlockItemModifierUtils {
         return "${name.uppercase()}_RUNE;$tier".toInternalName()
     }
 
-    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
-        val list = mutableListOf<NEUInternalName>()
-        for (attributes in it.keySet) {
-            if (attributes == "ability_scroll") {
-                val tagList = it.getTagList(attributes, 8)
-                for (i in 0..3) {
-                    val text = tagList.get(i).toString()
-                    if (text == "END") break
-                    list.add(text.replace("\"", "").toInternalName())
-                }
+    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let { compound ->
+        val ultimateWitherScroll = "ULTIMATE_WITHER_SCROLL".toInternalName()
+        val implosion = "IMPLOSION_SCROLL".toInternalName()
+        val witherShield = "WITHER_SHIELD_SCROLL".toInternalName()
+        val shadowWarp = "SHADOW_WARP_SCROLL".toInternalName()
+
+        val scrolls = mutableSetOf<NEUInternalName>()
+
+        for (scroll in compound.getStringList("ability_scroll").map { it.toInternalName() }) {
+            if (scroll == ultimateWitherScroll) {
+                scrolls.add(implosion)
+                scrolls.add(witherShield)
+                scrolls.add(shadowWarp)
+                continue
             }
+            scrolls.add(scroll)
         }
-        list.toList()
+
+        scrolls.toList()
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.hasKey("attributes", Constants.NBT.TAG_COMPOUND) }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -165,20 +177,19 @@ object SkyBlockItemModifierUtils {
         }
     }
 
-    fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
+    fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 
-    fun ItemStack.hasJalapenoBook() = getAttributeBoolean("jalapeno_count")
+    fun ItemStack.hasJalapenoBook() = getAttributeInt("jalapeno_count").isPositive()
 
     fun ItemStack.hasEtherwarp() = getAttributeBoolean("ethermerge")
 
-    fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
+    fun ItemStack.hasWoodSingularity() = getAttributeInt("wood_singularity_count").isPositive()
 
     fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
 
-    fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
+    fun ItemStack.hasArtOfWar() = getAttributeInt("art_of_war_count").isPositive()
 
-    // TODO untested
-    fun ItemStack.hasBookOfStats() = getAttributeBoolean("stats_book")
+    fun ItemStack.hasBookOfStats() = getAttributeInt("stats_book") != null
 
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
@@ -186,9 +197,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
-
-    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+        "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
+        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
+        else -> null
+    }
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 

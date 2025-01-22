@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -34,7 +34,7 @@ object RiftGunthersRace {
      */
     private val raceStartedPattern by patternGroup.pattern(
         "start",
-        "§3§lRIFT RACING §r§eRace started! Good luck!"
+        "§3§lRIFT RACING §r§eRace started! Good luck!",
     )
 
     /**
@@ -43,7 +43,7 @@ object RiftGunthersRace {
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
-        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*"
+        "§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*",
     )
 
     /**
@@ -53,7 +53,7 @@ object RiftGunthersRace {
      */
     private val raceCancelledPattern by patternGroup.pattern(
         "cancel",
-        "§3§lRIFT RACING §r§cRace cancelled!.*"
+        "§3§lRIFT RACING §r§cRace cancelled!.*",
     )
 
     @HandleEvent
@@ -61,12 +61,12 @@ object RiftGunthersRace {
         parkourHelper?.reset()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         RiftAPI.inRiftRace = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(
@@ -122,8 +122,8 @@ object RiftGunthersRace {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
 
         parkourHelper?.render(event)

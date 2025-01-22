@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,6 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoppityCallWarning {
 
+    // <editor-fold desc="Patterns">
     /**
      * Test messages (and the real ones from Hypixel) have a space at the end of
      * them that the IDE kills. So it's "§r§e ✆ "
@@ -63,6 +65,7 @@ object HoppityCallWarning {
         "hoppity.call.pickup",
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
+    // </editor-fold>
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
     private var warningSound = SoundUtils.createSound("note.pling", 1f)
@@ -100,8 +103,8 @@ object HoppityCallWarning {
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onTick(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!activeWarning) return
         if (nextWarningTime == null || finalWarningTime == null) return
@@ -113,8 +116,8 @@ object HoppityCallWarning {
         if (currentTime >= finalWarningTime) stopWarningUser()
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         val minecraft = Minecraft.getMinecraft()
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
@@ -150,6 +153,12 @@ object HoppityCallWarning {
             // TODO if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
             action = { HypixelCommands.bank() },
         )
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        acceptUUID = null
+        stopWarningUser()
     }
 
     private fun readPickupUuid(event: LorenzChatEvent) {

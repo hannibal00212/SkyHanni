@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
@@ -19,8 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!VisitorAPI.inInventory) return
 
@@ -53,7 +52,7 @@ object VisitorRewardWarning {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorAPI.inInventory) return
         val stack = event.slot?.stack ?: return
@@ -71,7 +70,7 @@ object VisitorRewardWarning {
         }
 
         // all but shift click types work for accepting visitor
-        if (event.clickTypeEnum == GuiContainerEvent.ClickType.SHIFT) return
+        if (event.clickType == GuiContainerEvent.ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorAPI.changeStatus(visitor, VisitorAPI.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled
@@ -86,8 +85,8 @@ object VisitorRewardWarning {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onTooltip(event: ToolTipEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
         val visitor = VisitorAPI.getVisitor(lastClickedNpc) ?: return

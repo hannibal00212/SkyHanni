@@ -39,7 +39,7 @@ object InventoryUtils {
     }
 
     // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun openInventoryName() = Minecraft.getMinecraft().currentScreen.let {
+    fun openInventoryName(): String = Minecraft.getMinecraft().currentScreen.let {
         if (it is GuiChest) {
             val chest = it.inventorySlots as ContainerChest
             chest.getInventoryName()
@@ -131,6 +131,13 @@ object InventoryUtils {
         }
     }
 
+    fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            this[slot] = slot.stack
+        }
+    }
+
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
@@ -150,4 +157,8 @@ object InventoryUtils {
     fun Slot.isTopInventory() = inventory.isTopInventory()
 
     fun IInventory.isTopInventory() = this is ContainerLocalMenu
+
+    fun closeInventory() {
+        Minecraft.getMinecraft().currentScreen = null
+    }
 }

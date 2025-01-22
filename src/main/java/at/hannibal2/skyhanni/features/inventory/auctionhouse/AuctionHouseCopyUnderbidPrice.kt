@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AuctionHouseCopyUnderbidPrice {
@@ -28,16 +27,28 @@ object AuctionHouseCopyUnderbidPrice {
     private val config get() = SkyHanniMod.feature.inventory.auctions
 
     private val patternGroup = RepoPattern.group("auctions.underbid")
+
+    /**
+     * REGEX-TEST: §7Buy it now: §61,000,000,000 coins
+     * REGEX-TEST: §7Starting bid: §6200,000,000 coins
+     * REGEX-TEST: §7Top bid: §6220,000 coins
+     */
     private val auctionPricePattern by patternGroup.pattern(
         "price",
         "§7(?:Buy it now|Starting bid|Top bid): §6(?<coins>[0-9,]+) coins",
     )
+
+    /**
+     * REGEX-TEST: Auctions Browser
+     * REGEX-TEST: Manage Auctions
+     * REGEX-TEST: Auctions: "aaa"
+     */
     private val allowedInventoriesPattern by patternGroup.pattern(
         "allowedinventories",
         "Auctions Browser|Manage Auctions|Auctions: \".*\"?",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.autoCopyUnderbidPrice) return

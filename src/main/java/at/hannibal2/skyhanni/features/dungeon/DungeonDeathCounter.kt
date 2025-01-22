@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -47,7 +47,7 @@ object DungeonDeathCounter {
 
         "§c ☠ §r§(.*)§r§7 disconnected from the Dungeon and became a ghost§r§7.".toPattern(),
 
-        "§c ☠ §r§7(.*)§r§7 fell to their death with help from §r(.*)§r§7 and became a ghost§r§7.".toPattern()
+        "§c ☠ §r§7(.*)§r§7 fell to their death with help from §r(.*)§r§7 and became a ghost§r§7.".toPattern(),
     )
 
     private fun isDeathMessage(message: String): Boolean =
@@ -84,19 +84,19 @@ object DungeonDeathCounter {
         update()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         deaths = 0
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.deathCounterPos.renderString(
             DungeonMilestonesDisplay.color + display,
-            posLabel = "Dungeon Death Counter"
+            posLabel = "Dungeon Death Counter",
         )
     }
 

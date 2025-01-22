@@ -61,7 +61,7 @@ object MythologicalCreatureTracker {
     private val tracker = SkyHanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
         SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(
+            it.diana.mythologicalMobTrackerPerElection.getOrPut(
                 SkyBlockTime.now().getElectionYear(), ::Data,
             )
         },
@@ -122,8 +122,8 @@ object MythologicalCreatureTracker {
                 searchText = creatureType.displayName,
             )
         }
-        addSearchString(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
-        addSearchString(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
+        addSearchString("§7Total Mythological Creatures: §e${total.addSeparators()}")
+        addSearchString("§7Creatures since last Minos Inquisitor: §e${data.creaturesSinceLastInquisitor.addSeparators()} ")
     }
 
     @HandleEvent
@@ -133,7 +133,7 @@ object MythologicalCreatureTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
