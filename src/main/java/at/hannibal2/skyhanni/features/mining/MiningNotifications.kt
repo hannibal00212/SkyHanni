@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -92,8 +92,8 @@ object MiningNotifications {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hasSentCold = false
         hasSentAscensionRope = false
     }

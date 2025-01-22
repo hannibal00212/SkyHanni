@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -141,8 +141,8 @@ object DungeonCopilot {
         changeNextStep("Defeat the boss! Good luck :)")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         changeNextStep("")
     }
 
