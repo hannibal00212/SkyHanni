@@ -94,6 +94,7 @@ object SummoningMobManager {
         mobs -= mob
 
         // since MobEvent.DeSpawn can be fired while outside sb
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock) return
         if (!config.summonMessages) return
 
@@ -105,16 +106,16 @@ object SummoningMobManager {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobHideNametag) return
+        if (!config.summoningMobHideNametag) return
         if (event.entity.mob !in mobs) return
         event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobDisplay) return
+        if (!config.summoningMobDisplay) return
         if (mobs.isEmpty()) return
 
         val list = buildList {

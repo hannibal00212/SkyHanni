@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -137,9 +137,8 @@ object HoppityCallWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!HoppityAPI.pickupOutgoingCommandPattern.matches(event.message)) return
         if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
         if (PurseAPI.getPurse() >= config.coinThreshold) return
@@ -155,8 +154,8 @@ object HoppityCallWarning {
         )
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         acceptUUID = null
         stopWarningUser()
     }

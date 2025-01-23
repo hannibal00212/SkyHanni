@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -69,8 +69,8 @@ object SkyBlockKickDuration {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         if (kickMessage) {
             kickMessage = false
@@ -104,7 +104,7 @@ object SkyBlockKickDuration {
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
             "§cLast kicked from SkyBlock §b$format ago",
-            posLabel = "SkyBlock Kick Duration"
+            posLabel = "SkyBlock Kick Duration",
         )
     }
 
