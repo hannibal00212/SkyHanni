@@ -61,8 +61,8 @@ object PreciseGuessBurrow {
         if (distToLast == 0.0 || distToLast > 3.0) return
         particleLocations.add(currLoc)
         // A Degree n polynomial can be solved with n+1 unique points
-        // The Bézier curve used is a degree 3, so four points are needed to solve
-        if (particleLocations.size <= 3) return
+        // The Bézier curve used is a degree 3, so 4 points are needed to solve
+        if (particleLocations.size < 4) return
         val fitters = arrayOf(PolynomialFitter(3), PolynomialFitter(3), PolynomialFitter(3))
         for ((index, location) in particleLocations.withIndex()) {
             val x = index.toDouble()
