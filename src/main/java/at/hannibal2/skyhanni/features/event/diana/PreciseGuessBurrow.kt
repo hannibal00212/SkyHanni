@@ -80,9 +80,9 @@ object PreciseGuessBurrow {
 
         val t = 3 * controlPointDistance / startPointDerivative.length()
 
-        val guessPosition = coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) - 0.5 }.toLorenzVec()
+        val guessPosition = coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) }.toLorenzVec()
 
-        BurrowGuessEvent(guessPosition.down(0.5)).post()
+        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock()).post()
     }
 
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {
