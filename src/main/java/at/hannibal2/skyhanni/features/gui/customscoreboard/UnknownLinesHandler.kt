@@ -124,7 +124,6 @@ object UnknownLinesHandler {
                 if (firstFoundSince > 10.seconds && lastWarnedSince > 30.minutes) {
                     unknownLine.lastWarned = SimpleTimeMark.now()
                     warn(line, "same line active for 10 seconds")
-                    continue
                 }
             }
         }
@@ -143,7 +142,7 @@ object UnknownLinesHandler {
             // line included in chat message to not cache a previous message
             Exception(line),
             "CustomScoreboard detected a unknown line: '$line'",
-            "Unknown Line" to line,
+            "Unknown Line(s)" to line,
             "reason" to reason,
             "Island" to LorenzUtils.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
