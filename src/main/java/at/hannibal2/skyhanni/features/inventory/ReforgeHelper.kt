@@ -177,9 +177,8 @@ object ReforgeHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         when {
             isHexReforgeMenu(event.inventoryName) -> {
                 isInHexReforgeMenu = true

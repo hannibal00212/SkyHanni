@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -42,10 +41,8 @@ object ToolTooltipTweaks {
 
     private val statFormatter = DecimalFormat("0.##")
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         val itemStack = event.itemStack
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()

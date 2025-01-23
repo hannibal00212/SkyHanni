@@ -78,9 +78,8 @@ object SharkFishCounter {
 
     private fun isWaterFishingRod() = FishingAPI.isFishing() && !FishingAPI.holdingLavaRod
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
         if (!hasWaterRodInHand) return
 
