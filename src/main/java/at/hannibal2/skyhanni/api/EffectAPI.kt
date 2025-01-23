@@ -213,9 +213,8 @@ object EffectAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         for (line in event.footer.split("\n")) {
             godPotTabPattern.matchMatcher(line) {
                 profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
@@ -235,9 +234,9 @@ object EffectAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock || !event.isGodPotEffectsFilterSelect()) return
+        if (!event.isGodPotEffectsFilterSelect()) return
 
         val potionLore = event.inventoryItems[10]?.getLore() ?: run {
             // No active god pot effects found, reset the expiry time
@@ -260,9 +259,8 @@ object EffectAPI {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
