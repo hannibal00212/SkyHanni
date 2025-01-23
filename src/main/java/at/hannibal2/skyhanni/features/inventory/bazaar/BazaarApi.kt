@@ -125,9 +125,8 @@ object BazaarApi {
     }
 
     // TODO cache
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!inBazaarInventory) return
         if (!SkyHanniMod.feature.inventory.bazaar.purchaseHelper) return
         if (currentSearchedItem == "") return
@@ -161,6 +160,13 @@ object BazaarApi {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
         if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
+        }
+
+        // check for Buy Instantly
+        event.inventoryItems[16]?.let {
+            if (it.name == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+                return true
+            }
         }
 
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true

@@ -691,9 +691,8 @@ enum class HotmData(
             }
         }
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
-            if (!LorenzUtils.inSkyBlock) return
 
             ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
@@ -714,9 +713,8 @@ enum class HotmData(
             heartItem = null
         }
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-            if (!LorenzUtils.inSkyBlock) return
             inInventory = inventoryPattern.matches(event.inventoryName)
             if (!inInventory) return
             DelayedRun.runNextTick {
