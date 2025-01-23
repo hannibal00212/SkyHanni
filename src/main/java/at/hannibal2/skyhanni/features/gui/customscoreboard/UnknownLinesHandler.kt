@@ -142,7 +142,7 @@ object UnknownLinesHandler {
             // line included in chat message to not cache a previous message
             Exception(line),
             "CustomScoreboard detected a unknown line: '$line'",
-            "Unknown Line(s)" to line,
+            "Unknown Line" to line,
             "reason" to reason,
             "Island" to LorenzUtils.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
