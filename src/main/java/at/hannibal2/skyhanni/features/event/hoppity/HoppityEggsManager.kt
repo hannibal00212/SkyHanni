@@ -144,10 +144,11 @@ object HoppityEggsManager {
     private fun syncFromConfig() {
         if (syncedFromConfig) return
         val mealLastSpawn = profileStorage?.mealLastSpawn ?: return
-        syncedFromConfig = true
-        mealLastSpawn.forEach { (meal, time) ->
+        for((meal, time) in mealLastSpawn) {
+            if (time.isFarPast()) continue
             if (time.passedSince() >= 40.minutes) meal.markSpawned()
         }
+        syncedFromConfig = true
     }
 
     @HandleEvent
@@ -233,8 +234,12 @@ object HoppityEggsManager {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        checkSpawned()
         if (!isActive()) return
         checkWarn()
+    }
+
+    private fun checkSpawned() {
         resettingEntries
             .filter { it.spawnedToday() && !it.alreadyResetToday() }
             .forEach { EggSpawnedEvent(it).post() }

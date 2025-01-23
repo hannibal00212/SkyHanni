@@ -7,12 +7,14 @@ import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
@@ -44,6 +46,9 @@ enum class HoppityEggType(
     val timeUntil: Duration get() = nextSpawn.timeUntil()
     private val nextSpawn: SimpleTimeMark get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
         ?: calculateNextSpawn()
+    val lastSpawn: SimpleTimeMark get() = (nextSpawn - 40.minutes).takeIfHoppity() ?: SimpleTimeMark.farPast()
+
+    private fun SimpleTimeMark.takeIfHoppity() = takeIf { it.toSkyBlockTime().getSeason() == SkyblockSeason.SPRING }
 
     private fun spawnsToday(): Boolean {
         val sbTimeNow = SkyBlockTime.now()
@@ -109,7 +114,11 @@ enum class HoppityEggType(
     @SkyHanniModule
     companion object {
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
-        private val nextSpawnCache: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+        private val nextSpawnCache = CollectionUtils.ObservableMap<HoppityEggType, SimpleTimeMark>(
+            postUpdate = { key, _ ->
+                profileStorage?.mealLastSpawn?.set(key, key.lastSpawn)
+            }
+        )
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
 
