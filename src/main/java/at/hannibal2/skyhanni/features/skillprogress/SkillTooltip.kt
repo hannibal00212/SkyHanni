@@ -1,19 +1,18 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkillTooltip {
@@ -21,9 +20,8 @@ object SkillTooltip {
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
         if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {

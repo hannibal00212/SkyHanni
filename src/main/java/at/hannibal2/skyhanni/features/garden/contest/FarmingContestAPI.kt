@@ -59,9 +59,8 @@ object FarmingContestAPI {
         ContestBracket.entries.forEach { it.bracketPattern }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         if (internalContest && startTime.passedSince() > 20.minutes) {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()

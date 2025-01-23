@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 
 @SkyHanniModule
@@ -15,9 +14,9 @@ object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock || RiftAPI.inRift() || !config.display) return
+        if (RiftAPI.inRift() || !config.display) return
 
         val displayName = CurrentPetAPI.currentPet?.getUserFriendlyName(includeLevel = false) ?: return
         config.displayPos.renderString(displayName, posLabel = "Current Pet")

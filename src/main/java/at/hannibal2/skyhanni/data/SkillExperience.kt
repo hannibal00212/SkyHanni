@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,9 +30,8 @@ object SkillExperience {
         skillExp.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         actionBarPattern.matchMatcher(event.actionBar) {
             val skill = group("skill").lowercase()

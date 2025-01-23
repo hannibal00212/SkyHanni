@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -105,18 +105,16 @@ object GetFromSackAPI {
         inventoryMap.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
         event.cancel()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->
             tip.add("")
@@ -125,9 +123,8 @@ object GetFromSackAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageToServer(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
         if (!event.isCommand(commandsWithSlash)) return
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)

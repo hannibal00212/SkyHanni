@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -21,9 +20,8 @@ object BetterWikiFromMenus {
         event.move(6, "fandomWiki", "commands.fandomWiki")
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
 
         val chestName = InventoryUtils.openInventoryName()

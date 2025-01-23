@@ -194,15 +194,13 @@ object HoppityEventSummary {
         if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()
     }
 
@@ -263,9 +261,8 @@ object HoppityEventSummary {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         checkLbUpdateWarning()
         reCheckInventoryState()
         checkEnded()
