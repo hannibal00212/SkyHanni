@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -48,9 +47,8 @@ object AuctionHouseCopyUnderbidPrice {
         "Auctions Browser|Manage Auctions|Auctions: \".*\"?",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.autoCopyUnderbidPrice) return
         if (!event.fullyOpenedOnce) return
         if (event.inventoryName != "Create BIN Auction") return
@@ -69,10 +67,9 @@ object AuctionHouseCopyUnderbidPrice {
         ChatUtils.chat("Copied ${newPrice.addSeparators()} to clipboard. (Copy Underbid Price)")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
-        if (!LorenzUtils.inSkyBlock) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
         val stack = event.guiContainer.slotUnderMouse?.stack ?: return
 

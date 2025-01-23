@@ -307,9 +307,8 @@ object HoppityCollectionStats {
         reCalcHotspotCount()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) {
             // Clear highlight cache in case options are toggled
             highlightMap.clear()

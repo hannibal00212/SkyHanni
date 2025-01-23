@@ -207,15 +207,13 @@ object HoppityEventSummary {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         reCheckInventoryState()
     }
 
@@ -276,9 +274,8 @@ object HoppityEventSummary {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         checkStatsTypeCountInit()
         checkLbUpdateWarning()
         reCheckInventoryState()
@@ -578,7 +575,6 @@ object HoppityEventSummary {
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
-
             put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
                 stats.getMealEggCount().takeIf { it > 0 }?.let {
                     val spawnedMealEggs = getSpawnedEggCount(year)

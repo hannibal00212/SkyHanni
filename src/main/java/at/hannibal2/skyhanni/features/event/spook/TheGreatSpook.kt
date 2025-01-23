@@ -78,9 +78,8 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
         val fear = SkyblockStat.FEAR.lastKnownValue ?: 0.0
@@ -147,9 +146,8 @@ object TheGreatSpook {
         isGreatSpookActive = currentTime in timeRange
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {

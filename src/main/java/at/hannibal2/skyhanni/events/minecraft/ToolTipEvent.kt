@@ -1,12 +1,10 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.events.minecraft
 
+import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-@Cancelable
-class LorenzToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) :
-    LorenzEvent() {
+class ToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) : CancellableSkyHanniEvent() {
 
     var toolTip: MutableList<String>
         set(value) {
