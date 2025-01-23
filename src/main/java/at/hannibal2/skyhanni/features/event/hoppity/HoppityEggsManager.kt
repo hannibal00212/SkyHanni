@@ -144,7 +144,7 @@ object HoppityEggsManager {
     private fun syncFromConfig() {
         if (syncedFromConfig) return
         val mealLastSpawn = profileStorage?.mealLastSpawn ?: return
-        for((meal, time) in mealLastSpawn) {
+        for ((meal, time) in mealLastSpawn) {
             if (time.isFarPast()) continue
             if (time.passedSince() >= 40.minutes) meal.markSpawned()
         }
