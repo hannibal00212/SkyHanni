@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -61,9 +60,8 @@ object HarpFeatures {
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
     private fun isMenuGui(chestName: String) = menuTitlePattern.matches(chestName)
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGui(event: GuiKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.keybinds) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         val chest = event.guiContainer as? GuiChest ?: return
@@ -95,9 +93,8 @@ object HarpFeatures {
 
     private var openTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (config.quickRestart && isMenuGui(event.inventoryName)) {
             openTime = SimpleTimeMark.now()
         }
@@ -120,9 +117,8 @@ object HarpFeatures {
         minecraft.currentScreen?.setWorldAndResolution(minecraft, width, height)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.guiScale) return
         unSetGUIScale()
     }
@@ -150,9 +146,8 @@ object HarpFeatures {
         isGUIScaled = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
@@ -177,9 +172,8 @@ object HarpFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showNumbers) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (Item.getIdFromItem(event.stack.item) != 159) return // Stained hardened clay item id = 159
@@ -198,9 +192,8 @@ object HarpFeatures {
         event.move(2, "misc.harpNumbers", "inventory.helper.harp.showNumbers")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot.inventory !is ContainerLocalMenu) return

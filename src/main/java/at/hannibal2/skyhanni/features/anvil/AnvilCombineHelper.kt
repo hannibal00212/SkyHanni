@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 
 @SkyHanniModule
 object AnvilCombineHelper {
@@ -18,7 +17,7 @@ object AnvilCombineHelper {
     private var lastInventoryHash = 0
     private var highlightSlots = setOf<Int>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled() || !event.eventMatches()) return
 
@@ -35,16 +34,16 @@ object AnvilCombineHelper {
         }.keys
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper && LorenzUtils.inSkyBlock
+    private fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper
     private fun InventoryUpdatedEvent.eventMatches() = inventoryName == "Anvil" && inventorySize >= 52
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
         lastInventoryHash = 0
         highlightSlots = emptySet()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 

@@ -105,18 +105,16 @@ object GetFromSackAPI {
         inventoryMap.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
         event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->
             tip.add("")
@@ -125,9 +123,8 @@ object GetFromSackAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageToServer(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
         if (!event.isCommand(commandsWithSlash)) return
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
