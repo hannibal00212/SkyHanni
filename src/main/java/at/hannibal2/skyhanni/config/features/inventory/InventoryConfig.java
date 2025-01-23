@@ -64,6 +64,10 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @Category(name = "Shopping List", desc = "Generall shopping list")
+    public ShoppingListConfig shoppingList = new ShoppingListConfig();
+
+    @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
     // TODO remove the suffix "config"
