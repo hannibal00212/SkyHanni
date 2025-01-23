@@ -162,6 +162,13 @@ object BazaarApi {
             return true
         }
 
+        // check for Buy Instantly
+        event.inventoryItems[16]?.let {
+            if (it.name == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+                return true
+            }
+        }
+
         if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
         return when (event.inventoryName) {
             "How many do you want?" -> true
