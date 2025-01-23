@@ -420,7 +420,7 @@ object HoppityEventSummary {
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
             if (statYear == Int.MAX_VALUE) {
-                val numberEvents = storage?.hoppityEventStats?.keys?.count { it < currentSbYear } ?: 0
+                val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
                 addCenteredString(
                     "§7Compiled from §f$numberEvents §7events".partyModeReplace(),
                 )
