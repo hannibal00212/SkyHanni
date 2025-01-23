@@ -140,9 +140,9 @@ object NonGodPotEffectDisplay {
         checkFooter = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock || !checkFooter) return
+        if (!checkFooter) return
         val lines = event.footer.split("\n")
         if (!lines.any { it.contains("§a§lActive Effects") }) return
 

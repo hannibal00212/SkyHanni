@@ -155,9 +155,8 @@ object DianaProfitTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (!DianaAPI.isDoingDiana() && !spadeInHand) return

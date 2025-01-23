@@ -66,9 +66,8 @@ object KuudraAPI {
 
     fun inKuudra() = kuudraTier != null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (kuudraTier != null) return
         tierPattern.firstMatcher(event.added) {
             val tier = group("tier").toInt()
