@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -203,8 +203,8 @@ object TunnelsMaps {
         clickTranslate = mapOf()
     }
 
-    @SubscribeEvent
-    fun onRenderItemTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
@@ -269,7 +269,7 @@ object TunnelsMaps {
     init {
         RenderDisplayHelper(
             condition = { isEnabled() },
-            inOwnInventory = true
+            inOwnInventory = true,
         ) {
             val display = buildList<Renderable> {
                 if (active.isNotEmpty()) {

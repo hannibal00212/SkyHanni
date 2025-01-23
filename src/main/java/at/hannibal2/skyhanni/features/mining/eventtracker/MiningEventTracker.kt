@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtils
@@ -80,8 +80,8 @@ object MiningEventTracker {
 
     val apiError get() = apiErrorCount > 0
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         eventEndTime = SimpleTimeMark.farPast()
         lastSentEvent = null
     }
@@ -231,7 +231,7 @@ object MiningEventTracker {
                     ChatUtils.chat(
                         "§cFailed loading Mining Event data!\n" +
                             "§cPlease wait until the server-problem fixes itself! There is nothing else to do at the moment.",
-                        onlySendOnce = true
+                        onlySendOnce = true,
                     )
                 } else {
                     ErrorManager.logErrorWithData(
