@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -740,9 +739,8 @@ enum class HotmData(
             }
         }
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onChat(event: SkyHanniChatEvent) {
-            if (!LorenzUtils.inSkyBlock) return
             if (resetChatPattern.matches(event.message)) {
                 resetTree()
                 return

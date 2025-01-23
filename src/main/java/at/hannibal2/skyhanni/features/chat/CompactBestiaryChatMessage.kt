@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.IChatComponent
 
 @SkyHanniModule
@@ -25,9 +24,8 @@ object CompactBestiaryChatMessage {
 
     private val milestonePattern = "^.+(§8\\d{1,3}➡§e\\d{1,3})$".toRegex()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.chat.compactBestiaryMessage) return
 
         val titleMessage = "§f                                  §6§lBESTIARY"

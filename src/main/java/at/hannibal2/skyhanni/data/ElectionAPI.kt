@@ -151,10 +151,8 @@ object ElectionAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = ElectionCandidate.UNKNOWN

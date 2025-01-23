@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -39,9 +38,8 @@ object SeaCreatureManager {
         "§e> Your bottle of thunder has fully charged!"
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (doubleHookPattern.matches(event.message)) {
             if (SkyHanniMod.feature.fishing.compactDoubleHook) {
                 event.blockedReason = "double_hook"

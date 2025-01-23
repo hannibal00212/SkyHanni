@@ -75,10 +75,8 @@ object SlayerAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
             questStartTime = SimpleTimeMark.now()
         }

@@ -142,9 +142,8 @@ object UpgradeReminder {
         clickedUpgrade = CommunityShopUpgrade.fromItem(item) ?: return
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (upgradeStartedPattern.matches(event.message)) {
             clickedUpgrade?.start()
             when (clickedUpgradeType) {

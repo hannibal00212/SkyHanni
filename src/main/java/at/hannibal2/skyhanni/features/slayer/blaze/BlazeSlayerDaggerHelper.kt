@@ -47,9 +47,8 @@ object BlazeSlayerDaggerHelper {
     private var lastNearestCheck = SimpleTimeMark.farPast()
     private var lastNearest: HellionShield? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.hideDaggerWarning) return
 
         val message = event.message

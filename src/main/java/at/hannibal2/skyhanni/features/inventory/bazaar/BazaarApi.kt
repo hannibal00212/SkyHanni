@@ -146,9 +146,8 @@ object BazaarApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!inBazaarInventory) return
         // TODO USE SH-REPO
         // TODO remove dynamic pattern

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -80,9 +79,8 @@ object KuudraAPI {
         kuudraTier = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         completePattern.matchMatcher(event.message) {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()

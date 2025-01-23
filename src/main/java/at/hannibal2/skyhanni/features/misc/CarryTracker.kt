@@ -89,9 +89,8 @@ object CarryTracker {
     // TODO create trade event with player name, coins and items
     private var lastTradedPlayer: String? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         tradeCompletedPattern.matchMatcher(event.message) {
             lastTradedPlayer = group("name").cleanPlayerName()
         }

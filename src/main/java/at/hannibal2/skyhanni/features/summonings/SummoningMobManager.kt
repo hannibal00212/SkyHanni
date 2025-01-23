@@ -67,9 +67,9 @@ object SummoningMobManager {
         seraphRecallPattern,
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summonMessages) return
+        if (!config.summonMessages) return
         if (spawnPattern.matches(event.message)) event.blockedReason = "summoning_soul"
 
         if (despawnPatterns.any { it.matches(event.message) }) {

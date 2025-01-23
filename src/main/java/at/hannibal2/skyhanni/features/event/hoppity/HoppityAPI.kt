@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -320,10 +319,8 @@ object HoppityAPI {
         attemptFireRabbitFound(event.chatEvent)
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)

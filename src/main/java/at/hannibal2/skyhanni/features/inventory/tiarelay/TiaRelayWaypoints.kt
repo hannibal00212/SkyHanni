@@ -24,9 +24,8 @@ object TiaRelayWaypoints {
         Relay.entries.forEach { it.chatPattern }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.nextWaypoint) return
 
         val message = event.message

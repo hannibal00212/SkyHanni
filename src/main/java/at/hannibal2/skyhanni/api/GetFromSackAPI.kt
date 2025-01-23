@@ -201,9 +201,8 @@ object GetFromSackAPI {
         return CommandResult.VALID to PrimitiveItemStack(item, amountString.toDouble().toInt())
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
         val stack = lastItemStack ?: return
         val message = event.message
