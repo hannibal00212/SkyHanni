@@ -137,9 +137,8 @@ object HoppityCallWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!HoppityAPI.pickupOutgoingCommandPattern.matches(event.message)) return
         if (!config.ensureCoins || commandSentTimer.passedSince() < 5.seconds) return
         if (PurseAPI.getPurse() >= config.coinThreshold) return
