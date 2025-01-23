@@ -41,7 +41,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object BazaarApi {
+object BazaarAPI {
 
     private var loadedNpcPriceData = false
 

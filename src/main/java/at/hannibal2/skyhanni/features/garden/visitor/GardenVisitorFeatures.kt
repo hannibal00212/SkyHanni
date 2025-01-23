@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -226,7 +226,7 @@ object GardenVisitorFeatures {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
                             if (internalName.isBazaarItem()) {
-                                BazaarApi.searchForBazaarItem(name, amount)
+                                BazaarAPI.searchForBazaarItem(name, amount)
                             } else if (internalName.isAuctionHouseItem()) {
                                 HypixelCommands.auctionSearch(name.removeColor())
                             } else {
@@ -668,7 +668,7 @@ object GardenVisitorFeatures {
 
     private fun shouldShowShoppingList(): Boolean {
         if (VisitorAPI.inInventory) return true
-        if (BazaarApi.inBazaarInventory) return true
+        if (BazaarAPI.inBazaarInventory) return true
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
         val isInOwnInventory = currentScreen is GuiInventory
         if (isInOwnInventory) return true
