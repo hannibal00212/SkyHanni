@@ -65,7 +65,7 @@ object EnchantedClockHelper {
      * REGEX-TEST: §7Status: §a§lREADY
      */
     private val statusLorePattern by patternGroup.pattern(
-        "inventory.status",
+        "boost.status",
         "§7Status: §(?<color>[a-f])§l(?<status>.+)",
     )
 
@@ -75,7 +75,7 @@ object EnchantedClockHelper {
      * REGEX-TEST: §7§cOn cooldown: 0 minutes
      */
     private val cooldownLorePattern by patternGroup.pattern(
-        "inventory.cooldown",
+        "boost.cooldown",
         "(?:§.)*On cooldown: (?<count>[\\d,]+) (?<type>[A-Za-z]+?)s?\\b",
     )
     // </editor-fold>
