@@ -155,15 +155,13 @@ object VisitorAPI {
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
 
-        fun hasReward(): VisitorReward? {
+        fun getRewardWarningAwards(): List<VisitorReward> = buildList {
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
                 if (reward in config.rewardWarning.drops) {
-                    return reward
+                    add(reward)
                 }
             }
-
-            return null
         }
     }
 
@@ -214,7 +212,7 @@ object VisitorAPI {
         val totalReward = totalReward ?: error("totalReward is null")
         val loss = totalPrice - totalReward
         return when {
-            preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
+            preventRefusing && getRewardWarningAwards().isNotEmpty() -> VisitorBlockReason.RARE_REWARD
             preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED
             preventRefusingCopper && pricePerCopper <= coinsPerCopperPrice -> VisitorBlockReason.CHEAP_COPPER
             preventAcceptingCopper && pricePerCopper > coinsPerCopperPrice -> VisitorBlockReason.EXPENSIVE_COPPER
