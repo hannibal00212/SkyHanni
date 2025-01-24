@@ -26,7 +26,7 @@ object TentacleWaypoint {
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val tentacleHits = mutableMapOf<EntityLivingBase, Int>()
 
-    private const val VALID_SLIME_SIZES = 4..8
+    private val VALID_SLIME_SIZES = 4..8
     private const val TENTACLE_FLOOR_Y = 68
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
