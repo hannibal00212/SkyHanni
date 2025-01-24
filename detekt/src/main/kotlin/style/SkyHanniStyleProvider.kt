@@ -11,7 +11,8 @@ class SkyHanniStyleProvider : RuleSetProvider {
 
     override fun instance(config: Config): RuleSet {
         return RuleSet(ruleSetId, listOf(
-            InSkyBlockEarlyReturn(config)
+            InSkyBlockEarlyReturn(config),
+            IsInIslandEarlyReturn(config),
         ))
     }
 }
