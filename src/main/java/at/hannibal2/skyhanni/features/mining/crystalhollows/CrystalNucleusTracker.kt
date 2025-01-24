@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.EPIC_BAL_ITEM
@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CrystalNucleusTracker {
@@ -79,9 +78,8 @@ object CrystalNucleusTracker {
         var runsCompleted = 0L
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(LorenzUtils.getPlayerName(), ignoreCase = true)) return@matchMatcher
 

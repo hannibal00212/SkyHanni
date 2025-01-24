@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CrystalNucleusAPI {
@@ -51,9 +50,9 @@ object CrystalNucleusAPI {
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
     val EPIC_BAL_ITEM = "BAL;3".toInternalName()
     val LEGENDARY_BAL_ITEM = "BAL;4".toInternalName()
-    val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
+    private val PRECURSOR_APPARATUS_ITEM = "PRECURSOR_APPARATUS".toInternalName()
     val JUNGLE_KEY_ITEM = "JUNGLE_KEY".toInternalName()
-    val ROBOT_PARTS_ITEMS = listOf(
+    private val ROBOT_PARTS_ITEMS = listOf(
         "CONTROL_SWITCH",
         "ELECTRON_TRANSMITTER",
         "FTX_3070",
@@ -90,8 +89,8 @@ object CrystalNucleusAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!IslandType.CRYSTAL_HOLLOWS.isInIsland()) return
         val message = event.message
 
@@ -118,7 +117,7 @@ object CrystalNucleusAPI {
         }
     }
 
-    private fun LorenzChatEvent.getLoot(): Pair<NEUInternalName, Int>? {
+    private fun SkyHanniChatEvent.getLoot(): Pair<NEUInternalName, Int>? {
         // All loot rewards start with 4 spaces.
         // To simplify regex statements, this check is done outside the main logic.
         // This also nerfs the "§r§a§lREWARDS" message.
