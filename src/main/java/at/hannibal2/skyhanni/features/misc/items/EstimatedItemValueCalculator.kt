@@ -658,8 +658,7 @@ object EstimatedItemValueCalculator {
                     "internalName" to internalName,
                     "rawName" to rawName,
                     "rawLevel" to rawLevel,
-                    "alwaysActiveEnchants" to data.alwaysActiveEnchants,
-                    "alwaysActiveEnchants.entries" to data.alwaysActiveEnchants.entries,
+                    "alwaysActiveEnchants" to data.alwaysActiveEnchants.entries,
                 )
                 false
             }
