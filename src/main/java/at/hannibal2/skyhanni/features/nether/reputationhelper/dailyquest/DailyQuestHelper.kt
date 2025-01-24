@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -51,7 +51,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
@@ -144,8 +143,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -224,9 +223,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         event.drawDynamicText(location, "Town Board", 1.5)
     }
 
-    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
-    }
+    private fun Quest.needsTownBoardLocation() =
+        state == QuestState.READY_TO_COLLECT ||
+            (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
     fun MutableList<Renderable>.addQuests() {
         if (greatSpook) {
@@ -287,13 +286,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        return Renderable.horizontalContainer(
-            buildList {
-                addString("  $stateText$categoryName: ")
-                addItemStack(item)
-                addString("§f$displayName$progressText$sacksText")
-            },
-        )
+        return Renderable.line {
+            addString("  $stateText$categoryName: ")
+            addItemStack(item)
+            addString("§f$displayName$progressText$sacksText")
+        }
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {

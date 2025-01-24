@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -46,7 +45,7 @@ object GardenPlotAPI {
      */
     private val plotNamePattern by patternGroup.pattern(
         "name",
-        "§.Plot §7- §b(?<name>.*)"
+        "§.Plot §7- §b(?<name>.*)",
     )
 
     /**
@@ -54,7 +53,7 @@ object GardenPlotAPI {
      */
     private val barnNamePattern by patternGroup.pattern(
         "barnname",
-        "§.(?<name>The Barn)"
+        "§.(?<name>The Barn)",
     )
 
     /**
@@ -62,7 +61,7 @@ object GardenPlotAPI {
      */
     private val uncleanedPlotPattern by patternGroup.pattern(
         "uncleaned",
-        "§7Cleanup: .* (?:§.)*Completed"
+        "§7Cleanup: .* (?:§.)*Completed",
     )
 
     /**
@@ -70,7 +69,7 @@ object GardenPlotAPI {
      */
     private val unlockPlotChatPattern by patternGroup.pattern(
         "chat.unlock",
-        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!",
     )
 
     /**
@@ -78,7 +77,7 @@ object GardenPlotAPI {
      */
     private val cleanPlotChatPattern by patternGroup.pattern(
         "chat.clean",
-        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!",
     )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
@@ -91,7 +90,7 @@ object GardenPlotAPI {
      */
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+        "§9§lSPLASH! §r§6Your §r§[ba]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!",
     )
 
     /**
@@ -103,7 +102,7 @@ object GardenPlotAPI {
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spray",
-        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?"
+        "Spray: §r§[7a](?<spray>[\\w\\s]+)(?:§r§7\\((?:(?<minutes>\\d+)m)? ?(?:(?<seconds>\\d+)s)?\\))?",
     )
     var plots = listOf<Plot>()
 
@@ -252,7 +251,7 @@ object GardenPlotAPI {
     }
 
     private fun isSprayAccurate(
-        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType,
     ): Boolean {
         return sprayExpiryTime >= expectedExpireTime + 6.seconds ||
             sprayExpiryTime <= expectedExpireTime - 1.minutes ||
@@ -260,11 +259,12 @@ object GardenPlotAPI {
     }
 
     private fun sprayMessageEligible(
-        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType
+        sprayExpiryTime: SimpleTimeMark, expectedExpireTime: SimpleTimeMark, currentSpray: SprayType, newSpray: SprayType,
     ): Boolean {
         return (sprayExpiryTime <= expectedExpireTime - 10.minutes || currentSpray != newSpray) &&
             (config.newSprayNotification && sprayExpiryTime >= SimpleTimeMark.now() + 1.minutes)
     }
+
     fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
@@ -305,8 +305,8 @@ object GardenPlotAPI {
         plots = list
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!GardenAPI.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {

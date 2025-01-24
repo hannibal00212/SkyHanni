@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -46,7 +46,7 @@ object MinecraftData {
 
             is S2APacketParticles -> {
                 if (ReceiveParticleEvent(
-                        packet.particleType!!,
+                        packet.particleType,
                         LorenzVec(packet.xCoordinate, packet.yCoordinate, packet.zCoordinate),
                         packet.particleCount,
                         packet.particleSpeed,
@@ -68,7 +68,7 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        LorenzWorldChangeEvent().postAndCatch()
+        WorldChangeEvent().post()
     }
 
     var totalTicks = 0
@@ -105,8 +105,8 @@ object MinecraftData {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         InventoryUtils.itemInHandId = NEUInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()
     }

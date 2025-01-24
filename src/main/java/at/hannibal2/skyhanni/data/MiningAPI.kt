@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
@@ -192,12 +192,10 @@ object MiningAPI {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!inCustomMiningIsland()) return
+        if (!inColdIsland()) return
 
         dungeonRoomPattern.firstMatcher(event.added) {
             mineshaftRoomId = group("roomId")
-        } ?: run {
-            mineshaftRoomId = null
         }
 
         val newCold = coldPattern.firstMatcher(event.added) {
@@ -220,8 +218,8 @@ object MiningAPI {
         lastClicked = now
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!inColdIsland()) return
         if (coldResetPattern.matches(event.message)) {
             updateCold(0)
@@ -372,6 +370,8 @@ object MiningAPI {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
+
+        mineshaftRoomId = null
     }
 
     private fun runEvent() {
@@ -402,8 +402,8 @@ object MiningAPI {
         lastClickedPos = null
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks.clear()

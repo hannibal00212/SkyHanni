@@ -25,8 +25,10 @@ object ExperimentationTableAPI {
 
     val inTable get() = inventoriesPattern.matches(openInventoryName())
 
-    fun inDistanceToTable(vec: LorenzVec, max: Double): Boolean =
-        storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    fun inDistanceToTable(max: Double): Boolean {
+        val vec = LorenzVec.getBlockBelowPlayer()
+        return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    }
 
     fun getCurrentExperiment(): Experiment? =
         superpairsPattern.matchMatcher(openInventoryName()) {

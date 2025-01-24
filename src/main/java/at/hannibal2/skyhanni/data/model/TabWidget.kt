@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -392,9 +391,9 @@ enum class TabWidget(
 
         private val FORCE_UPDATE_DELAY = 2.seconds
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onSecondPassed(event: SecondPassedEvent) {
-            if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
+            if (sentSinceWorldChange) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
@@ -439,8 +438,8 @@ enum class TabWidget(
             }
         }
 
-        @SubscribeEvent
-        fun onWorldChange(event: LorenzWorldChangeEvent) {
+        @HandleEvent
+        fun onWorldChange(event: WorldChangeEvent) {
             sentSinceWorldChange = false
         }
 

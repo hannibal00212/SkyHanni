@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -68,6 +68,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
@@ -550,8 +551,8 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
         }
@@ -649,7 +650,7 @@ object GardenVisitorFeatures {
 
         if (config.shoppingList.onlyWhenClose && !GardenAPI.onBarnPlot) return
 
-        if (!hideExtraGuis()) {
+        if (!hideExtraGuis() && shouldShowShoppingList()) {
             config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
     }
@@ -660,9 +661,19 @@ object GardenVisitorFeatures {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
 
-        if (showGui()) {
+        if (showGui() && shouldShowShoppingList()) {
             config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
         }
+    }
+
+    private fun shouldShowShoppingList(): Boolean {
+        if (VisitorAPI.inInventory) return true
+        if (BazaarApi.inBazaarInventory) return true
+        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
+        val isInOwnInventory = currentScreen is GuiInventory
+        if (isInOwnInventory) return true
+
+        return false
     }
 
     private fun showGui(): Boolean {
