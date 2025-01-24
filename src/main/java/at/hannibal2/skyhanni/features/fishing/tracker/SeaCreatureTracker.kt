@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -180,14 +179,7 @@ object SeaCreatureTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { shouldShowDisplay() },
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

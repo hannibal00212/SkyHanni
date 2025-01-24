@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -48,7 +47,7 @@ object CorpseTracker {
             val divisor = 1.coerceAtLeast(
                 getSelectedBucket()?.let {
                     corpsesLooted[it]?.toInt()
-                } ?: corpsesLooted.sumAllValues().toInt()
+                } ?: corpsesLooted.sumAllValues().toInt(),
             )
             val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
@@ -130,14 +129,7 @@ object CorpseTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { isEnabled() },
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent

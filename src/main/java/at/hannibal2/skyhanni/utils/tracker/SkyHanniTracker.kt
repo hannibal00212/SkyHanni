@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -177,6 +178,17 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (display.isEmpty()) {
             update()
         }
+    }
+
+    fun initRenderer(position: Position, condition: () -> Boolean) {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = condition,
+            onRender = {
+                renderDisplay(position)
+            },
+        )
     }
 
     inner class SharedTracker<Data : TrackerData>(

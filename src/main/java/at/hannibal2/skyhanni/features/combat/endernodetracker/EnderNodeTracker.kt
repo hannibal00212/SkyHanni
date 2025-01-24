@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -175,14 +174,7 @@ object EnderNodeTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { isEnabled() },
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent

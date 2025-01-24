@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -99,14 +98,7 @@ object ArmorDropTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { shouldShowDisplay() },
-            onRender = {
-                tracker.renderDisplay(config.pos)
-            },
-        )
+        tracker.initRenderer(config.pos) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

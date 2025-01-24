@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -169,14 +168,7 @@ object DicerRngDropTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { shouldShowDisplay() },
-            onRender = {
-                tracker.renderDisplay(config.pos)
-            },
-        )
+        tracker.initRenderer(config.pos) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
