@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -134,7 +133,7 @@ object ChocolateFactoryStrayTracker {
      */
     val doradoEscapeStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.doradoescape",
-        ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*"
+        ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*",
     )
     // </editor-fold>
 
@@ -212,7 +211,7 @@ object ChocolateFactoryStrayTracker {
             "mountain" to { count, list -> list.add("§b$count §6Chocolate ${StringUtils.pluralize(count, "Mountain")}") },
             "dorado" to { count, list -> list.add("§b$count §6El Dorado ${StringUtils.pluralize(count, "Sighting")}") },
             "stampede" to { count, list -> list.add("§b$count §6${StringUtils.pluralize(count, "Stampede")}") },
-            "goldenclick" to { count, list -> list.add("§b$count §6Golden ${StringUtils.pluralize(count, "Click")}") }
+            "goldenclick" to { count, list -> list.add("§b$count §6Golden ${StringUtils.pluralize(count, "Click")}") },
         )
     }
 
@@ -303,14 +302,7 @@ object ChocolateFactoryStrayTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { isEnabled() },
-            onRender = {
-                tracker.renderDisplay(config.strayRabbitTrackerPosition)
-            },
-        )
+        tracker.initRenderer(config.strayRabbitTrackerPosition) { isEnabled() }
     }
 
     @HandleEvent
