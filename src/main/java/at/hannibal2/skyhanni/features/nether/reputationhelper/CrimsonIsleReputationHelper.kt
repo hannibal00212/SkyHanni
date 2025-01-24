@@ -143,10 +143,9 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
         if (config.useHotkey && !isHotkeyHeld()) {
             return
