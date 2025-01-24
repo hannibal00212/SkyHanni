@@ -179,6 +179,10 @@ public class DamageIndicatorConfig {
     @ConfigEditorBoolean
     public boolean timeToKillSlayer = true;
 
+    @Expose
+    @ConfigOption(name = "Show Bacte Phase", desc = "Show the current phase of Bacte in the Rift.")
+    @ConfigEditorBoolean
+    public boolean showBactePhase = true;
 
     @Expose
     @ConfigOption(name = "Ender Slayer", desc = "")

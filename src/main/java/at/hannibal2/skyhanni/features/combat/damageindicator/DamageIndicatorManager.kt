@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteAPI
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteAPI.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -471,8 +473,20 @@ object DamageIndicatorManager {
                 entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
+            BossType.BACTE,
+            -> {
+                return checkBacte(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
+            }
+
             else -> return ""
         }
+        return ""
+    }
+
+    private fun checkBacte(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
+        if (!config.showBactePhase) return ""
+        if (currentPhase == BacteAPI.Phase.NOT_ACTIVE) return ""
+        entityData.nameAbove = "§c${currentPhase.displayName}/${BacteAPI.Phase.PHASE_5.ordinal}"
         return ""
     }
 
