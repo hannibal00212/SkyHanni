@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
-import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -30,26 +29,26 @@ object TentacleWaypoint {
     private const val TENTACLE_FLOOR_Y = 68
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: MobEvent.Spawn.Special) {
         if (!isEnabled()) return
-        val entity = event.entity as? EntitySlime ?: return
-        if (!entity.isSkyBlockMob()) return
-        if (entity.displayName.formattedText != "Slime§r") return
+        val entity = event.mob.baseEntity as? EntitySlime ?: return
+        if (event.mob.name != "Bacte Tentacle") return
         // Only get the tentacle on the ground
         if (ceil(entity.posY).toInt() != TENTACLE_FLOOR_Y) return
         if (entity.slimeSize !in VALID_SLIME_SIZES) return
         if (entity in tentacleHits) return
 
-        tentacleHits += entity to 0
+        tentacleHits += (event.mob.baseEntity as EntitySlime) to 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onEntityDamage(event: EntityHurtEvent<EntitySlime>) {
+    fun onEntityDamage(event: MobEvent.Hurt.Special) {
         if (!isEnabled()) return
+        val entity = event.mob.baseEntity as? EntitySlime ?: return
 
         // Fixes Wall Damage counting as tentacle damage
         if (event.source.damageType != "generic") return
-        tentacleHits[event.entity]?.let { tentacleHits[event.entity] = it + 1 }
+        tentacleHits[entity]?.let { tentacleHits[entity] = it + 1 }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
