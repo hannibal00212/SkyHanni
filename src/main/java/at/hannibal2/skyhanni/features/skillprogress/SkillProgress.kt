@@ -155,9 +155,8 @@ object SkillProgress {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
