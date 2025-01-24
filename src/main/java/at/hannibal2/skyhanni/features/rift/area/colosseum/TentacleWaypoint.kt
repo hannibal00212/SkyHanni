@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -23,7 +24,7 @@ import kotlin.math.ceil
 object TentacleWaypoint {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
-    private var tentacles = mutableMapOf<EntityLivingBase, Int>()
+    private val tentacles = mutableMapOf<EntityLivingBase, Int>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
@@ -52,7 +53,7 @@ object TentacleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRender(event: RenderWorldEvent) {
         if (!isEnabled()) return
-        tentacles = tentacles.filterNot { it.key.isDead || it.key.health == 0f }.toMutableMap()
+        tentacles.removeIfKey { it.isDead || it.health == 0f }
 
         for ((tentacle, hits) in tentacles) {
             event.drawWaypointFilled(
