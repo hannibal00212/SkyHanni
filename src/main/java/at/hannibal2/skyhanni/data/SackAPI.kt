@@ -150,6 +150,7 @@ object SackAPI {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
                     gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
+                    println("Gemstone: $name, $rarity, $stored")
                     if (gemstoneMap.containsKey(name.removeColor())) {
                         val internalName = "${rarity.uppercase()}_${
                             name.uppercase().split(" ")[0].removeColor()

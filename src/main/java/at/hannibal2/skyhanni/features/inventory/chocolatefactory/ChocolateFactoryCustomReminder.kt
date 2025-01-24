@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -109,7 +110,7 @@ object ChocolateFactoryCustomReminder {
     private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
         val list = item.getLore()
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(list)
-            ?: return milestoneCostLorePattern.matchAll(list) {
+            ?: return milestoneCostLorePattern.firstMatcher(list) {
                 // math needed to get from "time until current chocolate" to "time until all time chocolate"
                 val amount = group("amount").formatLong()
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
