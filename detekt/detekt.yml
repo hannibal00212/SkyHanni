@@ -25,6 +25,10 @@ ImportRules:
     CustomImportOrdering:
         active: true
 
+SkyHanniStyle:
+    InSkyBlockEarlyReturn:
+        active: true
+
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
         active: false

@@ -45,6 +45,8 @@
 #### Inventory Improvements
 
 + Added time-held display for Discrite in stack size and lore. - Luna (https://github.com/hannibal002/SkyHanni/pull/3101)
++ Added support for more NEU GUIs in Estimated Item Value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3251)
+    + Added Trade Overlay, Equipment Overlay, and Storage Overlay support.
 
 #### Mining Improvements
 
@@ -106,12 +108,17 @@
 + Fixed Experimentation Table Tracker not detecting Exp Bottles thrown over 5 blocks away. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3239)
     + Limited Experimentation Table Tracker checks to within 15 blocks around the table.
 + Fixed some items not rendering in personal compactor/deletor overlay. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3243)
++ Fixed Anvil Combine Helper not highlighting when a book is in the second slot. - Ownwn (https://github.com/hannibal002/SkyHanni/pull/3258)
++ Fixed bazaar detection in instant buy menu, breaking visibility of features like Visitor Shopping List and Hide Non Clickable Items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3269)
++ Fixed enchanted clock reminders triggering at incorrect times. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3256)
 
 #### Custom Scoreboard Bug Fixes
 
 + Fixed Custom Scoreboard Lines sometimes not showing Kuudra Lines. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3157)
 + Fixed "Rift Dimension" appearing on Custom Scoreboard in the Rift. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3230)
 + Fixed Custom Scoreboard in the Garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3230)
++ Fixed Custom Scoreboard error when visiting a garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3266)
++ Fixed Custom Scoreboard not showing the Mineshaft Room ID. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3254)
 
 #### Garden Bug Fixes
 
@@ -141,6 +148,14 @@
 
 + Fixed `/show` messages from ironman and non-ranked players not reformatted by Chat Player Messages. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3238)
 
+#### Command Bug Fixes
+
++ Fixed `/shskills` command showing usage when resetting a custom skill goal. - Luna (https://github.com/hannibal002/SkyHanni/pull/3264)
+
+#### Dungeon Bug Fixes
+
++ Fixed incorrect Livid highlighting in F5/M5 sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
+
 #### Misc Bug Fixes
 
 + Fixed overflow level-up message not showing and removed dependency on skill progress display. - appable (https://github.com/hannibal002/SkyHanni/pull/3146)
@@ -151,6 +166,7 @@
 + Fixed a rare crash when using ancient versions of NEU. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3247)
 + Fixed GUI Editor hotkey blocking GUI searches. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3226)
 + Fixed skull crash with missing repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/3229)
++ Fixed SkyBlock XP Bar overriding in Rift & Catacombs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3252)
 
 ### Technical Details
 
@@ -185,6 +201,14 @@
 + Rewrote ReputationHelper to use Renderables & TabWidgetUpdateEvent. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3207)
 + Split RegexTestMissing Detekt Rule. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3220)
 + Transferred more events to SkyHanniEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3199)
++ Added EnumMap helper methods. - Empa (https://github.com/hannibal002/SkyHanni/pull/3200)
++ Changed more events to SkyHanniEvent. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3234)
++ Cleaned EstimatedItemValueCalculator code: improved onlyTierOnePrices and onlyTierFivePrices calculations. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3250)
++ Cleaned up estimated item value logic. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3255)
++ Resolved some Baseline LongMethod issues. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3240)
++ Reworked Livid color detection. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
+    + Added performance improvements.
+    + Added easier debugging for future issues.
 
 ## Version 1.0.0
 
