@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TerracottaPhase {
@@ -45,7 +44,7 @@ object TerracottaPhase {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isActive() && config.hideParticles) {
             event.cancel()

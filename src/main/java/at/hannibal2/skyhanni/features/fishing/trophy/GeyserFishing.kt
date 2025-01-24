@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GeyserFishing {
@@ -29,7 +27,7 @@ object GeyserFishing {
     private var geyser: LorenzVec? = null
     private var geyserBox: AxisAlignedBB? = null
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
         with(event) {
