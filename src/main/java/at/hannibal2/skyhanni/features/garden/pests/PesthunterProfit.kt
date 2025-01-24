@@ -120,7 +120,7 @@ object PesthunterProfit {
         val endIndex = lore.indexOfFirst { it.isBlank() && lore.indexOf(it) > startIndex }
 
         val costLore =
-            if (endIndex != -1)  lore.subList(startIndex, endIndex)
+            if (endIndex != -1) lore.subList(startIndex, endIndex)
             else lore.subList(startIndex, lore.size)
 
         return costLore.filter {
