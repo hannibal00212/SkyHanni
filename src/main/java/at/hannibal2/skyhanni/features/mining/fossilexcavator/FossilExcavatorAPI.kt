@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -52,9 +51,8 @@ object FossilExcavatorAPI {
 
     val scrapItem = "SUSPICIOUS_SCRAP".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (event.inventoryName != "Fossil Excavator") return
         inInventory = true
     }
@@ -79,9 +77,8 @@ object FossilExcavatorAPI {
         inExcavatorMenu = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         val message = event.message
 
