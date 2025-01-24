@@ -54,6 +54,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
+import at.hannibal2.skyhanni.features.inventory.shoppinglist.ShoppingList
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -741,6 +742,11 @@ object Commands {
             description = "Changes the SkyBlock island SkyHanni thinks you are on"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
+        }
+        event.register("shtestshoppinglist") {
+            description = "Test the shopping list feature"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { ShoppingList.test() }
         }
     }
 
