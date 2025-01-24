@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
 import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -83,8 +83,8 @@ object MiningCommissionsBlocksColor {
     private val ignoredTabListCommissions = TimeLimitedSet<CommissionBlock>(5.seconds)
 
     // TODO Commission API
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!enabled) return
         commissionCompletePattern.matchMatcher(event.message) {
             val name = group("name")
@@ -146,8 +146,8 @@ object MiningCommissionsBlocksColor {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         enabled = false
         replaceBlocksMapCache = mutableMapOf()
     }
