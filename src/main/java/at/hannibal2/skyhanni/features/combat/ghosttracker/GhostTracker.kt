@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -216,8 +215,8 @@ object GhostTracker {
         tracker.addCoins(event.coins.toInt(), false)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return

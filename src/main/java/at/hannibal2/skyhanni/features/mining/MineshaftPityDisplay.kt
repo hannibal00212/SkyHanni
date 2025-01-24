@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
@@ -31,7 +31,6 @@ import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MineshaftPityDisplay {
@@ -98,8 +97,8 @@ object MineshaftPityDisplay {
         update()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!MiningAPI.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
