@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,9 +53,8 @@ object ItemAddManager {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSackChange(event: SackChangeEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         if (inSackInventory || lastSackInventoryLeave.passedSince() < 10.seconds) return
 
@@ -71,9 +68,8 @@ object ItemAddManager {
         superCraftedItems.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemAdd(event: ItemAddInInventoryEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val internalName = event.internalName
         if (internalName == ARCHFIEND_DICE || internalName == HIGH_CLASS_ARCHFIEND_DICE) {
@@ -92,8 +88,8 @@ object ItemAddManager {
     private var lastDiceRoll = SimpleTimeMark.farPast()
     private val superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (diceRollChatPattern.matches(event.message)) {
             lastDiceRoll = SimpleTimeMark.now()
         }

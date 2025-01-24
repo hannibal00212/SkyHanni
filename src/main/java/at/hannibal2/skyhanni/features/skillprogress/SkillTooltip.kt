@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
@@ -21,9 +20,8 @@ object SkillTooltip {
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
         if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
