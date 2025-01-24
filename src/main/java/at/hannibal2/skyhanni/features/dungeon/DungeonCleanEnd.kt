@@ -40,9 +40,8 @@ object DungeonCleanEnd {
     private var chestsSpawned = false
     private var lastBossId: Int = -1
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
 
         val message = event.message
@@ -53,7 +52,6 @@ object DungeonCleanEnd {
     }
 
     private fun shouldBlock(): Boolean {
-        if (!DungeonAPI.inDungeon()) return false
         if (!config.enabled) return false
 
         if (!bossDone) return false
@@ -68,9 +66,8 @@ object DungeonCleanEnd {
         lastBossId = -1
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
-        if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
 
         if (lastBossId == -1) {
@@ -78,9 +75,8 @@ object DungeonCleanEnd {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
         if (bossDone) return
         if (lastBossId == -1) return
@@ -117,14 +113,14 @@ object DungeonCleanEnd {
         event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
             event.cancel()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
             event.cancel()

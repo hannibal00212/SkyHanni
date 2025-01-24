@@ -23,7 +23,7 @@ import net.minecraft.util.EnumParticleTypes
 object RiftMotesOrb {
 
     private val config get() = RiftAPI.config.motesOrbs
-    private val enabled = config.enabled
+    private val enabled get() = config.enabled
 
     /**
      * REGEX-TEST: §5§lORB! §r§dPicked up §r§5+10 Motes§r§d!
