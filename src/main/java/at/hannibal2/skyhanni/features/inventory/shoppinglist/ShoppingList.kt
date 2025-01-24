@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -70,7 +72,6 @@ object ShoppingList {
         ChatUtils.chat(itemList.toString())
 
         createDisplay()
-        config.position.renderRenderables(display, posLabel = "Shopping List")
 
         ChatUtils.chat("test done")
     }
@@ -78,8 +79,18 @@ object ShoppingList {
     fun createDisplay() {
         display = buildList {
             addString("Shopping List")
-//             itemList.forEach { addString(it.toString()) }
+            itemList.forEach { addString(it.toString()) }
         }
+    }
+
+    @HandleEvent
+    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent){
+        config.position.renderRenderables(display, posLabel = "Shopping List")
+    }
+
+    @HandleEvent
+    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent){
+        config.position.renderRenderables(display, posLabel = "Shopping List")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
