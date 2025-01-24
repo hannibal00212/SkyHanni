@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
@@ -57,7 +57,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             return
         }
         // TODO move the function to common
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }

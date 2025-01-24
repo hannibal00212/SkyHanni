@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
-import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
-import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
-import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.api.SkillApi
+import at.hannibal2.skyhanni.api.SkillApi.activeSkill
+import at.hannibal2.skyhanni.api.SkillApi.lastUpdate
+import at.hannibal2.skyhanni.api.SkillApi.oldSkillInfoMap
+import at.hannibal2.skyhanni.api.SkillApi.showDisplay
+import at.hannibal2.skyhanni.api.SkillApi.skillXpInfoMap
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
@@ -161,7 +161,7 @@ object SkillProgress {
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
         val newLevel = event.newLevel
-        val skill = SkillAPI.storage?.get(event.skill) ?: return
+        val skill = SkillApi.storage?.get(event.skill) ?: return
         val goalReached = newLevel == skill.customGoalLevel && customGoalConfig.enableInChat
 
         val rewards = buildList {
@@ -233,7 +233,7 @@ object SkillProgress {
 
     private fun update() {
         lastGainUpdate = SimpleTimeMark.now()
-        skillXPInfoMap.forEach {
+        skillXpInfoMap.forEach {
             it.value.xpGainLast = it.value.xpGainHour
         }
     }
@@ -250,11 +250,11 @@ object SkillProgress {
     }
 
     private fun drawAllDisplay() = buildMap {
-        val skillMap = SkillAPI.storage ?: return@buildMap
+        val skillMap = SkillApi.storage ?: return@buildMap
         val sortedMap = SkillType.entries.filter { it.displayName.isNotEmpty() }.sortedBy { it.displayName.take(2) }
 
         for (skill in sortedMap) {
-            val skillInfo = skillMap[skill] ?: SkillAPI.SkillInfo(level = -1, overflowLevel = -1)
+            val skillInfo = skillMap[skill] ?: SkillApi.SkillInfo(level = -1, overflowLevel = -1)
             val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
             val useCustomGoalLevel =
                 skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
@@ -314,8 +314,8 @@ object SkillProgress {
 
     private fun drawETADisplay() = buildList {
         val activeSkill = activeSkill ?: return@buildList
-        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return@buildList
-        val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildList
+        val skillInfo = SkillApi.storage?.get(activeSkill) ?: return@buildList
+        val xpInfo = skillXpInfoMap[activeSkill] ?: return@buildList
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildList
         oldSkillInfoMap[activeSkill] = skillInfo
         val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) {
@@ -395,7 +395,7 @@ object SkillProgress {
 
     private fun drawDisplay() = buildList {
         val activeSkill = activeSkill ?: return@buildList
-        val skillMap = SkillAPI.storage ?: return@buildList
+        val skillMap = SkillApi.storage ?: return@buildList
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
         val targetLevel = skill.customGoalLevel
@@ -468,7 +468,7 @@ object SkillProgress {
     }
 
     private fun addActionsLeft(
-        skill: SkillAPI.SkillInfo,
+        skill: SkillApi.SkillInfo,
         currentXpMax: Long,
         currentXp: Long,
     ): String {
@@ -484,8 +484,8 @@ object SkillProgress {
 
     private fun updateSkillInfo() {
         val activeSkill = activeSkill ?: return
-        val xpInfo = skillXPInfoMap.getOrPut(activeSkill) { SkillAPI.SkillXPInfo() }
-        val skillInfo = SkillAPI.storage?.get(activeSkill) ?: return
+        val xpInfo = skillXpInfoMap.getOrPut(activeSkill) { SkillApi.SkillXpInfo() }
+        val skillInfo = SkillApi.storage?.get(activeSkill) ?: return
         oldSkillInfoMap[activeSkill] = skillInfo
 
         val totalXp = skillInfo.currentXp
@@ -494,7 +494,7 @@ object SkillProgress {
             val delta = totalXp - xpInfo.lastTotalXp
             if (delta > 0 && delta < 1000) {
 
-                xpInfo.timer = when (SkillAPI.activeSkill) {
+                xpInfo.timer = when (SkillApi.activeSkill) {
                     SkillType.FARMING -> etaConfig.farmingPauseTime
                     SkillType.MINING -> etaConfig.miningPauseTime
                     SkillType.COMBAT -> etaConfig.combatPauseTime
@@ -505,12 +505,12 @@ object SkillProgress {
 
                 xpInfo.xpGainQueue.add(0, delta)
 
-                calculateXPHour(xpInfo)
+                calculateXpHour(xpInfo)
             } else if (xpInfo.timer > 0) {
                 xpInfo.timer--
                 xpInfo.xpGainQueue.add(0, 0f)
 
-                calculateXPHour(xpInfo)
+                calculateXpHour(xpInfo)
             } else if (delta <= 0) {
                 xpInfo.isActive = false
             }
@@ -518,7 +518,7 @@ object SkillProgress {
         xpInfo.lastTotalXp = totalXp.toFloat()
     }
 
-    private fun calculateXPHour(xpInfo: SkillAPI.SkillXPInfo) {
+    private fun calculateXpHour(xpInfo: SkillApi.SkillXpInfo) {
         while (xpInfo.xpGainQueue.size > 30) {
             xpInfo.xpGainQueue.removeLast()
         }

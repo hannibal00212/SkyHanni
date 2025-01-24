@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -67,7 +67,7 @@ object HypixelBazaarFetcher {
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
         try {
-            val jsonResponse = withContext(Dispatchers.IO) { APIUtils.getJSONResponse(URL) }.asJsonObject
+            val jsonResponse = withContext(Dispatchers.IO) { ApiUtils.getJSONResponse(URL) }.asJsonObject
             val response = ConfigManager.gson.fromJson<BazaarApiResponseJson>(jsonResponse)
             if (response.success) {
                 latestProductInformation = process(response.products)

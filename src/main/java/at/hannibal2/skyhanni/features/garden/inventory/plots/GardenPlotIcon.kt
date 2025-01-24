@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
@@ -20,8 +20,8 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object GardenPlotIcon {
 
-    private val config get() = GardenAPI.config.plotIcon
-    private val plotList get() = GardenAPI.storage?.plotIcon?.plotList
+    private val config get() = GardenApi.config.plotIcon
+    private val plotList get() = GardenApi.storage?.plotIcon?.plotList
     private var inInventory = false
     private var copyStack: ItemStack? = null
 
@@ -36,7 +36,7 @@ object GardenPlotIcon {
 
     var hardReset = false
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled && inInventory
+    fun isEnabled() = GardenApi.inGarden() && config.enabled && inInventory
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {

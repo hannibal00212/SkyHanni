@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -40,7 +40,7 @@ object GFSPiggyBank {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         patternList.matchMatchers(event.message) {
-            GetFromSackAPI.getFromChatMessageSackItems(ENCHANTED_PORK)
+            GetFromSackApi.getFromChatMessageSackItems(ENCHANTED_PORK)
         }
     }
 

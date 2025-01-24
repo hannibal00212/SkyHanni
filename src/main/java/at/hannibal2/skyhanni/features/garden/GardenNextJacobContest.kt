@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -114,7 +114,7 @@ object GardenNextJacobContest {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             event.addIrrelevant("not in garden")
             return
         }
@@ -209,7 +209,7 @@ object GardenNextJacobContest {
         if (!config.display) return
         monthPattern.matchMatcher(event.inventoryName) {
             inCalendar = true
-            val month = LorenzUtils.getSBMonthByName(group("month"))
+            val month = LorenzUtils.getSbMonthByName(group("month"))
             val year = group("year").toInt()
 
             readCalendar(event.inventoryItems.values, year, month)
@@ -519,7 +519,7 @@ object GardenNextJacobContest {
 
     private fun isEnabled() =
         config.display && (
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)) ||
+            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
                 (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
             )
 
@@ -548,7 +548,7 @@ object GardenNextJacobContest {
     suspend fun fetchUpcomingContests() {
         try {
             val url = "https://api.elitebot.dev/contests/at/now"
-            val result = withContext(dispatcher) { APIUtils.getJSONResponse(url) }.asJsonObject
+            val result = withContext(dispatcher) { ApiUtils.getJSONResponse(url) }.asJsonObject
 
             val newContests = mutableMapOf<SimpleTimeMark, FarmingContest>()
 
@@ -621,7 +621,7 @@ object GardenNextJacobContest {
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
 
-        val result = withContext(dispatcher) { APIUtils.postJSONIsSuccessful(url, body) }
+        val result = withContext(dispatcher) { ApiUtils.postJSONIsSuccessful(url, body) }
 
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
@@ -639,7 +639,7 @@ object GardenNextJacobContest {
         null
     }
 
-    private val config get() = GardenAPI.config.nextJacobContests
+    private val config get() = GardenApi.config.nextJacobContests
     private val nextContestCrops = mutableListOf<CropType>()
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis

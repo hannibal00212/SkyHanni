@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.WinterAPI
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -46,7 +46,7 @@ object TimeFeatures {
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
-            if (WinterAPI.isDecember()) return
+            if (WinterApi.isDecember()) return
             val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {

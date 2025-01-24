@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -56,8 +56,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityCollectionStats {
-    private val collectionConfig get() = ChocolateFactoryAPI.config.hoppityCollectionStats
-    private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
+    private val collectionConfig get() = ChocolateFactoryApi.config.hoppityCollectionStats
+    private val patternGroup = ChocolateFactoryApi.patternGroup.group("collection")
 
     // <editor-fold desc="Patterns">
     /**
@@ -312,7 +312,7 @@ object HoppityCollectionStats {
         }
 
         event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
-            val rarity = HoppityAPI.rarityByRabbit(stack.displayName)
+            val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
             val newItemStack = if (collectionConfig.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
@@ -366,7 +366,7 @@ object HoppityCollectionStats {
         }
 
         replaceIndex?.let {
-            ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
+            ChocolateFactoryApi.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
                 val operationFormat = when (milestoneType) {
                     HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
@@ -484,7 +484,7 @@ object HoppityCollectionStats {
     }
 
     private fun addHotspotRabbitsInformationToHud(newList: MutableList<Renderable>) {
-        if (!collectionConfig.showHotspotSummary || !HoppityAPI.isHoppityEvent()) return
+        if (!collectionConfig.showHotspotSummary || !HoppityApi.isHoppityEvent()) return
         val hotspotRabbitData = hotspotRabbitData ?: return
 
         val totalHotspotCount = hotspotRabbitData.hotspotRabbits.values.sumOf { it.size }

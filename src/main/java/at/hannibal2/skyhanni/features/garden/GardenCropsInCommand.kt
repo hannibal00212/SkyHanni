@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 
 object GardenCropsInCommand {
 
-    private val config get() = GardenAPI.config.moneyPerHours
+    private val config get() = GardenApi.config.moneyPerHours
 
     fun onCommand(args: Array<String>) {
         if (!config.display) {

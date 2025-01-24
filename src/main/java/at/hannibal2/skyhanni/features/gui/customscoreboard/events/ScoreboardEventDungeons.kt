@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -25,5 +25,5 @@ object ScoreboardEventDungeons : ScoreboardEvent() {
         ScoreboardPattern.floor3GuardiansPattern,
     )
 
-    override fun showIsland() = DungeonAPI.inDungeon()
+    override fun showIsland() = DungeonApi.inDungeon()
 }

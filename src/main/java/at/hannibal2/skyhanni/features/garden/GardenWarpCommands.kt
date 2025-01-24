@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenWarpCommands {
 
-    private val config get() = GardenAPI.config.gardenCommands
+    private val config get() = GardenApi.config.gardenCommands
 
     /**
      * REGEX-TEST: /tp 3
@@ -33,7 +33,7 @@ object GardenWarpCommands {
     @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.warpCommands) return
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
 
         val message = event.message.lowercase()
 
@@ -59,7 +59,7 @@ object GardenWarpCommands {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
 

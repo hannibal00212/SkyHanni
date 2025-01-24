@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -108,7 +108,7 @@ object SlayerProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
             tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
@@ -155,8 +155,8 @@ object SlayerProfitTracker {
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-        if (!SlayerAPI.hasActiveSlayerQuest()) return
+        if (!SlayerApi.isInCorrectArea) return
+        if (!SlayerApi.hasActiveSlayerQuest()) return
 
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
@@ -234,7 +234,7 @@ object SlayerProfitTracker {
 
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
-        if (!SlayerAPI.isInCorrectArea) return false
+        if (!SlayerApi.isInCorrectArea) return false
 
         return true
     }

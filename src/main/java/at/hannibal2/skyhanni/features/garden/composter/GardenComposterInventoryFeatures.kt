@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,11 +22,11 @@ import net.minecraft.inventory.ContainerChest
 @SkyHanniModule
 object GardenComposterInventoryFeatures {
 
-    private val config get() = GardenAPI.config.composters
+    private val config get() = GardenApi.config.composters
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.upgradePrice) return
 
         if (InventoryUtils.openInventoryName() != "Composter Upgrades") return

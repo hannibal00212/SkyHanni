@@ -323,7 +323,7 @@ object DungeonFinderFeatures {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = DungeonAPI.getColor(level)
+                    val color = DungeonApi.getColor(level)
                     if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level"
                     classNames.remove(className)
                 }

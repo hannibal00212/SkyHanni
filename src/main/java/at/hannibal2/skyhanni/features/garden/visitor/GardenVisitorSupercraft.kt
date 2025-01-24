@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenVisitorSupercraft {
 
-    private val isSupercraftEnabled get() = VisitorAPI.config.shoppingList.showSuperCraft
+    private val isSupercraftEnabled get() = VisitorApi.config.shoppingList.showSuperCraft
 
     private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.craft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -162,7 +162,7 @@ object CraftableItemList {
             materials.addOrPut(item.internalName, item.amount.toLong())
         }
         if (config.includeSacks) {
-            for ((internalName, item) in SackAPI.sackData) {
+            for ((internalName, item) in SackApi.sackData) {
                 materials.addOrPut(internalName, item.amount.toLong())
             }
         }

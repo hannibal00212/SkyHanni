@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.removeKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -162,7 +162,7 @@ object EstimatedItemValueCalculator {
         val internalNameString = internalName.removeKuudraTier().removePrefix("VANQUISHED_").asString()
         var genericName = internalNameString
         if (internalName.isKuudraArmor()) {
-            genericName = KuudraAPI.kuudraSets.fold(internalNameString) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
+            genericName = KuudraApi.kuudraSets.fold(internalNameString) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         stack.getAttributeFromShard()?.let {
             return 0.0
@@ -238,7 +238,7 @@ object EstimatedItemValueCalculator {
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
-        val reforge = ReforgeAPI.onlyPowerStoneReforge.firstOrNull {
+        val reforge = ReforgeApi.onlyPowerStoneReforge.firstOrNull {
             rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0

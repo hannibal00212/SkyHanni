@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -91,5 +91,5 @@ object ScoreboardEventMining : ScoreboardEvent() {
 
     )
 
-    override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
+    override fun showIsland() = MiningApi.inAdvancedMiningIsland()
 }

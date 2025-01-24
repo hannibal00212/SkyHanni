@@ -95,7 +95,7 @@ object ItemAddManager {
         }
         craftedPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemName(group("item"))
-            if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
+            if (!SackApi.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
             superCraftedItems.add(internalName)
         }
     }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -19,5 +19,5 @@ object ScoreboardEventGarden : ScoreboardEvent() {
         ScoreboardPattern.cleanUpPattern,
     )
 
-    override fun showIsland() = GardenAPI.inGarden()
+    override fun showIsland() = GardenApi.inGarden()
 }

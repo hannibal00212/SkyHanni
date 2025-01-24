@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -91,7 +91,7 @@ object PestProfitTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
+        PestApi.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
@@ -140,8 +140,8 @@ object PestProfitTracker {
 
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
-        if (GardenAPI.isCurrentlyFarming()) return false
-        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestAPI.hasVacuumInHand()) return false
+        if (GardenApi.isCurrentlyFarming()) return false
+        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestApi.hasVacuumInHand()) return false
 
         return true
     }
@@ -167,5 +167,5 @@ object PestProfitTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -94,7 +94,7 @@ object ItemPriceUtils {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        return HypixelItemAPI.getNpcPrice(this)
+        return HypixelItemApi.getNpcPrice(this)
     }
 
     fun debugItemPrice(args: Array<String>) {
@@ -170,6 +170,6 @@ object ItemPriceUtils {
     }
 
     private fun refreshLowestBins() {
-        lowestBins = APIUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
+        lowestBins = ApiUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
     }
 }

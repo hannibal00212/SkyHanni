@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent

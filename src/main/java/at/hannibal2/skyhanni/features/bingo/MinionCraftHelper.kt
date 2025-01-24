@@ -49,7 +49,7 @@ object MinionCraftHelper {
     private var hasMinionInInventory = false
     private var hasItemsForMinion = false
     private val tierOneMinions = mutableListOf<NEUInternalName>()
-    private val tierOneMinionsDone get() = BingoAPI.bingoStorage.tierOneMinionsDone
+    private val tierOneMinionsDone get() = BingoApi.bingoStorage.tierOneMinionsDone
     private val allIngredients = mutableListOf<NEUInternalName>()
     private val alreadyNotified = mutableListOf<String>()
 

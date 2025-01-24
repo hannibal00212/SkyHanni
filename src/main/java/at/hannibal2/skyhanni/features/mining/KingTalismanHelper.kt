@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -231,7 +231,7 @@ object KingTalismanHelper {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!MiningAPI.inDwarvenMines) return
+        if (!MiningApi.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()

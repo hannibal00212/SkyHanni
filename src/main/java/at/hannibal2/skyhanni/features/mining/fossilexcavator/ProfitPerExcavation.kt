@@ -35,7 +35,7 @@ object ProfitPerExcavation {
             }
         }
 
-        val scrapItem = FossilExcavatorAPI.scrapItem
+        val scrapItem = FossilExcavatorApi.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.itemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -117,7 +117,7 @@ object PunchcardHighlight {
     private var warningCooldown = SimpleTimeMark.farPast()
 
     private fun checkPunchcard() {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
 
         val hasPunchcard = InventoryUtils.isItemInInventory(PUNCHCARD_ARTIFACT)
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
@@ -218,7 +218,7 @@ object PunchcardHighlight {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")
     }

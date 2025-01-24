@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -30,13 +30,13 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ComposterDisplay {
 
-    private val config get() = GardenAPI.config.composters
-    private val storage get() = GardenAPI.storage
+    private val config get() = GardenApi.config.composters
+    private val storage get() = GardenApi.storage
     private var display = emptyList<List<Any>>()
     private var composterEmptyTime: Duration? = null
 
     private val bucket by lazy { "BUCKET".toInternalName().getItemStack() }
-    private var tabListData by ComposterAPI::tabListData
+    private var tabListData by ComposterApi::tabListData
 
     enum class DataType(rawPattern: String, val icon: String) {
         ORGANIC_MATTER(" Organic Matter: §r(.*)", "WHEAT"),
@@ -60,7 +60,7 @@ object ComposterDisplay {
         readData(event.lines)
 
         if (tabListData.isNotEmpty()) {
-            composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()
+            composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
             updateDisplay()
             sendNotify()
         }
@@ -87,7 +87,7 @@ object ComposterDisplay {
 
     private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
         return if (emptyTime != null) {
-            GardenAPI.storage?.composterEmptyTime = emptyTime.fromNow()
+            GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
             listOf(bucket, "§b$format")
         } else {
@@ -130,7 +130,7 @@ object ComposterDisplay {
 
         val storage = storage ?: return
 
-        if (ComposterAPI.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
+        if (ComposterApi.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
@@ -138,7 +138,7 @@ object ComposterDisplay {
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
-        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
+        if (ComposterApi.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
@@ -152,7 +152,7 @@ object ComposterDisplay {
         @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.COMPOSTER_TIME.isSelected()) return
 
-        if (GardenAPI.inGarden() && config.displayEnabled) {
+        if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
         }
 
@@ -160,7 +160,7 @@ object ComposterDisplay {
     }
 
     private fun checkWarningsAndOutsideGarden() {
-        val format = GardenAPI.storage?.let {
+        val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
                 if (duration > 0.0.seconds) {
@@ -177,7 +177,7 @@ object ComposterDisplay {
 
         val inSb = LorenzUtils.inSkyBlock && config.displayOutsideGarden
         val outsideSb = !LorenzUtils.inSkyBlock && OutsideSbFeature.COMPOSTER_TIME.isSelected()
-        if (!GardenAPI.inGarden() && (inSb || outsideSb)) {
+        if (!GardenApi.inGarden() && (inSb || outsideSb)) {
             val list = Collections.singletonList(listOf(bucket, "§b$format"))
             config.outsideGardenPos.renderStringsAndItems(list, posLabel = "Composter Outside Garden")
         }
@@ -185,7 +185,7 @@ object ComposterDisplay {
 
     private fun warn(warningMessage: String) {
         if (!config.warnAlmostClose) return
-        val storage = GardenAPI.storage ?: return
+        val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
 

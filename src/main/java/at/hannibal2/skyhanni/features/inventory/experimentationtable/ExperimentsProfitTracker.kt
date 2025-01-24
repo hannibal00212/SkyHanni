@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottleChatPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentsDropPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.inventoriesPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.claimMessagePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.enchantingExpPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottleChatPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottlePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentRenewPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentsDropPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -173,7 +173,7 @@ object ExperimentsProfitTracker {
 
         lastSplashTime = SimpleTimeMark.now()
 
-        if (ExperimentationTableAPI.inDistanceToTable(15.0)) {
+        if (ExperimentationTableApi.inDistanceToTable(15.0)) {
             tracker.modify {
                 it.startCost -= calculateBottlePrice(internalName)
             }
@@ -214,7 +214,7 @@ object ExperimentsProfitTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (ExperimentationTableAPI.getCurrentExperiment() != null) {
+        if (ExperimentationTableApi.getCurrentExperiment() != null) {
             tracker.modify {
                 it.experimentsDone++
             }
@@ -290,6 +290,6 @@ object ExperimentsProfitTracker {
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
         IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
-            (!checkDistanceToExperimentationTable || ExperimentationTableAPI.inDistanceToTable(5.0))
+            (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
 
 }

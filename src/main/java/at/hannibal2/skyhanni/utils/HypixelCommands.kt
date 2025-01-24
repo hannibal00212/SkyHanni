@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
@@ -63,7 +63,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackAPI.getFromSack(itemName.toInternalName(), amount)
+        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }
 
     fun widget() {

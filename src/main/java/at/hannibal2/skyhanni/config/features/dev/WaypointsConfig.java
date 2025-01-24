@@ -26,5 +26,6 @@ public class WaypointsConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Make parkour waypoints outside of SkyBlock too.")
     @ConfigEditorBoolean
+    // TODO rename to parkourOutsideSb
     public boolean parkourOutsideSB = false;
 }

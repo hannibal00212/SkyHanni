@@ -62,14 +62,14 @@ public class GUIConfig {
     public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
 
     @Expose
-    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar")
+    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar.")
     @Accordion
     public HotbarConfig hotbar = new HotbarConfig();
 
     @Expose
-    @ConfigOption(name = "Xp Bar", desc = "Settings for adjusting the xp bar")
+    @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
-    public XPBarConfig xpBar = new XPBarConfig();
+    public XpBarConfig xpBar = new XpBarConfig();
 
     @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")

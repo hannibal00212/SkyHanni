@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -41,11 +41,11 @@ object MinisterInCalendar {
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-        if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
-        val minister = ElectionAPI.currentMinister ?: return
+        if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+        val minister = ElectionApi.currentMinister ?: return
 
         val itemStack = "${minister.name}_MAYOR_MONSTER".toInternalName().getItemStack()
-        val ministerColor = ElectionAPI.mayorNameToColorCode(minister.mayorName)
+        val ministerColor = ElectionApi.mayorNameToColorCode(minister.mayorName)
 
         ministerItemStack = changeItem(ministerColor, minister, itemStack)
     }
@@ -53,7 +53,7 @@ object MinisterInCalendar {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
-        if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         ministerItemStack = null
     }
 
@@ -61,7 +61,7 @@ object MinisterInCalendar {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return
-        if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         event.replace(ministerItemStack ?: return)
     }
 

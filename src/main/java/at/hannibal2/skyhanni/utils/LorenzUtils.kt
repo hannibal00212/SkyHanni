@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
@@ -56,7 +56,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
-    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
+    val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -117,7 +117,7 @@ object LorenzUtils {
     }
 
     // TODO move into time utils
-    fun getSBMonthByName(month: String): Int {
+    fun getSbMonthByName(month: String): Int {
         var monthNr = 0
         for (i in 1..12) {
             val monthName = SkyBlockTime.monthName(i)
@@ -309,7 +309,7 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

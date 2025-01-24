@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import net.minecraft.block.state.IBlockState
@@ -203,7 +203,7 @@ enum class OreType(
 
         fun IBlockState.isOreType(oreType: OreType): Boolean {
             for (oreBlock in oreType.oreBlocks) {
-                if (oreBlock !in MiningAPI.currentAreaOreBlocks) continue
+                if (oreBlock !in MiningApi.currentAreaOreBlocks) continue
                 if (oreBlock.checkBlock(this)) {
                     return true
                 }

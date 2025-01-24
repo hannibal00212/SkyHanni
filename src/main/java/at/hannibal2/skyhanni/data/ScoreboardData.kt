@@ -120,7 +120,7 @@ object ScoreboardData {
         monitor()
 
         val list = fetchScoreboardLines().reversed()
-        val semiFormatted = list.map { cleanSB(it) }
+        val semiFormatted = list.map { cleanSb(it) }
         if (semiFormatted != sidebarLines) {
             sidebarLines = semiFormatted
             RawScoreboardUpdateEvent(semiFormatted).post()
@@ -142,7 +142,7 @@ object ScoreboardData {
 
     }
 
-    private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
+    private fun cleanSb(scoreboard: String) = scoreboard.toCharArray().filter {
         // 10735 = Rift Blood Effigies symbol
         it.code in 21..126 || it.code == 167 || it.code == 10735
     }.joinToString(separator = "")

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object ShowMotesNpcSellPrice {
 
-    private val config get() = RiftAPI.config.motes
+    private val config get() = RiftApi.config.motes
 
     private val burgerPattern by RepoPattern.pattern(
         "rift.everywhere.burger",
@@ -121,7 +121,7 @@ object ShowMotesNpcSellPrice {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
             chat("Set your McGrubber's burger stacks to ${group("amount")}.")
@@ -191,9 +191,9 @@ object ShowMotesNpcSellPrice {
         else -> "0"
     }
 
-    private fun isShowPriceEnabled() = RiftAPI.inRift() && config.showPrice
+    private fun isShowPriceEnabled() = RiftApi.inRift() && config.showPrice
 
-    private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
+    private fun isInventoryValueEnabled() = RiftApi.inRift() && config.inventoryValue.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

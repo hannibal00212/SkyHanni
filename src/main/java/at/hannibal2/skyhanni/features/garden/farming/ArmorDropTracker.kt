@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ArmorDropTracker {
 
-    private val config get() = GardenAPI.config.farmingArmorDrop
+    private val config get() = GardenApi.config.farmingArmorDrop
 
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
@@ -102,10 +102,10 @@ object ArmorDropTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (!GardenAPI.inGarden()) return false
+        if (!GardenApi.inGarden()) return false
         if (!config.enabled) return false
         if (!hasArmor) return false
-        if (!GardenAPI.hasFarmingToolInHand()) return false
+        if (!GardenApi.hasFarmingToolInHand()) return false
 
         return true
     }
@@ -119,7 +119,7 @@ object ArmorDropTracker {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.enabled) return
 
         checkArmor()

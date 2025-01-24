@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -137,7 +137,7 @@ object TrophyFishDisplay {
                 return
             }
         }
-        val hover = TrophyFishAPI.hoverInfo(rawName)
+        val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
             Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
         } ?: Renderable.string(string)
@@ -262,7 +262,7 @@ object TrophyFishDisplay {
         if (!canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (config.requireHunterArmor.get() && !FishingAPI.wearingTrophyArmor) return
+        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
 
         config.position.renderRenderables(
             display,
@@ -274,7 +274,7 @@ object TrophyFishDisplay {
     fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
-        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingAPI.holdingLavaRod
+        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 

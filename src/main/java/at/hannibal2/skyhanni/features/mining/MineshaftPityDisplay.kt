@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -82,7 +82,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+        if (!MiningApi.inGlacialTunnels()) return
 
         val originalOre = event.originalOre
         originalOre?.getPityBlock()?.let { it.blocksBroken++ }
@@ -99,7 +99,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!MiningAPI.inGlacialTunnels()) return
+        if (!MiningApi.inGlacialTunnels()) return
         if (MiningNotifications.mineshaftSpawn.matches(event.message)) {
             val pityCounter = calculateCounter()
             val chance = calculateChance(pityCounter)
@@ -266,7 +266,7 @@ object MineshaftPityDisplay {
         }
     }
 
-    private fun isDisplayEnabled() = (MiningAPI.inGlacialTunnels() || MiningAPI.inDwarvenBaseCamp()) && config.enabled
+    private fun isDisplayEnabled() = (MiningApi.inGlacialTunnels() || MiningApi.inDwarvenBaseCamp()) && config.enabled
 
     enum class MineshaftPityLine(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         TITLE("§3§lMineshaft Pity Counter"),

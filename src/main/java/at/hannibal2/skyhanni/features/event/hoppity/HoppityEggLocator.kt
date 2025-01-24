@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -290,7 +290,7 @@ object HoppityEggLocator {
     private fun ReceiveParticleEvent.isEnchantmentParticle() = type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden() && !ReminderUtils.isBusy(true) && HoppityAPI.isHoppityEvent()
+        LorenzUtils.inSkyBlock && config.waypoints && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) && HoppityApi.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 

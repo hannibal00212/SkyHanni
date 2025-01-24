@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.exactLevelingMap
-import at.hannibal2.skyhanni.api.SkillAPI.levelingMap
+import at.hannibal2.skyhanni.api.SkillApi
+import at.hannibal2.skyhanni.api.SkillApi.activeSkill
+import at.hannibal2.skyhanni.api.SkillApi.exactLevelingMap
+import at.hannibal2.skyhanni.api.SkillApi.levelingMap
 import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
 
@@ -13,8 +13,8 @@ object SkillUtil {
     const val XP_NEEDED_FOR_60 = 111_672_425L
     const val XP_NEEDED_FOR_50 = 55_172_425L
 
-    fun getSkillInfo(skill: SkillType): SkillAPI.SkillInfo? {
-        return SkillAPI.storage?.get(skill)
+    fun getSkillInfo(skill: SkillType): SkillApi.SkillInfo? {
+        return SkillApi.storage?.get(skill)
     }
 
     fun xpRequiredForLevel(desiredLevel: Int): Long {
@@ -51,7 +51,7 @@ object SkillUtil {
     }
 
     fun calculateLevelXp(level: Int): Double {
-        return SkillAPI.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
+        return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
     fun calculateSkillLevel(currentXp: Long, maxSkillCap: Int): Quad<Int, Long, Long, Long> {

@@ -72,7 +72,7 @@ object ExcavatorProfitTracker {
         var fossilDustGained = 0L
     }
 
-    private val scrapItem get() = FossilExcavatorAPI.scrapItem
+    private val scrapItem get() = FossilExcavatorApi.scrapItem
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFossil Excavation Profit Tracker")
@@ -217,7 +217,7 @@ object ExcavatorProfitTracker {
         if (!isEnabled()) return false
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
         // Only show in excavation menu
-        if (inChest && !FossilExcavatorAPI.inExcavatorMenu) return false
+        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
 
         return true
     }

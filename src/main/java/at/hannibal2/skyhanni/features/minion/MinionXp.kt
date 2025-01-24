@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.minion
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXpJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
@@ -185,7 +185,7 @@ object MinionXp {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        xpInfoMap = event.getConstant<MinionXPJson>("MinionXP").minionXp.mapNotNull { xpType ->
+        xpInfoMap = event.getConstant<MinionXpJson>("MinionXP").minionXp.mapNotNull { xpType ->
             xpType.value.mapNotNull { it.key.toInternalName() to XpInfo(SkillType.getByName(xpType.key), it.value) }
         }.flatten().toMap()
     }

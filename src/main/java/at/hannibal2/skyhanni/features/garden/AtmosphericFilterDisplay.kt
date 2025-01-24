@@ -20,14 +20,14 @@ object AtmosphericFilterDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!GardenAPI.inGarden() && !config.outsideGarden) return
+        if (!GardenApi.inGarden() && !config.outsideGarden) return
         display = drawDisplay(SkyblockSeason.currentSeason ?: return)
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.inGarden()) {
+        if (GardenApi.inGarden()) {
             config.position.renderString(display, posLabel = "Atmospheric Filter Perk Display")
         } else {
             config.positionOutside.renderString(display, posLabel = "Atmospheric Filter Perk Display")
@@ -44,6 +44,6 @@ object AtmosphericFilterDisplay {
 
     private fun isEnabled() = LorenzUtils.onHypixel && config.enabled && (
         (OutsideSbFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.outsideGarden))
+            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden))
         )
 }

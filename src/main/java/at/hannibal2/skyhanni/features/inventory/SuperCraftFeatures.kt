@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -32,9 +32,9 @@ object SuperCraftFeatures {
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
             NEUInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
         } ?: return
-        if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return
+        if (!SackApi.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {
-            GetFromSackAPI.getFromChatMessageSackItems(PrimitiveItemStack(internalName, amount))
+            GetFromSackApi.getFromChatMessageSackItems(PrimitiveItemStack(internalName, amount))
         }
     }
 }

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.inventory.plots
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -17,8 +17,8 @@ object GardenNextPlotPrice {
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.config.plotPrice) return
+        if (!GardenApi.inGarden()) return
+        if (!GardenApi.config.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 

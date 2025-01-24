@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -121,7 +121,7 @@ object CollectionTracker {
     }
 
     private fun setNewCollection(internalName: NEUInternalName, name: String) {
-        val foundAmount = CollectionAPI.getCollectionCounter(internalName)
+        val foundAmount = CollectionApi.getCollectionCounter(internalName)
         if (foundAmount == null) {
             ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
             return
@@ -188,7 +188,7 @@ object CollectionTracker {
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
-        return CollectionAPI.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
+        return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
             .map { it.displayName.removeColor().replace(" ", "_") }
     }
 

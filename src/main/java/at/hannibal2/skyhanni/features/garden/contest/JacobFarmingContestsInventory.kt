@@ -65,8 +65,8 @@ object JacobFarmingContestsInventory {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
             foundEvents.add(item.name)
-            val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
-            FarmingContestAPI.addContest(time, item)
+            val time = FarmingContestApi.getSbTimeFor(item.name) ?: continue
+            FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
             }
@@ -91,7 +91,7 @@ object JacobFarmingContestsInventory {
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
-                val (year, month, day) = FarmingContestAPI.getSbDateFromItemName(itemName) ?: return
+                val (year, month, day) = FarmingContestApi.getSbDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
             }
@@ -108,7 +108,7 @@ object JacobFarmingContestsInventory {
     }
 
     private fun openContest(year: String, month: String, day: String) {
-        val date = "$year/${LorenzUtils.getSBMonthByName(month)}/$day"
+        val date = "$year/${LorenzUtils.getSbMonthByName(month)}/$day"
         OSUtils.openBrowser("https://elitebot.dev/contests/$date")
         ChatUtils.chat("Opening contest in elitebot.dev")
     }
@@ -146,7 +146,7 @@ object JacobFarmingContestsInventory {
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
             val month = group("month")
-            val time = SkyBlockTime(year.toInt(), LorenzUtils.getSBMonthByName(month), day.toInt()).toMillis()
+            val time = SkyBlockTime(year.toInt(), LorenzUtils.getSbMonthByName(month), day.toInt()).toMillis()
             if (time < SkyBlockTime.now().toMillis()) {
                 openContest(year, month, day)
             } else {

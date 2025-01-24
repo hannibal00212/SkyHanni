@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.add
@@ -29,7 +29,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object AnitaMedalProfit {
 
-    private val config get() = GardenAPI.config.anitaShop
+    private val config get() = GardenApi.config.anitaShop
     private var display = emptyList<Renderable>()
 
     var inInventory = false
@@ -51,7 +51,7 @@ object AnitaMedalProfit {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
-        if (VisitorAPI.inInventory) return
+        if (VisitorApi.inInventory) return
 
         inInventory = true
 
@@ -219,7 +219,7 @@ object AnitaMedalProfit {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory || VisitorAPI.inInventory) return
+        if (!inInventory || VisitorApi.inInventory) return
         config.medalProfitPos.renderRenderables(
             display,
             extraSpace = 5,

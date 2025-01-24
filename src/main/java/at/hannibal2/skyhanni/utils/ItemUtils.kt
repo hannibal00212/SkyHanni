@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -324,7 +324,7 @@ object ItemUtils {
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
-        if (PetAPI.hasPetName(cleanName)) {
+        if (PetApi.hasPetName(cleanName)) {
             return getPetRarity(this) to ItemCategory.PET
         }
 
@@ -371,7 +371,7 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            PetAPI.hasPetName(cleanName) -> ItemCategory.PET
+            PetApi.hasPetName(cleanName) -> ItemCategory.PET
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
@@ -576,7 +576,7 @@ object ItemUtils {
         }
 
         // hide pet level
-        PetAPI.getCleanName(name)?.let {
+        PetApi.getCleanName(name)?.let {
             return "$it Pet"
         }
         return name

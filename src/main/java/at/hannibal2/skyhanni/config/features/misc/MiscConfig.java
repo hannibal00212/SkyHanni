@@ -137,6 +137,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
+    // TODO rename to showOutsideSb
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose

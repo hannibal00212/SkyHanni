@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
-import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -30,7 +30,7 @@ object CustomScoreboardUtils {
         HypixelData.ironman -> "§7♲ "
         HypixelData.stranded -> "§a☀ "
         HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull {
-            BingoAPI.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
+            BingoApi.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
         } ?: "§e❤ "
 
         else -> "§e"
@@ -48,15 +48,15 @@ object CustomScoreboardUtils {
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
-    internal fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
+    internal fun getPurseEarned() = getGroup(PurseApi.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
     } ?: "0"
 
-    internal fun getBits() = formatNumber(BitsAPI.bits.coerceAtLeast(0))
+    internal fun getBits() = formatNumber(BitsApi.bits.coerceAtLeast(0))
 
-    internal fun getBitsAvailable() = formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
+    internal fun getBitsAvailable() = formatNumber(BitsApi.bitsAvailable.coerceAtLeast(0))
 
     internal fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
