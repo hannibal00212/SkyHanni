@@ -15,11 +15,6 @@ class PesthunterShopConfig {
     var pesthunterProfitEnabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Highlight Best Profit", desc = "Highlight the best profit/pest trade.")
-    @ConfigEditorBoolean
-    var highlightBestProfit: Boolean = true
-
-    @Expose
     @ConfigLink(owner = PesthunterShopConfig::class, field = "pesthunterProfitEnabled")
     var pesthunterProfitPos: Position = Position(206, 158, false, true)
 }
