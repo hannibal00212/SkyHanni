@@ -21,7 +21,7 @@ object ErrorManager {
     // random id -> error message
     private val errorMessages = mutableMapOf<String, String>()
     private val fullErrorMessages = mutableMapOf<String, String>()
-    private val cache = TimeLimitedSet<Pair<String, Int>>(10.minutes)
+    private val cache = TimeLimitedSet<CachedError>(10.minutes)
     private var repoErrors: List<RepoErrorData> = emptyList()
 
     private val breakAfter = listOf(
@@ -54,6 +54,7 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.SimpleCommand.",
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
+        "at at.hannibal2.skyhanni.test.command.ErrorManager.skyHanniError",
         "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
@@ -64,8 +65,9 @@ object ErrorManager {
         cache.clear()
     }
 
+    // throw a error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message)
+        val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
         println("extraData: \n${buildExtraDataString(extraData)}")
@@ -88,6 +90,7 @@ object ErrorManager {
         )
     }
 
+    // just log for debug cases
     fun logErrorStateWithData(
         userMessage: String,
         internalMessage: String,
@@ -108,6 +111,7 @@ object ErrorManager {
         )
     }
 
+    // log with stack trace from other try catch block
     fun logErrorWithData(
         throwable: Throwable,
         message: String,
@@ -118,6 +122,8 @@ object ErrorManager {
     ) {
         logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
     }
+
+    data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
     private fun logError(
         throwable: Throwable,
@@ -130,11 +136,11 @@ object ErrorManager {
     ) {
         if (betaOnly && !SkyHanniMod.isBetaVersion) return
         if (!ignoreErrorCache) {
-            val pair = if (throwable.stackTrace.isNotEmpty()) {
-                throwable.stackTrace[0].let { (it.fileName ?: "<unknown>") to it.lineNumber }
-            } else message to 0
-            if (pair in cache) return
-            cache.add(pair)
+            val cachedError = throwable.stackTrace.getOrNull(0)?.let {
+                CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
+            } ?: CachedError("<empty stack trace>", 0, message)
+            if (cachedError in cache) return
+            cache.add(cachedError)
         }
         if (!condition()) return
 

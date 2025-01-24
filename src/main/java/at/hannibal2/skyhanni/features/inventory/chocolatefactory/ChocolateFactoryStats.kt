@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 
 @SkyHanniModule
@@ -33,14 +32,13 @@ object ChocolateFactoryStats {
 
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
         if (!config.statsDisplay) return

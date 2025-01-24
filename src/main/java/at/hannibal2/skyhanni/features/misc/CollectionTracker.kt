@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -233,10 +233,8 @@ object CollectionTracker {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
     }
 }

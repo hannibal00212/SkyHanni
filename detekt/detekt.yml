@@ -14,13 +14,19 @@ FormattingRules:
 RepoRules:
     SkullTexturesUseRepo:
         active: true
-    RepoPatternRegexTest:
+    RepoPatternRegexTestMissing:
+        active: true
+    RepoPatternRegexTestFailed:
         active: true
     RepoPatternUnnamedGroup:
         active: true
 
 ImportRules:
     CustomImportOrdering:
+        active: true
+
+SkyHanniStyle:
+    InSkyBlockEarlyReturn:
         active: true
 
 style:
@@ -87,6 +93,14 @@ formatting:
         active: false
     AnnotationSpacing: # handled by custom rule
         active: false
+    FunctionReturnTypeSpacing:
+        maxLineLength: 140
+    ParameterWrapping:
+        maxLineLength: 140
+    PropertyWrapping:
+        maxLineLength: 140
+    Wrapping:
+        maxLineLength: 140
 
 complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method

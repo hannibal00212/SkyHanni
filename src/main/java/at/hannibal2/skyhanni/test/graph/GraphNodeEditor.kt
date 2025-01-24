@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +32,7 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 

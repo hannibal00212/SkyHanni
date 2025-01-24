@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : LorenzEvent() {
+abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
 
     data class BackgroundDrawnEvent(
         override val gui: GuiContainer,
@@ -18,14 +18,13 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
-    @Cancelable
     data class PreDraw(
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container) {
+    ) : GuiContainerEvent(gui, container), Cancellable {
         fun drawDefaultBackground() =
             GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
     }
@@ -38,20 +37,18 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
-    @Cancelable
     data class CloseWindowEvent(override val gui: GuiContainer, override val container: Container) :
-        GuiContainerEvent(gui, container)
+        GuiContainerEvent(gui, container), Cancellable
 
     abstract class DrawSlotEvent(gui: GuiContainer, container: Container, open val slot: Slot) :
         GuiContainerEvent(gui, container) {
 
-        @Cancelable
         data class GuiContainerDrawSlotPre(
             override val gui: GuiContainer,
             override val container: Container,
             override val slot: Slot,
         ) :
-            DrawSlotEvent(gui, container, slot)
+            DrawSlotEvent(gui, container, slot), Cancellable
 
         data class GuiContainerDrawSlotPost(
             override val gui: GuiContainer,
@@ -69,7 +66,6 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val partialTicks: Float,
     ) : GuiContainerEvent(gui, container)
 
-    @Cancelable
     data class SlotClickEvent(
         override val gui: GuiContainer,
         override val container: Container,
@@ -77,16 +73,14 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
-        @Deprecated("old", ReplaceWith("clickTypeEnum"))
-        val clickType: Int,
-        val clickTypeEnum: ClickType? = ClickType.getTypeById(clickType),
-    ) : GuiContainerEvent(gui, container) {
+        val clickType: ClickType?,
+    ) : GuiContainerEvent(gui, container), Cancellable {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.MIDDLE) return
+            if (this.clickedButton == 2 && this.clickType == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
                 InventoryUtils.clickSlot(slotNumber, container.windowId, 2, 3)
-                isCanceled = true
+                cancel()
             }
         }
     }

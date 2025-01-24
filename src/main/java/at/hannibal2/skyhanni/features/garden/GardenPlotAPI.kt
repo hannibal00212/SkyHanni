@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -251,8 +250,8 @@ object GardenPlotAPI {
         plots = list
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!GardenAPI.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {
@@ -316,7 +315,7 @@ object GardenPlotAPI {
 
     fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
-    fun LorenzRenderWorldEvent.renderPlot(
+    fun RenderWorldEvent.renderPlot(
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
@@ -387,7 +386,7 @@ object GardenPlotAPI {
         }
     }
 
-    private fun LorenzRenderWorldEvent.tryDraw3DLine(
+    private fun RenderWorldEvent.tryDraw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,

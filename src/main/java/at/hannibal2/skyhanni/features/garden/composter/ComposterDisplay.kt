@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -149,9 +148,9 @@ object ComposterDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.COMPOSTER_TIME.isSelected()) return
+        if (!OutsideSbFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenAPI.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")

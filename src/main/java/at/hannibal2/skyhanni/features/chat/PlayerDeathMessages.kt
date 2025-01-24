@@ -26,9 +26,8 @@ object PlayerDeathMessages {
         checkOtherPlayers()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerDeath(event: PlayerDeathEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val name = event.name
 

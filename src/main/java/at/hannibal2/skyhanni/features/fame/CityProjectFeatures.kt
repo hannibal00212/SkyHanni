@@ -44,7 +44,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -102,9 +101,8 @@ object CityProjectFeatures {
         inInventory = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         inInventory = false
         if (!inCityProject(event)) return
@@ -209,18 +207,16 @@ object CityProjectFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
         if (!inInventory) return
 
         config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showReady) return
         if (!inInventory) return
 

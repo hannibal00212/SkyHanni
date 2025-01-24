@@ -43,7 +43,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -69,8 +68,8 @@ object GardenNextJacobContest {
     private val patternGroup = RepoPattern.group("garden.nextcontest")
 
     /**
-     * REGEX-TEST: Day 1
-     * REGEX-TEST: Day 31
+     * REGEX-TEST: §aDay 1
+     * REGEX-TEST: §aDay 31
      */
     val dayPattern by patternGroup.pattern(
         "day",
@@ -348,43 +347,41 @@ object GardenNextJacobContest {
         }
     }
 
-    private fun drawDisplay() = Renderable.horizontalContainer(
-        buildList {
-            if (inCalendar) {
-                val size = contests.size
-                val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
-                val formatted = LorenzUtils.formatPercentage(percentage)
-                addString("§eDetected $formatted of farming contests this year")
-                return@buildList
-            }
+    private fun drawDisplay() = Renderable.line {
+        if (inCalendar) {
+            val size = contests.size
+            val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
+            val formatted = LorenzUtils.formatPercentage(percentage)
+            addString("§eDetected $formatted of farming contests this year")
+            return@line
+        }
 
-            if (contests.isEmpty()) {
-                if (isCloseToNewYear()) {
-                    addString(CLOSE_TO_NEW_YEAR_TEXT)
-                } else {
-                    addString("§cOpen calendar to read Jacob contest times!")
-                }
-                return@buildList
-            }
-
-            val nextContest = contests.values.filterNot { it.endTime.isInPast() }.minByOrNull { it.endTime }
-
-            // Show next contest
-            if (nextContest != null) {
-                addAll(drawNextContest(nextContest))
-                return@buildList
-            }
-
+        if (contests.isEmpty()) {
             if (isCloseToNewYear()) {
                 addString(CLOSE_TO_NEW_YEAR_TEXT)
             } else {
                 addString("§cOpen calendar to read Jacob contest times!")
             }
+            return@line
+        }
 
-            fetchedFromElite = false
-            contests.clear()
-        },
-    )
+        val nextContest = contests.values.filterNot { it.endTime.isInPast() }.minByOrNull { it.endTime }
+
+        // Show next contest
+        if (nextContest != null) {
+            addAll(drawNextContest(nextContest))
+            return@line
+        }
+
+        if (isCloseToNewYear()) {
+            addString(CLOSE_TO_NEW_YEAR_TEXT)
+        } else {
+            addString("§cOpen calendar to read Jacob contest times!")
+        }
+
+        fetchedFromElite = false
+        contests.clear()
+    }
 
 
     private fun drawNextContest(nextContest: FarmingContest) = buildList {
@@ -496,7 +493,7 @@ object GardenNextJacobContest {
 
     private fun warnForCrop(): Boolean = nextContestCrops.any { it in config.warnFor }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -507,7 +504,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return

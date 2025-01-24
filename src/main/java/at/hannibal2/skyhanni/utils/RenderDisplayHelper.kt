@@ -1,6 +1,6 @@
-
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -33,6 +33,10 @@ class RenderDisplayHelper(
         allDisplays.add(this)
     }
 
+    private fun renderIn(inOwnInventory: Boolean): Boolean {
+        return (this.inOwnInventory && inOwnInventory) || inventory.isInside()
+    }
+
     @SkyHanniModule
     companion object {
         private val noInventory = InventoryDetector { false }
@@ -44,20 +48,21 @@ class RenderDisplayHelper(
             currentlyVisibleDisplays = allDisplays.filter { it.checkCondition() }
         }
 
-        @SubscribeEvent
-        fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        @HandleEvent
+        fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if ((display.inOwnInventory && isInOwnInventory) || display.inventory.isInside()) {
+                if (display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+            val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if (display.outsideInventory) {
+                if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }

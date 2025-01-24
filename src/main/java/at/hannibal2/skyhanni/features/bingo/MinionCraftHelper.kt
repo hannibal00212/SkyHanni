@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -36,9 +36,13 @@ object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
+    /**
+     * REGEX-TEST: Sheep Minion X
+     * REGEX-TEST: Wheat Minion IV
+     */
     private val minionNamePattern by RepoPattern.pattern(
         "bingo.minion.name",
-        "(?<name>.*) Minion (?<number>.*)"
+        "(?<name>.*) Minion (?<number>.*)",
     )
 
     private var display = emptyList<String>()
@@ -49,8 +53,8 @@ object MinionCraftHelper {
     private val allIngredients = mutableListOf<NEUInternalName>()
     private val alreadyNotified = mutableListOf<String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         alreadyNotified.clear()
     }
 
@@ -96,8 +100,9 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: List<ItemStack>):
-        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(
+        mainInventory: List<ItemStack>,
+    ): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -239,7 +244,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return

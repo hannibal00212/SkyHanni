@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -70,7 +69,7 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
@@ -112,8 +111,7 @@ object GardenCropMilestoneDisplay {
 
         try {
             val item = event.itemStack
-            val counter = GardenAPI.readCounter(item)
-            if (counter == -1L) return
+            val counter = GardenAPI.readCounter(item) ?: return
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
@@ -156,16 +154,14 @@ object GardenCropMilestoneDisplay {
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
-        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(
-            buildList {
-                addCropIcon(crop)
-                if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-                    addString("§7" + crop.cropName + " §eMAXED")
-                } else {
-                    addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
-                }
-            },
-        )
+        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.line {
+            addCropIcon(crop)
+            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+                addString("§7" + crop.cropName + " §eMAXED")
+            } else {
+                addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
+            }
+        }
 
         val allowOverflowOrCustom = overflowDisplay || useCustomGoal
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
@@ -206,7 +202,7 @@ object GardenCropMilestoneDisplay {
                 val speedText = "§7In §b$duration"
                 lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
                 GardenAPI.itemInHand?.let {
-                    if (GardenAPI.readCounter(it) == -1L) {
+                    if (GardenAPI.readCounter(it) == null) {
                         lineMap[MilestoneTextEntry.TIME] = Renderable.string("$speedText §7Inaccurate!")
                     }
                 }
@@ -304,12 +300,10 @@ object GardenCropMilestoneDisplay {
         val missing = need - have
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
-        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(
-            buildList {
-                addCropIcon(mushroom)
-                addString("§7Mushroom Milestone $nextTier")
-            },
-        )
+        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.line {
+            addCropIcon(mushroom)
+            addString("§7Mushroom Milestone $nextTier")
+        }
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
 
