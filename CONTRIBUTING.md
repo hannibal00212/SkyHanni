@@ -242,7 +242,7 @@ The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
 A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
 If you add stuff to the repo make sure it gets serialised. See
-the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
+the [JsonObjects](src/main/kotlin/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
 
 ### Discord IPC
