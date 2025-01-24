@@ -29,9 +29,11 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -39,7 +41,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object BazaarApi {
+object BazaarAPI {
 
     private var loadedNpcPriceData = false
 
@@ -49,6 +51,45 @@ object BazaarApi {
 
     var currentlyOpenedProduct: NEUInternalName? = null
     var orderOptionProduct: NEUInternalName? = null
+
+    private val patternGroup = RepoPattern.group("inventory.bazaar")
+
+    /**
+     * REGEX-TEST: [Bazaar] Bought 1x Small Storage for 3,999.5 coins!
+     */
+    private val resetCurrentSearchPattern by patternGroup.pattern(
+        "reset-current-search",
+        "\\[Bazaar] (?:Buy Order Setup!|Bought) \\d+x (?<item>.*) for .*",
+    )
+
+    /**
+     * REGEX-TEST: Bazaar ➜ Coal
+     * REGEX-TEST: How many do you want?
+     * REGEX-TEST: Confirm Buy Order
+     * REGEX-TEST: Confirm Buy Order
+     * REGEX-TEST: Order options
+     */
+    private val inventoryNamePattern by patternGroup.list(
+        "inventory-name",
+        "Bazaar ➜ .*",
+        "How many do you want\\?",
+        "How much do you want to pay\\?",
+        "Confirm Buy Order",
+        "Confirm Instant Buy",
+        "At what price are you selling\\?",
+        "Confirm Sell Offer",
+        "Order options",
+    )
+
+    /**
+     * REGEX-TEST: Your Bazaar Orders
+     * REGEX-TEST: Co-op Bazaar Orders
+     */
+    private val inventoryBazaarOrdersPattern by patternGroup.list(
+        "inventory-bazaar-orders",
+        "Your Bazaar Orders",
+        "Co-op Bazaar Orders",
+    )
 
     fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
@@ -148,11 +189,14 @@ object BazaarApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!inBazaarInventory) return
-        // TODO USE SH-REPO
-        // TODO remove dynamic pattern
-        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
-            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
+        val message = event.message.removeColor()
+        val item = resetCurrentSearchPattern.matchMatcher(message) {
+            group("item")
+        } ?: return
+
+        if (currentSearchedItem == item) {
+            currentSearchedItem = ""
+        }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
@@ -168,18 +212,8 @@ object BazaarApi {
             }
         }
 
-        if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
-        return when (event.inventoryName) {
-            "How many do you want?" -> true
-            "How much do you want to pay?" -> true
-            "Confirm Buy Order" -> true
-            "Confirm Instant Buy" -> true
-            "At what price are you selling?" -> true
-            "Confirm Sell Offer" -> true
-            "Order options" -> true
-
-            else -> false
-        }
+        if (isBazaarOrderInventory(event.inventoryName)) return true
+        return inventoryNamePattern.matches(event.inventoryName)
     }
 
     @HandleEvent
@@ -193,9 +227,5 @@ object BazaarApi {
         currentlyOpenedProduct = null
     }
 
-    fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
-        "Your Bazaar Orders" -> true
-        "Co-op Bazaar Orders" -> true
-        else -> false
-    }
+    fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
 }
