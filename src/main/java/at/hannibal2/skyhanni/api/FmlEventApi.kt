@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.MobDetection
+import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -24,6 +27,11 @@ object FmlEventApi {
 
     @SubscribeEvent
     fun onEntityHurt(event: LivingAttackEvent) {
-        EntityHurtEvent(event.entity, event.source, event.ammount).post()
+        val entity = event.entity
+        val source = event.source
+        val amount = event.ammount
+        EntityHurtEvent(entity, source, amount).post()
+        val skyblockMob = MobData.entityToMob[entity] ?: return
+        MobDetection.postMobHurtEvent(skyblockMob, source, amount)
     }
 }
