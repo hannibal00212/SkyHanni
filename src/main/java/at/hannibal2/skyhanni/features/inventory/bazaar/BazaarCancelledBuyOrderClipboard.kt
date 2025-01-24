@@ -83,7 +83,7 @@ object BazaarCancelledBuyOrderClipboard {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!BazaarApi.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
+        if (!BazaarAPI.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
         val item = event.slot?.stack ?: return
 
         val name = lastItemClickedPattern.matchMatcher(item.name) {
@@ -109,7 +109,7 @@ object BazaarCancelledBuyOrderClipboard {
         ChatUtils.clickableChat(
             message,
             onClick = {
-                BazaarApi.searchForBazaarItem(lastClicked, latestAmount)
+                BazaarAPI.searchForBazaarItem(lastClicked, latestAmount)
             },
         )
         OSUtils.copyToClipboard(latestAmount.toString())

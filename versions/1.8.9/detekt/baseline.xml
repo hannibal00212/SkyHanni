@@ -11,33 +11,43 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
+    <ID>CyclomaticComplexMethod:BitsAPI.kt$BitsAPI$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NEUInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
+    <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: RenderWorldEvent)</ID>
+    <ID>CyclomaticComplexMethod:DungeonHideItems.kt$DungeonHideItems$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender(event: CheckRenderEntityEvent&lt;Entity&gt;)</ID>
     <ID>CyclomaticComplexMethod:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
-    <ID>CyclomaticComplexMethod:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun addEnchantments(stack: ItemStack, list: MutableList&lt;String&gt;): Double</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
+    <ID>CyclomaticComplexMethod:GardenVisitorTimer.kt$GardenVisitorTimer$@HandleEvent fun onSecondPassed(event: SecondPassedEvent)</ID>
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
+    <ID>CyclomaticComplexMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
     <ID>CyclomaticComplexMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>CyclomaticComplexMethod:ParkourHelper.kt$ParkourHelper$fun render(event: RenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
+    <ID>CyclomaticComplexMethod:SensitivityReducer.kt$SensitivityReducer$@SubscribeEvent fun onTick(event: LorenzTickEvent)</ID>
+    <ID>CyclomaticComplexMethod:SoopyGuessBurrow.kt$SoopyGuessBurrow$@HandleEvent(onlyOnSkyblock = true) fun onReceiveParticle(event: ReceiveParticleEvent)</ID>
+    <ID>CyclomaticComplexMethod:ToolTooltipTweaks.kt$ToolTooltipTweaks$@HandleEvent(onlyOnSkyblock = true) fun onToolTip(event: ToolTipEvent)</ID>
+    <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: RenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:ElectionAPI.kt$ElectionAPI$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
+    <ID>LongMethod:BitsAPI.kt$BitsAPI$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
+    <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: RenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
+    <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
     <ID>LoopWithTooManyJumpStatements:DataWatcherAPI.kt$DataWatcherAPI$for</ID>
-    <ID>LoopWithTooManyJumpStatements:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt$GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenVisitorFeatures.kt$GardenVisitorFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:IslandAreas.kt$IslandAreas$for</ID>
@@ -242,7 +252,6 @@
     <ID>ReturnCount:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
     <ID>ReturnCount:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
-    <ID>ReturnCount:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator$private fun calculateStarPrice( internalName: NEUInternalName, inputStars: Int, ): Pair&lt;EssenceItemUtils.EssenceUpgradePrice, Pair&lt;Int, Int&gt;&gt;?</ID>
     <ID>ReturnCount:FishingAPI.kt$FishingAPI$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
     <ID>ReturnCount:GraphEditor.kt$GraphEditor$private fun input()</ID>
@@ -284,7 +293,6 @@
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
     <ID>TooManyFunctions:RenderUtils.kt$RenderUtils</ID>
-    <ID>TooManyFunctions:Renderable.kt$Renderable$Companion</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
