@@ -3,52 +3,67 @@ package at.hannibal2.skyhanni.features.anvil
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.InventoryUtils.highlightAll
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
+import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.inventory.ContainerChest
 
 @SkyHanniModule
 object AnvilCombineHelper {
 
+    private val enabled get() = SkyHanniMod.feature.inventory.anvilCombineHelper
     private var lastInventoryHash = 0
     private var highlightSlots = setOf<Int>()
+    private const val LEFT_STACK_INDEX = 29
+    private const val RIGHT_STACK_INDEX = 33
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || !event.eventMatches()) return
-
-        val inventoryHash = event.inventoryItems.hashCode()
-        if (inventoryHash == lastInventoryHash) return
-        lastInventoryHash = inventoryHash
-
-        val leftStack = event.inventoryItems[29]
-        val rightStack = event.inventoryItems[33]
-        val stackInternalName = leftStack?.getInternalNameOrNull() ?: rightStack?.getInternalNameOrNull() ?: return
-
-        highlightSlots = event.inventoryItems.filterKeys { it in 27..54 }.filter {
-            it.value.getInternalNameOrNull() == stackInternalName
-        }.keys
-    }
-
-    private fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper
-    private fun InventoryUpdatedEvent.eventMatches() = inventoryName == "Anvil" && inventorySize >= 52
-
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        lastInventoryHash = 0
-        highlightSlots = emptySet()
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
+        val inventory = event.extractInventoryOrNull() ?: return
+        inventory.checkInventory()
 
-        InventoryUtils.getItemsInOpenChest().filter {
-            it.slotNumber in highlightSlots
-        } highlightAll LorenzColor.GREEN
+        inventory.getLowerItems().filter {
+            it.key.slotIndex in highlightSlots
+        }.keys highlightAll LorenzColor.GREEN
     }
+
+    private fun ContainerChest.compHash(): Int =
+        getLowerItems().hashCode() + getUpperItems().hashCode()
+
+    private fun ContainerChest.checkInventory() {
+        lastInventoryHash = this.compHash().takeIf {
+            it != lastInventoryHash
+        } ?: return
+
+        // Reset highlight cache
+        highlightSlots = emptySet()
+
+        val (leftStack, rightStack) = getSlot(LEFT_STACK_INDEX)?.stack to getSlot(RIGHT_STACK_INDEX)?.stack
+        if (leftStack != null && rightStack != null) return
+
+        val itemInternalName = when {
+            leftStack != null -> leftStack.getInternalNameOrNull()
+            rightStack != null -> rightStack.getInternalNameOrNull()
+            else -> null
+        } ?: return
+
+        var slots = 0
+        highlightSlots = getLowerItems().mapNotNull { (slot, stack) ->
+            slots++
+            slot.slotIndex.takeIf {
+                stack.getInternalNameOrNull() == itemInternalName
+            }
+        }.toSet()
+    }
+
+    private fun GuiContainerEvent.BackgroundDrawnEvent.extractInventoryOrNull(): ContainerChest? =
+        ((gui as? GuiChest)?.inventorySlots as? ContainerChest).takeIf {
+            it?.getInventoryName() == "Anvil" && it.getUpperItems().size >= 52
+        }
 }

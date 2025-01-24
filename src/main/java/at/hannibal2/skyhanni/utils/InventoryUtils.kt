@@ -35,8 +35,13 @@ object InventoryUtils {
     }
 
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList<Slot>()
-        return guiInventory.inventorySlots.inventorySlots
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory
+        val inventorySlots = guiInventory?.inventorySlots?.inventorySlots
+            ?: Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.mapIndexed { index, _ ->
+                Slot(Minecraft.getMinecraft().thePlayer.inventory, index, 0, 0)
+            }
+            ?: return emptyList()
+        return inventorySlots
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
@@ -164,10 +169,11 @@ object InventoryUtils {
         Minecraft.getMinecraft().currentScreen = null
     }
 
-    infix fun Collection<Slot>.highlightAll(color: Any) =
-        when (color) {
-            is LorenzColor -> forEach { it.highlight(color) }
-            is Color -> forEach { it.highlight(color) }
-            else -> throw IllegalArgumentException("Unsupported color type: $color")
-        }
+    infix fun Collection<Slot>.highlightAll(lorenzColor: LorenzColor) {
+        forEach { it highlight lorenzColor }
+    }
+
+    infix fun Collection<Slot>.highlightAll(color: Color) {
+        forEach { it highlight color }
+    }
 }
