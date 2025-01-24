@@ -76,7 +76,7 @@ object PestProfitTracker {
 
     val DUNG_ITEM = "DUNG".toInternalName()
     private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
-    private val tracker = SkyHanniBucketedItemTracker<PestType, BucketData>(
+    private val tracker = SkyHanniBucketedItemTracker(
         "Pest Profit Tracker",
         { BucketData() },
         { it.garden.pestProfitTracker },
@@ -128,15 +128,15 @@ object PestProfitTracker {
 
     private fun SprayType.addSprayUsed() = tracker.modify { it.spraysUsed.addOrPut(this, 1) }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
         tracker.addItem(event)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         event.checkPestChats()
         event.checkSprayChats()
     }
@@ -262,7 +262,7 @@ object PestProfitTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (!isEnabled()) return false
+        if (!config.enabled || !GardenAPI.inGarden()) return false
         if (GardenAPI.isCurrentlyFarming()) return false
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
@@ -271,9 +271,9 @@ object PestProfitTracker {
         return !(allInactive && notHoldingTool)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled() || event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
+        if (!config.enabled || event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
         val coins = event.coins.takeIf { it in 1000.0..10000.0 } ?: return
 
         // Get a list of all that have been killed in the last 2 seconds, it will
@@ -292,8 +292,6 @@ object PestProfitTracker {
     fun resetCommand() {
         tracker.resetCommand()
     }
-
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
