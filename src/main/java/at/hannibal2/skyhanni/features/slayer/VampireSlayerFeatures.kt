@@ -128,9 +128,7 @@ object VampireSlayerFeatures {
                     it.name.contains(username)
                 }
                 val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                    coopList.isNotEmpty() &&
-                        configCoopBoss.highlight &&
-                        coopList.spawnedByCoop(it)
+                    configCoopBoss.highlight && coopList.spawnedByCoop(it)
                 }
                 val shouldSendTitle =
                     if (containUser && configOwnBoss.twinClawsTitle) true
@@ -153,7 +151,7 @@ object VampireSlayerFeatures {
         for (it in getAllNameTagsInRadiusWith("Spawned by")) {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
-            val containCoop = coopList.isNotEmpty() && coopList.spawnedByCoop(it)
+            val containCoop = coopList.spawnedByCoop(it)
             val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(entityId)) {
                 taggedEntityList.remove(entityId)
