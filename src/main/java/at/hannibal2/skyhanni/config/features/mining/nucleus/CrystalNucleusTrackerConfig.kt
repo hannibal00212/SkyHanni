@@ -22,11 +22,6 @@ class CrystalNucleusTrackerConfig {
     var position: Position = Position(20, 20, false, true)
 
     @Expose
-    @ConfigOption(name = "Hide in Chocolate Factory", desc = "Hide tracker while the Chocolate Factory is open.")
-    @ConfigEditorBoolean
-    var hideInCf: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Show Outside of Nucleus", desc = "Show the tracker anywhere in the Crystal Hollows.")
     @ConfigEditorBoolean
     var showOutsideNucleus: Boolean = false
