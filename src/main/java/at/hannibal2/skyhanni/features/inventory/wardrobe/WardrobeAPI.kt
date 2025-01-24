@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -114,10 +113,8 @@ object WardrobeAPI {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         inventoryPattern.matchMatcher(event.inventoryName) {
             inWardrobe = true
             currentPage = group("currentPage").formatInt()

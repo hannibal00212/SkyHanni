@@ -46,9 +46,8 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
         if (!config.toggleTab) return
         if (Minecraft.getMinecraft().currentScreen != null) return

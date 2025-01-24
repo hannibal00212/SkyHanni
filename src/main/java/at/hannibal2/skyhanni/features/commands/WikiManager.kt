@@ -30,9 +30,8 @@ object WikiManager {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
@@ -57,9 +56,8 @@ object WikiManager {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (NEUItems.neuHasFocus()) return
         val stack = event.guiContainer.slotUnderMouse?.stack ?: return
 
