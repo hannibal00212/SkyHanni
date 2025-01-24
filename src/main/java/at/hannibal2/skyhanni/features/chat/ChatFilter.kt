@@ -595,7 +595,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun crystalNucleusBlock(event: LorenzChatEvent): String? {
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
         val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
         newMessage?.let { event.chatComponent = ChatComponentText(it) }
         blockCode?.let { return it }
