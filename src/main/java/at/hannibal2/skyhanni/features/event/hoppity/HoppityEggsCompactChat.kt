@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityChatConfig
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.getRabbitsFormat
@@ -30,7 +30,7 @@ object HoppityEggsCompactChat {
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
     val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
 
-    fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
+    fun compactChat(event: SkyHanniChatEvent?, dataSet: HoppityStateDataSet) {
         if (!chatConfig.compact) return
         hoppityDataSet = dataSet.copy()
         event?.let { it.blockedReason = "compact_hoppity" }

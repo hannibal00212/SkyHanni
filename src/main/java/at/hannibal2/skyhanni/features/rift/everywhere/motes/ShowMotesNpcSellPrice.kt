@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,7 +50,7 @@ object ShowMotesNpcSellPrice {
             config.inventoryValue.position.renderStringsAndItems(
                 display,
                 itemScale = 0.7,
-                posLabel = "Inventory Motes Value"
+                posLabel = "Inventory Motes Value",
             )
         }
     }
@@ -62,8 +62,8 @@ object ShowMotesNpcSellPrice {
         processItems()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack
@@ -75,7 +75,7 @@ object ShowMotesNpcSellPrice {
         if (size > 1) {
             event.toolTip.add(
                 "§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes " +
-                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)"
+                    "§7($size x §d${(baseMotes / size).addSeparators()} Motes§7)",
             )
         } else {
             event.toolTip.add("§6NPC price: $burgerText§d${baseMotes.addSeparators()} Motes")
@@ -119,8 +119,8 @@ object ShowMotesNpcSellPrice {
         update()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!RiftAPI.inRift()) return
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
@@ -158,10 +158,10 @@ object ShowMotesNpcSellPrice {
                             "§6${stack.displayName}: §b$price",
                             tips,
                             highlightsOnHoverSlots = index,
-                            stack = stack
-                        )
+                            stack = stack,
+                        ),
                     )
-                }
+                },
             )
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
@@ -175,7 +175,7 @@ object ShowMotesNpcSellPrice {
             onChange = {
                 config.inventoryValue.formatType = NumberFormatEntry.entries[it.ordinal] // todo avoid ordinal
                 update()
-            }
+            },
         )
         return newDisplay
     }
