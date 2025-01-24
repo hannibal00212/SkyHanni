@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.contests.rewards.ContestRewardSet
 import at.hannibal2.skyhanni.events.garden.contests.rewards.ContestRewardsClaimedEvent
 import at.hannibal2.skyhanni.features.garden.AnitaMedalProfit
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -107,13 +107,13 @@ object CompactJacobClaim {
         CropType.WHEAT to Pair(LorenzColor.GOLD, "Wh"),
     )
 
-    private fun LorenzChatEvent.block(reason: String) {
+    private fun SkyHanniChatEvent.block(reason: String) {
         messageSet.add(message)
         blockedReason = reason
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.compactJacobClaim) return
         val message = event.message
         var eventDelay = 300.milliseconds
