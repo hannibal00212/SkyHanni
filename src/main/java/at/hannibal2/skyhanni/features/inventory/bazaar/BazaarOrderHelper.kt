@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -55,7 +55,7 @@ object BazaarOrderHelper {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         val inventoryName = chest.getInventoryName()
-        if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
+        if (!BazaarAPI.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
             bazaarItemNamePattern.matchMatcher(stack.name) {
