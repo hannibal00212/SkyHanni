@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
 @SkyHanniModule
@@ -51,7 +52,7 @@ object OpenLastStorage {
         ChatUtils.chat(message)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
         if (event.senderIsSkyhanni()) return
@@ -70,7 +71,7 @@ object OpenLastStorage {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
             callback {
-                if (isEnabled()) {
+                if (isEnabled() && LorenzUtils.inSkyBlock) {
                     openLastStoragePage(lastStorageType)
                 } else {
                     ChatUtils.chatAndOpenConfig(
