@@ -324,89 +324,77 @@ object BitsAPI {
     }
 
     private fun handleFameRankGui(stacks: List<ItemStack>) {
-        var foundFameRankStack = false
-        var foundBitsStack = false
-        var foundCookieStack = false
-        items@ for (item in stacks.reversed()) {
-            if (foundFameRankStack && foundBitsStack && foundCookieStack) return
-            if (!foundFameRankStack && fameRankGuiStackPattern.matches(item.displayName)) {
-                foundFameRankStack = true
-                lore@ for (line in item.getLore()) {
-                    fameRankCommunityShopPattern.matchMatcher(line) {
-                        val rank = group("rank")
+        processFameRankStacks(stacks)
+        processBitsStacks(stacks)
+        processCookieStacks(stacks)
+    }
 
-                        currentFameRank = getFameRankByNameOrNull(rank)
-                            ?: return ErrorManager.logErrorWithData(
-                                FameRankNotFoundException(rank),
-                                "FameRank $rank not found",
-                                "Rank" to rank,
-                                "Lore" to item.getLore(),
-                                "FameRanks" to FameRanks.fameRanks,
-                            )
-
-                        continue@lore
-                    }
-
-                    fameRankSbMenuPattern.matchMatcher(line) {
-                        val rank = group("rank")
-
-                        currentFameRank = getFameRankByNameOrNull(rank)
-                            ?: return ErrorManager.logErrorWithData(
-                                FameRankNotFoundException(rank),
-                                "FameRank $rank not found",
-                                "Rank" to rank,
-                                "Lore" to item.getLore(),
-                                "FameRanks" to FameRanks.fameRanks,
-                            )
-
-                        continue@lore
-                    }
-                }
-                continue@items
+    private fun processFameRankStacks(stacks: List<ItemStack>) {
+        val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
+        for (line in stack.getLore()) {
+            fameRankCommunityShopPattern.matchMatcher(line) {
+                val rank = group("rank")
+                currentFameRank = getFameRankByNameOrNull(rank)
+                    ?: return ErrorManager.logErrorWithData(
+                        FameRankNotFoundException(rank),
+                        "FameRank $rank not found",
+                        "Rank" to rank,
+                        "Lore" to stack.getLore(),
+                        "FameRanks" to FameRanks.fameRanks,
+                    )
             }
-            if (!foundBitsStack && bitsStackPattern.matches(item.displayName)) {
-                foundBitsStack = true
-                var foundAvailable = false
-                var foundBits = false
-                lore@ for (line in item.getLore()) {
-                    if (foundBits && foundAvailable) break@lore
-                    if (!foundBits) bitsPurseMenuPattern.findMatcher(line) {
-                        foundBits = true
-                        val amount = group("amount").formatInt()
-                        updateBits(amount, false)
 
-                        continue@lore
-                    }
-                    if (!foundAvailable) bitsAvailableMenuPattern.matchMatcher(line) {
-                        foundAvailable = true
-                        val amount = group("toClaim").formatInt()
-                        if (amount != bitsAvailable) {
-                            bitsAvailable = amount
-                            sendBitsAvailableGainedEvent()
-                        }
-
-                        continue
-                    }
-                }
-                continue@items
+            fameRankSbMenuPattern.matchMatcher(line) {
+                val rank = group("rank")
+                currentFameRank = getFameRankByNameOrNull(rank)
+                    ?: return ErrorManager.logErrorWithData(
+                        FameRankNotFoundException(rank),
+                        "FameRank $rank not found",
+                        "Rank" to rank,
+                        "Lore" to stack.getLore(),
+                        "FameRanks" to FameRanks.fameRanks,
+                    )
             }
-            if (!foundCookieStack && cookieGuiStackPattern.matches(item.displayName)) {
-                foundCookieStack = true
-                lore@ for (line in item.getLore()) {
-                    cookieDurationPattern.matchMatcher(line) {
-                        val duration = TimeUtils.getDuration(group("time"))
-                        cookieBuffTime = SimpleTimeMark.now().plus(duration)
+        }
+    }
 
-                        break@lore
-                    }
-                    noCookieActiveCookieMenuPattern.matchMatcher(line) {
-                        val nextLine = item.getLore().nextAfter(line) ?: continue@lore
-                        if (noCookieActiveCookieMenuPattern.matches(nextLine)) cookieBuffTime = SimpleTimeMark.farPast()
+    private fun processBitsStacks(stacks: List<ItemStack>) {
+        val stack = stacks.firstOrNull { bitsStackPattern.matches(it.displayName) } ?: return
+        var foundAvailable = false
+        var foundBits = false
+        for (line in stack.getLore()) {
+            if (!foundBits) bitsPurseMenuPattern.findMatcher(line) {
+                foundBits = true
+                val amount = group("amount").formatInt()
+                updateBits(amount, false)
+            }
 
-                        break@lore
-                    }
+            if (!foundAvailable) bitsAvailableMenuPattern.matchMatcher(line) {
+                foundAvailable = true
+                val amount = group("toClaim").formatInt()
+                if (amount != bitsAvailable) {
+                    bitsAvailable = amount
+                    sendBitsAvailableGainedEvent()
                 }
-                continue@items
+            }
+
+            if (foundBits && foundAvailable) break
+        }
+    }
+
+    private fun processCookieStacks(stacks: List<ItemStack>) {
+        val stack = stacks.firstOrNull { cookieGuiStackPattern.matches(it.displayName) } ?: return
+        for (line in stack.getLore()) {
+            cookieDurationPattern.matchMatcher(line) {
+                val duration = TimeUtils.getDuration(group("time"))
+                cookieBuffTime = SimpleTimeMark.now().plus(duration)
+                return
+            }
+
+            noCookieActiveCookieMenuPattern.matchMatcher(line) {
+                val nextLine = stack.getLore().nextAfter(line) ?: continue
+                if (noCookieActiveCookieMenuPattern.matches(nextLine)) cookieBuffTime = SimpleTimeMark.farPast()
+                return
             }
         }
     }
