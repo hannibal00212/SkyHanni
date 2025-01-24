@@ -146,7 +146,7 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    private fun LorenzChatEvent.sendNextEggAvailable() {
+    private fun SkyHanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
         ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
         blockedReason = "hoppity_egg"
