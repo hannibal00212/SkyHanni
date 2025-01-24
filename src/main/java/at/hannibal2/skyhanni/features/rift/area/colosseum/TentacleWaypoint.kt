@@ -26,6 +26,9 @@ object TentacleWaypoint {
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
     private val tentacleHits = mutableMapOf<EntityLivingBase, Int>()
 
+    private const val VALID_SLIME_SIZES = 4..8
+    private const val TENTACLE_FLOOR_Y = 68
+
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
@@ -33,9 +36,8 @@ object TentacleWaypoint {
         if (!entity.isSkyBlockMob()) return
         if (entity.displayName.formattedText != "Slime§r") return
         // Only get the tentacle on the ground
-        if (ceil(entity.posY).toInt() != 68) return
-        // Only get the tentacle with size 4 to 8
-        if (entity.slimeSize !in 4..8) return
+        if (ceil(entity.posY).toInt() != TENTACLE_FLOOR_Y) return
+        if (entity.slimeSize !in VALID_SLIME_SIZES) return
         if (entity in tentacleHits) return
 
         tentacleHits += entity to 0
