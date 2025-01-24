@@ -20,14 +20,6 @@ object OpenLastStorage {
     private val config get() = SkyHanniMod.feature.misc.lastStorage
     private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
 
-    private var lastStorageType: StorageType
-        get() = storage?.type ?: StorageType.ENDER_CHEST
-        set(value) { storage?.type = value }
-
-    private var lastStoragePage: Int?
-        get() = storage?.page
-        set(value) { storage?.page = value }
-
     enum class StorageType(private val validPages: IntRange, val runCommand: (Int) -> Unit, vararg val commands: String) {
         ENDER_CHEST(1..9, { HypixelCommands.enderChest(it) }, "/enderchest", "/ec"),
         BACKPACK(0..18, { HypixelCommands.backPack(it) }, "/backpack", "/bp"),
@@ -44,11 +36,13 @@ object OpenLastStorage {
     }
 
     private fun openLastStoragePage(type: StorageType) {
-        lastStoragePage?.let { type.runCommand(it) } ?: ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
-
-        val message = lastStoragePage?.let { page ->
+        val message = storage?.page?.let { page ->
+            type.runCommand(page)
             "Opened last ${type.storageName} $page."
-        } ?: "No last ${type.storageName} found. Running /${config.fallbackCommand}."
+        } ?: run {
+            ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
+            "No last ${type.storageName} found. Running /${config.fallbackCommand}."
+        }
         ChatUtils.chat(message)
     }
 
@@ -71,8 +65,9 @@ object OpenLastStorage {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
             callback {
+                val storage = storage ?: return@callback
                 if (isEnabled() && LorenzUtils.inSkyBlock) {
-                    openLastStoragePage(lastStorageType)
+                    openLastStoragePage(storage.type)
                 } else {
                     ChatUtils.chatAndOpenConfig(
                         "This feature is disabled, enable it in the config if you want to use it.",
@@ -88,15 +83,15 @@ object OpenLastStorage {
             openLastStoragePage(type)
             return true
         }
-
-        if (args.size <= 1) {
+        val storage = storage ?: return false
+        storage.page = if (args.size <= 1) {
             // No argument means open the first page of the respective storage
-            lastStoragePage = 1
+            1
         } else {
             val pageNumber = args[1].formatIntOrUserError() ?: return false
-            lastStoragePage = pageNumber.takeIf { type.isValidPage(it) }
+            pageNumber.takeIf { type.isValidPage(it) }
         }
-        lastStorageType = type
+        storage.type = type
         return false
     }
 
