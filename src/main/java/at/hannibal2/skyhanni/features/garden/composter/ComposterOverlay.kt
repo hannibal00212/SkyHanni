@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -486,7 +486,7 @@ object ComposterOverlay {
         if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
             !LorenzUtils.noTradeMode && internalName != BIOFUEL
         ) {
-            BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
+            BazaarAPI.searchForBazaarItem(itemName, itemsNeeded)
             return
         }
         val havingInInventory = internalName.getAmountInInventory()
@@ -515,7 +515,7 @@ object ComposterOverlay {
                 ChatUtils.chat("No $itemName §efound in sacks.")
             } else {
                 ChatUtils.chat("No $itemName §efound in sacks. Opening Bazaar.")
-                BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
+                BazaarAPI.searchForBazaarItem(itemName, itemsNeeded)
             }
             return
         }
