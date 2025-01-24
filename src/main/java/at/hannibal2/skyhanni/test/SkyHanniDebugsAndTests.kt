@@ -69,7 +69,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -616,7 +615,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
