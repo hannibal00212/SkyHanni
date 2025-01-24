@@ -6,20 +6,15 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.regex.Pattern
 
 enum class TabWidgetDisplay(
     private val configName: String?,
     vararg val widgets: TabWidget,
-    var expectedLinePattern: Pattern? = null, // Todo: Remove when TabWidget data is no longer bad
 ) {
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
@@ -62,30 +57,8 @@ enum class TabWidgetDisplay(
     @SkyHanniModule
     companion object {
 
-        private val patternGroup = RepoPattern.group("tabwidget")
         private val config get() = SkyHanniMod.feature.gui.tabWidget
         private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-        // Todo: Remove when TabWidget data is no longer bad
-        // <editor-fold desc="Patterns">
-        /**
-         * REGEX-TEST: §6§lBestiary:
-         * REGEX-TEST:  Crypt Ghoul 15§r§f: §r§b§lMAX
-         * REGEX-TEST:  §r§6Golden Ghoul 13§r§f: §r§b2,409/3,000
-         * REGEX-TEST:  Old Wolf 10§r§f: §r§b332/600
-         * REGEX-TEST:  Wolf 7§r§f: §r§b834/1,400
-         * REGEX-FAIL: §8[§d326§8] §boBlazin §6✿
-         */
-        private val bestiaryLinePattern by patternGroup.pattern(
-            "lines.bestiary",
-            "§6§lBestiary:| .*: (?:§.)+(?:MAX|[\\d,]+\\/[\\d,]+)"
-        )
-        // </editor-fold>
-
-        @HandleEvent
-        fun onRepoReload(event: RepositoryReloadEvent) {
-            BESTIARY.expectedLinePattern = bestiaryLinePattern
-        }
 
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -94,10 +67,7 @@ enum class TabWidgetDisplay(
             config.display.forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->
-                        subWidget.lines.filter { line ->
-                            // Todo: Remove when TabWidget data is no longer bad
-                            widget.expectedLinePattern?.matches(line) ?: true
-                        }
+                        subWidget.lines
                     },
                     posLabel = "Display Widget: ${widget.name}",
                 )
