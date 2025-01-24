@@ -271,6 +271,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var boosterCookieExpiryTime: SimpleTimeMark? = null
+
+        @Expose
+        var museumMilestone: Int = -1
     }
 
     @Expose
