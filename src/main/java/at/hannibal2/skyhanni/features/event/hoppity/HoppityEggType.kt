@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -103,7 +103,7 @@ enum class HoppityEggType(
 
         private fun getMealByName(mealName: String) = entries.find { it.mealName == mealName }
 
-        internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
+        internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
             HoppityEggType.getMealByName(group("meal")) ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",

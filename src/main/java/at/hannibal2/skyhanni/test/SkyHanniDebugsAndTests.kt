@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
@@ -413,9 +413,8 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowInternalName(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
@@ -423,9 +422,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun showItemRarity(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
@@ -433,9 +431,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item rarity: $rarity")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun showItemCategory(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
 
@@ -443,9 +440,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item category: $category")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowNpcPrice(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -453,9 +449,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowBaseStats(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showBaseValues) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -469,18 +464,16 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowCraftPrice(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
 
         event.toolTip.add("§7Craft price: ${price.addSeparators()}")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowBzPrice(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -492,9 +485,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onShowItemName(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
@@ -506,16 +498,14 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         if (false) {
             itemRenderDebug()
         }

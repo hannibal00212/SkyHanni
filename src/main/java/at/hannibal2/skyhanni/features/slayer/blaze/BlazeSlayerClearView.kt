@@ -18,9 +18,8 @@ object BlazeSlayerClearView {
 
     private var nearBlaze = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!event.repeatSeconds(3)) return
         nearBlaze = DamageIndicatorManager.getDistanceTo(
             BossType.SLAYER_BLAZE_1,
