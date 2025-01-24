@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -74,9 +73,9 @@ object TotemOfCorruption {
         display = createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!isHideParticlesEnabled()) return
+        if (!config.hideParticles) return
 
         for (totem in totems) {
             if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
@@ -168,7 +167,6 @@ object TotemOfCorruption {
         }
 
     private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
-    private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
     private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 

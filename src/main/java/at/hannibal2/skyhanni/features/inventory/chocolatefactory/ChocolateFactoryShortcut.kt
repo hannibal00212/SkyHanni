@@ -34,9 +34,8 @@ object ChocolateFactoryShortcut {
         )
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.inAnyIsland(
                 IslandType.THE_RIFT,
                 IslandType.KUUDRA_ARENA,

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.cos
@@ -120,21 +119,7 @@ object SoopyGuessBurrow {
             return
         }
 
-        val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
-
-        distance = distance2!!
-        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
-        var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
-        changes = changes.map { o -> o / lineDist }
-
-        lastSoundPoint?.let {
-            guessPoint =
-                LorenzVec(
-                    it.x + changes[0] * distance!!,
-                    it.y + changes[1] * distance!!,
-                    it.z + changes[2] * distance!!,
-                )
-        }
+        calcNewGuessPoint()
     }
 
     @Suppress("MaxLineLength")
@@ -146,7 +131,7 @@ object SoopyGuessBurrow {
         return LorenzVec(a, b, c)
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
@@ -264,23 +249,25 @@ object SoopyGuessBurrow {
 
             if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
 
-            val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
+            calcNewGuessPoint()
+        }
+    }
 
-            distance = distance2!!
+    private fun calcNewGuessPoint() {
+        val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
+        distance = distance2!!
 
-            val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
+        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
+        var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
+        changes = changes.map { o -> o / lineDist }
 
-            var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
-            changes = changes.map { o -> o / lineDist }
-
-            lastParticlePoint?.let {
-                guessPoint =
-                    LorenzVec(
-                        it.x + changes[0] * distance!!,
-                        it.y + changes[1] * distance!!,
-                        it.z + changes[2] * distance!!,
-                    )
-            }
+        lastParticlePoint?.let {
+            guessPoint =
+                LorenzVec(
+                    it.x + changes[0] * distance!!,
+                    it.y + changes[1] * distance!!,
+                    it.z + changes[2] * distance!!,
+                )
         }
     }
 

@@ -5,19 +5,17 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FossilExcavatorAPI {
@@ -53,9 +51,8 @@ object FossilExcavatorAPI {
 
     val scrapItem = "SUSPICIOUS_SCRAP".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (event.inventoryName != "Fossil Excavator") return
         inInventory = true
     }
@@ -80,9 +77,8 @@ object FossilExcavatorAPI {
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onChat(event: SkyHanniChatEvent) {
 
         val message = event.message
 
