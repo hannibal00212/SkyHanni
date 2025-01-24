@@ -24,7 +24,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -89,7 +91,7 @@ object CrystalNucleusTracker {
                 else -> return@matchMatcher
             }
             tracker.modify {
-                it.addItem(item, 1, false)
+                it.addItem(item, amount = 1, false)
             }
         }
     }
@@ -97,7 +99,7 @@ object CrystalNucleusTracker {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetcrystalnucleustracker") {
-            description = "Resets the Crystal Nucleus Tracker"
+            description = "Resets the Crystal Nucleus Tracker."
             category = CommandCategory.USERS_RESET
             callback { tracker.resetCommand() }
         }
@@ -120,35 +122,33 @@ object CrystalNucleusTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lCrystal Nucleus Profit Tracker")
-        var profit = tracker.drawItems(data, { true }, this)
 
         val runsCompleted = data.runsCompleted
-
         if (runsCompleted > 0) {
+            var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
                 Renderable.hoverTips(
                     " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    listOf(
+                    tips = listOf(
                         "§7You lost §c$jungleKeyCostFormat §7of total profit",
                         "§7due to §5Jungle Keys§7."
                     ),
-                ).toSearchable(),
+                ).toSearchable("Jungle Key"),
             )
 
             val usesApparatus = CrystalNucleusAPI.usesApparatus()
             val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
             val totalSapphireCost = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
-            val usageString =
-                if (usesApparatus) StringUtils.pluralize(
-                    runsCompleted.toInt(),
-                    rawConfigString,
-                    "§5Precursor Apparatuses"
-                )
-                else rawConfigString
+            val usageString = if (usesApparatus) StringUtils.pluralize(
+                runsCompleted.toInt(),
+                rawConfigString,
+                "§5Precursor Apparatuses",
+            )
+            else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
             profit -= totalSapphireCost
@@ -156,11 +156,11 @@ object CrystalNucleusTracker {
             add(
                 Renderable.hoverTips(
                     " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
-                    listOf(
+                    tips = listOf(
                         "§7You lost §c$totalSapphireCostFormat §7of total profit",
                         "§7due to $usageString§7."
                     ),
-                ).toSearchable(),
+                ).toSearchable(usageString.removeColor()),
             )
 
             add(
