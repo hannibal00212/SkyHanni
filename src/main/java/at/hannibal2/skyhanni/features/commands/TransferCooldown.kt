@@ -31,9 +31,9 @@ object TransferCooldown {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommand(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.transferCooldown || lastRunCompleted.isInPast()) return
+        if (!config.transferCooldown || lastRunCompleted.isInPast()) return
         when (event.splitMessage[0]) {
             "/is" -> {
                 event.cancel()

@@ -391,9 +391,9 @@ enum class TabWidget(
 
         private val FORCE_UPDATE_DELAY = 2.seconds
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onSecondPassed(event: SecondPassedEvent) {
-            if (sentSinceWorldChange || !LorenzUtils.inSkyBlock) return
+            if (sentSinceWorldChange) return
             if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
