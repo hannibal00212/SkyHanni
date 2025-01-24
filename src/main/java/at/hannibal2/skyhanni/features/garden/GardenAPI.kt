@@ -185,7 +185,7 @@ object GardenAPI {
         ChocolateFactoryAPI.inChocolateFactory ||
         ChocolateFactoryAPI.chocolateFactoryPaused ||
         HoppityCollectionStats.inInventory ||
-        PesthunterProfit.inInventory
+        PesthunterProfit.isInInventory()
 
     fun resetCropSpeed() {
         storage?.cropsPerSecond?.clear()

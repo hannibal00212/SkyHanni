@@ -36,7 +36,7 @@ object PesthunterProfit {
     )
     private var display = emptyList<Renderable>()
     private var bestPesthunterTrade = mutableListOf<PesthunterTrade>()
-    var inInventory = false
+    private var inInventory = false
 
     data class PesthunterTrade(val internalName: NEUInternalName, val coinsPerPest: Double)
 
@@ -48,6 +48,8 @@ object PesthunterProfit {
         "garden.pests.pesthunter.cost",
         "§2(?<pests>[\\d,]+) Pests"
     )
+
+    fun isInInventory() = inInventory
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
