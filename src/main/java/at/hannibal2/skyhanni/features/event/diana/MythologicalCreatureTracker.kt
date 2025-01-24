@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -132,16 +132,21 @@ object MythologicalCreatureTracker {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
-        if (spadeInHand) {
-            tracker.firstUpdate()
-        }
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { config.enabled },
+            onRender = {
+                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+                if (!DianaAPI.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
+                if (spadeInHand) {
+                    tracker.firstUpdate()
+                }
 
-        tracker.renderDisplay(config.position)
+                tracker.renderDisplay(config.position)
+            },
+        )
     }
 
     fun resetCommand() {
