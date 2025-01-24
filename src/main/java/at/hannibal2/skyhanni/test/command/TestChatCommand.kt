@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -66,8 +66,8 @@ object TestChatCommand {
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
-        val event = LorenzChatEvent(message, componentText)
-        event.postAndCatch() // TODO don't use deprecated function
+        val event = SkyHanniChatEvent(message, componentText)
+        event.post()
 
         if (event.blockedReason != "") {
             if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
