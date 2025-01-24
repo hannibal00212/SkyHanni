@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-//#if MC < 1.12
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if MC < 1.12
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import net.minecraft.entity.boss.BossStatus
-
 //#else
 //$$ import net.minecraftforge.client.event.RenderGameOverlayEvent
 //#endif
