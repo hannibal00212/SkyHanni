@@ -2,27 +2,30 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
 @SkyHanniModule
 object OpenLastStorage {
 
-    private val config get() = SkyHanniMod.feature.misc
+    private val config get() = SkyHanniMod.feature.misc.lastStorage
+    private val storage get() = ProfileStorageData.profileSpecific?.lastStorage
 
-    private enum class StorageType(val validPages: IntRange, val runCommand: (Int) -> Unit, vararg val commands: String) {
+    enum class StorageType(private val validPages: IntRange, val runCommand: (Int) -> Unit, vararg val commands: String) {
         ENDER_CHEST(1..9, { HypixelCommands.enderChest(it) }, "/enderchest", "/ec"),
         BACKPACK(0..18, { HypixelCommands.backPack(it) }, "/backpack", "/bp"),
         ;
 
         val storageName = name.lowercase().replace("_", " ")
-        var lastPage: Int? = null
         fun isValidPage(page: Int) = page in validPages
 
         companion object {
@@ -32,19 +35,18 @@ object OpenLastStorage {
         }
     }
 
-    // Default to Ender Chest as last storage type, since every profile on any account has at least one partial ender chest page unlocked
-    private var lastStorageType = StorageType.ENDER_CHEST
-
     private fun openLastStoragePage(type: StorageType) {
-        type.lastPage?.let { type.runCommand(it) }
-
-        val message = type.lastPage?.let { page ->
+        val message = storage?.page?.let { page ->
+            type.runCommand(page)
             "Opened last ${type.storageName} $page."
-        } ?: "No last ${type.storageName} to open."
+        } ?: run {
+            ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
+            "No last ${type.storageName} found. Running /${config.fallbackCommand}."
+        }
         ChatUtils.chat(message)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
         if (event.senderIsSkyhanni()) return
@@ -63,8 +65,9 @@ object OpenLastStorage {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlo")
             callback {
-                if (isEnabled()) {
-                    openLastStoragePage(lastStorageType)
+                val storage = storage ?: return@callback
+                if (isEnabled() && LorenzUtils.inSkyBlock) {
+                    openLastStoragePage(storage.type)
                 } else {
                     ChatUtils.chatAndOpenConfig(
                         "This feature is disabled, enable it in the config if you want to use it.",
@@ -80,16 +83,21 @@ object OpenLastStorage {
             openLastStoragePage(type)
             return true
         }
-
-        if (args.size <= 1) {
+        val storage = storage ?: return false
+        storage.page = if (args.size <= 1) {
             // No argument means open the first page of the respective storage
-            type.lastPage = 1
+            1
         } else {
             val pageNumber = args[1].formatIntOrUserError() ?: return false
-            type.lastPage = pageNumber.takeIf { type.isValidPage(it) }
+            pageNumber.takeIf { type.isValidPage(it) }
         }
-        lastStorageType = type
+        storage.type = type
         return false
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(71, "misc.openLastStorage", "misc.lastStorage.openLastStorage")
     }
 
     private fun isEnabled() = config.openLastStorage

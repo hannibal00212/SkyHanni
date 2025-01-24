@@ -98,7 +98,10 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
 @Suppress("LargeClass", "LongMethod")
+@Deprecated("do not use this class anymore")
 object Commands {
+    // Do not add new commands in this class
+    // TODO move all command loading away from this class
 
     val commandList = mutableListOf<CommandBuilder>()
 
