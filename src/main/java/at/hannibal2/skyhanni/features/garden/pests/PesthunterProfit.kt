@@ -117,7 +117,7 @@ object PesthunterProfit {
         return lore.subList(startIndex, endIndex).map { it.replace("§8 ", " §8") }
     }
 
-    private fun getFullCost(requiredItems: List<String>): Double  = requiredItems.mapNotNull {
+    private fun getFullCost(requiredItems: List<String>): Double = requiredItems.mapNotNull {
         ItemUtils.readItemAmount(it)
     }.sumOf { (name, amount) ->
         val internalName = NEUInternalName.fromItemNameOrNull(name) ?: return@sumOf 0.0
