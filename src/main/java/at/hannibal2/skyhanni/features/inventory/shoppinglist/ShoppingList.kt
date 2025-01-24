@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
@@ -10,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -28,7 +24,7 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 object ShoppingList {
     private val config get() = SkyHanniMod.feature.inventory.shoppingList
 
-    private val shoppingList = mutableListOf<ShoppingListElement>()
+    private val itemList = mutableListOf<ShoppingListElement>()
 
     fun add(itemName: NEUInternalName, amount: Int = 1, categoryName: String? = null) {
         // TODO: shouldn't happen @Thunderblade73
@@ -37,11 +33,11 @@ object ShoppingList {
         val maybeItem = ShoppingListItem(itemName, amount)
 
         if (categoryName != null) {
-            val category = shoppingList.firstOrNull { it is ShoppingListCategory && it.name == categoryName } as ShoppingListCategory?
+            val category = itemList.firstOrNull { it is ShoppingListCategory && it.name == categoryName } as ShoppingListCategory?
             if (category == null) {
                 val newCategory = ShoppingListCategory(categoryName)
                 newCategory.items.add(maybeItem)
-                shoppingList.add(newCategory)
+                itemList.add(newCategory)
             } else {
                 val item = category.items.firstOrNull { it.name == itemName } as ShoppingListItem?
 
@@ -52,12 +48,12 @@ object ShoppingList {
                 }
             }
         } else {
-            val item = shoppingList.firstOrNull {
+            val item = itemList.firstOrNull {
                 it is ShoppingListItem && it.name == itemName
             } as? ShoppingListItem
 
             if (item == null) {
-                shoppingList.add(maybeItem)
+                itemList.add(maybeItem)
             } else {
                 item.changeAmountBy(amount)
             }
@@ -75,12 +71,12 @@ object ShoppingList {
     }
 
     private fun MutableList<List<Any>>.drawShoppingList() {
-        if (shoppingList.isEmpty()) return
+        if (itemList.isEmpty()) return
 
         var totalPrice = 0.0
         addAsSingletonList("§Shopping List:")
 
-        shoppingList.forEach { element ->
+        itemList.forEach { element ->
             when (element) {
                 is ShoppingListItem -> {
                     val internalName = element.name
@@ -123,7 +119,9 @@ object ShoppingList {
                     add(list)
                 }
 
-                is ShoppingListCategory -> {TODO()}
+                is ShoppingListCategory -> {
+                    TODO()
+                }
             }
         }
 //         if (totalPrice > 0) {
