@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.gui.inventory.GuiChest
 import kotlin.time.Duration.Companion.milliseconds
@@ -16,9 +15,8 @@ object ChocolateFactoryKeybinds {
     private val config get() = ChocolateFactoryAPI.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
@@ -37,9 +35,8 @@ object ChocolateFactoryKeybinds {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
