@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobDetection
-import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent

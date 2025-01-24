@@ -32,7 +32,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class Projectile(mob: Mob) : FirstSeen(mob)
     }
 
-    open class Hurt(mob: Mob, val source: DamageSource, val amount: Float): MobEvent(mob) {
+    open class Hurt(mob: Mob, val source: DamageSource, val amount: Float) : MobEvent(mob) {
         class SkyblockMob(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Summon(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Player(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
