@@ -125,13 +125,13 @@ class ItemResolutionQuery {
                 val cleanedEnchantName = name.renamedEnchantmentCheck().replace(" ", "_").replace("-", "_").uppercase()
                 "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
             }
-        private fun String.renamedEnchantmentCheck(): String {
-            if (this == "Turbo-Cocoa") return "Turbo-Coco"
-            if (this == "Turbo-Cacti") return "Turbo-Cactus"
-            if (this == "Prismatic") return "Pristine"
-            if (this == "Dragon Tracer") return "Aiming"
 
-            return this
+        private fun String.renamedEnchantmentCheck(): String = when (this) {
+            "Turbo-Cocoa" -> "Turbo-Coco"
+            "Turbo-Cacti" -> "Turbo-Cactus"
+            "Prismatic" -> "Pristine"
+            "Dragon Tracer" -> "Aiming"
+            else -> this
         }
     }
 
