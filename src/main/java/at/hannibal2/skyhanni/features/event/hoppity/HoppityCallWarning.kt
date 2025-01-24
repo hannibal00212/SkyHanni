@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -24,8 +24,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.time.Instant
 import kotlin.math.sin
@@ -95,8 +93,8 @@ object HoppityCallWarning {
         finalWarningTime = null
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onChat(event: SkyHanniChatEvent) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
@@ -160,7 +158,7 @@ object HoppityCallWarning {
         stopWarningUser()
     }
 
-    private fun readPickupUuid(event: LorenzChatEvent) {
+    private fun readPickupUuid(event: SkyHanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
         if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return
