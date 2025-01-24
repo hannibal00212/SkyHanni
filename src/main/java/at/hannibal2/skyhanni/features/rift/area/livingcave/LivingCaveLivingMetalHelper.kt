@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
@@ -79,7 +78,7 @@ object LivingCaveLivingMetalHelper {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return

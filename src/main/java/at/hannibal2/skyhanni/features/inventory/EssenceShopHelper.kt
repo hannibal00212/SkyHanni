@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
@@ -139,7 +139,7 @@ object EssenceShopHelper {
         val currentEssenceItem = currentEssenceItem ?: return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            BazaarApi.searchForBazaarItem(currentEssenceItem, essenceNeeded)
+            BazaarAPI.searchForBazaarItem(currentEssenceItem, essenceNeeded)
             lastClick = SimpleTimeMark.now()
         }
     }
