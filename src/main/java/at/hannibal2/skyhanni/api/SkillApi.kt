@@ -81,7 +81,7 @@ object SkillApi {
         " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
     )
 
-    var skillXpInfoMap = mutableMapOf<SkillType, SkillXpInfo>()
+    var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
     val storage get() = ProfileStorageData.profileSpecific?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
@@ -95,7 +95,7 @@ object SkillApi {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         val activeSkill = activeSkill ?: return
-        val info = skillXpInfoMap[activeSkill] ?: return
+        val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
 
         val time = when (activeSkill) {
@@ -127,7 +127,7 @@ object SkillApi {
             val skillName = matcher.group("skillName")
             val skillType = SkillType.getByNameOrNull(skillName) ?: return
             val skillInfo = storage?.get(skillType) ?: SkillInfo()
-            val skillXp = skillXpInfoMap[skillType] ?: SkillXpInfo()
+            val skillXp = skillXPInfoMap[skillType] ?: SkillXPInfo()
             activeSkill = skillType
             when (matcher.pattern()) {
                 skillPercentPattern -> handleSkillPatternPercent(matcher, skillType)
@@ -422,8 +422,8 @@ object SkillApi {
                         ChatUtils.userError("Not a valid number: '$second'")
                         return
                     }
-                    val neededXp = xpRequiredForLevel(level)
-                    ChatUtils.chat("You need §b${neededXp.addSeparators()} §eXP to reach level §b${level.toDouble()}")
+                    val neededXP = xpRequiredForLevel(level)
+                    ChatUtils.chat("You need §b${neededXP.addSeparators()} §eXP to reach level §b${level.toDouble()}")
                     return
                 }
 
@@ -512,7 +512,7 @@ object SkillApi {
         @Expose var customGoalLevel: Int = 0,
     )
 
-    data class SkillXpInfo(
+    data class SkillXPInfo(
         var lastTotalXp: Float = 0f,
         var xpGainQueue: LinkedList<Float> = LinkedList(),
         var xpGainHour: Float = 0f,
