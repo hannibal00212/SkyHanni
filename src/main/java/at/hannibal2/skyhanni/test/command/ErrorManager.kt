@@ -65,6 +65,7 @@ object ErrorManager {
         cache.clear()
     }
 
+    // throw a error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
@@ -89,6 +90,7 @@ object ErrorManager {
         )
     }
 
+    // just log for debug cases
     fun logErrorStateWithData(
         userMessage: String,
         internalMessage: String,
@@ -109,6 +111,7 @@ object ErrorManager {
         )
     }
 
+    // log with stack trace from other try catch block
     fun logErrorWithData(
         throwable: Throwable,
         message: String,
