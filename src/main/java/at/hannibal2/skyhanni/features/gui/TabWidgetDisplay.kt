@@ -12,7 +12,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 
-enum class TabWidgetDisplay(private val configName: String?, vararg val widgets: TabWidget) {
+enum class TabWidgetDisplay(
+    private val configName: String?,
+    vararg val widgets: TabWidget,
+) {
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
     SB_LEVEL("Skyblock Level", TabWidget.SB_LEVEL),
@@ -55,7 +58,6 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
     companion object {
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget
-
         private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
         @HandleEvent
@@ -64,7 +66,9 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
             if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
-                    widget.widgets.flatMap { it.lines },
+                    widget.widgets.flatMap { subWidget ->
+                        subWidget.lines
+                    },
                     posLabel = "Display Widget: ${widget.name}",
                 )
             }
