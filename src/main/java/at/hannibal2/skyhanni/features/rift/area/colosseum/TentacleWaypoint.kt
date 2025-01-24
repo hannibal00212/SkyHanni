@@ -24,7 +24,7 @@ import kotlin.math.ceil
 object TentacleWaypoint {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
-    private val tentacles = mutableMapOf<EntityLivingBase, Int>()
+    private val tentacleHits = mutableMapOf<EntityLivingBase, Int>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
@@ -36,9 +36,9 @@ object TentacleWaypoint {
         if (ceil(entity.posY).toInt() != 68) return
         // Only get the tentacle with size 4 to 8
         if (entity.slimeSize !in 4..8) return
-        if (entity in tentacles) return
+        if (entity in tentacleHits) return
 
-        tentacles += entity to 0
+        tentacleHits += entity to 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
@@ -47,40 +47,40 @@ object TentacleWaypoint {
 
         // Fixes Wall Damage counting as tentacle damage
         if (event.source.damageType != "generic") return
-        tentacles[event.entity]?.let { tentacles[event.entity] = it + 1 }
+        tentacleHits[event.entity]?.let { tentacleHits[event.entity] = it + 1 }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRender(event: RenderWorldEvent) {
         if (!isEnabled()) return
-        tentacles.removeIfKey { it.isDead || it.health == 0f }
+        tentacleHits.removeIfKey { it.isDead || it.health == 0f }
 
-        for ((tentacle, hits) in tentacles) {
+        for ((tentacle, hits) in tentacleHits) {
+            val location = tentacle.getLorenzVec()
             event.drawWaypointFilled(
-                tentacle.getLorenzVec().add(-0.5, 0.0, -0.5),
+                location.add(-0.5, 0.0, -0.5),
                 Color.RED,
                 seeThroughBlocks = true,
                 beacon = true,
             )
-
-            val text = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
-                "§a${pluralize(hits, "Hit", withNumber = true)}"
-            } else {
-                val maxHp = when (BactePhase.currentPhase) {
-                    BactePhase.BactePhase.PHASE_4 -> 3
-                    else -> 4
-                }
-                val hpColor = if (hits > 0) "§c" else "§a"
-                "$hpColor${maxHp - hits}§a/$maxHp§c❤"
-            }
-
-            event.drawDynamicText(tentacle.getLorenzVec().up(1.0), text, 1.0)
+            event.drawDynamicText(location.up(1.0), getText(hits), 1.0)
         }
+    }
+
+    private fun getText(hits: Int) = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
+        "§a${pluralize(hits, "Hit", withNumber = true)}"
+    } else {
+        val maxHp = when (BactePhase.currentPhase) {
+            BactePhase.BactePhase.PHASE_4 -> 3
+            else -> 4
+        }
+        val hpColor = if (hits > 0) "§c" else "§a"
+        "$hpColor${maxHp - hits}§a/$maxHp§c❤"
     }
 
     @HandleEvent
     fun onWorldSwitch(event: WorldChangeEvent) {
-        tentacles.clear()
+        tentacleHits.clear()
     }
 
     fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
