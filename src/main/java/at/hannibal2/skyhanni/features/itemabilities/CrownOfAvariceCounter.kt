@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -102,8 +103,8 @@ object CrownOfAvariceCounter {
 
     private fun buildList(): List<Renderable> = buildList {
         addLine {
-            Renderable.itemStack(internalName.getItemStack())
-            Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
+            addItemStack(internalName.getItemStack())
+            addString("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators())
         }
 
         if (config.perHour) {
