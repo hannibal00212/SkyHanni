@@ -46,9 +46,8 @@ object ItemStars {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         if (stack.getInternalNameOrNull()?.isKuudraArmor() != true) return

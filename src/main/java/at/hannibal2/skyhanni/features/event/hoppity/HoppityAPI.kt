@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzRarity.RARE
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -49,8 +48,6 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration.Companion.seconds
@@ -207,7 +204,7 @@ object HoppityAPI {
         stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
             stack.hasDisplayName() && stack.getLore().isNotEmpty()
 
-    private fun postApiEggFoundEvent(type: HoppityEggType, event: LorenzChatEvent, note: String? = null) {
+    private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
         EggFoundEvent(
             type,
             chatEvent = event,
@@ -232,9 +229,8 @@ object HoppityAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
         checkNextInvOpen = true
     }
@@ -323,10 +319,8 @@ object HoppityAPI {
         attemptFireRabbitFound(event.chatEvent)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
+    fun onChat(event: SkyHanniChatEvent) {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             hoppityDataSet.reset()
             val type = getEggType(event)
@@ -366,7 +360,7 @@ object HoppityAPI {
         }
     }
 
-    fun attemptFireRabbitFound(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: SkyHanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             hoppityDataSet.lastDuplicateAmount = it
             hoppityDataSet.duplicate = true
