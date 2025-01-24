@@ -134,6 +134,8 @@ object VisitorAPI {
         val offerItem: ItemStack,
     )
 
+    private val debug = true
+
     class Visitor(
         val visitorName: String,
         var entityId: Int = -1,
@@ -156,6 +158,12 @@ object VisitorAPI {
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)
 
         fun getRewardWarningAwards(): List<VisitorReward> = buildList {
+            if (debug) {
+                add(VisitorReward.SPACE_HELMET)
+                add(VisitorReward.COPPER_DYE)
+                add(VisitorReward.OVERGROWN_GRASS)
+                return@buildList
+            }
             for (internalName in allRewards) {
                 val reward = VisitorReward.getByInternalName(internalName) ?: continue
                 if (reward in config.rewardWarning.drops) {

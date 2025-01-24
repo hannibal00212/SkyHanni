@@ -383,11 +383,13 @@ object GardenVisitorFeatures {
         val location = event.location
         event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
-            var counter = 1
+            val initialOffset = 2.73
+            val heightOffset = 0.25
+            var counter = 0
             visitor.getRewardWarningAwards().forEach { reward ->
                 val name = reward.displayName
-                val offset = counter * 2.73
-                event.parent.drawString(location.up(offset), "§c!$name§c!")
+                val offset = initialOffset + (counter * heightOffset)
+                event.parent.drawString(location.up(offset), "§c§l! $name §c§l!")
                 counter++
             }
         }
