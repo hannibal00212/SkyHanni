@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -29,12 +29,13 @@ object RiftTimer {
     private val config get() = RiftAPI.config.timer
 
     private val patternGroup = RepoPattern.group("rift.everywhere")
+
     /**
      * REGEX-TEST: 3150 §aф
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) §aф"
+        "(?<time>\\d+) §aф",
     )
 
     private var display = emptyList<String>()
@@ -43,8 +44,8 @@ object RiftTimer {
     private var latestTime = 0.seconds
     private val changes = mutableMapOf<Long, String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         maxTime = 0.seconds
         latestTime = 0.seconds
