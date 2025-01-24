@@ -371,7 +371,7 @@ object GraphEditor {
     private fun loadThisIsland() {
         val graph = IslandGraphs.currentIslandGraph
         if (graph == null) {
-            ChatUtils.userError("There is no graph data loaded for this island!")
+            ChatUtils.userError("This island does not have graph data!")
             return
         }
         if (!config.enabled) {
