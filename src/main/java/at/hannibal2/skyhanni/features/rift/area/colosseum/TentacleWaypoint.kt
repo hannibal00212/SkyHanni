@@ -83,5 +83,5 @@ object TentacleWaypoint {
         tentacleHits.clear()
     }
 
-    fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
+    private fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
 }

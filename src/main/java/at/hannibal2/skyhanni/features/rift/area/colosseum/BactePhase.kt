@@ -101,6 +101,6 @@ object BactePhase {
         )
     }
 
-    fun isEnabled() = RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
+    private fun isEnabled() = RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
 
 }
