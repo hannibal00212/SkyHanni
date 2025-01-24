@@ -32,9 +32,8 @@ object ChocolateFactoryStats {
 
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
         updateDisplay()
     }

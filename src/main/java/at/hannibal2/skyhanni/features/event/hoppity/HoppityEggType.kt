@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -132,7 +132,7 @@ enum class HoppityEggType(
             event.eggType.lastReset = SkyBlockTime.now()
         }
 
-        internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
+        internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
             entries.find { it.mealName == group("meal") } ?: run {
                 ErrorManager.skyHanniError(
                     "Unknown meal: ${group("meal")}",

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -172,9 +171,8 @@ enum class SkyblockStat(
             }
         }
 
-        @HandleEvent
+        @HandleEvent(onlyOnSkyblock = true)
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-            if (!LorenzUtils.inSkyBlock) return
             onSkyblockMenu(event)
             onStatsMenu(event)
         }
