@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -37,9 +36,13 @@ object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
+    /**
+     * REGEX-TEST: Sheep Minion X
+     * REGEX-TEST: Wheat Minion IV
+     */
     private val minionNamePattern by RepoPattern.pattern(
         "bingo.minion.name",
-        "(?<name>.*) Minion (?<number>.*)"
+        "(?<name>.*) Minion (?<number>.*)",
     )
 
     private var display = emptyList<String>()
@@ -50,8 +53,8 @@ object MinionCraftHelper {
     private val allIngredients = mutableListOf<NEUInternalName>()
     private val alreadyNotified = mutableListOf<String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         alreadyNotified.clear()
     }
 
@@ -97,8 +100,9 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: List<ItemStack>):
-        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(
+        mainInventory: List<ItemStack>,
+    ): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -141,7 +145,7 @@ object MinionCraftHelper {
             val recipes = NEUItems.getRecipes(minion)
 
             for (recipe in recipes) {
-                for (ingredient in recipe.getCachedIngredients()) {
+                for (ingredient in recipe.ingredients) {
                     val ingredientInternalName = ingredient.internalName
                     if (ingredientInternalName == internalName) return true
 
@@ -176,7 +180,7 @@ object MinionCraftHelper {
                 for (recipe in NEUItems.getRecipes(internalName)) {
                     if (!recipe.isCraftingRecipe()) continue
 
-                    for (ingredient in recipe.getCachedIngredients()) {
+                    for (ingredient in recipe.ingredients) {
                         val id = ingredient.internalName
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
@@ -240,7 +244,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
@@ -263,8 +267,8 @@ object MinionCraftHelper {
 
     private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (event.inventoryName != "Crafted Minions") return
 

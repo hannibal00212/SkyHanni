@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryDataLoader {
@@ -230,19 +229,19 @@ object ChocolateFactoryDataLoader {
 
     // </editor-fold>
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
         updateInventoryItems(event.inventoryItems)
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
@@ -436,20 +435,20 @@ object ChocolateFactoryDataLoader {
 
         for (line in item.getLore()) {
             hitmanAvailableEggsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.availableEggs = group("amount").formatInt()
+                profileStorage.hitmanStats.availableHitmanEggs = group("amount").formatInt()
             }
             hitmanSingleSlotCooldownPattern.matchMatcher(line) {
                 val timeUntilSlot = TimeUtils.getDuration(group("duration"))
                 val nextSlot = (SimpleTimeMark.now() + timeUntilSlot)
-                profileStorage.hitmanStats.slotCooldown = nextSlot
+                profileStorage.hitmanStats.singleSlotCooldownMark = nextSlot
             }
             hitmanAllSlotsCooldownPattern.matchMatcher(line) {
                 val timeUntilAllSlots = TimeUtils.getDuration(group("duration"))
                 val nextAllSlots = (SimpleTimeMark.now() + timeUntilAllSlots)
-                profileStorage.hitmanStats.allSlotsCooldown = nextAllSlots
+                profileStorage.hitmanStats.allSlotsCooldownMark = nextAllSlots
             }
             hitmanPurchasedSlotsPattern.matchMatcher(line) {
-                profileStorage.hitmanStats.purchasedSlots = group("amount").formatInt()
+                profileStorage.hitmanStats.purchasedHitmanSlots = group("amount").formatInt()
             }
         }
     }

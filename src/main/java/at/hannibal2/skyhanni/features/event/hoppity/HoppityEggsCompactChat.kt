@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -26,7 +26,7 @@ object HoppityEggsCompactChat {
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val rarityConfig get() = HoppityEggsManager.config.rarityInCompact
 
-    fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
+    fun compactChat(event: SkyHanniChatEvent?, dataSet: HoppityStateDataSet) {
         if (!HoppityEggsManager.config.compactChat) return
         hoppityDataSet = dataSet.copy()
         event?.let { it.blockedReason = "compact_hoppity" }

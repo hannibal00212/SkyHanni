@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.composter.ComposterAPI.getLevel
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -105,12 +105,12 @@ object ComposterOverlay {
         ChatUtils.chat("Composter test offset set to $testOffset.")
     }
 
-    private val COMPOST by lazy { "COMPOST".toInternalName() }
-    private val BIOFUEL by lazy { "BIOFUEL".toInternalName() }
-    private val VOLTA by lazy { "VOLTA".toInternalName() }
-    private val OIL_BARREL by lazy { "OIL_BARREL".toInternalName() }
+    private val COMPOST = "COMPOST".toInternalName()
+    private val BIOFUEL = "BIOFUEL".toInternalName()
+    private val VOLTA = "VOLTA".toInternalName()
+    private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
@@ -131,8 +131,8 @@ object ComposterOverlay {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
@@ -143,8 +143,8 @@ object ComposterOverlay {
         update()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
@@ -505,7 +505,7 @@ object ComposterOverlay {
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
                 onClick = { HypixelCommands.sacks() },
                 "§eClick to run /sax!",
-                replaceSameMessage = true
+                replaceSameMessage = true,
             )
             return
         }
@@ -548,7 +548,7 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         organicMatter = data.organicMatter
@@ -599,7 +599,7 @@ object ComposterOverlay {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (EstimatedItemValue.isCurrentlyShowing()) return
 

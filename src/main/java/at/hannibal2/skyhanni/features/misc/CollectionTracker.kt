@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -40,6 +40,12 @@ object CollectionTracker {
 
     private var recentGain = 0
     private var lastGainTime = -1L
+
+    private val CACTUS = "CACTUS".toInternalName()
+    private val CACTUS_GREEN = "INK_SACK-2".toInternalName()
+    private val YOUNGITE = "YOUNGITE".toInternalName()
+    private val OBSOLITE = "OBSOLITE".toInternalName()
+    private val TIMITE = "TIMITE".toInternalName()
 
     fun command(args: Array<String>) {
         if (args.isEmpty()) {
@@ -167,16 +173,17 @@ object CollectionTracker {
         )
     }
 
-    private fun countCurrentlyInInventory(): Int {
-        val cactus = "CACTUS".toInternalName()
-        val cactusGreen = "INK_SACK-2".toInternalName()
-        return InventoryUtils.countItemsInLowerInventory {
-            if (internalName == cactus && it.getInternalName() == cactusGreen) {
-                return@countItemsInLowerInventory true
-            }
-            it.getInternalName() == internalName
+    private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {
+        val name = it.getInternalName()
+        if (internalName == CACTUS && name == CACTUS_GREEN) {
+            return@countItemsInLowerInventory true
         }
+        if (internalName == TIMITE && (name == YOUNGITE || name == OBSOLITE)) {
+            return@countItemsInLowerInventory true
+        }
+        name == internalName
     }
+
 
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
@@ -226,10 +233,8 @@ object CollectionTracker {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
     }
 }

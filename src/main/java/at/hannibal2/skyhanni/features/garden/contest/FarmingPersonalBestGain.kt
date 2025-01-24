@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
@@ -53,7 +52,7 @@ object FarmingPersonalBestGain {
     var crop: String? = null
     var cropType: CropType? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         personalBestIncrements = data.personalBestIncrement
@@ -64,8 +63,8 @@ object FarmingPersonalBestGain {
         event.move(68, "garden.contestPersonalBestIncreaseFF", "garden.personalBests.increaseFF")
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         newPattern.matchMatcher(event.message) {
@@ -80,8 +79,10 @@ object FarmingPersonalBestGain {
         newFFPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             newFF = group("ff").formatDouble()
+            val newFF = newFF ?: return
             crop = cropName
             cropType = CropType.getByName(cropName)
+            val cropType = cropType ?: return
             GardenAPI.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }

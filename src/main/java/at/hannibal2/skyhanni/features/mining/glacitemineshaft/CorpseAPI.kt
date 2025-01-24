@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CorpseAPI {
@@ -43,10 +42,8 @@ object CorpseAPI {
 
     private var corpseType: CorpseType? = null
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!IslandType.MINESHAFT.isInIsland()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
 
         startPattern.matchMatcher(message) {

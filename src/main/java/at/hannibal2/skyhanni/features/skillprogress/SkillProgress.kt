@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.skillprogress
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.activeSkill
-import at.hannibal2.skyhanni.api.SkillAPI.defaultSkillCap
 import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
@@ -39,7 +38,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -61,9 +59,9 @@ object SkillProgress {
     private var maxWidth = 182
     var hideInActionBar = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (showDisplay) {
@@ -79,9 +77,9 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
@@ -143,9 +141,9 @@ object SkillProgress {
         skillExpPercentage = 0.0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!isDisplayEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
         allDisplay = formatAllDisplay(drawAllDisplay())
@@ -157,9 +155,8 @@ object SkillProgress {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
-        if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
         val oldLevel = event.oldLevel
@@ -220,7 +217,7 @@ object SkillProgress {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
-        if (!config.hideInActionBar || !isEnabled()) return
+        if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
@@ -404,7 +401,7 @@ object SkillProgress {
         val targetLevel = skill.customGoalLevel
         val xp = skill.totalXp
         val lvl = skill.level
-        val cap = defaultSkillCap[activeSkill.lowercaseName] ?: 60
+        val cap = activeSkill.maxLevel
         val add = if (lvl >= 50) {
             when (cap) {
                 50 -> XP_NEEDED_FOR_50
@@ -463,18 +460,26 @@ object SkillProgress {
                     }
 
                     if (config.showActionLeft.get() && percent != 100f) {
-                        append(" - ")
-                        val gain = skill.lastGain.formatDouble()
-                        val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().addSeparators()
-                        if (skill.lastGain != "" && !actionLeft.contains("-")) {
-                            append("§6$actionLeft Left")
-                        } else {
-                            append("§6∞ Left")
-                        }
+                        append(" - " + addActionsLeft(skill, currentXpMax, currentXp))
                     }
                 },
             ),
         )
+    }
+
+    private fun addActionsLeft(
+        skill: SkillAPI.SkillInfo,
+        currentXpMax: Long,
+        currentXp: Long,
+    ): String {
+        if (skill.lastGain != "") {
+            val gain = skill.lastGain.formatDouble()
+            val actionLeft = (ceil(currentXpMax.toDouble() - currentXp) / gain).toLong().plus(1).addSeparators()
+            if (skill.lastGain != "" && !actionLeft.contains("-")) {
+                return "§6$actionLeft Left"
+            }
+        }
+        return "§6∞ Left"
     }
 
     private fun updateSkillInfo() {
@@ -524,5 +529,5 @@ object SkillProgress {
         xpInfo.isActive = true
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isDisplayEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 }

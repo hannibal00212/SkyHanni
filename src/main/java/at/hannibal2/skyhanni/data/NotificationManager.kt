@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -37,7 +36,7 @@ object NotificationManager {
         lastNotificationClosed = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         val notification = getCurrentNotification() ?: return
 
@@ -102,8 +101,8 @@ data class SkyHanniNotification(
 
     var endTime = SimpleTimeMark.farFuture()
 
-    val width by lazy { (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8 }
-    val height by lazy { message.size * 10 + 18 }
+    val width = (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8
+    val height = message.size * 10 + 18
 
     fun setEndTime() {
         if (length.isInfinite()) return

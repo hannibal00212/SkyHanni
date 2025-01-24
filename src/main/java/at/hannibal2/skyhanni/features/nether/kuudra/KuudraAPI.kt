@@ -1,33 +1,36 @@
 package at.hannibal2.skyhanni.features.nether.kuudra
 
-import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object KuudraAPI {
 
     private val patternGroup = RepoPattern.group("data.kuudra")
 
+    /**
+     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T5)
+     * REGEX-TEST:  §7⏣ §cKuudra's Hollow §8(T2)
+     */
     private val tierPattern by patternGroup.pattern(
         "scoreboard.tier",
-        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>.*)\\)"
+        " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)",
     )
     private val completePattern by patternGroup.pattern(
         "chat.complete",
-        "§.\\s*(?:§.)*KUUDRA DOWN!"
+        "§.\\s*(?:§.)*KUUDRA DOWN!",
     )
 
     /**
@@ -38,7 +41,7 @@ object KuudraAPI {
      */
     private val kuudraArmorPattern by patternGroup.pattern(
         "internalname.armor",
-        "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+        "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     private val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
@@ -61,28 +64,24 @@ object KuudraAPI {
 
     fun inKuudra() = kuudraTier != null
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            tierPattern.matchMatcher(line) {
-                val tier = group("tier").toInt()
-                kuudraTier = tier
-                KuudraEnterEvent(tier).post()
-            }
+        tierPattern.firstMatcher(event.added) {
+            val tier = group("tier").toInt()
+            kuudraTier = tier
+            KuudraEnterEvent(tier).post()
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         kuudraTier = null
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        val message = event.message
-        completePattern.matchMatcher(message) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        completePattern.matchMatcher(event.message) {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }

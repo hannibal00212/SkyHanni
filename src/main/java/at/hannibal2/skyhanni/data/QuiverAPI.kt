@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemBow
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Matcher
 
 
 @SkyHanniModule
@@ -39,11 +39,8 @@ object QuiverAPI {
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    var arrowAmount: MutableMap<NEUInternalName, Int>
+    private val arrowAmount: MutableMap<NEUInternalName, Int>
         get() = storage?.arrows?.arrowAmount ?: mutableMapOf()
-        set(value) {
-            storage?.arrows?.arrowAmount = value
-        }
     var currentAmount: Int
         get() = currentArrow?.amount ?: 0
         set(value) {
@@ -69,7 +66,18 @@ object QuiverAPI {
 
     private val group = RepoPattern.group("data.quiver")
     private val chatGroup = group.group("chat")
-    private val selectPattern by chatGroup.pattern("select", "§aYou set your selected arrow type to §.(?<arrow>.*)§a!")
+
+    /**
+     * REGEX-TEST: §aYou set your selected arrow type to §r§fFlint Arrow§r§a!
+     */
+    private val selectPattern by chatGroup.pattern(
+        "select",
+        "§aYou set your selected arrow type to §.(?<arrow>.*)§a!",
+    )
+
+    /**
+     * REGEX-TEST: §aJax forged §r§fFlint Arrow§r§8 x386 §r§afor §r§61,930 Coins§r§a!
+     */
     private val fillUpJaxPattern by chatGroup.pattern(
         "fillupjax",
         "(?:§.)*Jax forged (?:§.)*(?<type>.*?)(?:§.)* x(?<amount>[\\d,]+)(?: (?:§.)*for (?:§.)*(?<coins>[\\d,]+) Coins)?(?:§.)*!",
@@ -86,11 +94,18 @@ object QuiverAPI {
         "cleared",
         "§aCleared your quiver!|§c§lYour quiver is now completely empty!",
     )
+
+    /**
+     * REGEX-TEST: §c§lQUIVER! §cYou have run out of §fFlint Arrows§c!
+     */
     private val arrowRanOutPattern by chatGroup.pattern(
         "ranout",
         "§c§lQUIVER! §cYou have run out of §f(?<type>.*)s§c!",
     )
-    private val arrowResetPattern by chatGroup.pattern("arrowreset", "§cYour favorite arrow has been reset!")
+    private val arrowResetPattern by chatGroup.pattern(
+        "arrowreset",
+        "§cYour favorite arrow has been reset!",
+    )
     private val addedToQuiverPattern by chatGroup.pattern(
         "addedtoquiver",
         "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!",
@@ -101,8 +116,8 @@ object QuiverAPI {
      * REGEX-TEST: BOSS_SPIRIT_BOW
      * REGEX-TEST: CRYPT_BOW
      */
-    private val fakeBowsPattern by group.pattern("fakebows", "^(?:BOSS_SPIRIT_BOW|CRYPT_BOW)$")
-    private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
+    private val fakeBowsPattern by group.pattern("fakebows", "BOSS_SPIRIT_BOW|CRYPT_BOW")
+    private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
 
     /**
      * REGEX-TEST: §7Active Arrow: §fFlint Arrow §7(§e2880§7)
@@ -112,8 +127,8 @@ object QuiverAPI {
         "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)",
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -142,20 +157,7 @@ object QuiverAPI {
         }
 
         fillUpJaxPattern.matchMatcher(message) {
-            val type = group("type")
-            val amount = group("amount").formatInt()
-            val filledUpType = getArrowByNameOrNull(type)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownArrowType("Unknown arrow type: $type"),
-                    "Unknown arrow type: $type",
-                    "message" to message,
-                )
-
-            filledUpType.amount += amount
-            if (filledUpType == currentArrow) {
-                postUpdateEvent()
-            }
-            return
+            this.handleQuiverAddedMatch(message)
         }
 
         fillUpPattern.matchMatcher(message) {
@@ -169,20 +171,7 @@ object QuiverAPI {
         }
 
         addedToQuiverPattern.matchMatcher(message) {
-            val type = group("type")
-            val amount = group("amount").formatInt()
-            val filledUpType = getArrowByNameOrNull(type)
-                ?: return ErrorManager.logErrorWithData(
-                    UnknownArrowType("Unknown arrow type: $type"),
-                    "Unknown arrow type: $type",
-                    "message" to message,
-                )
-
-            filledUpType.amount += amount
-            if (filledUpType == currentArrow) {
-                postUpdateEvent()
-            }
-            return
+            this.handleQuiverAddedMatch(message)
         }
 
         clearedPattern.matchMatcher(message) {
@@ -202,8 +191,25 @@ object QuiverAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
+    private fun Matcher.handleQuiverAddedMatch(message: String) {
+        val type = group("type")
+        val amount = group("amount").formatInt()
+        val filledUpType = getArrowByNameOrNull(type)
+            ?: return ErrorManager.logErrorWithData(
+                UnknownArrowType("Unknown arrow type: $type"),
+                "Unknown arrow type: $type",
+                "message" to message,
+            )
+
+        filledUpType.amount += amount
+        if (filledUpType == currentArrow) {
+            postUpdateEvent()
+        }
+        return
+    }
+
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
@@ -286,7 +292,7 @@ object QuiverAPI {
         QuiverUpdateEvent(arrowType, currentAmount).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {
@@ -296,7 +302,7 @@ object QuiverAPI {
     }
 
     // Load arrows from repo
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.toInternalName()) }

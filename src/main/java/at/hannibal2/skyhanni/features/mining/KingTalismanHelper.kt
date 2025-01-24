@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -24,7 +27,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -65,9 +67,14 @@ object KingTalismanHelper {
         return currentOffset
     }
 
-    fun kingFix() {
+    private fun kingFix() {
         currentOffset = null
         ChatUtils.chat("Reset internal offset of King Talisman Helper.")
+    }
+
+    private fun resetKings() {
+        storage?.kingsTalkedTo = mutableListOf<String>()
+        update()
     }
 
     private val kingLocation = LorenzVec(129.6, 196.5, 194.1)
@@ -89,7 +96,7 @@ object KingTalismanHelper {
         LorenzUtils.skyBlockArea == "Royal Palace" &&
         kingLocation.distanceToPlayer() < 10
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val storage = storage ?: return
@@ -127,8 +134,8 @@ object KingTalismanHelper {
         LorenzUtils.inSkyBlock &&
         (IslandType.DWARVEN_MINES.isInIsland() || config.outsideMines)
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Commissions") return
         if (!isEnabled()) return
         if (getCurrentOffset() == null) return
@@ -214,21 +221,35 @@ object KingTalismanHelper {
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (!MiningAPI.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()
             update()
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shkingfix") {
+            description = "Resets the local King Talisman Helper offset."
+            category = CommandCategory.USERS_BUG_FIX
+            callback { kingFix() }
+        }
+        event.register("shresetkinghelper") {
+            description = "Resets the King Talisman Helper"
+            category = CommandCategory.USERS_RESET
+            callback { resetKings() }
         }
     }
 }

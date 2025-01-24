@@ -6,16 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SackAPI {
@@ -43,7 +43,7 @@ object SackAPI {
     private val chatConfig get() = SkyHanniMod.feature.chat
     private var lastOpenedInventory = ""
 
-    var inSackInventory = false
+    val inventory = InventoryDetector { name -> sackPattern.matches(name) }
 
     private val patternGroup = RepoPattern.group("data.sacks")
 
@@ -102,9 +102,8 @@ object SackAPI {
     var sackListNames = emptySet<String>()
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        inSackInventory = false
         isRuneSack = false
         isGemstoneSack = false
         isTrophySack = false
@@ -114,19 +113,17 @@ object SackAPI {
         stackList.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
         lastOpenedInventory = inventoryName
-        val match = sackPattern.matches(inventoryName)
-        if (!match) return
+        if (!inventory.isInside()) return
         val stacks = event.inventoryItems
         isRuneSack = inventoryName == "Runes Sack"
         isGemstoneSack = inventoryName == "Gemstones Sack"
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
         sackRarity = inventoryName.getTrophyRarity()
-        inSackInventory = true
         stackList.putAll(stacks)
         SackDisplay.update(isNewInventory)
     }
@@ -236,14 +233,15 @@ object SackAPI {
         if (savingSacks) saveSackData()
     }
 
-    private var sackData = mapOf<NEUInternalName, SackItem>()
+    var sackData = mapOf<NEUInternalName, SackItem>()
+        private set
 
     data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
 
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->

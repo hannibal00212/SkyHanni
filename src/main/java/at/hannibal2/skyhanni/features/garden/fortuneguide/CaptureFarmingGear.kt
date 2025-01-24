@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -31,7 +30,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
@@ -40,6 +38,10 @@ object CaptureFarmingGear {
     private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
 
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+
+    /**
+     * REGEX-TEST: SKILL LEVEL UP Farming 1 ➜ 2
+     */
     private val farmingLevelUpPattern by patternGroup.pattern(
         "farminglevel",
         "SKILL LEVEL UP Farming .*➜(?<level>.*)",
@@ -48,6 +50,10 @@ object CaptureFarmingGear {
         "fortuneupgrade",
         "You claimed the Garden Farming Fortune (?<level>.*) upgrade!",
     )
+
+    /**
+     * REGEX-TEST: §6+48☘ Farming Fortune
+     */
     private val bestiaryPattern by patternGroup.pattern(
         "bestiary",
         ".*§6+(?<fortune>.*)☘ Farming Fortune.*",
@@ -68,6 +74,10 @@ object CaptureFarmingGear {
         "lotusupgrade",
         "Lotus (?<piece>.*) upgraded to [+].*☘!",
     )
+
+    /**
+     * REGEX-TEST: Your Bingo leveled up to level 2!
+     */
     private val petLevelUpPattern by patternGroup.pattern(
         "petlevelup",
         "Your (?<pet>.*) leveled up to level .*!",
@@ -169,9 +179,8 @@ object CaptureFarmingGear {
         captureFarmingGear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
@@ -300,6 +309,7 @@ object CaptureFarmingGear {
         var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestSlugRarity = (FarmingItems.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestHedgehogRarity = (FarmingItems.HEDGEHOG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
@@ -329,6 +339,11 @@ object CaptureFarmingGear {
                 outdatedItems[FarmingItems.SLUG] = false
                 highestSlugRarity = rarity.toInt()
             }
+            if (name == "HEDGEHOG" && rarity.toInt() > highestHedgehogRarity) {
+                FarmingItems.HEDGEHOG.setItem(item)
+                outdatedItems[FarmingItems.HEDGEHOG] = false
+                highestHedgehogRarity = rarity.toInt()
+            }
         }
     }
 
@@ -352,9 +367,8 @@ object CaptureFarmingGear {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()

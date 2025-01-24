@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -23,8 +22,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -32,12 +29,12 @@ object WardrobeAPI {
 
     val storage get() = ProfileStorageData.profileSpecific?.wardrobe
 
-    private val repoGroup = RepoPattern.group("inventory.wardrobe")
+    private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
      * REGEX-TEST: Wardrobe (2/2)
      */
-    private val inventoryPattern by repoGroup.pattern(
+    private val inventoryPattern by patternGroup.pattern(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
     )
@@ -45,7 +42,7 @@ object WardrobeAPI {
     /**
      * REGEX-TEST: §7Slot 4: §aEquipped
      */
-    private val equippedSlotPattern by repoGroup.pattern(
+    private val equippedSlotPattern by patternGroup.pattern(
         "equippedslot",
         "§7Slot \\d+: §aEquipped",
     )
@@ -108,7 +105,7 @@ object WardrobeAPI {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inventoryPattern.matches(event.inventoryName).let {
             inWardrobe = it
@@ -116,10 +113,8 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         inventoryPattern.matchMatcher(event.inventoryName) {
             inWardrobe = true
             currentPage = group("currentPage").formatInt()
@@ -169,7 +164,7 @@ object WardrobeAPI {
         return foundCurrentSlot
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inWardrobe) return
         DelayedRun.runDelayed(250.milliseconds) {

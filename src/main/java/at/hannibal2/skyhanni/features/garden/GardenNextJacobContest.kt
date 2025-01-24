@@ -18,13 +18,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.json.toJsonArray
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
@@ -41,7 +43,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -59,15 +60,20 @@ import kotlin.time.Duration.Companion.seconds
 object GardenNextJacobContest {
 
     private val dispatcher = Dispatchers.IO
-    private var display = emptyList<Any>()
+    private var display: Renderable? = null
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
     private var inCalendar = false
 
     private val patternGroup = RepoPattern.group("garden.nextcontest")
+
+    /**
+     * REGEX-TEST: §aDay 1
+     * REGEX-TEST: §aDay 31
+     */
     val dayPattern by patternGroup.pattern(
         "day",
-        "§aDay (?<day>.*)"
+        "§aDay (?<day>.*)",
     )
 
     /**
@@ -77,11 +83,17 @@ object GardenNextJacobContest {
      */
     val monthPattern by patternGroup.pattern(
         "month",
-        "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
+        "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §e○ §7Cactus
+     * REGEX-TEST: §6☘ §7Carrot
+     * REGEX-TEST: §e○ §7Melon
+     */
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§(?:e○|6☘) §7(?<crop>.*)"
+        "§(?:e○|6☘) §7(?<crop>.*)",
     )
 
     private const val CLOSE_TO_NEW_YEAR_TEXT = "§7Close to new SB year!"
@@ -111,7 +123,7 @@ object GardenNextJacobContest {
             add("Current time: ${SimpleTimeMark.now()}")
             add("")
 
-            val display = display.filterIsInstance<String>().joinToString("")
+            // TODO Renderable.toString()
             add("Display: '$display'")
             add("")
 
@@ -176,7 +188,7 @@ object GardenNextJacobContest {
         return diffA < 30.minutes || diffB < 30.minutes
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -184,7 +196,7 @@ object GardenNextJacobContest {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (inCalendar) {
             inCalendar = false
@@ -192,8 +204,8 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
         monthPattern.matchMatcher(event.inventoryName) {
             inCalendar = true
@@ -254,7 +266,7 @@ object GardenNextJacobContest {
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                         onClick = { shareContests() },
                         "§eClick to submit!",
-                        oneTimeClick = true
+                        oneTimeClick = true,
                     )
                 }
             }
@@ -310,7 +322,7 @@ object GardenNextJacobContest {
                     ChatUtils.chat("§2Enabled automatic sharing of future contests!")
                 },
                 "§eClick to enable autosharing!",
-                oneTimeClick = true
+                oneTimeClick = true,
             )
         }
     }
@@ -328,82 +340,74 @@ object GardenNextJacobContest {
         }
 
         display = if (isFetchingContests) {
-            listOf("§cFetching this years jacob contests...")
+            Renderable.string("§cFetching this years jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
         }
     }
 
-    private fun drawDisplay(): List<Any> {
-        val list = mutableListOf<Any>()
-
+    private fun drawDisplay() = Renderable.line {
         if (inCalendar) {
             val size = contests.size
             val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
             val formatted = LorenzUtils.formatPercentage(percentage)
-            list.add("§eDetected $formatted of farming contests this year")
-
-            return list
+            addString("§eDetected $formatted of farming contests this year")
+            return@line
         }
 
         if (contests.isEmpty()) {
             if (isCloseToNewYear()) {
-                list.add(CLOSE_TO_NEW_YEAR_TEXT)
+                addString(CLOSE_TO_NEW_YEAR_TEXT)
             } else {
-                list.add("§cOpen calendar to read Jacob contest times!")
+                addString("§cOpen calendar to read Jacob contest times!")
             }
-            return list
+            return@line
         }
 
-        val nextContest =
-            contests.filter { !it.value.endTime.isInPast() }.toSortedMap()
-                .firstNotNullOfOrNull { it.value }
+        val nextContest = contests.values.filterNot { it.endTime.isInPast() }.minByOrNull { it.endTime }
+
         // Show next contest
-        if (nextContest != null) return drawNextContest(nextContest, list)
+        if (nextContest != null) {
+            addAll(drawNextContest(nextContest))
+            return@line
+        }
 
         if (isCloseToNewYear()) {
-            list.add(CLOSE_TO_NEW_YEAR_TEXT)
+            addString(CLOSE_TO_NEW_YEAR_TEXT)
         } else {
-            list.add("§cOpen calendar to read Jacob contest times!")
+            addString("§cOpen calendar to read Jacob contest times!")
         }
 
         fetchedFromElite = false
         contests.clear()
-
-        return list
     }
 
-    private fun drawNextContest(
-        nextContest: FarmingContest,
-        list: MutableList<Any>,
-    ): MutableList<Any> {
+
+    private fun drawNextContest(nextContest: FarmingContest) = buildList {
         var duration = nextContest.endTime.timeUntil()
         if (duration > 4.days) {
-            list.add(CLOSE_TO_NEW_YEAR_TEXT)
-            return list
+            addString(CLOSE_TO_NEW_YEAR_TEXT)
+            return@buildList
         }
 
         val boostedCrop = calculateBoostedCrop(nextContest)
 
         val activeContest = duration < contestDuration
         if (activeContest) {
-            list.add("§aActive: ")
+            addString("§aActive: ")
         } else {
-            list.add("§eNext: ")
+            addString("§eNext: ")
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            list.addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
+            addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
             nextContestCrops.add(crop)
         }
         if (!activeContest) {
             warn(duration, nextContest.crops, boostedCrop)
         }
-        val format = duration.format()
-        list.add("§7(§b$format§7)")
-
-        return list
+        addString("§7(§b${duration.format()}§7)")
     }
 
     private fun calculateBoostedCrop(nextContest: FarmingContest): CropType? {
@@ -439,10 +443,7 @@ object GardenNextJacobContest {
         }
         if (config.warnPopup && !Display.isActive()) {
             SkyHanniMod.coroutineScope.launch {
-                openPopupWindow(
-                    "<html>Farming Contest soon!<br />" +
-                        "Crops: $cropTextNoColor</html>"
-                )
+                openPopupWindow("<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>")
             }
         }
     }
@@ -456,7 +457,7 @@ object GardenNextJacobContest {
         } catch (e: java.lang.Exception) {
             ErrorManager.logErrorWithData(
                 e, "Failed to open a popup window",
-                "message" to message
+                "message" to message,
             )
         }
 
@@ -468,11 +469,13 @@ object GardenNextJacobContest {
 
         val buttons = mutableListOf<JButton>()
         val close = JButton("Ok")
-        close.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(event: MouseEvent) {
-                frame.isVisible = false
-            }
-        })
+        close.addMouseListener(
+            object : MouseAdapter() {
+                override fun mouseClicked(event: MouseEvent) {
+                    frame.isVisible = false
+                }
+            },
+        )
         buttons.add(close)
 
         val allOptions = buttons.toTypedArray()
@@ -484,32 +487,32 @@ object GardenNextJacobContest {
             JOptionPane.INFORMATION_MESSAGE,
             null,
             allOptions,
-            allOptions[0]
+            allOptions[0],
         )
     }
 
     private fun warnForCrop(): Boolean = nextContestCrops.any { it in config.warnFor }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        if (display.isEmpty()) {
+        if (display == null) {
             config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderSingleLineWithItems(display, posLabel = "Next Jacob Contest")
+            config.pos.renderRenderable(display, posLabel = "Next Jacob Contest")
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return
 
-        if (display.isNotEmpty()) {
-            SkyHanniMod.feature.misc.inventoryLoadPos.renderSingleLineWithItems(
+        if (display != null) {
+            SkyHanniMod.feature.misc.inventoryLoadPos.renderRenderable(
                 display,
-                posLabel = "Load SkyBlock Calendar"
+                posLabel = "Load SkyBlock Calendar",
             )
         }
     }
@@ -567,12 +570,12 @@ object GardenNextJacobContest {
             } else {
                 ChatUtils.chat(
                     "This year's contests aren't available to fetch automatically yet, " +
-                        "please load them from your calendar or wait 10 minutes."
+                        "please load them from your calendar or wait 10 minutes.",
                 )
                 ChatUtils.clickableChat(
                     "Click here to open your calendar!",
                     onClick = { HypixelCommands.calendar() },
-                    "§eClick to run /calendar!"
+                    "§eClick to run /calendar!",
                 )
             }
 
@@ -589,7 +592,7 @@ object GardenNextJacobContest {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e,
-                "Failed to fetch upcoming contests. Please report this error if it continues to occur"
+                "Failed to fetch upcoming contests. Please report this error if it continues to occur",
             )
 
         }
@@ -625,13 +628,13 @@ object GardenNextJacobContest {
         } else {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong submitting upcoming contests!",
-                "submitContestsToElite not successful"
+                "submitContestsToElite not successful",
             )
         }
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(
             e, "Failed to submit upcoming contests. Please report this error if it continues to occur.",
-            "contests" to contests
+            "contests" to contests,
         )
         null
     }

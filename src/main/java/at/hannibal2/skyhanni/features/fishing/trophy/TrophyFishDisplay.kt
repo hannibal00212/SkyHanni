@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -93,7 +92,6 @@ object TrophyFishDisplay {
         }
     }
 
-
     fun update() {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
@@ -106,16 +104,23 @@ object TrophyFishDisplay {
     private fun createTable(): List<List<Renderable>> {
         val trophyFishes = TrophyFishManager.fish ?: return emptyList()
         val table = mutableListOf<List<Renderable>>()
+
+        if (trophyFishes.isEmpty()) {
+            table.addSingleString("§cNo Trophy data found!")
+            table.addSingleString("§eTalk to Odger to load the data!")
+            return table
+        }
+
         for ((rawName, data) in getOrder(trophyFishes)) {
             addRow(rawName, data, table)
         }
-        if (table.isEmpty()) {
-            get(config.onlyShowMissing.get())?.let { rarity ->
-                val name = rarity.formattedString
-                table.addSingleString("§eYou caught all $name Trophy Fishes")
-                if (rarity != TrophyRarity.DIAMOND) {
-                    table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
-                }
+        if (table.isNotEmpty()) return table
+
+        get(config.onlyShowMissing.get())?.let { rarity ->
+            val name = rarity.formattedString
+            table.addSingleString("§eYou caught all $name Trophy Fishes")
+            if (rarity != TrophyRarity.DIAMOND) {
+                table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
             }
         }
         return table
@@ -233,7 +238,7 @@ object TrophyFishDisplay {
 
         ErrorManager.skyHanniError(
             "No Trophy Fishing name found",
-            "name" to name
+            "name" to name,
         )
     }
 
@@ -251,8 +256,8 @@ object TrophyFishDisplay {
         return null
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
@@ -262,7 +267,7 @@ object TrophyFishDisplay {
         config.position.renderRenderables(
             display,
             extraSpace = config.extraSpace.get(),
-            posLabel = "Trophy Fishing Display"
+            posLabel = "Trophy Fishing Display",
         )
     }
 
