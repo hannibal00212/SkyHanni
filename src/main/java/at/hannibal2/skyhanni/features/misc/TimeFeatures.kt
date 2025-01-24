@@ -31,6 +31,7 @@ object TimeFeatures {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) {

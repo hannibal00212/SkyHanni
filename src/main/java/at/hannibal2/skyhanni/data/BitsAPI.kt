@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -154,11 +154,6 @@ object BitsAPI {
         "§7Fame Rank: §e(?<rank>.*)",
     )
 
-    private val bitsGuiNamePattern by bitsGuiGroup.pattern(
-        "mainmenuname",
-        "^SkyBlock Menu$",
-    )
-
     private val cookieGuiStackPattern by bitsGuiGroup.pattern(
         "mainmenustack",
         "^§6Booster Cookie$",
@@ -214,8 +209,8 @@ object BitsAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -259,7 +254,7 @@ object BitsAPI {
 
         val stacks = event.inventoryItems
 
-        if (bitsGuiNamePattern.matches(event.inventoryName)) {
+        if (UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) {
             val cookieStack = stacks.values.lastOrNull { cookieGuiStackPattern.matches(it.displayName) }
 
             // If the cookie stack is null, then the player should not have any bits to claim
