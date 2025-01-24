@@ -17,6 +17,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 public class MiningConfig {
 
@@ -108,6 +109,7 @@ public class MiningConfig {
 
     @Expose
     @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
+    @SearchTag("Pickaxe Pickobulus")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = true;

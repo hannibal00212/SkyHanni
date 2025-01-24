@@ -27,6 +27,7 @@ object ParkourWaypointSaver {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
@@ -70,6 +71,7 @@ object ParkourWaypointSaver {
 
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
 
         if (locations.size > 1) {
