@@ -191,14 +191,14 @@ object SkillApi {
 
         skillInfo.apply {
             this.overflowLevel = overflowLevel
-            this.overflowCurrentXP = overflowCurrent
-            this.overflowCurrentXPMax = overflowNeeded
-            this.overflowTotalXP = overflowTotal
+            this.overflowCurrentXp = overflowCurrent
+            this.overflowCurrentXpMax = overflowNeeded
+            this.overflowTotalXp = overflowTotal
 
-            this.totalXP = totalXP
+            this.totalXp = totalXP
             this.level = skillLevel
-            this.currentXP = currentXP
-            this.currentXPMax = 0L
+            this.currentXp = currentXP
+            this.currentXpMax = 0L
         }
     }
 
@@ -209,15 +209,15 @@ object SkillApi {
         val levelXP = calculateLevelXP(skillLevel - 1).toLong()
 
         skillInfo.apply {
-            this.currentXP = currentXP
+            this.currentXp = currentXP
             this.level = skillLevel
-            this.currentXPMax = neededXP
-            this.totalXP = levelXP + currentXP
+            this.currentXpMax = neededXP
+            this.totalXp = levelXP + currentXP
 
-            this.overflowCurrentXP = currentXP
+            this.overflowCurrentXp = currentXP
             this.overflowLevel = skillLevel
-            this.overflowCurrentXPMax = neededXP
-            this.overflowTotalXP = levelXP + currentXP
+            this.overflowCurrentXpMax = neededXP
+            this.overflowTotalXp = levelXP + currentXP
         }
     }
 
@@ -252,13 +252,13 @@ object SkillApi {
     private fun MutableList<String>.addDebug(skillType: SkillType, skillInfo: SkillInfo) {
         add("Name: $skillType")
         add("-  Level: ${skillInfo.level}")
-        add("-  CurrentXp: ${skillInfo.currentXP}")
-        add("-  CurrentXpMax: ${skillInfo.currentXPMax}")
-        add("-  TotalXp: ${skillInfo.totalXP}")
+        add("-  CurrentXp: ${skillInfo.currentXp}")
+        add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
+        add("-  TotalXp: ${skillInfo.totalXp}")
         add("-  OverflowLevel: ${skillInfo.overflowLevel}")
-        add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXP}")
-        add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXPMax}")
-        add("-  OverflowTotalXp: ${skillInfo.overflowTotalXP}")
+        add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
+        add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
+        add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
@@ -334,14 +334,14 @@ object SkillApi {
             calculateSkillLevel(totalXP + add, cap ?: 60)
 
         existingLevel.apply {
-            this.totalXP = totalXP
-            this.currentXP = currentXP
-            this.currentXPMax = maxXP
+            this.totalXp = totalXP
+            this.currentXp = currentXP
+            this.currentXpMax = maxXP
             this.level = level
 
-            this.overflowTotalXP = totalOverflow
-            this.overflowCurrentXP = currentOverflow
-            this.overflowCurrentXPMax = currentMaxOverflow
+            this.overflowTotalXp = totalOverflow
+            this.overflowCurrentXp = currentOverflow
+            this.overflowCurrentXpMax = currentMaxOverflow
             this.overflowLevel = levelOverflow
 
             this.lastGain = gained
@@ -365,14 +365,14 @@ object SkillApi {
         }
 
         skillInfo.apply {
-            this.overflowCurrentXP = currentOverflow
-            this.overflowCurrentXPMax = currentMaxOverflow
-            this.overflowTotalXP = totalOverflow
+            this.overflowCurrentXp = currentOverflow
+            this.overflowCurrentXpMax = currentMaxOverflow
+            this.overflowTotalXp = totalOverflow
             this.overflowLevel = currentLevel
 
-            this.currentXP = currentXP
-            this.currentXPMax = maxXP
-            this.totalXP = levelXP
+            this.currentXp = currentXP
+            this.currentXpMax = maxXP
+            this.totalXp = levelXP
             this.level = level
 
             this.lastGain = matcher.group("gained")
@@ -500,14 +500,15 @@ object SkillApi {
     }
 
     data class SkillInfo(
+        // TODO rename all Xp -> XP
         @Expose var level: Int = 0,
-        @Expose var totalXP: Long = 0,
-        @Expose var currentXP: Long = 0,
-        @Expose var currentXPMax: Long = 0,
+        @Expose var totalXp: Long = 0,
+        @Expose var currentXp: Long = 0,
+        @Expose var currentXpMax: Long = 0,
         @Expose var overflowLevel: Int = 0,
-        @Expose var overflowCurrentXP: Long = 0,
-        @Expose var overflowTotalXP: Long = 0,
-        @Expose var overflowCurrentXPMax: Long = 0,
+        @Expose var overflowCurrentXp: Long = 0,
+        @Expose var overflowTotalXp: Long = 0,
+        @Expose var overflowCurrentXpMax: Long = 0,
         @Expose var lastGain: String = "",
         @Expose var customGoalLevel: Int = 0,
     )

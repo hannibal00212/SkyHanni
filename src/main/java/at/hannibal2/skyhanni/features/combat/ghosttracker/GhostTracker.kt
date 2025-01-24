@@ -82,7 +82,7 @@ object GhostTracker {
             kills = 0
             ghostsSinceSorrow = 0
             maxKillCombo = 0
-            combatXPGained = 0
+            combatXpGained = 0
         }
 
         @Expose
@@ -94,8 +94,9 @@ object GhostTracker {
         @Expose
         var maxKillCombo = 0L
 
+        // TODO rename to combatXPGained
         @Expose
-        var combatXPGained = 0L
+        var combatXpGained = 0L
 
         @Expose
         var totalMagicFind = 0L
@@ -179,7 +180,7 @@ object GhostTracker {
         if (!isEnabled()) return
         if (event.gained > 10_000) return
         tracker.modify {
-            it.combatXPGained += event.gained.toLong()
+            it.combatXpGained += event.gained.toLong()
         }
     }
 
@@ -326,7 +327,7 @@ object GhostTracker {
         ),
         COMBAT_XP_GAINED(
             "§7Combat XP Gained: §e4,687,800",
-            { "§7Combat XP Gained: §e${combatXPGained.addSeparators()}" },
+            { "§7Combat XP Gained: §e${combatXpGained.addSeparators()}" },
         ),
         AVERAGE_MAGIC_FIND(
             "§7Average Magic Find: §b278.9",

@@ -36,7 +36,7 @@ object SkillTooltip {
             for (line in iterator) {
                 val maxReached = "§7§8Max Skill level reached!"
                 if (line.contains(maxReached) && overflowConfig.enableInSkillMenuTooltip) {
-                    val progress = (skillInfo.overflowCurrentXP.toDouble() / skillInfo.overflowCurrentXPMax) * 100
+                    val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax) * 100
                     val percent = "§e${progress.roundTo(1)}%"
                     val currentLevel = skillInfo.overflowLevel
 
@@ -51,18 +51,18 @@ object SkillTooltip {
                 val bar = "                    "
                 if (next && overflowConfig.enableInSkillMenuTooltip) {
                     if (line.contains(bar)) {
-                        val progress = (skillInfo.overflowCurrentXP.toDouble() / skillInfo.overflowCurrentXPMax)
+                        val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax)
                         val progressBar = StringUtils.progressBar(progress)
                         iterator.set(
-                            "$progressBar §e${skillInfo.overflowCurrentXP.addSeparators()}§6/" +
-                                "§e${skillInfo.overflowCurrentXPMax.addSeparators()}",
+                            "$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/" +
+                                "§e${skillInfo.overflowCurrentXpMax.addSeparators()}",
                         )
                         iterator.add("")
                     }
                 }
                 if ((line.contains(bar) || line.contains("/")) && showCustomGoal) {
                     val targetLevel = skillInfo.customGoalLevel
-                    val have = skillInfo.totalXP
+                    val have = skillInfo.totalXp
                     val need = SkillUtil.xpRequiredForLevel(targetLevel)
 
                     val progress = have.toDouble() / need
@@ -77,7 +77,7 @@ object SkillTooltip {
                 if (next && overflowConfig.enableInSkillMenuTooltip) {
                     if (line.contains(bar)) {
                         iterator.add("§b§lOVERFLOW XP:")
-                        iterator.add("§7▸ ${skillInfo.overflowTotalXP.addSeparators()}")
+                        iterator.add("§7▸ ${skillInfo.overflowTotalXp.addSeparators()}")
                     }
                 }
             }

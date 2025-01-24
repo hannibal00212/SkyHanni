@@ -255,15 +255,15 @@ object SkillProgress {
 
         for (skill in sortedMap) {
             val skillInfo = skillMap[skill] ?: SkillApi.SkillInfo(level = -1, overflowLevel = -1)
-            val lockedLevels = skillInfo.overflowCurrentXP > skillInfo.overflowCurrentXPMax
+            val lockedLevels = skillInfo.overflowCurrentXp > skillInfo.overflowCurrentXpMax
             val useCustomGoalLevel =
                 skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInAllDisplay
             val targetLevel = skillInfo.customGoalLevel
-            var xp = skillInfo.overflowTotalXP
+            var xp = skillInfo.overflowTotalXp
             if (targetLevel in 50..60 && skillInfo.overflowLevel >= 50) xp += SkillUtil.xpRequiredForLevel(50)
             else if (targetLevel > 60 && skillInfo.overflowLevel >= 60) xp += SkillUtil.xpRequiredForLevel(60)
 
-            var have = skillInfo.overflowTotalXP
+            var have = skillInfo.overflowTotalXp
             val need = SkillUtil.xpRequiredForLevel(targetLevel)
             if (targetLevel in 51..59) have += SkillUtil.xpRequiredForLevel(50)
             else if (targetLevel > 60) have += SkillUtil.xpRequiredForLevel(60)
@@ -274,12 +274,12 @@ object SkillProgress {
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
                     Quad(
                         skillInfo.overflowLevel,
-                        skillInfo.overflowCurrentXP,
-                        skillInfo.overflowCurrentXPMax,
-                        skillInfo.overflowTotalXP,
+                        skillInfo.overflowCurrentXp,
+                        skillInfo.overflowCurrentXpMax,
+                        skillInfo.overflowTotalXp,
                     )
                 else
-                    Quad(skillInfo.level, skillInfo.currentXP, skillInfo.currentXPMax, skillInfo.totalXP)
+                    Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             this[skill] = if (level == -1) {
                 Renderable.clickAndHover(
@@ -329,8 +329,8 @@ object SkillProgress {
         var targetLevel = if (useCustomGoalLevel) skillInfo.customGoalLevel else level + 1
         if (targetLevel <= level || targetLevel > 400) targetLevel = (level + 1)
 
-        val need = skillInfo.overflowCurrentXPMax
-        val have = skillInfo.overflowCurrentXP
+        val need = skillInfo.overflowCurrentXpMax
+        val have = skillInfo.overflowCurrentXp
 
         val currentLevelNeededXP = SkillUtil.xpRequiredForLevel(level) + have
         val targetNeededXP = SkillUtil.xpRequiredForLevel(targetLevel)
@@ -338,7 +338,7 @@ object SkillProgress {
         var remaining = if (useCustomGoalLevel) targetNeededXP - currentLevelNeededXP else need - have
 
         if (!useCustomGoalLevel && have < need) {
-            if (skillInfo.overflowCurrentXPMax == skillInfoLast.overflowCurrentXPMax) {
+            if (skillInfo.overflowCurrentXpMax == skillInfoLast.overflowCurrentXpMax) {
                 remaining =
                     interpolate(remaining.toFloat(), (need - have).toFloat(), lastGainUpdate.toMillis()).toLong()
             }
@@ -399,7 +399,7 @@ object SkillProgress {
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
         val targetLevel = skill.customGoalLevel
-        val xp = skill.totalXP
+        val xp = skill.totalXp
         val lvl = skill.level
         val cap = activeSkill.maxLevel
         val add = if (lvl >= 50) {
@@ -418,9 +418,9 @@ object SkillProgress {
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
                 Quad(currentLevel, xp + add, need, xpTotalCurrent)
             else if (config.overflowConfig.enableInDisplay.get())
-                Quad(skill.overflowLevel, skill.overflowCurrentXP, skill.overflowCurrentXPMax, skill.overflowTotalXP)
+                Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
-                Quad(skill.level, skill.currentXP, skill.currentXPMax, skill.totalXP)
+                Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
             add(Renderable.string("§9[§d$level§9] "))
@@ -441,9 +441,9 @@ object SkillProgress {
                         if (useCustomGoalLevel && customGoalConfig.enableInProgressBar)
                             Pair(currentXP, currentXPMax)
                         else if (config.overflowConfig.enableInProgressBar.get())
-                            Pair(skill.overflowCurrentXP, skill.overflowCurrentXPMax)
+                            Pair(skill.overflowCurrentXp, skill.overflowCurrentXpMax)
                         else
-                            Pair(skill.currentXP, skill.currentXPMax)
+                            Pair(skill.currentXp, skill.currentXpMax)
 
                     val barPercent = if (barMax == 0L) 100F else 100F * barCurrent / barMax
                     skillExpPercentage = (barPercent.toDouble() / 100)
@@ -488,7 +488,7 @@ object SkillProgress {
         val skillInfo = SkillApi.storage?.get(activeSkill) ?: return
         oldSkillInfoMap[activeSkill] = skillInfo
 
-        val totalXP = skillInfo.currentXP
+        val totalXP = skillInfo.currentXp
 
         if (xpInfo.lastTotalXP > 0) {
             val delta = totalXP - xpInfo.lastTotalXP

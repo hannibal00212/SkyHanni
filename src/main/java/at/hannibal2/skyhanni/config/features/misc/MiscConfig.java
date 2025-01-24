@@ -180,7 +180,8 @@ public class MiscConfig {
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean skyblockXPBar = false;
+    // TODO rename to skyblockXPBar
+    public boolean skyblockXpBar = false;
 
     @Expose
     @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
