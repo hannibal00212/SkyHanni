@@ -63,7 +63,7 @@ object TentacleWaypoint {
                 seeThroughBlocks = true,
                 beacon = true,
             )
-            event.drawDynamicText(location.up(1.0), getText(hits), 1.2)
+            event.drawDynamicText(location.add(-0.5, 1.0, -0.5), getText(hits), 1.2)
         }
     }
 
