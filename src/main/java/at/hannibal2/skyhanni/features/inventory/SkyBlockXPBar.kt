@@ -13,29 +13,29 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkyBlockXPBar {
     private val config get() = SkyHanniMod.feature.misc
-    private var playerExperience: Float = 0f
-    private var playerExperienceTotal: Int = 0
-    private var playerExperienceLevel: Int = 0
+    private var cache: OriginalValues? = null
+
+    private class OriginalValues(val currentXp: Float, val maxXp: Int, val level: Int)
 
     @SubscribeEvent
     fun onRenderExperienceBar(event: RenderGameOverlayEvent.Pre) {
         if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
-        val thePlayer = Minecraft.getMinecraft().thePlayer
-        playerExperience = thePlayer.experience
-        playerExperienceTotal = thePlayer.experienceTotal
-        playerExperienceLevel = thePlayer.experienceLevel
         val (level, xp) = SkyBlockXPAPI.levelXpPair ?: return
 
-        thePlayer.setXPStats(xp / 100f, 100, level)
+        with(Minecraft.getMinecraft().thePlayer) {
+            cache = OriginalValues(experience, experienceTotal, experienceLevel)
+            setXPStats(xp / 100f, 100, level)
+        }
     }
 
     @SubscribeEvent
     fun onRenderExperienceBarPost(event: RenderGameOverlayEvent.Post) {
-        if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
-        val thePlayer = Minecraft.getMinecraft().thePlayer
-        thePlayer.setXPStats(playerExperience, playerExperienceTotal, playerExperienceLevel)
+        with(cache ?: return) {
+            Minecraft.getMinecraft().thePlayer.setXPStats(currentXp, maxXp, level)
+            cache = null
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS) && config.skyblockXpBar
