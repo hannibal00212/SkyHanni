@@ -130,18 +130,16 @@ object PestAPI {
     )
 
     /**
-     * REGEX-TEST: §eMouse Trap #1§r
-     * REGEX-TEST: §eMouse Trap #2§r
-     * REGEX-TEST: §eMouse Trap #3§r
-     * REGEX-TEST: §aPest Trap #3§r
+     * REGEX-TEST: §a§lPEST TRAP #3§r
+     * REGEX-TEST: §9§lMOUSE TRAP #2§r
      */
     private val pestTrapPattern by patternGroup.pattern(
         "entity.pesttrap",
-        "(?:§.)+(?:Pest|Mouse) Trap(?: #\\d+)?(?:§.)+",
+        "(?:§.)+§l(?:PEST|MOUSE) TRAP(?: #\\d+)?(?:§.)+",
     )
 
-    var gardenJoinTime = SimpleTimeMark.farPast()
-    var firstScoreboardCheck = false
+    private var gardenJoinTime = SimpleTimeMark.farPast()
+    private var firstScoreboardCheck = false
 
     private fun fixPests(loop: Int = 2) {
         DelayedRun.runDelayed(2.seconds) {
@@ -309,11 +307,7 @@ object PestAPI {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot() ?: run {
-            if (isNearPestTrap()) return
-            else ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
-        }
-
+        val plot = getNearestInfestedPlot() ?: return updatePests()
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--
         updatePests()

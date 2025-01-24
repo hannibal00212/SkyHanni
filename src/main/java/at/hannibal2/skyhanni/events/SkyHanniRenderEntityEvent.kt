@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-@Cancelable
 open class SkyHanniRenderEntityEvent<T : EntityLivingBase>(
     val entity: T,
     val renderer: RendererLivingEntity<out T>,

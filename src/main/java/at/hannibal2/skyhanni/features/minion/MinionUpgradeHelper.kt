@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -121,7 +121,7 @@ object MinionUpgradeHelper {
         val internalName = internalName ?: return
         val remainingItems = itemsNeeded - itemsInSacks
         if (remainingItems > 0) {
-            BazaarApi.searchForBazaarItem(internalName, remainingItems)
+            BazaarAPI.searchForBazaarItem(internalName, remainingItems)
         } else {
             GetFromSackAPI.getFromSack(internalName, itemsNeeded)
         }

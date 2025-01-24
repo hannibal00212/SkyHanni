@@ -21,7 +21,7 @@ class ObjectHighlighterConfig {
         @ConfigOption(name = "Highlight Starred", desc = "Highlights starred mobs in a color.")
         @ConfigEditorBoolean
         @FeatureToggle
-        var highlight: Property<Boolean> = Property.of(true)
+        var highlight: Property<Boolean> = Property.of(false)
 
         /*
         TODO for someone who has time
