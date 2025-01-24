@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -41,6 +42,7 @@ object RiftAPI {
     }
 
     var inMirrorVerse = false
+    private var inColosseum = false
     var inRiftRace = false
     var trackingButtons = false
     var allButtonsHit = false
@@ -48,12 +50,13 @@ object RiftAPI {
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inMirrorVerse = event.area == "Mirrorverse"
+        inColosseum = event.area == "Colosseum"
     }
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
     fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
-    fun inColosseum() = LorenzUtils.skyBlockArea == "Colosseum"
+    fun inColosseum() = LorenzUtils.skyBlockArea == "Colosseum" || inColosseum
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
     fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
 }
