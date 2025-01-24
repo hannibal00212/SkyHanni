@@ -20,7 +20,6 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityGuardian
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonCleanEnd {
@@ -41,7 +40,7 @@ object DungeonCleanEnd {
     private var chestsSpawned = false
     private var lastBossId: Int = -1
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
@@ -62,14 +61,14 @@ object DungeonCleanEnd {
         return true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onWorldChange(event: WorldChangeEvent) {
         bossDone = false
         chestsSpawned = false
         lastBossId = -1
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (bossDone) return
@@ -79,7 +78,7 @@ object DungeonCleanEnd {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
@@ -118,7 +117,7 @@ object DungeonCleanEnd {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
             event.cancel()
