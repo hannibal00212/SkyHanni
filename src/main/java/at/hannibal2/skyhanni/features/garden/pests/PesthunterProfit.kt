@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -35,10 +36,8 @@ object PesthunterProfit {
         " ",
     )
     private var display = emptyList<Renderable>()
-    private var bestPesthunterTrade = mutableListOf<PesthunterTrade>()
+    private val tradeProfits = mutableListOf<Double>()
     private var inInventory = false
-
-    data class PesthunterTrade(val internalName: NEUInternalName, val coinsPerPest: Double)
 
     /**
      * REGEX-TEST: §2100 Pests
@@ -54,6 +53,7 @@ object PesthunterProfit {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
+        tradeProfits.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -72,16 +72,18 @@ object PesthunterProfit {
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
-        val itemName = item.displayName.takeIf { it !in DENY_LIST_ITEMS } ?: return null
+        val itemName = item.displayName.takeIf {
+            it !in DENY_LIST_ITEMS && it.trim().isNotEmpty()
+        } ?: return null
         if (slot == 49) return null
 
-        val totalCost = getFullCost(getRequiredItems(item)).takeIf { it > 0 } ?: return null
+        val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NEUInternalName.fromItemNameOrNull(fixedDisplayName)
             ?: item.getInternalName()
 
-        val itemPrice = (internalName.getPrice() * amount).takeIf { it > 0 } ?: return null
+        val itemPrice = (internalName.getPrice() * amount).takeIf { it >= 0 } ?: return null
 
         val profit = itemPrice - totalCost
         val pestsCost = getPestsCost(item)
@@ -97,12 +99,6 @@ object PesthunterProfit {
             "§7Profit per pest: §6${profitPerPest.shortFormat()} ",
         )
 
-        val bestTrade = bestPesthunterTrade.maxOfOrNull { it.coinsPerPest } ?: 0.0
-        if (bestPesthunterTrade.isEmpty() || profitPerPest > bestTrade) {
-            bestPesthunterTrade.clear()
-            bestPesthunterTrade.add(PesthunterTrade(internalName, profitPerPest))
-        }
-
         return DisplayTableEntry(
             itemName.replace("[Lvl 100]", "[Lvl 1]"), // show level 1 hedgehog instead of level 100
             "$color${profitPerPest.shortFormat()}",
@@ -113,21 +109,13 @@ object PesthunterProfit {
         )
     }
 
-    private fun getRequiredItems(item: ItemStack): MutableList<String> {
-        val lore = item.getLore()
-        // Find the subsection of lore between "§7Cost" and the next empty line
+    private fun getRequiredItems(item: ItemStack): List<String> {
+        val lore = item.getLore().filter { !pestCostPattern.matches(it) }
+
         val startIndex = lore.indexOf("§7Cost") + 1
-        val endIndex = lore.indexOfFirst { it.isBlank() && lore.indexOf(it) > startIndex }
+        val endIndex = lore.indexOfFirstOrNull { it.isBlank() && lore.indexOf(it) > startIndex } ?: lore.size
 
-        val costLore =
-            if (endIndex != -1) lore.subList(startIndex, endIndex)
-            else lore.subList(startIndex, lore.size)
-
-        return costLore.filter {
-            !pestCostPattern.matches(it)
-        }.map {
-            it.replace("§8 ", " §8")
-        }.toMutableList()
+        return lore.subList(startIndex, endIndex).map { it.replace("§8 ", " §8") }
     }
 
     private fun getFullCost(requiredItems: List<String>): Double {

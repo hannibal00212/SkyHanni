@@ -9,10 +9,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class PesthunterShopConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enable the Pesthunter Profit display.")
+    @ConfigOption(name = "Enable", desc = "Enable the Pesthunter Shop Profit display.")
     @ConfigEditorBoolean
     @FeatureToggle
     var pesthunterProfitEnabled: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Highlight Best Profit", desc = "Highlight the best profit/pest trade.")
+    @ConfigEditorBoolean
+    var highlightBestProfit: Boolean = true
 
     @Expose
     @ConfigLink(owner = PesthunterShopConfig::class, field = "pesthunterProfitEnabled")
