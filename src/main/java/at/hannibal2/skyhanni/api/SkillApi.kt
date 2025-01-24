@@ -127,7 +127,7 @@ object SkillApi {
             val skillName = matcher.group("skillName")
             val skillType = SkillType.getByNameOrNull(skillName) ?: return
             val skillInfo = storage?.get(skillType) ?: SkillInfo()
-            val skillXp = skillXPInfoMap[skillType] ?: SkillXPInfo()
+            val skillXP = skillXPInfoMap[skillType] ?: SkillXPInfo()
             activeSkill = skillType
             when (matcher.pattern()) {
                 skillPercentPattern -> handleSkillPatternPercent(matcher, skillType)
@@ -138,8 +138,8 @@ object SkillApi {
 
             showDisplay = true
             lastUpdate = SimpleTimeMark.now()
-            skillXp.lastUpdate = SimpleTimeMark.now()
-            skillXp.sessionTimerActive = true
+            skillXP.lastUpdate = SimpleTimeMark.now()
+            skillXP.sessionTimerActive = true
             SkillProgress.updateDisplay()
             SkillProgress.hideInActionBar = listOf(component)
             return
@@ -183,41 +183,41 @@ object SkillApi {
     }
 
     private fun onUpdateMax(progress: String, skill: SkillType, skillInfo: SkillInfo, skillLevel: Int) {
-        val totalXp = progress.formatLong()
+        val totalXP = progress.formatLong()
         val cap = skill.maxLevel
-        val maxXp = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
-        val currentXp = totalXp - maxXp
-        val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXp, cap)
+        val maxXP = if (cap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
+        val currentXP = totalXP - maxXP
+        val (overflowLevel, overflowCurrent, overflowNeeded, overflowTotal) = calculateSkillLevel(totalXP, cap)
 
         skillInfo.apply {
             this.overflowLevel = overflowLevel
-            this.overflowCurrentXp = overflowCurrent
-            this.overflowCurrentXpMax = overflowNeeded
-            this.overflowTotalXp = overflowTotal
+            this.overflowCurrentXP = overflowCurrent
+            this.overflowCurrentXPMax = overflowNeeded
+            this.overflowTotalXP = overflowTotal
 
-            this.totalXp = totalXp
+            this.totalXP = totalXP
             this.level = skillLevel
-            this.currentXp = currentXp
-            this.currentXpMax = 0L
+            this.currentXP = currentXP
+            this.currentXPMax = 0L
         }
     }
 
     private fun onUpdateNotMax(progress: String, skillLevel: Int, skillInfo: SkillInfo) {
         val splitProgress = progress.split("/")
-        val currentXp = splitProgress.first().formatLong()
-        val neededXp = splitProgress.last().formatLong()
-        val levelXp = calculateLevelXP(skillLevel - 1).toLong()
+        val currentXP = splitProgress.first().formatLong()
+        val neededXP = splitProgress.last().formatLong()
+        val levelXP = calculateLevelXP(skillLevel - 1).toLong()
 
         skillInfo.apply {
-            this.currentXp = currentXp
+            this.currentXP = currentXP
             this.level = skillLevel
-            this.currentXpMax = neededXp
-            this.totalXp = levelXp + currentXp
+            this.currentXPMax = neededXP
+            this.totalXP = levelXP + currentXP
 
-            this.overflowCurrentXp = currentXp
+            this.overflowCurrentXP = currentXP
             this.overflowLevel = skillLevel
-            this.overflowCurrentXpMax = neededXp
-            this.overflowTotalXp = levelXp + currentXp
+            this.overflowCurrentXPMax = neededXP
+            this.overflowTotalXP = levelXP + currentXP
         }
     }
 
@@ -252,13 +252,13 @@ object SkillApi {
     private fun MutableList<String>.addDebug(skillType: SkillType, skillInfo: SkillInfo) {
         add("Name: $skillType")
         add("-  Level: ${skillInfo.level}")
-        add("-  CurrentXp: ${skillInfo.currentXp}")
-        add("-  CurrentXpMax: ${skillInfo.currentXpMax}")
-        add("-  TotalXp: ${skillInfo.totalXp}")
+        add("-  CurrentXp: ${skillInfo.currentXP}")
+        add("-  CurrentXpMax: ${skillInfo.currentXPMax}")
+        add("-  TotalXp: ${skillInfo.totalXP}")
         add("-  OverflowLevel: ${skillInfo.overflowLevel}")
-        add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXp}")
-        add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXpMax}")
-        add("-  OverflowTotalXp: ${skillInfo.overflowTotalXp}")
+        add("-  OverflowCurrentXp: ${skillInfo.overflowCurrentXP}")
+        add("-  OverflowCurrentXpMax: ${skillInfo.overflowCurrentXPMax}")
+        add("-  OverflowTotalXp: ${skillInfo.overflowTotalXP}")
         add("-  CustomGoalLevel: ${skillInfo.customGoalLevel}\n")
     }
 
@@ -298,27 +298,27 @@ object SkillApi {
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
         if (isPercentPatternFound) {
-            val levelXp = calculateLevelXP(existingLevel.level - 1)
+            val levelXP = calculateLevelXP(existingLevel.level - 1)
             val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
             val nextLevelProgress = nextLevelDiff * xpPercentage / 100
-            val totalXp = levelXp + nextLevelProgress
+            val totalXP = levelXP + nextLevelProgress
             updateSkillInfo(
                 existingLevel,
                 level,
                 nextLevelProgress.toLong(),
                 nextLevelDiff.toLong(),
-                totalXp.toLong(),
+                totalXP.toLong(),
                 matcher.group("gained"),
             )
         } else {
             val exactLevel = getLevelExact(needed)
-            val levelXp = calculateLevelXP(existingLevel.level - 1).toLong() + current
-            updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, matcher.group("gained"))
+            val levelXP = calculateLevelXP(existingLevel.level - 1).toLong() + current
+            updateSkillInfo(existingLevel, exactLevel, current, needed, levelXP, matcher.group("gained"))
         }
         storage?.set(skillType, existingLevel)
     }
 
-    private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXp: Long, maxXp: Long, totalXp: Long, gained: String) {
+    private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
         val add = if (level >= 50) {
             when (cap) {
@@ -331,17 +331,17 @@ object SkillApi {
         }
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
-            calculateSkillLevel(totalXp + add, cap ?: 60)
+            calculateSkillLevel(totalXP + add, cap ?: 60)
 
         existingLevel.apply {
-            this.totalXp = totalXp
-            this.currentXp = currentXp
-            this.currentXpMax = maxXp
+            this.totalXP = totalXP
+            this.currentXP = currentXP
+            this.currentXPMax = maxXP
             this.level = level
 
-            this.overflowTotalXp = totalOverflow
-            this.overflowCurrentXp = currentOverflow
-            this.overflowCurrentXpMax = currentMaxOverflow
+            this.overflowTotalXP = totalOverflow
+            this.overflowCurrentXP = currentOverflow
+            this.overflowCurrentXPMax = currentMaxOverflow
             this.overflowLevel = levelOverflow
 
             this.lastGain = gained
@@ -349,30 +349,30 @@ object SkillApi {
     }
 
     private fun handleSkillPatternMultiplier(matcher: Matcher, skillType: SkillType, skillInfo: SkillInfo) {
-        val currentXp = matcher.group("current").formatLong()
-        val maxXp = matcher.group("needed").formatLong()
+        val currentXP = matcher.group("current").formatLong()
+        val maxXP = matcher.group("needed").formatLong()
 
         // when at overflow, we dont need to subtract one level in the logic below
-        val minus = if (maxXp == 0L) 0 else 1
-        val level = getLevelExact(maxXp) - minus
+        val minus = if (maxXP == 0L) 0 else 1
+        val level = getLevelExact(maxXP) - minus
 
-        val levelXp = calculateLevelXP(level - 1).toLong() + currentXp
+        val levelXP = calculateLevelXP(level - 1).toLong() + currentXP
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
-            calculateSkillLevel(levelXp, skillType.maxLevel)
+            calculateSkillLevel(levelXP, skillType.maxLevel)
 
         if (skillInfo.overflowLevel > skillType.maxLevel && currentLevel == skillInfo.overflowLevel + 1) {
             SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, currentLevel).post()
         }
 
         skillInfo.apply {
-            this.overflowCurrentXp = currentOverflow
-            this.overflowCurrentXpMax = currentMaxOverflow
-            this.overflowTotalXp = totalOverflow
+            this.overflowCurrentXP = currentOverflow
+            this.overflowCurrentXPMax = currentMaxOverflow
+            this.overflowTotalXP = totalOverflow
             this.overflowLevel = currentLevel
 
-            this.currentXp = currentXp
-            this.currentXpMax = maxXp
-            this.totalXp = levelXp
+            this.currentXP = currentXP
+            this.currentXPMax = maxXP
+            this.totalXP = levelXP
             this.level = level
 
             this.lastGain = matcher.group("gained")
@@ -501,19 +501,19 @@ object SkillApi {
 
     data class SkillInfo(
         @Expose var level: Int = 0,
-        @Expose var totalXp: Long = 0,
-        @Expose var currentXp: Long = 0,
-        @Expose var currentXpMax: Long = 0,
+        @Expose var totalXP: Long = 0,
+        @Expose var currentXP: Long = 0,
+        @Expose var currentXPMax: Long = 0,
         @Expose var overflowLevel: Int = 0,
-        @Expose var overflowCurrentXp: Long = 0,
-        @Expose var overflowTotalXp: Long = 0,
-        @Expose var overflowCurrentXpMax: Long = 0,
+        @Expose var overflowCurrentXP: Long = 0,
+        @Expose var overflowTotalXP: Long = 0,
+        @Expose var overflowCurrentXPMax: Long = 0,
         @Expose var lastGain: String = "",
         @Expose var customGoalLevel: Int = 0,
     )
 
     data class SkillXPInfo(
-        var lastTotalXp: Float = 0f,
+        var lastTotalXP: Float = 0f,
         var xpGainQueue: LinkedList<Float> = LinkedList(),
         var xpGainHour: Float = 0f,
         var xpGainLast: Float = 0f,
