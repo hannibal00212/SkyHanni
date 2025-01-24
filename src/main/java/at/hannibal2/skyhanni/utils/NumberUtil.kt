@@ -274,4 +274,6 @@ object NumberUtil {
         return interp
     }
 
+    fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
+
 }

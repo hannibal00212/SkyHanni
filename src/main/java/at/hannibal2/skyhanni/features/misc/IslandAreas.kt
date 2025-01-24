@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -32,7 +32,9 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,8 +49,8 @@ object IslandAreas {
     var currentAreaName = ""
     private val textInput = SearchTextInput()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -110,6 +112,8 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
@@ -120,6 +124,8 @@ object IslandAreas {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
+        val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
+        if (!isInOwnInventory) return
 
         display?.let {
             config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")

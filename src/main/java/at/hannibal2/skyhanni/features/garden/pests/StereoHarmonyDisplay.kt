@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object StereoHarmonyDisplay {
@@ -40,7 +39,7 @@ object StereoHarmonyDisplay {
      */
     private val selectVinylPattern by vinylTypeGroup.pattern(
         "select",
-        "§aYou are now playing §r§e(?<type>.*)§r§a!"
+        "§aYou are now playing §r§e(?<type>.*)§r§a!",
     )
 
     /**
@@ -48,7 +47,7 @@ object StereoHarmonyDisplay {
      */
     private val unselectVinylPattern by vinylTypeGroup.pattern(
         "unselect",
-        "§aYou are no longer playing §r§e.*§r§a!"
+        "§aYou are no longer playing §r§e.*§r§a!",
     )
 
     private var display = emptyList<Renderable>()
@@ -57,7 +56,7 @@ object StereoHarmonyDisplay {
         ItemUtils.createSkull(
             displayName = "§c?",
             uuid = "28aa984a-2077-40cc-8de7-e641adf2c497",
-            value = SkullTextureHolder.getTexture("QUESTION_MARK")
+            value = SkullTextureHolder.getTexture("QUESTION_MARK"),
         )
     }
 
@@ -82,8 +81,8 @@ object StereoHarmonyDisplay {
         add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         selectVinylPattern.matchMatcher(event.message) {
             activeVinyl = VinylType.getByName(group("type"))
@@ -108,8 +107,8 @@ object StereoHarmonyDisplay {
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
     }
 

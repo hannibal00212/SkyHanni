@@ -149,4 +149,14 @@ class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var petRarityDropMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Shorten Coin Amounts",
+        desc = "Replace coin amounts in chat messages with their shortened version.\n" +
+            "e.g. §65,100,000 Coins §7-> §65.1M Coins"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenCoinAmounts: Boolean = false
 }

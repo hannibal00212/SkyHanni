@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -44,7 +45,6 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 
@@ -66,7 +66,7 @@ class ConfigManager {
 
     private val logger = LorenzLogger("config_manager")
 
-    private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
+    private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false

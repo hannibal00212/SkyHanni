@@ -4,11 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -18,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -32,7 +30,7 @@ object LimboPlaytime {
      */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a(?<minutes>[\\d.,]+) minutes.*$"
+        "§5§o§a(?<minutes>[\\d.,]+) minutes.*$",
     )
 
     /**
@@ -40,7 +38,7 @@ object LimboPlaytime {
      */
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b(?<hours>[\\d.,]+) hours.*$"
+        "§5§o§b(?<hours>[\\d.,]+) hours.*$",
     )
 
     var tooltipPlaytime = mutableListOf<String>()
@@ -79,7 +77,7 @@ object LimboPlaytime {
     private fun createItemLore(): Array<String> = when {
         wholeMinutes >= 60 -> arrayOf(
             "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
-            "§7Or: §b$hoursString hours"
+            "§7Or: §b$hoursString hours",
         )
 
         wholeMinutes == 1 -> arrayOf("§7Playtime: §a$wholeMinutes minute")
@@ -87,9 +85,8 @@ object LimboPlaytime {
         else -> arrayOf("§7Playtime: §a$wholeMinutes minutes")
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         if (!enabled) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
