@@ -437,6 +437,7 @@ object SkillAPI {
                     val skill = storage?.get(skillType) ?: return
                     skill.customGoalLevel = 0
                     ChatUtils.chat("Custom goal level for §b${skillType.displayName} §ereset")
+                    return
                 }
             }
         }
