@@ -47,7 +47,7 @@ object CrystalNucleusTracker {
     @Suppress("MaxLineLength")
     private val balObtainedPattern by patternGroup.pattern(
         "bal.obtained",
-        "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!"
+        "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!",
     )
 
     private val tracker = SkyHanniItemTracker(
@@ -132,7 +132,7 @@ object CrystalNucleusTracker {
                     " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
                     tips = listOf(
                         "§7You lost §c$jungleKeyCostFormat §7of total profit",
-                        "§7due to §5Jungle Keys§7."
+                        "§7due to §5Jungle Keys§7.",
                     ),
                 ).toSearchable("Jungle Key"),
             )
@@ -156,7 +156,7 @@ object CrystalNucleusTracker {
                     " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
                     tips = listOf(
                         "§7You lost §c$totalSapphireCostFormat §7of total profit",
-                        "§7due to $usageString§7."
+                        "§7due to $usageString§7.",
                     ),
                 ).toSearchable(usageString.removeColor()),
             )
@@ -164,7 +164,7 @@ object CrystalNucleusTracker {
             add(
                 Renderable.hoverTips(
                     "§7Runs completed: §e${runsCompleted.addSeparators()}",
-                    listOf("§7You completed §e${runsCompleted.addSeparators()} §7Crystal Nucleus Runs."),
+                    tips = listOf("§7You completed §e${runsCompleted.addSeparators()} §7Crystal Nucleus Runs."),
                 ).toSearchable(),
             )
 
