@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -55,8 +54,8 @@ object SensitivityReducer {
             }
 
             SensitivityReducerConfig.Mode.TOOL -> {
-                if (isHoldingTool() && !isToggled) toggle(true)
-                else if (isToggled && !isHoldingTool()) toggle(false)
+                if (GardenAPI.isHoldingTool() && !isToggled) toggle(true)
+                else if (isToggled && !GardenAPI.isHoldingTool()) toggle(false)
             }
 
             SensitivityReducerConfig.Mode.KEYBIND -> {
@@ -111,10 +110,6 @@ object SensitivityReducer {
         if (!config.showGUI) return
         if (LockMouseLook.lockedMouse) return
         config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
-    }
-
-    private fun isHoldingTool(): Boolean {
-        return GardenAPI.toolInHand != null
     }
 
     private fun isHoldingKey(): Boolean {
