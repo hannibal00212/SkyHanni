@@ -10,8 +10,16 @@ class ShoppingListItem(
 
     private val subItems = mutableListOf<ShoppingListItem>()
 
+    override fun toString(): String {
+        return "$name x$amount" + if (subItems.isNotEmpty()) {
+            " (${subItems.joinToString(", ")})"
+        } else {
+            ""
+        }
+    }
+
     fun showRecipe() {
-        NEUItems.getRecipes(name)
+        val allRecipes = NEUItems.getRecipes(name)
     }
 
     fun changeAmountBy(amount: Int) {
