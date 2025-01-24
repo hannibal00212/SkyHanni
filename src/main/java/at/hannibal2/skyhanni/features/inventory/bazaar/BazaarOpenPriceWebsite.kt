@@ -34,7 +34,7 @@ object BazaarOpenPriceWebsite {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
-        BazaarApi.currentlyOpenedProduct ?: return
+        BazaarAPI.currentlyOpenedProduct ?: return
         if (event.inventory is InventoryPlayer) return
 
         if (event.slot == 22) {
@@ -45,7 +45,7 @@ object BazaarOpenPriceWebsite {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        val lastItem = BazaarApi.currentlyOpenedProduct ?: return
+        val lastItem = BazaarAPI.currentlyOpenedProduct ?: return
 
         if (event.slotId == 22) {
             event.cancel()

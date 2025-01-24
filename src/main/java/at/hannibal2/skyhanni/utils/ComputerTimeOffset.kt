@@ -115,14 +115,21 @@ object ComputerTimeOffset {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Time Offset")
+        event.title("Computer Time Offset")
         val offset = offsetMillis ?: run {
             event.addIrrelevant("not calculated yet")
             return
         }
 
-        val relevant = offset.absoluteValue > 500.milliseconds
+        val relevant = offset.absoluteValue > 1.seconds
         if (relevant) {
+            event.addData {
+                add(offset.toString())
+                offsetFixLinks?.let {
+                    add("Instructions on how to fix your clock can be found here:")
+                    add(it)
+                }
+            }
             event.addData(offset.toString())
         } else {
             event.addIrrelevant(offset.toString())
