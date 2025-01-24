@@ -89,9 +89,8 @@ object CrystalNucleusAPI {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!IslandType.CRYSTAL_HOLLOWS.isInIsland()) return
         val message = event.message
 
         if (startPattern.matches(message)) {
