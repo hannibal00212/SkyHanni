@@ -140,6 +140,12 @@ public class MiscConfig {
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
+    @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean autoJoinSkyblock = false;
+
+    @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
