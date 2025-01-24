@@ -84,7 +84,7 @@ object FishingHookDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(70, "fishing.fishingHookDisplay.position", Position::migrate)
+        event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
     }
 
     private fun EntityArmorStand.hasCorrectName(): Boolean {

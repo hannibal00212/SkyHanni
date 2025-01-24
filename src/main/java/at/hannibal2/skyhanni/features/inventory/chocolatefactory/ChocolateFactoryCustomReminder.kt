@@ -147,7 +147,7 @@ object ChocolateFactoryCustomReminder {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(70, "inventory.chocolateFactory.customReminder.position", Position::migrate)
+        event.transform(72, "inventory.chocolateFactory.customReminder.position", Position::migrate)
     }
 
     private fun inChocolateMenu() = ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||

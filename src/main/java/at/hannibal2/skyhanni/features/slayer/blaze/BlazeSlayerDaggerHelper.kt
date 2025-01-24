@@ -265,7 +265,7 @@ object BlazeSlayerDaggerHelper {
             ConfigUtils.migrateIntToEnum(element, FirstDaggerEntry::class.java)
         }
         listOf("positionTop", "positionBottom").forEach {
-            event.transform(70, "slayer.blazes.hellion.$it", Position::migrate)
+            event.transform(72, "slayer.blazes.hellion.$it", Position::migrate)
         }
     }
 }
