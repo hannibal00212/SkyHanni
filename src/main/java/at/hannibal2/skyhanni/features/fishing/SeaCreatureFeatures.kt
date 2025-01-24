@@ -73,9 +73,8 @@ object SeaCreatureFeatures {
         rareSeaCreatures.remove(event.mob)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.alertOwnCatches) return
 
         if (event.seaCreature.rare) {

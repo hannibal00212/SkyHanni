@@ -121,7 +121,8 @@ format like "- #821" to illustrate the dependency.
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register it to the forge event bus and load the repo patterns
+    - This will automatically register it to the forge event bus and load the repo patterns.
+    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`. 
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.

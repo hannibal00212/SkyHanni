@@ -49,9 +49,8 @@ object ChocolateFactoryBlockOpen {
 
     private var commandSentTimer = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val slotDisplayName = event.slot?.stack?.displayName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
@@ -59,9 +58,8 @@ object ChocolateFactoryBlockOpen {
         if (checkIsBlocked()) event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
