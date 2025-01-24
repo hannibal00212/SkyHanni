@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -98,14 +97,17 @@ object ArmorDropTracker {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!config.enabled) return
-        if (!hasArmor) return
-        if (!GardenAPI.hasFarmingToolInHand()) return
+    init {
+        tracker.initRenderer(config.pos) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.pos)
+    private fun shouldShowDisplay(): Boolean {
+        if (!GardenAPI.inGarden()) return false
+        if (!config.enabled) return false
+        if (!hasArmor) return false
+        if (!GardenAPI.hasFarmingToolInHand()) return false
+
+        return true
     }
 
     @HandleEvent

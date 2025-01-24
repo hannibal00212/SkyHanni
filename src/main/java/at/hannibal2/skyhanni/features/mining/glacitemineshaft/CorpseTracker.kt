@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
@@ -50,7 +49,7 @@ object CorpseTracker {
             val divisor = 1.coerceAtLeast(
                 selectedBucket?.let {
                     corpsesLooted[it]?.toInt()
-                } ?: corpsesLooted.sumAllValues().toInt()
+                } ?: corpsesLooted.sumAllValues().toInt(),
             )
             val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
@@ -139,10 +138,8 @@ object CorpseTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent

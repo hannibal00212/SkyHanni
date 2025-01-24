@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -246,11 +245,8 @@ object ExperimentsProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent

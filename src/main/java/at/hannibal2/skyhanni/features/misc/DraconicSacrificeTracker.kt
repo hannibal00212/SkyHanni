@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -100,7 +99,7 @@ object DraconicSacrificeTracker {
             Renderable.hoverTips(
                 "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrificed",
                 data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
-            ).toSearchable()
+            ).toSearchable(),
         )
 
         add(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice"))
@@ -129,12 +128,15 @@ object DraconicSacrificeTracker {
         tracker.update()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return false
+
+        return true
     }
 
     @HandleEvent

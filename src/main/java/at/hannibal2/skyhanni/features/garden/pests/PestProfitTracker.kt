@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -259,14 +258,7 @@ object PestProfitTracker {
     }
 
     init {
-        RenderDisplayHelper(
-            outsideInventory = true,
-            inOwnInventory = true,
-            condition = { shouldShowDisplay() },
-            onRender = {
-                tracker.renderDisplay(config.position)
-            },
-        )
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

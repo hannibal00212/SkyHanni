@@ -221,6 +221,7 @@ object SlayerProfitTracker {
     }
 
     init {
+        // Can not use tracker.initRenderer(), since we have multiple tracker instances in use
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
