@@ -14,7 +14,7 @@ class ReceiveParticleEvent(
     val offset: LorenzVec,
     private val longDistance: Boolean,
     private val particleArgs: IntArray,
-) : SkyHanniEvent(), SkyHanniEvent.Cancellable {
+) : CancellableSkyHanniEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
