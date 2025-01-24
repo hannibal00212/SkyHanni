@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
 import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PartyCommands {
@@ -126,8 +124,8 @@ object PartyCommands {
         event.move(31, "commands", "misc.commands")
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.reversePT.clickable) return
         if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
         if (partyLeader != LorenzUtils.getPlayerName()) return
