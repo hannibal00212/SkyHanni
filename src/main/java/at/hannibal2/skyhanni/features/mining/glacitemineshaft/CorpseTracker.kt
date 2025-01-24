@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
-import java.util.EnumMap
 
 @SkyHanniModule
 object CorpseTracker {
@@ -43,7 +43,7 @@ object CorpseTracker {
 
     class BucketData : BucketedItemTrackerData<CorpseType>() {
         override fun resetItems() {
-            corpsesLooted = EnumMap(CorpseType::class.java)
+            corpsesLooted = enumMapOf()
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -66,7 +66,7 @@ object CorpseTracker {
         override fun CorpseType.isBucketSelectable() = true
 
         @Expose
-        var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
+        var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
 
         fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }

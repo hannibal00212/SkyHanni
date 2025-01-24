@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.BoostType.Companion.filterStatusSlots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -24,10 +24,10 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EnchantedClockHelper {
@@ -64,16 +64,18 @@ object EnchantedClockHelper {
      * REGEX-TEST: §7Status: §a§lREADY
      */
     private val statusLorePattern by patternGroup.pattern(
-        "inventory.status",
+        "boost.status",
         "§7Status: §(?<color>[a-f])§l(?<status>.+)",
     )
 
     /**
      * REGEX-TEST: §7§cOn cooldown: 20 hours
+     * REGEX-TEST: §7§cOn cooldown: 41 minutes
+     * REGEX-TEST: §7§cOn cooldown: 0 minutes
      */
     private val cooldownLorePattern by patternGroup.pattern(
-        "inventory.cooldown",
-        "(?:§.)*On cooldown: (?<hours>\\d+) hours?",
+        "boost.cooldown",
+        "(?:§.)*On cooldown: (?<count>[\\d,]+) (?<type>[A-Za-z]+?)s?\\b",
     )
     // </editor-fold>
 
@@ -118,7 +120,7 @@ object EnchantedClockHelper {
                         color = LorenzColor.valueOf(it.color),
                         displaySlot = it.displaySlot,
                         statusSlot = it.statusSlot,
-                        cooldown = it.cooldownHours.hours,
+                        cooldown = (it.cooldownHours.takeIf { cdh -> cdh > 0 } ?: 48).hours,
                     )
                 }
             }
@@ -158,8 +160,8 @@ object EnchantedClockHelper {
         for ((type, status) in storage.filter { !it.value.warned }) {
             val inConfig = config.reminderBoosts.contains(type)
             val isProperState = status.state == State.CHARGING
-            val inFuture = status.availableAt?.isInFuture() == true
-            if (!inConfig || !isProperState || inFuture) continue
+            val inPast = status.availableAt?.isInPast() ?: false
+            if (!inConfig || !isProperState || !inPast) continue
 
             val complexType = BoostType.bySimpleBoostType(type) ?: continue
 
@@ -177,13 +179,13 @@ object EnchantedClockHelper {
         BoostType.populateFromJson(data)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         val usageString = boostUsedChatPattern.matchMatcher(event.message) { group("usagestring") } ?: return
         val boostType = BoostType.byUsageStringOrNull(usageString) ?: return
         val simpleType = boostType.toSimple() ?: return
         val storage = storage ?: return
-        storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow())
+        storage[simpleType] = Status(State.CHARGING, boostType.getCooldownFromNow(), exactTime = true)
     }
 
     private fun ItemStack.getTypePair(): Pair<BoostType?, SimpleBoostType?> {
@@ -209,8 +211,10 @@ object EnchantedClockHelper {
         for ((_, stack) in statusStacks) {
             val (boostType, simpleType) = stack.getTypePair()
             val currentBoostState = stack.getBoostState()
-            if (boostType == null || simpleType == null || currentBoostState == null) continue
+            val timeAlreadyExact = storage[simpleType]?.exactTime == true
+            if (boostType == null || simpleType == null || currentBoostState == null || timeAlreadyExact) continue
 
+            var exactUpdate = false
             val parsedCooldown: SimpleTimeMark? = when (currentBoostState) {
                 State.READY, State.PROBLEM -> {
                     storage[simpleType]?.availableAt = SimpleTimeMark.now()
@@ -218,26 +222,26 @@ object EnchantedClockHelper {
                 }
 
                 else -> cooldownLorePattern.firstMatcher(stack.getLore()) {
-                    group("hours")?.toIntOrNull()?.hours?.let { SimpleTimeMark.now() + it }
+                    val count = group("count").toInt()
+                    val type = group("type")
+                    if (type == "minute") exactUpdate = true
+                    SimpleTimeMark.now() + when (type) {
+                        "hour" -> count.hours
+                        "minute" -> count.minutes
+                        else -> 0.seconds
+                    }
                 }
             }
 
-            // Because the times provided by the clock UI is inaccurate (we only get hour count)
-            //  We only want to set it if the current time is horribly incorrect.
-            storage[simpleType]?.availableAt?.let { existing ->
-                parsedCooldown?.let { parsed ->
-                    if (existing.absoluteDifference(parsed) < 2.hours) return
-                }
-            }
-
-            storage[simpleType] = Status(currentBoostState, parsedCooldown)
+            storage[simpleType] = Status(currentBoostState, parsedCooldown, exactTime = exactUpdate)
         }
     }
 
     class Status(
-        @field:Expose var state: State,
-        @field:Expose var availableAt: SimpleTimeMark?,
-        @field:Expose var warned: Boolean = false,
+        @Expose var state: State,
+        @Expose var availableAt: SimpleTimeMark?,
+        @Expose var exactTime: Boolean = false,
+        @Expose var warned: Boolean = false,
     ) {
         override fun toString(): String = "Status(state=$state, availableAt=$availableAt, warned=$warned)"
     }

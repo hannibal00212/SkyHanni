@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -127,8 +126,8 @@ object HoppityEggsManager {
 
     private var latestWaypointOnclick: () -> Unit = {}
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastMeal = null
         lastNote = null
     }
@@ -142,10 +141,8 @@ object HoppityEggsManager {
         lastNote = event.note
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         hoppityEventNotOn.matchMatcher(event.message) {
             val currentYear = SkyBlockTime.now().year
 

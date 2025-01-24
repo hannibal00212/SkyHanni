@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -65,8 +65,8 @@ object RiftMotesOrb {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         motesPattern.matchMatcher(event.message) {
             motesOrbs.minByOrNull { it.location.distanceToPlayer() }?.let {
                 it.pickedUp = true

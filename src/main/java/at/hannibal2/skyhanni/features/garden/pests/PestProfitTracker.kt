@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -41,7 +41,6 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -136,14 +135,14 @@ object PestProfitTracker {
         tracker.addItem(event)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         event.checkPestChats()
         event.checkSprayChats()
     }
 
-    private fun LorenzChatEvent.checkPestChats() {
+    private fun SkyHanniChatEvent.checkPestChats() {
         PestAPI.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -177,7 +176,7 @@ object PestProfitTracker {
         }
     }
 
-    private fun LorenzChatEvent.checkSprayChats() {
+    private fun SkyHanniChatEvent.checkSprayChats() {
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
@@ -220,9 +219,9 @@ object PestProfitTracker {
                         }.forEach { (type, count) ->
                             add("§7${type.pluralName}: §e${count.addSeparators()}")
                         }
-                    }
+                    },
                 ).toSearchable()
-            }
+            },
         )
 
         if (selectedBucket == null || selectedBucket.spray != null) {
@@ -249,8 +248,8 @@ object PestProfitTracker {
             add(
                 Renderable.hoverTips(
                     "§aSprays used: §a$sumSpraysUsed$sprayCostString",
-                    hoverTips
-                ).toSearchable()
+                    hoverTips,
+                ).toSearchable(),
             )
         }
 
@@ -350,7 +349,7 @@ object PestProfitTracker {
             JsonPrimitive(
                 entry.asLong - pestKillCountMap.entries.filter {
                     it.key != PestType.UNKNOWN
-                }.sumOf { it.value }
+                }.sumOf { it.value },
             )
         }
     }
