@@ -129,9 +129,9 @@ object HoppityEggLocations {
         ChatUtils.chat("$enabledDisabled hoppity egg location debug viewer.")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !showEggLocationsDebug) return
+        if (!showEggLocationsDebug) return
         val legacyLocations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val apiLocations = apiEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val collectedLocations = islandCollectedLocations
