@@ -171,6 +171,8 @@ object CrystalNucleusTracker {
             )
 
             add(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
+        } else {
+            addSearchString("§7Do a run to start tracking!")
         }
 
         tracker.addPriceFromButton(this)
