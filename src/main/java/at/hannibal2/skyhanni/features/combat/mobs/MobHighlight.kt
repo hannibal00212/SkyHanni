@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -30,9 +29,8 @@ object MobHighlight {
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var arachne: EntityLivingBase? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         val baseMaxHealth = entity.baseMaxHealth
@@ -44,9 +42,8 @@ object MobHighlight {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         val maxHealth = event.maxHealth
@@ -98,9 +95,9 @@ object MobHighlight {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
+        if (!config.lineToArachne) return
 
         val arachne = arachne ?: return
         if (arachne.isDead || arachne.health <= 0) {
