@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +35,7 @@ object ArachneSpawnTimer {
      */
     private val arachneFragmentPattern by patternGroup.pattern(
         "fragment",
-        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$"
+        "^☄ [a-z0-9_]{2,22} placed an arachne's calling! something is awakening! \\(4/4\\)\$",
     )
 
     /**
@@ -44,7 +43,7 @@ object ArachneSpawnTimer {
      */
     private val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
-        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$"
+        "^☄ [a-z0-9_]{2,22} placed an arachne crystal! something is awakening!$",
     )
 
     private val arachneAltarLocation = LorenzVec(-283f, 51f, -179f)
@@ -54,8 +53,8 @@ object ArachneSpawnTimer {
     private var lastTickTime = SimpleTimeMark.farPast()
     private var searchTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         searchTime = SimpleTimeMark.farPast()
         lastTickTime = SimpleTimeMark.farPast()
         particleCounter = 0
@@ -73,8 +72,8 @@ object ArachneSpawnTimer {
         event.drawDynamicText(arachneAltarLocation, "§b$format", 1.5)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().lowercase()
 

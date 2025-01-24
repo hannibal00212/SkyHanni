@@ -1,5 +1,3 @@
-import at.hannibal2.skyhanni.tweaker.DownloadSourceChecker;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -96,8 +94,6 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
     public static void main(String[] args) {
         try {
-            DownloadSourceChecker.init();
-
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             SkyHanniInstallerFrame frame = new SkyHanniInstallerFrame();
             frame.centerFrame(frame);
