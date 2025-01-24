@@ -112,16 +112,12 @@ object ItemUtils {
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()
-        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
-        val list: MutableList<String> = ArrayList()
-        for (i in 0 until tagList.tagCount()) {
-            list.add(tagList.getStringTagAt(i))
-        }
-        return list
+        return this.getCompoundTag("display").getStringList("Lore")
     }
 
     fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
@@ -242,11 +238,13 @@ object ItemUtils {
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
-        val nbt = tagCompound ?: return null
-        if (!nbt.hasKey("SkullOwner")) return null
-        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
-            .getCompoundTagAt(0).getString("Value")
+        val compound = tagCompound ?: return null
+        if (!compound.hasKey("SkullOwner")) return null
+        return compound.getCompoundTag("SkullOwner").getSkullTexture()
+
     }
+
+    fun NBTTagCompound.getSkullTexture(): String = getCompoundTag("Properties").getCompoundList("textures")[0].getString("Value")
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
@@ -653,4 +651,17 @@ object ItemUtils {
         )
         NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
     }
+
+    fun NBTTagCompound.getStringList(key: String): List<String> {
+        if (!hasKey(key, Constants.NBT.TAG_LIST)) return emptyList()
+
+        return getTagList(key, Constants.NBT.TAG_STRING).let { loreList ->
+            List(loreList.tagCount()) { loreList.getStringTagAt(it) }
+        }
+    }
+
+    fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
+        getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
+            List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
+        }
 }
