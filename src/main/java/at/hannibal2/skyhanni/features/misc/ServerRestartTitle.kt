@@ -34,9 +34,8 @@ object ServerRestartTitle {
         "§cServer closing.*",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.serverRestartTitle) return
 
         restartingPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
