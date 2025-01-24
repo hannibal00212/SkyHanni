@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
@@ -56,7 +56,7 @@ object GardenComposterInventoryFeatures {
                     )
                     continue
                 }
-                val internalName = NEUInternalName.fromItemName(itemName)
+                val internalName = NeuInternalName.fromItemName(itemName)
                 val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price

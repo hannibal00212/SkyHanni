@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -39,7 +39,7 @@ object QuiverApi {
         set(value) {
             storage?.arrows?.currentArrow = value?.toString() ?: return
         }
-    private val arrowAmount: MutableMap<NEUInternalName, Int>
+    private val arrowAmount: MutableMap<NeuInternalName, Int>
         get() = storage?.arrows?.arrowAmount ?: mutableMapOf()
     var currentAmount: Int
         get() = currentArrow?.amount ?: 0
@@ -265,11 +265,11 @@ object QuiverApi {
         return arrows.firstOrNull { it.arrow == name }
     }
 
-    fun getArrowByNameOrNull(internalName: NEUInternalName): ArrowType? {
+    fun getArrowByNameOrNull(internalName: NeuInternalName): ArrowType? {
         return arrows.firstOrNull { it.internalName == internalName }
     }
 
-    private fun NEUInternalName.asArrowTypeOrNull() = getArrowByNameOrNull(this)
+    private fun NeuInternalName.asArrowTypeOrNull() = getArrowByNameOrNull(this)
 
     fun isEnabled() = LorenzUtils.inSkyBlock && storage != null
 

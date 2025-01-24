@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -30,7 +30,7 @@ object SuperCraftFeatures {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.superCraftGFS) return
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
-            NEUInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
+            NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
         } ?: return
         if (!SackApi.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {

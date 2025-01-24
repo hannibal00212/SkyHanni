@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object SkyBlockXpApi {
+object SkyBlockXPApi {
 
     private val group = RepoPattern.group("skyblockxpapi.inventory")
 
@@ -30,7 +30,7 @@ object SkyBlockXpApi {
      */
     private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
-    val levelXpPair get() = storage?.toLevelXpPair()
+    val levelXPPair get() = storage?.toLevelXPPair()
 
     // Stored as 12345, 123 is the level, 45 is the xp
     private var storage
@@ -39,7 +39,7 @@ object SkyBlockXpApi {
             ProfileStorageData.profileSpecific?.totalSkyBlockXP = value
         }
 
-    private fun Int.toLevelXpPair() = this / 100 to this % 100
+    private fun Int.toLevelXPPair() = this / 100 to this % 100
 
     private val levelColors = mapOf(
         0..39 to LorenzColor.GRAY,
@@ -58,7 +58,7 @@ object SkyBlockXpApi {
     )
 
 
-    fun getLevelColor(): LorenzColor = levelXpPair?.let { getLevelColor(it.first) } ?: LorenzColor.BLACK
+    fun getLevelColor(): LorenzColor = levelXPPair?.let { getLevelColor(it.first) } ?: LorenzColor.BLACK
 
     fun getLevelColor(level: Int): LorenzColor = levelColors.entries.firstOrNull { level in it.key }?.value ?: LorenzColor.BLACK
 
@@ -105,9 +105,9 @@ object SkyBlockXpApi {
     }
 
     private fun updateStorage(level: Int?, xp: Int?) {
-        storage = calculateTotalXp(level ?: return, xp ?: return)
+        storage = calculateTotalXP(level ?: return, xp ?: return)
     }
 
-    fun calculateTotalXp(level: Int, xp: Int): Int = level * 100 + xp
+    fun calculateTotalXP(level: Int, xp: Int): Int = level * 100 + xp
 
 }

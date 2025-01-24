@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -68,7 +68,7 @@ object SlayerRngMeterDisplay {
     private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = SimpleTimeMark.farPast()
 
-    var rngScore = mapOf<String, Map<NEUInternalName, Long>>()
+    var rngScore = mapOf<String, Map<NeuInternalName, Long>>()
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -173,11 +173,11 @@ object SlayerRngMeterDisplay {
         val itemName = bookFormatPattern.matchMatcher(rawName) {
             group("name")
         } ?: rawName
-        val internalName = NEUInternalName.fromItemName(itemName)
+        val internalName = NeuInternalName.fromItemName(itemName)
         setNewGoal(internalName)
     }
 
-    private fun setNewGoal(internalName: NEUInternalName?) {
+    private fun setNewGoal(internalName: NeuInternalName?) {
         val storage = getStorage() ?: return
         if (internalName == null) {
             storage.itemGoal = ""

@@ -34,7 +34,7 @@ object BetterWikiFromMenus {
         val isWiki = event.slotId == 11 && itemClickedName.contains("Wiki Command")
         val isWikithis = event.slotId == 15 && itemClickedName.contains("Wikithis Command")
         val inBiblioInventory = chestName == "SkyBlock Wiki" && (isWiki || isWikithis)
-        val inSbGuideInventory =
+        val inSBGuideInventory =
             (itemClickedStack.getLore().let { it.any { line -> line == "§7§eClick to view on the SkyBlock Wiki!" } })
 
         if (inBiblioInventory) {
@@ -49,7 +49,7 @@ object BetterWikiFromMenus {
             }
         }
 
-        if (inSbGuideInventory && config.sbGuide) {
+        if (inSBGuideInventory && config.sbGuide) {
             val wikiSearch = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             WikiManager.sendWikiMessage(wikiSearch, autoOpen = config.menuOpenWiki)
             event.cancel()

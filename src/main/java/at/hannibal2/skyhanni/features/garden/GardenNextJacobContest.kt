@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -209,7 +209,7 @@ object GardenNextJacobContest {
         if (!config.display) return
         monthPattern.matchMatcher(event.inventoryName) {
             inCalendar = true
-            val month = LorenzUtils.getSbMonthByName(group("month"))
+            val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
             readCalendar(event.inventoryItems.values, year, month)
@@ -520,7 +520,7 @@ object GardenNextJacobContest {
     private fun isEnabled() =
         config.display && (
             (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)) ||
-                (OutsideSbFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
+                (OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !LorenzUtils.inSkyBlock)
             )
 
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically

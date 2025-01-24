@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 
-class NEUInternalName private constructor(private val internalName: String) {
+class NeuInternalName private constructor(private val internalName: String) {
 
     companion object {
 
-        private val internalNameMap = mutableMapOf<String, NEUInternalName>()
+        private val internalNameMap = mutableMapOf<String, NeuInternalName>()
 
         val NONE = "NONE".toInternalName()
         val MISSING_ITEM = "MISSING_ITEM".toInternalName()
@@ -17,22 +17,22 @@ class NEUInternalName private constructor(private val internalName: String) {
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".toInternalName()
         val WISP_POTION = "WISP_POTION".toInternalName()
 
-        fun String.toInternalName(): NEUInternalName = uppercase().replace(" ", "_").let {
-            internalNameMap.getOrPut(it) { NEUInternalName(it) }
+        fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
+            internalNameMap.getOrPut(it) { NeuInternalName(it) }
         }
 
-        fun Set<String>.toInternalNames(): Set<NEUInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
-        fun List<String>.toInternalNames(): List<NEUInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
+        fun Set<String>.toInternalNames(): Set<NeuInternalName> = mapTo(mutableSetOf()) { it.toInternalName() }
+        fun List<String>.toInternalNames(): List<NeuInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
 
-        private val itemNameCache = mutableMapOf<String, NEUInternalName?>()
+        private val itemNameCache = mutableMapOf<String, NeuInternalName?>()
 
-        fun fromItemNameOrNull(itemName: String): NEUInternalName? = itemNameCache.getOrPut(itemName) {
+        fun fromItemNameOrNull(itemName: String): NeuInternalName? = itemNameCache.getOrPut(itemName) {
             ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet")) ?: getCoins(itemName)
         }
 
-        fun fromItemNameOrInternalName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
+        fun fromItemNameOrInternalName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: itemName.toInternalName()
 
-        private fun getCoins(itemName: String): NEUInternalName? = when {
+        private fun getCoins(itemName: String): NeuInternalName? = when {
             isCoins(itemName) -> SKYBLOCK_COIN
             else -> null
         }
@@ -45,7 +45,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
         private fun isCoins(itemName: String): Boolean = itemName.lowercase() in coinNames
 
-        fun fromItemName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: run {
+        fun fromItemName(itemName: String): NeuInternalName = fromItemNameOrNull(itemName) ?: run {
             val name = "itemName:$itemName"
             ItemUtils.addMissingRepoItem(name, "Could not find internal name for $name")
             MISSING_ITEM
@@ -66,7 +66,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     fun endsWith(other: String) = internalName.endsWith(other)
 
-    fun replace(oldValue: String, newValue: String): NEUInternalName =
+    fun replace(oldValue: String, newValue: String): NeuInternalName =
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN

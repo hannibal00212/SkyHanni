@@ -33,8 +33,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -785,7 +785,7 @@ object HoppityCollectionStats {
 
     enum class RabbitCollectionRarity(
         val displayName: String,
-        val item: NEUInternalName,
+        val item: NeuInternalName,
     ) {
         COMMON("§fCommon", "STAINED_GLASS".toInternalName()),
         UNCOMMON("§aUncommon", "STAINED_GLASS-5".toInternalName()),

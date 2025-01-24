@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.google.gson.Gson
@@ -59,8 +59,8 @@ object ReforgeApi {
         val name: String,
         val type: ReforgeType,
         val stats: Map<LorenzRarity, SkyblockStatList>,
-        val reforgeStone: NEUInternalName? = null,
-        val specialItems: List<NEUInternalName>? = null,
+        val reforgeStone: NeuInternalName? = null,
+        val specialItems: List<NeuInternalName>? = null,
         val extraProperty: Map<LorenzRarity, String> = emptyMap(),
         val costs: Map<LorenzRarity, Long>? = null,
     ) {
@@ -73,7 +73,7 @@ object ReforgeApi {
 
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
-        fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
+        fun isValid(itemCategory: ItemCategory?, internalName: NeuInternalName) = when (type) {
             ReforgeType.SWORD -> setOf(
                 ItemCategory.SWORD,
                 ItemCategory.GAUNTLET,

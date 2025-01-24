@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -54,8 +54,8 @@ object FishingApi {
     var holdingLavaRod = false
     var holdingWaterRod = false
 
-    private var lavaRods = listOf<NEUInternalName>()
-    private var waterRods = listOf<NEUInternalName>()
+    private var lavaRods = listOf<NeuInternalName>()
+    private var waterRods = listOf<NeuInternalName>()
 
     var bobber: EntityFishHook? = null
     var bobberHasTouchedLiquid = false
@@ -109,11 +109,11 @@ object FishingApi {
     }
 
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
-    fun NEUInternalName.isFishingRod() = isLavaRod() || isWaterRod()
+    fun NeuInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
-    fun NEUInternalName.isLavaRod() = this in lavaRods
+    fun NeuInternalName.isLavaRod() = this in lavaRods
 
-    fun NEUInternalName.isWaterRod() = this in waterRods
+    fun NeuInternalName.isWaterRod() = this in waterRods
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
@@ -134,7 +134,7 @@ object FishingApi {
 
     private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks
 
-    fun getFilletPerTrophy(internalName: NEUInternalName): Int {
+    fun getFilletPerTrophy(internalName: NeuInternalName): Int {
         val internal = internalName.asString()
         val trophyFishName = internal.substringBeforeLast("_")
             .replace("_", "").lowercase()

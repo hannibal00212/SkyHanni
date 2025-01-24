@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -61,7 +61,7 @@ object GardenYawAndPitch {
 
     private fun isEnabled() =
         config.enabled && (
-            (OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (OutsideSBFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
                 (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden))
             )
 

@@ -33,11 +33,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -59,9 +59,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
-    private var organicMatterFactors: Map<NEUInternalName, Double> = emptyMap()
-    private var fuelFactors: Map<NEUInternalName, Double> = emptyMap()
-    private var organicMatter: Map<NEUInternalName, Double> = emptyMap()
+    private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
+    private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
+    private var organicMatter: Map<NeuInternalName, Double> = emptyMap()
 
     private val config get() = GardenApi.config.composters
     private var organicMatterDisplay = emptyList<List<Any>>()
@@ -84,13 +84,13 @@ object ComposterOverlay {
 
     private var testOffset = 0
 
-    var currentOrganicMatterItem: NEUInternalName?
+    var currentOrganicMatterItem: NeuInternalName?
         get() = GardenApi.storage?.composterCurrentOrganicMatterItem
         private set(value) {
             GardenApi.storage?.composterCurrentOrganicMatterItem = value
         }
 
-    var currentFuelItem: NEUInternalName?
+    var currentFuelItem: NeuInternalName?
         get() = GardenApi.storage?.composterCurrentFuelItem
         private set(value) {
             GardenApi.storage?.composterCurrentFuelItem = value
@@ -387,12 +387,12 @@ object ComposterOverlay {
 
     private fun fillList(
         bigList: MutableList<List<Any>>,
-        factors: Map<NEUInternalName, Double>,
+        factors: Map<NeuInternalName, Double>,
         missing: Double,
         testOffsetRec: Int = 0,
-        onClick: (NEUInternalName) -> Unit,
-    ): NEUInternalName {
-        val map = mutableMapOf<NEUInternalName, Double>()
+        onClick: (NeuInternalName) -> Unit,
+    ): NeuInternalName {
+        val map = mutableMapOf<NeuInternalName, Double>()
         for ((internalName, factor) in factors) {
             map[internalName] = factor / getPrice(internalName)
         }
@@ -403,7 +403,7 @@ object ComposterOverlay {
             0
         } else testOffsetRec
 
-        val first: NEUInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
+        val first: NeuInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
         if (testOffset != 0) {
             bigList.addAsSingletonList(
                 Renderable.link("testOffset = $testOffset") {
@@ -417,15 +417,15 @@ object ComposterOverlay {
     }
 
     private fun calculateFirst(
-        map: MutableMap<NEUInternalName, Double>,
+        map: MutableMap<NeuInternalName, Double>,
         testOffset: Int,
-        factors: Map<NEUInternalName, Double>,
+        factors: Map<NeuInternalName, Double>,
         missing: Double,
-        onClick: (NEUInternalName) -> Unit,
+        onClick: (NeuInternalName) -> Unit,
         bigList: MutableList<List<Any>>,
-    ): NEUInternalName? {
+    ): NeuInternalName? {
         var i = 0
-        var first: NEUInternalName? = null
+        var first: NeuInternalName? = null
         for (internalName in map.sortedDesc().keys) {
             i++
             if (i < testOffset) continue
@@ -460,11 +460,11 @@ object ComposterOverlay {
 
     private fun formatPrice(
         totalPrice: Double,
-        internalName: NEUInternalName,
+        internalName: NeuInternalName,
         itemName: String,
         list: MutableList<Any>,
         itemsNeeded: Double,
-        onClick: (NEUInternalName) -> Unit,
+        onClick: (NeuInternalName) -> Unit,
     ) {
         val format = totalPrice.shortFormat()
         val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
@@ -481,7 +481,7 @@ object ComposterOverlay {
         )
     }
 
-    private fun retrieveMaterials(internalName: NEUInternalName, itemName: String, itemsNeeded: Int) {
+    private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
         if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
             !LorenzUtils.noTradeMode && internalName != BIOFUEL
@@ -536,7 +536,7 @@ object ComposterOverlay {
         }
     }
 
-    private fun getPrice(internalName: NEUInternalName): Double {
+    private fun getPrice(internalName: NeuInternalName): Double {
         val price = internalName.getPrice(config.priceSource)
         if (internalName == BIOFUEL && price > 20_000) return 20_000.0
 
@@ -581,12 +581,12 @@ object ComposterOverlay {
             internalName.endsWith("_LEGGINGS")
     }
 
-    private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
-        val map = mutableMapOf<NEUInternalName, Double>()
-        for ((internalName, _) in NEUItems.allNeuRepoItems()) {
+    private fun updateOrganicMatterFactors(baseValues: Map<NeuInternalName, Double>): Map<NeuInternalName, Double> {
+        val map = mutableMapOf<NeuInternalName, Double>()
+        for ((internalName, _) in NeuItems.allNeuRepoItems()) {
             if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
-            var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.toInternalName())
+            var (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName.toInternalName())
             if (amount <= 9) continue
             if (internalName == "ENCHANTED_HUGE_MUSHROOM_1" || internalName == "ENCHANTED_HUGE_MUSHROOM_2") {
                 //  160 * 8 * 4 is 5120 and not 5184, but hypixel made an error, so we have to copy the error

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import net.minecraft.item.ItemStack
@@ -23,7 +23,7 @@ object RiftApi {
     val config: RiftConfig get() = SkyHanniMod.feature.rift
 
     // internal name -> motes
-    var motesPrice = emptyMap<NEUInternalName, Double>()
+    var motesPrice = emptyMap<NeuInternalName, Double>()
 
     val farmingTool = "FARMING_WAND".toInternalName()
 

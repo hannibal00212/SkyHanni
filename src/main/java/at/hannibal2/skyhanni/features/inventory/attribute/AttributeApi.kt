@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsIgnoreOrder
 import at.hannibal2.skyhanni.utils.CollectionUtils.toPair
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import net.minecraft.item.ItemStack
@@ -91,7 +91,7 @@ object AttributeApi {
             AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
         }?.toPair()
 
-    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean =
+    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NeuInternalName): Boolean =
         goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
             val attributes = first.type to second.type
             goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }

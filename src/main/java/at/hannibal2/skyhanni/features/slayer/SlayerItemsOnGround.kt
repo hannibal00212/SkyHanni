@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -31,7 +31,7 @@ object SlayerItemsOnGround {
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
             val itemStack = entityItem.entityItem
             if (itemStack.item == Items.spawn_egg) continue
-            if (itemStack.getInternalName() == NEUInternalName.NONE) continue
+            if (itemStack.getInternalName() == NeuInternalName.NONE) continue
             val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.stackSize)
             if (config.minimumPrice > price) continue
             itemsOnGround[entityItem] = name

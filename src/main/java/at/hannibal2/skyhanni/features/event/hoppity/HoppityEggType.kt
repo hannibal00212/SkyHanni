@@ -112,15 +112,15 @@ enum class HoppityEggType(
             }
 
         fun checkClaimed() {
-            val currentSbTime = SkyBlockTime.now()
-            val currentSbDay = currentSbTime.day
-            val currentSbHour = currentSbTime.hour
-            val isAltDay = currentSbTime.isAlternateDay()
+            val currentSBTime = SkyBlockTime.now()
+            val currentSBDay = currentSBTime.day
+            val currentSBHour = currentSBTime.hour
+            val isAltDay = currentSBTime.isAlternateDay()
 
             for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
-                if (currentSbHour < eggType.resetsAt || eggType.lastResetDay == currentSbDay) continue
+                if (currentSBHour < eggType.resetsAt || eggType.lastResetDay == currentSBDay) continue
                 eggType.markSpawned()
-                eggType.lastResetDay = currentSbDay
+                eggType.lastResetDay = currentSBDay
                 if (HoppityEggLocator.currentEggType == eggType) {
                     HoppityEggLocator.currentEggType = null
                     HoppityEggLocator.currentEggNote = null

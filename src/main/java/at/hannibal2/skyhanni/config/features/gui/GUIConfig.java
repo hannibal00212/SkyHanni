@@ -69,7 +69,7 @@ public class GUIConfig {
     @Expose
     @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
-    public XpBarConfig xpBar = new XpBarConfig();
+    public XPBarConfig xpBar = new XPBarConfig();
 
     @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")

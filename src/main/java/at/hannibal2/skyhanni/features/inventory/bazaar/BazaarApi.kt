@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -49,8 +49,8 @@ object BazaarApi {
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 
-    var currentlyOpenedProduct: NEUInternalName? = null
-    var orderOptionProduct: NEUInternalName? = null
+    var currentlyOpenedProduct: NeuInternalName? = null
+    var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
@@ -91,9 +91,9 @@ object BazaarApi {
         "Co-op Bazaar Orders",
     )
 
-    fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
+    fun NeuInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
-    fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
+    fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
             "Can not find bazaar data for $itemName",
             "internal name" to this,
@@ -102,15 +102,15 @@ object BazaarApi {
 
     fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
-    fun NEUInternalName.isBazaarItem() = getBazaarData() != null
+    fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
-    fun searchForBazaarItem(internalName: NEUInternalName, amount: Int = -1) {
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int = -1) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
         if (!LorenzUtils.inSkyBlock) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         if (LorenzUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || LorenzUtils.inKuudraFight) return
         HypixelCommands.bazaar(displayName.removeColor())
@@ -147,13 +147,13 @@ object BazaarApi {
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return NEUInternalName.fromItemName(bazaarItem.displayName)
+        return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
     @SubscribeEvent

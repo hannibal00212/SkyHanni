@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -139,7 +139,7 @@ object VisitorApi {
         var entityId: Int = -1,
         var nameTagEntityId: Int = -1,
         var status: VisitorStatus,
-        val shoppingList: MutableMap<NEUInternalName, Int> = mutableMapOf(),
+        val shoppingList: MutableMap<NeuInternalName, Int> = mutableMapOf(),
         var offer: VisitorOffer? = null,
     ) {
         var offersAccepted: Int? = null
@@ -147,7 +147,7 @@ object VisitorApi {
         var totalPrice: Double? = null
         var totalReward: Double? = null
         var lore: List<String> = emptyList()
-        var allRewards = listOf<NEUInternalName>()
+        var allRewards = listOf<NeuInternalName>()
         var lastLore = listOf<String>()
         var blockedLore = listOf<String>()
         var blockReason: VisitorBlockReason? = null

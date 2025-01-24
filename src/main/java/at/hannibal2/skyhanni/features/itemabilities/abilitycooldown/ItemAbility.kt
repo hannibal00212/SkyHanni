@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
@@ -67,7 +67,7 @@ enum class ItemAbility(
     ECHO("Echo", 3, "Ancestral Spade");
 
     var newVariant = false
-    var internalNames = mutableListOf<NEUInternalName>()
+    var internalNames = mutableListOf<NeuInternalName>()
 
     constructor(
         cooldownInSeconds: Int,
@@ -124,7 +124,7 @@ enum class ItemAbility(
 
     companion object {
 
-        fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
+        fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 

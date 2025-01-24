@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -39,7 +39,7 @@ object ShowMotesNpcSellPrice {
     )
 
     private var display = emptyList<List<Any>>()
-    private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
+    private val itemMap = mutableMapOf<NeuInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 

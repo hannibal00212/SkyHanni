@@ -39,8 +39,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -146,7 +146,7 @@ object GardenApi {
         return if (isOtherTool(internalName)) internalName.asString() else null
     }
 
-    private fun isOtherTool(internalName: NEUInternalName): Boolean {
+    private fun isOtherTool(internalName: NeuInternalName): Boolean {
         return internalName.asString() in otherToolsList
     }
 
@@ -168,7 +168,7 @@ object GardenApi {
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
-        scale: Double = NEUItems.itemFontSize,
+        scale: Double = NeuItems.itemFontSize,
         highlight: Boolean = false,
     ) {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)

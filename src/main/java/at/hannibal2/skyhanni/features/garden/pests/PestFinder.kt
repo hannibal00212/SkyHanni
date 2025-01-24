@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -203,7 +203,7 @@ object PestFinder {
     fun onKeyPress(event: KeyPressEvent) {
         if (!GardenApi.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return

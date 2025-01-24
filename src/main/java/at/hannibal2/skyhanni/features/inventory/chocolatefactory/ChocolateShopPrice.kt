@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.million
@@ -207,7 +207,7 @@ object ChocolateShopPrice {
     private data class Product(
         var slot: Int?,
         val name: String,
-        val item: NEUInternalName,
+        val item: NeuInternalName,
         val chocolate: Long,
         val itemPrice: Double,
         val otherItemPrice: Double?,

@@ -120,7 +120,7 @@ object BitsApi {
     /**
      * REGEX-TEST: §7Your rank: §eAttaché
      */
-    private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
+    private val fameRankSBMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
         "§7Your rank: §e(?<rank>.*)",
     )
@@ -133,7 +133,7 @@ object BitsApi {
         "\\s*§7Duration: §a(?<time>.*)",
     )
 
-    private val noCookieActiveSbMenuPattern by bitsGuiGroup.pattern(
+    private val noCookieActiveSBMenuPattern by bitsGuiGroup.pattern(
         "sbmenunocookieactive",
         " §7Status: §cNot active!",
     )
@@ -280,7 +280,7 @@ object BitsApi {
                 val duration = TimeUtils.getDuration(group("time"))
                 cookieBuffTime = SimpleTimeMark.now() + duration
             }
-            noCookieActiveSbMenuPattern.firstMatcher(lore) {
+            noCookieActiveSBMenuPattern.firstMatcher(lore) {
                 val cookieTime = cookieBuffTime
                 if (cookieTime == null || cookieTime.isInFuture()) cookieBuffTime = SimpleTimeMark.farPast()
             }
@@ -311,7 +311,7 @@ object BitsApi {
                             continue@lore
                         }
 
-                        fameRankSbMenuPattern.matchMatcher(line) {
+                        fameRankSBMenuPattern.matchMatcher(line) {
                             val rank = group("rank")
 
                             currentFameRank = getFameRankByNameOrNull(rank)

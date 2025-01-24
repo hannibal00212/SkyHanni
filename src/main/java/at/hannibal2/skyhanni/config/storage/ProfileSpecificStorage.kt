@@ -50,8 +50,8 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
@@ -256,7 +256,7 @@ class ProfileSpecificStorage {
         var currentArrow: String? = null
 
         @Expose
-        var arrowAmount: MutableMap<NEUInternalName, Int> = mutableMapOf()
+        var arrowAmount: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
     @Expose
@@ -373,10 +373,10 @@ class ProfileSpecificStorage {
         var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
 
         @Expose
-        var composterCurrentOrganicMatterItem: NEUInternalName? = NONE
+        var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
 
         @Expose
-        var composterCurrentFuelItem: NEUInternalName? = NONE
+        var composterCurrentFuelItem: NeuInternalName? = NONE
 
         @Expose
         var uniqueVisitors: Int = 0
@@ -424,7 +424,7 @@ class ProfileSpecificStorage {
 
         class PlotIcon {
             @Expose
-            var plotList: MutableMap<Int, NEUInternalName> = mutableMapOf()
+            var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
         @Expose
@@ -697,7 +697,6 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    // TODO rename to totalSkyBlockXp
     var totalSkyBlockXP: Int? = null
 
     @Expose

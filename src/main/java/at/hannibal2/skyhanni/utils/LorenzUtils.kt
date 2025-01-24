@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -117,7 +117,7 @@ object LorenzUtils {
     }
 
     // TODO move into time utils
-    fun getSbMonthByName(month: String): Int {
+    fun getSBMonthByName(month: String): Int {
         var monthNr = 0
         for (i in 1..12) {
             val monthName = SkyBlockTime.monthName(i)
@@ -140,7 +140,7 @@ object LorenzUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = NEUItems.itemFontSize,
+        itemScale: Double = NeuItems.itemFontSize,
     ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 

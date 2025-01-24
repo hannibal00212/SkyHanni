@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
-object XpInInventories {
+object XPInInventories {
     private val config get() = SkyHanniMod.feature.misc
 
     /**
@@ -27,16 +27,16 @@ object XpInInventories {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
-        var requiredXp = 0
+        var requiredXP = 0
         val indexOfCost = event.toolTip.indexOfFirst {
             xpLevelsPattern.matchMatchers(it) {
-                requiredXp = group("xp").toInt()
+                requiredXP = group("xp").toInt()
             } != null
         }
         if (indexOfCost == -1) return
 
-        val playerXp = Minecraft.getMinecraft().thePlayer.experienceLevel
-        val color = if (playerXp >= requiredXp) "§a" else "§c"
+        val playerXP = Minecraft.getMinecraft().thePlayer.experienceLevel
+        val color = if (playerXP >= requiredXP) "§a" else "§c"
         event.toolTip.add(indexOfCost + 1, "§7Your XP: $color${Minecraft.getMinecraft().thePlayer.experienceLevel}")
     }
 

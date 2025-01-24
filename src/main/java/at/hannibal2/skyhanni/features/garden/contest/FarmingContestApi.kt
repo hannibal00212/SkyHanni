@@ -126,13 +126,13 @@ object FarmingContestApi {
         inInventory = false
     }
 
-    fun getSbDateFromItemName(text: String): List<String>? = timePattern.matchMatcher(text) {
+    fun getSBDateFromItemName(text: String): List<String>? = timePattern.matchMatcher(text) {
         listOf(group("year"), group("month"), group("day"))
     }
 
-    fun getSbTimeFor(text: String): Long? {
-        val (year, month, day) = getSbDateFromItemName(text) ?: return null
-        val monthNr = LorenzUtils.getSbMonthByName(month)
+    fun getSBTimeFor(text: String): Long? {
+        val (year, month, day) = getSBDateFromItemName(text) ?: return null
+        val monthNr = LorenzUtils.getSBMonthByName(month)
 
         return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }

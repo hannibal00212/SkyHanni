@@ -106,7 +106,7 @@ object HoppityEventSummary {
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
-    private var statYear: Int = getCurrentSbYear()
+    private var statYear: Int = getCurrentSBYear()
     private var currentTimerActive = false
     private var onHoppityIsland = false
 
@@ -324,7 +324,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSbYear())
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSBYear())
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -390,7 +390,7 @@ object HoppityEventSummary {
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
             val eventEnd = getEventEndMark(statYear)
-            val yearNow = getCurrentSbYear()
+            val yearNow = getCurrentSBYear()
             val isHoppity = HoppityApi.isHoppityEvent()
 
             val isCurrentEvent = isHoppity && statYear == yearNow
@@ -429,7 +429,7 @@ object HoppityEventSummary {
         val storage = storage ?: return null
         val statsStorage = storage.hoppityEventStats
 
-        val nextYear = getCurrentSbYear() + 1
+        val nextYear = getCurrentSBYear() + 1
         val isAlreadyNextEvent = currentStatYear == nextYear
         val predecessorYear = statsStorage.keys.filter { it < currentStatYear }.maxOrNull()
         val successorYear = statsStorage.keys.filter { it in (currentStatYear + 1)..<nextYear }.minOrNull()
@@ -452,7 +452,7 @@ object HoppityEventSummary {
             } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
                 Renderable.optionalLink(
                     "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
-                    onClick = { statYear = getCurrentSbYear() + 1 },
+                    onClick = { statYear = getCurrentSBYear() + 1 },
                 )
             } else null,
         )
@@ -461,10 +461,10 @@ object HoppityEventSummary {
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
         storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
-    private fun getYearStats(year: Int = getCurrentSbYear()): HoppityEventStats? =
+    private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
         storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
 
-    private fun getCurrentSbYear() = SkyBlockTime.now().year
+    private fun getCurrentSBYear() = SkyBlockTime.now().year
 
     private fun checkAddCfTime() {
         if (!ChocolateFactoryApi.inChocolateFactory) {
@@ -480,7 +480,7 @@ object HoppityEventSummary {
 
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
-        val currentYear = getCurrentSbYear()
+        val currentYear = getCurrentSBYear()
         val isSpring = SkyblockSeason.SPRING.isSeason()
 
         getUnsummarizedYearStats().filter {
@@ -694,7 +694,7 @@ object HoppityEventSummary {
             statList.clear()
             statList.addEmptyLine()
             statList.addStr("§c§lNothing to show!")
-            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == getCurrentSbYear()
+            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == getCurrentSBYear()
             val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
@@ -729,7 +729,7 @@ object HoppityEventSummary {
     }
 
     private fun getSpawnedEggCount(year: Int): Int {
-        val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
+        val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
         // Calculate total eggs from complete days and incomplete day periods
         val previousEggs = if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3

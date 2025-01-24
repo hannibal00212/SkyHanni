@@ -44,11 +44,11 @@ object CustomScoreboardUtils {
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
-    internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, getSbLines(), "motes") ?: "0"
+    internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, getSBLines(), "motes") ?: "0"
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
-    internal fun getPurseEarned() = getGroup(PurseApi.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
+    internal fun getPurseEarned() = getGroup(PurseApi.coinsPattern, getSBLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" }.orEmpty())
@@ -62,15 +62,15 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSbLines(), "copper") ?: "0"
+    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper") ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
-    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSbLines(), "heat")
+    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSBLines(), "heat")
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSBLines(), "northStars") ?: "0"
 
-    internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSbLines(), "symbol").orEmpty()
+    internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 
     internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { groupOrNull("color") + group("event") }
 
@@ -86,5 +86,5 @@ object CustomScoreboardUtils {
         else -> null
     }
 
-    internal fun getSbLines() = ScoreboardData.sidebarLinesFormatted
+    internal fun getSBLines() = ScoreboardData.sidebarLinesFormatted
 }

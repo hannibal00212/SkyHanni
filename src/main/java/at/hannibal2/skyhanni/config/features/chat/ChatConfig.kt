@@ -123,7 +123,6 @@ class ChatConfig {
     @ConfigOption(name = "SkyBlock XP in Chat", desc = "Send the SkyBlock XP messages into the chat.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to skyBlockXpInChat
     var skyBlockXPInChat: Boolean = true
 
     @Expose

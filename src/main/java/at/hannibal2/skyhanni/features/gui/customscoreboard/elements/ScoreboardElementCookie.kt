@@ -12,7 +12,7 @@ object ScoreboardElementCookie : ScoreboardElement() {
         append(
             BitsApi.cookieBuffTime?.let {
                 if (!BitsApi.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
-            } ?: "§cOpen SbMenu!",
+            } ?: "§cOpen SB Menu!",
         )
     }
 

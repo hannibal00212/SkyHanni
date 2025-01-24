@@ -31,10 +31,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 @SkyHanniModule
 object CropMoneyDisplay {
 
-    var multipliers = mapOf<NEUInternalName, Int>()
+    var multipliers = mapOf<NeuInternalName, Int>()
     private var showCalculation = false
 
     fun toggleShowCalculation() {
@@ -57,7 +57,7 @@ object CropMoneyDisplay {
     private val config get() = GardenApi.config.moneyPerHours
     private var loaded = false
     private var ready = false
-    private val cropNames = mutableMapOf<NEUInternalName, CropType>()
+    private val cropNames = mutableMapOf<NeuInternalName, CropType>()
     private val toolHasBountiful get() = GardenApi.storage?.toolWithBountiful
 
     private val BOX_OF_SEEDS by lazy { "BOX_OF_SEEDS".toInternalName().getItemStack() }
@@ -288,8 +288,8 @@ object CropMoneyDisplay {
         moneyPerHour.toLong().addSeparators()
     }
 
-    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NEUInternalName, Array<Double>> {
-        val moneyPerHours = mutableMapOf<NEUInternalName, Array<Double>>()
+    private fun calculateMoneyPerHour(debugList: MutableList<List<Any>>): Map<NeuInternalName, Array<Double>> {
+        val moneyPerHours = mutableMapOf<NeuInternalName, Array<Double>>()
 
         var seedsPrice: BazaarData? = null
         var seedsPerHour = 0.0
@@ -363,7 +363,7 @@ object CropMoneyDisplay {
                         if (debug) {
                             debugList.addAsSingletonList(" added seedsPerHour: $seedsPerHour")
                         }
-                        val factor = NEUItems.getPrimitiveMultiplier(internalName).amount
+                        val factor = NeuItems.getPrimitiveMultiplier(internalName).amount
                         npcPrice += SEEDS.getNpcPrice() * seedsPerHour / factor
                         sellOffer += it.sellOfferPrice * seedsPerHour
                         instantSell += it.instantBuyPrice * seedsPerHour
@@ -382,7 +382,7 @@ object CropMoneyDisplay {
         return moneyPerHours
     }
 
-    private fun isSeeds(internalName: NEUInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
+    private fun isSeeds(internalName: NeuInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
 
     // TODO : Rewrite to not be index-reliant
     private fun formatNumbers(sellOffer: Double, instantSell: Double, npcPrice: Double): Array<Double> {
@@ -414,15 +414,15 @@ object CropMoneyDisplay {
         loaded = true
 
         SkyHanniMod.coroutineScope.launch {
-            val map = mutableMapOf<NEUInternalName, Int>()
-            for ((rawInternalName, _) in NEUItems.allNeuRepoItems()) {
+            val map = mutableMapOf<NeuInternalName, Int>()
+            for ((rawInternalName, _) in NeuItems.allNeuRepoItems()) {
                 if (rawInternalName == "ENCHANTED_PAPER") continue
                 if (rawInternalName == "ENCHANTED_BREAD") continue
                 if (rawInternalName == "SIMPLE_CARROT_CANDY") continue
                 val internalName = rawInternalName.toInternalName()
                 if (!internalName.isBazaarItem()) continue
 
-                val (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName)
+                val (newId, amount) = NeuItems.getPrimitiveMultiplier(internalName)
                 val itemName = newId.itemNameWithoutColor
                 val crop = getByNameOrNull(itemName)
                 crop?.let {

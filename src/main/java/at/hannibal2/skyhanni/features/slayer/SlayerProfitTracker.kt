@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -97,7 +97,7 @@ object SlayerProfitTracker {
         }
     }
 
-    private var allowedItems = mapOf<String, List<NEUInternalName>>()
+    private var allowedItems = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -109,7 +109,7 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             addSlayerCosts(coins)
@@ -161,8 +161,8 @@ object SlayerProfitTracker {
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
-        if (!isAllowedItem(internalName) && internalName != NEUInternalName.SKYBLOCK_COIN) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+        if (!isAllowedItem(internalName) && internalName != NeuInternalName.SKYBLOCK_COIN) {
             ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$category'")
             return
         }
@@ -170,7 +170,7 @@ object SlayerProfitTracker {
         getTracker()?.addItem(internalName, amount, command)
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean {
+    private fun isAllowedItem(internalName: NeuInternalName): Boolean {
         val allowedList = allowedItems[baseSlayerType] ?: return false
         return internalName in allowedList
     }

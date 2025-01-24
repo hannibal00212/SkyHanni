@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -293,7 +293,7 @@ object FarmingFortuneDisplay {
     }
 
     fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
-    fun getToolFortune(internalName: NEUInternalName?): Double {
+    fun getToolFortune(internalName: NeuInternalName?): Double {
         if (internalName == null) return 0.0
         val string = internalName.asString()
         if (string == "THEORETICAL_HOE") {
@@ -349,7 +349,7 @@ object FarmingFortuneDisplay {
         getAbilityFortune(it.getInternalName(), it.getLore())
     } ?: 0.0
 
-    fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
+    fun getAbilityFortune(internalName: NeuInternalName, lore: List<String>): Double {
         var pieces = 0
 
         for (line in lore) {

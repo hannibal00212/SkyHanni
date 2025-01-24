@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUCalculator
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuCalculator
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -58,7 +58,7 @@ object GetFromSackApi {
         "§cYou have no (?<item>.+) in your Sacks!",
     )
 
-    fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
+    fun getFromSack(item: NeuInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
 
     fun getFromSack(item: PrimitiveItemStack) = getFromSack(listOf(item))
 
@@ -177,7 +177,7 @@ object GetFromSackApi {
         } else args
 
         var amountString = arguments.last()
-        amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
+        amountString = NeuCalculator.calculateOrNull(amountString)?.toString() ?: amountString
 
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
@@ -186,7 +186,7 @@ object GetFromSackApi {
 
         val item = when {
             SackApi.sackListInternalNames.contains(itemString) -> itemString.toInternalName()
-            SackApi.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
+            SackApi.sackListNames.contains(replacedString) -> NeuInternalName.fromItemNameOrNull(replacedString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",

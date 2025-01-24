@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.util.Calculator
 import java.math.BigDecimal
 
-object NEUCalculator {
+object NeuCalculator {
 
     fun calculateOrNull(input: String): BigDecimal? {
         if (!PlatformUtils.isNeuLoaded()) return null

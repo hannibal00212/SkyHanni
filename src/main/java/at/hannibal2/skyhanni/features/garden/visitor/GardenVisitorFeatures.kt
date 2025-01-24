@@ -47,10 +47,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -156,7 +156,7 @@ object GardenVisitorFeatures {
                 )
                 continue
             }
-            val internalName = NEUInternalName.fromItemName(itemName)
+            val internalName = NeuInternalName.fromItemName(itemName)
             visitor.shoppingList[internalName] = amount
         }
 
@@ -185,8 +185,8 @@ object GardenVisitorFeatures {
         drawVisitors(newVisitors, shoppingList)
     }
 
-    private fun prepareDrawingData(): Pair<MutableMap<NEUInternalName, Int>, MutableList<String>> {
-        val globalShoppingList = mutableMapOf<NEUInternalName, Int>()
+    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<String>> {
+        val globalShoppingList = mutableMapOf<NeuInternalName, Int>()
         val newVisitors = mutableListOf<String>()
         for ((visitorName, visitor) in VisitorApi.getVisitorsMap()) {
             if (visitor.status == VisitorApi.VisitorStatus.ACCEPTED || visitor.status == VisitorApi.VisitorStatus.REFUSED) continue
@@ -205,7 +205,7 @@ object GardenVisitorFeatures {
         return globalShoppingList to newVisitors
     }
 
-    private fun MutableList<List<Any>>.drawShoppingList(shoppingList: MutableMap<NEUInternalName, Int>) {
+    private fun MutableList<List<Any>>.drawShoppingList(shoppingList: MutableMap<NeuInternalName, Int>) {
         if (shoppingList.isEmpty()) return
 
         var totalPrice = 0.0
@@ -235,7 +235,7 @@ object GardenVisitorFeatures {
                             }
                         }
                     },
-                ) { GardenApi.inGarden() && !NEUItems.neuHasFocus() },
+                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
             )
 
             if (config.shoppingList.showPrice) {
@@ -256,7 +256,7 @@ object GardenVisitorFeatures {
     }
 
     private fun addSackData(
-        internalName: NEUInternalName,
+        internalName: NeuInternalName,
         amount: Int,
         list: MutableList<Any>,
     ) {
@@ -269,13 +269,13 @@ object GardenVisitorFeatures {
             list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
-        val ingredients = NEUItems.getRecipes(internalName)
+        val ingredients = NeuItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
 
-        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        val requiredIngredients = mutableMapOf<NeuInternalName, Int>()
         for ((key, count) in ingredients.toPrimitiveItemStacks()) {
             requiredIngredients.addOrPut(key, count)
         }
@@ -300,7 +300,7 @@ object GardenVisitorFeatures {
                             HypixelCommands.viewRecipe(internalName.asString())
                         }
                     },
-                ) { GardenApi.inGarden() && !NEUItems.neuHasFocus() },
+                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
             )
             list.add("§7)")
         }
@@ -308,7 +308,7 @@ object GardenVisitorFeatures {
 
     private fun MutableList<List<Any>>.drawVisitors(
         newVisitors: List<String>,
-        shoppingList: Map<NEUInternalName, Int>,
+        shoppingList: Map<NeuInternalName, Int>,
     ) {
         if (newVisitors.isEmpty()) return
         if (shoppingList.isNotEmpty()) {
@@ -341,7 +341,7 @@ object GardenVisitorFeatures {
                 list.add(" §7(§fAny§7)")
             } else {
                 for (item in items) {
-                    list.add(NEUInternalName.fromItemName(item).getItemStack())
+                    list.add(NeuInternalName.fromItemName(item).getItemStack())
                 }
             }
         }
@@ -411,7 +411,7 @@ object GardenVisitorFeatures {
         var farmingTimeRequired = 0.seconds
         var readingShoppingList = true
         lastFullPrice = 0.0
-        val foundRewards = mutableListOf<NEUInternalName>()
+        val foundRewards = mutableListOf<NeuInternalName>()
 
         for (formattedLine in stack.getLore()) {
             if (formattedLine.contains("Rewards")) {
@@ -419,7 +419,7 @@ object GardenVisitorFeatures {
             }
 
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NEUInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NeuInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue
@@ -481,7 +481,7 @@ object GardenVisitorFeatures {
                 readingShoppingList = false
             }
             val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
-            val internalName = NEUInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
+            val internalName = NeuInternalName.fromItemNameOrNull(itemName)?.replace("◆_", "") ?: continue
 
             // Ignoring custom NEU items like copper
             if (internalName.startsWith("SKYBLOCK_")) continue
@@ -492,7 +492,7 @@ object GardenVisitorFeatures {
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
             if (!readingShoppingList) continue
-            val primitiveStack = NEUItems.getPrimitiveMultiplier(internalName)
+            val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
 
             val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
@@ -544,11 +544,11 @@ object GardenVisitorFeatures {
         if (!recentWorldSwitch) {
             if (name.removeColor().contains("Jerry")) {
                 logger.log("Jerry!")
-                ItemBlink.setBlink(NEUItems.getItemStackOrNull("JERRY;4"), 5_000)
+                ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
             }
             if (name.removeColor().contains("Spaceman")) {
                 logger.log("Spaceman!")
-                ItemBlink.setBlink(NEUItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
+                ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
             }
         }
     }

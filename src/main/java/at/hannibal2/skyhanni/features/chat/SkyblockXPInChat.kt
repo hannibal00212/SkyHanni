@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
 @SkyHanniModule
-object SkyblockXpInChat {
+object SkyblockXPInChat {
 
     val config get() = SkyHanniMod.feature.chat.skyBlockXPInChat
 

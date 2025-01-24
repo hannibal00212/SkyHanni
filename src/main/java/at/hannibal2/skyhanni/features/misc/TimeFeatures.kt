@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -32,7 +32,7 @@ object TimeFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.REAL_TIME.isSelected()) return
+        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) {
                 // 12 h format

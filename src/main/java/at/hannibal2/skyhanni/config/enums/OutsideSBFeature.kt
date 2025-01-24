@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.enums
 import at.hannibal2.skyhanni.SkyHanniMod
 import net.minecraft.client.Minecraft
 
-enum class OutsideSbFeature(private val displayName: String) {
+enum class OutsideSBFeature(private val displayName: String) {
     MODIFY_VISUAL_WORDS("Modify Visual Words"),
     CUSTOM_TEXT_BOX("Custom Text Box"),
     REAL_TIME("Real Time"),

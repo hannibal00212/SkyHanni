@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -106,7 +106,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".toInternalName()) 200 else 100
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
-        val list = mutableListOf<NEUInternalName>()
+        val list = mutableListOf<NeuInternalName>()
         for (attributes in it.keySet) {
             if (attributes in drillPartTypes) {
                 val upgradeItem = it.getString(attributes)
@@ -128,7 +128,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getRanchersSpeed() = getAttributeInt("ranchers_speed")
 
-    fun ItemStack.getRune(): NEUInternalName? {
+    fun ItemStack.getRune(): NeuInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
         if (runesList.isEmpty()) return null
@@ -142,7 +142,7 @@ object SkyBlockItemModifierUtils {
         val witherShield = "WITHER_SHIELD_SCROLL".toInternalName()
         val shadowWarp = "SHADOW_WARP_SCROLL".toInternalName()
 
-        val scrolls = mutableSetOf<NEUInternalName>()
+        val scrolls = mutableSetOf<NeuInternalName>()
 
         for (scroll in compound.getStringList("ability_scroll").map { it.toInternalName() }) {
             if (scroll == ultimateWitherScroll) {

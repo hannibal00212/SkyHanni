@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -134,7 +134,7 @@ object SackApi {
         else -> null
     }
 
-    private fun NEUInternalName.sackPrice(stored: Int): Long {
+    private fun NeuInternalName.sackPrice(stored: Int): Long {
         return getPrice(sackDisplayConfig.priceSource).toLong() * stored
     }
 
@@ -149,7 +149,7 @@ object SackApi {
                 gemstonePattern.matchAll(lore) {
                     val rarity = group("gemrarity")
                     val stored = group("stored").formatInt()
-                    gem.internalName = gemstoneMap[name.removeColor()] ?: NEUInternalName.NONE
+                    gem.internalName = gemstoneMap[name.removeColor()] ?: NeuInternalName.NONE
                     if (gemstoneMap.containsKey(name.removeColor())) {
                         val internalName = "${rarity.uppercase()}_${
                             name.uppercase().split(" ")[0].removeColor()
@@ -233,10 +233,10 @@ object SackApi {
         if (savingSacks) saveSackData()
     }
 
-    var sackData = mapOf<NEUInternalName, SackItem>()
+    var sackData = mapOf<NeuInternalName, SackItem>()
         private set
 
-    data class SackChange(val delta: Int, val internalName: NEUInternalName, val sacks: List<String>)
+    data class SackChange(val delta: Int, val internalName: NeuInternalName, val sacks: List<String>)
 
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
@@ -267,7 +267,7 @@ object SackApi {
             val item = match.groups[2]!!.value
             val sacks = match.groups[3]!!.value.split(", ")
 
-            val internalName = NEUInternalName.fromItemName(item)
+            val internalName = NeuInternalName.fromItemName(item)
             sackChanges.add(SackChange(delta, internalName, sacks))
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
@@ -281,7 +281,7 @@ object SackApi {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
-        val uniqueSackItems = mutableSetOf<NEUInternalName>()
+        val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
 
@@ -293,7 +293,7 @@ object SackApi {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
 
         // if it gets added and subtracted but only 1 shows it will be outdated
-        val justChanged = mutableMapOf<NEUInternalName, Int>()
+        val justChanged = mutableMapOf<NeuInternalName, Int>()
 
         for (change in changes.sackChanges) {
             if (change.internalName in justChanged) {
@@ -330,11 +330,11 @@ object SackApi {
         saveSackData()
     }
 
-    private fun setSackItem(item: NEUInternalName, amount: Int) {
+    private fun setSackItem(item: NeuInternalName, amount: Int) {
         sackData = sackData.editCopy { this[item] = SackItem(amount, 0, SackStatus.CORRECT) }
     }
 
-    fun fetchSackItem(item: NEUInternalName): SackItem {
+    fun fetchSackItem(item: NeuInternalName): SackItem {
         sackData = ProfileStorageData.sackProfiles?.sackContents ?: return SackItem(0, 0, SackStatus.MISSING)
 
         if (sackData.containsKey(item)) {
@@ -353,7 +353,7 @@ object SackApi {
     }
 
     data class SackGemstone(
-        var internalName: NEUInternalName = NEUInternalName.NONE,
+        var internalName: NeuInternalName = NeuInternalName.NONE,
         var rough: Int = 0,
         var flawed: Int = 0,
         var fine: Int = 0,
@@ -373,7 +373,7 @@ object SackApi {
     ) : AbstractSackItem()
 
     data class SackOtherItem(
-        var internalName: NEUInternalName = NEUInternalName.NONE,
+        var internalName: NeuInternalName = NeuInternalName.NONE,
         var colorCode: String = "",
         var total: Int = 0,
         var magmaFish: Int = 0,
@@ -385,10 +385,10 @@ object SackApi {
         var slot: Int = -1,
     )
 
-    fun NEUInternalName.getAmountInSacksOrNull(): Int? =
+    fun NeuInternalName.getAmountInSacksOrNull(): Int? =
         fetchSackItem(this).takeIf { it.statusIsCorrectOrAlright() }?.amount
 
-    fun NEUInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
+    fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
     fun testSackApi(args: Array<String>) {
         if (args.size == 1) {

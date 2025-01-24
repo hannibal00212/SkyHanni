@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -47,7 +47,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
-        fun getPricePer(name: NEUInternalName) = name.getPrice(config.priceSource)
+        fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
     }
 
     fun isInventoryOpen() = inventoryOpen

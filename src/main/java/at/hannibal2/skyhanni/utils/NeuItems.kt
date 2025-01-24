@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -38,12 +38,12 @@ import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object NEUItems {
-    private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
-    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
+object NeuItems {
+    private val multiplierCache = mutableMapOf<NeuInternalName, PrimitiveItemStack>()
+    private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
 
-    var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    val allInternalNames = mutableListOf<NEUInternalName>()
+    var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
+    val allInternalNames = mutableListOf<NeuInternalName>()
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -65,9 +65,9 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    fun readAllNeuItems(): Map<String, NEUInternalName> {
+    fun readAllNeuItems(): Map<String, NeuInternalName> {
         allInternalNames.clear()
-        val map = mutableMapOf<String, NEUInternalName>()
+        val map = mutableMapOf<String, NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = getItemStackOrNull(rawInternalName)?.displayName?.lowercase() ?: continue
 
@@ -99,28 +99,28 @@ object NEUItems {
         .withItemStack(itemStack)
         .resolveInternalName()
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
+    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
         ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
-    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')
         return internalName.toInternalName().takeIf { it.getItemStackOrNull() != null }
     }
 
-    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+    fun getInternalNameFromHypixelId(hypixelId: String): NeuInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
-    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
-        ItemResolutionQuery.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
+    fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
+        ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
-    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
+    fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
-    fun NEUInternalName.getItemStack(): ItemStack =
+    fun NeuInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
             getPriceOrNull() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
@@ -137,7 +137,7 @@ object NEUItems {
         "GOLD_AXE", "GOLD_HOE", "GOLD_PICKAXE", "GOLD_SPADE", "GOLD_SWORD",
     )
 
-    fun NEUInternalName.isVanillaItem(): Boolean {
+    fun NeuInternalName.isVanillaItem(): Boolean {
         val asString = this.asString()
         if (hardcodedVanillaItems.contains(asString)) return true
 
@@ -149,7 +149,7 @@ object NEUItems {
         return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
     }
 
-    fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
+    fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
         if (prefix.isEmpty()) return this
         val string = asString()
         if (!string.startsWith(prefix)) return this
@@ -232,7 +232,7 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
 
-    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+    fun getInternalNamesForItemId(item: Item): List<NeuInternalName> {
         itemIdCache[item]?.let {
             return it
         }
@@ -245,7 +245,7 @@ object NEUItems {
         return result
     }
 
-    fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
+    fun getPrimitiveMultiplier(internalName: NeuInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
@@ -258,7 +258,7 @@ object NEUItems {
         for (recipe in getRecipes(internalName)) {
             if (!recipe.isCraftingRecipe()) continue
 
-            val map = mutableMapOf<NEUInternalName, Int>()
+            val map = mutableMapOf<NeuInternalName, Int>()
             for (ingredient in recipe.ingredients.toPrimitiveItemStacks()) {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
@@ -302,7 +302,7 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
+    fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
         if (!PlatformUtils.isNeuLoaded()) return false

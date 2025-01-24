@@ -122,13 +122,13 @@ object HitmanApi {
      * Return the duration between two HoppityEggTypes' spawn times.
      */
     private fun HoppityEggType.timeFromAnother(another: HoppityEggType): Duration {
-        val diffInSbHours = when {
+        val diffInSBHours = when {
             this == another -> (SB_HR_PER_DAY * 2)
             altDay != another.altDay -> SB_HR_PER_DAY - another.resetsAt + resetsAt
             resetsAt > another.resetsAt -> resetsAt - another.resetsAt
             else -> (SB_HR_PER_DAY * 2) - (resetsAt - another.resetsAt)
         }
-        return (diffInSbHours * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds
+        return (diffInSBHours * SkyBlockTime.SKYBLOCK_HOUR_MILLIS).milliseconds
     }
 
     /**

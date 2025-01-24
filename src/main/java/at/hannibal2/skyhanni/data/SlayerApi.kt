@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -27,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerApi {
 
-    private val nameCache = TimeLimitedCache<Pair<NEUInternalName, Int>, Pair<String, Double>>(1.minutes)
+    private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
     var isInCorrectArea = false
@@ -38,7 +38,7 @@ object SlayerApi {
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
 
-    fun getItemNameAndPrice(internalName: NEUInternalName, amount: Int): Pair<String, Double> =
+    fun getItemNameAndPrice(internalName: NeuInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {
             val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
             val displayName = internalName.itemName
@@ -50,7 +50,7 @@ object SlayerApi {
 
             val format = totalPrice.shortFormat()
 
-            if (internalName == NEUInternalName.SKYBLOCK_COIN) {
+            if (internalName == NeuInternalName.SKYBLOCK_COIN) {
                 "§6$format coins" to totalPrice
             } else {
                 val priceFormat = " §7(§6$format coins§7)"

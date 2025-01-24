@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -81,7 +81,7 @@ object FishingProfitTracker {
             )
         }
 
-        override fun getCustomPricePer(internalName: NEUInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName): Double {
             // TODO find better way to tell if the item is a trophy
             val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
@@ -101,7 +101,7 @@ object FishingProfitTracker {
     private const val NAME_ALL: CategoryName = "All"
     private var currentCategory: CategoryName = NAME_ALL
 
-    private var itemCategories = mapOf<String, List<NEUInternalName>>()
+    private var itemCategories = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -123,7 +123,7 @@ object FishingProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFishing Profit Tracker")
-        val filter: (NEUInternalName) -> Boolean = addCategories(data)
+        val filter: (NeuInternalName) -> Boolean = addCategories(data)
 
         val profit = tracker.drawItems(data, filter, this)
 
@@ -140,7 +140,7 @@ object FishingProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun MutableList<Searchable>.addCategories(data: Data): (NEUInternalName) -> Boolean {
+    private fun MutableList<Searchable>.addCategories(data: Data): (NeuInternalName) -> Boolean {
         val amounts = getCurrentCategories(data)
         checkMissingItems(data)
         val list = amounts.keys.toList()
@@ -160,7 +160,7 @@ object FishingProfitTracker {
             )
         }
 
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
+        val filter: (NeuInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
             { it in (itemCategories[currentCategory].orEmpty()) }
@@ -169,7 +169,7 @@ object FishingProfitTracker {
     }
 
     private fun checkMissingItems(data: Data) {
-        val missingItems = mutableListOf<NEUInternalName>()
+        val missingItems = mutableListOf<NeuInternalName>()
         for (internalName in data.items.keys) {
             if (itemCategories.none { internalName in it.value }) {
                 missingItems.add(internalName)
@@ -203,7 +203,7 @@ object FishingProfitTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         coinsChatPattern.matchMatcher(event.message) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
             addCatch()
         }
     }
@@ -234,7 +234,7 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         if (!FishingApi.isFishing(checkRodInHand = false)) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
@@ -245,7 +245,7 @@ object FishingProfitTracker {
         addCatch()
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
+    private fun isAllowedItem(internalName: NeuInternalName) = itemCategories.any { internalName in it.value }
 
     @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {

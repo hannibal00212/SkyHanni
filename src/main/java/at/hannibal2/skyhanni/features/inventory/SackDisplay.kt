@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -107,7 +107,7 @@ object SackDisplay {
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
-                    ) { !NEUItems.neuHasFocus() }
+                    ) { !NeuItems.neuHasFocus() }
                     add(nameText)
 
 
@@ -278,7 +278,7 @@ object SackDisplay {
                                 BazaarApi.searchForBazaarItem(name.dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
-                        ) { !NEUItems.neuHasFocus() },
+                        ) { !NeuItems.neuHasFocus() },
                     )
                     addAlignedNumber(gem.rough.addSeparators())
                     addAlignedNumber("§a${gem.flawed.addSeparators()}")

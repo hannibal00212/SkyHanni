@@ -18,24 +18,24 @@ object SkillUtil {
     }
 
     fun xpRequiredForLevel(desiredLevel: Int): Long {
-        var totalXp = 0L
+        var totalXP = 0L
         val maxLevel = 60
 
         if (desiredLevel <= maxLevel) {
             for (level in 1..desiredLevel) {
-                totalXp += levelingMap[level]?.toLong() ?: 0L
+                totalXP += levelingMap[level]?.toLong() ?: 0L
             }
         } else {
             val xpNeeded = XP_NEEDED_FOR_60
 
-            totalXp += xpNeeded
+            totalXP += xpNeeded
 
             var level = 60
             var xpForNext = 7000000L + 600000L
             var slope = 600000L
 
             while (level < desiredLevel) {
-                totalXp += xpForNext
+                totalXP += xpForNext
                 level++
                 xpForNext += slope
 
@@ -43,19 +43,19 @@ object SkillUtil {
             }
         }
 
-        return totalXp
+        return totalXP
     }
 
-    fun getLevelExact(neededXp: Long): Int {
-        return exactLevelingMap.getOrDefault(neededXp.toInt(), activeSkill?.maxLevel ?: 60)
+    fun getLevelExact(neededXP: Long): Int {
+        return exactLevelingMap.getOrDefault(neededXP.toInt(), activeSkill?.maxLevel ?: 60)
     }
 
-    fun calculateLevelXp(level: Int): Double {
+    fun calculateLevelXP(level: Int): Double {
         return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
-    fun calculateSkillLevel(currentXp: Long, maxSkillCap: Int): Quad<Int, Long, Long, Long> {
-        var xpCurrent = currentXp
+    fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): Quad<Int, Long, Long, Long> {
+        var xpCurrent = currentXP
         var level = 0
         val maxLevel = maxSkillCap.coerceAtMost(60)
 
@@ -66,15 +66,15 @@ object SkillUtil {
         }
 
         var xpForNext = levelingMap[level + 1]?.toLong() ?: 0L
-        var overflowXp = 0L
+        var overflowXP = 0L
 
         if (level >= maxLevel) {
             val xpNeeded = if (maxSkillCap == 50) XP_NEEDED_FOR_50 else XP_NEEDED_FOR_60
 
-            if (currentXp >= xpNeeded) {
-                overflowXp = currentXp - xpNeeded
+            if (currentXP >= xpNeeded) {
+                overflowXP = currentXP - xpNeeded
 
-                xpCurrent = overflowXp
+                xpCurrent = overflowXP
                 var slope = 300000L
                 var xpForCurr = 4000000L + slope
 
@@ -100,7 +100,7 @@ object SkillUtil {
             }
         }
 
-        return Quad(level, xpCurrent, xpForNext, overflowXp)
+        return Quad(level, xpCurrent, xpForNext, overflowXP)
     }
 
 }

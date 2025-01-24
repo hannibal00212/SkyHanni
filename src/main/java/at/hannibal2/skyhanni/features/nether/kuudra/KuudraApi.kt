@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -47,14 +47,14 @@ object KuudraApi {
     private val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
-    fun NEUInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
+    fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
-    fun NEUInternalName.getKuudraTier(): Int? {
+    fun NeuInternalName.getKuudraTier(): Int? {
         val tier = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return null
         return (kuudraTiers.indexOf(tier) + 1).takeIf { it != 0 }
     }
 
-    fun NEUInternalName.removeKuudraTier(): NEUInternalName {
+    fun NeuInternalName.removeKuudraTier(): NeuInternalName {
         val prefix = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return this
         return removePrefix("${prefix}_")
     }

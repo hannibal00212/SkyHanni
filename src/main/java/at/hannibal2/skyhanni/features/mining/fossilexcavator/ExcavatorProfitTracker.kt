@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -167,7 +167,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         tracker.addItem(internalName, amount, command)
     }
 
@@ -200,7 +200,7 @@ object ExcavatorProfitTracker {
             return
         }
 
-        val internalName = NEUInternalName.fromItemNameOrNull(name)
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             ChatUtils.debug("no price for excavator profit: '$name'")
             return
