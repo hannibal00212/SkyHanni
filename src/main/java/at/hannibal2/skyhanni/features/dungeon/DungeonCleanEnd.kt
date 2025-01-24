@@ -40,7 +40,7 @@ object DungeonCleanEnd {
     private var chestsSpawned = false
     private var lastBossId: Int = -1
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled) return
 
@@ -66,7 +66,7 @@ object DungeonCleanEnd {
         lastBossId = -1
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBossDead(event: DamageIndicatorFinalBossEvent) {
         if (bossDone) return
 
@@ -75,7 +75,7 @@ object DungeonCleanEnd {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CATACOMBS)
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!config.enabled) return
         if (bossDone) return
