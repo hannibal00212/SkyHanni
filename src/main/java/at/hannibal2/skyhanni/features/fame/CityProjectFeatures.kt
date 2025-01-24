@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -172,7 +172,7 @@ object CityProjectFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
+                            BazaarAPI.searchForBazaarItem(name, amount)
                         }
                     },
                 ) { inInventory && !NEUItems.neuHasFocus() },
