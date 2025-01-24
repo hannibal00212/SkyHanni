@@ -31,7 +31,6 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityOcelot
 import net.minecraft.entity.passive.EntityPig
-import kotlin.math.ceil
 
 object IslandExceptions {
 

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -64,7 +63,7 @@ object TentacleWaypoint {
                 seeThroughBlocks = true,
                 beacon = true,
             )
-            event.drawDynamicText(location.up(1.0), getText(hits), 1.0)
+            event.drawDynamicText(location.up(1.0), getText(hits), 1.2)
         }
     }
 
