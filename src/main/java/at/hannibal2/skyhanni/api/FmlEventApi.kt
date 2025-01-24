@@ -24,7 +24,6 @@ object FmlEventApi {
 
     @SubscribeEvent
     fun onEntityHurt(event: LivingAttackEvent) {
-        // Ammount is a typo on Forge's part
         EntityHurtEvent(event.entity, event.source, event.ammount).post()
     }
 }
