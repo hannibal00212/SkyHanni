@@ -55,9 +55,8 @@ object GardenCropMilestoneInventory {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.tooltipTweak.cropMilestoneTotalProgress) return
 
         val crop = GardenCropMilestones.getCropTypeByLore(event.itemStack) ?: return

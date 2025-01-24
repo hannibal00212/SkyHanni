@@ -25,5 +25,5 @@ data class AlwaysActiveEnchantJson(
     @Expose val level: Int,
     @Expose val items: List<String>,
 ) {
-    val internalNames = items.map { it.toInternalName() }
+    val internalNames get() = items.map { it.toInternalName() }
 }
