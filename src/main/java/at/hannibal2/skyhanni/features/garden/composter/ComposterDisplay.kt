@@ -53,9 +53,8 @@ object ComposterDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: WidgetUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
         readData(event.lines)
@@ -148,9 +147,10 @@ object ComposterDisplay {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!OutsideSbFeature.COMPOSTER_TIME.isSelected()) return
+        @Suppress("InSkyBlockEarlyReturn")
+        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenAPI.inGarden() && config.displayEnabled) {
             config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")

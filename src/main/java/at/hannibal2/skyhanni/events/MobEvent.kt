@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.mob.Mob
+import net.minecraft.util.DamageSource
 
 open class MobEvent(val mob: Mob) : SkyHanniEvent() {
     open class Spawn(mob: Mob) : MobEvent(mob) {
@@ -29,5 +30,14 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class DisplayNPC(mob: Mob) : FirstSeen(mob)
         class Special(mob: Mob) : FirstSeen(mob)
         class Projectile(mob: Mob) : FirstSeen(mob)
+    }
+
+    open class Hurt(mob: Mob, val source: DamageSource, val amount: Float) : MobEvent(mob) {
+        class SkyblockMob(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class Summon(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class Player(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class DisplayNPC(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class Special(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class Projectile(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
     }
 }
