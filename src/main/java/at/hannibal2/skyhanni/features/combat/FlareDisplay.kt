@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -81,20 +81,6 @@ object FlareDisplay {
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (config.displayType == FlareConfig.DisplayType.GUI) return
-
-        for (flare in flares) {
-            val location = flare.location.add(-0.5, 0.0, -0.5)
-            val name = flare.type.displayName
-            val time = "§b${getRemainingTime(flare).format()}"
-            event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-            event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
-        }
-    }
-
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
@@ -166,15 +152,26 @@ object FlareDisplay {
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
         flares.any { it.entity.entityId == entity.entityId }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         flares.clear()
         display = emptyList()
     }
 
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
+
+        if (config.displayType != FlareConfig.DisplayType.GUI) {
+            for (flare in flares) {
+                val location = flare.location.add(-0.5, 0.0, -0.5)
+                val name = flare.type.displayName
+                val time = "§b${getRemainingTime(flare).format()}"
+                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+            }
+        }
+
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
         for (flare in flares) {

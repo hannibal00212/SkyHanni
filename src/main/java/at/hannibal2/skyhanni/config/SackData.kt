@@ -7,15 +7,15 @@ import java.util.*
 
 class SackData {
     @Expose
-    var players: MutableMap<UUID, PlayerSpecific> = HashMap()
+    var players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
 
     class PlayerSpecific {
         @Expose
-        var profiles: MutableMap<String, ProfileSpecific> = HashMap()
+        var profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
     }
 
     class ProfileSpecific {
         @Expose
-        var sackContents: Map<NEUInternalName, SackItem> = HashMap()
+        var sackContents: Map<NEUInternalName, SackItem> = mutableMapOf()
     }
 }

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -19,10 +18,9 @@ import net.minecraft.inventory.ContainerChest
 @SkyHanniModule
 object ItemTipHelper {
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack ?: return
-        if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
+        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
         itemTipEvent.post()
@@ -38,9 +36,8 @@ object ItemTipHelper {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
         val gui = Minecraft.getMinecraft().currentScreen

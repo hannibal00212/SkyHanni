@@ -122,15 +122,16 @@ class ItemResolutionQuery {
                 val name = group("name").trim().replace("'", "")
                 val ultimate = group("format").lowercase().contains("§l")
                 val prefix = if (ultimate && name != "Ultimate Wise" && name != "Ultimate Jerry") "ULTIMATE_" else ""
-                val cleanedEnchantName = turboCheck(name).replace(" ", "_").replace("-", "_").uppercase()
+                val cleanedEnchantName = name.renamedEnchantmentCheck().replace(" ", "_").replace("-", "_").uppercase()
                 "$prefix$cleanedEnchantName;${group("level").romanToDecimal()}".uppercase()
             }
 
-        private fun turboCheck(text: String): String {
-            if (text == "Turbo-Cocoa") return "Turbo-Coco"
-            if (text == "Turbo-Cacti") return "Turbo-Cactus"
-
-            return text
+        private fun String.renamedEnchantmentCheck(): String = when (this) {
+            "Turbo-Cocoa" -> "Turbo-Coco"
+            "Turbo-Cacti" -> "Turbo-Cactus"
+            "Prismatic" -> "Pristine"
+            "Dragon Tracer" -> "Aiming"
+            else -> this
         }
     }
 
@@ -299,6 +300,9 @@ class ItemResolutionQuery {
         }
         if (guiName.startsWith("Choose Pet")) {
             return findInternalNameByDisplayName(displayName, false)
+        }
+        if (guiName.endsWith("Experimentation Table RNG")) {
+            return resolveEnchantmentByName(displayName)
         }
         return null
     }

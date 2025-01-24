@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -94,12 +94,12 @@ object DanceRoomHelper {
         config.position.renderStrings(
             display,
             config.extraSpace,
-            posLabel = "Dance Room Helper"
+            posLabel = "Dance Room Helper",
         )
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         inRoom = false
     }
 
@@ -161,7 +161,7 @@ object DanceRoomHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (config.enabled && inRoom) {
+        if (config.hidePlayers && inRoom) {
             event.cancel()
         }
     }
