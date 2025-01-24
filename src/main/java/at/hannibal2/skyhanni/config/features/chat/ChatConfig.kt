@@ -18,16 +18,6 @@ class ChatConfig {
 
     // TODO move into own sub category
     @Expose
-    @ConfigOption(
-        name = "Copy Chat",
-        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
-            "message with Shwords applied, and holding Ctrl will copy only one line."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean copyChat = false;
-
-    @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
     var filterType: FilterTypesConfig = FilterTypesConfig()
@@ -70,6 +60,16 @@ class ChatConfig {
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
+                "message with Shwords applied, and holding Ctrl will copy only one line.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var copyChat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")
