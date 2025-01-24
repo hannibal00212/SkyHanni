@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -43,10 +42,8 @@ object CorpseAPI {
 
     private var corpseType: CorpseType? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!IslandType.MINESHAFT.isInIsland()) return
-
         val message = event.message
 
         startPattern.matchMatcher(message) {
