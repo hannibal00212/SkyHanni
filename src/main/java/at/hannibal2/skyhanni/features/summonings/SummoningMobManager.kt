@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -68,9 +67,9 @@ object SummoningMobManager {
         seraphRecallPattern,
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summonMessages) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!config.summonMessages) return
         if (spawnPattern.matches(event.message)) event.blockedReason = "summoning_soul"
 
         if (despawnPatterns.any { it.matches(event.message) }) {
@@ -94,6 +93,7 @@ object SummoningMobManager {
         mobs -= mob
 
         // since MobEvent.DeSpawn can be fired while outside sb
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock) return
         if (!config.summonMessages) return
 
@@ -105,16 +105,16 @@ object SummoningMobManager {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobHideNametag) return
+        if (!config.summoningMobHideNametag) return
         if (event.entity.mob !in mobs) return
         event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock || !config.summoningMobDisplay) return
+        if (!config.summoningMobDisplay) return
         if (mobs.isEmpty()) return
 
         val list = buildList {

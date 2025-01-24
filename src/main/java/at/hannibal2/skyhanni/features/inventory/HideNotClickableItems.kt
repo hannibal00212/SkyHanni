@@ -107,9 +107,8 @@ object HideNotClickableItems {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is GuiChest) return
