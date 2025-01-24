@@ -269,7 +269,6 @@ object SoopyGuessBurrow {
                     it.y + changes[1] * distance!!,
                     it.z + changes[2] * distance!!,
                 )
-            }
         }
     }
 
