@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
+import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
@@ -56,7 +57,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
 import kotlin.time.Duration
 
 class ProfileSpecificStorage {
@@ -766,6 +766,17 @@ class ProfileSpecificStorage {
             }
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
+    }
+
+    @Expose
+    var lastStorage: LastStorage = LastStorage()
+
+    class LastStorage {
+        @Expose
+        var type: OpenLastStorage.StorageType = OpenLastStorage.StorageType.ENDER_CHEST
+
+        @Expose
+        var page: Int? = null
     }
 
     @Expose

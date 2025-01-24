@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -61,7 +61,7 @@ object PowerStoneGuideFeatures {
         if (!inInventory) return
         val internalName = missing[event.slotId] ?: return
 
-        BazaarApi.searchForBazaarItem(internalName, 9)
+        BazaarAPI.searchForBazaarItem(internalName, 9)
     }
 
     @HandleEvent
