@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -99,10 +98,8 @@ object EndermanSlayerFeatures {
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -184,10 +181,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
         nukekubiSkulls.removeAll {
             if (it.isDead) {
                 RenderLivingEntityHelper.removeEntityColor(it)
@@ -211,9 +206,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
         if (!showBeacon()) return
 
         val location = event.location

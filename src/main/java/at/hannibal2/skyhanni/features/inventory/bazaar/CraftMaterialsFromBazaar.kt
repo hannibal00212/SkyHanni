@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -108,7 +108,7 @@ object CraftMaterialsFromBazaar {
                     Renderable.optionalLink(
                         text,
                         onClick = {
-                            BazaarApi.searchForBazaarItem(material, priceMultiplier)
+                            BazaarAPI.searchForBazaarItem(material, priceMultiplier)
                         },
                     ),
                 )

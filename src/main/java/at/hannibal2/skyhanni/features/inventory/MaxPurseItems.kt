@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -64,9 +64,9 @@ object MaxPurseItems {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!BazaarApi.inBazaarInventory) return
+        if (!BazaarAPI.inBazaarInventory) return
         // I would use BazaarAPI for price info, but as soon as NEU's data goes out of date, it will be wrong
-        if (BazaarApi.currentlyOpenedProduct == null) {
+        if (BazaarAPI.currentlyOpenedProduct == null) {
             buyOrderPrice = null
             instantBuyPrice = null
             return

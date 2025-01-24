@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFo
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
@@ -103,7 +103,7 @@ object SackDisplay {
                         itemName.replace("§k", ""),
                         onClick = {
                             if (!SackAPI.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(itemName)
+                                BazaarAPI.searchForBazaarItem(itemName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
@@ -275,7 +275,7 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onClick = {
-                                BazaarApi.searchForBazaarItem(name.dropLast(1))
+                                BazaarAPI.searchForBazaarItem(name.dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ) { !NEUItems.neuHasFocus() },
