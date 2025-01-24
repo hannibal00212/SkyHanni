@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -201,7 +201,7 @@ object CurrentPetAPI {
         PetChangeEvent(oldPet, newPet).post()
     }
 
-    private fun handlePetMessageBlock(event: LorenzChatEvent) {
+    private fun handlePetMessageBlock(event: SkyHanniChatEvent) {
         if (!config.hideAutopet) return
         val spawnMatches = chatSpawnPattern.matches(event.message)
         val despawnMatches = chatDespawnPattern.matches(event.message)
@@ -247,7 +247,7 @@ object CurrentPetAPI {
     // </editor-fold>
 
     // <editor-fold desc="Pet Data Extractors (AutoPet)">
-    private fun onAutopetMessage(event: LorenzChatEvent) {
+    private fun onAutopetMessage(event: SkyHanniChatEvent) {
         val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
 
         val (petData, _) = parsePetData(
@@ -339,8 +339,8 @@ object CurrentPetAPI {
         updatePet(petData.copy(xp = petData.xp?.plus(overflowXP)))
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         handlePetMessageBlock(event)
         if (autopetMessagePattern.matches(event.message)) {
             onAutopetMessage(event)
