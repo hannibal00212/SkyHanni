@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -118,22 +117,11 @@ object PesthunterProfit {
         return lore.subList(startIndex, endIndex).map { it.replace("§8 ", " §8") }
     }
 
-    private fun getFullCost(requiredItems: List<String>): Double {
-        var otherItemsPrice = 0.0
-        for (itemName in requiredItems) {
-            val pair = ItemUtils.readItemAmount(itemName)
-            if (pair == null) {
-                ErrorManager.logErrorStateWithData(
-                    "Error in Pesthunter Profit", "Could not read item amount",
-                    "itemName" to itemName,
-                )
-                continue
-            }
-
-            val (name, amount) = pair
-            otherItemsPrice += NEUInternalName.fromItemName(name).getPrice() * amount
-        }
-        return otherItemsPrice
+    private fun getFullCost(requiredItems: List<String>): Double  = requiredItems.mapNotNull {
+        ItemUtils.readItemAmount(it)
+    }.sumOf { (name, amount) ->
+        val internalName = NEUInternalName.fromItemNameOrNull(name) ?: return@sumOf 0.0
+        internalName.getPrice() * amount
     }
 
     private fun getPestsCost(item: ItemStack): Int = pestCostPattern.firstMatcher(item.getLore()) {
