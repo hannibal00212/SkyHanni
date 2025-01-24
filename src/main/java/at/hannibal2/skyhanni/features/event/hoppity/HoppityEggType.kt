@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -22,7 +22,7 @@ enum class HoppityEggType(
     val resetsAt: Int,
     private var claimed: Boolean = false,
     private var lastReset: SkyBlockTime = SkyBlockTime.fromSbYear(0),
-    val altDay: Boolean = false
+    val altDay: Boolean = false,
 ) {
     BREAKFAST("Breakfast", "§6", 7),
     LUNCH("Lunch", "§9", 14),
@@ -44,8 +44,9 @@ enum class HoppityEggType(
     val coloredName get() = "$mealColor$mealName"
 
     val timeUntil: Duration get() = nextSpawn.timeUntil()
-    private val nextSpawn: SimpleTimeMark get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
-        ?: calculateNextSpawn()
+    private val nextSpawn: SimpleTimeMark
+        get() = nextSpawnCache[this]?.takeIf { !it.isInPast() }
+            ?: calculateNextSpawn()
     val lastSpawn: SimpleTimeMark get() = (nextSpawn - 40.minutes).takeIfHoppity() ?: SimpleTimeMark.farPast()
 
     private fun SimpleTimeMark.takeIfHoppity() = takeIf { it.toSkyBlockTime().getSeason() == SkyblockSeason.SPRING }
@@ -80,7 +81,7 @@ enum class HoppityEggType(
             day = sbTimeNow.day + daysToAdd,
             hour = resetsAt,
             minute = 0,
-            second = 0
+            second = 0,
         ).asTimeMark().also {
             nextSpawnCache[this] = it
         }
@@ -117,7 +118,7 @@ enum class HoppityEggType(
         private val nextSpawnCache = CollectionUtils.ObservableMap<HoppityEggType, SimpleTimeMark>(
             postUpdate = { key, _ ->
                 profileStorage?.mealLastSpawn?.set(key, key.lastSpawn)
-            }
+            },
         )
         val resettingEntries = entries.filter { it.resetsAt != -1 }
         val sortedResettingEntries = resettingEntries.sortedBy { it.resetsAt }
