@@ -12,51 +12,34 @@ import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
-import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
-import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
-import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
-import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
-import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
-import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
-import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
-import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -214,94 +197,6 @@ object Commands {
     }
 
     private fun usersNormalReset(event: CommandRegistrationEvent) {
-
-        // Trackers
-        event.register("shresetslayerprofits") {
-            description = "Resets the total slayer profit for the current slayer type"
-            category = CommandCategory.USERS_RESET
-            callback { SlayerProfitTracker.resetCommand() }
-        }
-        event.register("shresetpowdertracker") {
-            description = "Resets the Powder Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { PowderTracker.resetCommand() }
-        }
-        event.register("shresetdicertracker") {
-            description = "Resets the Dicer Drop Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { DicerRngDropTracker.resetCommand() }
-        }
-        event.register("shresetcorpsetracker") {
-            description = "Resets the Glacite Mineshaft Corpse Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { CorpseTracker.resetCommand() }
-        }
-        event.register("shresetendernodetracker") {
-            description = "Resets the Ender Node Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { EnderNodeTracker.resetCommand() }
-        }
-        event.register("shresetarmordroptracker") {
-            description = "Resets the Armor Drop Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { ArmorDropTracker.resetCommand() }
-        }
-        event.register("shresetfrozentreasuretracker") {
-            description = "Resets the Frozen Treasure Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { FrozenTreasureTracker.resetCommand() }
-        }
-        event.register("shresetfishingtracker") {
-            description = "Resets the Fishing Profit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { FishingProfitTracker.resetCommand() }
-        }
-        event.register("shresetvisitordrops") {
-            description = "Resets the Visitors Drop Statistics"
-            category = CommandCategory.USERS_RESET
-            callback { GardenVisitorDropStatistics.resetCommand() }
-        }
-        event.register("shresetvermintracker") {
-            description = "Resets the Vermin Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { VerminTracker.resetCommand() }
-        }
-        event.register("shresetdianaprofittracker") {
-            description = "Resets the Diana Profit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { DianaProfitTracker.resetCommand() }
-        }
-        event.register("shresetpestprofittracker") {
-            description = "Resets the Pest Profit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { PestProfitTracker.resetCommand() }
-        }
-        event.register("shresetexperimentsprofittracker") {
-            description = "Resets the Experiments Profit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { ExperimentsProfitTracker.resetCommand() }
-        }
-        event.register("shresetmythologicalcreaturetracker") {
-            description = "Resets the Mythological Creature Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { MythologicalCreatureTracker.resetCommand() }
-        }
-        event.register("shresetseacreaturetracker") {
-            description = "Resets the Sea Creature Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { SeaCreatureTracker.resetCommand() }
-        }
-        event.register("shresetstrayrabbittracker") {
-            description = "Resets the Stray Rabbit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { ChocolateFactoryStrayTracker.resetCommand() }
-        }
-        event.register("shresetexcavatortracker") {
-            description = "Resets the Fossil Excavator Profit Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { ExcavatorProfitTracker.resetCommand() }
-        }
-
         // non trackers
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
