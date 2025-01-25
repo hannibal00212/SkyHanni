@@ -1,28 +1,28 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPests
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SprayFeatures {
 
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
 
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
@@ -32,7 +32,7 @@ object SprayFeatures {
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
 
-    private val SPRAYONATOR by lazy { "SPRAYONATOR".toInternalName() }
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
 
     private fun SprayType?.getSprayEffect(): String =
         this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
@@ -43,8 +43,8 @@ object SprayFeatures {
         }
 
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         display = changeMaterialPattern.matchMatcher(event.message) {
@@ -57,7 +57,7 @@ object SprayFeatures {
         lastChangeTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -71,12 +71,12 @@ object SprayFeatures {
         config.position.renderString(display, posLabel = "Pest Spray Selector")
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
+        if (!GardenApi.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
         if (InventoryUtils.itemInHandId != SPRAYONATOR) return
-        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        val plot = GardenPlotApi.getCurrentPlot() ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
 

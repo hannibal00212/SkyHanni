@@ -9,12 +9,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TestCopyRngMeterValues {
@@ -29,11 +28,11 @@ object TestCopyRngMeterValues {
         "§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
     )
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
 
-        val map = mutableMapOf<NEUInternalName, Long>()
+        val map = mutableMapOf<NeuInternalName, Long>()
         for (item in event.inventoryItems.values) {
             for (line in item.getLore()) {
                 slayerPattern.matchMatcher(line) {

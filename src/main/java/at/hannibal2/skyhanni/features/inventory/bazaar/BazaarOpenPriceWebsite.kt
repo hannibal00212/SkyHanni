@@ -6,14 +6,11 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -23,9 +20,8 @@ object BazaarOpenPriceWebsite {
     private var lastClick = SimpleTimeMark.farPast()
 
     private val item by lazy {
-        val neuItem = "PAPER".toInternalName().getItemStack()
         ItemUtils.createItemStack(
-            neuItem.item,
+            Items.paper,
             "§bPrice History",
             "§8(From SkyHanni)",
             "",
@@ -46,7 +42,7 @@ object BazaarOpenPriceWebsite {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val lastItem = BazaarApi.currentlyOpenedProduct ?: return
@@ -61,7 +57,7 @@ object BazaarOpenPriceWebsite {
         }
     }
 
-    private fun getSkyBlockBzName(internalName: NEUInternalName): String {
+    private fun getSkyBlockBzName(internalName: NeuInternalName): String {
         val name = internalName.asString()
         return if (name.contains(";")) {
             "ENCHANTMENT_" + name.replace(";", "_")

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 
 data class NeuSacksJson(
@@ -8,6 +8,6 @@ data class NeuSacksJson(
 )
 
 data class SackInfo(
-    @Expose val item: NEUInternalName,
-    @Expose val contents: List<NEUInternalName>,
+    @Expose val item: NeuInternalName,
+    @Expose val contents: List<NeuInternalName>,
 )

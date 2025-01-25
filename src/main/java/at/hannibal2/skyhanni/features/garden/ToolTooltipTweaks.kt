@@ -3,31 +3,37 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
 @SkyHanniModule
 object ToolTooltipTweaks {
 
-    private val config get() = GardenAPI.config.tooltipTweak
+    private val config get() = GardenApi.config.tooltipTweak
 
-    private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
+    /**
+     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     */
+    private val farmingFortunePattern by RepoPattern.pattern(
+        "garden.tooltip.farmingfortune",
+        "§7Farming Fortune: §a",
+    )
+
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
     private const val ABILITY_DESCRIPTION_START = "§5§o§7These boots gain §a+2❈ Defense"
@@ -35,10 +41,8 @@ object ToolTooltipTweaks {
 
     private val statFormatter = DecimalFormat("0.##")
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         val itemStack = event.itemStack
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()
@@ -67,8 +71,7 @@ object ToolTooltipTweaks {
         var removingAbilityDescription = false
 
         for (line in iterator) {
-            val match = tooltipFortunePattern.matchEntire(line)?.groups
-            if (match != null) {
+            if (farmingFortunePattern.find(line)) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
@@ -89,8 +92,10 @@ object ToolTooltipTweaks {
                 val fortuneLine = when (config.cropTooltipFortune) {
                     CropTooltipFortuneEntry.DEFAULT ->
                         "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+
                     CropTooltipFortuneEntry.SHOW ->
                         "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+
                     else ->
                         "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }

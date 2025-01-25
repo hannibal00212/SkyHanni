@@ -2,19 +2,18 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,7 +22,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -76,7 +74,7 @@ object VerminTracker {
     private var hasVacuum = false
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
 
-    private val config get() = RiftAPI.config.area.westVillage.verminTracker
+    private val config get() = RiftApi.config.area.westVillage.verminTracker
 
     private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker }) {
         drawDisplay(it)
@@ -98,9 +96,9 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         checkVacuum()
     }
 
@@ -109,8 +107,8 @@ object VerminTracker {
             .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
@@ -122,9 +120,9 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!RiftAPI.inRift() || event.inventoryName != "Vermin Bin") return
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (!RiftApi.inRift() || event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
@@ -182,13 +180,16 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return
-        if (!config.showWithoutVacuum && !hasVacuum) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showOutsideWestVillage && !RiftApi.inWestVillage()) return false
+        if (!config.showWithoutVacuum && !hasVacuum) return false
+
+        return true
     }
 
     @HandleEvent
@@ -202,5 +203,5 @@ object VerminTracker {
         tracker.resetCommand()
     }
 
-    private fun isEnabled() = RiftAPI.inRift() && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && config.enabled
 }

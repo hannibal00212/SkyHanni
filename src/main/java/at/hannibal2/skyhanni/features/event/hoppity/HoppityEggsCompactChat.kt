@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,11 +22,11 @@ typealias RarityType = HoppityEggsConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var hoppityDataSet = HoppityStateDataSet()
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val rarityConfig get() = HoppityEggsManager.config.rarityInCompact
 
-    fun compactChat(event: LorenzChatEvent?, dataSet: HoppityStateDataSet) {
+    fun compactChat(event: SkyHanniChatEvent?, dataSet: HoppityStateDataSet) {
         if (!HoppityEggsManager.config.compactChat) return
         hoppityDataSet = dataSet.copy()
         event?.let { it.blockedReason = "compact_hoppity" }
@@ -62,7 +62,7 @@ object HoppityEggsCompactChat {
         return if (hoppityDataSet.duplicate) {
             val dupeChocAmount = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormat = hoppityDataSet.lastDuplicateAmount?.let {
-                ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
+                ChocolateFactoryApi.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
                 (HoppityCollectionStats.getRabbitCount(hoppityDataSet.lastName)).takeIf { it > 0 }?.let {
