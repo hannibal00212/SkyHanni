@@ -31,15 +31,18 @@ class PestTrapConfig {
 
     class WarningConfig {
 
+        enum class WarningReason(val displayName: String) {
+            TRAP_FULL("§cTrap Full§r"),
+            NO_BAIT("§eNo Bait§r"),
+            ;
+
+            override fun toString() = displayName
+        }
+
         @Expose
         @ConfigOption(name = "Enabled Warnings", desc = "Which warning types to enable.")
         @ConfigEditorDraggableList
         var enabledWarnings: Property<MutableList<WarningReason>> = Property.of(mutableListOf())
-
-        @Expose
-        @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")
-        @ConfigEditorText
-        var warningSound: Property<String> = Property.of("note.pling")
 
         enum class WarningDisplayType(val displayName: String) {
             CHAT("Chat"),
@@ -55,14 +58,11 @@ class PestTrapConfig {
         @ConfigEditorDropdown
         var warningDisplayType: WarningDisplayType = WarningDisplayType.TITLE
 
-        enum class WarningReason(val displayName: String) {
-            PEST_CAUGHT("§2Pest Caught"),
-            TRAP_FULL("§cTrap Full"),
-            NO_BAIT("§eNo Bait"),
-            ;
+        @Expose
+        @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")
+        @ConfigEditorText
+        var warningSound: Property<String> = Property.of("note.pling")
 
-            override fun toString() = displayName
-        }
 
         @Expose
         @ConfigOption(name = "Warning Interval", desc = "Reminder interval for messages in seconds.")

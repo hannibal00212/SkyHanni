@@ -6,14 +6,16 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapAPI.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraft.client.audio.ISound
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,6 +33,7 @@ object PestTrapFeatures {
     private var noBaitSet: Set<Int> = emptySet()
     private var warningSound: ISound? = null
     private var nextWarning: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastWarningCount: Int = 0
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -46,8 +49,6 @@ object PestTrapFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
-        ChatUtils.chat("in onPestTrapDataUpdate")
-        if (nextWarning.isInFuture()) return
         val data = event.data
         fullSet = data.checkFullWarnings()
         noBaitSet = data.checkNoBaitWarnings()
@@ -61,21 +62,22 @@ object PestTrapFeatures {
             fullEnabled || noBaitEnabled -> 1
             else -> 0
         }.takeIf { it != 0 } ?: return
-        ChatUtils.chat("warningCount: $warningCount")
 
         val fullWarning = data.buildFullWarning(warningCount)
         val noBaitWarning = data.buildNoBaitWarning(warningCount)
         val finalWarning = listOf(fullWarning, noBaitWarning).joinToString(" §8| ")
 
-        ChatUtils.chat("finalWarning: $finalWarning")
-
         val chatWarnEnabled = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
         val titleWarnEnabled = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
 
-        val actionPlot = data.first { it.isFull || it.noBait }.plot
+        val firstDataItem = data.firstOrNull { it.isFull || it.noBait }
+        val actionPlot = firstDataItem?.plot ?: firstDataItem?.location?.let { GardenPlotApi.closestPlot(it) }
 
-        ChatUtils.chat("actionPlot: $actionPlot")
+        lastWarningCount = (fullSet.size + noBaitSet.size).takeIf {
+            it != 0
+        }?.takeIf { it > lastWarningCount || !nextWarning.isInFuture() } ?: return
 
+        warningSound?.playSound()
         if (chatWarnEnabled) {
             when (actionPlot) {
                 null -> ChatUtils.chat(finalWarning)
@@ -84,7 +86,7 @@ object PestTrapFeatures {
                     config.warningConfig::enabledWarnings,
                     actionName = "warp to $actionPlot",
                     action = {
-                        HypixelCommands.teleportToPlot(actionPlot)
+                        actionPlot.sendTeleportTo()
                     },
                     oneTimeClick = true,
                 )
@@ -95,11 +97,11 @@ object PestTrapFeatures {
     }
 
     private fun List<PestTrapData>.getFullWarningJoinedString() =
-        this.filter { it.isFull }.joinToString("§8, ") { "§a#${it.number}" }
+        this.filter { it.isFull }.toList().joinToString("§8, ") { "§a#${it.number}" }
 
     private fun List<PestTrapData>.buildFullWarning(warningCount: Int) = when (warningCount) {
-        1 -> "§cFull: ${this.getFullWarningJoinedString()}"
-        2 -> "§cPest Traps Full! ${this.getFullWarningJoinedString()}"
+        2 -> "§cFull: ${this.getFullWarningJoinedString()}"
+        1 -> "§cPest Traps Full! ${this.getFullWarningJoinedString()}"
         else -> "§cF: ${this.getFullWarningJoinedString()}"
     }
 
@@ -107,8 +109,8 @@ object PestTrapFeatures {
         this.filter { it.noBait }.joinToString("§8, ") { "§a#${it.number}" }
 
     private fun List<PestTrapData>.buildNoBaitWarning(warningCount: Int) = when (warningCount) {
-        1 -> "§cNo Bait: ${this.getNoBaitWarningJoinedString()}"
-        2 -> "§cNo Bait in Pest Traps! ${this.getNoBaitWarningJoinedString()}"
+        2 -> "§cNo Bait: ${this.getNoBaitWarningJoinedString()}"
+        1 -> "§cNo Bait in Pest Traps! ${this.getNoBaitWarningJoinedString()}"
         else -> "§cNB: ${this.getNoBaitWarningJoinedString()}"
     }
 
