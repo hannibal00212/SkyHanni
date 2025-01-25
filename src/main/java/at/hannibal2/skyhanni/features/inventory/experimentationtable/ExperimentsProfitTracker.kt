@@ -12,13 +12,13 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottleChatPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentsDropPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.inventoriesPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.claimMessagePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.enchantingExpPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottleChatPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottlePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentRenewPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentsDropPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -60,8 +60,8 @@ object ExperimentsProfitTracker {
 
     private val lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
-    private val lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
-    private val currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
+    private val lastBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
+    private val currentBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -142,7 +142,7 @@ object ExperimentsProfitTracker {
             return
         }
 
-        val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
+        val internalName = NeuInternalName.fromItemNameOrNull(reward) ?: return
         if (!experienceBottleChatPattern.matches(reward)) tracker.addItem(internalName, 1, false)
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
@@ -173,7 +173,7 @@ object ExperimentsProfitTracker {
 
         lastSplashTime = SimpleTimeMark.now()
 
-        if (ExperimentationTableAPI.inDistanceToTable(15.0)) {
+        if (ExperimentationTableApi.inDistanceToTable(15.0)) {
             tracker.modify {
                 it.startCost -= calculateBottlePrice(internalName)
             }
@@ -183,7 +183,7 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun NEUInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
+    private fun NeuInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -204,7 +204,7 @@ object ExperimentsProfitTracker {
         handleExpBottles(false)
     }
 
-    private fun calculateBottlePrice(internalName: NEUInternalName): Int {
+    private fun calculateBottlePrice(internalName: NeuInternalName): Int {
         val price = internalName.getPrice()
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
@@ -214,7 +214,7 @@ object ExperimentsProfitTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (ExperimentationTableAPI.getCurrentExperiment() != null) {
+        if (ExperimentationTableApi.getCurrentExperiment() != null) {
             tracker.modify {
                 it.experimentsDone++
             }
@@ -290,6 +290,6 @@ object ExperimentsProfitTracker {
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
         IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
-            (!checkDistanceToExperimentationTable || ExperimentationTableAPI.inDistanceToTable(5.0))
+            (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
 
 }

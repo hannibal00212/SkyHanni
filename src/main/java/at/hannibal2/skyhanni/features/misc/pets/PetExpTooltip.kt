@@ -41,9 +41,9 @@ object PetExpTooltip {
 
             val index = findIndex(event.toolTip) ?: return
 
-            val (maxLevel, maxXp) = getMaxValues(name, petExperience)
+            val (maxLevel, maxXP) = getMaxValues(name, petExperience)
 
-            val percentage = petExperience / maxXp
+            val percentage = petExperience / maxXP
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
             if (percentage < 1) {
@@ -53,7 +53,7 @@ object PetExpTooltip {
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
                 event.toolTip.add(
                     index,
-                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXp.shortFormat()}",
+                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}",
                 )
                 event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
             }
@@ -103,14 +103,14 @@ object PetExpTooltip {
 
         val maxLevel = if (useGoldenDragonLevels) 200 else 100
 
-        val maxXp = when {
+        val maxXP = when {
             useGoldenDragonLevels -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY
         }
 
-        return Pair(maxLevel, maxXp)
+        return Pair(maxLevel, maxXP)
     }
 
     @HandleEvent

@@ -31,5 +31,5 @@ object GlacitePowderFeatures {
         }
     }
 
-    fun isEnabled() = FossilExcavatorAPI.inInventory && config.glacitePowderStack
+    fun isEnabled() = FossilExcavatorApi.inInventory && config.glacitePowderStack
 }

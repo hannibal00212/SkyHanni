@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -101,6 +101,6 @@ object BactePhase {
         )
     }
 
-    private fun isEnabled() = RiftAPI.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
+    private fun isEnabled() = RiftApi.inColosseum() && SkyHanniMod.feature.rift.area.colosseum.showBactePhase
 
 }

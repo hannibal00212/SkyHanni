@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -81,12 +81,12 @@ object ItemAddManager {
         Source.ITEM_ADD.addItem(internalName, event.amount)
     }
 
-    private fun Source.addItem(internalName: NEUInternalName, amount: Int) {
+    private fun Source.addItem(internalName: NeuInternalName, amount: Int) {
         ItemAddEvent(internalName, amount, this).post()
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
-    private val superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
+    private val superCraftedItems = TimeLimitedSet<NeuInternalName>(30.seconds)
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -94,8 +94,8 @@ object ItemAddManager {
             lastDiceRoll = SimpleTimeMark.now()
         }
         craftedPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemName(group("item"))
-            if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
+            val internalName = NeuInternalName.fromItemName(group("item"))
+            if (!SackApi.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
             superCraftedItems.add(internalName)
         }
     }

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
@@ -67,7 +67,7 @@ enum class ItemAbility(
     ECHO("Echo", 3, "Ancestral Spade");
 
     var newVariant = false
-    var internalNames = mutableListOf<NEUInternalName>()
+    var internalNames = mutableListOf<NeuInternalName>()
 
     constructor(
         cooldownInSeconds: Int,
@@ -124,7 +124,7 @@ enum class ItemAbility(
 
     companion object {
 
-        fun getByInternalName(internalName: NEUInternalName): ItemAbility? {
+        fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 
@@ -134,18 +134,18 @@ enum class ItemAbility(
 
         private fun ItemAbility.getMageCooldownReduction(): Double? {
             if (ignoreMageCooldownReduction) return null
-            if (!DungeonAPI.inDungeon()) return null
-            if (DungeonAPI.playerClass != DungeonAPI.DungeonClass.MAGE) return null
+            if (!DungeonApi.inDungeon()) return null
+            if (DungeonApi.playerClass != DungeonApi.DungeonClass.MAGE) return null
 
             var abilityCooldownMultiplier = 1.0
-            abilityCooldownMultiplier -= if (DungeonAPI.isUniqueClass) {
+            abilityCooldownMultiplier -= if (DungeonApi.isUniqueClass) {
                 0.5 // 50% base reduction at level 0
             } else {
                 0.25 // 25% base reduction at level 0
             }
 
             // 1% ability reduction every other level
-            abilityCooldownMultiplier -= 0.01 * floor(DungeonAPI.playerClassLevel / 2f)
+            abilityCooldownMultiplier -= 0.01 * floor(DungeonApi.playerClassLevel / 2f)
 
             return abilityCooldownMultiplier
         }
