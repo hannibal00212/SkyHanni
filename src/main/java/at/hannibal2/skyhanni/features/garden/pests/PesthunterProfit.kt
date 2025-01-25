@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -27,7 +27,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object PesthunterProfit {
 
-    private val config get() = GardenAPI.config.pests.pesthunterShop
+    private val config get() = GardenApi.config.pests.pesthunterShop
     private val patternGroup = RepoPattern.group("garden.pests.pesthunter")
     private val DENY_LIST_ITEMS = listOf(
         "§cClose",
@@ -79,7 +79,7 @@ object PesthunterProfit {
         val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
-        val internalName = NEUInternalName.fromItemNameOrNull(fixedDisplayName)
+        val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)
             ?: item.getInternalName()
 
         val itemPrice = (internalName.getPrice() * amount).takeIf { it >= 0 } ?: return null
@@ -120,7 +120,7 @@ object PesthunterProfit {
     private fun getFullCost(requiredItems: List<String>): Double = requiredItems.mapNotNull {
         ItemUtils.readItemAmount(it)
     }.sumOf { (name, amount) ->
-        val internalName = NEUInternalName.fromItemNameOrNull(name) ?: return@sumOf 0.0
+        val internalName = NeuInternalName.fromItemNameOrNull(name) ?: return@sumOf 0.0
         internalName.getPrice() * amount
     }
 
