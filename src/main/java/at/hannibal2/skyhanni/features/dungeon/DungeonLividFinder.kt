@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -31,7 +31,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -65,7 +64,7 @@ object DungeonLividFinder {
             // When the real livid dies at the same time as a fake livid, Hypixel despawns the player entity,
             // and makes it impossible to get the mob of the real livid again.
             lividArmorStandId = mob.armorStand?.entityId
-            if (config.enabled) mob.highlight(lividColor.toColor())
+            if (config.enabled.get()) mob.highlight(lividColor.toColor())
         } else {
             fakeLivids += mob
         }
@@ -87,8 +86,8 @@ object DungeonLividFinder {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         color = null
         lividArmorStandId = null
     }
@@ -107,9 +106,9 @@ object DungeonLividFinder {
         return armorStand?.name?.startsWith("$chatColor﴾ $chatColor§lLivid") ?: false
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!inLividBossRoom() || !config.enabled) return
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!inLividBossRoom() || !config.enabled.get()) return
         if (isBlind) return
 
         val entity = lividEntityOrArmorstand ?: return
