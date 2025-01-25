@@ -7,10 +7,9 @@ import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.F
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -26,7 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FrozenTreasureTracker {
@@ -35,7 +33,7 @@ object FrozenTreasureTracker {
 
     private val compactPattern by RepoPattern.pattern(
         "event.jerry.frozentreasure.compact",
-        "COMPACT! You found an Enchanted Ice!"
+        "COMPACT! You found an Enchanted Ice!",
     )
 
     private var estimatedIce = 0L
@@ -69,15 +67,15 @@ object FrozenTreasureTracker {
         var treasureCount: MutableMap<FrozenTreasure, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onJerryWorkshop()) return
 
@@ -116,8 +114,8 @@ object FrozenTreasureTracker {
         return newList
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!ProfileStorageData.loaded) return
         if (!onJerryWorkshop()) return
 
@@ -169,13 +167,16 @@ object FrozenTreasureTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        if (!onJerryWorkshop()) return
-        if (config.onlyInCave && !inGlacialCave()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
+        if (!onJerryWorkshop()) return false
+        if (config.onlyInCave && !inGlacialCave()) return false
+
+        return true
     }
 
     @HandleEvent
@@ -184,7 +185,7 @@ object FrozenTreasureTracker {
         event.move(
             11,
             "event.winter.frozenTreasureTracker.textFormat",
-            "event.winter.frozenTreasureTracker.textFormat"
+            "event.winter.frozenTreasureTracker.textFormat",
         ) { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, FrozenTreasureDisplayEntry::class.java)
         }

@@ -84,7 +84,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
     }
 
-    private fun isNEUAnnotation(klass: KSClassDeclaration): Boolean {
+    private fun isNeuAnnotation(klass: KSClassDeclaration): Boolean {
         val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
         return annotation.arguments.find { it.name?.asString() == "neuRequired" }?.value as? Boolean ?: false
     }
@@ -104,6 +104,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
 
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
+            it.write("@Suppress(\"LargeClass\")\n")
             it.write("object LoadedModules {\n")
             it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
             it.write("    val hasNeu: Boolean get() = at.hannibal2.skyhanni.utils.system.PlatformUtils.isNeuLoaded()\n")
@@ -112,7 +113,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             symbols.forEach { symbol ->
                 if (isDevAnnotation(symbol)) {
                     it.write("        if (isDev) add(${symbol.qualifiedName!!.asString()})\n")
-                } else if (isNEUAnnotation(symbol)) {
+                } else if (isNeuAnnotation(symbol)) {
                     it.write("        if (hasNeu) add(${symbol.qualifiedName!!.asString()})\n")
                 } else {
                     it.write("        add(${symbol.qualifiedName!!.asString()})\n")

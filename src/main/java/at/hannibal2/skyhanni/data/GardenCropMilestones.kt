@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestones {
@@ -39,7 +39,7 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)",
     )
 
-    private val config get() = GardenAPI.config.cropMilestones
+    private val config get() = GardenApi.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -49,8 +49,8 @@ object GardenCropMilestones {
         return null
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
@@ -106,7 +106,7 @@ object GardenCropMilestones {
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenApi.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
@@ -192,7 +192,7 @@ object GardenCropMilestones {
         return (progress - startCrops).toDouble() / (end - startCrops)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }

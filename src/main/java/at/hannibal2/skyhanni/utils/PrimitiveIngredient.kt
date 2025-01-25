@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
 
-class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double = 1.0) {
+class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double = 1.0) {
 
-    constructor(internalName: NEUInternalName, count: Int) : this(internalName, count.toDouble())
+    constructor(internalName: NeuInternalName, count: Int) : this(internalName, count.toDouble())
 
     constructor(ingredientIdentifier: String) : this(
         ingredientIdentifier.substringBefore(':').toInternalName(),
@@ -17,9 +16,6 @@ class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double =
 
     companion object {
         fun coinIngredient(count: Double = 1.0) = PrimitiveIngredient(SKYBLOCK_COIN, count)
-
-        fun fromNeuIngredient(neuIngredient: Ingredient) =
-            PrimitiveIngredient(neuIngredient.internalItemId.toInternalName(), neuIngredient.count)
 
         fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
             map { it.toPrimitiveItemStack() }

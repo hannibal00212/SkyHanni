@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -46,7 +46,7 @@ object BingoCardDisplay {
     }
 
     private fun reload() {
-        BingoAPI.bingoGoals.clear()
+        BingoApi.bingoGoals.clear()
     }
 
     fun toggleCommand() {
@@ -68,7 +68,7 @@ object BingoCardDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasHiddenPersonalGoals) {
             update()
@@ -82,7 +82,7 @@ object BingoCardDisplay {
     private fun drawDisplay(): MutableList<Renderable> {
         val newList = mutableListOf<Renderable>()
 
-        if (BingoAPI.bingoGoals.isEmpty()) {
+        if (BingoApi.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
             newList.add(
                 Renderable.clickAndHover(
@@ -104,7 +104,7 @@ object BingoCardDisplay {
 
     private fun MutableList<Renderable>.addCommunityGoals() {
         add(Renderable.string("§6Community Goals:"))
-        val goals = BingoAPI.communityGoals.toMutableList()
+        val goals = BingoApi.communityGoals.toMutableList()
         var hiddenGoals = 0
         for (goal in goals.toList()) {
             if (goal.hiddenGoalData.unknownTip) {
@@ -123,15 +123,15 @@ object BingoCardDisplay {
             val name = StringUtils.pluralize(hiddenGoals, "goal")
             add(Renderable.string("§7+ $hiddenGoals more §cunknown §7community $name."))
         }
-        add(Renderable.string(" "))
+        addString(" ")
     }
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
-        " " + BingoAPI.getCommunityPercentageColor(it)
+        " " + BingoApi.getCommunityPercentageColor(it)
     }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
-        val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()
+        val todo = BingoApi.personalGoals.filter { !it.done }.toMutableList()
         val done = MAX_PERSONAL_GOALS - todo.size
         add(Renderable.string("§6Personal Goals: ($done/$MAX_PERSONAL_GOALS done)"))
 
@@ -158,7 +158,7 @@ object BingoCardDisplay {
         }
         hasHiddenPersonalGoals = config.nextTipDuration.get() && nextTip != 14.days
         if (hasHiddenPersonalGoals) {
-            val nextTipTime = BingoAPI.lastBingoCardOpenTime + nextTip
+            val nextTipTime = BingoApi.lastBingoCardOpenTime + nextTip
             if (nextTipTime.isInPast()) {
                 add(Renderable.string("§eThe next hint got unlocked already!"))
                 add(Renderable.string("§eOpen the bingo card to update!"))
@@ -214,7 +214,7 @@ object BingoCardDisplay {
     private var lastSneak = false
     private var inventoryOpen = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return

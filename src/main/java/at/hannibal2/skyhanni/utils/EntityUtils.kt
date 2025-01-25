@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -113,7 +113,7 @@ object EntityUtils {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
-        if (!boss && !DungeonAPI.inDungeon()) {
+        if (!boss && !DungeonApi.inDungeon()) {
             // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
@@ -196,7 +196,7 @@ object EntityUtils {
 
     ) {
         val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
+        if (shEvent.post()) {
             event.cancel()
         }
     }
@@ -211,7 +211,7 @@ object EntityUtils {
         //#endif
 
     ) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
     }
 
     //#if MC < 11400
@@ -220,7 +220,7 @@ object EntityUtils {
         event: RenderLivingEvent.Specials.Pre<*>,
     ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.postAndCatch()) {
+        if (shEvent.post()) {
             event.cancel()
         }
     }
@@ -229,7 +229,7 @@ object EntityUtils {
     fun onEntityRenderSpecialsPost(
         event: RenderLivingEvent.Specials.Post<*>,
     ) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
     }
     //#endif
 

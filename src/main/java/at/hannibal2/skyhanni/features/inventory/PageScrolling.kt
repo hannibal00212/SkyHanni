@@ -21,15 +21,15 @@ object PageScrolling {
 
     private val config get() = SkyHanniMod.feature.inventory.pageScrolling
 
-    private val repoGroup = RepoPattern.group("inventory.pagescrolling")
+    private val patternGroup = RepoPattern.group("inventory.pagescrolling")
 
-    private val illegalInventory by repoGroup.list(
+    private val illegalInventory by patternGroup.list(
         "illegal",
         "Large Chest",
         "Chest",
     )
 
-    private val forwardPattern by repoGroup.list(
+    private val forwardPattern by patternGroup.list(
         "forward",
         "§aNext Page",
         "§aScroll Up",
@@ -38,7 +38,7 @@ object PageScrolling {
         "§aScroll Right",
     )
 
-    private val backwardPattern by repoGroup.list(
+    private val backwardPattern by patternGroup.list(
         "backward",
         "§aPrevious Page",
         "§aScroll Down",
@@ -54,6 +54,7 @@ object PageScrolling {
     @SubscribeEvent
     fun onLorenzTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
         if (cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 

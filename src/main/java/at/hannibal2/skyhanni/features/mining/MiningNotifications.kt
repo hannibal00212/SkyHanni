@@ -1,25 +1,24 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
-import at.hannibal2.skyhanni.data.MiningAPI.lastColdReset
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.MiningApi.inGlaciteArea
+import at.hannibal2.skyhanni.data.MiningApi.lastColdReset
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -61,8 +60,8 @@ object MiningNotifications {
     private var hasSentCold = false
     private var hasSentAscensionRope = false
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inMiningIsland()) return
         if (!config.enabled) return
         val message = event.message
@@ -84,16 +83,16 @@ object MiningNotifications {
             hasSentCold = true
             sendNotification(MiningNotificationList.COLD)
         }
-        if (MiningAPI.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount && !hasSentAscensionRope) {
+        if (MiningApi.inMineshaft() && config.getAscensionRope && event.cold >= config.coldAmount && !hasSentAscensionRope) {
             hasSentAscensionRope = true
             DelayedRun.runDelayed(0.5.seconds) {
-                GetFromSackAPI.getFromChatMessageSackItems(ASCENSION_ROPE)
+                GetFromSackApi.getFromChatMessageSackItems(ASCENSION_ROPE)
             }
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hasSentCold = false
         hasSentAscensionRope = false
     }
@@ -101,7 +100,7 @@ object MiningNotifications {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.coldThreshold) {
-            if (MiningAPI.cold != config.coldThreshold.get()) hasSentCold = false
+            if (MiningApi.cold != config.coldThreshold.get()) hasSentCold = false
         }
     }
 

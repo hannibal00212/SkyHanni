@@ -32,6 +32,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.util.DamageSource
 import net.minecraft.world.World
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -63,11 +64,11 @@ object MobDetection {
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
             it.createDeSpawnEvent()
-        }.forEach { it.postAndCatch() }
+        }.forEach { it.post() }
         MobData.retries.clear()
     }
 
-    // TODO this is a unused debug funciton. maybe connect with a debug commmand or remove
+    // TODO this is a unused debug function. maybe connect with a debug commmand or remove
     private fun watchdog() {
         val world = LorenzUtils.getPlayer()?.worldObj ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {
@@ -167,7 +168,7 @@ object MobDetection {
                 Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
                 Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
                 Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
-            }.postAndCatch()
+            }.post()
         }
         return isVisible
     }
@@ -175,7 +176,7 @@ object MobDetection {
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
         when (roughType) {
-            Mob.Type.PLAYER -> MobEvent.Spawn.Player(MobFactories.player(entity)).postAndCatch()
+            Mob.Type.PLAYER -> MobEvent.Spawn.Player(MobFactories.player(entity)).post()
 
             Mob.Type.DISPLAY_NPC -> return MobFilter.createDisplayNPC(entity)
             Mob.Type.BASIC -> {
@@ -188,16 +189,12 @@ object MobDetection {
                         if (mob == null) return mobDetectionError("Mob is null even though result is Found")
                         when (mob.mobType) {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
-
-                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
-                                mob,
-                            )
-
+                            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(mob)
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
                             Mob.Type.PROJECTILE -> MobEvent.Spawn.Projectile(mob)
                             Mob.Type.DISPLAY_NPC -> MobEvent.Spawn.DisplayNPC(mob) // Needed for some special cases
                             Mob.Type.PLAYER -> return mobDetectionError("An Player Ended Here. How?")
-                        }.postAndCatch()
+                        }.post()
                     }
                 }
             }
@@ -223,7 +220,7 @@ object MobDetection {
                 val entity = EntityUtils.getEntityByID(id) as? EntityBat ?: return@drainForEach
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 removeRetry(entity)
-                MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).postAndCatch()
+                MobEvent.Spawn.Projectile(MobFactories.projectile(entity, "Spirit Scepter Bat")).post()
             }
 
             EntityPacketType.VILLAGER -> {
@@ -247,7 +244,7 @@ object MobDetection {
                 if (MobData.entityToMob[entity] != null) return@drainForEach
                 if (!entity.powered) return@drainForEach
                 removeRetry(entity)
-                MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).postAndCatch()
+                MobEvent.Spawn.Special(MobFactories.special(entity, "Creeper Veil")).post()
             }
         }
     }
@@ -276,7 +273,7 @@ object MobDetection {
     }
 
     private fun entityDeSpawn(entity: EntityLivingBase) {
-        MobData.entityToMob[entity]?.createDeSpawnEvent()?.postAndCatch() ?: removeRetry(entity)
+        MobData.entityToMob[entity]?.createDeSpawnEvent()?.post() ?: removeRetry(entity)
         allEntitiesViaPacketId.remove(entity.entityId)
     }
 
@@ -288,6 +285,15 @@ object MobDetection {
         Mob.Type.DISPLAY_NPC -> MobEvent.DeSpawn.DisplayNPC(this)
         Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.DeSpawn.SkyblockMob(this)
     }
+
+    fun postMobHurtEvent(mob: Mob, source: DamageSource, amount: Float) = when (mob.mobType) {
+        Mob.Type.PLAYER -> MobEvent.Hurt.Player(mob, source, amount)
+        Mob.Type.SUMMON -> MobEvent.Hurt.Summon(mob, source, amount)
+        Mob.Type.SPECIAL -> MobEvent.Hurt.Special(mob, source, amount)
+        Mob.Type.PROJECTILE -> MobEvent.Hurt.Projectile(mob, source, amount)
+        Mob.Type.DISPLAY_NPC -> MobEvent.Hurt.DisplayNPC(mob, source, amount)
+        Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Hurt.SkyblockMob(mob, source, amount)
+    }.post()
 
     private fun handleRetries() {
         val iterator = MobData.retries.iterator()

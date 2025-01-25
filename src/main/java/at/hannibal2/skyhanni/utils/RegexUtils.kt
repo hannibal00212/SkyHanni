@@ -29,11 +29,10 @@ object RegexUtils {
     inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
         firstMatcherWithIndex(list.asSequence(), consumer)
 
-    inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
+    inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T) {
         for (line in list) {
             matcher(line).let { if (it.find()) consumer(it) }
         }
-        return null
     }
 
     inline fun <T> List<Pattern>.matchMatchers(text: String, consumer: Matcher.() -> T): T? {
@@ -95,6 +94,21 @@ object RegexUtils {
             while (matcher.find()) {
                 add(matcher.group())
             }
+        }
+    }
+
+    /** Replaces all occurrences of the pattern in the input string with the result of the [transform] function. */
+    fun Pattern.replace(input: String, transform: Matcher.() -> String): String {
+        val matcher = matcher(input)
+        var lastEnd = 0
+        return buildString {
+            while (matcher.find()) {
+                append(input, lastEnd, matcher.start())
+                append(transform(matcher))
+                lastEnd = matcher.end()
+            }
+
+            if (lastEnd < input.length) append(input, lastEnd, input.length)
         }
     }
 }

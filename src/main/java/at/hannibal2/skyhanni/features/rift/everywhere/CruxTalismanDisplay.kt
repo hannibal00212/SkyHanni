@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -17,12 +17,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CruxTalismanDisplay {
 
-    private val config get() = RiftAPI.config.cruxTalisman
+    private val config get() = RiftApi.config.cruxTalisman
 
     /**
      * REGEX-TEST:   §23 §2Shy§7: §e88§7/§a100 §7kills
@@ -42,7 +41,7 @@ object CruxTalismanDisplay {
     private var maxed = false
     private var percentValue = 0.0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderStringsAndItems(
@@ -89,7 +88,7 @@ object CruxTalismanDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
@@ -133,5 +132,5 @@ object CruxTalismanDisplay {
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled && LorenzUtils.skyBlockArea != "Mirrorverse"
+    fun isEnabled() = RiftApi.inRift() && config.enabled && LorenzUtils.skyBlockArea != "Mirrorverse"
 }
