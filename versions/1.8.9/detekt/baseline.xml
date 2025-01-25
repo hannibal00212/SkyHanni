@@ -28,7 +28,7 @@
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>CyclomaticComplexMethod:ParkourHelper.kt$ParkourHelper$fun render(event: RenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
-    <ID>CyclomaticComplexMethod:SensitivityReducer.kt$SensitivityReducer$@SubscribeEvent fun onTick(event: LorenzTickEvent)</ID>
+    <ID>CyclomaticComplexMethod:SensitivityReducer.kt$SensitivityReducer$@HandleEvent fun onTick(event: SkyHanniTickEvent)</ID>
     <ID>CyclomaticComplexMethod:SoopyGuessBurrow.kt$SoopyGuessBurrow$@HandleEvent(onlyOnSkyblock = true) fun onReceiveParticle(event: ReceiveParticleEvent)</ID>
     <ID>CyclomaticComplexMethod:ToolTooltipTweaks.kt$ToolTooltipTweaks$@HandleEvent(onlyOnSkyblock = true) fun onToolTip(event: ToolTipEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: RenderWorldEvent)</ID>
