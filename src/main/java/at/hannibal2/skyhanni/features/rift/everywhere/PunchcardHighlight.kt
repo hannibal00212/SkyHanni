@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -173,7 +173,7 @@ object PunchcardHighlight {
     fun onPunch(event: EntityClickEvent) {
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
-        if (entity.isNPC()) return
+        if (entity.isNpc()) return
         val name = entity.name
         if (name in playerList || name in playerQueue) return
         playerQueue.add(name)
