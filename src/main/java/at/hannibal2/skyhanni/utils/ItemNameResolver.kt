@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
 object ItemNameResolver {
-    private val itemNameCache = mutableMapOf<String, NEUInternalName>() // item name -> internal name
+    private val itemNameCache = mutableMapOf<String, NeuInternalName>() // item name -> internal name
 
-    internal fun getInternalNameOrNull(itemName: String): NEUInternalName? {
+    internal fun getInternalNameOrNull(itemName: String): NeuInternalName? {
         val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
             return it
@@ -26,7 +26,7 @@ object ItemNameResolver {
         }
 
         if (itemName == "§cmissing repo item") {
-            return itemNameCache.getOrPut(lowercase) { NEUInternalName.MISSING_ITEM }
+            return itemNameCache.getOrPut(lowercase) { NeuInternalName.MISSING_ITEM }
         }
 
         ItemResolutionQuery.resolveEnchantmentByName(itemName)?.let {
@@ -78,7 +78,7 @@ object ItemNameResolver {
         return internalName
     }
 
-    private fun resolveEnchantmentByCleanName(itemName: String): NEUInternalName? {
+    private fun resolveEnchantmentByCleanName(itemName: String): NeuInternalName? {
         UtilsPatterns.cleanEnchantedNamePattern.matchMatcher(itemName) {
             val name = group("name").replace("'", "")
             val level = group("level").romanToDecimalIfNecessary()
@@ -102,7 +102,7 @@ object ItemNameResolver {
     // Workaround for duplex
     private val duplexPattern = "ULTIMATE_DUPLEX;(?<tier>.*)".toPattern()
 
-    fun fixEnchantmentName(originalName: String): NEUInternalName {
+    fun fixEnchantmentName(originalName: String): NeuInternalName {
         duplexPattern.matchMatcher(originalName) {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".toInternalName()
@@ -111,24 +111,24 @@ object ItemNameResolver {
         return originalName.toInternalName()
     }
 
-    private fun getInternalNameOrNullIgnoreCase(itemName: String): NEUInternalName? {
+    private fun getInternalNameOrNullIgnoreCase(itemName: String): NeuInternalName? {
         itemNameCache[itemName]?.let {
             return it
         }
 
-        if (NEUItems.allItemsCache.isEmpty()) {
-            NEUItems.allItemsCache = NEUItems.readAllNeuItems()
+        if (NeuItems.allItemsCache.isEmpty()) {
+            NeuItems.allItemsCache = NeuItems.readAllNeuItems()
         }
 
         // supports colored names, rarities
-        NEUItems.allItemsCache[itemName]?.let {
+        NeuItems.allItemsCache[itemName]?.let {
             itemNameCache[itemName] = it
             return it
         }
 
         // if nothing got found with colors, try without colors
         val removeColor = itemName.removeColor()
-        return NEUItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
+        return NeuItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 
     @HandleEvent

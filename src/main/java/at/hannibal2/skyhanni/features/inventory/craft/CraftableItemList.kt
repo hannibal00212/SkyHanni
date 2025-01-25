@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.craft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.isVanillaItem
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.isVanillaItem
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
@@ -52,8 +52,8 @@ object CraftableItemList {
         if (!craftItemPattern.matches(event.inventoryName)) return
         inInventory = true
 
-        val pricePer = mutableMapOf<NEUInternalName, Double>()
-        val lines = mutableMapOf<NEUInternalName, Searchable>()
+        val pricePer = mutableMapOf<NeuInternalName, Double>()
+        val lines = mutableMapOf<NeuInternalName, Searchable>()
         loadItems(pricePer, lines)
 
         display = if (lines.isEmpty()) {
@@ -75,14 +75,14 @@ object CraftableItemList {
     }
 
     private fun loadItems(
-        pricePer: MutableMap<NEUInternalName, Double>,
-        lines: MutableMap<NEUInternalName, Searchable>,
+        pricePer: MutableMap<NeuInternalName, Double>,
+        lines: MutableMap<NeuInternalName, Searchable>,
     ) {
         val availableMaterial = readItems()
-        for (internalName in NEUItems.allInternalNames) {
+        for (internalName in NeuItems.allInternalNames) {
             if (config.excludeVanillaItems && internalName.isVanillaItem()) continue
 
-            val recipes = NEUItems.getRecipes(internalName)
+            val recipes = NeuItems.getRecipes(internalName)
             for (recipe in recipes) {
                 if (!recipe.isCraftingRecipe()) continue
                 val renderable = createItemRenderable(recipe, availableMaterial, pricePer, internalName) ?: continue
@@ -93,9 +93,9 @@ object CraftableItemList {
 
     private fun createItemRenderable(
         recipe: PrimitiveRecipe,
-        availableMaterial: Map<NEUInternalName, Long>,
-        pricePer: MutableMap<NEUInternalName, Double>,
-        internalName: NEUInternalName,
+        availableMaterial: Map<NeuInternalName, Long>,
+        pricePer: MutableMap<NeuInternalName, Double>,
+        internalName: NeuInternalName,
     ): Searchable? {
         val neededItems = ItemUtils.neededItems(recipe)
         // Just a fail save, should not happen normally
@@ -138,13 +138,13 @@ object CraftableItemList {
         inInventory = false
     }
 
-    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map {
+    private fun pricePer(neededItems: Map<NeuInternalName, Int>): Double = neededItems.map {
         it.key.getPrice() * it.value
     }.sum()
 
     private fun canCraftAmount(
-        need: Map<NEUInternalName, Int>,
-        available: Map<NEUInternalName, Long>,
+        need: Map<NeuInternalName, Int>,
+        available: Map<NeuInternalName, Long>,
     ): Int {
         val canCraftTotal = mutableListOf<Int>()
         for ((name, neededAmount) in need) {
@@ -155,14 +155,14 @@ object CraftableItemList {
         return canCraftTotal.min()
     }
 
-    private fun readItems(): Map<NEUInternalName, Long> {
-        val materials = mutableMapOf<NEUInternalName, Long>()
+    private fun readItems(): Map<NeuInternalName, Long> {
+        val materials = mutableMapOf<NeuInternalName, Long>()
         for (stack in InventoryUtils.getItemsInOwnInventory()) {
             val item = stack.toPrimitiveStackOrNull() ?: continue
             materials.addOrPut(item.internalName, item.amount.toLong())
         }
         if (config.includeSacks) {
-            for ((internalName, item) in SackAPI.sackData) {
+            for ((internalName, item) in SackApi.sackData) {
                 materials.addOrPut(internalName, item.amount.toLong())
             }
         }

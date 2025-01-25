@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object VoltHighlighter {
 
-    private val config get() = RiftAPI.config.area.dreadfarm.voltCrux
+    private val config get() = RiftApi.config.area.dreadfarm.voltCrux
 
     private val VOLT_DOING_LIGHTNING by lazy { SkullTextureHolder.getTexture("VOLT_DOING_LIGHTNING") }
     private val VOLT_FRIENDLY by lazy { SkullTextureHolder.getTexture("VOLT_FRIENDLY") }
@@ -54,7 +54,7 @@ object VoltHighlighter {
 
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
+        if (!RiftApi.inRift() || !(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
             val state = getVoltState(entity)
             if (state == VoltState.NO_VOLT) continue

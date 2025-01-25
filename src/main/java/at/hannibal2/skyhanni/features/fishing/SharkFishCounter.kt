@@ -76,7 +76,7 @@ object SharkFishCounter {
         else -> "How???"
     }
 
-    private fun isWaterFishingRod() = FishingAPI.isFishing() && !FishingAPI.holdingLavaRod
+    private fun isWaterFishingRod() = FishingApi.isFishing() && !FishingApi.holdingLavaRod
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

@@ -5,10 +5,9 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -30,7 +29,7 @@ import java.util.regex.Pattern
 object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = GardenAPI.config.dicerCounters
+    private val config get() = GardenApi.config.dicerCounters
     private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) {
         drawDisplay(it)
     }
@@ -102,7 +101,7 @@ object DicerRngDropTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.hideChat && !config.display) return
 
         val message = event.message
@@ -168,17 +167,20 @@ object DicerRngDropTracker {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (cropInHand == null) return
+    init {
+        tracker.initRenderer(config.pos) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.pos)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (cropInHand == null) return false
+
+        return true
     }
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)
 
-    fun isEnabled() = GardenAPI.inGarden() && config.display
+    fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

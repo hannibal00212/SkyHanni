@@ -108,14 +108,14 @@ object IslandExceptions {
         nextEntity: EntityLivingBase?,
         armorStand: EntityArmorStand?,
     ) = when {
-        baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult.illegal// Bacte Tentacle
+        baseEntity is EntitySlime && nextEntity is EntitySlime ->
+            MobData.MobResult.found(Mob(baseEntity, Mob.Type.SPECIAL, armorStand, "Bacte Tentacle"))
+
         baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Bacte"))
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " ->
-            MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Branchstrutter"),
-            )
+            MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Branchstrutter"))
 
         else -> null
     }
@@ -126,20 +126,14 @@ object IslandExceptions {
         nextEntity: EntityLivingBase?,
     ) = when {
         baseEntity is EntitySlime && MobFilter.heavyPearlPattern.matches(armorStand?.name) ->
-            MobData.MobResult.found(
-                MobFactories.special(baseEntity, "Heavy Pearl"),
-            )
+            MobData.MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
 
         baseEntity is EntityPig && nextEntity is EntityPig -> MobData.MobResult.illegal // Matriarch Tongue
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "BarbarianGuard " ->
-            MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Barbarian Guard"),
-            )
+            MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Barbarian Guard"))
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "MageGuard " ->
-            MobData.MobResult.found(
-                Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Mage Guard"),
-            )
+            MobData.MobResult.found(Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Mage Guard"))
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Mage Outlaw" ->
             // fix for wierd name

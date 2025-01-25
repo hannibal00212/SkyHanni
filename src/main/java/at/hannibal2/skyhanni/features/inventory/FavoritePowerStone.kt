@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -37,13 +37,13 @@ object FavoritePowerStone {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
         val displayName = event.item?.name?.removeColor()?.trim() ?: return
-        val power = MaxwellAPI.getPowerByNameOrNull(displayName) ?: return
+        val power = MaxwellApi.getPowerByNameOrNull(displayName) ?: return
 
-        if (power in MaxwellAPI.favoritePowers) {
-            MaxwellAPI.favoritePowers -= power
+        if (power in MaxwellApi.favoritePowers) {
+            MaxwellApi.favoritePowers -= power
             highlightedSlots -= event.slotId
         } else {
-            MaxwellAPI.favoritePowers += power
+            MaxwellApi.favoritePowers += power
             highlightedSlots += event.slotId
         }
 
@@ -52,7 +52,7 @@ object FavoritePowerStone {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled() || !MaxwellAPI.isThaumaturgyInventory(event.inventoryName)) return
+        if (!isEnabled() || !MaxwellApi.isThaumaturgyInventory(event.inventoryName)) return
 
         inInventory = true
     }
@@ -62,7 +62,7 @@ object FavoritePowerStone {
         if (!isEnabled() || !inInventory) return
 
         highlightedSlots = event.inventoryItems
-            .filter { (_, item) -> item.displayName.removeColor() in MaxwellAPI.favoritePowers }
+            .filter { (_, item) -> item.displayName.removeColor() in MaxwellApi.favoritePowers }
             .keys
     }
 

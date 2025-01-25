@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -23,9 +23,9 @@ object ScoreboardEventCarnival : ScoreboardEvent() {
     )
 
     override fun getDisplay() = buildList {
-        ScoreboardPattern.carnivalPattern.firstMatches(getSbLines())?.let {
+        ScoreboardPattern.carnivalPattern.firstMatches(getSBLines())?.let {
             add(it)
-            addAll(patterns.allMatches(getSbLines()))
+            addAll(patterns.allMatches(getSBLines()))
         }
     }
 

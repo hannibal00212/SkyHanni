@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
+import at.hannibal2.skyhanni.features.combat.SpidersDenApi
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 
 // scoreboard
@@ -12,7 +12,7 @@ object ScoreboardEventBroodmother : ScoreboardEvent() {
 
     override val configLine = "Broodmother§7: §eDormant"
 
-    override val elementPatterns = listOf(SpidersDenAPI.broodmotherPattern)
+    override val elementPatterns = listOf(SpidersDenApi.broodmotherPattern)
 
     override fun showIsland() = IslandType.SPIDER_DEN.isInIsland()
 }
