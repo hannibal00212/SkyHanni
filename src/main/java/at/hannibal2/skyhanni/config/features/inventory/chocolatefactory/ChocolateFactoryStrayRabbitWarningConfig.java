@@ -50,15 +50,15 @@ public class ChocolateFactoryStrayRabbitWarningConfig {
         ALL("All"),
         NONE("None"),
         ;
-        private final String str;
+        private final String displayName;
 
-        StrayTypeEntry(String str) {
-            this.str = str;
+        StrayTypeEntry(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

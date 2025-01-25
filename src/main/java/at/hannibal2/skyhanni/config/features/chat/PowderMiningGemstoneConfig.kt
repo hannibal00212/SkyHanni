@@ -5,7 +5,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class PowderMiningGemstoneFilterConfig {
+class PowderMiningGemstoneConfig {
     @Expose
     @ConfigOption(name = "Stronger Tool Messages", desc = "Hide 'You need a stronger tool..' messages.")
     @ConfigEditorBoolean

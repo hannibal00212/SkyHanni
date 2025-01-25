@@ -14,6 +14,9 @@
 #### Inventory
 
 + Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
++ Added XP in Inventory. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
+    + Showing current XP in item lore of XP-dependent menus (e.g., Experimentation Table, Anvil, Hex).
+    + This ensures XP visibility even when replaced by the SkyBlock XP bar.
 
 #### Chat
 
@@ -25,6 +28,17 @@
 #### Slayer
 
 + Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
+
+#### Rift
+
++ Added Bacte Phase Display to the Damage Indicator. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
++ Added waypoints for Bacte's Tentacles with hit counts. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
+    + Shows hit counts instead of HP display due to varying max health values.
+
+#### Mining
+
++ Added a chat filter, profit per run, and profit tracker for Crystal Nucleus runs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
++ Added automatic SkyBlock joining when connecting to Hypixel. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/2745)
 
 #### Misc
 
@@ -47,6 +61,7 @@
 + Added time-held display for Discrite in stack size and lore. - Luna (https://github.com/hannibal002/SkyHanni/pull/3101)
 + Added support for more NEU GUIs in Estimated Item Value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3251)
     + Added Trade Overlay, Equipment Overlay, and Storage Overlay support.
++ Made the "Open Last Storage" feature persistent across instances. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3182)
 
 #### Mining Improvements
 
@@ -73,6 +88,7 @@
 
 + Added EliteBot profile button to Discord Rich Presence. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3169)
 + Improved multiple GUIs by graying out or hiding irrelevant ones. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3218)
++ Hide Item Tracker buttons when the display is grayed out. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3286)
 
 ### Bug Fixes
 
@@ -111,6 +127,10 @@
 + Fixed Anvil Combine Helper not highlighting when a book is in the second slot. - Ownwn (https://github.com/hannibal002/SkyHanni/pull/3258)
 + Fixed bazaar detection in instant buy menu, breaking visibility of features like Visitor Shopping List and Hide Non Clickable Items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3269)
 + Fixed enchanted clock reminders triggering at incorrect times. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3256)
++ Fixed Estimated Item Value in NEU menus. - nopo (https://github.com/hannibal002/SkyHanni/pull/3301)
++ Fixed prismatic books causing errors with Bazaar Order Helper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3273)
++ Fixed reading NEU data in Estimated Item Value. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3297)
++ Fixed Sack Display for gemstone sacks. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3294)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -126,6 +146,9 @@
 + Fixed Farming Fortune Breakdown not showing in itooltips for Armor or Farming Tools with Gemstones applied. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3184)
 + Fixed missing visuals in /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3196)
 + Fixed opening AH for items not in AH in Visitor Shopping List. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3222)
++ Fixed Composter Overlay display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3280)
++ Fixed errors when farming pests from traps. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3278)
++ Fixed visitor reward checks for multi-rare-reward visitors. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3277)
 
 #### Combat Bug Fixes
 
@@ -143,6 +166,7 @@
 #### Mining Bug Fixes
 
 + Fixed 'Buy 10 levels' text for fewer levels remaining in HOTM menu. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3237)
++ Fixed King's Scent detection for Non-God Pot display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3298)
 
 #### Chat Bug Fixes
 
@@ -156,6 +180,10 @@
 
 + Fixed incorrect Livid highlighting in F5/M5 sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
 
+#### Fishing Bug Fixes
+
++ Fixed chat message about missing attribute shards in the Fishing Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3289)
+
 #### Misc Bug Fixes
 
 + Fixed overflow level-up message not showing and removed dependency on skill progress display. - appable (https://github.com/hannibal002/SkyHanni/pull/3146)
@@ -167,6 +195,10 @@
 + Fixed GUI Editor hotkey blocking GUI searches. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3226)
 + Fixed skull crash with missing repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/3229)
 + Fixed SkyBlock XP Bar overriding in Rift & Catacombs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3252)
++ Fixed GUI search for some profit trackers. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3287)
++ Fixed rare freezes at Minecraft startup. - nopo (https://github.com/hannibal002/SkyHanni/pull/3302)
++ Fixed SkyBlock XP Bar overriding other mods. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
++ Fixed Widget Display occasionally showing player names. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3257)
 
 ### Technical Details
 
@@ -209,6 +241,15 @@
 + Reworked Livid color detection. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
     + Added performance improvements.
     + Added easier debugging for future issues.
++ Added `CrystalNucleusLootEvent` for loot info upon completing a Nucleus run. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
++ Added `EntityHurtEvent`. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
++ Added detekt rule for early returns instead of island type annotations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3274)
++ Added detekt rule to prevent `@Expose` from being removed during merges. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3292)
++ All SkyHanni trackers use `RenderDisplayHelper`, some with `initRenderer()`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3287)
++ Followed Kotlin conventions: `API` → `Api`, `NEU` → `Neu`, `Xp` → `XP`, etc. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3296)
++ Implemented REPO patterns in `BazaarAPI`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3271)
+    + Improved maintainability.
++ Renamed `LorenzChatEvent` to `SkyHanniChatEvent`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3270)
 
 ## Version 1.0.0
 

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object ShiftClickNPCSell {
+object ShiftClickNpcSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
