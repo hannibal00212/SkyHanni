@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.lang.Integer.parseInt
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object RareDropMessages {
      */
     private val petDroppedPattern by chatGroup.pattern(
         "pet.petdroppedmessage",
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)"
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)",
     )
 
     /**
@@ -30,7 +30,7 @@ object RareDropMessages {
      */
     private val petFishedPattern by chatGroup.pattern(
         "pet.petfishedmessage",
-        "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
 
     /**
@@ -38,7 +38,7 @@ object RareDropMessages {
      */
     private val petClaimedPattern by chatGroup.pattern(
         "pet.petclaimedmessage",
-        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*You can manage your Pets.*)"
+        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*You can manage your Pets.*)",
     )
 
     /**
@@ -46,7 +46,7 @@ object RareDropMessages {
      */
     private val petObtainedPattern by chatGroup.pattern(
         "pet.petobtainedmessage",
-        "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
 
     /**
@@ -55,11 +55,11 @@ object RareDropMessages {
      */
     private val oringoPattern by chatGroup.pattern(
         "pet.oringopattern",
-        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)"
+        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
     private val patterns = listOf(
-        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern
+        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern,
     )
 
     private val config get() = SkyHanniMod.feature.chat.petRarityDropMessage
@@ -78,12 +78,10 @@ object RareDropMessages {
                 start = start.replace(" $".toRegex(), "n ")
 
             event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end"
+                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
             )
         }
     }
-
-
 
     /**
      * REGEX-TEST: §6§lPET DROP! §r§5Baby Yeti §r§b(+§r§b168% §r§b✯ Magic Find§r§b)
@@ -91,14 +89,13 @@ object RareDropMessages {
      */
     private val petDropsWithMagicFindPattern by chatGroup.pattern(
         "pet.petdropmessage", // TODO: Improve name
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)((?:§.)*\\(\\+(?:§.)*(?<magicFind>\\d+)% (?:§.)*(?<mfMessage>✯ Magic Find)(?:§.)*\\))"
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)((?:§.)*\\(\\+(?:§.)*(?<magicFind>\\d+)% (?:§.)*(?<mfMessage>✯ Magic Find)(?:§.)*\\))",
         // TODO: ugly regex gotta fix
     )
 
-    @SubscribeEvent
-    fun onChatting(event: LorenzChatEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChatting(event: SkyHanniChatEvent) {
         // if (!isEnabled()) return // TODO: implement config toggle
-        if (!LorenzUtils.inSkyBlock) return
         val matcher = petDropsWithMagicFindPattern.matcher(event.message)
 
         if (!matcher.matches()) return
@@ -110,7 +107,8 @@ object RareDropMessages {
         val magicFind: String = matcher.group("magicFind") ?: return
         val mfMessage = matcher.group("mfMessage")
 
-        val petLuck = SkyblockStat.PET_LUCK.lastKnownValue
+        // TODO make sure the 0 value here is intended
+        val petLuck = SkyblockStat.PET_LUCK.lastKnownValue ?: 0
 
         event.chatComponent = ChatComponentText(
             // TODO: extremely fragile
