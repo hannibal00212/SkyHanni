@@ -23,7 +23,7 @@ data class CachedItemData(
 
     var itemCategory: ItemCategory? = null,
 
-    var lastInternalName: NEUInternalName? = null,
+    var lastInternalName: NeuInternalName? = null,
 
     var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {

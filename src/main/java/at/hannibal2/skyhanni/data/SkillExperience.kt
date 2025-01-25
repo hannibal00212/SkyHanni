@@ -82,8 +82,8 @@ object SkillExperience {
 
     private fun getLevelForExpExactly(experience: Long): Int {
         var level = 1
-        for (levelXp in levelingExp) {
-            if (levelXp.toLong() == experience) {
+        for (levelXP in levelingExp) {
+            if (levelXP.toLong() == experience) {
                 return level
             }
             level++
@@ -97,8 +97,8 @@ object SkillExperience {
     fun getExpForLevel(requestedLevel: Int): Long {
         var total = 0L
         var level = 0
-        for (levelXp in levelingExp) {
-            total += levelXp
+        for (levelXP in levelingExp) {
+            total += levelXP
             level++
             if (level == requestedLevel) {
                 return total

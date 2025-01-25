@@ -42,7 +42,7 @@ object CustomWardrobeKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }.filterNot { config.onlyFavorites && !it.favorite }
+        val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }.filterNot { config.onlyFavorites && !it.favorite }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue
@@ -60,5 +60,5 @@ object CustomWardrobeKeybinds {
     fun allowMouseClick() = isEnabled() && keybinds.filter { it < 0 }.any { it.isKeyHeld() }
     fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeAPI.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && WardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 }
