@@ -52,7 +52,7 @@ object MinecraftData {
                         LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
                         packet.isLongDistance,
                         packet.particleArgs,
-                    ).postAndCatch()
+                    ).post()
                 ) {
                     event.cancel()
                 }

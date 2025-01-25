@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
@@ -210,18 +209,17 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
-        if (inChest) {
-            // Only show in excavation menu
-            if (!FossilExcavatorAPI.inExcavatorMenu) {
-                return
-            }
-        }
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        // Only show in excavation menu
+        if (inChest && !FossilExcavatorAPI.inExcavatorMenu) return false
+
+        return true
     }
 
     @HandleEvent

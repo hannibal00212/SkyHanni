@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -160,13 +159,15 @@ object PowderTracker {
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        if (config.onlyWhenPowderGrinding && !isGrinding) return
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (config.onlyWhenPowderGrinding && !isGrinding) return false
 
-        tracker.renderDisplay(config.position)
+        return true
     }
 
     @HandleEvent

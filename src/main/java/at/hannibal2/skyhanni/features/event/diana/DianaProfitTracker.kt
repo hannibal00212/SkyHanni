@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -154,16 +154,21 @@ object DianaProfitTracker {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
-        if (spadeInHand) {
-            tracker.firstUpdate()
-        }
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { config.enabled },
+            onRender = {
+                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+                if (!DianaAPI.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
+                if (spadeInHand) {
+                    tracker.firstUpdate()
+                }
 
-        tracker.renderDisplay(config.position)
+                tracker.renderDisplay(config.position)
+            },
+        )
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops

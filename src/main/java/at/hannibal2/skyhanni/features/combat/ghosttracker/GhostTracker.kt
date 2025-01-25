@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -282,11 +281,8 @@ object GhostTracker {
         parseBestiaryWidget(event.lines)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent

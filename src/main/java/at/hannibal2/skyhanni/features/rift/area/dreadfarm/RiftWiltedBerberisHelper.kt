@@ -63,7 +63,7 @@ object RiftWiltedBerberisHelper {
         list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return

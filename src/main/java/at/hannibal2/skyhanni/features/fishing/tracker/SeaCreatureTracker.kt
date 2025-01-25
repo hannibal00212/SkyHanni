@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.fishing.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
@@ -179,12 +178,15 @@ object SeaCreatureTracker {
         tracker.firstUpdate()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!FishingAPI.isFishing(checkRodInHand = false)) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!FishingAPI.isFishing(checkRodInHand = false)) return false
+
+        return true
     }
 
     fun resetCommand() {

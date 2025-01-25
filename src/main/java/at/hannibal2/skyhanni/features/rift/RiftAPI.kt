@@ -41,6 +41,7 @@ object RiftAPI {
     }
 
     var inMirrorVerse = false
+    private var inColosseum = false
     var inRiftRace = false
     var trackingButtons = false
     var allButtonsHit = false
@@ -48,11 +49,13 @@ object RiftAPI {
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inMirrorVerse = event.area == "Mirrorverse"
+        inColosseum = event.area == "Colosseum"
     }
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
     fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
+    fun inColosseum() = LorenzUtils.skyBlockArea == "Colosseum" || inColosseum
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
     fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
 }

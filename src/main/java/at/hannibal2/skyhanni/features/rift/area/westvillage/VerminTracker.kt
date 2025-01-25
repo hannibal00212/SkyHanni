@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -181,13 +180,16 @@ object VerminTracker {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return
-        if (!config.showWithoutVacuum && !hasVacuum) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return false
+        if (!config.showWithoutVacuum && !hasVacuum) return false
+
+        return true
     }
 
     @HandleEvent

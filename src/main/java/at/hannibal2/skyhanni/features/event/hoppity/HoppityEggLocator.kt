@@ -173,7 +173,7 @@ object HoppityEggLocator {
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!locatorInHotbar) return

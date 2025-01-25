@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -226,7 +226,7 @@ object GardenVisitorFeatures {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
                             if (internalName.isBazaarItem()) {
-                                BazaarApi.searchForBazaarItem(name, amount)
+                                BazaarAPI.searchForBazaarItem(name, amount)
                             } else if (internalName.isAuctionHouseItem()) {
                                 HypixelCommands.auctionSearch(name.removeColor())
                             } else {
@@ -383,10 +383,14 @@ object GardenVisitorFeatures {
         val location = event.location
         event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
-            visitor.hasReward()?.let { reward ->
+            val initialOffset = 2.73
+            val heightOffset = 0.25
+            var counter = 0
+            visitor.getRewardWarningAwards().forEach { reward ->
                 val name = reward.displayName
-
-                event.parent.drawString(location.up(2.73), "§c!$name§c!")
+                val offset = initialOffset + (counter * heightOffset)
+                event.parent.drawString(location.up(offset), "§c§l! $name §c§l!")
+                counter++
             }
         }
     }
@@ -436,11 +440,9 @@ object GardenVisitorFeatures {
         if (foundRewards.isNotEmpty()) {
             val wasEmpty = visitor.allRewards.isEmpty()
             visitor.allRewards = foundRewards
-            if (wasEmpty) {
-                visitor.hasReward()?.let { reward ->
-                    if (config.rewardWarning.notifyInChat) {
-                        ChatUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
-                    }
+            if (wasEmpty && config.rewardWarning.notifyInChat) {
+                visitor.getRewardWarningAwards().forEach { reward ->
+                    ChatUtils.chat("Found Visitor Reward ${reward.displayName}§e!")
                 }
             }
         }
@@ -668,7 +670,7 @@ object GardenVisitorFeatures {
 
     private fun shouldShowShoppingList(): Boolean {
         if (VisitorAPI.inInventory) return true
-        if (BazaarApi.inBazaarInventory) return true
+        if (BazaarAPI.inBazaarInventory) return true
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
         val isInOwnInventory = currentScreen is GuiInventory
         if (isInOwnInventory) return true

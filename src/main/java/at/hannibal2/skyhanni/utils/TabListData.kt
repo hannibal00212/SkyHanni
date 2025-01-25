@@ -143,7 +143,8 @@ object TabListData {
             result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
-        return result.dropLast(1)
+        return if (result.size < 80) result.dropLast(1)
+        else result.subList(0, 80)
     }
 
     var dirty = false
