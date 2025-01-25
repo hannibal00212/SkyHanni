@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PetUtils.xpToLevel
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -20,9 +20,9 @@ import net.minecraft.item.ItemStack
  *
  */
 data class PetData(
-    val petItem: NEUInternalName? = null, // The internal name of the pet, e.g., `RABBIT;5`
-    val skinItem: NEUInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
-    val heldItem: NEUInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
+    val petItem: NeuInternalName? = null, // The internal name of the pet, e.g., `RABBIT;5`
+    val skinItem: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
+    val heldItem: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     val cleanName: String? = null, // The clean name of the pet, e.g., `Rabbit`
     val skinSymbol: String? = null, // The symbol of the skin of the pet, e.g., §d ✦
     val rarity: LorenzRarity? = null, // The rarity of the pet, e.g., `COMMON`
@@ -71,7 +71,7 @@ data class PetData(
         // <editor-fold desc="Pet Data Extractors (General)">
         fun parsePetData(
             lines: List<String>,
-            itemHandler: (String) -> NEUInternalName?,
+            itemHandler: (String) -> NeuInternalName?,
             xpHandler: (String) -> Double?,
             petHandler: (String) -> PetData?
         ): Pair<PetData, Double>? {
@@ -85,7 +85,7 @@ data class PetData(
 
         fun parsePetDataLists(
             lines: List<String>,
-            itemHandlerList: (List<String>) -> NEUInternalName?,
+            itemHandlerList: (List<String>) -> NeuInternalName?,
             xpHandlerList: (List<String>) -> Double?,
             petHandlerList: (List<String>) -> PetData?
         ): Pair<PetData, Double>? {
@@ -127,10 +127,10 @@ data class PetData(
             )
         }
 
-        fun petNameToInternalName(name: String, rarity: LorenzRarity): NEUInternalName =
+        fun petNameToInternalName(name: String, rarity: LorenzRarity): NeuInternalName =
             "${name.removeColor()};${rarity.id}".toInternalName()
 
-        fun internalNameToPetName(internalName: NEUInternalName): Pair<String, LorenzRarity>? {
+        fun internalNameToPetName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
             val (name, rarityStr) = internalName.asString().split(";")
             val rarity = LorenzRarity.getById(rarityStr.toInt()) ?: return null
             return Pair(name, rarity)
