@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -25,13 +25,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -43,16 +45,55 @@ object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    val holder = HypixelItemAPI()
+    val holder = HypixelItemApi()
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 
-    var currentlyOpenedProduct: NEUInternalName? = null
-    var orderOptionProduct: NEUInternalName? = null
+    var currentlyOpenedProduct: NeuInternalName? = null
+    var orderOptionProduct: NeuInternalName? = null
 
-    fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
+    private val patternGroup = RepoPattern.group("inventory.bazaar")
 
-    fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
+    /**
+     * REGEX-TEST: [Bazaar] Bought 1x Small Storage for 3,999.5 coins!
+     */
+    private val resetCurrentSearchPattern by patternGroup.pattern(
+        "reset-current-search",
+        "\\[Bazaar] (?:Buy Order Setup!|Bought) \\d+x (?<item>.*) for .*",
+    )
+
+    /**
+     * REGEX-TEST: Bazaar ➜ Coal
+     * REGEX-TEST: How many do you want?
+     * REGEX-TEST: Confirm Buy Order
+     * REGEX-TEST: Confirm Buy Order
+     * REGEX-TEST: Order options
+     */
+    private val inventoryNamePattern by patternGroup.list(
+        "inventory-name",
+        "Bazaar ➜ .*",
+        "How many do you want\\?",
+        "How much do you want to pay\\?",
+        "Confirm Buy Order",
+        "Confirm Instant Buy",
+        "At what price are you selling\\?",
+        "Confirm Sell Offer",
+        "Order options",
+    )
+
+    /**
+     * REGEX-TEST: Your Bazaar Orders
+     * REGEX-TEST: Co-op Bazaar Orders
+     */
+    private val inventoryBazaarOrdersPattern by patternGroup.list(
+        "inventory-bazaar-orders",
+        "Your Bazaar Orders",
+        "Co-op Bazaar Orders",
+    )
+
+    fun NeuInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
+
+    fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
             "Can not find bazaar data for $itemName",
             "internal name" to this,
@@ -61,17 +102,17 @@ object BazaarApi {
 
     fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
-    fun NEUInternalName.isBazaarItem() = getBazaarData() != null
+    fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
-    fun searchForBazaarItem(internalName: NEUInternalName, amount: Int = -1) {
+    fun searchForBazaarItem(internalName: NeuInternalName, amount: Int = -1) {
         searchForBazaarItem(internalName.itemNameWithoutColor, amount)
     }
 
     fun searchForBazaarItem(displayName: String, amount: Int? = null) {
         if (!LorenzUtils.inSkyBlock) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         if (LorenzUtils.noTradeMode) return
-        if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
+        if (DungeonApi.inDungeon() || LorenzUtils.inKuudraFight) return
         HypixelCommands.bazaar(displayName.removeColor())
         amount?.let { OSUtils.copyToClipboard(it.toString()) }
         currentSearchedItem = displayName.removeColor()
@@ -106,13 +147,13 @@ object BazaarApi {
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return NEUInternalName.fromItemName(bazaarItem.displayName)
+        return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
     @SubscribeEvent
@@ -148,11 +189,14 @@ object BazaarApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!inBazaarInventory) return
-        // TODO USE SH-REPO
-        // TODO remove dynamic pattern
-        "\\[Bazaar] (Buy Order Setup!|Bought).*$currentSearchedItem.*".toPattern()
-            .matchMatcher(event.message.removeColor()) { currentSearchedItem = "" }
+        val message = event.message.removeColor()
+        val item = resetCurrentSearchPattern.matchMatcher(message) {
+            group("item")
+        } ?: return
+
+        if (currentSearchedItem == item) {
+            currentSearchedItem = ""
+        }
     }
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
@@ -168,18 +212,8 @@ object BazaarApi {
             }
         }
 
-        if (event.inventoryName.startsWith("Bazaar ➜ ")) return true
-        return when (event.inventoryName) {
-            "How many do you want?" -> true
-            "How much do you want to pay?" -> true
-            "Confirm Buy Order" -> true
-            "Confirm Instant Buy" -> true
-            "At what price are you selling?" -> true
-            "Confirm Sell Offer" -> true
-            "Order options" -> true
-
-            else -> false
-        }
+        if (isBazaarOrderInventory(event.inventoryName)) return true
+        return inventoryNamePattern.matches(event.inventoryName)
     }
 
     @HandleEvent
@@ -193,9 +227,5 @@ object BazaarApi {
         currentlyOpenedProduct = null
     }
 
-    fun isBazaarOrderInventory(inventoryName: String): Boolean = when (inventoryName) {
-        "Your Bazaar Orders" -> true
-        "Co-op Bazaar Orders" -> true
-        else -> false
-    }
+    fun isBazaarOrderInventory(inventoryName: String): Boolean = inventoryBazaarOrdersPattern.matches(inventoryName)
 }

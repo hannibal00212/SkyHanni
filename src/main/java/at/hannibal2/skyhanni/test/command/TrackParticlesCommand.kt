@@ -93,7 +93,7 @@ object TrackParticlesCommand {
         isRecording = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
         event.distanceToPlayer // Need to call to initialize Lazy

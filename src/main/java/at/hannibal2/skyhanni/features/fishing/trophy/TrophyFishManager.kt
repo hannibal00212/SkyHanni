@@ -165,7 +165,7 @@ object TrophyFishManager {
     }
 
     fun getTooltip(internalName: String): ChatStyle? {
-        val display = TrophyFishAPI.hoverInfo(internalName) ?: return null
+        val display = TrophyFishApi.hoverInfo(internalName) ?: return null
         return ChatStyle().setChatHoverEvent(
             HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText(display)),
         )
