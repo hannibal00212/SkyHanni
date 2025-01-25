@@ -48,7 +48,7 @@ object BroodmotherFeatures {
     private var display = ""
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
         if (newStage.isNotEmpty() && newStage != lastStage.toString()) {
