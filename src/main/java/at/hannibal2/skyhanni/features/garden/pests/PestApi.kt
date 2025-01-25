@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -256,7 +257,7 @@ object PestApi {
         if (!GardenApi.inGarden()) return
         pestDeathChatPattern.matchMatcher(event.message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: return
-            val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val item = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && item != DUNG_ITEM) return

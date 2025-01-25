@@ -132,7 +132,7 @@ enum class PestType(
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid pest type '$name'")
 
-        private val internalNameRareDropMap: Map<NEUInternalName, PestType?> = mapOf(
+        private val internalNameRareDropMap: Map<NeuInternalName, PestType?> = mapOf(
             // Beetle deterministic drops
             "ENCHANTED_NETHER_STALK" to BEETLE,
             "PESTERMINATOR;1" to BEETLE,
@@ -216,6 +216,6 @@ enum class PestType(
             it.key.toInternalName() to it.value
         }.toMap()
 
-        fun getByInternalNameItemOrNull(internalName: NEUInternalName): PestType? = internalNameRareDropMap[internalName]
+        fun getByInternalNameItemOrNull(internalName: NeuInternalName): PestType? = internalNameRareDropMap[internalName]
     }
 }
