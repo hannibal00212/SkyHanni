@@ -8,15 +8,16 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -49,6 +50,14 @@ object SunGeckoHelper {
     private val sunGeckoActionBar by patternGroup.pattern(
         "actionbar",
         "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]",
+    )
+    private val sunGeckoActiveModifiers by patternGroup.pattern(
+        "modifiers",
+        "§f                           §r§c§lACTIVE MODIFIERS!",
+    )
+    private val sunGeckoChatLine by patternGroup.pattern(
+        "chatline",
+        "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
     private var healthLeft = 250
@@ -118,22 +127,14 @@ object SunGeckoHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn) {
         if (!event.mob.name.contains("Sun Gecko")) return
         if (event.mob.name.contains("?") && config.highlightFakeBoss) {
             event.mob.highlight(Color.RED.addAlpha(80))
-            /* RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-                event.mob.baseEntity,
-                Color.RED.addAlpha(80),
-            ) { config.highlightFakeBoss } */
         } else {
             if (config.highlightRealBoss) {
                 event.mob.highlight(Color.GREEN.addAlpha(80))
-                /* RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-                    event.mob.baseEntity,
-                    Color.GREEN.addAlpha(80),
-                ) { config.highlightRealBoss } */
             }
             if (currentBoss == null) {
                 currentBoss = event.mob
@@ -170,14 +171,14 @@ object SunGeckoHelper {
     }
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
         pos.renderStrings(display, 0, "Sun Gecko Helper")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Modifiers") return
@@ -243,13 +244,13 @@ object SunGeckoHelper {
     }
 
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (event.message == "§f                           §r§c§lACTIVE MODIFIERS!") {
+        if (sunGeckoActiveModifiers.matches(event.message)) {
             scanningChat = true
             modifiers.clear()
-        } else if (event.message == "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬") {
+        } else if (sunGeckoChatLine.matches(event.message)) {
             scanningChat = false
         }
 
@@ -269,7 +270,7 @@ object SunGeckoHelper {
         inTimeChamber = event.area == "Time Chamber"
     }
 
-    private fun isEnabled() = config.enabled && RiftAPI.inRift() && RiftAPI.inMountainTop()
+    private fun isEnabled() = config.enabled && RiftApi.inRift() && RiftApi.inMountainTop()
 
     enum class Modifiers(val slot: Int, val formattedName: String) {
         REVIVAL(19, "Revival"), // spawns a second dude
