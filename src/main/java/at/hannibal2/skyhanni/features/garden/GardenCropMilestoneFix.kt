@@ -88,7 +88,7 @@ object GardenCropMilestoneFix {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         tabListPattern.firstMatcher(event.lines) {
             val tier = group("tier").toInt()
