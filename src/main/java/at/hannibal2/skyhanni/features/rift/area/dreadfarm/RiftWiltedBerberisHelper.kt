@@ -216,7 +216,7 @@ object RiftWiltedBerberisHelper {
         if (berberisList.isEmpty()) fallback = false
     }
 
-    private fun fallbackRender(event: LorenzRenderWorldEvent) {
+    private fun fallbackRender(event: RenderWorldEvent) {
         for (berberis in list) {
             with(berberis) {
                 if (currentParticles.distanceToPlayer() > 20) continue
@@ -237,7 +237,7 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    private fun primaryRender(event: LorenzRenderWorldEvent) {
+    private fun primaryRender(event: RenderWorldEvent) {
         if (berberisList.isEmpty()) return
         var alpha = 0.8f
         var previousBerberis: LorenzVec? = null
@@ -277,7 +277,7 @@ object RiftWiltedBerberisHelper {
 
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
-    private fun LorenzRenderWorldEvent.drawBox(location: LorenzVec, color: Color, alphaMultiplier: Float) {
+    private fun RenderWorldEvent.drawBox(location: LorenzVec, color: Color, alphaMultiplier: Float) {
         drawFilledBoundingBoxNea(axisAlignedBB(location), color, alphaMultiplier)
     }
 

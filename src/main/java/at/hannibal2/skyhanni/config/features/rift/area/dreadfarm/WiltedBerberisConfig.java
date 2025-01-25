@@ -7,8 +7,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-import java.awt.Color;
-
 public class WiltedBerberisConfig {
 
     @Expose
