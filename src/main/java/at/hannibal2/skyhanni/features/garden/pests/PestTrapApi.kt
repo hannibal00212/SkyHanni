@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.seconds
 private typealias ArmorStandNameChangeEvent = EntityCustomNameUpdateEvent<EntityArmorStand>
 
 @SkyHanniModule
-object PestTrapAPI {
+object PestTrapApi {
 
     data class PestTrapData(
         @Expose var number: Int,

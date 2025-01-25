@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapAPI.PestTrapData
+import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -114,7 +114,7 @@ object PestTrapFeatures {
     }
 
     private fun List<PestTrapData>.checkFullWarnings() = this.filter {
-        it.count >= PestTrapAPI.MAX_PEST_COUNT_PER_TRAP
+        it.count >= PestTrapApi.MAX_PEST_COUNT_PER_TRAP
     }.map { it.number }.toSet()
 
     private fun List<PestTrapData>.checkNoBaitWarnings() = this.filter {
