@@ -14,6 +14,9 @@ import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -23,8 +26,9 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -35,10 +39,10 @@ object ShowMotesNpcSellPrice {
 
     private val burgerPattern by RepoPattern.pattern(
         "rift.everywhere.burger",
-        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*"
+        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*",
     )
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private val itemMap = mutableMapOf<NeuInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
@@ -47,9 +51,8 @@ object ShowMotesNpcSellPrice {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
-            config.inventoryValue.position.renderStringsAndItems(
+            config.inventoryValue.position.renderRenderables(
                 display,
-                itemScale = 0.7,
                 posLabel = "Inventory Motes Value",
             )
         }
@@ -132,43 +135,40 @@ object ShowMotesNpcSellPrice {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList<List<Any>> {
-        val newDisplay = mutableListOf<List<Any>>()
-        newDisplay.addAsSingletonList("§7Item Values:")
+    private fun drawDisplay() = buildList<Renderable> {
+        addString("§7Item Values:")
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
-            newDisplay.add(
-                buildList {
-                    val (index, value) = pair
-                    add("  §7- ")
-                    val stack = internalName.getItemStack()
-                    add(stack)
-                    val price = value.formatPrice()
-                    val valuePer = stack.motesNpcPrice() ?: continue
-                    val tips = buildList {
-                        add("§6Item: ${stack.displayName}")
-                        add("§6Value per: §d$valuePer Motes")
-                        add("§6Total in chest: §d${(value / valuePer).toInt()}")
-                        add("")
-                        add("§6Total value: §d$price coins")
-                    }
-                    add(
-                        Renderable.hoverTips(
-                            "§6${stack.displayName}: §b$price",
-                            tips,
-                            highlightsOnHoverSlots = index,
-                            stack = stack,
-                        ),
-                    )
-                },
-            )
+            val (index, value) = pair
+            val stack = internalName.getItemStack()
+            val valuePer = stack.motesNpcPrice() ?: continue
+            val price = value.formatPrice()
+            addLine {
+                addString("  §7- ")
+                addItemStack(stack)
+                val tips = buildList {
+                    add("§6Item: ${stack.displayName}")
+                    add("§6Value per: §d$valuePer Motes")
+                    add("§6Total in chest: §d${(value / valuePer).toInt()}")
+                    add("")
+                    add("§6Total value: §d$price coins")
+                }
+                add(
+                    Renderable.hoverTips(
+                        "§6${stack.displayName}: §b$price",
+                        tips,
+                        highlightsOnHoverSlots = index,
+                        stack = stack,
+                    ),
+                )
+            }
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
-        newDisplay.addAsSingletonList("§7Total price: §b$total")
+        addString("§7Total price: §b$total")
         val name = FormatType.entries[config.inventoryValue.formatType.ordinal].type // todo avoid ordinal
-        newDisplay.addAsSingletonList("§7Price format: §c$name")
-        newDisplay.addSelector<FormatType>(
+        addString("§7Price format: §c$name")
+        addSelector<FormatType>(
             " ",
             getName = { type -> type.type },
             isCurrent = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal
@@ -177,7 +177,6 @@ object ShowMotesNpcSellPrice {
                 update()
             },
         )
-        return newDisplay
     }
 
     enum class FormatType(val type: String) {
