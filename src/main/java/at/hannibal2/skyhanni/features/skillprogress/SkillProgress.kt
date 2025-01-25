@@ -90,7 +90,7 @@ object SkillProgress {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
                 val content = horizontalContainer(display)
-                config.displayPosition.renderRenderables(content, posLabel = "Skill Progress")
+                config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
             }
 
             SkillProgressConfig.TextAlignment.CENTERED,
