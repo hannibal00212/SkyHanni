@@ -97,15 +97,15 @@ public class DisplayConfig {
         BOTH("Available / All"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        PowderDisplay(String str) {
-            this.str = str;
+        PowderDisplay(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -118,15 +118,15 @@ public class DisplayConfig {
         LONG("1,234,567"),
         SHORT("1.2M");
 
-        private final String str;
+        private final String displayName;
 
-        NumberFormat(String str) {
-            this.str = str;
+        NumberFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -138,7 +138,7 @@ public class DisplayConfig {
     @Expose
     @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
     @ConfigEditorBoolean
-    public boolean skyblockTimeExactMinutes = true;
+    public boolean skyblockTimeExactMinutes = false;
 
     @Expose
     @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")

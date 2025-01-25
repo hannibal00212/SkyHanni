@@ -6,18 +6,16 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -58,15 +56,15 @@ object DungeonMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)
@@ -74,14 +72,13 @@ object DungeonMobManager {
         handleFelDespawn(event.mob)
     }
 
-    @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
-        if (!IslandType.CATACOMBS.isInIsland()) return
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onTick(event: SkyHanniTickEvent) {
         handleInvisibleStar()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {

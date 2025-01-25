@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 // 1s internal while on mining islands?
 object ScoreboardElementPowder : ScoreboardElement() {
     override fun getDisplay() = buildList {
-        val powderTypes = HotmAPI.PowderType.entries
+        val powderTypes = HotmApi.PowderType.entries
         if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) return@buildList
 
         add("§9§lPowder")
@@ -44,7 +44,7 @@ object ScoreboardElementPowder : ScoreboardElement() {
 
     override val configLine = "§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234\n §7- §fGlacite: §b86,574"
 
-    override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
+    override fun showIsland() = MiningApi.inAdvancedMiningIsland()
 }
 
 // click: open /hotm

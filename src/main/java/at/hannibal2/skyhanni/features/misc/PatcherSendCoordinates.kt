@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -21,8 +21,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PatcherSendCoordinates {
@@ -38,11 +36,11 @@ object PatcherSendCoordinates {
      */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",
-        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>[0-9.-]+(?: .*)?)"
+        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>[0-9.-]+(?: .*)?)",
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled) return
 
         val message = event.message.removeColor()
@@ -64,8 +62,8 @@ object PatcherSendCoordinates {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.enabled) return
 
         for (beacon in patcherBeacon) {
@@ -79,8 +77,8 @@ object PatcherSendCoordinates {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
@@ -91,8 +89,8 @@ object PatcherSendCoordinates {
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         patcherBeacon.clear()
         logger.log("Reset everything (world change)")
     }

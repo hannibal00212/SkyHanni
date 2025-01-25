@@ -4,22 +4,21 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
 
-    private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
+    private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
@@ -60,8 +59,8 @@ object LivingCaveLivingMetalHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
         if (System.currentTimeMillis() > startTime + 5_000) return
@@ -79,7 +78,7 @@ object LivingCaveLivingMetalHelper {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return
@@ -101,5 +100,5 @@ object LivingCaveLivingMetalHelper {
 
     val color get() = config.color.get().toSpecialColor()
 
-    fun isEnabled() = RiftAPI.inRift() && (RiftAPI.inLivingCave() || RiftAPI.inLivingStillness()) && config.enabled
+    fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
 }

@@ -4,36 +4,34 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.isSprayExpired
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.markExpiredSprayAsNotified
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.plots
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.plots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SprayDisplay {
 
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
     private var display: String? = null
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden() || !event.isMod(5, 3)) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!GardenApi.inGarden() || !event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
-            display = GardenPlotAPI.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
+            display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
                 plot.currentSpray?.let {
                     val timer = it.expiry.timeUntil()
                     "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
@@ -46,16 +44,15 @@ object SprayDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onIslandChange(event: IslandChangeEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.expiryNotification || event.newIsland != IslandType.GARDEN) return
         sendExpiredPlotsToChat(true)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden() || !config.displayEnabled) return
+        if (!GardenApi.inGarden() || !config.displayEnabled) return
         val display = display ?: return
         config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
     }

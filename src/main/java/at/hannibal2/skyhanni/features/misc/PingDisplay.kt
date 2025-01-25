@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S37PacketStatistics
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.round
 
@@ -28,9 +27,9 @@ object PingDisplay {
     private var invokedCommand = false
     private var display: String? = null
 
-    var latestPing: Double = 0.0
+    private var latestPing: Double = 0.0
 
-    fun sendPing(command: Boolean) {
+    private fun sendPing(command: Boolean) {
         if (lastPingAt > 0) {
             if (invokedCommand) {
                 ChatUtils.chat("§cAlready pinging!")
@@ -84,7 +83,7 @@ object PingDisplay {
         return "§$color${round(ping * 100) / 100} §7ms"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(5)) return
@@ -96,7 +95,7 @@ object PingDisplay {
         display = "§ePing: ${formatPingMessage(latestPing)}"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 

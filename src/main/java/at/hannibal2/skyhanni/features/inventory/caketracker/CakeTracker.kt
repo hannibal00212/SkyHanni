@@ -13,18 +13,18 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.patternGroup
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -37,8 +37,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
@@ -49,6 +49,8 @@ private typealias DisplayType = CakeTrackerDisplayType
 
 @SkyHanniModule
 object CakeTracker {
+
+    private val patternGroup = RepoPattern.group("inventory.cake-tracker")
 
     // <editor-fold desc="Patterns">
     /**
@@ -156,8 +158,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()
@@ -175,7 +177,7 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
@@ -185,8 +187,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
@@ -198,8 +200,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
@@ -239,7 +241,7 @@ object CakeTracker {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCakeInventory = false
         knownCakesInCurrentInventory = listOf()
@@ -248,7 +250,7 @@ object CakeTracker {
         searchingForCakes = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         val sbTimeNow = SkyBlockTime.now()
@@ -278,7 +280,7 @@ object CakeTracker {
 
     private fun recalculateMissingCakes() {
         val storage = storage ?: return
-        storage.missingCakes = (1..currentYear).toSet() - storage.ownedCakes
+        storage.missingCakes = ((1..currentYear).toSet() - storage.ownedCakes).toMutableSet()
     }
 
     private fun getCakePrice(year: Int): Double {
@@ -314,7 +316,7 @@ object CakeTracker {
             return if (!config.priceOnHover) Renderable.string(displayString)
             else Renderable.hoverTips(
                 displayString,
-                getPriceHoverTooltip(displayType, colorCode)
+                getPriceHoverTooltip(displayType, colorCode),
             )
         }
 
@@ -348,56 +350,52 @@ object CakeTracker {
         lastKnownCakeDataHash = 0
     }
 
-    private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
-            val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
+    private fun buildDisplayTypeToggle(): Renderable = Renderable.line {
+        val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
+        val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
 
-            add(
-                Renderable.optionalLink(
-                    "$ownedColor[Owned]",
-                    { setDisplayType(DisplayType.OWNED_CAKES) },
-                    condition = { config.displayType != DisplayType.OWNED_CAKES },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$missingColor[Missing]",
-                    { setDisplayType(DisplayType.MISSING_CAKES) },
-                    condition = { config.displayType != DisplayType.MISSING_CAKES },
-                ),
-            )
-        },
-    )
+        add(
+            Renderable.optionalLink(
+                "$ownedColor[Owned]",
+                { setDisplayType(DisplayType.OWNED_CAKES) },
+                condition = { config.displayType != DisplayType.OWNED_CAKES },
+            ),
+        )
+        addString(" ")
+        add(
+            Renderable.optionalLink(
+                "$missingColor[Missing]",
+                { setDisplayType(DisplayType.MISSING_CAKES) },
+                condition = { config.displayType != DisplayType.MISSING_CAKES },
+            ),
+        )
+    }
 
     private fun setDisplayOrderType(type: DisplayOrder) {
         config.displayOrderType = type
         lastKnownCakeDataHash = 0
     }
 
-    private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
-            val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
+    private fun buildOrderTypeToggle(): Renderable = Renderable.line {
+        val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
+        val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
 
-            add(
-                Renderable.optionalLink(
-                    "$newestColor[Newest First]",
-                    { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$oldestColor[Oldest First]",
-                    { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
-                ),
-            )
-        },
-    )
+        add(
+            Renderable.optionalLink(
+                "$newestColor[Newest First]",
+                { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
+                condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
+            ),
+        )
+        addString(" ")
+        add(
+            Renderable.optionalLink(
+                "$oldestColor[Oldest First]",
+                { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
+                condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
+            ),
+        )
+    }
 
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
@@ -444,8 +442,8 @@ object CakeTracker {
                 getCakeRanges(cakeList, config.displayOrderType, config.displayType),
                 height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
-                showScrollableTipsInList = true
-            )
+                showScrollableTipsInList = true,
+            ),
         )
     }
 

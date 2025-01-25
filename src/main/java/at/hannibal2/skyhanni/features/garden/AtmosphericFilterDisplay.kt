@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyblockSeason
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AtmosphericFilterDisplay {
@@ -17,17 +17,17 @@ object AtmosphericFilterDisplay {
 
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (!GardenAPI.inGarden() && !config.outsideGarden) return
+        if (!GardenApi.inGarden() && !config.outsideGarden) return
         display = drawDisplay(SkyblockSeason.currentSeason ?: return)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.inGarden()) {
+        if (GardenApi.inGarden()) {
             config.position.renderString(display, posLabel = "Atmospheric Filter Perk Display")
         } else {
             config.positionOutside.renderString(display, posLabel = "Atmospheric Filter Perk Display")
@@ -43,7 +43,7 @@ object AtmosphericFilterDisplay {
     }
 
     private fun isEnabled() = LorenzUtils.onHypixel && config.enabled && (
-        (OutsideSbFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
-            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.outsideGarden))
+        (OutsideSBFeature.ATMOSPHERIC_FILTER.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.outsideGarden))
         )
 }

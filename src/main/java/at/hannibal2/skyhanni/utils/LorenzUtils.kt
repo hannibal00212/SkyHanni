@@ -3,19 +3,17 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -57,7 +55,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
-    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
+    val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -76,7 +74,7 @@ object LorenzUtils {
             val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
             val result = (!never && (always || itsTime))
             if (previousApril != result) {
-                ModifyVisualWords.textCache.clear()
+                ModifyVisualWords.update()
             }
             previousApril = result
             return result
@@ -88,10 +86,6 @@ object LorenzUtils {
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
-
-    // TODO replace all calls with regex
-    @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
-    fun String.between(start: String, end: String): String = this.split(start, end)[1]
 
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
@@ -145,7 +139,7 @@ object LorenzUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = NEUItems.itemFontSize,
+        itemScale: Double = NeuItems.itemFontSize,
     ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
@@ -230,43 +224,11 @@ object LorenzUtils {
         }
     }
 
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
-    inline fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        add(
-            buildList {
-                add(prefix)
-                add("§a[")
-                if (tips.isEmpty()) {
-                    add(Renderable.link("§e$getName", false, onClick))
-                } else {
-                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                }
-                add("§a]")
-            },
-        )
-    }
-
     fun GuiEditSign.isRancherSign(): Boolean {
         if (this !is AccessorGuiEditSign) return false
 
-        val tileSign = (this as AccessorGuiEditSign).tileSign
-        return (
-            tileSign.signText[1].unformattedText.removeColor() == "^^^^^^" &&
-                tileSign.signText[2].unformattedText.removeColor() == "Set your" &&
-                tileSign.signText[3].unformattedText.removeColor() == "speed cap!"
-            )
+        val signText = (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
+        return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
@@ -295,7 +257,7 @@ object LorenzUtils {
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
-        TitleManager.sendTitle(text, duration, height, fontSize)
+        TitleManager.setTitle(text, duration, height, fontSize)
     }
 
     inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
@@ -304,8 +266,7 @@ object LorenzUtils {
     }
 
     inline fun <reified T : Enum<T>> enumValueOf(name: String) =
-        enumValueOfOrNull<T>(name)
-            ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
+        enumValueOfOrNull<T>(name) ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
 
     inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
         enumValues<T>().joinToString("|", transform = transform)
@@ -319,10 +280,7 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
-        IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
-
-    fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 

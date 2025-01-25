@@ -1,16 +1,13 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
@@ -50,13 +47,11 @@ object HideMobNames {
         patterns.add("§8\\[§7Lv\\d+§8] §c$bossName§r §[ae](?<min>.+)§f/§a(?<max>.+)§c❤".toPattern())
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!SkyHanniMod.feature.slayer.hideMobNames) return
 
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
 
         val name = entity.name
@@ -77,8 +72,8 @@ object HideMobNames {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastMobName.clear()
         mobNamesHidden.clear()
     }

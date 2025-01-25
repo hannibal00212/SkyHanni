@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.caughtRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.caughtRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -28,15 +28,18 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 
 @SkyHanniModule
 object ChocolateFactoryStrayWarning {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private val warningConfig get() = config.rabbitWarning
+    private const val CHROMA_COLOR = "249:255:255:85:85"
+    private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
+    private const val CHROMA_COLOR_ALT2 = "243:255:255:85:85"
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
@@ -79,29 +82,50 @@ object ChocolateFactoryStrayWarning {
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
 
-        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryApi.warningSound)
         else SoundUtils.playBeepSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        InventoryUtils.getItemsInOpenChest().filter {
+        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (config.partyMode.get()) event.partyModeHighlight()
+        else event.strayHighlight()
+    }
+
+    private fun GuiContainerEvent.getEventChest(): ContainerChest? =
+        gui.inventorySlots as? ContainerChest
+
+    private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
+        eventChest.inventorySlots.filter {
+            it.slotNumber != it.slotIndex
+        }.forEach {
+            it highlight CHROMA_COLOR_ALT2.toSpecialColor()
+        }
+    }
+
+    private fun GuiContainerEvent.BackgroundDrawnEvent.strayHighlight() {
+        val eventChest = getEventChest() ?: return
+        eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
             it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!ChocolateFactoryApi.inChocolateFactory) {
             flashScreen = false
             return
         }
-        val strayStacks = HoppityAPI.filterMayBeStray(event.inventoryItems)
+        val strayStacks = HoppityApi.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
-        activeStraySlots = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }.keys
-        flashScreen = strayStacks.any {
+        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
+        activeStraySlots = activeStrays.keys
+        flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
                 StrayTypeEntry.SPECIAL -> isSpecial(stack)
@@ -121,7 +145,7 @@ object ChocolateFactoryStrayWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }
@@ -132,13 +156,14 @@ object ChocolateFactoryStrayWarning {
         flashScreen = false
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!flashScreen) return
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        val color = (alpha shl 24) or (config.rabbitWarning.flashColor.toSpecialColorInt() and 0xFFFFFF)
+        val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
+        val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
         Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }

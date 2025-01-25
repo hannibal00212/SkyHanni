@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -25,14 +24,13 @@ object LineToMobHandler {
         lines[mob] = settings
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn) {
         lines.remove(event.mob)
     }
 
-    @SubscribeEvent
-    fun onLorenzRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (lines.isEmpty()) return
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
             for ((mob, settings) in lines) {

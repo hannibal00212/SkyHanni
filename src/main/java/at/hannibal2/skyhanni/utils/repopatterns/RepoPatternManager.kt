@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -84,7 +82,7 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
+        if (EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
         }
     }
@@ -156,7 +154,7 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }
@@ -240,14 +238,14 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    private val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+[.-])*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
         require(keyShape.matches(key)) {
-            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers and dots."
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers, dots and dashes."
         }
     }
 

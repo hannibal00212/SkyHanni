@@ -2,20 +2,20 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -36,7 +35,7 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object GardenVisitorTimer {
 
-    private val config get() = GardenAPI.config.visitors.timer
+    private val config get() = GardenApi.config.visitors.timer
 
     /**
      * REGEX-TEST:  Next Visitor: §r§b11m
@@ -59,10 +58,10 @@ object GardenVisitorTimer {
     // TODO nea?
 //    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
-        get() = GardenAPI.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
+        get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
             value?.let {
-                GardenAPI.storage?.visitorInterval = it.inWholeMilliseconds
+                GardenApi.storage?.visitorInterval = it.inWholeMilliseconds
             }
         }
 
@@ -80,11 +79,11 @@ object GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        var visitorsAmount = VisitorAPI.visitorsInTabList(TabListData.getTabList()).size
+        var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
         var queueFull = false
@@ -127,7 +126,7 @@ object GardenVisitorTimer {
             millis = sixthVisitorArrivalTime.timeUntil()
 
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
-            GardenAPI.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
+            GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
@@ -163,8 +162,8 @@ object GardenVisitorTimer {
             else -> "e"
         }
 
-        val adjustedMillis = if (GardenAPI.isCurrentlyFarming()) millis / 3 else millis
-        val extraSpeed = if (GardenAPI.isCurrentlyFarming()) {
+        val adjustedMillis = if (GardenApi.isCurrentlyFarming()) millis / 3 else millis
+        val extraSpeed = if (GardenApi.isCurrentlyFarming()) {
             val duration = adjustedMillis * (GardenCropSpeed.getRecentBPS() / 20)
             "§7/§$formatColor" + duration.format()
         } else ""
@@ -186,17 +185,20 @@ object GardenVisitorTimer {
         onClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-
-        config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
+    init {
+        RenderDisplayHelper(
+            condition = { isEnabled() },
+            outsideInventory = true,
+            inOwnInventory = true,
+        ) {
+            config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
+        }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastVisitors = -1
-        GardenAPI.storage?.nextSixthVisitorArrival?.let {
+        GardenApi.storage?.nextSixthVisitorArrival?.let {
             if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {
                 sixthVisitorArrivalTime = it
             }
@@ -234,7 +236,7 @@ object GardenVisitorTimer {
 
     private fun isSixthVisitorEnabled() = config.sixthVisitorEnabled
     private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

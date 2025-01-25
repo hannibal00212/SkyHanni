@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -39,7 +38,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -100,10 +98,8 @@ object EndermanSlayerFeatures {
 
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -117,7 +113,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: LorenzRenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -143,7 +139,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -163,7 +159,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: LorenzRenderWorldEvent) {
+    private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
@@ -185,10 +181,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
-
         nukekubiSkulls.removeAll {
             if (it.isDead) {
                 RenderLivingEntityHelper.removeEntityColor(it)
@@ -212,9 +206,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandType.THE_END.isInIsland()) return
         if (!showBeacon()) return
 
         val location = event.location
@@ -234,8 +227,8 @@ object EndermanSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
         nukekubiSkulls.clear()

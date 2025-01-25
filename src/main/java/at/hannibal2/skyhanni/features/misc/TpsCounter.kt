@@ -5,18 +5,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,10 +38,11 @@ object TpsCounter {
     private var display: String? = null
 
     private val timeSinceWorldSwitch get() = LorenzUtils.lastWorldSwitch.passedSince()
-    private val tilCalculated: String get() =
-        "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
+    private val tilCalculated: String
+        get() =
+            "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (shouldIgnore()) {
             updateDisplay()
@@ -79,16 +79,16 @@ object TpsCounter {
         ChatUtils.chat("§eTPS: $tpsMessage")
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (hasReceivedPacket) {
             packetsFromLastSecond++
             hasReceivedPacket = false
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         tpsList.clear()
         tps = null
         packetsFromLastSecond = 0
@@ -101,7 +101,7 @@ object TpsCounter {
         hasReceivedPacket = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -121,7 +121,7 @@ object TpsCounter {
 
     private fun isEnabled() = LorenzUtils.onHypixel &&
         config.tpsDisplay &&
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
+        (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

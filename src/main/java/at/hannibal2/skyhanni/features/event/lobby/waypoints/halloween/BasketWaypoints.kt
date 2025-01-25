@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BasketWaypoints {
@@ -62,7 +61,7 @@ object BasketWaypoints {
         "^§a§lCongratulations! You found all Candy Baskets!$"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(2)) return
         if (!isActive || !isEnabled()) return
@@ -74,8 +73,8 @@ object BasketWaypoints {
         if (config.pathfind.get() && config.allWaypoints) startPathfind()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.allWaypoints) return
         if (!isActive) return
         if (!isEnabled()) return
@@ -95,8 +94,8 @@ object BasketWaypoints {
         startPathfind()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
         if (!config.allWaypoints) return
@@ -110,7 +109,7 @@ object BasketWaypoints {
         }
     }
 
-    private fun EventWaypoint?.render(event: LorenzRenderWorldEvent) {
+    private fun EventWaypoint?.render(event: SkyHanniRenderWorldEvent) {
         if (this == null) return
         event.drawDynamicText(position, "§dBasket", 1.0)
     }

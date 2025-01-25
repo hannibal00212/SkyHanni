@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -26,7 +25,7 @@ object DungeonMilestonesDisplay {
      */
     private val milestonePattern by RepoPattern.pattern(
         "dungeon.milestone",
-        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
+        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*",
     )
 
     private var display = ""
@@ -34,16 +33,16 @@ object DungeonMilestonesDisplay {
     private var timeReached = SimpleTimeMark.farPast()
     var color = ""
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         if (currentMilestone >= 3 && timeReached.passedSince() > 3.seconds && display.isNotEmpty()) {
             display = display.substring(1)
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         if (milestonePattern.matches(event.message)) {
@@ -67,8 +66,8 @@ object DungeonMilestonesDisplay {
         display = "Current Milestone: $currentMilestone"
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = ""
         currentMilestone = 0
     }
@@ -79,15 +78,15 @@ object DungeonMilestonesDisplay {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
             color + display,
-            posLabel = "Dungeon Milestone"
+            posLabel = "Dungeon Milestone",
         )
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.showMilestonesDisplay
+    private fun isEnabled() = DungeonApi.inDungeon() && config.showMilestonesDisplay
 }

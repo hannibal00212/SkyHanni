@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.isBlowgun
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.isBlowgun
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -30,13 +30,12 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WoodenButtonsHelper {
 
-    private val config get() = RiftAPI.config.enigmaSoulWaypoints
+    private val config get() = RiftApi.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
 
@@ -55,7 +54,7 @@ object WoodenButtonsHelper {
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
         buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
@@ -67,15 +66,15 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hitButtons.clear()
-        RiftAPI.allButtonsHit = false
+        RiftApi.allButtonsHit = false
         currentSpot = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         findClosestSpot()
         checkBlowgunActivatedButtons()
     }
@@ -146,8 +145,8 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {
@@ -155,7 +154,7 @@ object WoodenButtonsHelper {
         }
 
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
-        RiftAPI.allButtonsHit = true
+        RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
         soulLocations["Buttons"]?.let {
             IslandGraphs.pathFind(
@@ -167,8 +166,8 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!showButtons()) return
 
         val spot = currentSpot ?: return
@@ -186,6 +185,6 @@ object WoodenButtonsHelper {
         }
     }
 
-    private fun checkButtons() = RiftAPI.inRift() && !RiftAPI.allButtonsHit
-    fun showButtons() = checkButtons() && RiftAPI.trackingButtons && config.showButtonsHelper
+    private fun checkButtons() = RiftApi.inRift() && !RiftApi.allButtonsHit
+    fun showButtons() = checkButtons() && RiftApi.trackingButtons && config.showButtonsHelper
 }

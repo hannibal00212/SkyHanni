@@ -32,17 +32,17 @@ public class ChatMessagesConfig {
         STYLE_1("Style 1", 0),
         STYLE_2("Style 2", 1),
         STYLE_3("Style 3", 2);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DesignFormat(String str, int legacyId) {
-            this.str = str;
+        DesignFormat(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DesignFormat(String str) {
-            this(str, -1);
+        DesignFormat(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -52,7 +52,7 @@ public class ChatMessagesConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

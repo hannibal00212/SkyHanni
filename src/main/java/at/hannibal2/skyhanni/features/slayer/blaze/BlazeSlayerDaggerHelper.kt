@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.Fir
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,9 +46,8 @@ object BlazeSlayerDaggerHelper {
     private var lastNearestCheck = SimpleTimeMark.farPast()
     private var lastNearest: HellionShield? = null
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
@@ -58,8 +56,8 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         val dagger = getDaggerFromStack(InventoryUtils.getItemInHand())
@@ -242,7 +240,7 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
