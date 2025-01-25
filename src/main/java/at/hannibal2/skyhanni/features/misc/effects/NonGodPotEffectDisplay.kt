@@ -157,7 +157,7 @@ object NonGodPotEffectDisplay {
         totalEffectsCount = effectsCount
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftApi.inRift()) return
