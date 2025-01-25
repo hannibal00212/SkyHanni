@@ -272,5 +272,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.SOOPY_GUESS
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.SOOPY_GUESS
 }

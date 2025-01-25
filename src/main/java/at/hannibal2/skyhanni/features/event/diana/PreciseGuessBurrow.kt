@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
@@ -126,5 +126,5 @@ object PreciseGuessBurrow {
         event.move(71, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.PRECISE_GUESS
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.PRECISE_GUESS
 }
