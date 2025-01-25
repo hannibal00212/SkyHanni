@@ -8,18 +8,17 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.isBlowgun
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.isBlowgun
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object WoodenButtonsHelper {
 
-    private val config get() = RiftAPI.config.enigmaSoulWaypoints
+    private val config get() = RiftApi.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
 
@@ -55,7 +55,7 @@ object WoodenButtonsHelper {
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
         buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
@@ -67,10 +67,10 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hitButtons.clear()
-        RiftAPI.allButtonsHit = false
+        RiftApi.allButtonsHit = false
         currentSpot = null
     }
 
@@ -99,7 +99,7 @@ object WoodenButtonsHelper {
                 IslandGraphs.pathFind(
                     it.position,
                     "Button Spot",
-                    config.color.toChromaColor(),
+                    config.color.toSpecialColor(),
                     condition = { config.showPathFinder && config.showButtonsHelper },
                 )
             }
@@ -146,8 +146,8 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {
@@ -155,20 +155,20 @@ object WoodenButtonsHelper {
         }
 
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
-        RiftAPI.allButtonsHit = true
+        RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
         soulLocations["Buttons"]?.let {
             IslandGraphs.pathFind(
                 it,
                 "Buttons Enigma Soul",
-                config.color.toChromaColor(),
+                config.color.toSpecialColor(),
                 condition = { config.showPathFinder },
             )
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!showButtons()) return
 
         val spot = currentSpot ?: return
@@ -181,11 +181,11 @@ object WoodenButtonsHelper {
         val spotName = "${spot.name}:${spot.position}"
         buttonLocations[spotName]?.forEach { button ->
             if (!hitButtons.contains(button)) {
-                event.drawWaypointFilled(button, config.color.toChromaColor(), inverseAlphaScale = true)
+                event.drawWaypointFilled(button, config.color.toSpecialColor(), inverseAlphaScale = true)
             }
         }
     }
 
-    private fun checkButtons() = RiftAPI.inRift() && !RiftAPI.allButtonsHit
-    fun showButtons() = checkButtons() && RiftAPI.trackingButtons && config.showButtonsHelper
+    private fun checkButtons() = RiftApi.inRift() && !RiftApi.allButtonsHit
+    fun showButtons() = checkButtons() && RiftApi.trackingButtons && config.showButtonsHelper
 }

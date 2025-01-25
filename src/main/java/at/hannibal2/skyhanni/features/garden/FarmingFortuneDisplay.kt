@@ -1,23 +1,27 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.events.CropClickEvent
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -34,12 +38,11 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.log10
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingFortuneDisplay {
-    private val config get() = GardenAPI.config.farmingFortunes
+    private val config get() = GardenApi.config.farmingFortunes
 
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
     private val universalTabFortunePattern by patternGroup.pattern(
@@ -54,6 +57,7 @@ object FarmingFortuneDisplay {
         "collection",
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
     )
+
     @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
@@ -78,7 +82,7 @@ object FarmingFortuneDisplay {
 
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
-    private val latestFF: MutableMap<CropType, Double>? get() = GardenAPI.storage?.latestTrueFarmingFortune
+    private val latestFF: MutableMap<CropType, Double>? get() = GardenApi.storage?.latestTrueFarmingFortune
 
     private var currentCrop: CropType? = null
 
@@ -99,9 +103,11 @@ object FarmingFortuneDisplay {
     private var lastUniversalFortuneMissingError = SimpleTimeMark.farPast()
     private var lastCropFortuneMissingError = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
+
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         event.tabList.firstNotNullOfOrNull {
             universalTabFortunePattern.matchMatcher(it) {
                 val fortune = group("fortune").toDouble()
@@ -121,43 +127,43 @@ object FarmingFortuneDisplay {
                     tabFortuneCrop = cropFortune
                     update()
                 }
-                if (GardenAPI.cropInHand == crop) {
+                if (GardenApi.cropInHand == crop) {
                     latestFF?.put(crop, getCurrentFarmingFortune())
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (GardenAPI.toolInHand == null) return
+        if (GardenApi.hideExtraGuis()) return
+        if (GardenApi.toolInHand == null) return
         config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
     }
 
     private fun update() {
-        display =
-            if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-                drawMissingFortuneDisplay(false)
-            } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-                drawMissingFortuneDisplay(true)
-            } else drawDisplay()
+        display = if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
+            drawMissingFortuneDisplay(false)
+        } else if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
+            drawMissingFortuneDisplay(true)
+        } else drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
-        val displayCrop = GardenAPI.cropInHand ?: currentCrop ?: return@buildList
+        val displayCrop = GardenApi.cropInHand ?: currentCrop ?: return@buildList
 
         val list = mutableListOf<Renderable>()
         list.add(Renderable.itemStack(displayCrop.icon))
 
         var recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
-        val wrongTabCrop = GardenAPI.cropInHand != null && GardenAPI.cropInHand != currentCrop
+        val wrongTabCrop = GardenApi.cropInHand != null && GardenApi.cropInHand != currentCrop
+        val ffReduction = getPestFFReduction()
 
         val farmingFortune = if (wrongTabCrop) {
             (displayCrop.getLatestTrueFarmingFortune() ?: -1.0).also {
@@ -165,34 +171,44 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        list.add(
-            Renderable.string(
-                "§6Farming Fortune§7: §e" + if (!recentlySwitchedTool && farmingFortune != -1.0) {
-                    farmingFortune.roundTo(0).addSeparators()
-                } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?"),
-            ),
-        )
-        add(Renderable.horizontalContainer(list))
+        val farmingFortuneText = if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: "
+        val fortuneColorCode = if (ffReduction > 0) "§c" else "§e"
+        val fortuneAmount = if (!recentlySwitchedTool && farmingFortune != -1.0) {
+            farmingFortune.roundTo(0).addSeparators()
+        } else "§7" + (displayCrop.getLatestTrueFarmingFortune()?.addSeparators() ?: "?")
 
-        val ffReduction = getPestFFReduction()
-        if (ffReduction > 0) {
-            add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+        val latest = if (farmingFortune != -1.0) " latest" else ""
+        val wrongTabCropText = "§cBreak §e${GardenApi.cropInHand?.cropName}§c to see" + latest + " fortune!"
+
+        if (!wrongTabCrop || !config.compactFormat) {
+            list.add(Renderable.string(farmingFortuneText + fortuneColorCode + fortuneAmount))
+        } else {
+            list.add(Renderable.hoverTips("$farmingFortuneText§c???", listOf(wrongTabCropText)))
         }
 
-        if (wrongTabCrop) {
-            var text = "§cBreak §e${GardenAPI.cropInHand?.cropName}§c to see"
-            if (farmingFortune != -1.0) text += " latest"
-            text += " fortune!"
+        add(Renderable.horizontalContainer(list))
 
-            add(Renderable.string(text))
+        if (ffReduction > 0) {
+            if (config.compactFormat) {
+                add(Renderable.string("§cPests: §7-§e$ffReduction%"))
+            } else {
+                add(Renderable.string("§cPests are reducing your fortune by §e$ffReduction%§c!"))
+            }
+
+        }
+
+        if (wrongTabCrop && !config.hideMissingFortuneWarnings && !config.compactFormat) {
+            add(Renderable.string(wrongTabCropText))
         }
     }
 
     private fun drawMissingFortuneDisplay(cropFortune: Boolean) = buildList {
+        if (config.hideMissingFortuneWarnings) return@buildList
         if (cropFortune) {
             add(
+
                 Renderable.clickAndHover(
-                    "§cNo Crop Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
@@ -205,7 +221,7 @@ object FarmingFortuneDisplay {
         } else {
             add(
                 Renderable.clickAndHover(
-                    "§cNo Farming Fortune Found! Enable The Stats Widget",
+                    if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
                     listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
@@ -220,37 +236,39 @@ object FarmingFortuneDisplay {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (event.isMod(2)) update()
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
-            if (lastUniversalFortuneMissingError.passedSince() < 1.minutes) return
+            if (lastUniversalFortuneMissingError.passedSince() < 20.seconds) return
             ChatUtils.clickableChat(
-                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "show the Farming Fortune stat, also give the widget enough priority.",
+                "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and show the Farming Fortune " +
+                    "stat, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
         if (firstBrokenCropTime.passedSince() > 10.seconds && !foundTabCropFortune && !firstBrokenCropTime.isFarPast()) {
-            if (lastCropFortuneMissingError.passedSince() < 1.minutes || !GardenAPI.isCurrentlyFarming()) return
+            if (lastCropFortuneMissingError.passedSince() < 20.seconds || !GardenApi.isCurrentlyFarming()) return
             ChatUtils.clickableChat(
-                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
-                    "show latest Crop Fortune, also give the widget enough priority.",
+                "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and show latest Crop Fortune, " +
+                    "also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
                 "§eClick to run /widget!",
+                replaceSameMessage = true,
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (firstBrokenCropTime == SimpleTimeMark.farPast()) firstBrokenCropTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         gardenJoinTime = SimpleTimeMark.now()
         firstBrokenCropTime = SimpleTimeMark.farPast()
@@ -258,26 +276,38 @@ object FarmingFortuneDisplay {
         foundTabCropFortune = false
     }
 
-    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
+    private fun isEnabled(): Boolean = GardenApi.inGarden() && config.display
 
-    private fun getPestFFReduction(): Int = when (PestAPI.scoreboardPests) {
-        in 0..3 -> 0
-        4 -> 5
-        5 -> 15
-        6 -> 30
-        7 -> 50
-        else -> 75
+    private fun getPestFFReduction(): Int {
+        val bpc = SkyblockStat.BONUS_PEST_CHANCE.lastKnownValue ?: 0.0
+        val pests = (PestApi.scoreboardPests - floor(bpc / 100).toInt()).coerceAtLeast(0)
+
+        return when (pests) {
+            in 0..3 -> 0
+            4 -> 5
+            5 -> 15
+            6 -> 30
+            7 -> 50
+            else -> 75
+        }
     }
 
     fun getToolFortune(tool: ItemStack?): Double = getToolFortune(tool?.getInternalName())
-    fun getToolFortune(internalName: NEUInternalName?): Double {
+    fun getToolFortune(internalName: NeuInternalName?): Double {
         if (internalName == null) return 0.0
-        if (internalName.equals("THEORETICAL_HOE")) {
+        val string = internalName.asString()
+        if (string == "THEORETICAL_HOE") {
             return 0.0
         }
-        return if (internalName.startsWith("THEORETICAL_HOE")) {
-            listOf(10.0, 25.0, 50.0)[internalName.asString().last().digitToInt() - 1]
-        } else when (internalName.asString()) {
+        return if (string.startsWith("THEORETICAL_HOE")) {
+            val digit = string.last().digitToIntOrNull() ?: ErrorManager.skyHanniError(
+                "Failed to read the tool fortune.",
+                "internalName" to internalName,
+                "string" to string,
+                "string.last()" to string.last(),
+            )
+            listOf(10.0, 25.0, 50.0)[digit - 1]
+        } else when (string) {
             "FUNGI_CUTTER" -> 30.0
             "COCO_CHOPPER" -> 20.0
             else -> 0.0
@@ -313,13 +343,13 @@ object FarmingFortuneDisplay {
     fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
     fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
     fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
-    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 1.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 2.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
     } ?: 0.0
 
-    fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
+    fun getAbilityFortune(internalName: NeuInternalName, lore: List<String>): Double {
         var pieces = 0
 
         for (line in lore) {
@@ -360,14 +390,14 @@ object FarmingFortuneDisplay {
 
             itemBaseFortune = if (tool.getInternalName().contains("LOTUS")) {
                 5.0
-            } else if (tool.getInternalName().equals("ZORROS_CAPE")) {
+            } else if (tool.getInternalName() == ZORROS_CAPE) {
                 10.0
             } else {
                 val dummiesFF = (tool.getFarmingForDummiesCount() ?: 0) * 1.0
                 displayedFortune - reforgeFortune - gemstoneFortune - pesterminatorFortune - enchantmentFortune - dummiesFF
             }
 
-            greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it.equals("ZORROS_CAPE") }) {
+            greenThumbFortune = if (tool.getInternalName().let { it.contains("LOTUS") || it == ZORROS_CAPE }) {
                 displayedFortune - reforgeFortune - itemBaseFortune
             } else 0.0
         }
@@ -377,7 +407,7 @@ object FarmingFortuneDisplay {
 
     fun CropType.getLatestTrueFarmingFortune() = latestFF?.get(this)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")

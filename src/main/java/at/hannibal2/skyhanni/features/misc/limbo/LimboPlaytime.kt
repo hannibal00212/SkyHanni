@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -25,13 +24,21 @@ object LimboPlaytime {
     private lateinit var modifiedList: MutableList<String>
     private var setMinutes = false
     private val patternGroup = RepoPattern.group("misc.limbo.tooltip")
+
+    /**
+     * REGEX-TEST: §5§o§a10,032.8 minutes
+     */
     private val minutesPattern by patternGroup.pattern(
         "minutes",
-        "§5§o§a([\\d.,]+) minutes.+\$"
+        "§5§o§a(?<minutes>[\\d.,]+) minutes.*$",
     )
+
+    /**
+     * REGEX-TEST: §5§o§b1,000.4 hours
+     */
     private val hoursPattern by patternGroup.pattern(
         "hours",
-        "§5§o§b([\\d.,]+) hours.+\$"
+        "§5§o§b(?<hours>[\\d.,]+) hours.*$",
     )
 
     var tooltipPlaytime = mutableListOf<String>()
@@ -42,12 +49,12 @@ object LimboPlaytime {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
-    private val itemID = "ENDER_PEARL".asInternalName()
+    private val itemID = "ENDER_PEARL".toInternalName()
     private const val ITEM_NAME = "§aLimbo"
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
@@ -70,7 +77,7 @@ object LimboPlaytime {
     private fun createItemLore(): Array<String> = when {
         wholeMinutes >= 60 -> arrayOf(
             "§7Playtime: §a${wholeMinutes.addSeparators()} minutes",
-            "§7Or: §b$hoursString hours"
+            "§7Or: §b$hoursString hours",
         )
 
         wholeMinutes == 1 -> arrayOf("§7Playtime: §a$wholeMinutes minute")
@@ -78,9 +85,8 @@ object LimboPlaytime {
         else -> arrayOf("§7Playtime: §a$wholeMinutes minutes")
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         if (!enabled) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
@@ -95,8 +101,8 @@ object LimboPlaytime {
         remakeList(event.toolTip, minutesList, hoursList)
     }
 
-    @SubscribeEvent
-    fun onRenderGUI(event: InventoryOpenEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds
         if (playtime < 60.seconds) return
@@ -122,7 +128,7 @@ object LimboPlaytime {
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = hoursPattern.matcher(it)
                 if (matcher.find()) {
-                    matcher.group(1).replace(",", "").toDoubleOrNull() ?: 0.0
+                    matcher.group("hours").replace(",", "").toDoubleOrNull() ?: 0.0
                 } else 0.0
             }.toMutableList()
             setMinutes = false
@@ -133,7 +139,7 @@ object LimboPlaytime {
             modifiedList = modifiedList.sortedByDescending {
                 val matcher = minutesPattern.matcher(it)
                 if (matcher.find()) {
-                    matcher.group(1).toDoubleOrNull() ?: 0.0
+                    matcher.group("minutes").toDoubleOrNull() ?: 0.0
                 } else 0.0
             }.toMutableList()
             setMinutes = true

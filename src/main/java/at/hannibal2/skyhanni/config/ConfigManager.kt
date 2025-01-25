@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -11,10 +12,12 @@ import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -37,12 +40,11 @@ import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
-    return if (LorenzUtils.isBetaVersion()) {
+    return if (SkyHanniMod.isBetaVersion) {
         registerTypeAdapterFactory(create)
     } else this
 }
@@ -59,7 +61,7 @@ class ConfigManager {
 
     private val logger = LorenzLogger("config_manager")
 
-    private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
+    private val jsonHolder: Map<ConfigFileType, Any> = enumMapOf()
 
     lateinit var processor: MoulConfigProcessor<Features>
     private var disableSaving = false
@@ -91,12 +93,14 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver(processor).processConfig(features)
+        val driver = ConfigProcessorDriver(processor)
+        driver.warnForPrivateFields = false
+        driver.processConfig(features)
 
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler) throw e
+            if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) throw e
         }
     }
 
@@ -123,8 +127,7 @@ class ConfigManager {
         if (ic in slog) return
         slog.add(ic)
         var missingConfigLink = false
-        for (field in obj.javaClass.fields) {
-            field.isAccessible = true
+        for (field in obj.javaClass.declaredFields.map { it.makeAccessible() }) {
             if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue

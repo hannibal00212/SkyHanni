@@ -8,11 +8,12 @@ import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.Fir
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -35,7 +36,7 @@ object BlazeSlayerDaggerHelper {
 
     private val attunementPattern by RepoPattern.pattern(
         "slayer.blaze.dagger.attunement",
-        "§cStrike using the §r(.+) §r§cattunement on your dagger!"
+        "§cStrike using the §r.+ §r§cattunement on your dagger!"
     )
 
     private var clientSideClicked = false
@@ -46,9 +47,8 @@ object BlazeSlayerDaggerHelper {
     private var lastNearestCheck = SimpleTimeMark.farPast()
     private var lastNearest: HellionShield? = null
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.hideDaggerWarning) return
 
         val message = event.message
@@ -61,8 +61,7 @@ object BlazeSlayerDaggerHelper {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        val player = Minecraft.getMinecraft().thePlayer
-        val dagger = getDaggerFromStack(player.inventory.mainInventory[player.inventory.currentItem])
+        val dagger = getDaggerFromStack(InventoryUtils.getItemInHand())
         if (dagger != null) {
             setDaggerText(dagger)
             return
@@ -151,8 +150,7 @@ object BlazeSlayerDaggerHelper {
     }
 
     private fun readFromInventory(dagger: Dagger): HellionShield? {
-        val player = Minecraft.getMinecraft().thePlayer
-        for (stack in player.inventory.mainInventory) {
+        for (stack in InventoryUtils.getItemsInOwnInventory()) {
             val otherDagger = getDaggerFromStack(stack) ?: continue
             if (dagger != otherDagger) continue
             for (line in stack.getLore()) {
@@ -180,10 +178,9 @@ object BlazeSlayerDaggerHelper {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-
 
         for (shield in HellionShield.entries) {
             if (shield.formattedName + "§r" == event.title) {
@@ -219,12 +216,12 @@ object BlazeSlayerDaggerHelper {
         TWILIGHT(
             listOf("Twilight Dagger", "Mawdredge Dagger", "Deathripper Dagger"),
             HellionShield.SPIRIT,
-            HellionShield.CRYSTAL
+            HellionShield.CRYSTAL,
         ),
         FIREDUST(
             listOf("Firedust Dagger", "Kindlebane Dagger", "Pyrochaos Dagger"),
             HellionShield.ASHEN,
-            HellionShield.AURIC
+            HellionShield.AURIC,
         ),
         ;
 
@@ -244,7 +241,7 @@ object BlazeSlayerDaggerHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -256,7 +253,7 @@ object BlazeSlayerDaggerHelper {
         config.positionBottom.renderString(textBottom, posLabel = "Blaze Slayer Dagger Bottom")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.blazeDaggers", "slayer.blazes.hellion.daggers")
         event.move(3, "slayer.blazeMarkRightHellionShield", "slayer.blazes.hellion.markRightHellionShield")

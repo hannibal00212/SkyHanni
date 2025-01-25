@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
@@ -201,7 +202,7 @@ object PacketTest {
             return LorenzVec(packet.x, packet.y, packet.z)
         }
         if (packet is C03PacketPlayer) {
-            return LorenzVec(packet.positionX, packet.positionY, packet.positionZ)
+            return packet.getLocation()
         }
 
         if (packet is S0FPacketSpawnMob) {

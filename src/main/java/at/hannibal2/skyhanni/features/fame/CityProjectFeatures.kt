@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -24,13 +26,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -43,7 +44,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -65,7 +65,7 @@ object CityProjectFeatures {
         "§aProject is (?:being built|released)!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
@@ -96,14 +96,13 @@ object CityProjectFeatures {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
 
         inInventory = false
         if (!inCityProject(event)) return
@@ -111,7 +110,7 @@ object CityProjectFeatures {
 
         if (config.showMaterials) {
             // internal name -> amount
-            val materials = mutableMapOf<NEUInternalName, Int>()
+            val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
                 if (item.name != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
@@ -128,9 +127,9 @@ object CityProjectFeatures {
                 val lore = item.getLore()
                 val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
                 if (completed) continue
-                lore.matchFirst(contributeAgainPattern) {
+                contributeAgainPattern.firstMatcher(lore) {
                     val rawTime = group("time")
-                    if (!rawTime.contains("Soon!")) return@matchFirst
+                    if (!rawTime.contains("Soon!")) return
                     val duration = TimeUtils.getDuration(rawTime)
                     val endTime = now + duration
                     if (endTime < nextTime) {
@@ -151,7 +150,7 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NEUInternalName, Int>) = buildList<List<Any>> {
+    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
         addAsSingletonList("§7City Project Materials")
 
         if (materials.isEmpty()) {
@@ -176,7 +175,7 @@ object CityProjectFeatures {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }
                     },
-                ) { inInventory && !NEUItems.neuHasFocus() },
+                ) { inInventory && !NeuItems.neuHasFocus() },
             )
 
             val price = internalName.getPrice() * amount
@@ -186,7 +185,7 @@ object CityProjectFeatures {
         }
     }
 
-    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NEUInternalName, Int>) {
+    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
@@ -202,24 +201,22 @@ object CityProjectFeatures {
             if (line == "" || line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
-            val internalName = NEUInternalName.fromItemName(name)
+            val internalName = NeuInternalName.fromItemName(name)
             val old = materials.getOrPut(internalName) { 0 }
             materials[internalName] = old + amount
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
         if (!inInventory) return
 
         config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showReady) return
         if (!inInventory) return
 
@@ -238,7 +235,7 @@ object CityProjectFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.cityProject", "event.cityProject")
     }

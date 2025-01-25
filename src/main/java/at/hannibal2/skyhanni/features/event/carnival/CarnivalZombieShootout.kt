@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,12 +19,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +36,7 @@ object CarnivalZombieShootout {
     private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
     private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
 
-    private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
+    private val lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
 
     private var content = Renderable.horizontalContainer(listOf())
     private var drawZombies = mapOf<EntityZombie, ZombieType>()
@@ -67,8 +68,8 @@ object CarnivalZombieShootout {
         DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
         lamp?.let {
@@ -81,8 +82,8 @@ object CarnivalZombieShootout {
         if (lastUpdate.zombie.passedSince() >= 0.25.seconds) {
             val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
                 if (zombie.health <= 0) return@mapNotNull null
-                val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-                val type = toType(armor) ?: return@mapNotNull null
+                val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+                val type = toType(helmet) ?: return@mapNotNull null
                 zombie to type
             }.toMap()
 
@@ -113,7 +114,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !started || !config.lampTimer) return
 
@@ -142,7 +143,7 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
@@ -156,8 +157,8 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message.removeColor()

@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 
 object CopyItemCommand {
 
@@ -18,21 +18,6 @@ object CopyItemCommand {
             return
         }
         copyItemToClipboard(itemStack)
-    }
-
-    private fun recurseTag(compound: NBTTagCompound, text: String, list: MutableList<String>) {
-        for (s in compound.keySet) {
-            if (s == "Lore") continue
-            val tag = compound.getTag(s)
-
-            if (tag !is NBTTagCompound) {
-                list.add("$text$s: $tag")
-            } else {
-                val element = compound.getCompoundTag(s)
-                list.add("$text$s:")
-                recurseTag(element, "$text  ", list)
-            }
-        }
     }
 
     fun copyItemToClipboard(itemStack: ItemStack) {
@@ -46,10 +31,9 @@ object CopyItemCommand {
         }
         resultList.add("")
         resultList.add("getTagCompound")
-        if (itemStack.hasTagCompound()) {
-            val tagCompound = itemStack.tagCompound
-            recurseTag(tagCompound, "  ", resultList)
-        }
+        itemStack.tagCompound?.let {
+            resultList.addAll(it.getReadableNBTDump())
+        } ?: resultList.add("no tag compound")
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)

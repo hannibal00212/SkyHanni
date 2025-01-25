@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -20,8 +21,6 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,8 +33,8 @@ object Translator {
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -49,15 +48,15 @@ object Translator {
         editedComponent.setChatStyle(clickStyle)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(55, "chat.translator", "chat.translator.translateOnClick")
     }
 
     var lastUserChange = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.languageCode.onToggle {
             if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle
             lastUserChange = SimpleTimeMark.now()
@@ -111,7 +110,7 @@ object Translator {
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) = APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
+    private fun getJSONResponse(urlString: String) = ApiUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
     fun getTranslation(
         message: String,
@@ -137,16 +136,6 @@ object Translator {
         }
         messageToSend = URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "") // Not sure if this is actually needed
         return arrayOf(messageToSend, language)
-    }
-
-    @Deprecated("Use toNativeLanguage() instead", ReplaceWith("Translator.toNativeLanguage(args)"))
-    fun toEnglish(args: Array<String>) {
-        toNativeLanguage(args)
-    }
-
-    @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
-    fun fromEnglish(args: Array<String>) {
-        fromNativeLanguage(args)
     }
 
     fun toNativeLanguage(args: Array<String>) {
@@ -196,7 +185,7 @@ object Translator {
         val targetLanguage = args[1]
         val message = args.drop(2).joinToString(" ")
 
-        val translation = getTranslation(message, sourceLanguage, targetLanguage)
+        val translation = getTranslation(message, targetLanguage, sourceLanguage)
         val translatedMessage = translation?.get(0) ?: "Error!"
         val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
 

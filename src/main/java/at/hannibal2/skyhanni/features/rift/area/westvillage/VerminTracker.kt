@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -22,38 +22,59 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
 object VerminTracker {
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aSilverfish§r§e!
+     */
     private val silverfishPattern by patternGroup.pattern(
         "silverfish",
-        ".*§eYou vacuumed a §.*Silverfish.*"
+        ".*§eYou vacuumed a §.*Silverfish.*",
     )
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aSpider§r§e!
+     */
     private val spiderPattern by patternGroup.pattern(
         "spider",
-        ".*§eYou vacuumed a §.*Spider.*"
+        ".*§eYou vacuumed a §.*Spider.*",
     )
+
+    /**
+     * REGEX-TEST: §eYou vacuumed a §r§aFly§r§e!
+     */
     private val flyPattern by patternGroup.pattern(
         "fly",
-        ".*§eYou vacuumed a §.*Fly.*"
+        ".*§eYou vacuumed a §.*Fly.*",
     )
+
+    /**
+     * REGEX-TEST: §fVermin Bin: §a27 Silverfishes
+     * REGEX-TEST: §fVermin Bin: §a19 Flies
+     */
     private val verminBinPattern by patternGroup.pattern(
         "binline",
-        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+        "§fVermin Bin: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
+
+    /**
+     * REGEX-TEST: §fVacuum Bag: §72 Silverfishes
+     * REGEX-TEST: §fVacuum Bag: §70 Spiders
+     */
     private val verminBagPattern by patternGroup.pattern(
         "bagline",
-        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)"
+        "§fVacuum Bag: §\\w(?<count>\\d+) (?<vermin>\\w+)",
     )
 
     private var hasVacuum = false
-    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".asInternalName()
+    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
 
-    private val config get() = RiftAPI.config.area.westVillage.verminTracker
+    private val config get() = RiftApi.config.area.westVillage.verminTracker
 
     private val tracker = SkyHanniTracker("Vermin Tracker", { Data() }, { it.rift.verminTracker }) {
         drawDisplay(it)
@@ -75,9 +96,9 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         checkVacuum()
     }
 
@@ -86,8 +107,8 @@ object VerminTracker {
             .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
@@ -99,9 +120,9 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!RiftAPI.inRift() || event.inventoryName != "Vermin Bin") return
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (!RiftApi.inRift() || event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()
@@ -121,7 +142,7 @@ object VerminTracker {
         val verminCounts = mutableMapOf(
             VerminType.SILVERFISH to 0,
             VerminType.SPIDER to 0,
-            VerminType.FLY to 0
+            VerminType.FLY to 0,
         )
         for (line in lore) {
             pattern.matchMatcher(line) {
@@ -159,16 +180,19 @@ object VerminTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!config.showOutsideWestVillage && !RiftAPI.inWestVillage()) return
-        if (!config.showWithoutVacuum && !hasVacuum) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
     }
 
-    @SubscribeEvent
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!config.showOutsideWestVillage && !RiftApi.inWestVillage()) return false
+        if (!config.showWithoutVacuum && !hasVacuum) return false
+
+        return true
+    }
+
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.THE_RIFT) {
             tracker.firstUpdate()
@@ -179,5 +203,5 @@ object VerminTracker {
         tracker.resetCommand()
     }
 
-    private fun isEnabled() = RiftAPI.inRift() && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && config.enabled
 }

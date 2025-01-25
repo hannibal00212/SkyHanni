@@ -1,19 +1,20 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.PersonalCompactorConfig
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems.getInternalNameFromHypixelId
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getInternalNameFromHypixelIdOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PersonalCompactorOverlay {
@@ -33,6 +33,11 @@ object PersonalCompactorOverlay {
     private val config get() = SkyHanniMod.feature.inventory.personalCompactor
 
     private val group = RepoPattern.group("inventory.personalcompactor")
+
+    /**
+     * REGEX-TEST: PERSONAL_COMPACTOR_4000
+     * REGEX-TEST: PERSONAL_DELETOR_7000
+     */
     private val internalNamePattern by group.pattern(
         "internalname",
         "PERSONAL_(?<type>[^_]+)_(?<tier>\\d+)",
@@ -42,7 +47,7 @@ object PersonalCompactorOverlay {
         7000 to 12,
         6000 to 7,
         5000 to 3,
-        4000 to 1
+        4000 to 1,
     )
 
     private const val MAX_ITEMS_PER_ROW = 7
@@ -50,8 +55,8 @@ object PersonalCompactorOverlay {
     private val compactorRenderableMap = mutableMapOf<String, Renderable>()
     private val compactorEnabledMap = mutableMapOf<String, Boolean>()
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!shouldShow()) return
 
@@ -75,7 +80,7 @@ object PersonalCompactorOverlay {
             val slots = slotsMap[tier] ?: return
             val itemList = (0 until slots).map { slot ->
                 val skyblockId = itemStack.getAttributeString(prefix + slot)
-                skyblockId?.let { getInternalNameFromHypixelId(it) }?.getItemStack()
+                skyblockId?.let { getInternalNameFromHypixelIdOrNull(it) }?.getItemStack()
             }
 
             RenderableInventory.fakeInventory(itemList, MAX_ITEMS_PER_ROW, 1.0)
@@ -83,26 +88,25 @@ object PersonalCompactorOverlay {
 
         val title = Renderable.string(name)
         val status = Renderable.string(
-            "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled"
+            "§7Status: " + if (enabled) "§aEnabled" else "§cDisabled",
         )
 
         RenderableTooltips.setTooltipForRender(listOf(title, status, fakeInventory), spacedTitle = true)
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         compactorRenderableMap.clear()
     }
 
-    @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         compactorEnabledMap.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showToggle) return
         val itemStack = event.stack
         val internalName = itemStack.getInternalNameOrNull() ?: return
@@ -113,7 +117,7 @@ object PersonalCompactorOverlay {
         val renderObject = RenderObject(
             text,
             -8,
-            -10
+            -10,
         )
         event.renderObjects.add(renderObject)
     }

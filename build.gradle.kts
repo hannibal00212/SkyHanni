@@ -1,20 +1,27 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
-import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import at.skyhanni.sharedvariables.*
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import moe.nea.shot.ShotParser
+import moe.nea.shot.Shots
+import net.fabricmc.loom.api.processor.MinecraftJarProcessor
+import net.fabricmc.loom.api.processor.ProcessorContext
+import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
+import java.io.Serializable
+import java.nio.file.Path
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+import kotlin.io.path.moveTo
+import kotlin.io.path.outputStream
 
 plugins {
     idea
     java
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
@@ -117,7 +124,15 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
+file("shots.txt")
+    .takeIf(File::exists)
+    ?.readText()
+    ?.lines()
+    ?.let(ShotParser()::parse)
+    ?.let(::Shots)
+    ?.let {
+        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+    }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -152,6 +167,12 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else if (target == ProjectTarget.BRIDGE116FABRIC) {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+    } else if (target == ProjectTarget.MODERN) {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -159,15 +180,16 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // October 3, 2024, 11:43 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
+    // December 29, 2024, 07:30 PM EST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -186,10 +208,14 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
-    implementation("net.hypixel:mod-api:0.3.1")
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        compileOnly(libs.hypixelmodapi)
+        shadowImpl(libs.hypixelmodapitweaker)
+    }
+
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -251,6 +277,25 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
+fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
+    if (buildPathsFile.exists()) {
+        sourceSet.get().apply {
+            val buildPaths = buildPathsFile.readText().lineSequence()
+                .map { it.substringBefore("#").trim() }
+                .filter { it.isNotBlank() }
+                .toSet()
+            kotlin.include(buildPaths)
+            java.include(buildPaths)
+        }
+    }
+}
+includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
+includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+}
+
 if (target.parent == ProjectTarget.MAIN) {
     val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
     tasks.named("processResources") {
@@ -267,6 +312,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -301,6 +347,7 @@ tasks.shadowJar {
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
     relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -331,13 +378,15 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
 
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
+    vars.put("FORGE", if (target.isForge) 1 else 0)
+    vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -375,8 +424,10 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        System.getenv("SKIP_DETEKT") != "true"
+        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
     }
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
 
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -386,11 +437,28 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
+}
+
+abstract class ShotApplicationJarProcessor @Inject constructor(private val shots: Shots) :
+    MinecraftJarProcessor<MinecraftJarProcessor.Spec>,
+    Serializable {
+
+    override fun buildSpec(context: SpecContext?): MinecraftJarProcessor.Spec? = ShotSpec(shots)
+
+    override fun processJar(source: Path, spec: MinecraftJarProcessor.Spec?, context: ProcessorContext?) {
+        val dest = source.resolveSibling(source.fileName.toString() + "-temp-shot")
+        ZipFile(source.toFile()).use { input ->
+            ZipOutputStream(dest.outputStream()).use { output ->
+                shots.processZipFile(input, output)
+            }
+        }
+        dest.moveTo(source, overwrite = true)
+    }
+
+    override fun getName(): String = "Shots"
+
+    private data class ShotSpec(val shots: Shots) : MinecraftJarProcessor.Spec, Serializable
 }

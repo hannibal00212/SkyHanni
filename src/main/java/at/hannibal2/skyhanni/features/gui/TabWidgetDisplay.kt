@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,9 +11,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-enum class TabWidgetDisplay(private val configName: String?, vararg val widgets: TabWidget) {
+enum class TabWidgetDisplay(
+    private val configName: String?,
+    vararg val widgets: TabWidget,
+) {
     SOULFLOW(null, TabWidget.SOULFLOW),
     COINS("Bank and Interest", TabWidget.BANK, TabWidget.INTEREST),
     SB_LEVEL("Skyblock Level", TabWidget.SB_LEVEL),
@@ -33,6 +36,16 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
     TIMERS(null, TabWidget.TIMERS),
     FIRE_SALE(null, TabWidget.FIRE_SALE),
     RAIN("Park Rain", TabWidget.RAIN),
+    PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS),
+    FULL_PROFILE_WIDGET(
+        "Profile Widget",
+        TabWidget.PROFILE,
+        TabWidget.SB_LEVEL,
+        TabWidget.BANK,
+        TabWidget.INTEREST,
+        TabWidget.SOULFLOW,
+        TabWidget.FAIRY_SOULS,
+    )
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -45,22 +58,23 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
     companion object {
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget
-
         private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
-                    widget.widgets.flatMap { it.lines },
+                    widget.widgets.flatMap { subWidget ->
+                        subWidget.lines
+                    },
                     posLabel = "Display Widget: ${widget.name}",
                 )
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onJoin(event: ProfileJoinEvent) {
             // Validation that the displayPositions in the config is correct
             val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size

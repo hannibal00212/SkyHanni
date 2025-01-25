@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointData
 import at.hannibal2.skyhanni.utils.LorenzVec
 
 data class EventWaypoint(
-    val name: String,
+    val name: String = "",
     val position: LorenzVec,
     var isFound: Boolean = false,
 )

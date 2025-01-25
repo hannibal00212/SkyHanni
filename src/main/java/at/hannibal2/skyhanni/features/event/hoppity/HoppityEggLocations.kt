@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,16 +19,15 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HoppityEggLocations {
 
     // TODO add gui/command to show total data/missing islands
     private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
+        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {
-            ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value
+            ChocolateFactoryApi.profileStorage?.collectedEggLocations = value
         }
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
@@ -44,7 +44,7 @@ object HoppityEggLocations {
 
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         // TODO: split Chocolate Factory and Hoppity repo data
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
@@ -74,12 +74,12 @@ object HoppityEggLocations {
 
     private var loadedNeuThisProfile = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         loadedNeuThisProfile = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
 
@@ -129,9 +129,9 @@ object HoppityEggLocations {
         ChatUtils.chat("$enabledDisabled hoppity egg location debug viewer.")
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !showEggLocationsDebug) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderWorld(event: RenderWorldEvent) {
+        if (!showEggLocationsDebug) return
         val legacyLocations = legacyEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val apiLocations = apiEggLocations[LorenzUtils.skyBlockIsland] ?: return
         val collectedLocations = islandCollectedLocations

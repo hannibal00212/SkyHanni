@@ -1,21 +1,21 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MarkedPlayerManager {
@@ -71,14 +71,14 @@ object MarkedPlayerManager {
     private fun EntityOtherPlayerMP.setColor() {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             this,
-            config.entityColor.get().toColor().withAlpha(127),
-            ::isEnabled
+            config.entityColor.get().toColor().addAlpha(127),
+            ::isEnabled,
         )
     }
 
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected()) &&
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
         config.highlightInWorld
 
     fun replaceInChat(string: String): String {
@@ -92,7 +92,7 @@ object MarkedPlayerManager {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.markOwnName.whenChanged { _, new ->
             val name = LorenzUtils.getPlayerName()
@@ -107,15 +107,15 @@ object MarkedPlayerManager {
         config.entityColor.onToggle(::refreshColors)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         findPlayers()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
         markedPlayers.clear()
@@ -127,7 +127,7 @@ object MarkedPlayerManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "markedPlayers", "gui.markedPlayers")
     }

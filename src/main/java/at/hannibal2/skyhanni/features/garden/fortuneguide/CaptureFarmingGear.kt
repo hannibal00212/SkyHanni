@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -19,10 +20,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
@@ -30,15 +30,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object CaptureFarmingGear {
-    private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
+    private val outdatedItems get() = GardenApi.storage?.fortune?.outdatedItems
 
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+
+    /**
+     * REGEX-TEST: SKILL LEVEL UP Farming 1 ➜ 2
+     */
     private val farmingLevelUpPattern by patternGroup.pattern(
         "farminglevel",
         "SKILL LEVEL UP Farming .*➜(?<level>.*)",
@@ -47,6 +50,10 @@ object CaptureFarmingGear {
         "fortuneupgrade",
         "You claimed the Garden Farming Fortune (?<level>.*) upgrade!",
     )
+
+    /**
+     * REGEX-TEST: §6+48☘ Farming Fortune
+     */
     private val bestiaryPattern by patternGroup.pattern(
         "bestiary",
         ".*§6+(?<fortune>.*)☘ Farming Fortune.*",
@@ -55,6 +62,10 @@ object CaptureFarmingGear {
         "anitabuff",
         "You tiered up the Extra Farming Drops upgrade to [+](?<level>.*)%!",
     )
+
+    /**
+     * REGEX-TEST: §7You have: §6+52☘ Farming Fortune
+     */
     private val anitaMenuPattern by patternGroup.pattern(
         "anitamenu",
         "§7You have: §6\\+(?<level>.*)☘ Farming Fortune",
@@ -63,22 +74,43 @@ object CaptureFarmingGear {
         "lotusupgrade",
         "Lotus (?<piece>.*) upgraded to [+].*☘!",
     )
+
+    /**
+     * REGEX-TEST: Your Bingo leveled up to level 2!
+     */
     private val petLevelUpPattern by patternGroup.pattern(
         "petlevelup",
         "Your (?<pet>.*) leveled up to level .*!",
     )
+
+    /**
+     * REGEX-TEST: Yum! You gain +5☘ Farming Fortune for 48 hours!
+     * REGEX-TEST: Big Yum! You refresh +5☘ Farming Fortune for 48 hours!
+     */
     private val cakePattern by patternGroup.pattern(
         "cake",
         "(?:Big )?Yum! You (?:gain|refresh) [+]5☘ Farming Fortune for 48 hours!",
     )
+
+    /**
+     * REGEX-TEST:  Strength: §r§c❁170
+     */
     private val strengthPattern by patternGroup.pattern(
         "strength",
         " Strength: §r§c❁(?<strength>.*)",
     )
+
+    /**
+     * REGEX-TEST: §7Progress to Tier 10: §e70%
+     */
     private val tierPattern by patternGroup.pattern(
         "uniquevisitors.tier",
         "§7Progress to Tier (?<nextTier>\\w+):.*",
     )
+
+    /**
+     * REGEX-TEST: §2§l§m              §f§l§m      §r §e7§6/§e10
+     */
     private val tierProgressPattern by patternGroup.pattern(
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
@@ -118,8 +150,8 @@ object CaptureFarmingGear {
             currentCrop.farmingItem.setItem(itemStack)
         }
 
-        TabListData.getTabList().matchFirst(strengthPattern) {
-            GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
+        strengthPattern.firstMatcher(TabListData.getTabList()) {
+            GardenApi.storage?.fortune?.farmingStrength = group("strength").toInt()
         }
     }
 
@@ -142,18 +174,17 @@ object CaptureFarmingGear {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         captureFarmingGear()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val storage = GardenAPI.storage?.fortune ?: return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
-        if (PetAPI.isPetMenu(event.inventoryName)) {
+        if (PetApi.isPetMenu(event.inventoryName)) {
             pets(items, outdatedItems)
             return
         }
@@ -202,7 +233,7 @@ object CaptureFarmingGear {
                 }
             }
             if (tier > -1 && tierProgress > -1) {
-                GardenAPI.storage?.uniqueVisitors = getUniqueVisitorsForTier(tier) + tierProgress
+                GardenApi.storage?.uniqueVisitors = getUniqueVisitorsForTier(tier) + tierProgress
             }
         }
     }
@@ -216,7 +247,7 @@ object CaptureFarmingGear {
             if (item.displayName.contains("Extra Farming Fortune")) {
                 level = 0
 
-                item.getLore().matchFirst(anitaMenuPattern) {
+                anitaMenuPattern.firstMatcher(item.getLore()) {
                     level = group("level").toInt() / 4
                 }
             }
@@ -278,6 +309,7 @@ object CaptureFarmingGear {
         var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestSlugRarity = (FarmingItems.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestHedgehogRarity = (FarmingItems.HEDGEHOG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
@@ -307,6 +339,11 @@ object CaptureFarmingGear {
                 outdatedItems[FarmingItems.SLUG] = false
                 highestSlugRarity = rarity.toInt()
             }
+            if (name == "HEDGEHOG" && rarity.toInt() > highestHedgehogRarity) {
+                FarmingItems.HEDGEHOG.setItem(item)
+                outdatedItems[FarmingItems.HEDGEHOG] = false
+                highestHedgehogRarity = rarity.toInt()
+            }
         }
     }
 
@@ -325,15 +362,14 @@ object CaptureFarmingGear {
                 val enchantments = slot.getEnchantments().orEmpty()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
                 val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
-                GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
+                GardenApi.storage?.uniqueVisitors = round(visitors).toInt()
             }
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val storage = GardenAPI.storage?.fortune ?: return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
+        val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
@@ -388,14 +424,14 @@ object CaptureFarmingGear {
     }
 
     fun onResetGearCommand() {
-        val storage = GardenAPI.storage?.fortune ?: return
+        val storage = GardenApi.storage?.fortune ?: return
         ChatUtils.chat("Resets farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()
     }
 
-    @SubscribeEvent
-    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
         event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")
         event.move(48, "#profile.garden.fortune.cocoaBeansFortune", "#profile.garden.fortune.carrolyn.COCOA_BEANS")

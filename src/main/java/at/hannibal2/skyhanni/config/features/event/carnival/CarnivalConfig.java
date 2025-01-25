@@ -36,4 +36,10 @@ public class CarnivalConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean doubleClickToStart = true;
+
+    @Expose
+    @ConfigOption(name = "Token Shop Helper", desc = "Show extra information about remaining upgrades in Event Shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tokenShopHelper = true;
 }

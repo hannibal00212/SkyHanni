@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -11,12 +13,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -25,15 +26,15 @@ object MiningEventDisplay {
 
     private val islandEventData = mutableMapOf<IslandType, MiningIslandEventInfo>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(display, posLabel = "Upcoming Mining Events")
+        config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
     }
 
     private fun updateDisplay() {
@@ -47,7 +48,17 @@ object MiningEventDisplay {
             add(Renderable.string("§cSwap servers to try again!"))
         }
 
-        for ((islandType, eventDetails) in islandEventData) {
+        val sortedIslandEventData = islandEventData.entries
+            .sortedBy { entry ->
+                when (entry.key) {
+                    IslandType.DWARVEN_MINES -> 0
+                    IslandType.CRYSTAL_HOLLOWS -> 1
+                    else -> Int.MAX_VALUE
+                }
+            }
+            .associate { it.key to it.value }
+
+        for ((islandType, eventDetails) in sortedIslandEventData) {
             val shouldShow = when (config.showType) {
                 MiningEventConfig.ShowType.DWARVEN -> islandType == IslandType.DWARVEN_MINES
                 MiningEventConfig.ShowType.CRYSTAL -> islandType == IslandType.CRYSTAL_HOLLOWS
@@ -75,18 +86,17 @@ object MiningEventDisplay {
     private fun getIslandIcon(islandType: IslandType) = listOf(
         when (islandType) {
             IslandType.DWARVEN_MINES -> Renderable.itemStack(
-                "MITHRIL_ORE".asInternalName().getItemStack(),
+                "MITHRIL_ORE".toInternalName().getItemStack(),
             )
 
             IslandType.CRYSTAL_HOLLOWS -> Renderable.itemStack(
-                "PERFECT_RUBY_GEM".asInternalName().getItemStack(),
+                "PERFECT_RUBY_GEM".toInternalName().getItemStack(),
             )
 
             else -> unknownDisplay
         },
         Renderable.string("§8:"),
     )
-
 
     private val unknownDisplay = Renderable.string("§7???")
     private val transitionDisplay = Renderable.string("§8->")
@@ -122,10 +132,13 @@ object MiningEventDisplay {
         }
     }
 
-    private fun shouldDisplay() =
-        LorenzUtils.inSkyBlock && config.enabled && !(!config.outsideMining && !MiningEventTracker.isMiningIsland())
+    private fun shouldDisplay(): Boolean {
+        val isOnValidMiningLocation = LorenzUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
 
-    @SubscribeEvent
+        return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
+    }
+
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(46, "mining.miningEvent.compressedFormat") {
             ConfigUtils.migrateBooleanToEnum(it, CompressFormat.COMPACT_TEXT, CompressFormat.DEFAULT)

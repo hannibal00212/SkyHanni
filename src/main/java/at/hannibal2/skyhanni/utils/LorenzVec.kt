@@ -73,17 +73,6 @@ data class LorenzVec(
 
     fun add(x: Int = 0, y: Int = 0, z: Int = 0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
-    override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
-    fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
-
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
     fun angleAsCos(other: LorenzVec) = normalize().dotProduct(other.normalize())
@@ -92,11 +81,13 @@ data class LorenzVec(
 
     fun angleInDeg(other: LorenzVec) = Math.toDegrees(angleInRad(other))
 
-    @Deprecated("Use operator fun plus instead", ReplaceWith("this + other"))
-    fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+    fun crossProduct(other: LorenzVec): LorenzVec = LorenzVec(
+        this.y * other.z - this.z * other.y,
+        this.z * other.x - this.x * other.z,
+        this.x * other.y - this.y * other.x,
+    )
 
-    @Deprecated("Use operator fun minus instead", ReplaceWith("this - other"))
-    fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+    fun scaledTo(other: LorenzVec) = this.normalize().times(other.length())
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
 
@@ -124,6 +115,8 @@ data class LorenzVec(
 
     fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
+    fun asStoredString(): String = "$x:$y:$z"
+
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(lengthSquared())
 
@@ -137,24 +130,6 @@ data class LorenzVec(
     fun toFloatArray(): Array<Float> = arrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-
-        return (other as? LorenzVec)?.let {
-            x == it.x && y == it.y && z == it.z
-        } ?: super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        result = 31 * result + z.hashCode()
-        return result
-    }
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun round(precision: Int) = roundTo(precision)
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 

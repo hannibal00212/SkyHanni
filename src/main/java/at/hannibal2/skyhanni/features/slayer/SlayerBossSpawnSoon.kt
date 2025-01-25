@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -26,10 +26,10 @@ object SlayerBossSpawnSoon {
     private var lastCompletion = 0.0
     private var warned = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
+        if (!SlayerApi.isInCorrectArea) return
 
         val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatDouble() / group("total").formatDouble()
@@ -47,5 +47,5 @@ object SlayerBossSpawnSoon {
         lastCompletion = completion
     }
 
-    fun isEnabled() = config.enabled && SlayerAPI.hasActiveSlayerQuest()
+    fun isEnabled() = config.enabled && SlayerApi.hasActiveSlayerQuest()
 }

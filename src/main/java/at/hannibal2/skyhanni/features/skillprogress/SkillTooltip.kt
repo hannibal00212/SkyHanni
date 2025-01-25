@@ -1,20 +1,18 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.api.SkillAPI
-import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.api.SkillApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkillTooltip {
@@ -22,9 +20,8 @@ object SkillTooltip {
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         val inventoryName = InventoryUtils.openInventoryName()
         val stack = event.itemStack
         if (inventoryName == "Your Skills" && stack.getLore().any { it.contains("Click to view!") }) {
@@ -33,7 +30,7 @@ object SkillTooltip {
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: return
             val useRoman = split.last().isRoman()
-            val skillInfo = SkillAPI.storage?.get(skill) ?: return
+            val skillInfo = SkillApi.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip
             var next = false
             for (line in iterator) {
@@ -58,21 +55,15 @@ object SkillTooltip {
                         val progressBar = StringUtils.progressBar(progress)
                         iterator.set(
                             "$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/" +
-                                "§e${skillInfo.overflowCurrentXpMax.addSeparators()}"
+                                "§e${skillInfo.overflowCurrentXpMax.addSeparators()}",
                         )
                         iterator.add("")
                     }
                 }
                 if ((line.contains(bar) || line.contains("/")) && showCustomGoal) {
                     val targetLevel = skillInfo.customGoalLevel
-                    var have = skillInfo.overflowTotalXp
-                    val need = SkillUtil.xpRequiredForLevel(targetLevel.toDouble())
-                    val xpFor50 = SkillUtil.xpRequiredForLevel(50.0)
-                    val xpFor60 = SkillUtil.xpRequiredForLevel(60.0)
-
-                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50..59) xpFor50
-                    else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
-                    else 0
+                    val have = skillInfo.totalXp
+                    val need = SkillUtil.xpRequiredForLevel(targetLevel)
 
                     val progress = have.toDouble() / need
                     val progressBar = StringUtils.progressBar(progress)

@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import net.minecraft.block.state.IBlockState
 
 enum class OreType(
     val oreName: String,
     internalName: String,
-    vararg val oreBlocks: OreBlock,
+    vararg oreBlocks: OreBlock,
 ) {
     MITHRIL(
         "Mithril",
@@ -173,7 +173,7 @@ enum class OreType(
     UMBER(
         "Umber",
         "UMBER",
-        OreBlock.LOW_TIER_UMBER, OreBlock.HIGH_TIER_UMBER,
+        OreBlock.LOW_TIER_UMBER, OreBlock.MID_TIER_UMBER, OreBlock.HIGH_TIER_UMBER,
     ),
     TUNGSTEN(
         "Tungsten",
@@ -187,7 +187,9 @@ enum class OreType(
     ),
     ;
 
-    val internalName: NEUInternalName = internalName.asInternalName()
+    val oreBlocks = oreBlocks.toSet()
+
+    val internalName: NeuInternalName = internalName.toInternalName()
 
     fun isGemstone(): Boolean = this in gemstones
 
@@ -201,7 +203,7 @@ enum class OreType(
 
         fun IBlockState.isOreType(oreType: OreType): Boolean {
             for (oreBlock in oreType.oreBlocks) {
-                if (oreBlock !in MiningAPI.currentAreaOreBlocks) continue
+                if (oreBlock !in MiningApi.currentAreaOreBlocks) continue
                 if (oreBlock.checkBlock(this)) {
                     return true
                 }

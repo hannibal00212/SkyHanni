@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -11,10 +12,12 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
+import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -105,14 +108,14 @@ class Mob(
         }
     }
 
-    val isCorrupted get() = baseEntity.isCorrupted() // Can change
-    val isRunic = baseEntity.isRunic() // Does not Change
+    val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted() // Can change
+    val isRunic = !RiftApi.inRift() && baseEntity.isRunic() // Does not Change
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
@@ -150,6 +153,9 @@ class Mob(
         get() = relativeBoundingBox?.offset(baseEntity.posX, baseEntity.posY, baseEntity.posZ)
             ?: baseEntity.entityBoundingBox
 
+    val health: Float get() = baseEntity.health
+    val maxHealth: Int get() = baseEntity.baseMaxHealth
+
     init {
         removeExtraEntitiesFromChecking()
         relativeBoundingBox =
@@ -157,7 +163,7 @@ class Mob(
 
         owner = (
             ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+                summonOwnerPattern.matchMatcher(it.cleanName()) { group("name") }
             } else null
             )?.let { MobUtils.OwnerShip(it) }
     }
@@ -227,7 +233,7 @@ class Mob(
         internalHighlight()
     }
 
-    val centerCords get() = boundingBox.getCenter()
+    val centerCords get() = boundingBox.getBoxCenter()
 
     override fun hashCode() = id.hashCode()
 

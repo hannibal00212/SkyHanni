@@ -100,7 +100,7 @@ object MobFactories {
             )
         }
 
-    fun displayNPC(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, clickArmorStand: EntityArmorStand): Mob =
+    fun displayNpc(baseEntity: EntityLivingBase, armorStand: EntityArmorStand, clickArmorStand: EntityArmorStand): Mob =
         Mob(
             baseEntity = baseEntity,
             mobType = Mob.Type.DISPLAY_NPC,

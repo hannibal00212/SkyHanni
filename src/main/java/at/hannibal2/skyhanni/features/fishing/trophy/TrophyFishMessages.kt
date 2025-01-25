@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,10 +30,8 @@ object TrophyFishMessages {
         "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\."
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         val (displayName, displayRarity) = trophyFishPattern.matchMatcher(event.message) {
             group("displayName").replace("§k", "") to
                 group("displayRarity")
@@ -100,9 +98,11 @@ object TrophyFishMessages {
         LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
     }
 
+    val regex = "[- ]".toRegex()
+
     fun getInternalName(displayName: String): String {
         return displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace("[- ]".toRegex(), "").lowercase().removeColor()
+            .replace(regex, "").lowercase().removeColor()
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
@@ -113,7 +113,7 @@ object TrophyFishMessages {
             rarity == TrophyRarity.SILVER &&
             amount != 1
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.trophyCounter", "fishing.trophyFishing.chatMessages.enabled")
         event.move(2, "fishing.trophyDesign", "fishing.trophyFishing.chatMessages.design")

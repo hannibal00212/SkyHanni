@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,8 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -45,27 +44,35 @@ object ItemAbilityCooldown {
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
         "alignedother",
-        "§eYou aligned §r§a.* §r§eother player(s)?!",
+        "§eYou aligned §r§a.* §r§eother players?!",
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
         "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
     )
 
+    /**
+     * REGEX-TEST: §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
+     */
+    private val abilityUsePattern by patternGroup.pattern(
+        "abilityuse",
+        ".*§b-\\d+ Mana \\(§6(?<type>.*)§b\\).*",
+    )
+
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
     private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
-    private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
-    private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
-    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
-    private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
-    private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
-    private val SOS_FLARE = "SOS_FLARE".asInternalName()
-    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".asInternalName()
+    private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
+    private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
+    private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".toInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
+    private val SOS_FLARE = "SOS_FLARE".toInternalName()
+    private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Hyperion
@@ -93,8 +100,8 @@ object ItemAbilityCooldown {
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName(),
+                            "SHADOW_FURY".toInternalName(),
+                            "STARRED_SHADOW_FURY".toInternalName(),
                         )
                     ) return
 
@@ -230,15 +237,15 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onIslandChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         for (ability in ItemAbility.entries) {
             ability.lastActivation = 0L
             ability.specialColor = null
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
@@ -265,9 +272,8 @@ object ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
-        // TODO use regex
-        if (message.contains(" (§6") && message.contains("§b) ")) {
-            val name: String = message.between(" (§6", "§b) ")
+        abilityUsePattern.matchMatcher(message) {
+            val name = group("type")
             if (name == lastAbility) return
             lastAbility = name
             for (ability in ItemAbility.entries) {
@@ -335,7 +341,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
 
@@ -357,7 +363,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItem(event: RenderGuiItemOverlayEvent) {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
@@ -384,8 +390,8 @@ object ItemAbilityCooldown {
 
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -415,7 +421,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.repo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -14,7 +13,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -66,7 +64,9 @@ class RepoManager(private val configLocation: File) {
         private const val DEFAULT_BRANCH = "main"
 
         fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-            user == DEFAULT_USER && name == DEFAULT_NAME && branch == DEFAULT_BRANCH
+            user.lowercase() == DEFAULT_USER.lowercase() &&
+                name.lowercase() == DEFAULT_NAME.lowercase() &&
+                branch.lowercase() == DEFAULT_BRANCH.lowercase()
     }
 
     fun loadRepoInformation() {
@@ -194,7 +194,7 @@ class RepoManager(private val configLocation: File) {
             unsuccessfulConstants.clear()
             lastConstant = null
 
-            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
+            RepositoryReloadEvent(repoLocation, gson).post {
                 error = true
                 lastConstant?.let {
                     unsuccessfulConstants.add(it)
@@ -242,7 +242,7 @@ class RepoManager(private val configLocation: File) {
                 val text = mutableListOf<IChatComponent>()
                 text.add(
                     (
-                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "§c[SkyHanni-${SkyHanniMod.VERSION}] §7Repo Issue! Some features may not work. " +
                             "Please report this error on the Discord!"
                         ).asComponent(),
                 )
@@ -317,11 +317,6 @@ class RepoManager(private val configLocation: File) {
                 StandardCharsets.UTF_8,
             ),
         ).use { writer -> writer.write(gson.toJson(json)) }
-    }
-
-    @SubscribeEvent
-    fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
     }
 
     fun resetRepositoryLocation(manual: Boolean = false) {

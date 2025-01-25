@@ -62,12 +62,12 @@ public class GUIConfig {
     public DiscordRPCConfig discordRPC = new DiscordRPCConfig();
 
     @Expose
-    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar")
+    @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar.")
     @Accordion
     public HotbarConfig hotbar = new HotbarConfig();
 
     @Expose
-    @ConfigOption(name = "Xp Bar", desc = "Settings for adjusting the xp bar")
+    @ConfigOption(name = "XP Bar", desc = "Settings for adjusting the XP bar.")
     @Accordion
     public XPBarConfig xpBar = new XPBarConfig();
 
@@ -121,6 +121,11 @@ public class GUIConfig {
     @ConfigOption(name = "Real Time 12h Format", desc = "Display the current computer time in 12hr Format rather than 24h Format.")
     @ConfigEditorBoolean
     public boolean realTimeFormatToggle = false;
+
+    @Expose
+    @ConfigOption(name = "Real Time Show Seconds", desc = "Include the current seconds in the Real Time display.")
+    @ConfigEditorBoolean
+    public boolean realTimeShowSeconds = true;
 
     @Expose
     @ConfigLink(owner = GUIConfig.class, field = "realTime")

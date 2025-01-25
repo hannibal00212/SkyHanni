@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -53,14 +53,14 @@ class MobFinder {
     // F2
     private var floor2summons1 = false
     private var floor2summons1SpawnTime = 0L
-    private var floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
+    private val floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
     private var floor2secondPhase = false
     private var floor2secondPhaseSpawnTime = 0L
 
     // F3
     private var floor3GuardianShield = false
     private var floor3GuardianShieldSpawnTime = 0L
-    private var guardians = mutableListOf<EntityGuardian>()
+    private val guardians = mutableListOf<EntityGuardian>()
     private var floor3Professor = false
     private var floor3ProfessorSpawnTime = 0L
     private var floor3ProfessorGuardianPrepare = false
@@ -76,14 +76,14 @@ class MobFinder {
     // F6
     private var floor6Giants = false
     private var floor6GiantsSpawnTime = 0L
-    private var floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
+    private val floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
     private var floor6Sadan = false
     private var floor6SadanSpawnTime = 0L
 
     internal fun tryAdd(entity: EntityLivingBase) = when {
-        DungeonAPI.inDungeon() -> tryAddDungeon(entity)
-        RiftAPI.inRift() -> tryAddRift(entity)
-        GardenAPI.inGarden() -> tryAddGarden(entity)
+        DungeonApi.inDungeon() -> tryAddDungeon(entity)
+        RiftApi.inRift() -> tryAddRift(entity)
+        GardenApi.inGarden() -> tryAddGarden(entity)
         else -> {
             if (entity is EntityLiving && entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
                 EntityResult(bossType = BossType.DUMMY)
@@ -124,19 +124,19 @@ class MobFinder {
     }
 
     private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
-        if (!GardenAPI.inGarden()) return null
+        if (!GardenApi.inGarden()) return null
 
         return PestType.entries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
             ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {
-        DungeonAPI.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
-        DungeonAPI.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
-        DungeonAPI.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
-        DungeonAPI.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
-        DungeonAPI.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
-        DungeonAPI.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
+        DungeonApi.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
+        DungeonApi.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
+        DungeonApi.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
+        DungeonApi.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
+        DungeonApi.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
+        DungeonApi.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
         else -> null
     }
 
@@ -223,7 +223,7 @@ class MobFinder {
     }
 
     private fun tryAddDungeonF5(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.lividEntity) {
+        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid?.baseEntity) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F5,
                 ignoreBlocks = true,
@@ -509,7 +509,7 @@ class MobFinder {
     }
 
     fun handleChat(message: String) {
-        if (!DungeonAPI.inDungeon()) return
+        if (!DungeonApi.inDungeon()) return
         when (message) {
             // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
@@ -579,7 +579,7 @@ class MobFinder {
 
             // F5
             "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                floor5lividEntity = DungeonLividFinder.lividEntity
+                floor5lividEntity = DungeonLividFinder.livid?.baseEntity as? EntityOtherPlayerMP?
                 floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
             }
 
@@ -606,7 +606,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (DungeonAPI.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+        if (DungeonApi.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }

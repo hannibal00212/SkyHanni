@@ -7,11 +7,12 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -20,24 +21,26 @@ import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object SkyHanniTypeAdapters {
 
-    val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NEUItems::saveNBTData, NEUItems::loadNBTData)
+    val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
         { java.util.UUID.fromString(this) },
     )
 
-    val INTERNAL_NAME: TypeAdapter<NEUInternalName> = SimpleStringTypeAdapter(
+    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
         { this.asString() },
-        { this.asInternalName() },
+        { this.toInternalName() },
     )
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
-        { "$x:$y:$z" },
-        { LorenzVec.decodeFromString(this) },
+        LorenzVec::asStoredString,
+        LorenzVec::decodeFromString,
     )
 
     val TROPHY_RARITY: TypeAdapter<TrophyRarity> = SimpleStringTypeAdapter(
@@ -55,6 +58,16 @@ object SkyHanniTypeAdapters {
         }
     }
 
+    val DURATION: TypeAdapter<Duration> = object : TypeAdapter<Duration>() {
+        override fun write(out: JsonWriter, value: Duration) {
+            out.value(value.inWholeMilliseconds)
+        }
+
+        override fun read(reader: JsonReader): Duration {
+            return reader.nextString().toLong().milliseconds
+        }
+    }
+
     val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
         { name },
         { CropType.getByName(this) },
@@ -69,6 +82,8 @@ object SkyHanniTypeAdapters {
         { name.lowercase() },
         { SkyblockStat.getValue(this.uppercase()) },
     )
+
+    val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()
