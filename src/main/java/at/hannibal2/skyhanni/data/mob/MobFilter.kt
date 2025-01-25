@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -150,17 +150,17 @@ object MobFilter {
         }
     }
 
-    private val extraDisplayNPCByName = setOf(
+    private val extraDisplayNpcByName = setOf(
         "Guy ", // Guy NPC (but only as visitor)
         "vswiblxdxg", // Mayor Cole
         "anrrtqytsl", // Weaponsmith
     )
 
-    private val displayNPCCompressedNamePattern by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
+    private val displayNpcCompressedNamePattern by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
 
-    private fun displayNPCNameCheck(name: String) = name.startsWith('§') ||
-        displayNPCCompressedNamePattern.matches(name) ||
-        extraDisplayNPCByName.contains(name)
+    private fun displayNpcNameCheck(name: String) = name.startsWith('§') ||
+        displayNpcCompressedNamePattern.matches(name) ||
+        extraDisplayNpcByName.contains(name)
 
     private val listOfClickArmorStand = setOf(
         "§e§lCLICK",
@@ -175,26 +175,26 @@ object MobFilter {
         this !is EntityLivingBase -> false
         this is EntityArmorStand -> false
         this is EntityPlayer && this.isRealPlayer() -> false
-        this.isDisplayNPC() -> false
+        this.isDisplayNpc() -> false
         this is EntityWither && this.entityId < 0 -> false
         else -> true
     }
 
     fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
 
-    fun EntityLivingBase.isDisplayNPC() =
-        (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name)) ||
+    fun EntityLivingBase.isDisplayNpc() =
+        (this is EntityPlayer && isNpc() && displayNpcNameCheck(this.name)) ||
             (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
-    fun createDisplayNPC(entity: EntityLivingBase): Boolean {
+    fun createDisplayNpc(entity: EntityLivingBase): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
             listOfClickArmorStand.contains(armorStand.name)
         } ?: return false
         val armorStand = MobUtils.getArmorStand(clickArmorStand, -1) ?: return false
-        MobEvent.Spawn.DisplayNPC(MobFactories.displayNPC(entity, armorStand, clickArmorStand)).post()
+        MobEvent.Spawn.DisplayNpc(MobFactories.displayNpc(entity, armorStand, clickArmorStand)).post()
         return true
     }
 
@@ -238,7 +238,7 @@ object MobFilter {
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(
+            ?: if (DungeonApi.inDungeon()) MobFactories.dungeon(
                 baseEntity,
                 armorStand,
                 extraEntityList,
@@ -323,7 +323,7 @@ object MobFilter {
         baseEntity: EntityLivingBase,
         extraEntityList: List<EntityLivingBase>,
     ): MobResult? =
-        if (DungeonAPI.inDungeon()) {
+        if (DungeonApi.inDungeon()) {
             when {
                 (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) &&
                     extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
@@ -374,7 +374,7 @@ object MobFilter {
             MobFactories.basic(
                 baseEntity,
                 when {
-                    DungeonAPI.inDungeon() -> "Dungeon Secret Bat"
+                    DungeonApi.inDungeon() -> "Dungeon Secret Bat"
                     IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },

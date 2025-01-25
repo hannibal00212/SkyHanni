@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -53,7 +53,7 @@ object ModifyVisualWords {
         var modifiedText = originalText ?: return null
         if (!LorenzUtils.onHypixel) return originalText
         if (!config.enabled) return originalText
-        if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
+        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) return originalText
 
         if (userModifiedWords.isEmpty()) {
             userModifiedWords.addAll(SkyHanniMod.visualWordsData.modifiedWords)

@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
@@ -28,7 +28,7 @@ object FortuneUpgrades {
     val cropSpecificUpgrades = mutableListOf<FortuneUpgrade>()
 
     fun generateGenericUpgrades() {
-        val storage = GardenAPI.storage?.fortune ?: return
+        val storage = GardenApi.storage?.fortune ?: return
         genericUpgrades.clear()
 
         if (storage.plotsUnlocked != -1 && storage.plotsUnlocked != 24) {
@@ -88,7 +88,7 @@ object FortuneUpgrades {
     }
 
     private fun getEquipmentUpgrades() {
-        val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
+        val visitors = GardenApi.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in FarmingItems.equip) {
             val item = piece.getItem()
             // todo tell them to buy the missing item

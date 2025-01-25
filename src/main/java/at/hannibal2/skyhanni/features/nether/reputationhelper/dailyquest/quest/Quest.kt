@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest
 
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 
 abstract class Quest(
-    val displayItem: NEUInternalName,
+    val displayItem: NeuInternalName,
     val location: LorenzVec?,
     val category: QuestCategory,
     val internalName: String,
