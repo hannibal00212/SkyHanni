@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -43,6 +41,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
 
@@ -381,7 +380,9 @@ object DungeonApi {
 
 
         companion object {
-            fun getByClassName(className: String) = DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+            fun getByClassName(className: String): DungeonClass? {
+                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+            }
         }
     }
 
@@ -434,12 +435,13 @@ object DungeonApi {
     fun getPlayerInfo(username: String): TeamMember =
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
+    @Suppress("MaxLineLength")
     private val playerClassRegex by patternGroup.pattern(
         "dungeon.tablist.playerteam",
         "§8\\[§.§.\\d+§.§.] §.§.(?<username>\\w+)[^(\\]]*§r§f\\(§r§d(§.§.)?(?<class>Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\\s*(?<level>[IVXLCDM0]+)?§r§f)?\\)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
