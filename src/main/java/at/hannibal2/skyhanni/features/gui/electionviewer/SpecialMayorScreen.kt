@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
-import at.hannibal2.skyhanni.data.ElectionAPI
-import at.hannibal2.skyhanni.data.ElectionAPI.ELECTION_END_DAY
-import at.hannibal2.skyhanni.data.ElectionAPI.ELECTION_END_MONTH
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.ELECTION_END_DAY
+import at.hannibal2.skyhanni.data.ElectionApi.ELECTION_END_MONTH
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,7 +23,7 @@ object SpecialMayorScreen : ElectionViewerScreen() {
         val specialMayorRenderables = ElectionViewerUtils.getNextSpecialMayors(SkyBlockTime.now().year).let { nextMayors ->
             nextMayors.map { (name, year) ->
                 val electionTime = SkyBlockTime(year, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
-                val color = ElectionAPI.mayorNameToColorCode(name)
+                val color = ElectionApi.mayorNameToColorCode(name)
                 Renderable.horizontalContainer(
                     listOf(
                         getFakeMayorRenderable(ElectionCandidate.getMayorFromName(name) ?: ElectionCandidate.UNKNOWN),

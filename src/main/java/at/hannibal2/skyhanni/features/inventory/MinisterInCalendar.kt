@@ -87,7 +87,7 @@ object MinisterInCalendar {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!ElectionAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ElectionApi.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
 
         if (event.slotId in listOf(37, 38)) {
             event.cancel()

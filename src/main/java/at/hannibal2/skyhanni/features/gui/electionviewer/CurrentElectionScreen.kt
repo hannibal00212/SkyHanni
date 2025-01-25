@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
-import at.hannibal2.skyhanni.data.ElectionAPI
+import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidateRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -17,7 +17,7 @@ object CurrentElectionScreen : ElectionViewerScreen() {
     override val posLabel = "Election Viewer - Current Election"
 
     override fun updateDisplay() {
-        val currentElection = ElectionAPI.rawMayorData?.current ?: return
+        val currentElection = ElectionApi.rawMayorData?.current ?: return
         val votesHidden = currentElection.candidates.sumOf { it.votes } == 0
 
         val sortedCandidates = currentElection.candidates.sortedByDescending { it.votes }
@@ -36,7 +36,7 @@ object CurrentElectionScreen : ElectionViewerScreen() {
 
         val candidateRenderables = currentElection.candidates.map { candidate ->
             val (_, rankColor) = candidateWithRank.first { it.first == candidate }
-            val color = ElectionAPI.mayorNameToColorCode(candidate.name)
+            val color = ElectionApi.mayorNameToColorCode(candidate.name)
             val votesText = if (votesHidden) "§7????" else "§7" + candidate.votes.addSeparators()
 
             val candidateContent = Renderable.verticalContainer(
