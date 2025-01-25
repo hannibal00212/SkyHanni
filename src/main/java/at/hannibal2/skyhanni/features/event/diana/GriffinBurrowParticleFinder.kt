@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -39,7 +39,7 @@ object GriffinBurrowParticleFinder {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Particle Finder")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }
@@ -155,7 +155,7 @@ object GriffinBurrowParticleFinder {
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
         ) {
-            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             val burrow = lastDugParticleBurrow
             if (burrow != null) {
                 if (!tryDig(burrow)) {
@@ -164,7 +164,7 @@ object GriffinBurrowParticleFinder {
             }
         }
         if (message == "§cDefeat all the burrow defenders in order to dig it!") {
-            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
         }
     }
 
@@ -198,7 +198,7 @@ object GriffinBurrowParticleFinder {
             lastDugParticleBurrow = location
 
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowAPI.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
                     burrows.remove(location)
                 }
             }
@@ -223,5 +223,5 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana()
+    private fun isEnabled() = DianaApi.isDoingDiana()
 }

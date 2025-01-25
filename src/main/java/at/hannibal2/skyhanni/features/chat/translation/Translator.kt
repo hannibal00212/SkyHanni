@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -110,7 +110,7 @@ object Translator {
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) = APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
+    private fun getJSONResponse(urlString: String) = ApiUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
     fun getTranslation(
         message: String,

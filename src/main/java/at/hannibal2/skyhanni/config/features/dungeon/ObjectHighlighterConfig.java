@@ -23,7 +23,7 @@ public class ObjectHighlighterConfig {
         @ConfigOption(name = "Highlight Starred", desc = "Highlights starred mobs in a color.")
         @ConfigEditorBoolean
         @FeatureToggle
-        public Property<Boolean> highlight = Property.of(true);
+        public Property<Boolean> highlight = Property.of(false);
 
         /*
         TODO for someone who has time

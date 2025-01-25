@@ -42,10 +42,10 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -69,7 +69,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -237,7 +236,7 @@ object SkyHanniDebugsAndTests {
             list.add("$coloredName§7 (")
             for (itemName in item.value) {
                 try {
-                    val internalName = NEUInternalName.fromItemName(itemName)
+                    val internalName = NeuInternalName.fromItemName(itemName)
                     list.add(internalName.getItemStack())
                 } catch (e: Error) {
                     ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
@@ -379,7 +378,7 @@ object SkyHanniDebugsAndTests {
             add("§bSkyHanni Test Item")
             add("§einput: '§f$input§e'")
 
-            NEUInternalName.fromItemNameOrNull(input)?.let { internalName ->
+            NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
@@ -418,7 +417,7 @@ object SkyHanniDebugsAndTests {
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
+        if ((internalName == NeuInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
@@ -490,7 +489,7 @@ object SkyHanniDebugsAndTests {
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
-        if (internalName == NEUInternalName.NONE) {
+        if (internalName == NeuInternalName.NONE) {
             event.toolTip.add("Item name: no item.")
             return
         }
@@ -616,7 +615,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
