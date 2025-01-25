@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,7 +30,7 @@ object SkillTooltip {
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: return
             val useRoman = split.last().isRoman()
-            val skillInfo = SkillAPI.storage?.get(skill) ?: return
+            val skillInfo = SkillApi.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip
             var next = false
             for (line in iterator) {

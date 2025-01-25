@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -54,8 +54,8 @@ object BitsPerCookieVisual {
             }
         } ?: (loreIndex + 1)
 
-        val gain = BitsAPI.bitsPerCookie() * cookieAmount
-        val newAvailable = BitsAPI.bitsAvailable + gain
+        val gain = BitsApi.bitsPerCookie() * cookieAmount
+        val newAvailable = BitsApi.bitsAvailable + gain
         val duration = 4 * cookieAmount
 
         var index = positionIndex
@@ -71,7 +71,7 @@ object BitsPerCookieVisual {
         if (config.showBitsOnCookie) toolTip.add(index++, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
         if (config.showBitsChangeOnCookie) toolTip.add(
             index++,
-            "§8‣ §7Available Bits: §3${BitsAPI.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
+            "§8‣ §7Available Bits: §3${BitsApi.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
         )
     }
 

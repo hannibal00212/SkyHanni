@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
@@ -32,7 +32,7 @@ object CollectionTracker {
     private var display = emptyList<List<Any>>()
 
     private var itemName = ""
-    private var internalName: NEUInternalName? = null
+    private var internalName: NeuInternalName? = null
     private var itemAmount = -1L
     private var goalAmount = -1L
 
@@ -82,7 +82,7 @@ object CollectionTracker {
             return
         }
 
-        val foundInternalName = NEUInternalName.fromItemNameOrNull(rawName)
+        val foundInternalName = NeuInternalName.fromItemNameOrNull(rawName)
         if (foundInternalName == null) {
             ChatUtils.userError("Item '$rawName' does not exist!")
             return
@@ -120,8 +120,8 @@ object CollectionTracker {
         else -> rawName
     }
 
-    private fun setNewCollection(internalName: NEUInternalName, name: String) {
-        val foundAmount = CollectionAPI.getCollectionCounter(internalName)
+    private fun setNewCollection(internalName: NeuInternalName, name: String) {
+        val foundAmount = CollectionApi.getCollectionCounter(internalName)
         if (foundAmount == null) {
             ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
             return
@@ -188,7 +188,7 @@ object CollectionTracker {
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
-        return CollectionAPI.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
+        return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
             .map { it.displayName.removeColor().replace(" ", "_") }
     }
 
