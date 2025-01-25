@@ -63,7 +63,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (source == ItemAddManager.Source.COMMAND) {
             TrackerManager.commandEditTrackerSuccess = true
             ChatUtils.chat(
-                "Added ${internalName.itemName} §e${amount}§7x to ($selectedBucket§7)",
+                "Added ${internalName.itemName} §e$amount§7x to ($selectedBucket§7)",
             )
         }
     }
