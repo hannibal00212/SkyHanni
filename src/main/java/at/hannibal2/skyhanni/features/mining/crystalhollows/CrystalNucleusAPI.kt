@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.fromItemNameOrNull
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -43,7 +43,7 @@ object CrystalNucleusAPI {
 
     private var inLootLoop = false
     private var unCheckedBooks: Int = 0
-    private val loot = mutableMapOf<NEUInternalName, Int>()
+    private val loot = mutableMapOf<NeuInternalName, Int>()
 
     private val LAPIDARY_I_BOOK_ITEM = "LAPIDARY;1".toInternalName()
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
@@ -115,7 +115,7 @@ object CrystalNucleusAPI {
         }
     }
 
-    private fun SkyHanniChatEvent.getLoot(): Pair<NEUInternalName, Int>? {
+    private fun SkyHanniChatEvent.getLoot(): Pair<NeuInternalName, Int>? {
         // All loot rewards start with 4 spaces.
         // To simplify regex statements, this check is done outside the main logic.
         // This also nerfs the "§r§a§lREWARDS" message.

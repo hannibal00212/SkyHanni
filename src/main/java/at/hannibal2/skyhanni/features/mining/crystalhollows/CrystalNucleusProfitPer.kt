@@ -26,8 +26,8 @@ object CrystalNucleusProfitPer {
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
         for ((internalName, amount) in loot) {
-            internalName.getPrice().takeIf { price -> price != -1.0 }?.let { pricePer ->
-                val profit = amount * pricePer
+            internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
+                val profit: Double = amount * pricePer
                 val nameFormat = internalName.itemName
                 val text = "§eFound $nameFormat §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
                 map.addOrPut(text, profit)

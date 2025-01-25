@@ -124,7 +124,7 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
+            val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
@@ -139,7 +139,7 @@ object CrystalNucleusTracker {
 
             val usesApparatus = CrystalNucleusAPI.usesApparatus()
             val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
-            val totalSapphireCost = partsCost * runsCompleted
+            val totalSapphireCost: Double = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
             val usageString = if (usesApparatus) StringUtils.pluralize(
                 runsCompleted.toInt(),
