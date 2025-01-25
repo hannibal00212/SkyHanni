@@ -1,15 +1,12 @@
-package at.hannibal2.skyhanni.config.features.rift.area.mountaintop;
+package at.hannibal2.skyhanni.config.features.rift.area.mountaintop
 
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class MountaintopConfig {
-
+class MountaintopConfig {
     @Expose
     @ConfigOption(name = "Timite", desc = "")
     @Accordion
-    public TimiteConfig timite = new TimiteConfig();
-
+    var timite: TimiteConfig = TimiteConfig()
 }
-

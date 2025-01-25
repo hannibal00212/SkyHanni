@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -30,11 +31,11 @@ object TimiteTracker {
 
     private val config get() = SkyHanniMod.feature.rift.area.mountaintop.timite
     private val HIGHLITE = "HIGHLITE".toInternalName()
-
+    private val TIMITE = "TIMITE".toInternalName()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
-            "detekt ur a stupid fucker"
+            return
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -54,18 +55,16 @@ object TimiteTracker {
         }
 
         fun getTime(): Int {
-            this.items["TIMITE".toInternalName()]?.let {
+            this.items[TIMITE]?.let {
                 return it.totalAmount.toInt() * 2
             }
             return 0
         }
-
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§9§lTimite Tracker")
         val profit = tracker.drawItems(data, { true }, this)
-
 
         val highliteRecipe = NeuItems.getRecipes(HIGHLITE).singleOrNull()
         if (highliteRecipe != null) {
@@ -94,13 +93,11 @@ object TimiteTracker {
 
         add(Renderable.string("§aTime§7: §a${data.getTime().seconds.format()}ф").toSearchable())
 
-
         add(
             Renderable.string(
                 "§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes"
             ).toSearchable()
         )
-
     }
 
     private val tracker =
@@ -114,15 +111,14 @@ object TimiteTracker {
         "OBSOLITE".toInternalName(),
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onItem(event: ItemAddEvent) {
-
         if (validItems.contains(event.internalName)) {
             tracker.addItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
@@ -139,5 +135,4 @@ object TimiteTracker {
     }
 
     private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTracker
-
 }

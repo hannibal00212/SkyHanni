@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.features.rift.area.mountaintop
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -41,7 +42,7 @@ object TimiteHelper {
     private var currentBlockState: IBlockState? = null
     private var doubleTimeShooting = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockHit(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
@@ -69,7 +70,7 @@ object TimiteHelper {
         holdingClick = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
@@ -91,7 +92,7 @@ object TimiteHelper {
 
     private val timiteLocations = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
         val location = LocationUtils.playerLocation()
         val from = location.add(-15, -15, -15).toBlockPos()
@@ -117,12 +118,10 @@ object TimiteHelper {
                 }
             }
         }
-
-
     }
 
-    @HandleEvent
-    fun onBlockRender(event: RenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!RiftApi.inMountainTop() || !config.timiteExpiryTimer) return
 
         for (timiteLocation in timiteLocations.entries) {
@@ -134,9 +133,9 @@ object TimiteHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) = timiteLocations.clear()
-
+    fun onWorldChange(event: WorldChangeEvent) {
+        timiteLocations.clear()
+    }
 
     private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTimer
-
 }
