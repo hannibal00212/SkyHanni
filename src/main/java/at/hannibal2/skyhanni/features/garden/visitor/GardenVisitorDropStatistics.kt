@@ -15,8 +15,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,9 +25,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,7 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 object GardenVisitorDropStatistics {
 
     private val config get() = GardenApi.config.visitors.dropsStatistics
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
 
     private var acceptedVisitors = 0
     var deniedVisitors = 0
@@ -103,14 +107,7 @@ object GardenVisitorDropStatistics {
 
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
-        for (index in config.textFormat) {
-            // We need to use the ordinal here, can't change this.
-            newList.add(map[index.ordinal])
-        }
-        return newList
-    }
+    private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -189,13 +186,13 @@ object GardenVisitorDropStatistics {
     /**
      * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
      */
-    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<List<Any>> {
-        addAsSingletonList("§e§lVisitor Statistics")
-        addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
+    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<Renderable> {
+        addString("§e§lVisitor Statistics")
+        addString(format(totalVisitors, "Total", "§e", ""))
         val visitorRarities = storage.visitorRarities
         fixRaritiesSize(visitorRarities)
         if (visitorRarities.isNotEmpty()) {
-            addAsSingletonList(
+            addString(
                 "§a${visitorRarities[0].addSeparators()}§f-" +
                     "§9${visitorRarities[1].addSeparators()}§f-" +
                     "§6${visitorRarities[2].addSeparators()}§f-" +
@@ -203,34 +200,43 @@ object GardenVisitorDropStatistics {
                     "§c${visitorRarities[4].addSeparators()}",
             )
         } else {
-            addAsSingletonList("§c?")
+            addString("§c?")
             ErrorManager.logErrorWithData(
                 RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
                 "Error rendering visitor drop statistics",
             )
         }
-        addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
-        addAsSingletonList(format(deniedVisitors, "Denied", "§c", ""))
-        addAsSingletonList("")
-        addAsSingletonList(format(storage.copper, "Copper", "§c", ""))
-        addAsSingletonList(format(storage.farmingExp, "Farming EXP", "§3", "§7"))
-        addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
+        addString(format(acceptedVisitors, "Accepted", "§2", ""))
+        addString(format(deniedVisitors, "Denied", "§c", ""))
+        addString("")
+        addString(format(storage.copper, "Copper", "§c", ""))
+        addString(format(storage.farmingExp, "Farming EXP", "§3", "§7"))
+        addString(format(coinsSpent, "Coins Spent", "§6", ""))
 
-        addAsSingletonList("")
-        addAsSingletonList(format(storage.gardenExp, "Garden EXP", "§2", "§7"))
-        addAsSingletonList(format(storage.bits, "Bits", "§b", "§b"))
-        addAsSingletonList(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
-        addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
+        addString("")
+        addString(format(storage.gardenExp, "Garden EXP", "§2", "§7"))
+        addString(format(storage.bits, "Bits", "§b", "§b"))
+        addString(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
+        addString(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
 
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) { // Icons
                 val stack = reward.itemStack
-                if (config.displayNumbersFirst)
-                    add(listOf("§b${count.addSeparators()} ", stack))
-                else add(listOf(stack, " §b${count.addSeparators()}"))
+                val text = "§b${count.addSeparators()}"
+                if (config.displayNumbersFirst) {
+                    addLine {
+                        addString(text)
+                        addItemStack(stack)
+                    }
+                } else {
+                    addLine {
+                        addString(text)
+                        addItemStack(stack)
+                    }
+                }
             } else { // No Icons
-                addAsSingletonList(format(count, reward.displayName, "§b"))
+                addString(format(count, reward.displayName, "§b"))
             }
         }
     }
@@ -322,7 +328,7 @@ object GardenVisitorDropStatistics {
         if (!GardenApi.inGarden()) return
         if (GardenApi.hideExtraGuis()) return
         if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
-        config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
+        config.pos.renderRenderables(display, posLabel = "Visitor Stats")
     }
 
     @HandleEvent
