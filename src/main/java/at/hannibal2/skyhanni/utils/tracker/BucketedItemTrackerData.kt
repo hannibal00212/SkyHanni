@@ -73,10 +73,9 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
         it.value.isNotEmpty()
     }.keys.toMutableList()
-    fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = getSelectedBucket()?.let {
+    fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = selectedBucket?.let {
         getBucket(it)
     } ?: flattenBucketsItems()
-    private fun getSelectedBucket() = selectedBucket
     fun selectNextSequentialBucket(): E? {
         // Move to the next ordinal, or wrap to null if at the last value
         val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null

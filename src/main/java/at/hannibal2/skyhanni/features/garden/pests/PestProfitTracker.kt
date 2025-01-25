@@ -131,7 +131,7 @@ object PestProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
-        tracker.addItem(event)
+        with(tracker) { event.addItemFromEvent() }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

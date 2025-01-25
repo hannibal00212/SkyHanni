@@ -44,22 +44,27 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         return selectedBucket
     }
 
-    fun addItem(event: ItemAddEvent) {
-        getSelectedBucket()?.let { bucket ->
-            modify {
-                it.addItem(bucket, event.internalName, event.amount)
-            }
-            if (event.source == ItemAddManager.Source.COMMAND) {
-                TrackerManager.commandEditTrackerSuccess = true
-                ChatUtils.chat(
-                    "Added ${event.internalName.itemName} §e${event.amount}§7x to ($bucket§7)"
-                )
-            }
-        } ?: run {
+    fun ItemAddEvent.addItemFromEvent() {
+        var bucket: E? = null
+        modify { data ->
+            bucket = data.selectedBucket
+        }
+        val selectedBucket: E = bucket ?: run {
             ChatUtils.userError(
-                "No bucket selected for §b$name§c.\nSelect one in the §b$name §cGUI, then try again."
+                "No bucket selected for §b$name§c.\nSelect one in the §b$name §cGUI, then try again.",
             )
-            event.cancel()
+            cancel()
+            return
+        }
+
+        modify {
+            it.addItem(selectedBucket, internalName, amount)
+        }
+        if (source == ItemAddManager.Source.COMMAND) {
+            TrackerManager.commandEditTrackerSuccess = true
+            ChatUtils.chat(
+                "Added ${internalName.itemName} §e${amount}§7x to ($selectedBucket§7)",
+            )
         }
     }
 
@@ -166,7 +171,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                         ChatUtils.chat(
                             "Removed $cleanName §efrom $name" +
                                 if (data.selectedBucket != null) " (${data.selectedBucket})"
-                                else ""
+                                else "",
                         )
                     } else {
                         modify {

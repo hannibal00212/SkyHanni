@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class SprayType(val displayName: String) {
     COMPOST("Compost"),
