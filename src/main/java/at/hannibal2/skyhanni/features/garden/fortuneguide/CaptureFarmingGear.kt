@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
 object CaptureFarmingGear {
-    private val outdatedItems get() = GardenAPI.storage?.fortune?.outdatedItems
+    private val outdatedItems get() = GardenApi.storage?.fortune?.outdatedItems
 
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
 
@@ -151,7 +151,7 @@ object CaptureFarmingGear {
         }
 
         strengthPattern.firstMatcher(TabListData.getTabList()) {
-            GardenAPI.storage?.fortune?.farmingStrength = group("strength").toInt()
+            GardenApi.storage?.fortune?.farmingStrength = group("strength").toInt()
         }
     }
 
@@ -181,7 +181,7 @@ object CaptureFarmingGear {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        val storage = GardenAPI.storage?.fortune ?: return
+        val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
         if (isPetMenu(event.inventoryName, event.inventoryItems)) {
@@ -233,7 +233,7 @@ object CaptureFarmingGear {
                 }
             }
             if (tier > -1 && tierProgress > -1) {
-                GardenAPI.storage?.uniqueVisitors = getUniqueVisitorsForTier(tier) + tierProgress
+                GardenApi.storage?.uniqueVisitors = getUniqueVisitorsForTier(tier) + tierProgress
             }
         }
     }
@@ -362,14 +362,14 @@ object CaptureFarmingGear {
                 val enchantments = slot.getEnchantments().orEmpty()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
                 val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
-                GardenAPI.storage?.uniqueVisitors = round(visitors).toInt()
+                GardenApi.storage?.uniqueVisitors = round(visitors).toInt()
             }
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        val storage = GardenAPI.storage?.fortune ?: return
+        val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val msg = event.message.removeColor().trim()
         fortuneUpgradePattern.matchMatcher(msg) {
@@ -424,7 +424,7 @@ object CaptureFarmingGear {
     }
 
     fun onResetGearCommand() {
-        val storage = GardenAPI.storage?.fortune ?: return
+        val storage = GardenApi.storage?.fortune ?: return
         ChatUtils.chat("Resets farming items")
         storage.farmingItems.clear()
         storage.outdatedItems.clear()

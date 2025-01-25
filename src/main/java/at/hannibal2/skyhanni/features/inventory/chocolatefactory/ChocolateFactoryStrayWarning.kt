@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.caughtRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.caughtRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +35,7 @@ import kotlin.math.sin
 @SkyHanniModule
 object ChocolateFactoryStrayWarning {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private val warningConfig get() = config.rabbitWarning
     private const val CHROMA_COLOR = "249:255:255:85:85"
     private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
@@ -82,13 +82,13 @@ object ChocolateFactoryStrayWarning {
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
 
-        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryAPI.warningSound)
+        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryApi.warningSound)
         else SoundUtils.playBeepSound()
     }
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (config.partyMode.get()) event.partyModeHighlight()
         else event.strayHighlight()
     }
@@ -117,11 +117,11 @@ object ChocolateFactoryStrayWarning {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) {
+        if (!ChocolateFactoryApi.inChocolateFactory) {
             flashScreen = false
             return
         }
-        val strayStacks = HoppityAPI.filterMayBeStray(event.inventoryItems)
+        val strayStacks = HoppityApi.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
         val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
         activeStraySlots = activeStrays.keys
@@ -158,7 +158,7 @@ object ChocolateFactoryStrayWarning {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getAttributesLevels
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.isGoodRoll
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getAttributesLevels
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.isGoodRoll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -38,7 +38,7 @@ object AttributeOverlay {
     }
 
     private fun GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost.drawAttribute(
-        attribute: AttributeAPI.Attribute,
+        attribute: AttributeApi.Attribute,
         goodRoll: Boolean,
         index: Int,
     ) {

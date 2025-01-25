@@ -147,3 +147,5 @@ potential-bugs:
         active: false
     HasPlatformType: # false positives on config get() methods
         active: false
+    StorageNeedsExpose:
+        active: true

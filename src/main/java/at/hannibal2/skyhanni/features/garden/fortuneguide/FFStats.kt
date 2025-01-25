@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -20,9 +20,9 @@ object FFStats {
     private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
     var cakeExpireTime
-        get() = GardenAPI.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
+        get() = GardenApi.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
         set(value) {
-            GardenAPI.storage?.fortune?.cakeExpiring = value
+            GardenApi.storage?.fortune?.cakeExpiring = value
         }
 
     var equipmentTotalFF = mapOf<FFTypes, Double>()
@@ -126,7 +126,7 @@ object FFStats {
     }
 
     fun getPetFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
-        val gardenLvl = GardenAPI.getGardenLevel(overflow = false)
+        val gardenLvl = GardenApi.getGardenLevel(overflow = false)
         this[FFTypes.BASE] = getPetFF(item)
         this[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
             "GREEN_BANDANA" -> 4.0 * gardenLvl
@@ -138,7 +138,7 @@ object FFStats {
     }
 
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
-        val storage = GardenAPI.storage?.fortune ?: return emptyMap()
+        val storage = GardenApi.storage?.fortune ?: return emptyMap()
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
         this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
@@ -172,7 +172,7 @@ object FFStats {
     private fun getPetFF(pet: ItemStack?): Double {
         if (pet == null) return 0.0
         val petLevel = pet.getPetLevel()
-        val strength = (GardenAPI.storage?.fortune?.farmingStrength)
+        val strength = (GardenApi.storage?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return when {

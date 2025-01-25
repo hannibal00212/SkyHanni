@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.CurrentPetAPI
+import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -36,7 +36,7 @@ object PetUtils {
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
      * REGEX-TEST: ⭐ [Lvl 100] Black Cat ✦
      */
-    val petItemNamePattern by CurrentPetAPI.patternGroup.pattern(
+    val petItemNamePattern by CurrentPetApi.patternGroup.pattern(
         "item.name",
         "(?<favorite>(?:§.)*⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
     )
@@ -56,7 +56,7 @@ object PetUtils {
      * REGEX-TEST: §7[Lvl 1➡200] §6Golden Dragon
      * REGEX-TEST: §7[Lvl {LVL}] §6Golden Dragon
      */
-    private val neuRepoPetItemNamePattern by CurrentPetAPI.patternGroup.pattern(
+    private val neuRepoPetItemNamePattern by CurrentPetApi.patternGroup.pattern(
         "item.name.neu.format",
         "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
     )
@@ -67,7 +67,7 @@ object PetUtils {
      * REGEX-TEST: §7To Select Process (Slot #7)
      * REGEX-TEST: §7To Select Process
      */
-    private val forgeBackMenuPattern by CurrentPetAPI.patternGroup.pattern(
+    private val forgeBackMenuPattern by CurrentPetApi.patternGroup.pattern(
         "menu.forge.goback",
         "§7To Select Process(?: \\(Slot #\\d\\))?",
     )
@@ -85,7 +85,7 @@ object PetUtils {
      * REGEX-TEST: PET_SKIN_RABBIT_PLUSHIE
      * REGEX-TEST: PET_SKIN_RABBIT_ROSE
      */
-    private val petSkinNamePattern by CurrentPetAPI.patternGroup.pattern(
+    private val petSkinNamePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet",
         "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
     )
@@ -155,7 +155,7 @@ object PetUtils {
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
 
-    fun xpToLevel(totalXp: Double, petInternalName: NEUInternalName): Int? {
+    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int? {
         val (petName, rarity) = internalNameToPetName(petInternalName) ?: return null
         return xpToLevel(totalXp, rarity, petName)
     }
@@ -227,7 +227,7 @@ object PetUtils {
         baseXpLevelReqs = data.petLevels
         customXpLevelReqs = data.customPetLeveling
 
-        NEUItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
+        NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
                 // Skin name can be empty, see PET_SKIN_ENDERMAN, PET_SKIN_RABBIT, etc.
