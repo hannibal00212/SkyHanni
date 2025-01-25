@@ -42,7 +42,7 @@ object IsFishingDetection {
 
         if (lastInAreaTime.passedSince() < 5.seconds) {
             if (EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(5.0)
-                    .filter { FishingAPI.seaCreatureCount(it) > 0 }.any()
+                    .filter { FishingApi.seaCreatureCount(it) > 0 }.any()
             ) {
                 lastSeaCreatureKillArea = LocationUtils.playerLocation()
                 lastSeaCreatureKillAreaTime = SimpleTimeMark.now()

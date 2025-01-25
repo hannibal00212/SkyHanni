@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -21,7 +21,7 @@ object MythicRabbitPetWarning {
         }
     }
 
-    fun correctPet() = PetAPI.isCurrentPet(MYTHIC_RABBIT_DISPLAY_NAME)
+    fun correctPet() = PetApi.isCurrentPet(MYTHIC_RABBIT_DISPLAY_NAME)
 
     private fun warn() {
         ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")

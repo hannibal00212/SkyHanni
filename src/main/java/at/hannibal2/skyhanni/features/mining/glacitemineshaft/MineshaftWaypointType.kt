@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class MineshaftWaypointType(
     val displayText: String,
@@ -20,7 +20,7 @@ enum class MineshaftWaypointType(
     val helmet = itemName?.toInternalName()
 
     companion object {
-        fun getByHelmetOrNull(internalName: NEUInternalName): MineshaftWaypointType? {
+        fun getByHelmetOrNull(internalName: NeuInternalName): MineshaftWaypointType? {
             return entries.firstOrNull { it.helmet == internalName }
         }
     }

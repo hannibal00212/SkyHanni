@@ -24,10 +24,10 @@ object GriffinPetWarning {
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(10)) return
         if (!config.petWarning) return
-        if (!DianaAPI.isDoingDiana()) return
-        if (!DianaAPI.hasSpadeInHand()) return
+        if (!DianaApi.isDoingDiana()) return
+        if (!DianaApi.hasSpadeInHand()) return
 
-        val hasGriffinPet = DianaAPI.hasGriffinPet()
+        val hasGriffinPet = DianaApi.hasGriffinPet()
         if (hasGriffinPet) {
             wasCorrectPetAlready = true
             return

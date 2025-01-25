@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -323,7 +323,7 @@ object CollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NEUItems.itemFontSize,
+        scale: Double = NeuItems.itemFontSize,
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
@@ -332,7 +332,7 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
-    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+    fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
         addItemStack(internalName.getItemStack())
     }
 

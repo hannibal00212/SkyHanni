@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
@@ -189,7 +189,7 @@ object PlayerNameFormatter {
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
             val faction = it.faction.icon?.trim()?.toCleanChatComponent()
             val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
-            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() }
+            val bingo = it.bingoLevel?.let { level -> BingoApi.getBingoIcon(level).toCleanChatComponent() }
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 

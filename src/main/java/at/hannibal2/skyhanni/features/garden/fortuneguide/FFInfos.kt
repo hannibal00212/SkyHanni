@@ -121,7 +121,7 @@ internal enum class FFInfos(
         from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
         what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentEquip == null },
-        max = { at.hannibal2.skyhanni.features.garden.GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 },
+        max = { at.hannibal2.skyhanni.features.garden.GardenApi.totalAmountVisitorsExisting.toDouble() / 4.0 },
     ),
     ;
 
