@@ -50,12 +50,14 @@ class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
         private val isInGardenRegex = Regex(".*!GardenApi.inGarden\\(\\).*")
         private val isInRiftRegex = Regex(".*!RiftApi.inRift\\(\\).*")
         private val isInDungeonRegex = Regex(".*!DungeonApi.inDungeon\\(\\).*")
+        private val isInKuudraRegex = Regex(".*!KuudraApi.inKuudra\\(\\).*")
 
         private val regexMap = mapOf(
             isInIslandRegex to "IslandType",
             isInGardenRegex to "IslandType.GARDEN",
             isInRiftRegex to "IslandType.THE_RIFT",
-            isInDungeonRegex to "IslandType.CATACOMBS"
+            isInDungeonRegex to "IslandType.CATACOMBS",
+            isInKuudraRegex to "IslandType.KUUDRA_ARENA"
         )
     }
 }
