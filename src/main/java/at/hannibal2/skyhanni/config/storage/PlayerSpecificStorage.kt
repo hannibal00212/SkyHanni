@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
@@ -48,7 +48,7 @@ class PlayerSpecificStorage {
 
     class BingoSession {
         @Expose
-        var tierOneMinionsDone: MutableSet<NEUInternalName> = mutableSetOf()
+        var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
         @Expose
         var goals: MutableMap<Int, BingoGoal> = mutableMapOf()

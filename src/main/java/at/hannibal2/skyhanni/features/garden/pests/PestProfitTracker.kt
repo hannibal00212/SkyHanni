@@ -14,15 +14,15 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -82,7 +82,7 @@ object PestProfitTracker {
         { it.garden.pestProfitTracker },
         { drawDisplay(it) },
     )
-    private var adjustmentMap: Map<PestType, Map<NEUInternalName, Int>> = mapOf()
+    private var adjustmentMap: Map<PestType, Map<NeuInternalName, Int>> = mapOf()
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
@@ -142,13 +142,13 @@ object PestProfitTracker {
     }
 
     private fun SkyHanniChatEvent.checkPestChats() {
-        PestAPI.pestDeathChatPattern.matchMatcher(message) {
+        PestApi.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
                 "pest_name" to group("pest"),
                 "full_message" to message,
             )
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
             tracker.addItem(pest, internalName, amount)
@@ -161,7 +161,7 @@ object PestProfitTracker {
         }
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
-            val internalName = NEUInternalName.fromItemNameOrNull(itemGroup) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
             val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
             val amount = 1.fixAmount(internalName, pest).also {
                 if (it == 1) return@also
@@ -186,7 +186,7 @@ object PestProfitTracker {
         adjustmentMap = event.getConstant<GardenJson>("Garden").pestRareDrops
     }
 
-    private fun Int.fixAmount(internalName: NEUInternalName, pestType: PestType) =
+    private fun Int.fixAmount(internalName: NeuInternalName, pestType: PestType) =
         adjustmentMap.takeIf { it.isNotEmpty() }?.get(pestType)?.get(internalName) ?: this
 
     private fun addKill(type: PestType) {
@@ -262,12 +262,12 @@ object PestProfitTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (!config.enabled || !GardenAPI.inGarden()) return false
-        if (GardenAPI.isCurrentlyFarming()) return false
+        if (!config.enabled || !GardenApi.inGarden()) return false
+        if (GardenApi.isCurrentlyFarming()) return false
         val allInactive = lastPestKillTimes.all {
             it.value.passedSince() > config.timeDisplayed.seconds
         }
-        val notHoldingTool = !PestAPI.hasVacuumInHand() && !PestAPI.hasSprayonatorInHand()
+        val notHoldingTool = !PestApi.hasVacuumInHand() && !PestApi.hasSprayonatorInHand()
         return !(allInactive && notHoldingTool)
     }
 
@@ -298,7 +298,7 @@ object PestProfitTracker {
         // Move any items that are in pestProfitTracker.items as the object as a map themselves,
         // migrate them to the new format of PestType -> Drop Count. All entries will be mapped to
         // respective PestType when possible, and the rest will be moved to UNKNOWN.
-        val pestTypeMap: MutableMap<NEUInternalName, PestType> = mutableMapOf()
+        val pestTypeMap: MutableMap<NeuInternalName, PestType> = mutableMapOf()
         val pestKillCountMap: MutableMap<PestType, Long> = mutableMapOf()
         event.move(
             69,
@@ -343,4 +343,6 @@ object PestProfitTracker {
             )
         }
     }
+
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
@@ -77,9 +77,9 @@ object BingoCardReader {
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
-            val guide = BingoAPI.getData(name)?.guide?.map { "§7$it" } ?: listOf("§cNo guide yet!")
+            val guide = BingoApi.getData(name)?.guide?.map { "§7$it" } ?: listOf("§cNo guide yet!")
 
-            val bingoGoal = BingoAPI.bingoGoals.getOrPut(slot) { BingoGoal() }
+            val bingoGoal = BingoApi.bingoGoals.getOrPut(slot) { BingoGoal() }
 
             with(bingoGoal) {
                 this.type = goalType
@@ -94,7 +94,7 @@ object BingoCardReader {
                 bingoGoal.communtyGoalPercentage = it
             }
         }
-        BingoAPI.lastBingoCardOpenTime = SimpleTimeMark.now()
+        BingoApi.lastBingoCardOpenTime = SimpleTimeMark.now()
 
         BingoCardUpdateEvent.post()
     }
@@ -105,8 +105,8 @@ object BingoCardReader {
         if (!config.communityGoalProgress) return
         if (new == old) return
 
-        val oldFormat = BingoAPI.getCommunityPercentageColor(old)
-        val newFormat = BingoAPI.getCommunityPercentageColor(new)
+        val oldFormat = BingoApi.getCommunityPercentageColor(old)
+        val newFormat = BingoApi.getCommunityPercentageColor(new)
         val color = if (new > old) "§c" else "§a"
         ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
     }
@@ -143,7 +143,7 @@ object BingoCardReader {
             }
         }
 
-        val description = BingoAPI.getData(name)?.getDescriptionLine()
+        val description = BingoApi.getData(name)?.getDescriptionLine()
         val tipNote = description?.let {
             unknownTip = false
             it
@@ -160,7 +160,7 @@ object BingoCardReader {
             group("name")
         } ?: return
 
-        val goal = BingoAPI.personalGoals.firstOrNull { it.displayName == name } ?: return
+        val goal = BingoApi.personalGoals.firstOrNull { it.displayName == name } ?: return
         goal.done = true
         BingoGoalReachedEvent(goal).post()
         BingoCardUpdateEvent.post()

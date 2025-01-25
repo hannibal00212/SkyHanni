@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.isBlowgun
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.isBlowgun
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -36,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object WoodenButtonsHelper {
 
-    private val config get() = RiftAPI.config.enigmaSoulWaypoints
+    private val config get() = RiftApi.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
 
@@ -70,7 +70,7 @@ object WoodenButtonsHelper {
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         hitButtons.clear()
-        RiftAPI.allButtonsHit = false
+        RiftApi.allButtonsHit = false
         currentSpot = null
     }
 
@@ -155,7 +155,7 @@ object WoodenButtonsHelper {
         }
 
         if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
-        RiftAPI.allButtonsHit = true
+        RiftApi.allButtonsHit = true
         hitButtons = buttonLocations.values.flatten().toMutableSet()
         soulLocations["Buttons"]?.let {
             IslandGraphs.pathFind(
@@ -186,6 +186,6 @@ object WoodenButtonsHelper {
         }
     }
 
-    private fun checkButtons() = RiftAPI.inRift() && !RiftAPI.allButtonsHit
-    fun showButtons() = checkButtons() && RiftAPI.trackingButtons && config.showButtonsHelper
+    private fun checkButtons() = RiftApi.inRift() && !RiftApi.allButtonsHit
+    fun showButtons() = checkButtons() && RiftApi.trackingButtons && config.showButtonsHelper
 }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -57,7 +57,7 @@ object GuiEditManager {
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)

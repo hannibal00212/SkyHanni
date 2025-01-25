@@ -3,15 +3,15 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class PestType(
     val displayName: String,
     val damageIndicatorBoss: BossType,
     val spray: SprayType?,
     val vinyl: VinylType?,
-    val internalName: NEUInternalName,
+    val internalName: NeuInternalName,
     val crop: CropType?,
     val pluralName: String? = "${displayName}s",
 ) {

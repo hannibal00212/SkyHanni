@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -8,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -27,14 +28,14 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
 
     companion object {
-        val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
+        val SKYBLOCK_COIN = NeuInternalName.SKYBLOCK_COIN
     }
 
     fun addCoins(amount: Int, command: Boolean) {
         addItem(SKYBLOCK_COIN, amount, command)
     }
 
-    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -58,11 +59,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun drawItems(
         data: Data,
-        filter: (NEUInternalName) -> Boolean,
+        filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
-        val items = mutableMapOf<NEUInternalName, Long>()
+        val items = mutableMapOf<NeuInternalName, Long>()
         for ((internalName, itemProfit) in data.items) {
             if (!filter(internalName)) continue
 
@@ -147,7 +148,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
         newDrop: Boolean,
-        internalName: NEUInternalName,
+        internalName: NeuInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))

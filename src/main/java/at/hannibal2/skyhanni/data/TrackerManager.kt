@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 
 @SkyHanniModule
@@ -54,7 +54,7 @@ object TrackerManager {
         }
 
         val rawName = args.dropLast(1).joinToString(" ")
-        val internalName = NEUInternalName.fromItemNameOrInternalName(rawName)
+        val internalName = NeuInternalName.fromItemNameOrInternalName(rawName)
         if (!internalName.isKnownItem()) {
             ChatUtils.chat("No item found for '$rawName'!")
             return

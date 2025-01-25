@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.progressToNextLevel
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -57,7 +57,7 @@ var beenAfkFor = SimpleTimeMark.now()
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
     val cropCounter = crop?.getCounter()
-    val allowOverflow = GardenAPI.config.cropMilestones.overflow.discordRPC
+    val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
     val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
         LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
@@ -73,7 +73,7 @@ private fun getCropMilestoneDisplay(): String {
     return "${crop.cropName}: $text"
 }
 
-fun getPetDisplay(): String = PetAPI.currentPet?.let {
+fun getPetDisplay(): String = PetApi.currentPet?.let {
     val colorCode = it.substring(1..2).first()
     val petName = it.substring(2).removeColor()
     val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
@@ -153,7 +153,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     STATS(
         {
-            val statString = if (!RiftAPI.inRift()) {
+            val statString = if (!RiftApi.inRift()) {
                 "❤${ActionBarStatsData.HEALTH.value} ❈${ActionBarStatsData.DEFENSE.value} ✎${ActionBarStatsData.MANA.value}"
             } else {
                 "${ActionBarStatsData.RIFT_TIME.value}ф ✎${ActionBarStatsData.MANA.value}"
@@ -319,16 +319,16 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     DUNGEONS(
         {
-            if (!DungeonAPI.inDungeon()) {
+            if (!DungeonApi.inDungeon()) {
                 AutoStatus.DUNGEONS.placeholderText
             } else {
-                val boss = DungeonAPI.getCurrentBoss()
+                val boss = DungeonApi.getCurrentBoss()
                 if (boss == null) {
                     "Unknown dungeon boss"
                 } else {
-                    val floor = DungeonAPI.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
-                    val amountKills = DungeonAPI.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
-                    val time = DungeonAPI.time
+                    val floor = DungeonApi.dungeonFloor ?: AutoStatus.DUNGEONS.placeholderText
+                    val amountKills = DungeonApi.bossStorage?.get(boss)?.addSeparators() ?: "Unknown"
+                    val time = DungeonApi.time
                     "$floor Kills: $amountKills ($time)"
                 }
             }

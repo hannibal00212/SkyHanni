@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChocolateFactoryShortcut {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private var showItem = false
     private var lastClick = SimpleTimeMark.farPast()
 
