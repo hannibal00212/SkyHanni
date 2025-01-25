@@ -54,8 +54,10 @@ abstract class ContainerBuilder {
         )
     }
 
-    fun renderable(renderable: Renderable) {
-        children.add(renderable)
+    fun renderable(renderable: Renderable?) {
+        if (renderable != null) {
+            children.add(renderable)
+        }
     }
 
     fun renderables(renderables: Collection<Renderable>) {
