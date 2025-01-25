@@ -30,15 +30,15 @@ public class FlareConfig {
         CHAT_TITLE("Chat & Title"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        AlertType(String str) {
-            this.str = str;
+        AlertType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -73,15 +73,15 @@ public class FlareConfig {
         BOTH("Both"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        DisplayType(String str) {
-            this.str = str;
+        DisplayType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -97,15 +97,15 @@ public class FlareConfig {
         CIRCLE("Circle")
         ;
 
-        private final String str;
+        private final String displayName;
 
-        OutlineType(String str) {
-            this.str = str;
+        OutlineType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

@@ -1,6 +1,8 @@
-package at.hannibal2.skyhanni.events
+package at.hannibal2.skyhanni.events.minecraft
 
-class LorenzTickEvent(private val tick: Int) : LorenzEvent() {
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
 
     fun isMod(i: Int, offset: Int = 0) = (tick + offset) % i == 0
 
