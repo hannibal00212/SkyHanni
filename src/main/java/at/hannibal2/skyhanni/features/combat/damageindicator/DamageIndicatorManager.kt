@@ -78,8 +78,8 @@ object DamageIndicatorManager {
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
-    fun isDamageSplash(entity: EntityLivingBase): Boolean {
-        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
+    fun isDamageSplash(entity: EntityArmorStand): Boolean {
+        if (entity.ticksExisted > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.isDead) return false
         val name = entity.customNameTag.removeColor().replace(",", "")
@@ -864,7 +864,7 @@ object DamageIndicatorManager {
     private val dummyDamageCache = mutableListOf<UUID>()
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 
