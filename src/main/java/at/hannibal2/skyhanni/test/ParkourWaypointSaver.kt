@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
@@ -30,7 +30,7 @@ object ParkourWaypointSaver {
         @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 

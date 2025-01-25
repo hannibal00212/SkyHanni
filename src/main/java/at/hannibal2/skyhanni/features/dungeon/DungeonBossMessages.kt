@@ -46,10 +46,10 @@ object DungeonBossMessages {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!DungeonAPI.inDungeon()) return
+        if (!DungeonApi.inDungeon()) return
         if (!isBoss(event.message)) return
 
-        DungeonAPI.handleBossMessage(event.message)
+        DungeonApi.handleBossMessage(event.message)
 
         if (config.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"

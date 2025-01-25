@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -136,7 +136,7 @@ object NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
         }
 
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.") {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
@@ -271,7 +271,7 @@ object NonGodPotEffectDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
-        if (RiftAPI.inRift()) return
+        if (RiftApi.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,
@@ -287,5 +287,5 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 }

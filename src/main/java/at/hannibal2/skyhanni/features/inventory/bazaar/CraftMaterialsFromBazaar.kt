@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -81,7 +81,7 @@ object CraftMaterialsFromBazaar {
     }
 
     private fun calculateMaterialsNeeded(items: Map<Int, PrimitiveItemStack>): List<PrimitiveItemStack> {
-        val recipeMaterials = mutableMapOf<NEUInternalName, Int>()
+        val recipeMaterials = mutableMapOf<NeuInternalName, Int>()
         for (slot in materialSlots) {
             val item = items[slot] ?: continue
             val internalName = item.internalName
