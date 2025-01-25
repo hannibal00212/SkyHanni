@@ -21,5 +21,6 @@ class KotlinLanguageAdapter : ILanguageAdapter {
     }
 
     @Suppress("EmptyFunctionBlock")
-    override fun setInternalProxies(modContainer: ModContainer, side: Side, classLoader: ClassLoader) {}
+    override fun setInternalProxies(modContainer: ModContainer, side: Side, classLoader: ClassLoader) {
+    }
 }

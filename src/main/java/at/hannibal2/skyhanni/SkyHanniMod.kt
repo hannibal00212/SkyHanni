@@ -46,7 +46,7 @@ import org.apache.logging.log4j.Logger
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
     version = SkyHanniMod.VERSION,
-    modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter"
+    modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
 )
 object SkyHanniMod {
 
