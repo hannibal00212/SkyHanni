@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.events.mining
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 
-class CrystalNucleusLootEvent(val loot: Map<NEUInternalName, Int>) : SkyHanniEvent()
+class CrystalNucleusLootEvent(val loot: Map<NeuInternalName, Int>) : SkyHanniEvent()
