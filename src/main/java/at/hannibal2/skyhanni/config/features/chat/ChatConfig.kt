@@ -65,7 +65,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Copy Chat",
         desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
-                "message with Shwords applied, and holding Ctrl will copy only one line.",
+            "message with Shwords applied, and holding Ctrl will copy only one line.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
