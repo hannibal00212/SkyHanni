@@ -130,7 +130,6 @@ object ComputerTimeOffset {
                     add(it)
                 }
             }
-            event.addData(offset.toString())
         } else {
             event.addIrrelevant(offset.toString())
         }

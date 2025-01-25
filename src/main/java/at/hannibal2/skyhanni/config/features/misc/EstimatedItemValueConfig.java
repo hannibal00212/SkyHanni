@@ -83,15 +83,15 @@ public class EstimatedItemValueConfig {
         INSTANT_BUY("Instant Buy"),
         BUY_ORDER("Buy Order"),
         ;
-        private final String str;
+        private final String displayName;
 
-        BazaarPriceSource(String str) {
-            this.str = str;
+        BazaarPriceSource(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
