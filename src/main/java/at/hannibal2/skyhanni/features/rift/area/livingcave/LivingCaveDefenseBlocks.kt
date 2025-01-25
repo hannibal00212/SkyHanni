@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -27,7 +27,7 @@ import net.minecraft.util.EnumParticleTypes
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
 
-    private val config get() = RiftAPI.config.area.livingCave.defenseBlockConfig
+    private val config get() = RiftApi.config.area.livingCave.defenseBlockConfig
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
 
@@ -138,7 +138,7 @@ object LivingCaveDefenseBlocks {
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((block, time) in movingBlocks) {
@@ -171,7 +171,7 @@ object LivingCaveDefenseBlocks {
 
     private val color get() = config.color.get().toSpecialColor()
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
+    fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inLivingCave()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

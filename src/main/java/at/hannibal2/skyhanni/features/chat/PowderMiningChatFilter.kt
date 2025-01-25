@@ -2,18 +2,18 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PICKONIMBUS
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PREHISTORIC_EGG
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ROBOT_PARTS
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
-import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.OIL_BARREL
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.PICKONIMBUS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.PREHISTORIC_EGG
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.ROBOT_PARTS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.TREASURITE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.YOGGIE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneConfig.GemstoneFilterEntry
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -28,8 +28,8 @@ import java.util.regex.Pattern
 @SkyHanniModule
 object PowderMiningChatFilter {
 
-    private val config get() = SkyHanniMod.feature.chat.filterType.powderMiningFilter
-    private val gemstoneConfig get() = config.gemstoneFilterConfig
+    private val config get() = SkyHanniMod.feature.chat.filterType.powderMining
+    private val gemstoneConfig get() = config.gemstone
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
@@ -285,22 +285,22 @@ object PowderMiningChatFilter {
 
         // Powder
         powderRewardPattern.matchMatcher(ssMessage) {
-            if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
+            if (config.powderThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
-            if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
+            if (amountStr.isNotEmpty() && config.powderThreshold > 0) {
                 val amountParsed = amountStr.formatInt()
-                return if (amountParsed < config.powderFilterThreshold) "powder_mining_powder"
+                return if (amountParsed < config.powderThreshold) "powder_mining_powder"
                 else "no_filter"
             }
         }
 
         // Essence
         essenceRewardPattern.matchMatcher(ssMessage) {
-            if (config.essenceFilterThreshold == 20) return "powder_mining_essence"
+            if (config.essenceThreshold == 20) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: "1"
-            if (amountStr.isNotEmpty() && config.essenceFilterThreshold > 0) {
+            if (amountStr.isNotEmpty() && config.essenceThreshold > 0) {
                 val amountParsed = amountStr.toInt()
-                return if (amountParsed < config.essenceFilterThreshold) "powder_mining_essence"
+                return if (amountParsed < config.essenceThreshold) "powder_mining_essence"
                 else "no_filter"
             }
         }
@@ -313,7 +313,7 @@ object PowderMiningChatFilter {
         return null
     }
 
-    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningConfig.SimplePowderMiningRewardTypes>, String> =
         emptyMap()
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -344,21 +344,21 @@ object PowderMiningChatFilter {
 
     private fun blockGoblinEggs(ssMessage: String): String? {
         goblinEggPattern.matchMatcher(ssMessage) {
-            if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) return "no_filter"
-            if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
+            if (config.goblinEggs == PowderMiningConfig.GoblinEggEntry.SHOW_ALL) return "no_filter"
+            if (config.goblinEggs == PowderMiningConfig.GoblinEggEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
             return when (val colorStr = groupOrNull("color")?.lowercase()) {
                 // 'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
-                "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
+                "green" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.GREEN_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
 
-                "yellow" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.YELLOW_UP) {
+                "yellow" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.YELLOW_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
 
-                "red" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.RED_UP) {
+                "red" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.RED_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
                 // BLUE_ONLY enum not explicitly used in comparison, as the only

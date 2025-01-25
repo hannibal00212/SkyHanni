@@ -9,10 +9,10 @@ class WardrobeSlot(
     val leggingsSlot: Int,
     val bootsSlot: Int,
 ) {
-    fun getData() = WardrobeAPI.storage?.data?.getOrPut(id) {
-        WardrobeAPI.WardrobeData(
+    fun getData() = WardrobeApi.storage?.data?.getOrPut(id) {
+        WardrobeApi.WardrobeData(
             id,
-            armor = WardrobeAPI.emptyArmor(),
+            armor = WardrobeApi.emptyArmor(),
             locked = true,
             favorite = false,
         )
@@ -30,13 +30,13 @@ class WardrobeSlot(
             getData()?.favorite = value
         }
 
-    val armor get() = getData()?.armor ?: WardrobeAPI.emptyArmor()
+    val armor get() = getData()?.armor ?: WardrobeApi.emptyArmor()
 
     val inventorySlots = listOf(helmetSlot, chestplateSlot, leggingsSlot, bootsSlot)
 
     fun isEmpty(): Boolean = armor.all { it == null }
 
-    fun isCurrentSlot() = getData()?.id == WardrobeAPI.currentSlot
+    fun isCurrentSlot() = getData()?.id == WardrobeApi.currentSlot
 
-    fun isInCurrentPage() = (WardrobeAPI.currentPage == null && page == 1) || (page == WardrobeAPI.currentPage)
+    fun isInCurrentPage() = (WardrobeApi.currentPage == null && page == 1) || (page == WardrobeApi.currentPage)
 }

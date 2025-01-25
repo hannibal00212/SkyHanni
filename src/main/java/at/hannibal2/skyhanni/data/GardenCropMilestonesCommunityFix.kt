@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -56,7 +56,7 @@ object GardenCropMilestonesCommunityFix {
 
     fun openInventory(inventoryItems: Map<Int, ItemStack>) {
         if (!showWrongData) return
-        if (!GardenAPI.config.copyMilestoneData) return
+        if (!GardenApi.config.copyMilestoneData) return
         fixForWrongData(inventoryItems)
     }
 
