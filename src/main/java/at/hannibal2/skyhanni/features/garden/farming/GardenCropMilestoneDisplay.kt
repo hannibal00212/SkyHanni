@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -107,7 +108,6 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-
         try {
             val item = event.itemStack
             val counter = GardenApi.readCounter(item) ?: return

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -29,8 +30,12 @@ object PestTrapAPI {
         @Expose var plot: String? = null,
         @Expose var type: PestTrapType? = PestTrapType.PEST_TRAP,
         @Expose var count: Int = 0,
-        @Expose var hasBait: Boolean = true,
-    )
+        @Expose var baitCount: Int = 0,
+        @Expose var baitType: SprayType? = null,
+    ) {
+        val isFull = count >= MAX_PEST_COUNT_PER_TRAP
+        val noBait = baitCount == 0
+    }
 
     enum class PestTrapType(val displayName: String) {
         PEST_TRAP("§2Pest Trap"),
@@ -43,13 +48,15 @@ object PestTrapAPI {
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
 
-    private var MAX_PEST_COUNT_PER_TRAP = 3
+    // Todo: Use this in the future to tell the user to enable the widget if it's disabled
+    private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
+
+    var MAX_PEST_COUNT_PER_TRAP = 3
     private var lastTabHash: Int = 0
     private var lastTitleHash: Int = 0
     private var lastFullHash: Int = 0
     private var lastNoBaitHash: Int = 0
-
-    val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
+    private var lastTotalHash: Int = lastTitleHash + lastFullHash + lastNoBaitHash
 
 
     // <editor-fold desc="Patterns">
@@ -83,13 +90,17 @@ object PestTrapAPI {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: TabListUpdateEvent) {
         val storage = storage ?: return
-        val thisHash = event.tabList.hashCode().takeIf { it != lastTabHash } ?: return
-        lastTabHash = thisHash
+        lastTabHash = event.tabList.sumOf { it.hashCode() }.takeIf { it != lastTabHash } ?: return
 
         for (line in event.tabList) {
             line.updateDataFromTitle(storage)
             line.updateDataFromFull(storage)
+            line.updateDataFromNoBait(storage)
         }
+
+        lastTotalHash = (lastTitleHash + lastFullHash + lastNoBaitHash).takeIf { it != lastTotalHash } ?: return
+
+        PestTrapDataUpdatedEvent(storage.pestTrapStatus).post()
     }
 
     private fun String.updateDataFromTitle(
@@ -106,6 +117,7 @@ object PestTrapAPI {
         val numberToTrack = min(count, MAX_PEST_COUNT_PER_TRAP)
 
         storage.pestTrapStatus = storage.pestTrapStatus.take(numberToTrack).toMutableList()
+        ChatUtils.chat("Updated pest trap status to ${storage.pestTrapStatus.joinToString("\n")}")
     }
 
     private fun Matcher.extractTrapList() = listOf(
@@ -126,6 +138,7 @@ object PestTrapAPI {
         }.forEach {
             it.count = MAX_PEST_COUNT_PER_TRAP
         }
+        ChatUtils.chat("Updated pest trap status to ${storage.pestTrapStatus.joinToString("\n")}")
     }
 
     private fun String.updateDataFromNoBait(
@@ -138,8 +151,10 @@ object PestTrapAPI {
         storage.pestTrapStatus.filter {
             noBaitTraps[it.number] != null
         }.forEach {
-            it.hasBait = false
+            it.baitType = null
+            it.baitCount = 0
         }
+        ChatUtils.chat("Updated pest trap status to ${storage.pestTrapStatus.joinToString("\n")}")
     }
 
     @Suppress("UnstableApiUsage")

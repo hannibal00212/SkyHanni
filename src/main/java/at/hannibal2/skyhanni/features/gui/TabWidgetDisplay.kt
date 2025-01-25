@@ -36,7 +36,7 @@ enum class TabWidgetDisplay(
     TIMERS(null, TabWidget.TIMERS),
     FIRE_SALE(null, TabWidget.FIRE_SALE),
     RAIN("Park Rain", TabWidget.RAIN),
-    PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS, TabWidget.FULL_TRAPS),
+    PEST_TRAPS("Pest Traps", TabWidget.PEST_TRAPS, TabWidget.FULL_TRAPS, TabWidget.NO_BAIT),
     FULL_PROFILE_WIDGET(
         "Profile Widget",
         TabWidget.PROFILE,

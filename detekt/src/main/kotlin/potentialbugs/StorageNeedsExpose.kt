@@ -8,6 +8,7 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import io.gitlab.arturbosch.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
 class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
     override val issue = Issue(
@@ -31,6 +32,8 @@ class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
     override fun visitProperty(property: KtProperty) {
         // Skip local variables inside functions
         if (property.isLocal) return
+        // Skip private properties
+        if (property.isPrivate()) return
 
         // If the property is not annotated with @Expose, report it
         if (!property.hasAnnotation("Expose")) {
