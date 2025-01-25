@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,7 +32,7 @@ object PlayerDeathMessages {
         val name = event.name
 
         if (MarkedPlayerManager.config.highlightInChat &&
-            !DungeonAPI.inDungeon() &&
+            !DungeonApi.inDungeon() &&
             !LorenzUtils.inKuudraFight &&
             MarkedPlayerManager.isMarkedPlayer(name)
         ) {
@@ -58,5 +58,5 @@ object PlayerDeathMessages {
     }
 
     private fun isHideFarDeathsEnabled(): Boolean =
-        LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+        LorenzUtils.inSkyBlock && SkyHanniMod.feature.chat.hideFarDeathMessages && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 }

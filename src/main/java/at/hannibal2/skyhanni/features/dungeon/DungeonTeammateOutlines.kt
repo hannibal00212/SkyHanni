@@ -23,7 +23,7 @@ object DungeonTeammateOutlines {
         }
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.highlightTeammates
+    private fun isEnabled() = DungeonApi.inDungeon() && config.highlightTeammates
 
     private fun getEntityOutlineColor(entity: Entity): Int? {
         if (entity !is EntityOtherPlayerMP || entity.team == null) return null

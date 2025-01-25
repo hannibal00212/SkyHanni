@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.data.MiningAPI.currentAreaOreBlocks
-import at.hannibal2.skyhanni.data.MiningAPI.inCrimsonIsle
-import at.hannibal2.skyhanni.data.MiningAPI.inCrystalHollows
-import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
-import at.hannibal2.skyhanni.data.MiningAPI.inEnd
-import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
-import at.hannibal2.skyhanni.data.MiningAPI.inMineshaft
-import at.hannibal2.skyhanni.data.MiningAPI.inSpidersDen
-import at.hannibal2.skyhanni.data.MiningAPI.inTunnels
+import at.hannibal2.skyhanni.data.MiningApi.currentAreaOreBlocks
+import at.hannibal2.skyhanni.data.MiningApi.inCrimsonIsle
+import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
+import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
+import at.hannibal2.skyhanni.data.MiningApi.inEnd
+import at.hannibal2.skyhanni.data.MiningApi.inGlacite
+import at.hannibal2.skyhanni.data.MiningApi.inMineshaft
+import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
+import at.hannibal2.skyhanni.data.MiningApi.inTunnels
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import net.minecraft.block.Block
 import net.minecraft.block.BlockColored

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
@@ -23,7 +23,7 @@ import net.minecraft.entity.Entity
 @SkyHanniModule
 object RiftGunthersRace {
 
-    private val config get() = RiftAPI.config.area.westVillage.gunthersRace
+    private val config get() = RiftApi.config.area.westVillage.gunthersRace
     private var parkourHelper: ParkourHelper? = null
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.riftrace")
@@ -62,7 +62,7 @@ object RiftGunthersRace {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        RiftAPI.inRiftRace = false
+        RiftApi.inRiftRace = false
     }
 
     @HandleEvent
@@ -97,15 +97,15 @@ object RiftGunthersRace {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {
-            RiftAPI.inRiftRace = true
+            RiftApi.inRiftRace = true
         }
         raceCancelledPattern.matchMatcher(event.message) {
             parkourHelper?.reset()
-            RiftAPI.inRiftRace = false
+            RiftApi.inRiftRace = false
         }
         raceFinishedPattern.matchMatcher(event.message) {
             parkourHelper?.reset()
-            RiftAPI.inRiftRace = false
+            RiftApi.inRiftRace = false
         }
     }
 
@@ -113,7 +113,7 @@ object RiftGunthersRace {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
-        if (!RiftAPI.inRiftRace) return
+        if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
         if (entity is EntityOtherPlayerMP && !entity.isNPC()) {
@@ -123,11 +123,11 @@ object RiftGunthersRace {
 
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!isEnabled() || !RiftAPI.inRiftRace) return
+        if (!isEnabled() || !RiftApi.inRiftRace) return
 
         parkourHelper?.render(event)
     }
 
     fun isEnabled() =
-        RiftAPI.inRift() && RiftAPI.inWestVillage() && config.enabled
+        RiftApi.inRift() && RiftApi.inWestVillage() && config.enabled
 }
