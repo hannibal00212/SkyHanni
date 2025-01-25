@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 
 data class CrimsonIsleReputationJson(
@@ -13,6 +13,6 @@ data class CrimsonIsleReputationJson(
 )
 
 data class ReputationQuest(
-    @Expose val item: NEUInternalName,
+    @Expose val item: NeuInternalName,
     @Expose val location: List<Double>,
 )

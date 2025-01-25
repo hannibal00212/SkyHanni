@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -69,7 +69,7 @@ object DungeonHighlightClickedBlocks {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonApi.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         val type = event.blockType
 
@@ -89,7 +89,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         blocks.forEach { (position, block) ->
@@ -108,6 +108,6 @@ object DungeonHighlightClickedBlocks {
     private data class ClickedBlock(val displayText: String, var color: Color)
     private data class BlockProperties(val name: String, val color: String)
 
-    private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
 
 }

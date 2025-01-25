@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -26,10 +26,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -44,8 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
-    private val recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
-    private val itemNameCache = mutableMapOf<String, NEUInternalName>()
+    private val recentlyDroppedTrophies = TimeLimitedCache<NeuInternalName, TrophyRarity>(5.seconds)
+    private val itemNameCache = mutableMapOf<String, NeuInternalName>()
 
     private var display = emptyList<Renderable>()
 
@@ -137,7 +137,7 @@ object TrophyFishDisplay {
                 return
             }
         }
-        val hover = TrophyFishAPI.hoverInfo(rawName)
+        val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
             Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
         } ?: Renderable.string(string)
@@ -226,7 +226,7 @@ object TrophyFishDisplay {
         return name.split(" ").dropLast(1).joinToString(" ")
     }
 
-    private fun getInternalName(name: String): NEUInternalName {
+    private fun getInternalName(name: String): NeuInternalName {
         itemNameCache[name]?.let {
             return it
         }
@@ -242,8 +242,8 @@ object TrophyFishDisplay {
         )
     }
 
-    private fun readInternalName(rawName: String): NEUInternalName? {
-        for ((name, internalName) in NEUItems.allItemsCache) {
+    private fun readInternalName(rawName: String): NeuInternalName? {
+        for ((name, internalName) in NeuItems.allItemsCache) {
             val test = name.removeColor().replace(" ", "").replace("-", "")
             if (test.startsWith(rawName)) {
                 return internalName
@@ -262,7 +262,7 @@ object TrophyFishDisplay {
         if (!canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (config.requireHunterArmor.get() && !FishingAPI.wearingTrophyArmor) return
+        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
 
         config.position.renderRenderables(
             display,
@@ -274,7 +274,7 @@ object TrophyFishDisplay {
     fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
-        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingAPI.holdingLavaRod
+        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 

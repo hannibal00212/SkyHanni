@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -18,20 +18,19 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ShowMotesNpcSellPrice {
 
-    private val config get() = RiftAPI.config.motes
+    private val config get() = RiftApi.config.motes
 
     private val burgerPattern by RepoPattern.pattern(
         "rift.everywhere.burger",
@@ -39,7 +38,7 @@ object ShowMotesNpcSellPrice {
     )
 
     private var display = emptyList<List<Any>>()
-    private val itemMap = mutableMapOf<NEUInternalName, Pair<MutableList<Int>, Double>>()
+    private val itemMap = mutableMapOf<NeuInternalName, Pair<MutableList<Int>, Double>>()
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
@@ -55,8 +54,8 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()
@@ -121,7 +120,7 @@ object ShowMotesNpcSellPrice {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
             chat("Set your McGrubber's burger stacks to ${group("amount")}.")
@@ -191,9 +190,9 @@ object ShowMotesNpcSellPrice {
         else -> "0"
     }
 
-    private fun isShowPriceEnabled() = RiftAPI.inRift() && config.showPrice
+    private fun isShowPriceEnabled() = RiftApi.inRift() && config.showPrice
 
-    private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
+    private fun isInventoryValueEnabled() = RiftApi.inRift() && config.inventoryValue.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

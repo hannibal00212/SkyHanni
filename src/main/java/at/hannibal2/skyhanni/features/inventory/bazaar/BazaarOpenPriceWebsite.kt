@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
@@ -57,7 +57,7 @@ object BazaarOpenPriceWebsite {
         }
     }
 
-    private fun getSkyBlockBzName(internalName: NEUInternalName): String {
+    private fun getSkyBlockBzName(internalName: NeuInternalName): String {
         val name = internalName.asString()
         return if (name.contains(";")) {
             "ENCHANTMENT_" + name.replace(";", "_")
