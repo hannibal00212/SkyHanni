@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -61,8 +61,8 @@ object CropAccessoryData {
             .maxOrNull() ?: CropAccessory.NONE
 
     var cropAccessory: CropAccessory
-        get() = GardenAPI.storage?.savedCropAccessory ?: CropAccessory.NONE
+        get() = GardenApi.storage?.savedCropAccessory ?: CropAccessory.NONE
         private set(accessory) {
-            GardenAPI.storage?.savedCropAccessory = accessory
+            GardenApi.storage?.savedCropAccessory = accessory
         }
 }

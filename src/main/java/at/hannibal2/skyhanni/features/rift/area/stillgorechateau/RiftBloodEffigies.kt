@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -48,7 +48,7 @@ object RiftBloodEffigies {
         }
     }
 
-    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
+    private val config get() = RiftApi.config.area.stillgoreChateau.bloodEffigies
 
     private var locations: List<LorenzVec> = emptyList()
     private val effigies = (0..5).associateWith { Effigy() }
@@ -212,7 +212,7 @@ object RiftBloodEffigies {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inStillgoreChateau()
+    fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inStillgoreChateau()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

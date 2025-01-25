@@ -9,9 +9,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.projectile.EntityFireball
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BlazeSlayerClearView {
@@ -37,7 +35,7 @@ object BlazeSlayerClearView {
         ) < 10
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
             event.cancel()
@@ -51,9 +49,7 @@ object BlazeSlayerClearView {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
-    }
+    private fun isEnabled() = SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

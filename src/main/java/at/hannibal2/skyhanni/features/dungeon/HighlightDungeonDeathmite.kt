@@ -12,7 +12,7 @@ object HighlightDungeonDeathmite {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!DungeonAPI.inDungeon()) return
+        if (!DungeonApi.inDungeon()) return
         if (!SkyHanniMod.feature.dungeon.highlightDeathmites) return
         if (event.mob.name == "Deathmite") event.mob.highlight(LorenzColor.DARK_RED.toColor().addAlpha(20))
     }
