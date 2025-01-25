@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -95,7 +95,7 @@ object BasketWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
         if (!config.allWaypoints) return
@@ -109,7 +109,7 @@ object BasketWaypoints {
         }
     }
 
-    private fun EventWaypoint?.render(event: RenderWorldEvent) {
+    private fun EventWaypoint?.render(event: SkyHanniRenderWorldEvent) {
         if (this == null) return
         event.drawDynamicText(position, "§dBasket", 1.0)
     }
