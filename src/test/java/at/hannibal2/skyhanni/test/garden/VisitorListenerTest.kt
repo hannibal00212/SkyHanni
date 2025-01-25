@@ -33,7 +33,7 @@ class VisitorListenerTest {
 
     @Test
     fun `onTablistUpdate it should add new visitors to the list`() {
-        listener.onTabListUpdate(
+        listener.onWidgetUpdate(
             fakeTabWidget(
                 mutableListOf(
                     "§b§lVisitors: §r§f(3)",
@@ -57,7 +57,7 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        listener.onTabListUpdate(
+        listener.onWidgetUpdate(
             fakeTabWidget(
                 mutableListOf("§b§lVisitors: §r§f(0)", ""),
             ),
@@ -74,7 +74,7 @@ class VisitorListenerTest {
 
         every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
-        listener.onTabListUpdate(
+        listener.onWidgetUpdate(
             fakeTabWidget(
                 mutableListOf("§b§lVisitors: §r§f(0)", ""),
             ),

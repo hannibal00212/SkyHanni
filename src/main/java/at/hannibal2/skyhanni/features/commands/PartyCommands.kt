@@ -85,10 +85,8 @@ object PartyCommands {
 
     private fun autoPartyTransfer(prevPartyLeader: String) {
         HypixelCommands.partyTransfer(prevPartyLeader)
-        config.reversePT.message?.let {
-            if (it.isNotBlank()) {
-                HypixelCommands.partyChat(it)
-            }
+        config.reversePT.message.takeIf { it.isNotBlank() }?.let {
+            HypixelCommands.partyChat(it)
         }
     }
 
