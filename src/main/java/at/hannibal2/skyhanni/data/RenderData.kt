@@ -27,7 +27,7 @@ object RenderData {
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         GlStateManager.translate(0f, 0f, -3f)
-        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        renderOverlay()
         GlStateManager.translate(0f, 0f, 3f)
     }
 
@@ -44,7 +44,7 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             GlStateManager.translate(0f, 0f, -3f)
-            GuiRenderEvent.GuiOverlayRenderEvent().post()
+            renderOverlay()
             GlStateManager.translate(0f, 0f, 3f)
         }
 
@@ -61,5 +61,13 @@ object RenderData {
         event.transform(17, "chroma.chromaDirection") { element ->
             ConfigUtils.migrateIntToEnum(element, ChromaConfig.Direction::class.java)
         }
+    }
+
+    var outsideInventory = false
+
+    fun renderOverlay() {
+        outsideInventory = true
+        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        outsideInventory = false
     }
 }

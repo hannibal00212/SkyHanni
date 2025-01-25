@@ -20,17 +20,17 @@ public class PestSpawnConfig {
         HYPIXEL("Hypixel Style", 0),
         COMPACT("Compact", 1),
         DISABLED("Disabled", 2);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ChatMessageFormatEntry(String str, int legacyId) {
-            this.str = str;
+        ChatMessageFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ChatMessageFormatEntry(String str) {
-            this(str, -1);
+        ChatMessageFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -40,7 +40,7 @@ public class PestSpawnConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

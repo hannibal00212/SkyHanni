@@ -61,6 +61,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
     + Plays meow sound when 'meow' appears in chat.
     + Plays bark sound when 'woof' appears in chat.
++ Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 
 </details>
 <details open><summary>
@@ -244,6 +245,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Displays a list of missing cake years.
 + Added commands "/bp -", "/ec -" and "/shlastopened" to reopen last opened storage pages. - aphased (https://github.com/hannibal002/SkyHanni/pull/2900)
 + Added reminders for Enchanted Clock boosts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3051)
++ Added XP in Inventory. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
+    + Showing current XP in item lore of XP-dependent menus (e.g., Experimentation Table, Anvil, Hex).
+    + This ensures XP visibility even when replaced by the SkyBlock XP bar.
 
 </details>
 <details open><summary>
@@ -872,6 +876,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Using pathfinding to guide the player to the nearest spot with unpressed buttons and highlights them.
 + Added a route helper for Gunther's Rift Race in the West Village. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
 + Added the ability to mute Wilted Berberis sounds when not farming. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
++ Added Bacte Phase Display to the Damage Indicator. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
++ Added waypoints for Bacte's Tentacles with hit counts. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
+    + Shows hit counts instead of HP display due to varying max health values.
 
 </details>
 <details open><summary>
@@ -941,6 +948,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
 + Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
     +  Displays stats for the Flowstate enchantment on mining tools.
++ Added a chat filter, profit per run, and profit tracker for Crystal Nucleus runs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
 
 </details>
 <details open><summary>
@@ -1369,6 +1377,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Added the current minister to the calendar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
   + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
   + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
++ Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
@@ -1473,6 +1482,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Tracks items and profit while using the Draconic Altar in the End.
 + Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
     + Displays current buffed region and duration until next change.
++ Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n1 (https://github.com/hannibal002/SkyHanni/pull/2886)
++ Added automatic SkyBlock joining when connecting to Hypixel. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/2745)
 
 </details>
 <details open><summary>

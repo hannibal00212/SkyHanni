@@ -5,15 +5,15 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
-import at.hannibal2.skyhanni.features.fishing.FishingAPI.isLavaRod
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -102,7 +102,7 @@ object GoldenFishTimer {
     private var goldenFishDespawnTimer = ServerTimeMark.FAR_FUTURE
     private var timePossibleSpawn = ServerTimeMark.FAR_FUTURE
 
-    private val isFishing get() = FishingAPI.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
+    private val isFishing get() = FishingApi.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
 
     private fun checkGoldenFish(entity: EntityArmorStand) {
@@ -130,8 +130,8 @@ object GoldenFishTimer {
 
     private var display: Renderable? = null
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isActive()) return
         if (spawnPattern.matches(event.message)) {
             lastChatMessage = SimpleTimeMark.now()
@@ -264,7 +264,7 @@ object GoldenFishTimer {
         if (!isActive()) return
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.
-        val bobber = FishingAPI.bobber ?: return
+        val bobber = FishingApi.bobber ?: return
         if (!bobber.isInLava || bobber.ticksExisted < 5) return
         if (bobber.motionY > 0 && goingDownInit) goingDownInit = false
         else if (bobber.motionY < 0 && !goingDownInit && !goingDownPost) {
@@ -291,8 +291,8 @@ object GoldenFishTimer {
         DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastChatMessage = SimpleTimeMark.farPast()
         lastFishEntity = SimpleTimeMark.farPast()
         lastGoldenFishTime = ServerTimeMark.FAR_PAST

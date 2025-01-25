@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.fishing.TotemOfCorruptionConfig.OutlineType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -48,7 +47,7 @@ object TotemOfCorruption {
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
     private val totemNamePattern by patternGroup.pattern(
         "totemname",
-        "§5§lTotem of Corruption"
+        "§5§lTotem of Corruption",
     )
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
@@ -74,9 +73,9 @@ object TotemOfCorruption {
         display = createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!isHideParticlesEnabled()) return
+        if (!config.hideParticles) return
 
         for (totem in totems) {
             if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
@@ -117,8 +116,8 @@ object TotemOfCorruption {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         totems = emptyList()
     }
@@ -168,7 +167,6 @@ object TotemOfCorruption {
         }
 
     private fun isOverlayEnabled() = LorenzUtils.inSkyBlock && config.showOverlay.get()
-    private fun isHideParticlesEnabled() = LorenzUtils.inSkyBlock && config.hideParticles
     private fun isEffectiveAreaEnabled() = LorenzUtils.inSkyBlock && config.outlineType != OutlineType.NONE
 }
 
@@ -176,5 +174,5 @@ private class Totem(
     val location: LorenzVec,
     val timeRemaining: Duration,
     val ownerName: String,
-    val distance: Double = location.distanceToPlayer()
+    val distance: Double = location.distanceToPlayer(),
 )

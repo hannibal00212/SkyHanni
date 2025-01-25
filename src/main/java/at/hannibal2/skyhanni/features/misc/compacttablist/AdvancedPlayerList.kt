@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.GuildAPI
+import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.features.bingo.BingoApi
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -52,7 +52,7 @@ object AdvancedPlayerList {
 
     fun newSorting(original: List<String>): List<String> {
         if (LorenzUtils.inKuudraFight) return original
-        if (DungeonAPI.inDungeon()) return original
+        if (DungeonApi.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
         val newList = mutableListOf<String>()
@@ -161,7 +161,7 @@ object AdvancedPlayerList {
             if (nameSuffix.contains("♲")) {
                 playerData.ironman = true
             } else {
-                playerData.bingoLevel = BingoAPI.getRank(line)
+                playerData.bingoLevel = BingoApi.getRank(line)
             }
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 playerData.faction = if (line.contains("§c⚒")) {
@@ -199,7 +199,7 @@ object AdvancedPlayerList {
 
         var suffix = if (config.hideEmblem) {
             if (data.ironman) "§7♲" else data.bingoLevel?.let {
-                BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
+                BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1)
             }.orEmpty()
         } else data.nameSuffix
 
@@ -226,9 +226,9 @@ object AdvancedPlayerList {
     private fun getSocialIcon(name: String) = when {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
         MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
-        PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
-        GuildAPI.isInGuild(name) -> SocialIcon.GUILD
+        PartyApi.partyMembers.contains(name) -> SocialIcon.PARTY
+        FriendApi.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
+        GuildApi.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }
 

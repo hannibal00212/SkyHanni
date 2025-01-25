@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
@@ -11,25 +11,23 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryBarnManager {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private val hoppityConfig get() = HoppityEggsManager.config
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
+    private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     /**
      * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
      */
-    private val rabbitCrashedPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val rabbitCrashedPattern by ChocolateFactoryApi.patternGroup.pattern(
         "rabbit.crushed",
         "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?<amount>[\\d,]+) Chocolate",
     )
@@ -38,14 +36,12 @@ object ChocolateFactoryBarnManager {
     private var sentBarnFullWarning = false
     private var lastRabbit = ""
 
-    fun processDataSet(dataSet: HoppityAPI.HoppityStateDataSet) {
+    fun processDataSet(dataSet: HoppityApi.HoppityStateDataSet) {
         lastRabbit = dataSet.lastName
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
             val profileStorage = profileStorage ?: return@matchMatcher
             profileStorage.currentRabbits += 1
@@ -57,13 +53,13 @@ object ChocolateFactoryBarnManager {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
             if (config.showDuplicateTime && !hoppityConfig.compactChat) {
-                val format = ChocolateFactoryAPI.timeUntilNeed(amount).format(maxUnits = 2)
+                val format = ChocolateFactoryApi.timeUntilNeed(amount).format(maxUnits = 2)
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
                 }
             }
             ChocolateAmount.addToAll(amount)
-            HoppityAPI.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
+            HoppityApi.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
 
             var changedMessage = event.message
 
@@ -100,7 +96,7 @@ object ChocolateFactoryBarnManager {
     }
 
     fun trySendBarnFullMessage(inventory: Boolean) {
-        if (!ChocolateFactoryAPI.isEnabled()) return
+        if (!ChocolateFactoryApi.isEnabled()) return
 
         if (config.barnCapacityThreshold <= 0) {
             return
@@ -109,7 +105,7 @@ object ChocolateFactoryBarnManager {
         val profileStorage = profileStorage ?: return
 
         // TODO rename maxRabbits to maxUnlockedBarnSpace
-        if (profileStorage.maxRabbits >= ChocolateFactoryAPI.maxRabbits) return
+        if (profileStorage.maxRabbits >= ChocolateFactoryApi.maxRabbits) return
 
         // when the unlocked barn space has already surpassed the total amount of rabbits
         val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
@@ -131,7 +127,7 @@ object ChocolateFactoryBarnManager {
             return
         }
 
-        if (config.rabbitCrushOnlyDuringHoppity && !HoppityAPI.isHoppityEvent()) return
+        if (config.rabbitCrushOnlyDuringHoppity && !HoppityApi.isHoppityEvent()) return
 
         val fullLevel = if (profileStorage.currentRabbits == profileStorage.maxRabbits) "full" else "almost full"
         ChatUtils.clickableChat(

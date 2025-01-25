@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
@@ -25,10 +25,10 @@ object PartyMemberOutlines {
     }
 
     fun isEnabled() = config.enabled &&
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) && !DungeonAPI.inDungeon()
+        (LorenzUtils.inSkyBlock || OutsideSBFeature.HIGHLIGHT_PARTY_MEMBERS.isSelected()) && !DungeonApi.inDungeon()
 
     private fun getEntityOutlineColor(entity: Entity): Int? {
-        if (entity !is EntityOtherPlayerMP || !PartyAPI.partyMembers.contains(entity.name)) return null
+        if (entity !is EntityOtherPlayerMP || !PartyApi.partyMembers.contains(entity.name)) return null
 
         return config.outlineColor.toSpecialColorInt()
     }

@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -33,7 +33,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -45,6 +44,7 @@ object FlareDisplay {
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
     private val flares = mutableListOf<Flare>()
+    private val enabled get() = config.enabled
 
     private var activeWarning = false
 
@@ -60,9 +60,9 @@ object FlareDisplay {
         )
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
             val minecraft = Minecraft.getMinecraft()
@@ -81,9 +81,9 @@ object FlareDisplay {
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
         flares.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             if (!entity.canBeSeen()) continue
@@ -152,15 +152,15 @@ object FlareDisplay {
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
         flares.any { it.entity.entityId == entity.entityId }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         flares.clear()
         display = emptyList()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
 
         if (config.displayType != FlareConfig.DisplayType.GUI) {
             for (flare in flares) {
@@ -202,9 +202,9 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
         if (!config.hideParticles) return
 
         val location = event.location
@@ -221,6 +221,4 @@ object FlareDisplay {
         ALERT("§9Alert Flare", "+50%"),
         WARNING("§aWarning Flare", null),
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
