@@ -86,7 +86,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 
         private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
-} // test
+}
 
 private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
     val colorCode = ElectionApi.mayorNameToColorCode(name.orEmpty())
