@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -150,7 +150,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onRenderLastClickedMinion(event: RenderWorldEvent) {
+    fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
         if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
@@ -366,7 +366,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onRenderLastEmptied(event: RenderWorldEvent) {
+    fun onRenderLastEmptied(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()

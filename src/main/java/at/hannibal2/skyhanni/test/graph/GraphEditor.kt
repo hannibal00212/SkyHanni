@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -108,14 +108,14 @@ object GraphEditor {
     private var active = false
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
         drawGhostPosition(event)
     }
 
-    private fun drawGhostPosition(event: RenderWorldEvent) {
+    private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
         val ghostPosition = ghostPosition ?: return
         if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
 
@@ -257,7 +257,7 @@ object GraphEditor {
         }
     }
 
-    private fun RenderWorldEvent.drawNode(node: GraphingNode) {
+    private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (node.position.distanceToPlayer() > config.maxNodeDistance) return
         this.drawWaypointFilled(
             node.position,
@@ -294,7 +294,7 @@ object GraphEditor {
         )
     }
 
-    private fun RenderWorldEvent.drawEdge(edge: GraphingEdge) {
+    private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
@@ -314,7 +314,7 @@ object GraphEditor {
         }
     }
 
-    private fun RenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
+    private fun SkyHanniRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
         val lineVec = edge.node2.position - edge.node1.position
         val center = edge.node1.position + lineVec / 2.0
         val quad1 = edge.node1.position + lineVec / 4.0

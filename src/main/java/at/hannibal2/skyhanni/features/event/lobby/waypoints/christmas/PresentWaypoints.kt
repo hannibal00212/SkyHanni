@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventWaypointsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.lobby.waypoints.EventWaypoint
@@ -98,13 +98,13 @@ object PresentWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         presentSet?.let { event.drawWaypoints(it, config.allWaypoints, LorenzColor.GOLD, "§6") }
         presentEntranceSet?.let { event.drawWaypoints(it, config.allEntranceWaypoints, LorenzColor.YELLOW, "§e") }
     }
 
-    private fun RenderWorldEvent.drawWaypoints(
+    private fun SkyHanniRenderWorldEvent.drawWaypoints(
         waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
     ) {
         if (!shouldDraw) return

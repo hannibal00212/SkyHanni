@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,7 +37,7 @@ object CosmeticFollowingLine {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         updateClose(event)
@@ -50,7 +50,7 @@ object CosmeticFollowingLine {
     }
 
     private fun renderFar(
-        event: RenderWorldEvent,
+        event: SkyHanniRenderWorldEvent,
         firstPerson: Boolean,
         color: Color,
     ) {
@@ -72,7 +72,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun updateClose(event: RenderWorldEvent) {
+    private fun updateClose(event: SkyHanniRenderWorldEvent) {
         val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
@@ -82,7 +82,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun renderClose(event: RenderWorldEvent, firstPerson: Boolean, color: Color) {
+    private fun renderClose(event: SkyHanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
 

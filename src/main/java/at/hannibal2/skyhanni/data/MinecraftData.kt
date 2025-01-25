@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -112,6 +112,6 @@ object MinecraftData {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        RenderWorldEvent(event.partialTicks).post()
+        SkyHanniRenderWorldEvent(event.partialTicks).post()
     }
 }
