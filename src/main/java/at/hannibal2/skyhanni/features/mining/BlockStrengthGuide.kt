@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -336,7 +335,7 @@ object BlockStrengthGuide {
         HypixelCommands.skyblockMenu()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (!shouldBlockSHMenu) return
 

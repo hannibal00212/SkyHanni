@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.currentAreaOreBlocks
 import at.hannibal2.skyhanni.data.MiningApi.inCrimsonIsle
 import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
@@ -121,7 +121,7 @@ enum class OreBlock(
     GLACITE(Blocks.packed_ice, { inGlacite }, OreCategory.DWARVEN_METAL),
     ;
 
-    val strength get() = MiningAPI.blockStrengths[this] ?: 0
+    val strength get() = MiningApi.blockStrengths[this] ?: 0
 
     val speedSoftCap get() = ceil(20.0 / 3.0 * strength).toInt()
 
