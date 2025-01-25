@@ -519,7 +519,7 @@ class ProfileSpecificStorage {
 
     data class CakeData(
         @Expose var ownedCakes: MutableSet<Int> = mutableSetOf(),
-        @Expose var missingCakes: MutableSet<Int> = mutableSetOf()
+        @Expose var missingCakes: MutableSet<Int> = mutableSetOf(),
     )
 
     @Expose
@@ -555,7 +555,7 @@ class ProfileSpecificStorage {
         @Expose var currentMeter: Long = -1,
         @Expose var gainPerBoss: Long = -1,
         @Expose var goalNeeded: Long = -1,
-        @Expose var itemGoal: String = "?"
+        @Expose var itemGoal: String = "?",
     )
 
     @Expose
@@ -754,8 +754,9 @@ class ProfileSpecificStorage {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
-                @Expose var strays: Int = 0
+                @Expose var strays: Int = 0,
             )
+
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }

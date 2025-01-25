@@ -24,15 +24,15 @@ public class DebugMobConfig {
         ONLY_HIGHLIGHT("Only Highlight"),
         NAME_AND_HIGHLIGHT("Both");
 
-        final String str;
+        final String displayName;
 
-        HowToShow(String str) {
-            this.str = str;
+        HowToShow(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
