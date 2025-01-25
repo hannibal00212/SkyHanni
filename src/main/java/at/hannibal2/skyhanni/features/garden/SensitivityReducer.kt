@@ -34,7 +34,7 @@ object SensitivityReducer {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
                 lastCheckCooldown = SimpleTimeMark.now()
                 isToggled = false
@@ -67,7 +67,7 @@ object SensitivityReducer {
             else -> return
         }
         if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
-            if (GardenAPI.onBarnPlot && config.onlyPlot.get()) {
+            if (GardenApi.onBarnPlot && config.onlyPlot.get()) {
                 isToggled = false
                 restoreSensitivity()
             }
@@ -85,7 +85,7 @@ object SensitivityReducer {
             reloadSensitivity()
         }
         config.onlyPlot.afterChange {
-            if (isToggled && config.onlyPlot.get() && GardenAPI.onBarnPlot) {
+            if (isToggled && config.onlyPlot.get() && GardenApi.onBarnPlot) {
                 restoreSensitivity()
                 isToggled = false
             }
@@ -114,7 +114,7 @@ object SensitivityReducer {
     }
 
     private fun isHoldingTool(): Boolean {
-        return GardenAPI.toolInHand != null
+        return GardenApi.toolInHand != null
     }
 
     private fun isHoldingKey(): Boolean {
@@ -156,7 +156,7 @@ object SensitivityReducer {
     }
 
     private fun toggle(state: Boolean) {
-        if (config.onlyPlot.get() && GardenAPI.onBarnPlot) return
+        if (config.onlyPlot.get() && GardenApi.onBarnPlot) return
         if (config.onGround.get() && !mc.thePlayer.onGround) return
         if (!isToggled) {
             lowerSensitivity()
@@ -186,7 +186,7 @@ object SensitivityReducer {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Sensitivity Reducer")
 
-        if (!GardenAPI.inGarden()) {
+        if (!GardenApi.inGarden()) {
             event.addIrrelevant("not in garden")
             return
         }
@@ -200,7 +200,7 @@ object SensitivityReducer {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
             add("onGround: ${mc.thePlayer.onGround}")
-            add("onBarn: ${GardenAPI.onBarnPlot}")
+            add("onBarn: ${GardenApi.onBarnPlot}")
             add("enabled: ${isToggled || isManualToggle}")
             add("--- config ---")
             add("mode: ${config.mode.name}")

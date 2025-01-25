@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class XPBarConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Allows for moving and scaling the Xp bar in the SkyHanni GUI Editor.")
+    @ConfigOption(name = "Enabled", desc = "Allows for moving and scaling the XP bar in the SkyHanni GUI Editor.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

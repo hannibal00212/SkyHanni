@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -26,9 +26,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -110,7 +110,7 @@ object CityProjectFeatures {
 
         if (config.showMaterials) {
             // internal name -> amount
-            val materials = mutableMapOf<NEUInternalName, Int>()
+            val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
                 if (item.name != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
@@ -150,7 +150,7 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NEUInternalName, Int>) = buildList<List<Any>> {
+    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
         addAsSingletonList("§7City Project Materials")
 
         if (materials.isEmpty()) {
@@ -172,10 +172,10 @@ object CityProjectFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            BazaarAPI.searchForBazaarItem(name, amount)
+                            BazaarApi.searchForBazaarItem(name, amount)
                         }
                     },
-                ) { inInventory && !NEUItems.neuHasFocus() },
+                ) { inInventory && !NeuItems.neuHasFocus() },
             )
 
             val price = internalName.getPrice() * amount
@@ -185,7 +185,7 @@ object CityProjectFeatures {
         }
     }
 
-    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NEUInternalName, Int>) {
+    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
@@ -201,7 +201,7 @@ object CityProjectFeatures {
             if (line == "" || line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
-            val internalName = NEUInternalName.fromItemName(name)
+            val internalName = NeuInternalName.fromItemName(name)
             val old = materials.getOrPut(internalName) { 0 }
             materials[internalName] = old + amount
         }

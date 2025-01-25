@@ -37,7 +37,7 @@ class ItemResolutionQuery {
 
         private val BAZAAR_ENCHANTMENT_PATTERN = "ENCHANTMENT_(\\D*)_(\\d+)".toPattern()
 
-        fun transformHypixelBazaarToNEUItemId(hypixelId: String): String {
+        fun transformHypixelBazaarToNeuItemId(hypixelId: String): String {
             val matcher = BAZAAR_ENCHANTMENT_PATTERN.matcher(hypixelId)
             if (matcher.matches()) {
                 return matcher.group(1) + ";" + matcher.group(2)

@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradeCostsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AnitaUpgradePrice
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object AnitaExtraFarmingFortune {
 
-    private val config get() = GardenAPI.config.anitaShop
+    private val config get() = GardenApi.config.anitaShop
 
     /**
      * REGEX-TEST: §5§o§aJacob's Ticket §8x450
@@ -41,7 +41,7 @@ object AnitaExtraFarmingFortune {
 
         if (!event.itemStack.displayName.contains("Extra Farming Fortune")) return
 
-        val anitaUpgrade = GardenAPI.storage?.fortune?.anitaUpgrade ?: return
+        val anitaUpgrade = GardenApi.storage?.fortune?.anitaUpgrade ?: return
 
         var contributionFactor = 1.0
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacobTickets ?: return

@@ -99,5 +99,5 @@ object DungeonDeathCounter {
         )
     }
 
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.deathCounterDisplay
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.deathCounterDisplay
 }
