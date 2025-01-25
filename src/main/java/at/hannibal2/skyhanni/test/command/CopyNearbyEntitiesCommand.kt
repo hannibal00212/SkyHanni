@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
+import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
@@ -222,8 +222,8 @@ object CopyNearbyEntitiesCommand {
     }
 
     private fun getType(entity: Entity, mob: Mob?) = buildString {
-        if (entity is EntityLivingBase && entity.isDisplayNPC()) append("DisplayNPC, ")
-        if (entity is EntityPlayer && entity.isNPC()) append("NPC, ")
+        if (entity is EntityLivingBase && entity.isDisplayNpc()) append("DisplayNPC, ")
+        if (entity is EntityPlayer && entity.isNpc()) append("NPC, ")
         if (entity is EntityPlayer && entity.isRealPlayer()) append("RealPlayer, ")
         if (mob?.mobType == Mob.Type.SUMMON) append("Summon, ")
         if (entity.isSkyBlockMob()) {
