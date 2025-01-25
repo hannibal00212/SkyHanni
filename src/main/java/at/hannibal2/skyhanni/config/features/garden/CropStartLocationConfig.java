@@ -25,15 +25,15 @@ public class CropStartLocationConfig {
         BOTH("Both"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        CropLocationMode(String str) {
-            this.str = str;
+        CropLocationMode(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
