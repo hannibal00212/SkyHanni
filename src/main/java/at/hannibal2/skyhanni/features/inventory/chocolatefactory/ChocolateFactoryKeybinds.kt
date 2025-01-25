@@ -6,22 +6,19 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ChocolateFactoryKeybinds {
-    private val config get() = ChocolateFactoryAPI.config.keybinds
+    private val config get() = ChocolateFactoryApi.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
 
         val chest = event.guiContainer as? GuiChest ?: return
 
@@ -38,14 +35,13 @@ object ChocolateFactoryKeybinds {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
 
         // needed to not send duplicate clicks via keybind feature
-        if (event.clickTypeEnum == GuiContainerEvent.ClickType.HOTBAR) {
+        if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {
             event.cancel()
         }
     }

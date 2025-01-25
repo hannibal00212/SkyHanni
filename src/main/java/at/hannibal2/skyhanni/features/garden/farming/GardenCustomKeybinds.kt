@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenCustomKeybinds {
 
-    private val config get() = GardenAPI.config.keyBind
+    private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getMinecraft().gameSettings
 
     private var map: Map<KeyBinding, Int> = emptyMap()
@@ -37,14 +37,25 @@ object GardenCustomKeybinds {
     @JvmStatic
     fun isKeyDown(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.keyCode)) {
+                cir.returnValue = false
+            }
+            return
+        }
+
         cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
         if (!isActive()) return
-        val override = map[keyBinding] ?: return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.keyCode)) {
+                cir.returnValue = false
+            }
+            return
+        }
         cir.returnValue = override.isKeyClicked()
     }
 
@@ -56,13 +67,13 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!isDuplicate || lastDuplicateKeybindsWarnTime.passedSince() < 30.seconds) return
         ChatUtils.chatAndOpenConfig(
             "Duplicate Custom Keybinds aren't allowed!",
-            GardenAPI.config::keyBind,
+            GardenApi.config::keyBind,
         )
         lastDuplicateKeybindsWarnTime = SimpleTimeMark.now()
     }
@@ -106,10 +117,10 @@ object GardenCustomKeybinds {
             .let { values -> values.size != values.toSet().size }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !(GardenAPI.onBarnPlot && config.excludeBarn)
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled && !(GardenApi.onBarnPlot && config.excludeBarn)
 
     private fun isActive(): Boolean =
-        isEnabled() && GardenAPI.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
+        isEnabled() && GardenApi.toolInHand != null && !isDuplicate && !hasGuiOpen() && lastWindowOpenTime.passedSince() > 300.milliseconds
 
     private fun hasGuiOpen() = Minecraft.getMinecraft().currentScreen != null
 

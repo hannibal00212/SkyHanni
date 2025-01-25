@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.features.rift.RiftApi
 
 // scoreboard
 // scoreboard update event
@@ -21,5 +22,7 @@ object ScoreboardElementMotes : ScoreboardElement() {
 
     override val configLine = "Motes: §d64,647"
 
-    override fun showIsland() = RiftAPI.inRift()
+    override val elementPatterns = listOf(ScoreboardPattern.motesPattern)
+
+    override fun showIsland() = RiftApi.inRift()
 }

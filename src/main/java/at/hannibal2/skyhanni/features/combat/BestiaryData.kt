@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -26,13 +27,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BestiaryData {
@@ -47,7 +47,7 @@ object BestiaryData {
      */
     private val tierProgressPattern by patternGroup.pattern(
         "tierprogress",
-        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%"
+        "§7Progress to Tier [\\dIVXC]+: §b[\\d.]+%",
     )
 
     /**
@@ -56,7 +56,7 @@ object BestiaryData {
      */
     private val overallProgressPattern by patternGroup.pattern(
         "overallprogress",
-        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"
+        "§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?",
     )
 
     /**
@@ -65,7 +65,7 @@ object BestiaryData {
      */
     private val progressPattern by patternGroup.pattern(
         "progress",
-        "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)"
+        "(?<current>[0-9kKmMbB,.]+)/(?<needed>[0-9kKmMbB,.]+\$)",
     )
 
     /**
@@ -74,10 +74,10 @@ object BestiaryData {
      */
     private val titlePattern by patternGroup.pattern(
         "title",
-        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$"
+        "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$",
     )
 
-    private var display: Renderable? = null
+    private var display = emptyList<Renderable>()
     private val mobList = mutableListOf<BestiaryMob>()
     private val stackList = mutableMapOf<Int, ItemStack>()
     private val catList = mutableListOf<Category>()
@@ -91,33 +91,32 @@ object BestiaryData {
         37..43,
     ).flatten()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inInventory) {
-            config.position.renderRenderable(display, posLabel = "Bestiary Data")
+            config.position.renderRenderables(
+                display, extraSpace = -1, posLabel = "Bestiary Data",
+            )
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
-        if (inInventory) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                val stack = slot.stack
-                val lore = stack.getLore()
-                if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                    slot highlight LorenzColor.GREEN
-                }
-                if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                    slot highlight LorenzColor.RED
-                }
+        if (!isEnabled() || !inInventory) return
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            val lore = slot.stack.getLore()
+            if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
+                slot highlight LorenzColor.GREEN
+            }
+            if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
+                slot highlight LorenzColor.RED
             }
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val inventoryName = event.inventoryName
         val items = event.inventoryItems
@@ -131,7 +130,7 @@ object BestiaryData {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         mobList.clear()
         stackList.clear()
@@ -168,7 +167,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = stack.displayName
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
@@ -197,7 +195,6 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            inInventory = true
             val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
             val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
@@ -234,29 +231,29 @@ object BestiaryData {
                     currentTotalKill,
                     totalKillToTier,
                     currentKillToTier,
-                    actualRealTotalKill
-                )
+                    actualRealTotalKill,
+                ),
             )
         }
     }
 
-    private fun drawDisplay(): Renderable {
-        val display = mutableListOf<Renderable>()
-
+    private fun drawDisplay() = buildList {
         if (!overallProgressEnabled) {
-            display.add(Renderable.string("§7Bestiary Data"))
-            display.add(Renderable.string(" §cPlease enable Overall Progress"))
-            display.add(Renderable.string(" §cUsing the Eye of Ender highlighted in red."))
-        } else {
-            init()
-            addCategories(display)
-            if (mobList.isNotEmpty()) {
-                addList(display)
-                addButtons(display)
-            }
+            addString("§7Bestiary Data")
+            addString(" §cPlease enable Overall Progress")
+            addString(" §cUsing the Eye of Ender highlighted in red.")
+            return@buildList
         }
 
-        return Renderable.verticalContainer(display)
+        init()
+
+        addCategories()
+
+        if (mobList.isEmpty()) return@buildList
+
+        addList()
+
+        addButtons()
     }
 
     private fun sortMobList(): MutableList<BestiaryMob> {
@@ -274,21 +271,21 @@ object BestiaryData {
         return sortedMobList
     }
 
-    private fun addList(newDisplay: MutableList<Renderable>) {
+    private fun MutableList<Renderable>.addList() {
         val sortedMobList = sortMobList()
 
-        newDisplay.add(Renderable.string("§7Bestiary Data"))
+        addString("§7Bestiary Data")
         for (mob in sortedMobList) {
             val isUnlocked = mob.actualRealTotalKill != 0.toLong()
             val isMaxed = mob.percentToMax() >= 1
             if (!isUnlocked) {
-                newDisplay.add(Renderable.string(" §7- ${mob.name}: §cNot unlocked!"))
+                addString(" §7- ${mob.name}: §cNot unlocked!")
                 continue
             }
             if (isMaxed && config.hideMaxed) continue
             val text = getMobLine(mob, isMaxed)
             val tips = getMobHover(mob)
-            newDisplay.add(Renderable.hoverTips(text, tips) { true })
+            add(Renderable.hoverTips(text, tips) { true })
         }
     }
 
@@ -304,7 +301,7 @@ object BestiaryData {
         "§6Percent to max: §b${mob.percentToMaxFormatted()}",
         "§6Percent to tier: §b${mob.percentToTierFormatted()}",
         "",
-        "§7More info thing"
+        "§7More info thing",
     )
 
     private fun getMobLine(mob: BestiaryMob, isMaxed: Boolean): String {
@@ -350,67 +347,61 @@ object BestiaryData {
         return text
     }
 
-    private fun addButtons(newDisplay: MutableList<Renderable>) {
-        newDisplay.addButton(
+    // TODO: Avoid ordinal
+    private fun MutableList<Renderable>.addButtons() {
+        addButton(
             prefix = "§7Number Format: ",
-            getName = FormatType.entries[config.numberFormat.ordinal].type, // todo: avoid ordinal
+            getName = FormatType.entries[config.numberFormat.ordinal].type,
             onChange = {
-                // todo: avoid ordinal
                 config.numberFormat = BestiaryConfig.NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 2]
                 update()
-            }
+            },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Display Type: ",
-            getName = DisplayType.entries[config.displayType.ordinal].type, // todo: avoid ordinal
+            getName = DisplayType.entries[config.displayType.ordinal].type,
             onChange = {
-                // todo: avoid ordinal
                 config.displayType = DisplayTypeEntry.entries[(config.displayType.ordinal + 1) % 8]
                 update()
-            }
+            },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Number Type: ",
             getName = NumberType.entries[if (config.replaceRoman) 0 else 1].type,
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()
-            }
+            },
         )
 
-        newDisplay.addButton(
+        addButton(
             prefix = "§7Hide Maxed: ",
             getName = HideMaxed.entries[if (config.hideMaxed) 1 else 0].type,
             onChange = {
                 config.hideMaxed = !config.hideMaxed
                 update()
-            }
+            },
         )
     }
 
-    private fun addCategories(newDisplay: MutableList<Renderable>) {
-        if (catList.isNotEmpty()) {
-            newDisplay.add(Renderable.string("§7Category"))
-            newDisplay += catList.mapNotNull { buildCategoryLine(it) }
-        }
-    }
-
-    private fun buildCategoryLine(cat: Category): Renderable? {
-        val list = buildList {
-            add(Renderable.string(" §7- ${cat.name}§7: "))
-            val element = when {
+    private fun MutableList<Renderable>.addCategories() {
+        if (catList.isEmpty()) return
+        addString("§7Category")
+        for (cat in catList) {
+            val info = when {
                 cat.familiesCompleted == cat.totalFamilies -> "§c§lCompleted!"
                 cat.familiesFound == cat.totalFamilies -> "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
                 cat.familiesFound < cat.totalFamilies ->
                     "§b${cat.familiesFound}§7/§b${cat.totalFamilies} §7found, " +
                         "§b${cat.familiesCompleted}§7/§b${cat.totalFamilies} §7completed"
-                else -> return null
+
+                else -> continue
             }
-            add(Renderable.string(element))
+
+            addString(" §7- ${cat.name}§7: $info")
         }
-        return Renderable.horizontalContainer(list)
     }
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {

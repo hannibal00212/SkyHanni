@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.GuildAPI
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.GuildApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
 import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PlayerTabComplete {
@@ -20,9 +19,9 @@ object PlayerTabComplete {
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var vipVisits = listOf<String>()
 
-    private val friendsEntry = lazyEntry { FriendAPI.getAllFriends().map { it.name } }
-    private val partyMembersEntry = lazyEntry { PartyAPI.partyMembers }
-    private val guildMembersEntry = lazyEntry { GuildAPI.getAllMembers() }
+    private val friendsEntry = lazyEntry { FriendApi.getAllFriends().map { it.name } }
+    private val partyMembersEntry = lazyEntry { PartyApi.partyMembers }
+    private val guildMembersEntry = lazyEntry { GuildApi.getAllMembers() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
     private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name } }
 
@@ -52,7 +51,7 @@ object PlayerTabComplete {
 
         parent("p", "party") {
             parent("accept", "invite") { add(getExcluding(PlayerCategory.PARTY)) }
-            conditional({ PartyAPI.partyMembers.isNotEmpty() }) {
+            conditional({ PartyApi.partyMembers.isNotEmpty() }) {
                 parent("kick", "demote", "promote", "transfer") { add(partyMembersEntry) }
                 literal("chat", "disband", "kickoffline", "leave", "list", "mute", "poll", "private", "settings", "warp")
             }
@@ -86,16 +85,16 @@ object PlayerTabComplete {
 
     private fun getExcluding(vararg categories: PlayerCategory) = LazySuggestionEntry {
         if (config.friends && PlayerCategory.FRIENDS !in categories) {
-            addAll(FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
+            addAll(FriendApi.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
         }
         if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in categories) {
             addAll(EntityUtils.getPlayerEntities().map { it.name })
         }
         if (config.party && PlayerCategory.PARTY !in categories) {
-            addAll(PartyAPI.partyMembers)
+            addAll(PartyApi.partyMembers)
         }
         if (config.guild && PlayerCategory.GUILD !in categories) {
-            addAll(GuildAPI.getAllMembers())
+            addAll(GuildApi.getAllMembers())
         }
     }
 
@@ -105,7 +104,7 @@ object PlayerTabComplete {
         it.isNotEmpty()
     }?.distinct()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<VipVisitsJson>("VipVisits")
         vipVisits = data.vipVisits

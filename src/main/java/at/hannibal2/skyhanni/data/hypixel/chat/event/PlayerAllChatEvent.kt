@@ -14,6 +14,6 @@ class PlayerAllChatEvent(
     blockedReason: String? = null,
 ) : AbstractChatEvent(authorComponent, messageComponent, chatComponent, blockedReason) {
     val levelColor = levelComponent?.sampleStyleAtStart()?.color
-    val level by lazy { levelComponent?.getText()?.toInt() }
-    val isAGuest by lazy { privateIslandGuest != null }
+    val level = levelComponent?.getText()?.toInt()
+    val isAGuest get() = privateIslandGuest != null
 }

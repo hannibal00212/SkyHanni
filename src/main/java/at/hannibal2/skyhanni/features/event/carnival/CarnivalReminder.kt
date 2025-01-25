@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.minutes
@@ -42,22 +41,22 @@ object CarnivalReminder {
             storage?.lastClaimedDay = value
         }
 
-    private val repoGroup = RepoPattern.group("carnival.tickets")
+    private val patternGroup = RepoPattern.group("carnival.tickets")
 
     /** REGEX-TEST: §aYou claimed §r§aCarnival Ticket §r§8x25§r§a!
      */
-    private val ticketClaimedPattern by repoGroup.pattern("claimed", "§aYou claimed §r§aCarnival Ticket §r§8x25§r§a!")
+    private val ticketClaimedPattern by patternGroup.pattern("claimed", "§aYou claimed §r§aCarnival Ticket §r§8x25§r§a!")
 
     /** REGEX-TEST: §e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.
      */
     @Suppress("MaxLineLength")
-    private val alreadyClaimedPattern by repoGroup.pattern(
+    private val alreadyClaimedPattern by patternGroup.pattern(
         "already",
         "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
     )
 
-    @SubscribeEvent
-    fun onSecondPassedEvent(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled() || nextCheckTime.isInFuture()) return
         check()
     }
@@ -71,8 +70,8 @@ object CarnivalReminder {
         check()
     }
 
-    @SubscribeEvent
-    fun onLorenzChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled() && !claimedToday) return
         if (!ticketClaimedPattern.matches(event.message) && !alreadyClaimedPattern.matches(event.message)) return
         claimedToday = true

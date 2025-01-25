@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -32,7 +32,7 @@ object QuickModMenuSwitch {
     private var currentlyOpeningMod = ""
     private var lastGuiOpen = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
         mods = modsJar.mods.filter { mod ->
@@ -163,7 +163,7 @@ object QuickModMenuSwitch {
         GlStateManager.popMatrix()
     }
 
-    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -46,7 +46,6 @@ enum class SkyblockSeason(
         )
 
     companion object {
-
         val currentSeason by RecalculatingValue(1.seconds) {
             getSeasonByName(SkyBlockTime.now().monthName)
         }

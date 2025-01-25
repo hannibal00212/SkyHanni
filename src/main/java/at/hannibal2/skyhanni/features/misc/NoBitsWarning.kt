@@ -28,6 +28,7 @@ object NoBitsWarning {
                     HypixelCommands.bazaar("booster cookie")
                 }, "§eClick to run /bz booster cookie!"
             )
+            // TODO use reminder utils
             LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }

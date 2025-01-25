@@ -10,17 +10,23 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object RngMeterInventory {
 
     private val config get() = SkyHanniMod.feature.inventory.rngMeter
+
+    /**
+     * REGEX-TEST: §8Catacombs (F1)
+     */
+    private val floorPattern by RepoPattern.pattern(
+        "rngmeterinventory.floor.name",
+        "(?:§.)*Catacombs \\((?<floor>.*)\\)",
+    )
 
     @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -29,14 +35,15 @@ object RngMeterInventory {
         val stack = event.stack
         if (config.floorName && chestName == "Catacombs RNG Meter") {
             if (stack.name.removeColor() == "RNG Meter") {
-                event.stackTip = stack.getLore()[0].between("(", ")")
+                floorPattern.firstMatcher(stack.getLore()) {
+                    event.stackTip = group("floor")
+                }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (config.noDrop && chestName == "Catacombs RNG Meter") {

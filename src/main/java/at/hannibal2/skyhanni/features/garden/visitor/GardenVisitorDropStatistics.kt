@@ -3,18 +3,19 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.GardenStorage.VisitorDrops
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -23,20 +24,17 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.renderables.Container
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenVisitorDropStatistics {
 
-    private val config get() = GardenAPI.config.visitors.dropsStatistics
-    private var display: Renderable? = null
+    private val config get() = GardenApi.config.visitors.dropsStatistics
+    private var display = emptyList<List<Any>>()
 
     private var acceptedVisitors = 0
     var deniedVisitors = 0
@@ -105,27 +103,23 @@ object GardenVisitorDropStatistics {
 
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
-    private val rewardsToEntries = mapOf(
-        DropsStatisticsTextEntry.FLOWERING_BOUQUET to VisitorReward.FLOWERING_BOUQUET,
-        DropsStatisticsTextEntry.OVERGROWN_GRASS to VisitorReward.OVERGROWN_GRASS,
-        DropsStatisticsTextEntry.GREEN_BANDANA to VisitorReward.GREEN_BANDANA,
-        DropsStatisticsTextEntry.DEDICATION_IV to VisitorReward.DEDICATION,
-        DropsStatisticsTextEntry.MUSIC_RUNE_I to VisitorReward.MUSIC_RUNE,
-        DropsStatisticsTextEntry.SPACE_HELMET to VisitorReward.SPACE_HELMET,
-        DropsStatisticsTextEntry.CULTIVATING_I to VisitorReward.CULTIVATING,
-        DropsStatisticsTextEntry.REPLENISH_I to VisitorReward.REPLENISH,
-        DropsStatisticsTextEntry.DELICATE to VisitorReward.COPPER_DYE,
-        DropsStatisticsTextEntry.COPPER_DYE to VisitorReward.SPACE_HELMET,
-    )
+    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
+        val newList = mutableListOf<List<Any>>()
+        for (index in config.textFormat) {
+            // We need to use the ordinal here, can't change this.
+            newList.add(map[index.ordinal])
+        }
+        return newList
+    }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        display = null
+        display = emptyList()
     }
 
     @HandleEvent
     fun onVisitorAccept(event: VisitorAcceptEvent) {
-        if (!GardenAPI.onBarnPlot) return
+        if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
 
         for (internalName in event.visitor.allRewards) {
@@ -135,14 +129,14 @@ object GardenVisitorDropStatistics {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!GardenAPI.onBarnPlot) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!GardenApi.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
         val message = event.message.removeColor().trim()
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
 
         copperPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
@@ -184,12 +178,61 @@ object GardenVisitorDropStatistics {
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
         val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
-        val visitorRarities = GardenAPI.storage?.visitorDrops?.visitorRarities ?: return
+        val visitorRarities = GardenApi.storage?.visitorDrops?.visitorRarities ?: return
         fixRaritiesSize(visitorRarities)
         // TODO, change functionality to use enum rather than ordinals
         val temp = visitorRarities[currentRarity.ordinal] + 1
         visitorRarities[currentRarity.ordinal] = temp
         saveAndUpdate()
+    }
+
+    /**
+     * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
+     */
+    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<List<Any>> {
+        addAsSingletonList("§e§lVisitor Statistics")
+        addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
+        val visitorRarities = storage.visitorRarities
+        fixRaritiesSize(visitorRarities)
+        if (visitorRarities.isNotEmpty()) {
+            addAsSingletonList(
+                "§a${visitorRarities[0].addSeparators()}§f-" +
+                    "§9${visitorRarities[1].addSeparators()}§f-" +
+                    "§6${visitorRarities[2].addSeparators()}§f-" +
+                    "§d${visitorRarities[3].addSeparators()}§f-" +
+                    "§c${visitorRarities[4].addSeparators()}",
+            )
+        } else {
+            addAsSingletonList("§c?")
+            ErrorManager.logErrorWithData(
+                RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
+                "Error rendering visitor drop statistics",
+            )
+        }
+        addAsSingletonList(format(acceptedVisitors, "Accepted", "§2", ""))
+        addAsSingletonList(format(deniedVisitors, "Denied", "§c", ""))
+        addAsSingletonList("")
+        addAsSingletonList(format(storage.copper, "Copper", "§c", ""))
+        addAsSingletonList(format(storage.farmingExp, "Farming EXP", "§3", "§7"))
+        addAsSingletonList(format(coinsSpent, "Coins Spent", "§6", ""))
+
+        addAsSingletonList("")
+        addAsSingletonList(format(storage.gardenExp, "Garden EXP", "§2", "§7"))
+        addAsSingletonList(format(storage.bits, "Bits", "§b", "§b"))
+        addAsSingletonList(format(storage.mithrilPowder, "Mithril Powder", "§2", "§2"))
+        addAsSingletonList(format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d"))
+
+        for (reward in VisitorReward.entries) {
+            val count = rewardsCount[reward] ?: 0
+            if (config.displayIcons) { // Icons
+                val stack = reward.itemStack
+                if (config.displayNumbersFirst)
+                    add(listOf("§b${count.addSeparators()} ", stack))
+                else add(listOf(stack, " §b${count.addSeparators()}"))
+            } else { // No Icons
+                addAsSingletonList(format(count, reward.displayName, "§b"))
+            }
+        }
     }
 
     // Adding the mythic rarity between legendary and special, if missing
@@ -201,12 +244,11 @@ object GardenVisitorDropStatistics {
         }
     }
 
-    fun format(amount: Number, name: String, color: String, amountColor: String = color) = Renderable.string(
+    fun format(amount: Number, name: String, color: String, amountColor: String = color) =
         if (config.displayNumbersFirst)
             "$color${format(amount)} $name"
         else
             "$color$name: $amountColor${format(amount)}"
-    )
 
     fun format(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
@@ -215,25 +257,24 @@ object GardenVisitorDropStatistics {
     }
 
     // todo this should just save when changed not once a second
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()
     }
 
     fun saveAndUpdate() {
-        if (!GardenAPI.inGarden()) return
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        if (!GardenApi.inGarden()) return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         storage.acceptedVisitors = acceptedVisitors
         storage.deniedVisitors = deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
         storage.coinsSpent = coinsSpent
         storage.rewardsCount = rewardsCount
-        display = drawDisplay(storage)
+        display = formatDisplay(drawDisplay(storage))
     }
 
-
     fun resetCommand() {
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         ChatUtils.clickableChat(
             "Click here to reset Visitor Drops Statistics.",
             onClick = {
@@ -258,7 +299,7 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val storage = GardenAPI.storage?.visitorDrops ?: return
+        val storage = GardenApi.storage?.visitorDrops ?: return
         val visitorRarities = storage.visitorRarities
         if (visitorRarities.size == 0) {
             visitorRarities.add(0)
@@ -275,13 +316,13 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (!GardenAPI.inGarden()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (config.onlyOnBarn && !GardenAPI.onBarnPlot) return
-        config.pos.renderRenderable(display, posLabel = "Visitor Stats")
+        if (!GardenApi.inGarden()) return
+        if (GardenApi.hideExtraGuis()) return
+        if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
+        config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
     }
 
     @HandleEvent
@@ -299,69 +340,6 @@ object GardenVisitorDropStatistics {
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
         }
     }
-
-    private fun drawDisplay(storage: VisitorDrops) = Container.vertical {
-        for (entry in config.textFormat) {
-            renderable(formatEntry(storage, entry))
-        }
-    }
-
-    private fun formatVisitorRewardEntry(reward: VisitorReward): Renderable {
-        val count = rewardsCount[reward] ?: 0
-        return when {
-            !config.displayIcons -> format(count, reward.displayName, "§b")
-            config.displayNumbersFirst -> Container.horizontal {
-                string("§b${count.addSeparators()} ")
-                item(reward.itemStack)
-            }
-            else -> Container.horizontal {
-                item(reward.itemStack)
-                string(" §b${count.addSeparators()}")
-            }
-        }
-    }
-
-    private fun formatEntry(storage: VisitorDrops, entry: DropsStatisticsTextEntry): Renderable {
-        return when (entry) {
-            DropsStatisticsTextEntry.TITLE -> Renderable.string("§e§lVisitor Statistics")
-            DropsStatisticsTextEntry.TOTAL_VISITORS -> format(totalVisitors, "Total", "§e", "")
-            DropsStatisticsTextEntry.ACCEPTED -> format(acceptedVisitors, "Accepted", "§2", "")
-            DropsStatisticsTextEntry.DENIED -> format(deniedVisitors, "Denied", "§c", "")
-            DropsStatisticsTextEntry.SPACER_1 -> Renderable.placeholder(0, 10)
-            DropsStatisticsTextEntry.SPACER_2 -> Renderable.placeholder(0, 10)
-            DropsStatisticsTextEntry.COPPER -> format(storage.copper, "Copper", "§c", "")
-            DropsStatisticsTextEntry.FARMING_EXP -> format(storage.farmingExp, "Farming EXP", "§3", "§7")
-            DropsStatisticsTextEntry.COINS_SPENT -> format(coinsSpent, "Coins Spent", "§6", "")
-            DropsStatisticsTextEntry.GARDEN_EXP -> format(storage.gardenExp, "Garden EXP", "§2", "§7")
-            DropsStatisticsTextEntry.BITS -> format(storage.bits, "Bits", "§b", "§b")
-            DropsStatisticsTextEntry.MITHRIL_POWDER -> format(storage.mithrilPowder, "Mithril Powder", "§2", "§2")
-            DropsStatisticsTextEntry.GEMSTONE_POWDER -> format(storage.gemstonePowder, "Gemstone Powder", "§d", "§d")
-            DropsStatisticsTextEntry.VISITORS_BY_RARITY -> {
-                val visitorRarities = storage.visitorRarities
-                fixRaritiesSize(visitorRarities)
-                if (visitorRarities.isNotEmpty()) {
-                    Renderable.string(
-                        "§a${visitorRarities[0].addSeparators()}§f-" +
-                            "§9${visitorRarities[1].addSeparators()}§f-" +
-                            "§6${visitorRarities[2].addSeparators()}§f-" +
-                            "§d${visitorRarities[3].addSeparators()}§f-" +
-                            "§c${visitorRarities[4].addSeparators()}",
-                    )
-                } else {
-                    ErrorManager.logErrorWithData(
-                        RuntimeException("visitorRarities is empty, maybe visitor refusing was the cause?"),
-                        "Error rendering visitor drop statistics",
-                    )
-                    Renderable.string("§c?")
-                }
-            }
-            else -> {
-                val reward = rewardsToEntries[entry] ?: return Renderable.string("§c?")
-                formatVisitorRewardEntry(reward)
-            }
-        }
-    }
-
 }
 
 enum class VisitorRarity {

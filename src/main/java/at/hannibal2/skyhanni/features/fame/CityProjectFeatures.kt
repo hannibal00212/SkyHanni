@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -25,15 +26,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -43,7 +44,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -51,7 +51,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display: Renderable? = null
+    private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -65,7 +65,7 @@ object CityProjectFeatures {
         "§aProject is (?:being built|released)!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.dailyReminder) return
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
@@ -96,14 +96,13 @@ object CityProjectFeatures {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
 
         inInventory = false
         if (!inCityProject(event)) return
@@ -111,7 +110,7 @@ object CityProjectFeatures {
 
         if (config.showMaterials) {
             // internal name -> amount
-            val materials = mutableMapOf<NEUInternalName, Int>()
+            val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
                 if (item.name != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
@@ -151,23 +150,22 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NEUInternalName, Int>): Renderable? {
-        val lines = mutableListOf<Renderable>()
-        lines.add(Renderable.string("§7City Project Materials"))
+    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
+        addAsSingletonList("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            lines.add(Renderable.string("§cNo Materials to contribute."))
-            return Renderable.verticalContainer(lines)
+            addAsSingletonList("§cNo Materials to contribute.")
+            return@buildList
         }
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
             val name = internalName.itemName
-            val line = mutableListOf<Renderable>()
-            line.add(Renderable.string(" §7- "))
-            line.add(Renderable.itemStack(stack))
+            val list = mutableListOf<Any>()
+            list.add(" §7- ")
+            list.add(stack)
 
-            line.add(
+            list.add(
                 Renderable.optionalLink(
                     "$name §ex${amount.addSeparators()}",
                     {
@@ -177,19 +175,17 @@ object CityProjectFeatures {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }
                     },
-                ) { inInventory && !NEUItems.neuHasFocus() },
+                ) { inInventory && !NeuItems.neuHasFocus() },
             )
 
             val price = internalName.getPrice() * amount
             val format = price.shortFormat()
-            line.add(Renderable.string(" §7(§6$format§7)"))
-            lines.add(Renderable.horizontalContainer(line))
+            list.add(" §7(§6$format§7)")
+            add(list)
         }
-
-        return Renderable.verticalContainer(lines)
     }
 
-    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NEUInternalName, Int>) {
+    private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
@@ -205,24 +201,22 @@ object CityProjectFeatures {
             if (line == "" || line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
-            val internalName = NEUInternalName.fromItemName(name)
+            val internalName = NeuInternalName.fromItemName(name)
             val old = materials.getOrPut(internalName) { 0 }
             materials[internalName] = old + amount
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderable(display, posLabel = "City Project Materials")
+        config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showReady) return
         if (!inInventory) return
 
