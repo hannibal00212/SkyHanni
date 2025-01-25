@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
@@ -29,7 +29,7 @@ object HideArmor {
         if (entity !is EntityPlayer) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
-        if (entity.isNPC()) return false
+        if (entity.isNpc()) return false
 
         return when (config.mode) {
             ModeEntry.ALL -> true

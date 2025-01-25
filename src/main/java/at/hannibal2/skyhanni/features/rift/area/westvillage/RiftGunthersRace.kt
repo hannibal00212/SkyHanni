@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -116,7 +116,7 @@ object RiftGunthersRace {
         if (!RiftApi.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNPC()) {
+        if (entity is EntityOtherPlayerMP && !entity.isNpc()) {
             event.cancel()
         }
     }
