@@ -31,6 +31,8 @@ object SkippingTypeAdapterFactory : TypeAdapterFactory {
             } catch (e: Exception) {
                 // TODO include path and value found (as string)
                 SkyHanniMod.logger.warn("Failed to read value from JSON, skipping", e)
+                if (!reader.hasNext()) return null
+                // reader skip value seems to have an infinite loop if you dont have another element
                 reader.skipValue()
                 null
             }

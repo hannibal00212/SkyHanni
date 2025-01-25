@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -34,7 +34,7 @@ import net.minecraft.inventory.ContainerChest
 @SkyHanniModule
 object EnigmaSoulWaypoints {
 
-    private val config get() = RiftAPI.config.enigmaSoulWaypoints
+    private val config get() = RiftApi.config.enigmaSoulWaypoints
     private var inInventory = false
     var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
@@ -90,7 +90,7 @@ object EnigmaSoulWaypoints {
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
             if (inventoryUnfound.contains("Buttons")) {
-                RiftAPI.trackingButtons = !RiftAPI.trackingButtons
+                RiftApi.trackingButtons = !RiftApi.trackingButtons
             }
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
@@ -111,7 +111,7 @@ object EnigmaSoulWaypoints {
         if (!soulLocations.contains(name)) return
 
         if (name == "Buttons") {
-            RiftAPI.trackingButtons = !RiftAPI.trackingButtons
+            RiftApi.trackingButtons = !RiftApi.trackingButtons
         }
 
         if (!trackedSouls.contains(name)) {
@@ -157,7 +157,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {
@@ -203,10 +203,10 @@ object EnigmaSoulWaypoints {
             trackedSouls.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
             if (closestSoul == "Buttons") {
-                RiftAPI.trackingButtons = false
+                RiftApi.trackingButtons = false
             }
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 }

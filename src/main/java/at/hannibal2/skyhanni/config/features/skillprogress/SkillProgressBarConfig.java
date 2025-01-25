@@ -55,11 +55,11 @@ public class SkillProgressBarConfig {
             CUSTOM_5("Texture 5", SkyHanniMod.MODID + ":bars/5.png"),
             ;
 
-            private final String str;
+            private final String displayName;
             private final String path;
 
-            UsedTexture(String str, String path) {
-                this.str = str;
+            UsedTexture(String displayName, String path) {
+                this.displayName = displayName;
                 this.path = path;
             }
 
@@ -69,7 +69,7 @@ public class SkillProgressBarConfig {
 
             @Override
             public String toString() {
-                return str;
+                return displayName;
             }
         }
 

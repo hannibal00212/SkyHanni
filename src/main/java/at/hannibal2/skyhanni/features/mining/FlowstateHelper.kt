@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +45,7 @@ object FlowstateHelper {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
-        if (!MiningAPI.inCustomMiningIsland()) return
+        if (!MiningApi.inCustomMiningIsland()) return
         if (flowstateCache == null) return
 
         displayHibernating = false
@@ -56,9 +55,9 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!MiningAPI.inCustomMiningIsland()) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!MiningApi.inCustomMiningIsland()) return
 
         attemptClearDisplay()
     }
@@ -76,7 +75,7 @@ object FlowstateHelper {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
+        if (!MiningApi.inCustomMiningIsland() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return
 
         if (shouldAutoHide()) return

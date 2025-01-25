@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -50,7 +49,7 @@ object PestParticleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (PestAPI.hasVacuumInHand()) {
+        if (PestApi.hasVacuumInHand()) {
             if (event.clickType == ClickType.LEFT_CLICK && !Minecraft.getMinecraft().thePlayer.isSneaking) {
                 reset()
                 lastPestTrackerUse = SimpleTimeMark.now()
@@ -128,7 +127,7 @@ object PestParticleWaypoint {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (locations.isEmpty()) return
         if (lastPestTrackerUse.passedSince() > config.showForSeconds.seconds) {
@@ -158,8 +157,8 @@ object PestParticleWaypoint {
         }
     } else guessPoint
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         val guessPoint = guessPoint ?: return
 
@@ -170,7 +169,7 @@ object PestParticleWaypoint {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestUpdate(event: PestUpdateEvent) {
-        if (PestAPI.scoreboardPests == 0) reset()
+        if (PestApi.scoreboardPests == 0) reset()
     }
 
     private fun calculateWaypoint(): LorenzVec? {
@@ -183,6 +182,6 @@ object PestParticleWaypoint {
         return firstParticle + pos * (120.0 / list.size)
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 
 }
