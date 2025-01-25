@@ -49,7 +49,7 @@ object EntityUtils {
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
         for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
-            if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+            if (!entity.isNpc() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
         }
@@ -154,7 +154,7 @@ object EntityUtils {
     fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    fun EntityPlayer.isNPC() = !isRealPlayer()
+    fun EntityPlayer.isNpc() = !isRealPlayer()
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
