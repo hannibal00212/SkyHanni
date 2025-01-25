@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -100,10 +99,8 @@ object SlayerApi {
         return null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 

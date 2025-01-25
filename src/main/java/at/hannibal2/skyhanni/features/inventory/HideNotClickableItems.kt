@@ -267,7 +267,7 @@ object HideNotClickableItems {
 
     private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
         if (!RiftApi.inRift()) return false
-        if (chestName != "Motes Grubber" && !ShiftClickNPCSell.inInventory) return false
+        if (chestName != "Motes Grubber" && !ShiftClickNpcSell.inInventory) return false
 
         showGreenLine = true
 
@@ -475,7 +475,7 @@ object HideNotClickableItems {
 
     private fun hideNpcSell(stack: ItemStack): Boolean {
         if (RiftApi.inRift()) return false
-        if (!ShiftClickNPCSell.inInventory) return false
+        if (!ShiftClickNpcSell.inInventory) return false
         if (VisitorApi.inInventory) return false
         showGreenLine = true
 
