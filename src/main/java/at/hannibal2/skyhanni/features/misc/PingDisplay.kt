@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -102,5 +102,5 @@ object PingDisplay {
         config.pingDisplayPosition.renderString(display, posLabel = "Ping Display")
     }
 
-    private fun isEnabled() = config.pingDisplay && (LorenzUtils.inSkyBlock || OutsideSbFeature.PING_DISPLAY.isSelected())
+    private fun isEnabled() = config.pingDisplay && (LorenzUtils.inSkyBlock || OutsideSBFeature.PING_DISPLAY.isSelected())
 }
