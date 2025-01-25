@@ -161,7 +161,7 @@ object CrystalNucleusChatFilter {
             ?: blockRunCompleted(message)
             ?: blockNonToolScavenge(message)
             ?: blockGoblinGuards(message)
-            ?: blockNPC(message)
+            ?: blockNpc(message)
     }
 
     private fun blockCrystalCollected(message: String): NucleusChatFilterRes? {
@@ -234,7 +234,7 @@ object CrystalNucleusChatFilter {
         return NucleusChatFilterRes("npc_goblin_guard")
     }
 
-    private fun blockNPC(message: String): NucleusChatFilterRes? {
+    private fun blockNpc(message: String): NucleusChatFilterRes? {
         if (!message.startsWith("§e[NPC]")) return null
 
         return blockProfessorRobot(message)

@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -84,7 +83,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         event.drawGuessImmediately()
@@ -118,7 +117,7 @@ object HoppityEggLocator {
         event.drawDuplicateEggs(islandEggsLocations)
     }
 
-    private fun RenderWorldEvent.drawGuessLocations() {
+    private fun SkyHanniRenderWorldEvent.drawGuessLocations() {
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
             drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
             if (config.showLine) {
@@ -127,7 +126,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun RenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
+    private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
         if (!config.highlightDuplicateEggLocations || !config.showNearbyDuplicateEggLocations) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
@@ -139,7 +138,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun RenderWorldEvent.drawGuessImmediately() {
+    private fun SkyHanniRenderWorldEvent.drawGuessImmediately() {
         if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
             lastParticlePositionForever?.let {
                 if (lastChange.passedSince() < 300.milliseconds) {
@@ -160,7 +159,7 @@ object HoppityEggLocator {
         }
     }
 
-    private fun RenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
+    private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = config.highlightDuplicateEggLocations && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
@@ -192,8 +191,8 @@ object HoppityEggLocator {
         HoppityEggLocator.lastParticlePosition = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (validParticleLocations.isEmpty()) return
         ticksSinceLastParticleFound++
