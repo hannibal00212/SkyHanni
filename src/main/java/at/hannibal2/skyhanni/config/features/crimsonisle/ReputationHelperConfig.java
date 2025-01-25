@@ -48,17 +48,17 @@ public class ReputationHelperConfig {
         ALWAYS("Always", 0),
         ONLY_HOTKEY("Only With Hotkey", 1),
         NEVER("Never", 2);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ShowLocationEntry(String str, int legacyId) {
-            this.str = str;
+        ShowLocationEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ShowLocationEntry(String str) {
-            this(str, -1);
+        ShowLocationEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -68,7 +68,7 @@ public class ReputationHelperConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 }

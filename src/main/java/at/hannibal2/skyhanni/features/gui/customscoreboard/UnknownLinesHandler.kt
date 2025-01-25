@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SBPattern
 
 internal var allUnknownLines = listOf<UnknownLine>()
 internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
@@ -51,14 +51,14 @@ object UnknownLinesHandler {
          * Remove Known Text
          **/
         // Remove objectives
-        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) } ?: "Objective"
+        val objectiveLine = sidebarLines.firstOrNull { SBPattern.objectivePattern.matches(it) } ?: "Objective"
 
         unknownLines = unknownLines.filter { line ->
             val nextLine = sidebarLines.nextAfter(objectiveLine)
             val secondNextLine = sidebarLines.nextAfter(objectiveLine, 2)
             val thirdNextLine = sidebarLines.nextAfter(objectiveLine, 3)
 
-            line != nextLine && line != secondNextLine && line != thirdNextLine && !SbPattern.thirdObjectiveLinePattern.matches(line)
+            line != nextLine && line != secondNextLine && line != thirdNextLine && !SBPattern.thirdObjectiveLinePattern.matches(line)
         }
 
         // Remove jacobs contest
@@ -66,7 +66,7 @@ object UnknownLinesHandler {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        SbPattern.jacobsContestPattern.matches(line)
+                        SBPattern.jacobsContestPattern.matches(line)
                     } ?: "§eJacob's Contest",
                     i,
                 ) != it
@@ -78,7 +78,7 @@ object UnknownLinesHandler {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        SbPattern.slayerQuestPattern.matches(line)
+                        SBPattern.slayerQuestPattern.matches(line)
                     } ?: "Slayer Quest",
                     i,
                 ) != it
@@ -89,7 +89,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
-                    SbPattern.mobLocationPattern.matches(line)
+                    SBPattern.mobLocationPattern.matches(line)
                 } ?: "Tracker Mob Location:",
             ) != it
         }
@@ -98,7 +98,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
-                    SbPattern.darkAuctionCurrentItemPattern.matches(line)
+                    SBPattern.darkAuctionCurrentItemPattern.matches(line)
                 } ?: "Current Item:",
             ) != it
         }

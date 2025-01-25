@@ -40,11 +40,11 @@ object DungeonRankTabListColor {
             val classLevel = group("classLevel")
 
             val cleanName = playerName.cleanPlayerName(true)
-            val color = DungeonAPI.getColor(classLevel.romanToDecimalIfNecessary())
+            val color = DungeonApi.getColor(classLevel.romanToDecimalIfNecessary())
 
             event.text = "§8$sbLevel $rank$cleanName §f(§d$className $color$classLevel§f)"
         }
     }
 
-    fun isEnabled() = DungeonAPI.inDungeon() && config.coloredClassLevel
+    fun isEnabled() = DungeonApi.inDungeon() && config.coloredClassLevel
 }

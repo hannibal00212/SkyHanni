@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,7 +27,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object OwnInventoryData {
 
-    private var itemAmounts = mapOf<NEUInternalName, Int>()
+    private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
 
     /**
@@ -73,9 +72,8 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
         if (itemAmounts.isEmpty()) {
             itemAmounts = getCurrentItems()
         }
@@ -90,8 +88,8 @@ object OwnInventoryData {
         itemAmounts = map
     }
 
-    private fun getCurrentItems(): MutableMap<NEUInternalName, Int> {
-        val map = mutableMapOf<NEUInternalName, Int>()
+    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
+        val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
             map.addOrPut(internalName, itemStack.stackSize)
@@ -104,7 +102,7 @@ object OwnInventoryData {
         itemAmounts = emptyMap()
     }
 
-    private fun calculateDifference(internalName: NEUInternalName, newAmount: Int) {
+    private fun calculateDifference(internalName: NeuInternalName, newAmount: Int) {
         val oldAmount = itemAmounts[internalName] ?: 0
 
         val diff = newAmount - oldAmount
@@ -173,15 +171,15 @@ object OwnInventoryData {
         }
     }
 
-    fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
+    fun ignoreItem(duration: Duration, condition: (NeuInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
 
     private val ignoredItemsUntil = mutableListOf<IgnoredItem>()
 
-    class IgnoredItem(val condition: (NEUInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
+    class IgnoredItem(val condition: (NeuInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
 
-    private fun addItem(internalName: NEUInternalName, add: Int) {
+    private fun addItem(internalName: NeuInternalName, add: Int) {
         if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
         ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -137,7 +137,7 @@ object DungeonLividFinder {
 
     @HandleEvent
     fun onBossStart(event: DungeonBossRoomEnterEvent) {
-        if (DungeonAPI.getCurrentBoss() != DungeonFloor.F5) return
+        if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
         color = LorenzColor.RED
     }
 
@@ -178,7 +178,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!inLividBossRoom() || !config.enabled.get()) return
         if (isBlind) return
 
@@ -198,7 +198,7 @@ object DungeonLividFinder {
         }
     }
 
-    private fun inLividBossRoom() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F5
+    private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -207,8 +207,8 @@ object DungeonLividFinder {
         if (!inLividBossRoom()) {
             event.addIrrelevant {
                 add("Not in Livid Boss")
-                add("currentBoss: ${DungeonAPI.getCurrentBoss()}")
-                add("inBossRoom: ${DungeonAPI.inBossRoom}")
+                add("currentBoss: ${DungeonApi.getCurrentBoss()}")
+                add("inBossRoom: ${DungeonApi.inBossRoom}")
             }
             return
         }

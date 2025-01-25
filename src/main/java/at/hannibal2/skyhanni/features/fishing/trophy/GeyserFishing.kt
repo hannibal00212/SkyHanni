@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
@@ -41,7 +41,7 @@ object GeyserFishing {
             potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2,
         )
 
-        if (config.hideParticles && FishingAPI.bobber != null) {
+        if (config.hideParticles && FishingApi.bobber != null) {
             hideGeyserParticles(event)
         }
     }
@@ -53,19 +53,19 @@ object GeyserFishing {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.drawBox) return
         val geyserBox = geyserBox ?: return
         val geyser = geyser ?: return
         if (geyser.distanceToPlayerIgnoreY() > 96) return
-        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
+        if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
         val color = config.boxColor.toSpecialColor()
         event.drawFilledBoundingBoxNea(geyserBox, color)
     }
 
     private fun hideGeyserParticles(event: ReceiveParticleEvent) {
-        val bobber = FishingAPI.bobber ?: return
+        val bobber = FishingApi.bobber ?: return
         val geyser = geyser ?: return
 
         if (bobber.distanceTo(event.location) < 3 && bobber.distanceTo(geyser) < 3) {

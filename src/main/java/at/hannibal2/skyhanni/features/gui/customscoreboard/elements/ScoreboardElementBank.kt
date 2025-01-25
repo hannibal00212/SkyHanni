@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 
 // widget
 // update with widget update event
@@ -20,7 +20,7 @@ object ScoreboardElementBank : ScoreboardElement() {
 
     override val configLine = "Bank: §6249M"
 
-    override fun showIsland() = !RiftAPI.inRift()
+    override fun showIsland() = !RiftApi.inRift()
 }
 
 // click: open /bank (does that even exist?)

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig.ChatMessageFormatEntry
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestSpawn {
 
-    private val config get() = PestAPI.config.pestSpawn
+    private val config get() = PestApi.config.pestSpawn
 
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
@@ -53,7 +53,7 @@ object PestSpawn {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         val message = event.message
         var blocked = false
 

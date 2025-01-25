@@ -3,14 +3,14 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.getBazaarDataOrError
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -55,7 +55,7 @@ object BazaarOrderHelper {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         val inventoryName = chest.getInventoryName()
-        if (!BazaarAPI.isBazaarOrderInventory(inventoryName)) return
+        if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
             bazaarItemNamePattern.matchMatcher(stack.name) {
@@ -68,7 +68,7 @@ object BazaarOrderHelper {
     }
 
     private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
-        val data = NEUInternalName.fromItemName(itemName).getBazaarDataOrError()
+        val data = NeuInternalName.fromItemName(itemName).getBazaarDataOrError()
 
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
