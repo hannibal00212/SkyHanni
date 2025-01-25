@@ -22,7 +22,7 @@ object GardenBurrowingSporesNotifier {
     private val patternGroup = RepoPattern.group("garden.burrowingspores")
     private val sporeDropMessage by patternGroup.pattern(
         "drop",
-        "§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores.",
+        "§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores\\.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

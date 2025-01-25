@@ -62,9 +62,10 @@ class GardenConfig {
     @Accordion
     var eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
 
+    // TODO rename to dicerRngDropTracker
     @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
-    @Accordion // TODO rename to dicerRngDropTracker
+    @Accordion
     var dicerCounters: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
 
     @Expose
@@ -77,9 +78,10 @@ class GardenConfig {
     @Accordion
     var nextJacobContests: NextJacobContestConfig = NextJacobContestConfig()
 
+    // TODO rename to armorDropTracker
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
-    @Accordion // TODO rename to armorDropTracker
+    @Accordion
     var farmingArmorDrop: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
 
     @Expose
@@ -243,7 +245,8 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Copy Milestone Data",
-        desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. Please share this data in SkyHanni discord."
+        desc = "Copy wrong crop milestone data in clipboard when opening the crop milestone menu. " +
+            "Please share this data in SkyHanni discord."
     )
     @ConfigEditorBoolean
     @FeatureToggle

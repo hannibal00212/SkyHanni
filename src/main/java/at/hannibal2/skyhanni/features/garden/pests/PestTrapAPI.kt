@@ -169,23 +169,17 @@ object PestTrapAPI {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (inIndex == -1) return
+        if (inIndex == -1 || !canReleasePest()) return
         val storage = storage ?: return
         val trap = storage.pestTrapStatus[inIndex].takeIf { it.count > 0 } ?: return
         val stack = event.slot?.stack ?: return
         when (event.slot.slotNumber) {
-            in PEST_SLOTS ->  {
-                if (stack.displayName == "§aPest Slot") return
-                if (!canReleasePest()) return
-                trap.apply { count-- }
-            }
+            in PEST_SLOTS -> if (stack.displayName != "§aPest Slot") trap.apply { count-- }
             RELEASE_ALL_SLOT -> {
                 if (!stack.canReleaseAll() || !canReleasePest(trap.count)) return
                 val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return
                 val pestsToRelease = min(trap.count, MAX_RELEASED_PESTS - existingPests)
-                trap.apply {
-                    count -= pestsToRelease
-                }
+                trap.count -= pestsToRelease
             }
             else -> return
         }

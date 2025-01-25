@@ -14,6 +14,6 @@ enum class SprayType(val displayName: String) {
     companion object {
 
         fun getByName(name: String) = entries.firstOrNull { it.displayName == name }
-        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.name ==  internalName.asString() }
+        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.name == internalName.asString() }
     }
 }
