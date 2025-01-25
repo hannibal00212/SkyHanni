@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 @SkyHanniModule
 object ChocolateFactoryUpgradeWarning {
 
-    private val config get() = ChocolateFactoryAPI.config.chocolateUpgradeWarnings
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
+    private val config get() = ChocolateFactoryApi.config.chocolateUpgradeWarnings
+    private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     private var lastUpgradeWarning = SimpleTimeMark.farPast()
     private var lastUpgradeSlot = -1
@@ -32,7 +32,7 @@ object ChocolateFactoryUpgradeWarning {
     }
 
     private fun checkUpgradeWarning() {
-        if (!ChocolateFactoryAPI.isEnabled()) return
+        if (!ChocolateFactoryApi.isEnabled()) return
         if (!config.upgradeWarning) return
         if (ReminderUtils.isBusy()) return
         if (ChocolateFactoryCustomReminder.isActive()) return
@@ -41,7 +41,7 @@ object ChocolateFactoryUpgradeWarning {
         if (config.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        if (ChocolateFactoryAPI.inChocolateFactory) return
+        if (ChocolateFactoryApi.inChocolateFactory) return
         ChatUtils.clickToActionOrDisable(
             "You have a Chocolate factory upgrade available to purchase!",
             config::upgradeWarning,

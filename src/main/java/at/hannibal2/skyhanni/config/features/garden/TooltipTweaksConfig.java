@@ -41,17 +41,17 @@ public class TooltipTweaksConfig {
         DEFAULT("Default", 0),
         SHOW("Show", 1),
         REPLACE("Replace", 2);
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        CropTooltipFortuneEntry(String str, int legacyId) {
-            this.str = str;
+        CropTooltipFortuneEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        CropTooltipFortuneEntry(String str) {
-            this(str, -1);
+        CropTooltipFortuneEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -61,7 +61,7 @@ public class TooltipTweaksConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

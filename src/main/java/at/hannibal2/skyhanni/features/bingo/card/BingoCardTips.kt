@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
+import at.hannibal2.skyhanni.features.bingo.BingoApi
+import at.hannibal2.skyhanni.features.bingo.BingoApi.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -55,7 +55,7 @@ object BingoCardTips {
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
         val slot = event.slot
-        val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
+        val goal = BingoApi.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
         // When hovering over a row
@@ -102,7 +102,7 @@ object BingoCardTips {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         for ((slot, _) in chest.getAllItems()) {
-            val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
+            val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
             val color = goal.getData()?.let {

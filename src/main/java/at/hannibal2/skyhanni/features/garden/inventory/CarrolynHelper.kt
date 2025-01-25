@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -19,7 +19,7 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object CarrolynHelper {
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
 
     private val carrolynLocation = LorenzVec(0.5, 103.1, -803.7)
 

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay
 import at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -105,7 +104,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) throw e
+            if (EventHandler.isInEventHandler) throw e
         }
     }
 

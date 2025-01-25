@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.QuiverDisplayConfig.ShowWhen
 import at.hannibal2.skyhanni.data.ArrowType
-import at.hannibal2.skyhanni.data.QuiverAPI
-import at.hannibal2.skyhanni.data.QuiverAPI.NONE_ARROW_TYPE
+import at.hannibal2.skyhanni.data.QuiverApi
+import at.hannibal2.skyhanni.data.QuiverApi.NONE_ARROW_TYPE
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -30,14 +30,14 @@ object QuiverDisplay {
 
     private var display = emptyList<Renderable>()
     private var arrow: ArrowType? = null
-    private var amount = QuiverAPI.currentAmount
+    private var amount = QuiverApi.currentAmount
     private var hideAmount = false
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
-        arrow = QuiverAPI.currentArrow
-        amount = QuiverAPI.currentAmount
+        arrow = QuiverApi.currentArrow
+        amount = QuiverApi.currentAmount
         updateDisplay()
     }
 
@@ -47,7 +47,7 @@ object QuiverDisplay {
 
     private fun drawDisplay() = buildList {
         val arrow = arrow ?: return@buildList
-        val itemStack = NEUItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
+        val itemStack = NeuItems.getItemStackOrNull(arrow.internalName.asString()) ?: ItemStack(Items.arrow)
 
         val rarity = itemStack.getItemRarityOrNull()?.chatColorCode ?: "§f"
         val arrowDisplayName =
@@ -66,7 +66,7 @@ object QuiverDisplay {
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         arrow = event.currentArrow
         amount = event.currentAmount
-        hideAmount = QuiverAPI.wearingSkeletonMasterChestplate
+        hideAmount = QuiverApi.wearingSkeletonMasterChestplate
 
         updateDisplay()
     }
@@ -77,8 +77,8 @@ object QuiverDisplay {
         if (display.isEmpty()) updateDisplay()
         val whenToShow = config.whenToShow.get()
         if (whenToShow == ShowWhen.ALWAYS ||
-            whenToShow == ShowWhen.ONLY_BOW_INVENTORY && QuiverAPI.hasBowInInventory() ||
-            whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverAPI.isHoldingBow()
+            whenToShow == ShowWhen.ONLY_BOW_INVENTORY && QuiverApi.hasBowInInventory() ||
+            whenToShow == ShowWhen.ONLY_BOW_HAND && QuiverApi.isHoldingBow()
         ) {
             val content =
                 Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
