@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -30,7 +28,7 @@ object LivingMetalSuitProgress {
         if (!isEnabled()) return
         config.position.renderRenderables(
             display,
-            posLabel = "Living Metal Armor Progress"
+            posLabel = "Living Metal Armor Progress",
         )
     }
 
@@ -58,7 +56,7 @@ object LivingMetalSuitProgress {
                 addString(
                     progress?.let {
                         drawProgressBar(it) + " §b${LorenzUtils.formatPercentage(it)}"
-                    } ?: "§cStart upgrading it!"
+                    } ?: "§cStart upgrading it!",
                 )
             }
         }
@@ -74,7 +72,7 @@ object LivingMetalSuitProgress {
                     armor,
                     armor.getLivingMetalProgress()?.toDouble()?.let {
                         it.coerceAtMost(100.0) / 100
-                    }
+                    },
                 )
             }
         }
