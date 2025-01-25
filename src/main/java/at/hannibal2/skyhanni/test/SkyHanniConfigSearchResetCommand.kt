@@ -255,7 +255,7 @@ object SkyHanniConfigSearchResetCommand {
         val line = term.split(".").drop(1)
         var field: Field? = null
         for (entry in line) {
-            field = obj.javaClass.getField(entry).makeAccessible()
+            field = obj.javaClass.getDeclaredField(entry).makeAccessible()
             parentObject = obj
             obj = field.get(obj)
         }
