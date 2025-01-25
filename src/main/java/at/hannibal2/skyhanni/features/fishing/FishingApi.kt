@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -30,7 +29,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FishingApi {
@@ -83,10 +81,8 @@ object FishingApi {
         resetBobber()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(5)) {
             wearingTrophyArmor = isWearingTrophyArmor()
         }

@@ -182,17 +182,17 @@ public class InventoryConfig {
         BESTIARY_LEVEL("§bBestiary Level"),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ItemNumberEntry(String str, int legacyId) {
-            this.str = str;
+        ItemNumberEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ItemNumberEntry(String str) {
-            this(str, -1);
+        ItemNumberEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -202,7 +202,7 @@ public class InventoryConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -280,6 +280,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to shiftClickNpcSell
     public boolean shiftClickNPCSell = false;
 
     @Expose

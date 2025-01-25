@@ -25,15 +25,15 @@ public class SulphurSkitterBoxConfig {
         WIREFRAME("Wireframe"),
 
         ;
-        private final String str;
+        private final String displayName;
 
-        BoxType(String str) {
-            this.str = str;
+        BoxType(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
 
     }
