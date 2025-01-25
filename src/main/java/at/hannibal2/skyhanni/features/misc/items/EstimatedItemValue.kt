@@ -72,7 +72,12 @@ object EstimatedItemValue {
     private fun isInNeuOverlay(): Boolean {
         val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
-        val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+
+        // Use reflection to make sure tradeMenu exists
+        val doesNeuFieldExist = NotEnoughUpdates.INSTANCE.config::class.java.declaredFields.any { it.name == "tradeMenu" }
+        val customTradeEnabled = doesNeuFieldExist && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+
+        val inNeuTrade = inTrade && customTradeEnabled
         val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
 
         return inPv || inNeuTrade || inStorage
