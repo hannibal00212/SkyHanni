@@ -756,6 +756,7 @@ class ProfileSpecificStorage {
                 @Expose var dupes: Int = 0,
                 @Expose var strays: Int = 0,
             )
+
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
