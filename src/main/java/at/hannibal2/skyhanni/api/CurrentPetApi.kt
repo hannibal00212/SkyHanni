@@ -388,7 +388,7 @@ object CurrentPetApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("PetAPI")
+        event.title("CurrentPetApi")
         if (currentPet?.isInitialized() == false) {
             event.addIrrelevant("no pet equipped")
             return
