@@ -14,13 +14,24 @@ object ColorUtils {
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 
+    fun getAlpha(color: Int) = color shr 24 and 0xFF
+
     fun getRed(color: Int) = color shr 16 and 0xFF
 
     fun getGreen(color: Int) = color shr 8 and 0xFF
 
     fun getBlue(color: Int) = color and 0xFF
 
-    fun getAlpha(color: Int) = color shr 24 and 0xFF
+    /**
+     * Returns a quad of the color's alpha, red, green, and blue values, in that order.
+     */
+    fun getQuad(color: Int): Quad<Float, Float, Float, Float> =
+        Quad(
+            getAlpha(color) / 255f,
+            getRed(color) / 255f,
+            getGreen(color) / 255f,
+            getBlue(color) / 255f
+        )
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),

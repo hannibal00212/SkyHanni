@@ -1,26 +1,21 @@
-package at.hannibal2.skyhanni.config;
+package at.hannibal2.skyhanni.config
 
-import at.hannibal2.skyhanni.data.SackItem;
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.data.SackItem
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import com.google.gson.annotations.Expose
+import java.util.UUID
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-public class SackData {
-
+class SackData {
     @Expose
-    public Map<UUID, PlayerSpecific> players = new HashMap<>();
+    var players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
 
-    public static class PlayerSpecific {
+    class PlayerSpecific {
         @Expose
-        public Map<String, ProfileSpecific> profiles = new HashMap<>();
+        var profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
     }
 
-    public static class ProfileSpecific {
-
+    class ProfileSpecific {
         @Expose
-        public Map<NEUInternalName, SackItem> sackContents = new HashMap<>();
+        var sackContents: Map<NeuInternalName, SackItem> = mutableMapOf()
     }
 }

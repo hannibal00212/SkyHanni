@@ -38,6 +38,7 @@ jobs:
                     path: versions/1.8.9/build/reports/tests/test/
 
     preprocess:
+        if: ${{ false }} # Fix github
         runs-on: ubuntu-latest
         name: "Build multi version"
         steps:

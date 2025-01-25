@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -16,10 +17,12 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
-import at.hannibal2.skyhanni.utils.NEUVersionCheck.checkIfNeuIsLoaded
+import at.hannibal2.skyhanni.utils.system.ModVersion
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -28,7 +31,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
@@ -37,27 +39,29 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
+@SkyHanniModule
 @Mod(
     modid = SkyHanniMod.MODID,
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
-    version = "@MOD_VERSION@",
+    version = SkyHanniMod.VERSION,
+    modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
 )
-class SkyHanniMod {
+object SkyHanniMod {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
-        checkIfNeuIsLoaded()
+        PlatformUtils.checkIfNeuIsLoaded()
 
         HotswapSupport.load()
 
-        loadModule(this)
         LoadedModules.modules.forEach { loadModule(it) }
 
         loadModule(CrimsonIsleReputationHelper(this))
 
         SkyHanniEvents.init(modules)
+        if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
 
         CommandRegistrationEvent.post()
 
@@ -104,47 +108,46 @@ class SkyHanniMod {
         }
     }
 
-    companion object {
+    const val MODID: String = "skyhanni"
+    const val VERSION: String = "@MOD_VERSION@"
 
-        const val MODID = "skyhanni"
+    val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
-        @JvmStatic
-        val version: String
-            get() = Loader.instance().indexedModList[MODID]!!.version
+    val isBetaVersion: Boolean
+        get() = modVersion.isBeta
 
-        @JvmField
-        var feature: Features = Features()
-        lateinit var sackData: SackData
-        lateinit var friendsData: FriendsJson
-        lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var jacobContestsData: JacobContestsJson
-        lateinit var visualWordsData: VisualWordsJson
+    @JvmField
+    var feature: Features = Features()
+    lateinit var sackData: SackData
+    lateinit var friendsData: FriendsJson
+    lateinit var knownFeaturesData: KnownFeaturesJson
+    lateinit var jacobContestsData: JacobContestsJson
+    lateinit var visualWordsData: VisualWordsJson
 
-        lateinit var repo: RepoManager
-        lateinit var configManager: ConfigManager
-        val logger: Logger = LogManager.getLogger("SkyHanni")
-        fun getLogger(name: String): Logger {
-            return LogManager.getLogger("SkyHanni.$name")
-        }
+    lateinit var repo: RepoManager
+    lateinit var configManager: ConfigManager
+    val logger: Logger = LogManager.getLogger("SkyHanni")
+    fun getLogger(name: String): Logger {
+        return LogManager.getLogger("SkyHanni.$name")
+    }
 
-        val modules: MutableList<Any> = ArrayList()
-        private val globalJob: Job = Job(null)
-        val coroutineScope = CoroutineScope(
-            CoroutineName("SkyHanni") + SupervisorJob(globalJob),
-        )
-        var screenToOpen: GuiScreen? = null
-        private var screenTicks = 0
-        fun consoleLog(message: String) {
-            logger.log(Level.INFO, message)
-        }
+    val modules: MutableList<Any> = ArrayList()
+    private val globalJob: Job = Job(null)
+    val coroutineScope = CoroutineScope(
+        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
+    )
+    var screenToOpen: GuiScreen? = null
+    private var screenTicks = 0
+    fun consoleLog(message: String) {
+        logger.log(Level.INFO, message)
+    }
 
-        fun launchCoroutine(function: suspend () -> Unit) {
-            coroutineScope.launch {
-                try {
-                    function()
-                } catch (ex: Exception) {
-                    ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
-                }
+    fun launchCoroutine(function: suspend () -> Unit) {
+        coroutineScope.launch {
+            try {
+                function()
+            } catch (ex: Exception) {
+                ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
             }
         }
     }

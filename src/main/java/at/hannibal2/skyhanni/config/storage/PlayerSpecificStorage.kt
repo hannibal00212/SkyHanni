@@ -1,81 +1,70 @@
-package at.hannibal2.skyhanni.config.storage;
+package at.hannibal2.skyhanni.config.storage
 
-import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
-import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
-import at.hannibal2.skyhanni.utils.GenericWrapper;
-import at.hannibal2.skyhanni.utils.NEUInternalName;
-import at.hannibal2.skyhanni.utils.SimpleTimeMark;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import com.google.gson.annotations.Expose
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class PlayerSpecificStorage {
+class PlayerSpecificStorage {
+    @Expose
+    var profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
 
     @Expose
-    public Map<String, ProfileSpecificStorage> profiles = new HashMap<>(); // profile name
+    var useRomanNumerals: Boolean = true
 
     @Expose
-    public Boolean useRomanNumerals = true;
+    var multipleProfiles: Boolean = false
 
     @Expose
-    public Boolean multipleProfiles = false;
+    var gardenCommunityUpgrade: Int = -1
 
     @Expose
-    public Integer gardenCommunityUpgrade = -1;
+    var nextCityProjectParticipationTime: SimpleTimeMark = farPast()
 
     @Expose
-    public SimpleTimeMark nextCityProjectParticipationTime = GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
+    var communityShopAccountUpgrade: CommunityShopUpgrade? = null
 
     @Expose
-    public UpgradeReminder.CommunityShopUpgrade communityShopAccountUpgrade = null;
+    var guildMembers: MutableList<String> = mutableListOf()
 
     @Expose
-    public List<String> guildMembers = new ArrayList<>();
+    var winter: WinterStorage = WinterStorage()
 
-    @Expose
-    public WinterStorage winter = new WinterStorage();
-
-    public static class WinterStorage {
+    class WinterStorage {
+        @Expose
+        var playersThatHaveBeenGifted: MutableSet<String> = mutableSetOf()
 
         @Expose
-        public Set<String> playersThatHaveBeenGifted = new HashSet<>();
+        var amountGifted: Int = 0
 
         @Expose
-        public int amountGifted = 0;
-
-        @Expose
-        public int cakeCollectedYear = 0;
+        var cakeCollectedYear: Int = 0
     }
 
     @Expose
-    public Map<Long, BingoSession> bingoSessions = new HashMap<>();
+    var bingoSessions: MutableMap<Long, BingoSession> = mutableMapOf()
 
-    public static class BingoSession {
+    class BingoSession {
+        @Expose
+        var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
         @Expose
-        public Set<NEUInternalName> tierOneMinionsDone = new HashSet<>();
-
-        @Expose
-        public Map<Integer, BingoGoal> goals = new HashMap<>();
+        var goals: MutableMap<Int, BingoGoal> = mutableMapOf()
     }
 
     @Expose
-    public LimboStats limbo = new LimboStats();
+    var limbo: LimboStats = LimboStats()
 
-    public static class LimboStats {
+    class LimboStats {
+        @Expose
+        var playtime: Int = 0
 
         @Expose
-        public int playtime = 0;
+        var personalBest: Int = 0
 
         @Expose
-        public int personalBest = 0;
-
-        @Expose
-        public float userLuck = 0f;
+        var userLuck: Float = 0f
     }
 }

@@ -24,6 +24,12 @@ object ScoreboardElementObjective : ScoreboardElement() {
     }
 
     override val configLine = "Objective:\n§eStar SkyHanni on Github"
+
+    override val elementPatterns = listOf(
+        ScoreboardPattern.objectivePattern,
+        ScoreboardPattern.thirdObjectiveLinePattern,
+        ScoreboardPattern.wtfAreThoseLinesPattern,
+    )
 }
 
 // click: open the objective page (i think a command should exist)

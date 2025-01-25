@@ -8,10 +8,8 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TrackerManager {
@@ -28,14 +26,14 @@ object TrackerManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayFirst(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayLast(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = false
@@ -56,7 +54,7 @@ object TrackerManager {
         }
 
         val rawName = args.dropLast(1).joinToString(" ")
-        val internalName = NEUInternalName.fromItemNameOrInternalName(rawName)
+        val internalName = NeuInternalName.fromItemNameOrInternalName(rawName)
         if (!internalName.isKnownItem()) {
             ChatUtils.chat("No item found for '$rawName'!")
             return

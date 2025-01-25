@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -17,12 +17,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -67,7 +68,7 @@ object ItemPickupLog {
         override fun toString() = display
     }
 
-    data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
+    data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NeuInternalName?) {
         var timeUntilExpiry = SimpleTimeMark.now()
 
         fun updateAmount(change: Long) {
@@ -88,6 +89,11 @@ object ItemPickupLog {
     private var dirty = false
 
     private val patternGroup = RepoPattern.group("itempickuplog")
+
+    /**
+     * REGEX-TEST: Mite Gel x33
+     * REGEX-TEST: Sludge Juice
+     */
     private val shopPattern by patternGroup.pattern(
         "shoppattern",
         "^(?<itemName>.+?)(?: x\\d+)?\$",
@@ -104,14 +110,14 @@ object ItemPickupLog {
     )
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
@@ -203,14 +209,12 @@ object ItemPickupLog {
         dirty = true
     }
 
-    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
-        buildList {
-            val displayLayout: List<DisplayLayout> = config.displayLayout
-            for (item in displayLayout) {
-                add(item.renderable(entry, prefix))
-            }
-        },
-    )
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.line {
+        val displayLayout: List<DisplayLayout> = config.displayLayout
+        for (item in displayLayout) {
+            add(item.renderable(entry, prefix))
+        }
+    }
 
     private fun checkForDuplicateItems(
         list: MutableMap<Int, Pair<ItemStack, Int>>,
@@ -254,13 +258,12 @@ object ItemPickupLog {
 
     private fun ItemStack.hash(): Int {
         var displayName = this.displayName.removeColor()
-        val matcher = shopPattern.matcher(displayName)
-        if (matcher.matches()) {
-            displayName = matcher.group("itemName")
+        shopPattern.matchMatcher(displayName) {
+            displayName = group("itemName")
         }
         return Objects.hash(
             this.getInternalNameOrNull(),
-            displayName.removeColor(),
+            displayName,
             this.getItemRarityOrNull(),
         )
     }

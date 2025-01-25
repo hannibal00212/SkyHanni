@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -112,7 +112,7 @@ object InquisitorWaypointShare {
         ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -123,8 +123,8 @@ object InquisitorWaypointShare {
         waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         waypoints = emptyMap()
         inquisitorsNearby = emptyList()
     }
@@ -155,8 +155,8 @@ object InquisitorWaypointShare {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message
 
@@ -299,7 +299,7 @@ object InquisitorWaypointShare {
             ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
             if (name != LorenzUtils.getPlayerName()) {
                 LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
-                SoundUtils.playBeepSound()
+                playUserSound()
             }
         }
         val inquis = SharedInquisitor(name, displayName, location, SimpleTimeMark.now())
@@ -308,13 +308,20 @@ object InquisitorWaypointShare {
         return true
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.enabled
 
     fun maybeRemove(inquis: SharedInquisitor) {
         if (inquisitorsNearby.isEmpty()) {
             waypoints = waypoints.editCopy { remove(inquis.fromPlayer) }
             GriffinBurrowHelper.update()
             ChatUtils.chat("Inquisitor from ${inquis.displayName} §enot found, deleting.")
+        }
+    }
+
+    @JvmStatic
+    fun playUserSound() {
+        with(config.sound) {
+            SoundUtils.createSound(name, pitch).playSound()
         }
     }
 }

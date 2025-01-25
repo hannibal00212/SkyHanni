@@ -1,58 +1,55 @@
-package at.hannibal2.skyhanni.config.storage;
+package at.hannibal2.skyhanni.config.storage
 
-import at.hannibal2.skyhanni.features.misc.reminders.Reminder;
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
-import at.hannibal2.skyhanni.utils.LorenzVec;
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
-import com.google.gson.annotations.Expose;
+import at.hannibal2.skyhanni.features.misc.reminders.Reminder
+import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import com.google.gson.annotations.Expose
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-public class Storage {
+class Storage {
+    @Expose
+    var hasPlayedBefore: Boolean = false
 
     @Expose
-    public boolean hasPlayedBefore = false;
+    var savedMouselockedSensitivity: Float = .5f
 
     @Expose
-    public Float savedMouselockedSensitivity = .5f;
+    var savedMouseloweredSensitivity: Float = .5f
+
+    @Deprecated("Moved into separate file")
+    @Expose
+    var knownFeatureToggles: Map<String, List<String>> = emptyMap()
+
+    @Deprecated(
+        message = "Use SkyHanniMod.visualWordsData.modifiedWords instead.",
+        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords")
+    )
+    @Expose
+    var modifiedWords: List<VisualWord> = listOf()
 
     @Expose
-    public Float savedMouseloweredSensitivity = .5f;
-
-    @Deprecated
-    @Expose
-    public Map<String, List<String>> knownFeatureToggles = new HashMap<>();
-
-    @Deprecated
-    @Expose
-    public List<VisualWord> modifiedWords = new ArrayList<>();
+    var visualWordsImported: Boolean = false
 
     @Expose
-    public boolean visualWordsImported = false;
+    var contestSendingAsked: Boolean = false
 
     @Expose
-    public Boolean contestSendingAsked = false;
+    var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
 
     @Expose
-    public Map<String, SkyHanniTracker.DisplayMode> trackerDisplayModes = new HashMap<>();
+    var foundDianaBurrowLocations: List<LorenzVec> = emptyList()
 
     @Expose
-    public List<LorenzVec> foundDianaBurrowLocations = new ArrayList<>();
-
-    @Expose
-    public Map<UUID, PlayerSpecificStorage> players = new HashMap<>();
+    var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
 
     // TODO this should get moved into player specific
     @Expose
-    public String currentFameRank = "New player";
+    var currentFameRank: String = "New player"
 
     @Expose
-    public List<String> blacklistedUsers = new ArrayList<>();
+    var blacklistedUsers: MutableList<String> = mutableListOf()
 
     @Expose
-    public Map<String, Reminder> reminders = new HashMap<>();
+    var reminders: MutableMap<String, Reminder> = mutableMapOf()
 }

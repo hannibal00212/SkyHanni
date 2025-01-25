@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 public class GardenConfig {
     @Expose
@@ -241,4 +242,11 @@ public class GardenConfig {
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
     public Position logBookStatsPos = new Position(427, 92, false, true);
+
+    @Expose
+    @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")
+    @SearchTag("Expired Pumpkin, Exportable Carrots, Supreme Chocolate Bar, Fine Flour")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean helpCarrolyn = true;
 }

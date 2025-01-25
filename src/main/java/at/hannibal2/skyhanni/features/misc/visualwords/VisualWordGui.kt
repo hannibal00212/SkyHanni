@@ -246,7 +246,7 @@ open class VisualWordGui : GuiScreen() {
             }
 
             if (modifiedWords.size < 1) {
-                modifiedWords = ModifyVisualWords.modifiedWords
+                modifiedWords = ModifyVisualWords.userModifiedWords
             }
 
             if (toRemove != null) {
@@ -469,7 +469,7 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
-                tryImportFromSBE()
+                tryImportFromSbe()
             }
         }
     }
@@ -568,13 +568,12 @@ open class VisualWordGui : GuiScreen() {
     }
 
     private fun saveChanges() {
-        ModifyVisualWords.modifiedWords = modifiedWords
-        ModifyVisualWords.textCache.clear()
-        SkyHanniMod.visualWordsData.modifiedWords = modifiedWords
+        ModifyVisualWords.userModifiedWords = modifiedWords
+        ModifyVisualWords.update()
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
-    private fun tryImportFromSBE() {
+    private fun tryImportFromSbe() {
         if (!drawImport) return
         try {
             val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
@@ -600,7 +599,7 @@ open class VisualWordGui : GuiScreen() {
             }
             if (importedWords > 0 || skippedWords > 0) {
                 chat(
-                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !"
+                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !",
                 )
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false

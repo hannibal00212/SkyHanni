@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import net.minecraft.client.Minecraft
 import java.time.Instant
 
 /**
@@ -38,7 +39,7 @@ data class SkyBlockTime(
         fun fromInstant(instant: Instant): SkyBlockTime =
             calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
 
-        fun fromSbYear(year: Int): SkyBlockTime =
+        fun fromSBYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
         fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
@@ -46,8 +47,8 @@ data class SkyBlockTime(
                 Instant.ofEpochMilli(
                     SKYBLOCK_EPOCH_START_MILLIS +
                         (SKYBLOCK_YEAR_MILLIS * year) +
-                        (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier)))
-                )
+                        (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier))),
+                ),
             )
         }
 
@@ -77,7 +78,7 @@ data class SkyBlockTime(
             day: Int,
             hour: Int,
             minute: Int,
-            second: Int
+            second: Int,
         ): Long {
             var time = 0L
             time += year * SKYBLOCK_YEAR_MILLIS
@@ -123,6 +124,8 @@ data class SkyBlockTime(
             val millis = toMillis() + duration.inWholeMilliseconds
             return fromInstant(Instant.ofEpochMilli(millis))
         }
+
+        fun isDay(): Boolean = Minecraft.getMinecraft().theWorld.worldTime % 24000 in 1..12000
     }
 }
 
