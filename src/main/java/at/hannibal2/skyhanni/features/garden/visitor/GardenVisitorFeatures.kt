@@ -591,7 +591,7 @@ object GardenVisitorFeatures {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
-                NPCVisitorFix.findNametag(visitorName.removeColor())?.let {
+                NpcVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }

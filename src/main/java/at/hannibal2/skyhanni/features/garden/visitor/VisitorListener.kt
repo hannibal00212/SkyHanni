@@ -68,7 +68,7 @@ object VisitorListener {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!GardenApi.inGarden()) return
         if (!event.isWidget(TabWidget.VISITORS)) return
 
