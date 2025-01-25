@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object EssenceUtils {
-    var itemPrices = mapOf<NEUInternalName, Map<Int, EssenceUpgradePrice>>()
+    var itemPrices = mapOf<NeuInternalName, Map<Int, EssenceUpgradePrice>>()
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
@@ -26,10 +26,10 @@ object EssenceUtils {
         this.itemPrices = reformatData(unformattedData)
     }
 
-    fun NEUInternalName.getEssencePrices(): Map<Int, EssenceUpgradePrice>? = itemPrices[this]
+    fun NeuInternalName.getEssencePrices(): Map<Int, EssenceUpgradePrice>? = itemPrices[this]
 
-    private fun reformatData(unformattedData: Map<String, NeuEssenceCostJson>): MutableMap<NEUInternalName, Map<Int, EssenceUpgradePrice>> {
-        val itemPrices = mutableMapOf<NEUInternalName, Map<Int, EssenceUpgradePrice>>()
+    private fun reformatData(unformattedData: Map<String, NeuEssenceCostJson>): MutableMap<NeuInternalName, Map<Int, EssenceUpgradePrice>> {
+        val itemPrices = mutableMapOf<NeuInternalName, Map<Int, EssenceUpgradePrice>>()
         for ((name, data) in unformattedData) {
 
             val essencePrices = loadEssencePrices(data)
@@ -51,16 +51,16 @@ object EssenceUtils {
 
     private fun loadCoinAndItemPrices(
         extraItems: Map<String, List<String>>,
-    ): Pair<MutableMap<Int, Long>, MutableMap<Int, Map<NEUInternalName, Int>>> {
+    ): Pair<MutableMap<Int, Long>, MutableMap<Int, Map<NeuInternalName, Int>>> {
 
         val collectCoinPrices = mutableMapOf<Int, Long>()
-        val collectItemPrices = mutableMapOf<Int, Map<NEUInternalName, Int>>()
+        val collectItemPrices = mutableMapOf<Int, Map<NeuInternalName, Int>>()
 
         for ((tier, rawItems) in extraItems.mapKeys { it.key.toInt() }) {
-            val itemPrices = mutableMapOf<NEUInternalName, Int>()
+            val itemPrices = mutableMapOf<NeuInternalName, Int>()
 
             for ((itemName, amount) in rawItems.map { split(it) }) {
-                if (itemName == NEUInternalName.SKYBLOCK_COIN) {
+                if (itemName == NeuInternalName.SKYBLOCK_COIN) {
                     collectCoinPrices[tier] = amount
                 } else {
                     itemPrices[itemName] = amount.toInt()
@@ -72,7 +72,7 @@ object EssenceUtils {
         return Pair(collectCoinPrices, collectItemPrices)
     }
 
-    private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let {
+    private fun split(string: String): Pair<NeuInternalName, Long> = string.split(":").let {
         it[0].toInternalName() to it[1].toLong()
     }
 
@@ -100,7 +100,7 @@ object EssenceUtils {
     data class EssenceUpgradePrice(
         val essencePrice: EssencePrice,
         val coinPrice: Long?,
-        val itemPrice: Map<NEUInternalName, Int>,
+        val itemPrice: Map<NeuInternalName, Int>,
     ) {
 
         operator fun plus(other: EssenceUpgradePrice): EssenceUpgradePrice {

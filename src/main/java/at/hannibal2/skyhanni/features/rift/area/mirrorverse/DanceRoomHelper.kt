@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DanceRoomHelper {
 
     private var display = emptyList<String>()
-    private val config get() = RiftAPI.config.area.mirrorverse.danceRoomHelper
+    private val config get() = RiftApi.config.area.mirrorverse.danceRoomHelper
     private var index = 0
     private var found = false
     private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
@@ -181,7 +181,7 @@ object DanceRoomHelper {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

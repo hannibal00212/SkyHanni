@@ -4,15 +4,15 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPests
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SprayFeatures {
 
-    private val config get() = PestAPI.config.spray
+    private val config get() = PestApi.config.spray
 
     private var display: String? = null
     private var lastChangeTime = SimpleTimeMark.farPast()
@@ -73,10 +73,10 @@ object SprayFeatures {
 
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
         if (InventoryUtils.itemInHandId != SPRAYONATOR) return
-        val plot = GardenPlotAPI.getCurrentPlot() ?: return
+        val plot = GardenPlotApi.getCurrentPlot() ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
 

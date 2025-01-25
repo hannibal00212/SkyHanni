@@ -24,8 +24,8 @@ import kotlin.time.Duration.Companion.seconds
 
 object InventoryUtils {
 
-    var itemInHandId = NEUInternalName.NONE
-    var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
+    var itemInHandId = NeuInternalName.NONE
+    var recentItemsInHand = mutableMapOf<Long, NeuInternalName>()
     var latestItemInHand: ItemStack? = null
 
     fun getItemsInOpenChest(): List<Slot> {
@@ -114,7 +114,7 @@ object InventoryUtils {
         return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
-    fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0
+    fun isItemInInventory(name: NeuInternalName) = name.getAmountInInventory() > 0
 
     fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
         for ((slot, stack) in getAllItems()) {
@@ -149,7 +149,7 @@ object InventoryUtils {
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
-    fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+    fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
     fun clickSlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
         windowId ?: return
