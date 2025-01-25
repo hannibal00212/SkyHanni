@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -98,5 +98,5 @@ object CraftRoomHolographicMob {
         }
     }
 
-    private fun isEnabled() = config.enabled && RiftAPI.inRift()
+    private fun isEnabled() = config.enabled && RiftApi.inRift()
 }

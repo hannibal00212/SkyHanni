@@ -65,8 +65,8 @@ object JacobFarmingContestsInventory {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
             foundEvents.add(item.name)
-            val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
-            FarmingContestAPI.addContest(time, item)
+            val time = FarmingContestApi.getSBTimeFor(item.name) ?: continue
+            FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
             }
@@ -91,7 +91,7 @@ object JacobFarmingContestsInventory {
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
-                val (year, month, day) = FarmingContestAPI.getSbDateFromItemName(itemName) ?: return
+                val (year, month, day) = FarmingContestApi.getSBDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
             }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -349,5 +349,5 @@ object VampireSlayerFeatures {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau()
+    fun isEnabled() = RiftApi.inRift() && RiftApi.inStillgoreChateau()
 }

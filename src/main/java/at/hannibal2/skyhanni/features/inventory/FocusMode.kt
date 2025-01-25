@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -33,7 +33,7 @@ object FocusMode {
             event.itemStack.getInternalNameOrNull().let {
                 if (it == null || it == "SKYBLOCK_MENU".toInternalName()) return
             }
-            val inBazaar = BazaarAPI.inBazaarInventory && event.slot.isTopInventory()
+            val inBazaar = BazaarApi.inBazaarInventory && event.slot.isTopInventory()
             if (inBazaar) return
         }
 

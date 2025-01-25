@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -30,18 +30,18 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object ChocolateFactoryCustomReminder {
-    private val configReminder get() = ChocolateFactoryAPI.config.customReminder
-    private val configUpgradeWarnings get() = ChocolateFactoryAPI.config.chocolateUpgradeWarnings
+    private val configReminder get() = ChocolateFactoryApi.config.customReminder
+    private val configUpgradeWarnings get() = ChocolateFactoryApi.config.chocolateUpgradeWarnings
 
     private var targetGoal: Long?
-        get() = ChocolateFactoryAPI.profileStorage?.targetGoal
+        get() = ChocolateFactoryApi.profileStorage?.targetGoal
         set(value) {
-            ChocolateFactoryAPI.profileStorage?.targetGoal = value
+            ChocolateFactoryApi.profileStorage?.targetGoal = value
         }
     private var targetName: String?
-        get() = ChocolateFactoryAPI.profileStorage?.targetName
+        get() = ChocolateFactoryApi.profileStorage?.targetName
         set(value) {
-            ChocolateFactoryAPI.profileStorage?.targetName = value
+            ChocolateFactoryApi.profileStorage?.targetName = value
         }
 
     fun isActive() = targetGoal != null && configReminder.enabled
@@ -75,7 +75,7 @@ object ChocolateFactoryCustomReminder {
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         if (!isEnabled()) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (configReminder.hideChat) {
             if (chatMessagePattern.matches(event.message)) {
                 event.blockedReason = "custom_reminder"
@@ -108,8 +108,8 @@ object ChocolateFactoryCustomReminder {
     // TODO add support for prestige
     private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
         val list = item.getLore()
-        val cost = ChocolateFactoryAPI.getChocolateBuyCost(list)
-            ?: return milestoneCostLorePattern.matchAll(list) {
+        val cost = ChocolateFactoryApi.getChocolateBuyCost(list)
+            ?: return milestoneCostLorePattern.firstMatcher(list) {
                 // math needed to get from "time until current chocolate" to "time until all time chocolate"
                 val amount = group("amount").formatLong()
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
@@ -120,7 +120,7 @@ object ChocolateFactoryCustomReminder {
                 missing to "§6${amount.shortFormat()} Chocolate Milestone"
             }
 
-        val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: item.name
+        val nextLevelName = ChocolateFactoryApi.getNextLevelName(item) ?: item.name
         return cost to nextLevelName
     }
 
@@ -143,8 +143,8 @@ object ChocolateFactoryCustomReminder {
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
-    private fun inChocolateMenu() = ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||
-        ChocolateFactoryAPI.chocolateFactoryPaused
+    private fun inChocolateMenu() = ChocolateShopPrice.inInventory || ChocolateFactoryApi.inChocolateFactory ||
+        ChocolateFactoryApi.chocolateFactoryPaused
 
     private fun setReminder(target: Long, name: String) {
         if (targetName == name) {

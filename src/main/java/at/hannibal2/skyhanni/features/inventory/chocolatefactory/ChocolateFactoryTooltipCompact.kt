@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryTooltipCompact {
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
 
     private var lastClick = SimpleTimeMark.farPast()
     private var lastHover = SimpleTimeMark.farPast()
@@ -23,7 +23,7 @@ object ChocolateFactoryTooltipCompact {
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
@@ -41,7 +41,7 @@ object ChocolateFactoryTooltipCompact {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {
                 config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
@@ -68,7 +68,7 @@ object ChocolateFactoryTooltipCompact {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
 
-        if (ChocolateFactoryAPI.inChocolateFactory) {
+        if (ChocolateFactoryApi.inChocolateFactory) {
             if (event.slotId == 13) {
                 lastClick = SimpleTimeMark.now()
             }
