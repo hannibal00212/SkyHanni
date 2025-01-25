@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.client.gui.FontRenderer
@@ -39,7 +39,7 @@ private fun tryToReplaceScoreboardLineHarder(text: String): String? {
         return null
     }
     if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-        PurseAPI.piggyPattern.matchMatcher(text) {
+        PurseApi.piggyPattern.matchMatcher(text) {
             val coins = group("coins")
             return "Purse: $coins"
         }

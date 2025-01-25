@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -146,5 +146,5 @@ object DianaFixChat {
         successfulCounter = 0
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsSoopyGuess
 }

@@ -12,13 +12,13 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ChocolateFactoryKeybinds {
-    private val config get() = ChocolateFactoryAPI.config.keybinds
+    private val config get() = ChocolateFactoryApi.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!config.enabled) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
 
         val chest = event.guiContainer as? GuiChest ?: return
 
@@ -38,7 +38,7 @@ object ChocolateFactoryKeybinds {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
 
         // needed to not send duplicate clicks via keybind feature
         if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {

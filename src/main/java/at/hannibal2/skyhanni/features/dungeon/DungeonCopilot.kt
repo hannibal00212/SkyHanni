@@ -93,7 +93,7 @@ object DungeonCopilot {
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            if (DungeonAPI.getCurrentBoss() == DungeonFloor.E) {
+            if (DungeonApi.getCurrentBoss() == DungeonFloor.E) {
                 changeNextStep("")
             } else {
                 changeNextStep("Enter Boss Room")
@@ -145,7 +145,7 @@ object DungeonCopilot {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.enabled
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

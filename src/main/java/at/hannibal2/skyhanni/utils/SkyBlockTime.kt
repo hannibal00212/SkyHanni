@@ -39,7 +39,7 @@ data class SkyBlockTime(
         fun fromInstant(instant: Instant): SkyBlockTime =
             calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
 
-        fun fromSbYear(year: Int): SkyBlockTime =
+        fun fromSBYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
         fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {

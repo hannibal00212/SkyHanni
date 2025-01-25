@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionAPI.getElectionYear
+import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -93,7 +93,7 @@ object MythologicalCreatureTracker {
     fun onChat(event: SkyHanniChatEvent) {
         for (creatureType in MythologicalCreatureType.entries) {
             if (!creatureType.pattern.matches(event.message)) continue
-            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            BurrowApi.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tracker.modify {
                 it.count.addOrPut(creatureType, 1)
 
@@ -139,7 +139,7 @@ object MythologicalCreatureTracker {
             condition = { config.enabled },
             onRender = {
                 val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-                if (!DianaAPI.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
+                if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
                 if (spadeInHand) {
                     tracker.firstUpdate()
                 }

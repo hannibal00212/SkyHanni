@@ -89,5 +89,5 @@ object DungeonMilestonesDisplay {
         )
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.showMilestonesDisplay
+    private fun isEnabled() = DungeonApi.inDungeon() && config.showMilestonesDisplay
 }

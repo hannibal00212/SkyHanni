@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.HasLegacyId
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 
 enum class VisitorReward(
     rawInternalName: String,
@@ -29,7 +29,7 @@ enum class VisitorReward(
 
     companion object {
 
-        fun getByInternalName(internalName: NEUInternalName) = entries.firstOrNull { it.internalName == internalName }
+        fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.internalName == internalName }
     }
 
     override fun getLegacyId(): Int {

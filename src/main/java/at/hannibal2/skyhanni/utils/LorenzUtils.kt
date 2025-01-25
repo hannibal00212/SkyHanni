@@ -3,18 +3,18 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -56,7 +56,7 @@ object LorenzUtils {
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
-    val inKuudraFight get() = inSkyBlock && KuudraAPI.inKuudra()
+    val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
 
     val noTradeMode get() = HypixelData.noTrade
 
@@ -140,7 +140,7 @@ object LorenzUtils {
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
-        itemScale: Double = NEUItems.itemFontSize,
+        itemScale: Double = NeuItems.itemFontSize,
     ): Renderable {
         val sorted = data.sortedByDescending { it.sort }
 
@@ -309,7 +309,7 @@ object LorenzUtils {
         FMLCommonHandler.instance().handleExit(-1)
     }
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningAPI.inAdvancedMiningIsland()
+    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 
     private var lastGuiTime = SimpleTimeMark.farPast()
 
