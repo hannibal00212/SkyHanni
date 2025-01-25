@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -38,6 +39,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -51,7 +53,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -150,38 +152,38 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
-        addAsSingletonList("§7City Project Materials")
+    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList {
+        addString("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            addAsSingletonList("§cNo Materials to contribute.")
+            addString("§cNo Materials to contribute.")
             return@buildList
         }
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
             val name = internalName.itemName
-            val list = mutableListOf<Any>()
-            list.add(" §7- ")
-            list.add(stack)
+            addLine {
+                addString(" §7- ")
+                addItemStack(stack)
 
-            list.add(
-                Renderable.optionalLink(
-                    "$name §ex${amount.addSeparators()}",
-                    {
-                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
-                        } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
-                        }
-                    },
-                ) { inInventory && !NeuItems.neuHasFocus() },
-            )
+                add(
+                    Renderable.optionalLink(
+                        "$name §ex${amount.addSeparators()}",
+                        {
+                            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                                LorenzUtils.setTextIntoSign("$amount")
+                            } else {
+                                BazaarApi.searchForBazaarItem(name, amount)
+                            }
+                        },
+                    ) { inInventory && !NeuItems.neuHasFocus() },
+                )
 
-            val price = internalName.getPrice() * amount
-            val format = price.shortFormat()
-            list.add(" §7(§6$format§7)")
-            add(list)
+                val price = internalName.getPrice() * amount
+                val format = price.shortFormat()
+                addString(" §7(§6$format§7)")
+            }
         }
     }
 
