@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,7 +16,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object LivingMetalSuitProgress {
 
-    private val config get() = RiftAPI.config.area.livingCave.livingMetalSuitProgress
+    private val config get() = RiftApi.config.area.livingCave.livingMetalSuitProgress
     private var display = emptyList<List<Any>>()
     private var progressMap = mapOf<ItemStack, Double?>()
 
@@ -99,5 +99,5 @@ object LivingMetalSuitProgress {
         return progressBar.toString()
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 }

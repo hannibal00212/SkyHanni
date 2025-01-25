@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getHitmanTimeToAll
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getOpenSlots
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanAPI.getTimeToFull
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getHitmanTimeToAll
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getOpenSlots
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.getTimeToFull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -27,20 +27,20 @@ import kotlin.time.Duration
 @SkyHanniModule
 object ChocolateFactoryStats {
 
-    private val config get() = ChocolateFactoryAPI.config
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
+    private val config get() = ChocolateFactoryApi.config
+    private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
+        if (!ChocolateFactoryApi.chocolateFactoryPaused) return
         updateDisplay()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
+        if (!ChocolateFactoryApi.inChocolateFactory && !ChocolateFactoryApi.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
 
         display?.let {
@@ -52,9 +52,9 @@ object ChocolateFactoryStats {
         val profileStorage = profileStorage ?: return
 
         val map = buildMap {
-            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
+            put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryApi.currentPrestige.toRoman()}")
 
-            val maxSuffix = if (ChocolateFactoryAPI.isMax()) " §cMax!" else ""
+            val maxSuffix = if (ChocolateFactoryApi.isMax()) " §cMax!" else ""
             put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}$maxSuffix")
             put(ChocolateFactoryStat.THIS_PRESTIGE, "§eThis Prestige: §6${ChocolateAmount.PRESTIGE.formatted}")
             put(ChocolateFactoryStat.ALL_TIME, "§eAll-time: §6${ChocolateAmount.ALL_TIME.formatted}")
@@ -95,9 +95,9 @@ object ChocolateFactoryStats {
     }
 
     private fun MutableMap<ChocolateFactoryStat, String>.addLeaderboard() {
-        val position = ChocolateFactoryAPI.leaderboardPosition
+        val position = ChocolateFactoryApi.leaderboardPosition
         val positionText = position?.addSeparators() ?: "???"
-        val percentile = ChocolateFactoryAPI.leaderboardPercentile
+        val percentile = ChocolateFactoryApi.leaderboardPercentile
         val percentileText = percentile?.let { "§7Top §a$it%" }.orEmpty()
         val leaderboard = "#$positionText $percentileText"
         ChocolatePositionChange.update(position, leaderboard)
@@ -131,7 +131,7 @@ object ChocolateFactoryStats {
         put(ChocolateFactoryStat.HITMAN_SLOT_COOLDOWN, "§eHitman Slot Cooldown: §b$hitmanSingleSlotCd")
         put(ChocolateFactoryStat.HITMAN_ALL_SLOTS, "§eAll Hitman Slots Cooldown: §b$hitmanAllSlotsCd")
 
-        if (HoppityAPI.isHoppityEvent()) {
+        if (HoppityApi.isHoppityEvent()) {
             put(ChocolateFactoryStat.HITMAN_FULL_SLOTS, "§eFull Hitman Slots: §b$hitmanSlotsFull")
             put(ChocolateFactoryStat.HITMAN_28_SLOTS, "§e$purchasedSlots Hitman Claims: $hitmanAllClaimReady")
         }
@@ -139,12 +139,12 @@ object ChocolateFactoryStats {
 
     private fun MutableMap<ChocolateFactoryStat, String>.addPrestige() {
         val allTime = ChocolateAmount.ALL_TIME.chocolate()
-        val nextChocolateMilestone = ChocolateFactoryAPI.getNextMilestoneChocolate(allTime)
+        val nextChocolateMilestone = ChocolateFactoryApi.getNextMilestoneChocolate(allTime)
         val amountUntilNextMilestone = nextChocolateMilestone - allTime
         val amountFormat = amountUntilNextMilestone.addSeparators()
         val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(nextChocolateMilestone)
-        val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryAPI.chocolateForPrestige)
-        val chocolateUntilPrestigeCalculation = ChocolateFactoryAPI.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
+        val prestigeEstimate = ChocolateAmount.PRESTIGE.formattedTimeUntilGoal(ChocolateFactoryApi.chocolateForPrestige)
+        val chocolateUntilPrestigeCalculation = ChocolateFactoryApi.chocolateForPrestige - ChocolateAmount.PRESTIGE.chocolate()
 
         var chocolateUntilPrestige = "§6${chocolateUntilPrestigeCalculation.addSeparators()}"
 
@@ -152,7 +152,7 @@ object ChocolateFactoryStats {
             chocolateUntilPrestige = "§aPrestige Available"
         }
         val prestigeData = when {
-            !ChocolateFactoryAPI.isMaxPrestige() -> mapOf(
+            !ChocolateFactoryApi.isMaxPrestige() -> mapOf(
                 ChocolateFactoryStat.TIME_TO_PRESTIGE to "§eTime To Prestige: $prestigeEstimate",
                 ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE to "§eChocolate To Prestige: §6$chocolateUntilPrestige",
             )
@@ -200,7 +200,7 @@ object ChocolateFactoryStats {
     )
 
     private fun MutableMap<ChocolateFactoryStat, String>.addProduction() {
-        val perSecond = ChocolateFactoryAPI.chocolatePerSecond
+        val perSecond = ChocolateFactoryApi.chocolatePerSecond
         val perMinute = perSecond * 60
         val perHour = perMinute * 60
         val perDay = perHour * 24
@@ -229,7 +229,7 @@ object ChocolateFactoryStats {
     enum class ChocolateFactoryStat(private val display: String, val shouldDisplay: () -> Boolean = { true }) {
         HEADER("§6§lChocolate Factory Stats"),
         CURRENT("§eCurrent Chocolate: §65,272,230"),
-        THIS_PRESTIGE("§eThis Prestige: §6483,023,853", { ChocolateFactoryAPI.currentPrestige != 1 }),
+        THIS_PRESTIGE("§eThis Prestige: §6483,023,853", { ChocolateFactoryApi.currentPrestige != 1 }),
         ALL_TIME("§eAll-time: §6641,119,115"),
         PER_SECOND("§ePer Second: §63,780.72"),
         PER_MINUTE("§ePer Minute: §6226,843.2"),
@@ -253,7 +253,7 @@ object ChocolateFactoryStats {
         CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851"),
         TIME_TO_BEST_UPGRADE(
             "§eBest Upgrade: §b 59m 4s",
-            { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
+            { ChocolateFactoryApi.profileStorage?.bestUpgradeCost != 0L },
         ),
         HITMAN_HEADER("§c§lRabbit Hitman"),
         AVAILABLE_HITMAN_EGGS("§eAvailable Hitman Eggs: §63"),

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -55,7 +55,7 @@ object AuctionHouseCopyUnderbidPrice {
         val item = event.inventoryItems[13] ?: return
 
         val internalName = item.getInternalName()
-        if (internalName == NEUInternalName.NONE) return
+        if (internalName == NeuInternalName.NONE) return
 
         val price = internalName.getPrice().toLong()
         if (price <= 0) {

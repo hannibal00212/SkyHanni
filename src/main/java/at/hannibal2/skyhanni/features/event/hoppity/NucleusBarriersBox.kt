@@ -82,5 +82,5 @@ object NucleusBarriersBox {
     }
 
     private fun isEnabled() =
-        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityAPI.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
+        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
 }

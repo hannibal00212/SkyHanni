@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -85,7 +85,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NEUItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> string(any)
@@ -266,7 +266,7 @@ interface Renderable {
 
             val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
-            val neuFocus = NEUItems.neuHasFocus()
+            val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
             val isInSkytilsSettings =
                 openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
@@ -376,7 +376,7 @@ interface Renderable {
 
         fun itemStackWithTip(
             item: ItemStack,
-            scale: Double = NEUItems.itemFontSize,
+            scale: Double = NeuItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
             rescaleSkulls: Boolean = true,
@@ -398,7 +398,7 @@ interface Renderable {
 
         fun itemStack(
             item: ItemStack,
-            scale: Double = NEUItems.itemFontSize,
+            scale: Double = NeuItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
