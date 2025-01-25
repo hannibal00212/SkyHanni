@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
@@ -24,9 +23,8 @@ object HideArmor {
     private val config get() = SkyHanniMod.feature.misc.hideArmor2
     private var armor = mapOf<Int, ItemStack>()
 
-    private fun shouldHideArmor(entity: EntityLivingBase): Boolean {
+    private fun shouldHideArmor(entity: EntityPlayer): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
-        if (entity !is EntityPlayer) return false
         if (entity is FakePlayer) return false
         if (entity.hasPotionEffect(EffectsCompat.INVISIBILITY)) return false
         if (entity.isNPC()) return false
@@ -42,7 +40,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+    fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return
@@ -60,7 +58,7 @@ object HideArmor {
     }
 
     @HandleEvent
-    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+    fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
         val armorInventory = entity.getArmorInventory() ?: return

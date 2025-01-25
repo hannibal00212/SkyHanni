@@ -164,7 +164,6 @@
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "bestiarystack", "§7Progress to Tier (?&lt;tier&gt;[\\dIVXC]+): §b[\\d.]+%", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "bingogoalrank", "(?:§.)*You were the (?:§.)*(?&lt;rank&gt;\\w+)(?&lt;ordinal&gt;st|nd|rd|th) (?:§.)*to", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "harvest", "§7§7You may harvest §6(?&lt;amount&gt;.).*", )</ID>
-    <ID>RepoPatternRegexTestMissing:ItemPickupLog.kt$ItemPickupLog$by patternGroup.pattern( "shoppattern", "^(?&lt;itemName&gt;.+?)(?: x\\d+)?\$", )</ID>
     <ID>RepoPatternRegexTestMissing:JacobFarmingContestsInventory.kt$JacobFarmingContestsInventory$by RepoPattern.pattern( "garden.jacob.contests.inventory.medal", "§7§7You placed in the (?&lt;medal&gt;.*) §7bracket!" )</ID>
     <ID>RepoPatternRegexTestMissing:KloonHacking.kt$KloonHacking$by RepoPattern.pattern( "rift.area.westvillage.kloon.color", "You've set the color of this terminal to (?&lt;color&gt;.*)!" )</ID>
     <ID>RepoPatternRegexTestMissing:KuudraApi.kt$KuudraApi$by patternGroup.pattern( "chat.complete", "§.\\s*(?:§.)*KUUDRA DOWN!", )</ID>
