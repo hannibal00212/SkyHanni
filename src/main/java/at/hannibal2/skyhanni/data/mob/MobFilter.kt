@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -238,7 +238,7 @@ object MobFilter {
         MobFactories.summon(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.slayer(baseEntity, armorStand, extraEntityList)
             ?: MobFactories.boss(baseEntity, armorStand, extraEntityList)
-            ?: if (DungeonAPI.inDungeon()) MobFactories.dungeon(
+            ?: if (DungeonApi.inDungeon()) MobFactories.dungeon(
                 baseEntity,
                 armorStand,
                 extraEntityList,
@@ -323,7 +323,7 @@ object MobFilter {
         baseEntity: EntityLivingBase,
         extraEntityList: List<EntityLivingBase>,
     ): MobResult? =
-        if (DungeonAPI.inDungeon()) {
+        if (DungeonApi.inDungeon()) {
             when {
                 (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) &&
                     extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
@@ -374,7 +374,7 @@ object MobFilter {
             MobFactories.basic(
                 baseEntity,
                 when {
-                    DungeonAPI.inDungeon() -> "Dungeon Secret Bat"
+                    DungeonApi.inDungeon() -> "Dungeon Secret Bat"
                     IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
                     else -> "Mega Bat"
                 },

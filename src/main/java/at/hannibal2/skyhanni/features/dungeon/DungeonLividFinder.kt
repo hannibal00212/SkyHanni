@@ -137,7 +137,7 @@ object DungeonLividFinder {
 
     @HandleEvent
     fun onBossStart(event: DungeonBossRoomEnterEvent) {
-        if (DungeonAPI.getCurrentBoss() != DungeonFloor.F5) return
+        if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
         color = LorenzColor.RED
     }
 
@@ -198,7 +198,7 @@ object DungeonLividFinder {
         }
     }
 
-    private fun inLividBossRoom() = DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F5
+    private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -207,8 +207,8 @@ object DungeonLividFinder {
         if (!inLividBossRoom()) {
             event.addIrrelevant {
                 add("Not in Livid Boss")
-                add("currentBoss: ${DungeonAPI.getCurrentBoss()}")
-                add("inBossRoom: ${DungeonAPI.inBossRoom}")
+                add("currentBoss: ${DungeonApi.getCurrentBoss()}")
+                add("inBossRoom: ${DungeonApi.inBossRoom}")
             }
             return
         }

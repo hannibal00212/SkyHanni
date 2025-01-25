@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -45,7 +45,7 @@ object GardenCropMilestoneDisplay {
     private var progressDisplay = emptyList<Renderable>()
     private var mushroomCowPerkDisplay = emptyList<Renderable>()
     private val cultivatingData = mutableMapOf<CropType, Long>()
-    private val config get() = GardenAPI.config.cropMilestones
+    private val config get() = GardenApi.config.cropMilestones
     private val overflowConfig get() = config.overflow
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
 
@@ -72,7 +72,7 @@ object GardenCropMilestoneDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
+        if (GardenApi.hideExtraGuis()) return
 
         config.progressDisplayPos.renderRenderables(
             progressDisplay, posLabel = "Crop Milestone Progress",
@@ -107,11 +107,11 @@ object GardenCropMilestoneDisplay {
 
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
 
         try {
             val item = event.itemStack
-            val counter = GardenAPI.readCounter(item) ?: return
+            val counter = GardenApi.readCounter(item) ?: return
             val crop = item.getCropType() ?: return
             if (cultivatingData.containsKey(crop)) {
                 val old = cultivatingData[crop]!!
@@ -130,7 +130,7 @@ object GardenCropMilestoneDisplay {
         progressDisplay = emptyList()
         mushroomCowPerkDisplay = emptyList()
         GardenBestCropTime.display = null
-        val currentCrop = GardenAPI.getCurrentlyFarmedCrop()
+        val currentCrop = GardenApi.getCurrentlyFarmedCrop()
         currentCrop?.let {
             progressDisplay = drawProgressDisplay(it)
         }
@@ -201,8 +201,8 @@ object GardenCropMilestoneDisplay {
 
                 val speedText = "§7In §b$duration"
                 lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
-                GardenAPI.itemInHand?.let {
-                    if (GardenAPI.readCounter(it) == null) {
+                GardenApi.itemInHand?.let {
+                    if (GardenApi.readCounter(it) == null) {
                         lineMap[MilestoneTextEntry.TIME] = Renderable.string("$speedText §7Inaccurate!")
                     }
                 }
@@ -237,7 +237,7 @@ object GardenCropMilestoneDisplay {
             }
         }
 
-        if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
+        if (GardenApi.mushroomCowPet && crop != CropType.MUSHROOM) {
             addMushroomCowData()
         }
 
@@ -309,7 +309,7 @@ object GardenCropMilestoneDisplay {
 
         val speed = GardenCropSpeed.averageBlocksPerSecond
         if (speed != 0.0) {
-            val blocksPerSecond = speed * (GardenAPI.getCurrentlyFarmedCrop()?.multiplier ?: 1)
+            val blocksPerSecond = speed * (GardenApi.getCurrentlyFarmedCrop()?.multiplier ?: 1)
 
             val missingTime = (missing / blocksPerSecond).seconds
             // TODO, change functionality to use enum rather than ordinals
@@ -330,7 +330,7 @@ object GardenCropMilestoneDisplay {
         mushroomCowPerkDisplay = config.mushroomPetPerk.text.mapNotNull { lineMap[it] }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.progress
+    private fun isEnabled() = GardenApi.inGarden() && config.progress
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

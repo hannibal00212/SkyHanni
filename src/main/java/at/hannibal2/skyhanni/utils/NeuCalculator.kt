@@ -1,0 +1,13 @@
+package at.hannibal2.skyhanni.utils
+
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import io.github.moulberry.notenoughupdates.util.Calculator
+import java.math.BigDecimal
+
+object NeuCalculator {
+
+    fun calculateOrNull(input: String): BigDecimal? {
+        if (!PlatformUtils.isNeuLoaded()) return null
+        return runCatching { Calculator.calculate(input) }.getOrNull()
+    }
+}

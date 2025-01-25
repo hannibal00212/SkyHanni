@@ -13,14 +13,14 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
 @SkyHanniModule
 object PowerStoneGuideFeatures {
 
-    private val missing = mutableMapOf<Int, NEUInternalName>()
+    private val missing = mutableMapOf<Int, NeuInternalName>()
     private var inInventory = false
 
     @HandleEvent
@@ -34,7 +34,7 @@ object PowerStoneGuideFeatures {
             val lore = item.getLore()
             if (lore.contains("§7Learned: §cNot Yet ✖")) {
                 val rawName = lore.nextAfter("§7Power stone:") ?: continue
-                val name = NEUInternalName.fromItemName(rawName)
+                val name = NeuInternalName.fromItemName(rawName)
                 missing[slot] = name
             }
         }

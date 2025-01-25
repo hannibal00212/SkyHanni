@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -75,7 +75,7 @@ object MaxPurseItems {
             getPrices()
         }
 
-        val currentPurse = PurseAPI.getPurse()
+        val currentPurse = PurseApi.getPurse()
         val buyOrders = buyOrderPrice?.let {
             (currentPurse / it).toInt()
         } ?: 0

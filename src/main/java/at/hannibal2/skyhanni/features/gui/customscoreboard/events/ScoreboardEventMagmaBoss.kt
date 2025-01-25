@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 // scoreboard update event
 object ScoreboardEventMagmaBoss : ScoreboardEvent() {
 
-    override fun getDisplay() = elementPatterns.allMatches(getSbLines())
+    override fun getDisplay() = elementPatterns.allMatches(getSBLines())
 
     override fun showWhen() = ScoreboardPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 

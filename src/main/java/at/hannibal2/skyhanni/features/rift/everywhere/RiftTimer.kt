@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object RiftTimer {
 
-    private val config get() = RiftAPI.config.timer
+    private val config get() = RiftApi.config.timer
 
     private val patternGroup = RepoPattern.group("rift.everywhere")
 
@@ -55,7 +55,7 @@ object RiftTimer {
     @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
-        if (!isEnabled() || RiftAPI.inRiftRace) return
+        if (!isEnabled() || RiftApi.inRiftRace) return
 
         val newTime = TimeUtils.getDuration(event.updated.value.replace("m", "m "))
         if (newTime > maxTime) {
@@ -69,7 +69,7 @@ object RiftTimer {
     // (hypixel hides the action bar during the race)
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled() || !RiftAPI.inRiftRace) return
+        if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
         val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
         currentTime = newTime
@@ -127,19 +127,19 @@ object RiftTimer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (RiftAPI.inMirrorVerse) return
+        if (RiftApi.inMirrorVerse) return
 
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
     @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
-        if (!RiftAPI.inRift() || !config.nametag) return
+        if (!RiftApi.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {
             group("time")?.toIntOrNull()
         } ?: return
         event.text = "${time.seconds.format()} §aф"
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
+    fun isEnabled() = RiftApi.inRift() && config.enabled
 }
