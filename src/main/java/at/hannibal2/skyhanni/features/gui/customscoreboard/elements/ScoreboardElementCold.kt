@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 
@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 // update with cold update event
 object ScoreboardElementCold : ScoreboardElement() {
     override fun getDisplay(): String? {
-        val cold = -MiningAPI.cold
+        val cold = -MiningApi.cold
 
         return when {
             informationFilteringConfig.hideEmptyLines && cold == 0 -> null
@@ -19,9 +19,9 @@ object ScoreboardElementCold : ScoreboardElement() {
 
     override val configLine = "Cold: §b0❄"
 
-    override val elementPatterns = listOf(MiningAPI.coldPattern)
+    override val elementPatterns = listOf(MiningApi.coldPattern)
 
-    override fun showIsland() = MiningAPI.inColdIsland()
+    override fun showIsland() = MiningApi.inColdIsland()
 }
 
 // click: warp basecamp

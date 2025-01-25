@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
@@ -22,7 +22,7 @@ object ChatPeek {
         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) return false
         if (Minecraft.getMinecraft().currentScreen is GuiScreenElementWrapper) return false
 
-        if (NEUItems.neuHasFocus()) return false
+        if (NeuItems.neuHasFocus()) return false
         if (GuiEditManager.isInGui() || FFGuideGUI.isInGui() || VisualWordGui.isInGui()) return false
 
         return key.isKeyHeld()

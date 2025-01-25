@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -47,7 +47,7 @@ object EstimatedItemValue {
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
@@ -59,7 +59,7 @@ object EstimatedItemValue {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent

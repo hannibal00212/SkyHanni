@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventDungeons : ScoreboardEvent() {
 
-    override fun getDisplay() = elementPatterns.allMatches(getSbLines()).map { it.removePrefix("§r") }
+    override fun getDisplay() = elementPatterns.allMatches(getSBLines()).map { it.removePrefix("§r") }
 
     override val configLine = "§7(All Dungeons Lines)"
 
@@ -25,5 +25,5 @@ object ScoreboardEventDungeons : ScoreboardEvent() {
         ScoreboardPattern.floor3GuardiansPattern,
     )
 
-    override fun showIsland() = DungeonAPI.inDungeon()
+    override fun showIsland() = DungeonApi.inDungeon()
 }

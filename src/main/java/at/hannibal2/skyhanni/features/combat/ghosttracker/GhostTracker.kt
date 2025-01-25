@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -26,8 +25,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -60,7 +59,7 @@ object GhostTracker {
         }
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
-    private var allowedDrops = setOf<NEUInternalName>()
+    private var allowedDrops = setOf<NeuInternalName>()
 
     // TODO: in the future get from neu bestiary data
     private const val MAX_BESTIARY_KILLS = 100_000
@@ -95,6 +94,7 @@ object GhostTracker {
         @Expose
         var maxKillCombo = 0L
 
+        // TODO rename to combatXPGained
         @Expose
         var combatXpGained = 0L
 
@@ -219,7 +219,7 @@ object GhostTracker {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         itemDropPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
             if (!isAllowedItem(internalName)) return
 
@@ -282,11 +282,8 @@ object GhostTracker {
         parseBestiaryWidget(event.lines)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(config.position) { isEnabled() }
     }
 
     @HandleEvent
@@ -307,7 +304,7 @@ object GhostTracker {
         }
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
+    private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     private fun getAverageMagicFind(mf: Long, kills: Long) =
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenOptimalSpeed {
 
-    private val config get() = GardenAPI.config.optimalSpeeds
+    private val config get() = GardenApi.config.optimalSpeeds
 
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingSince = SimpleTimeMark.farFuture()
@@ -64,7 +64,7 @@ object GardenOptimalSpeed {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
 
         if (sneaking && !sneakingSince.isInPast()) {
@@ -160,11 +160,11 @@ object GardenOptimalSpeed {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
 
         val speed = optimalSpeed ?: return
 
-        if (GardenAPI.hideExtraGuis()) return
+        if (GardenApi.hideExtraGuis()) return
 
         var text = "Optimal Speed: §f$speed"
         if (speed != currentSpeed) {
@@ -184,9 +184,9 @@ object GardenOptimalSpeed {
 
     private fun warn(optimalSpeed: Int) {
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
-        if (GardenAPI.onBarnPlot) return
+        if (GardenApi.onBarnPlot) return
         if (!config.warning) return
-        if (!GardenAPI.isCurrentlyFarming()) return
+        if (!GardenApi.isCurrentlyFarming()) return
         if (lastWarnTime.passedSince() < 20.seconds) return
         val ranchersEquipped = InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots
         if (!ranchersEquipped && config.onlyWarnRanchers) return
@@ -215,7 +215,7 @@ object GardenOptimalSpeed {
         }
     }
 
-    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
+    private fun isRancherOverlayEnabled() = GardenApi.inGarden() && config.signEnabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

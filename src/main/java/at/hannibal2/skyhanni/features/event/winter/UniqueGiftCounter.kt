@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.winter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.WinterAPI
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -74,6 +74,6 @@ object UniqueGiftCounter {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterAPI.isDecember() &&
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterApi.isDecember() &&
         InventoryUtils.itemInHandId.endsWith("_GIFT")
 }

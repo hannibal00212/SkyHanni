@@ -214,7 +214,7 @@ object DungeonChatFilter {
             message.isFiltered(MessageTypes.START) -> return "start"
         }
 
-        if (!DungeonAPI.inDungeon()) return ""
+        if (!DungeonApi.inDungeon()) return ""
 
         return when {
             message.isFiltered(MessageTypes.AMBIENCE) -> "ambience"

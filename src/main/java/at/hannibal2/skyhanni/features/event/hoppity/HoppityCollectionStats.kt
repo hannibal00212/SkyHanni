@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -36,8 +36,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -61,8 +61,8 @@ private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companio
 
 @SkyHanniModule
 object HoppityCollectionStats {
-    private val collectionConfig get() = ChocolateFactoryAPI.config.hoppityCollectionStats
-    private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
+    private val collectionConfig get() = ChocolateFactoryApi.config.hoppityCollectionStats
+    private val patternGroup = ChocolateFactoryApi.patternGroup.group("collection")
 
     // <editor-fold desc="Patterns">
     /**
@@ -318,7 +318,7 @@ object HoppityCollectionStats {
         }
 
         event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
-            val rarity = HoppityAPI.rarityByRabbit(stack.displayName)
+            val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
             val newItemStack = if (collectionConfig.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
@@ -372,7 +372,7 @@ object HoppityCollectionStats {
         }
 
         replaceIndex?.let {
-            ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
+            ChocolateFactoryApi.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
                 val operationFormat = when (milestoneType) {
                     HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
@@ -490,7 +490,7 @@ object HoppityCollectionStats {
     }
 
     private fun addHotspotRabbitsInformationToHud(newList: MutableList<Renderable>) {
-        if (!collectionConfig.showHotspotSummary || !HoppityAPI.isHoppityEvent()) return
+        if (!collectionConfig.showHotspotSummary || !HoppityApi.isHoppityEvent()) return
         val hotspotRabbitData = hotspotRabbitData ?: return
 
         val totalHotspotCount = hotspotRabbitData.hotspotRabbits.values.sumOf { it.size }
@@ -811,7 +811,7 @@ object HoppityCollectionStats {
 
     enum class RabbitCollectionRarity(
         val displayName: String,
-        val item: NEUInternalName,
+        val item: NeuInternalName,
     ) {
         COMMON("§fCommon", "STAINED_GLASS".toInternalName()),
         UNCOMMON("§aUncommon", "STAINED_GLASS-5".toInternalName()),
