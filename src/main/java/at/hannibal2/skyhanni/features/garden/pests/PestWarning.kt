@@ -82,10 +82,8 @@ object PestWarning {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
         if (event.inventoryName == "Your Equipment and Stats") {
             equipmentPestCooldown = checkEquipment(event.inventoryItems)
         }
