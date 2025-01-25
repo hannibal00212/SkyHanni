@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
@@ -24,11 +24,11 @@ object ScoreboardEventRift : ScoreboardEvent() {
         ScoreboardPattern.bigDamagePattern,
     )
 
-    override fun getDisplay() = importantPatterns.allMatches(getSbLines())
+    override fun getDisplay() = importantPatterns.allMatches(getSBLines())
 
     override val configLine = "§7(All Rift Lines)"
 
     override val elementPatterns = importantPatterns + listOf(ScoreboardPattern.riftDimensionPattern)
 
-    override fun showIsland() = RiftAPI.inRift()
+    override fun showIsland() = RiftApi.inRift()
 }

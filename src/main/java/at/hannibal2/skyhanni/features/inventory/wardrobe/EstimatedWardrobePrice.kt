@@ -17,11 +17,11 @@ object EstimatedWardrobePrice {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
-        val slot = WardrobeAPI.slots.firstOrNull {
+        val slot = WardrobeApi.slots.firstOrNull {
             event.slot.slotNumber == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 
-        val lore = WardrobeAPI.createPriceLore(slot)
+        val lore = WardrobeApi.createPriceLore(slot)
         if (lore.isEmpty()) return
 
         val tooltip = event.toolTip
@@ -41,7 +41,7 @@ object EstimatedWardrobePrice {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.armor && WardrobeAPI.inWardrobe() && !WardrobeAPI.inCustomWardrobe
+        LorenzUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() && !WardrobeApi.inCustomWardrobe
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ChatMessageStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CollectionStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CraftStep
@@ -217,7 +217,7 @@ object BingoNextStepHelper {
                 }
             }
             if (step is CollectionStep) {
-                val counter = CollectionAPI.getCollectionCounter(step.internalName) ?: 0
+                val counter = CollectionApi.getCollectionCounter(step.internalName) ?: 0
                 if (step.amountHaving != counter) {
                     step.amountHaving = counter
                     if (counter >= step.amountNeeded) {
@@ -248,7 +248,7 @@ object BingoNextStepHelper {
     }
 
     private fun update() {
-        val personalGoals = BingoAPI.personalGoals.filter { !it.done }
+        val personalGoals = BingoApi.personalGoals.filter { !it.done }
         if (personalGoals.isEmpty()) {
             if (!dirty) {
                 reset()

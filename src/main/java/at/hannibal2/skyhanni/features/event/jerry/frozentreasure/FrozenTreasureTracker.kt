@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.event.winter.FrozenTreasureConfig.F
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -168,13 +167,16 @@ object FrozenTreasureTracker {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.enabled) return
-        if (!onJerryWorkshop()) return
-        if (config.onlyInCave && !inGlacialCave()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
+        if (!onJerryWorkshop()) return false
+        if (config.onlyInCave && !inGlacialCave()) return false
+
+        return true
     }
 
     @HandleEvent

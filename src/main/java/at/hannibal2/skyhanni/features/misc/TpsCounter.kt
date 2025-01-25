@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -122,7 +122,7 @@ object TpsCounter {
 
     private fun isEnabled() = LorenzUtils.onHypixel &&
         config.tpsDisplay &&
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
+        (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

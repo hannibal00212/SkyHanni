@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningAPI.inCrystalHollows
-import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
-import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
+import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
+import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
+import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
