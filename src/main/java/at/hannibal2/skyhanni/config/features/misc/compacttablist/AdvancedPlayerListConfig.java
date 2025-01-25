@@ -21,17 +21,17 @@ public class AdvancedPlayerListConfig {
         SOCIAL_STATUS("Party/Friends/Guild", 4),
         RANDOM("Random", 5);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        PlayerSortEntry(String str, int legacyId) {
-            this.str = str;
+        PlayerSortEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PlayerSortEntry(String str) {
-            this(str, -1);
+        PlayerSortEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -41,7 +41,7 @@ public class AdvancedPlayerListConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

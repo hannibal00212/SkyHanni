@@ -3,11 +3,10 @@ package at.hannibal2.skyhanni.data
 //#if MC < 1.12
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.boss.BossStatus
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 //#else
 //$$ import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -28,8 +27,8 @@ object BossbarData {
     }
 
     //#if MC < 1.12
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val bossbarLine = BossStatus.bossName ?: return
         //#else
         //$$ @SubscribeEvent
