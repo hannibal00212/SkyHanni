@@ -136,7 +136,7 @@ object NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
         }
 
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.") {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }

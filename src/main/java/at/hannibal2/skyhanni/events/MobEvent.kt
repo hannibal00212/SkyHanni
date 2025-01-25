@@ -9,7 +9,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class SkyblockMob(mob: Mob) : Spawn(mob)
         class Summon(mob: Mob) : Spawn(mob)
         class Player(mob: Mob) : Spawn(mob)
-        class DisplayNPC(mob: Mob) : Spawn(mob)
+        class DisplayNpc(mob: Mob) : Spawn(mob)
         class Special(mob: Mob) : Spawn(mob)
         class Projectile(mob: Mob) : Spawn(mob)
     }
@@ -18,7 +18,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class SkyblockMob(mob: Mob) : DeSpawn(mob)
         class Summon(mob: Mob) : DeSpawn(mob)
         class Player(mob: Mob) : DeSpawn(mob)
-        class DisplayNPC(mob: Mob) : DeSpawn(mob)
+        class DisplayNpc(mob: Mob) : DeSpawn(mob)
         class Special(mob: Mob) : DeSpawn(mob)
         class Projectile(mob: Mob) : DeSpawn(mob)
     }
@@ -27,7 +27,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class SkyblockMob(mob: Mob) : FirstSeen(mob)
         class Summon(mob: Mob) : FirstSeen(mob)
         class Player(mob: Mob) : FirstSeen(mob)
-        class DisplayNPC(mob: Mob) : FirstSeen(mob)
+        class DisplayNpc(mob: Mob) : FirstSeen(mob)
         class Special(mob: Mob) : FirstSeen(mob)
         class Projectile(mob: Mob) : FirstSeen(mob)
     }
@@ -36,7 +36,7 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class SkyblockMob(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Summon(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Player(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
-        class DisplayNPC(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
+        class DisplayNpc(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Special(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Projectile(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
     }

@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
 
@@ -29,16 +28,15 @@ object HoppityEggDisplayManager {
 
     var display = listOf<Renderable>()
 
-    private fun canChangeOpacity(entity: EntityLivingBase): Boolean {
+    private fun canChangeOpacity(entity: EntityPlayer): Boolean {
         if (!HoppityEggLocator.isEnabled()) return false
-        if (entity !is EntityPlayer) return false
         if (entity == LorenzUtils.getPlayer()) return false
         if (!entity.isRealPlayer()) return false
         return config.playerOpacity < 100
     }
 
     @HandleEvent
-    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
 
         shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { event.entity.distanceTo(it) < 4.0 }
@@ -53,7 +51,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
 
         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -61,7 +59,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
+    fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
         if (!shouldHidePlayer) return
         event.cancel()

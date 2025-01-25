@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.MineshaftPityDisplay
 import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -48,6 +49,11 @@ public class MiningConfig {
     @ConfigOption(name = "Area Walls", desc = "")
     @Accordion
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
+
+    @Expose
+    @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
+    @Accordion
+    public CrystalNucleusTrackerConfig crystalNucleusTracker = new CrystalNucleusTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")

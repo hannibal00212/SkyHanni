@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,7 +17,6 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
@@ -59,8 +58,8 @@ object GardenCustomKeybinds {
         cir.returnValue = override.isKeyClicked()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         val screen = Minecraft.getMinecraft().currentScreen ?: return
         if (screen !is GuiEditSign) return

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,8 +55,8 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!MiningApi.inCustomMiningIsland()) return
 
         attemptClearDisplay()
