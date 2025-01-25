@@ -188,7 +188,6 @@ enum class HotmData(
         },
     ),
 
-
     // Static
 
     SKY_MALL("Sky Mall", 1, { null }, { emptyMap() }),
@@ -568,7 +567,7 @@ enum class HotmData(
                 it.isUnlocked = false
                 availableTokens = tokens
             }
-            HotmAPI.PowderType.entries.forEach(HotmAPI.PowderType::resetTree)
+            HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
         }
 
         private fun Slot.parse() {
