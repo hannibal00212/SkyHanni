@@ -24,7 +24,7 @@ object DungeonSecretChime {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonApi.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         when (event.blockType) {
             ClickedBlockType.CHEST,
@@ -80,7 +80,7 @@ object DungeonSecretChime {
         dungeonSecretItems = data.dungeonSecretItems
     }
 
-    fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
 
     @JvmStatic
     fun playSound() {

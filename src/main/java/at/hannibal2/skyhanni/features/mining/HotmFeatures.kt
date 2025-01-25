@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HotmFeatures {
@@ -18,8 +17,8 @@ object HotmFeatures {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
 
-    @SubscribeEvent
-    fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!config.highlightEnabledPerks) return
         HotmData.entries.forEach { entry ->

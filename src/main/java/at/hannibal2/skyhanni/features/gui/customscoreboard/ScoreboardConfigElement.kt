@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementProfile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementQuiver
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSkyBlockXP
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSlayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSoulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTime
@@ -64,6 +65,7 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     SLAYER(ScoreboardElementSlayer),
     QUIVER(ScoreboardElementQuiver),
     POWDER(ScoreboardElementPowder),
+    SKYBLOCK_XP(ScoreboardElementSkyBlockXP),
     EVENTS(ScoreboardElementEvents),
     MAYOR(ScoreboardElementMayor),
     PARTY(ScoreboardElementParty),
@@ -84,31 +86,34 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     override fun toString() = element.configLine
 
     companion object {
+        fun getElements() = entries.map { it.element }
+
         @JvmField
         val defaultOptions = listOf(
             TITLE,
+            LOBBY_CODE,
+            EMPTY_LINE,
+            DATE,
+            TIME,
+            ISLAND,
+            PLAYER_AMOUNT,
+            LOCATION,
+            VISITING,
             PROFILE,
+            EMPTY_LINE2,
             PURSE,
-            BANK,
             MOTES,
+            BANK,
             BITS,
             COPPER,
             GEMS,
-            NORTH_STARS,
             HEAT,
             COLD,
-            EMPTY_LINE,
-            ISLAND,
-            LOCATION,
-            LOBBY_CODE,
-            PLAYER_AMOUNT,
-            VISITING,
-            EMPTY_LINE2,
-            DATE,
-            TIME,
+            NORTH_STARS,
+            SOULFLOW,
+            EMPTY_LINE3,
             EVENTS,
             COOKIE,
-            EMPTY_LINE3,
             QUIVER,
             POWER,
             TUNING,

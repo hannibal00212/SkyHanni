@@ -26,12 +26,12 @@ object MotesSession {
     private var currentMotes: Long? = null
     private var enterRiftTime = SimpleTimeMark.farPast()
 
-    private val repoGroup = RepoPattern.group("rift.everywhere.motes")
+    private val patternGroup = RepoPattern.group("rift.everywhere.motes")
 
     /**
      * REGEX-TEST:  Lifetime Motes: §r§d593,922
      */
-    private val lifetimeMotesPattern by repoGroup.pattern(
+    private val lifetimeMotesPattern by patternGroup.pattern(
         "lifetime",
         "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
     )
@@ -64,7 +64,7 @@ object MotesSession {
         val initial = initialMotes ?: return
         val current = currentMotes ?: return
         val gained = current - initial
-        if (gained == 0L) return
+        if (gained < 1) return
         val timeInRift = enterRiftTime.passedSince()
         val motesPerHour = (gained / timeInRift.inPartialHours).toLong()
         val hover = buildList {

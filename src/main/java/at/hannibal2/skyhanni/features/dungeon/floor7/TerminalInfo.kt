@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
-import at.hannibal2.skyhanni.features.dungeon.DungeonBossAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossApi
 import at.hannibal2.skyhanni.utils.LorenzVec
 
-private typealias BossPhase = DungeonBossAPI.DungeonBossPhase
+private typealias BossPhase = DungeonBossApi.DungeonBossPhase
 
 enum class TerminalInfo(val location: LorenzVec, val phase: BossPhase, val text: String) {
     P1_TERMINAL_1(LorenzVec(111, 113, 73), BossPhase.F7_GOLDOR_1, "Terminal"),
