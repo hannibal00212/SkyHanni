@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -28,6 +31,7 @@ import com.google.common.cache.RemovalCause.EXPIRED
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
 import java.util.regex.Matcher
 import kotlin.math.max
@@ -63,7 +67,10 @@ object PestTrapAPI {
         override fun toString() = displayName
     }
 
-    private const val BAIT_SLOT_NUMBER = 11
+    private const val BAIT_SLOT = 11
+    private val PEST_SLOTS = 13..15
+    private const val RELEASE_ALL_SLOT = 17
+    private const val MAX_RELEASED_PESTS = 8
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
@@ -77,7 +84,7 @@ object PestTrapAPI {
     private var lastNoBaitHash: Int = 0
     private var lastTotalHash: Int = lastTitleHash + lastFullHash + lastNoBaitHash
     private var lastClickedIndex: Int = -1
-
+    private var inIndex: Int = -1
 
     // <editor-fold desc="Patterns">
     /**
@@ -139,10 +146,11 @@ object PestTrapAPI {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!PestApi.isNearPestTrap()) return
         if (lastClickedIndex == -1) return
+        inIndex = lastClickedIndex
         pestTrapInventoryName.matchMatcher(event.inventoryName) {
             val inventoryTrapType = this.extractTrapType() ?: return
             val storage = storage ?: return
-            val baitStack = event.inventoryItems[BAIT_SLOT_NUMBER]?.takeIf {
+            val baitStack = event.inventoryItems[BAIT_SLOT]?.takeIf {
                 it.displayName.isNotEmpty() && it.displayName != "§6Trap Bait"
             } ?: return
             val baitInternalName = baitStack.getInternalNameOrNull() ?: return
@@ -153,6 +161,44 @@ object PestTrapAPI {
             }
         }
     }
+
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inIndex = -1
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (inIndex == -1) return
+        val storage = storage ?: return
+        val trap = storage.pestTrapStatus[inIndex].takeIf { it.count > 0 } ?: return
+        val stack = event.slot?.stack ?: return
+        when (event.slot.slotNumber) {
+            in PEST_SLOTS ->  {
+                if (stack.displayName == "§aPest Slot") return
+                if (!canReleasePest()) return
+                trap.apply { count-- }
+            }
+            RELEASE_ALL_SLOT -> {
+                if (!stack.canReleaseAll() || !canReleasePest(trap.count)) return
+                val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return
+                val pestsToRelease = min(trap.count, MAX_RELEASED_PESTS - existingPests)
+                trap.apply {
+                    count -= pestsToRelease
+                }
+            }
+            else -> return
+        }
+    }
+
+    private fun canReleasePest(quantity: Int = 1): Boolean {
+        val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return false
+        val pestsToRelease = min(quantity, MAX_RELEASED_PESTS - existingPests)
+        return pestsToRelease > 0
+    }
+
+    private fun ItemStack.canReleaseAll() =
+        this.getLore().any { it == "§cThere are no §2Pests §cto release!" }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {

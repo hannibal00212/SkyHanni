@@ -97,7 +97,7 @@ object PestTrapFeatures {
     }
 
     private fun List<PestTrapData>.getFullWarningJoinedString() =
-        this.filter { it.isFull }.toList().joinToString("§8, ") { "§a#${it.number}" }
+        this.filter { it.isFull }.joinToString("§8, ") { "§a#${it.number}" }
 
     private fun List<PestTrapData>.buildFullWarning(warningCount: Int) = when (warningCount) {
         2 -> "§cFull: ${this.getFullWarningJoinedString()}"
