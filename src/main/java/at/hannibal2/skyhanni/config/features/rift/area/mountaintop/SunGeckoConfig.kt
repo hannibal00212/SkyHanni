@@ -1,37 +1,35 @@
-package at.hannibal2.skyhanni.config.features.rift.area.mountaintop;
+package at.hannibal2.skyhanni.config.features.rift.area.mountaintop
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class SunGeckoConfig {
-
+class SunGeckoConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show Sun Gecko Helper.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show Modifiers", desc = "Show a list of modifiers in the overlay.")
     @ConfigEditorBoolean
-    public boolean showModifiers = false;
+    var showModifiers: Boolean = false
 
     @Expose
     @ConfigOption(name = "Highlight Real Boss", desc = "Highlights the real boss in green.")
     @ConfigEditorBoolean
-    public boolean highlightRealBoss = false;
+    var highlightRealBoss: Boolean = false
 
     @Expose
     @ConfigOption(name = "Highlight Clones", desc = "Highlights the fakes bosses in red.")
     @ConfigEditorBoolean
-    public boolean highlightFakeBoss = true;
+    var highlightFakeBoss: Boolean = true
 
     @Expose
-    @ConfigLink(owner = SunGeckoConfig.class, field = "enabled")
-    public Position pos = new Position(-256, 140, false, true);
-
+    @ConfigLink(owner = SunGeckoConfig::class, field = "enabled")
+    var pos: Position = Position(-256, 140, false, true)
 }

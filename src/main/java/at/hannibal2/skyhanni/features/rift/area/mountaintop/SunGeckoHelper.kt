@@ -4,14 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.rift.area.mountaintop.SunGeckoConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -37,7 +37,7 @@ object SunGeckoHelper {
     private val pos: Position get() = config.pos
     private val display = mutableListOf<String>()
     private val modifiers: MutableSet<Modifiers> = mutableSetOf()
-    private val patternGroup = RepoPattern.group("rift.area.mountaintop.sungecko")
+    private val patternGroup = RepoPattern.group("rift.area.mountaintop.sun-gecko")
 
     /**
      * REGEX-TEST: §a[⬛⬛⬛⬜§c⬜ §e§lx2 §c⬜⬜⬜⬜⬜]
@@ -127,7 +127,7 @@ object SunGeckoHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onMobSpawn(event: MobEvent.Spawn) {
         if (!event.mob.name.contains("Sun Gecko")) return
         if (event.mob.name.contains("?") && config.highlightFakeBoss) {
@@ -145,11 +145,10 @@ object SunGeckoHelper {
                 }
             }
         }
-
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
         updateDisplay()
@@ -167,9 +166,7 @@ object SunGeckoHelper {
         }
         healthLeft = health
         totalHealth = boss.maxHealth
-
     }
-
 
     @HandleEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -191,7 +188,6 @@ object SunGeckoHelper {
             if (item.itemDamage != 5) continue
             modifiers.add(modifier)
         }
-
     }
 
     @HandleEvent
@@ -243,7 +239,6 @@ object SunGeckoHelper {
         }
     }
 
-
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
@@ -270,9 +265,9 @@ object SunGeckoHelper {
         inTimeChamber = event.area == "Time Chamber"
     }
 
-    private fun isEnabled() = config.enabled && RiftApi.inRift() && RiftApi.inMountainTop()
+    private fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inMountainTop()
 
-    enum class Modifiers(val slot: Int, val formattedName: String) {
+    private enum class Modifiers(val slot: Int, val formattedName: String) {
         REVIVAL(19, "Revival"), // spawns a second dude
         COMBO_MANIC(20, "Combo Manic"),
         TIME_SLICED(21, "Time Sliced"), // reduces combo lvl up by 1 for 30 seconds only
@@ -281,5 +276,4 @@ object SunGeckoHelper {
         BRAND_NEW_DANCE(24, "Brand New Dance"),
         CULMINATION(25, "Culmination"), // reduces combo lvl up by 1
     }
-
 }
