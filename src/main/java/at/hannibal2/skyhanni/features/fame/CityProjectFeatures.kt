@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -190,7 +190,7 @@ object CityProjectFeatures {
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
-        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
+        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } == true
         if (completed) return
         // TODO: Refactor this loop to not have so many jumps
         @Suppress("LoopWithTooManyJumpStatements")
@@ -214,7 +214,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
+        config.pos.renderRenderables(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
