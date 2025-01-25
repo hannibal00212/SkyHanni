@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
-object EffectAPI {
+object EffectApi {
 
     // <editor-fold desc="Patterns">
     /**
