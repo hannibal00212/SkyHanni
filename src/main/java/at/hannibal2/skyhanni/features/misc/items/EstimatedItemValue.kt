@@ -74,8 +74,12 @@ object EstimatedItemValue {
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
 
         // Use reflection to make sure tradeMenu exists
-        val doesNeuFieldExist = NotEnoughUpdates.INSTANCE.config::class.java.declaredFields.any { it.name == "tradeMenu" }
-        val customTradeEnabled = doesNeuFieldExist && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+        val neuConfig = NotEnoughUpdates.INSTANCE.config
+        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
+        val trade = tradeField[neuConfig]
+
+        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
+        val customTradeEnabled = booleanField[trade] as Boolean
 
         val inNeuTrade = inTrade && customTradeEnabled
         val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
