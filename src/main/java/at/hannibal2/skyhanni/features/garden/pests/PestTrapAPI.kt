@@ -76,6 +76,7 @@ object PestTrapAPI {
     private val PEST_SLOTS = 13..15
     private const val RELEASE_ALL_SLOT = 17
     private const val MAX_RELEASED_PESTS = 8
+    private const val MAX_PEST_TRAPS = 3
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
@@ -229,8 +230,13 @@ object PestTrapAPI {
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        val storage = storage?.takeIf { it.pestTrapStatus.size == 0 } ?: return
-        storage.pestTrapStatus = (1..MAX_PEST_COUNT_PER_TRAP).map { PestTrapData(it) }.toMutableList()
+        initializeStorage()
+    }
+
+    private fun initializeStorage() = storage?.takeIf { it.pestTrapStatus.size < MAX_PEST_TRAPS }?.apply {
+        pestTrapStatus = (1..MAX_PEST_TRAPS).map {
+            pestTrapStatus.getOrNull(it - 1) ?: PestTrapData(it)
+        }.toMutableList()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -252,7 +258,7 @@ object PestTrapAPI {
         val number = groupOrNull("number")?.toIntOrNull() ?: return
 
         // Provision space for the trap if it doesn't exist
-        while (storage.pestTrapStatus.size < max(number, 10)) storage.pestTrapStatus.add(PestTrapData(number))
+        if (storage.pestTrapStatus.size < number) initializeStorage()
 
         storage.pestTrapStatus[number - 1].apply {
             location = entity.getLorenzVec()
