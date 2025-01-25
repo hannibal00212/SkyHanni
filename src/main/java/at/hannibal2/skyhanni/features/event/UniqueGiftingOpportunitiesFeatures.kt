@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -76,7 +76,7 @@ object UniqueGiftingOpportunitiesFeatures {
         if (entity.name != HAS_GIFTED_NAMETAG) return
 
         val matchedPlayer = EntityUtils.getEntitiesNearby<EntityPlayer>(entity.getLorenzVec(), 2.0)
-            .singleOrNull { !it.isNPC() } ?: return
+            .singleOrNull { !it.isNpc() } ?: return
         addGiftedPlayer(matchedPlayer.name)
     }
 
@@ -95,7 +95,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun playerColor(event: EntityEnterWorldEvent<Entity>) {
         if (event.entity is EntityOtherPlayerMP) {
             val entity = event.entity
-            if (entity.isNPC() || isIronman(entity) || isBingo(entity)) return
+            if (entity.isNpc() || isIronman(entity) || isBingo(entity)) return
 
             RenderLivingEntityHelper.setEntityColor(
                 entity,
