@@ -475,7 +475,7 @@ object DamageIndicatorManager {
 
             BossType.BACTE,
             -> {
-                return checkBacte(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
+                return checkBacte(entityData)
             }
 
             else -> return ""
@@ -483,7 +483,7 @@ object DamageIndicatorManager {
         return ""
     }
 
-    private fun checkBacte(entity: EntityLiving, entityData: EntityData, health: Int, maxHealth: Int): String {
+    private fun checkBacte(entityData: EntityData): String {
         if (!config.showBactePhase) return ""
         if (currentPhase == BacteApi.Phase.NOT_ACTIVE) return ""
         entityData.namePrefix = "§c${currentPhase.ordinal}/${BacteApi.Phase.PHASE_5.ordinal} "
