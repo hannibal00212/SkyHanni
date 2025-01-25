@@ -55,7 +55,6 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.skyHanniError",
-        "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
