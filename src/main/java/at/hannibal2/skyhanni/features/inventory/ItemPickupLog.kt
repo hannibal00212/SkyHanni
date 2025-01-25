@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -88,6 +89,11 @@ object ItemPickupLog {
     private var dirty = false
 
     private val patternGroup = RepoPattern.group("itempickuplog")
+
+    /**
+     * REGEX-TEST: Mite Gel x33
+     * REGEX-TEST: Sludge Juice
+     */
     private val shopPattern by patternGroup.pattern(
         "shoppattern",
         "^(?<itemName>.+?)(?: x\\d+)?\$",
@@ -252,13 +258,12 @@ object ItemPickupLog {
 
     private fun ItemStack.hash(): Int {
         var displayName = this.displayName.removeColor()
-        val matcher = shopPattern.matcher(displayName)
-        if (matcher.matches()) {
-            displayName = matcher.group("itemName")
+        shopPattern.matchMatcher(displayName) {
+            displayName = group("itemName")
         }
         return Objects.hash(
             this.getInternalNameOrNull(),
-            displayName.removeColor(),
+            displayName,
             this.getItemRarityOrNull(),
         )
     }

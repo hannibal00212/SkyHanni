@@ -57,7 +57,7 @@ object MobDebug {
             MobData.skyblockMobs.highlight(event) { if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN }
         }
         if (config.displayNPC.isHighlight()) {
-            MobData.displayNPCs.highlight(event) { LorenzColor.RED }
+            MobData.displayNpcs.highlight(event) { LorenzColor.RED }
         }
         if (config.realPlayerHighlight) {
             MobData.players.highlight(event) { if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE }
@@ -72,7 +72,7 @@ object MobDebug {
             MobData.skyblockMobs.showName(event)
         }
         if (config.displayNPC.isName()) {
-            MobData.displayNPCs.showName(event)
+            MobData.displayNpcs.showName(event)
         }
         if (config.summon.isName()) {
             MobData.summoningMobs.showName(event)

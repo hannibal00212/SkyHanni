@@ -68,7 +68,7 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        WorldChangeEvent().post()
+        WorldChangeEvent.post()
     }
 
     var totalTicks = 0
