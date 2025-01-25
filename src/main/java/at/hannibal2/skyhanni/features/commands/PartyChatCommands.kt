@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
-import at.hannibal2.skyhanni.data.FriendAPI
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.FriendApi
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -68,7 +68,7 @@ object PartyChatCommands {
     }
 
     private fun isTrustedUser(name: String): Boolean {
-        val friend = FriendAPI.getAllFriends().find { it.name == name }
+        val friend = FriendApi.getAllFriends().find { it.name == name }
         return when (config.defaultRequiredTrustLevel) {
             PartyCommandsConfig.TrustedUser.FRIENDS -> friend != null
             PartyCommandsConfig.TrustedUser.BEST_FRIENDS -> friend?.bestFriend == true
@@ -92,7 +92,7 @@ object PartyChatCommands {
 
         if (name == LorenzUtils.getPlayerName()) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyAPI.partyLeader != LorenzUtils.getPlayerName()) return
+        if (command.requiresPartyLead && PartyApi.partyLeader != LorenzUtils.getPlayerName()) return
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
@@ -116,7 +116,7 @@ object PartyChatCommands {
 
     @HandleEvent
     fun onTabComplete(event: TabCompletionEvent) {
-        if (PartyAPI.partyLeader == null) return
+        if (PartyApi.partyLeader == null) return
         val prefix = event.fullText.firstOrNull() ?: return
         if (prefix !in commandPrefixes) return
 

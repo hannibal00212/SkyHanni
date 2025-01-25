@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -24,7 +24,7 @@ import kotlin.math.roundToInt
 @SkyHanniModule
 object ToolTooltipTweaks {
 
-    private val config get() = GardenAPI.config.tooltipTweak
+    private val config get() = GardenApi.config.tooltipTweak
 
     /**
      * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)

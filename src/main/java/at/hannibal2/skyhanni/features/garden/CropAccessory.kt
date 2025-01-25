@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 enum class CropAccessory(
-    val internalName: NEUInternalName?,
+    val internalName: NeuInternalName?,
     private val affectedCrops: Set<CropType>,
     private val fortune: Double,
     val upgradeCost: Pair<String, Int>?,
@@ -31,6 +31,6 @@ enum class CropAccessory(
 
     companion object {
 
-        fun getByName(internalName: NEUInternalName) = entries.firstOrNull { internalName == it.internalName }
+        fun getByName(internalName: NeuInternalName) = entries.firstOrNull { internalName == it.internalName }
     }
 }

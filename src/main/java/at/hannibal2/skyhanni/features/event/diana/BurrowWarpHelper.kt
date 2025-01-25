@@ -30,7 +30,7 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!DianaAPI.isDoingDiana()) return
+        if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
@@ -74,7 +74,7 @@ object BurrowWarpHelper {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }

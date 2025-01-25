@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -154,7 +154,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                APIUtils.patchHttpsRequest(it)
+                ApiUtils.patchHttpsRequest(it)
             }
         }
     }

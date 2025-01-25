@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig.PowderDisplayEntry
@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -160,13 +159,15 @@ object PowderTracker {
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        if (config.onlyWhenPowderGrinding && !isGrinding) return
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (config.onlyWhenPowderGrinding && !isGrinding) return false
 
-        tracker.renderDisplay(config.position)
+        return true
     }
 
     @HandleEvent
@@ -215,7 +216,7 @@ object PowderTracker {
         if (lastChestPicked.passedSince() > 5.seconds) return
         tracker.modify {
             val reward = when (event.powder) {
-                HotmAPI.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
+                HotmApi.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
                 else -> return@modify
             }
             it.rewards.addOrPut(reward, event.amount)
