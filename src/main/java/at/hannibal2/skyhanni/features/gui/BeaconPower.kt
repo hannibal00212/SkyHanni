@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BeaconPower {
@@ -62,9 +61,8 @@ object BeaconPower {
     private const val BEACON_POWER_SLOT = 22
     private const val STATS_SLOT = 23
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Beacon") return
         val items = event.inventoryItems
 
@@ -96,7 +94,7 @@ object BeaconPower {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.beaconPowerPosition.renderString(display, posLabel = "Beacon Power")

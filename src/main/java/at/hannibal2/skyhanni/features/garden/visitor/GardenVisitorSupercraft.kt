@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -11,20 +11,18 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Items
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenVisitorSupercraft {
 
-    private val isSupercraftEnabled get() = VisitorAPI.config.shoppingList.showSuperCraft
+    private val isSupercraftEnabled get() = VisitorApi.config.shoppingList.showSuperCraft
 
     private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()
@@ -71,12 +69,12 @@ object GardenVisitorSupercraft {
         }
     }
 
-    private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
-        val ingredients = NEUItems.getRecipes(internalName)
+    private fun getSupercraftForSacks(internalName: NeuInternalName, amount: Int) {
+        val ingredients = NeuItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients ?: return
-        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        val requiredIngredients = mutableMapOf<NeuInternalName, Int>()
         for ((key, count) in ingredients.toPrimitiveItemStacks()) {
             requiredIngredients.addOrPut(key, count)
         }
@@ -101,7 +99,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!hasIngredients) return
 

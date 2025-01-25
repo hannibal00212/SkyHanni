@@ -6,16 +6,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.InfernoMinionFuelsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object InfernoMinionFeatures {
@@ -29,7 +27,7 @@ object InfernoMinionFeatures {
         "minion.infernominiontitle",
         "Inferno Minion .*",
     )
-    private var fuelItemIds = listOf<NEUInternalName>()
+    private var fuelItemIds = listOf<NeuInternalName>()
     private var inInventory = false
 
     @HandleEvent
@@ -48,14 +46,13 @@ object InfernoMinionFeatures {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
         val containsFuel =
-            NEUInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.slotNumber == 19 || event.slot?.slotNumber == 53) {
@@ -64,12 +61,12 @@ object InfernoMinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NEUInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.slotNumber == 19) {

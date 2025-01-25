@@ -5,27 +5,24 @@ import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
 
-    @Suppress("PropertyWrapping")
-    private val mathCrops = setOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
-    private val dicerCrops = setOf(CropType.PUMPKIN, CropType.MELON)
-
     private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
     var cakeExpireTime
-        get() = GardenAPI.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
+        get() = GardenApi.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
         set(value) {
-            GardenAPI.storage?.fortune?.cakeExpiring = value
+            GardenApi.storage?.fortune?.cakeExpiring = value
         }
 
     var equipmentTotalFF = mapOf<FFTypes, Double>()
@@ -64,7 +61,7 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
-            in mathCrops -> {
+            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
                 FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
@@ -73,7 +70,7 @@ object FFStats {
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
-            in dicerCrops -> {
+            CropType.PUMPKIN, CropType.MELON -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
@@ -129,7 +126,7 @@ object FFStats {
     }
 
     fun getPetFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
-        val gardenLvl = GardenAPI.getGardenLevel(overflow = false)
+        val gardenLvl = GardenApi.getGardenLevel(overflow = false)
         this[FFTypes.BASE] = getPetFF(item)
         this[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
             "GREEN_BANDANA" -> 4.0 * gardenLvl
@@ -141,7 +138,7 @@ object FFStats {
     }
 
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
-        val storage = GardenAPI.storage?.fortune ?: return emptyMap()
+        val storage = GardenApi.storage?.fortune ?: return emptyMap()
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
         this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
@@ -175,7 +172,7 @@ object FFStats {
     private fun getPetFF(pet: ItemStack?): Double {
         if (pet == null) return 0.0
         val petLevel = pet.getPetLevel()
-        val strength = (GardenAPI.storage?.fortune?.farmingStrength)
+        val strength = (GardenApi.storage?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return when {
@@ -188,7 +185,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
-                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel * if (SkyBlockTime.isDay()) 1.0 else 3.0
                 else -> 0.0
             }
         }

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -22,7 +22,6 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
@@ -58,13 +57,13 @@ object GuiEditManager {
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.enableBlend()
@@ -116,11 +115,11 @@ object GuiEditManager {
 
         GlStateManager.translate(0f, 0f, 200f)
 
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        RenderData.renderOverlay()
 
         GlStateManager.pushMatrix()
         GlStateManager.enableDepth()
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
         GlStateManager.popMatrix()
 
         GlStateManager.translate(0f, 0f, -200f)

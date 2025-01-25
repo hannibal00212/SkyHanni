@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.remainingClicksPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
@@ -55,26 +54,26 @@ object SuperpairDataDisplay {
         found.clear()
     }
 
-    @SubscribeEvent
-    fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
         }
-        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.getCurrentExperiment() == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
         config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.getCurrentExperiment() == null) return
 
-        val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return
+        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return
 
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
@@ -220,7 +219,7 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return emptyList<String>()
+        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return emptyList<String>()
 
         add("§6Superpair Experimentation Data")
         add("")
@@ -231,7 +230,7 @@ object SuperpairDataDisplay {
         val pairs = found.entries.firstOrNull { it.key == FoundType.PAIR }?.value ?: mutableListOf()
         val possiblePairs = calculatePossiblePairs(currentExperiment)
 
-        if (pairs.isNotEmpty()) add("§2Found")
+        if (pairs.isNotEmpty()) add("§2Collected")
         for (pair in pairs) {
             val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
             add(" $prefix §a${pair.first?.reward.orEmpty()}")
@@ -253,7 +252,7 @@ object SuperpairDataDisplay {
 
         if (toAdd.isNotEmpty()) {
             add("")
-            add("§4Not found")
+            add("§4Not collected")
         }
         for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
@@ -281,10 +280,10 @@ object SuperpairDataDisplay {
                     }
             }
 
-    private fun isPowerUp(reward: String) = ExperimentationTableAPI.powerUpPattern.matches(reward)
+    private fun isPowerUp(reward: String) = ExperimentationTableApi.powerUpPattern.matches(reward)
 
     private fun isReward(reward: String) =
-        ExperimentationTableAPI.rewardPattern.matches(reward) || ExperimentationTableAPI.powerUpPattern.matches(reward)
+        ExperimentationTableApi.rewardPattern.matches(reward) || ExperimentationTableApi.powerUpPattern.matches(reward)
 
     // TODO use repo patterns instead
     private fun isWaiting(itemName: String) =

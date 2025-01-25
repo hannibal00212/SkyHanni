@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,8 +20,6 @@ import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -46,7 +44,7 @@ object ReplaceRomanNumerals {
         "§o§a✔ §.* (?<roman>[IVXLCDM]+)§r",
         "§5§o§7Purchase §a.* (?<roman>[IVXLCDM]+) §7.*",
         "§5§o(?:§7)§.(?<roman>[IVXLCDM]+).*",
-        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*"
+        ".*Heart of the Mountain (?<roman>[IVXLCDM]+) ?.*",
     )
 
     /**
@@ -58,8 +56,8 @@ object ReplaceRomanNumerals {
     )
 
     // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
         event.toolTip.replaceAll { it.tryReplace() }

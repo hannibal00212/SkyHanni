@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.makeShiftClick
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ShiftClickNPCSell {
@@ -33,9 +32,8 @@ object ShiftClickNPCSell {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryItems.isEmpty()) return
         val item = event.inventoryItems[event.inventoryItems.keys.last() + sellSlot] ?: return
 
@@ -47,7 +45,7 @@ object ShiftClickNPCSell {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!inInventory) return

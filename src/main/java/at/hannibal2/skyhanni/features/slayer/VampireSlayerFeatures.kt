@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -107,6 +107,16 @@ object VampireSlayerFeatures {
         }
     }
 
+    private fun List<String>.spawnedByCoop(stand: EntityArmorStand): Boolean = any {
+        var contain = false
+        if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(stand.name)) {
+            val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
+                .find(stand.name)?.groupValues?.get(1)
+            contain = it == name
+        }
+        contain
+    }
+
     private fun EntityOtherPlayerMP.process() {
         if (name != "Bloodfiend ") return
 
@@ -118,17 +128,7 @@ object VampireSlayerFeatures {
                     it.name.contains(username)
                 }
                 val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                    coopList.isNotEmpty() &&
-                        configCoopBoss.highlight &&
-                        coopList.any { it2 ->
-                            var contain = false
-                            if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                                val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-                                    .find(it.name)?.groupValues?.get(1)
-                                contain = it2 == name
-                            }
-                            contain
-                        }
+                    configCoopBoss.highlight && coopList.spawnedByCoop(it)
                 }
                 val shouldSendTitle =
                     if (containUser && configOwnBoss.twinClawsTitle) true
@@ -151,16 +151,7 @@ object VampireSlayerFeatures {
         for (it in getAllNameTagsInRadiusWith("Spawned by")) {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
-            val containCoop = coopList.isNotEmpty() &&
-                coopList.any { it2 ->
-                    var contain = false
-                    if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                        val name =
-                            ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
-                        contain = it2 == name
-                    }
-                    contain
-                }
+            val containCoop = coopList.spawnedByCoop(it)
             val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(entityId)) {
                 taggedEntityList.remove(entityId)
@@ -260,8 +251,8 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
 
         if (config.drawLine) {
@@ -328,14 +319,14 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         entityList.clear()
         taggedEntityList.clear()
         standList = mutableMapOf()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
@@ -354,5 +345,5 @@ object VampireSlayerFeatures {
         event.move(9, "slayer.vampireSlayerConfig", "slayer.vampire")
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau()
+    fun isEnabled() = RiftApi.inRift() && RiftApi.inStillgoreChateau()
 }

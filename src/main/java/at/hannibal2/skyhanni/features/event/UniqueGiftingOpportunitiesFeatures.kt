@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.event
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.WinterAPI
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -110,8 +110,8 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun isIronman(entity: EntityLivingBase) =
         !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
@@ -124,13 +124,13 @@ object UniqueGiftingOpportunitiesFeatures {
 
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!WinterAPI.isDecember()) return
+        if (!WinterApi.isDecember()) return
 
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         holdingGift = false
     }
 }

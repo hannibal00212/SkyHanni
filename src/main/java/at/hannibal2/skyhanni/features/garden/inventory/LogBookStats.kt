@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LogBookStats {
@@ -49,7 +48,7 @@ object LogBookStats {
         "§ePage (?<page>\\d)",
     )
 
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
     private var display = emptyList<Renderable>()
     private val loggedVisitors = mutableMapOf<Int, List<VisitorInfo>>()
     private var inInventory = false
@@ -84,7 +83,7 @@ object LogBookStats {
         display = buildList {
             val visited = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesVisited } }
             val accepted = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesAccepted } }
-            val visitingNow = VisitorAPI.getVisitors().size
+            val visitingNow = VisitorApi.getVisitors().size
             val denied = visited - accepted - visitingNow
             add(Renderable.string("§6Times Visited: §b${visited.addSeparators()}"))
             add(Renderable.string("§6Times Accepted: §a${accepted.addSeparators()}"))
@@ -92,7 +91,7 @@ object LogBookStats {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
         if (inInventory && config.showLogBookStats) {

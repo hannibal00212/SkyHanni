@@ -1,13 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
-import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
-import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -19,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SBPattern
 
 internal var allUnknownLines = listOf<UnknownLine>()
 internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
@@ -39,130 +33,15 @@ object UnknownLinesHandler {
     /**
      * Remove known lines with patterns
      **/
-    private val patternsToExclude = mutableListOf(
-        PurseAPI.coinsPattern,
-        SbPattern.motesPattern,
-        BitsAPI.bitsScoreboardPattern,
-        SbPattern.heatPattern,
-        SbPattern.copperPattern,
-        SbPattern.locationPattern,
-        SbPattern.lobbyCodePattern,
-        SbPattern.datePattern,
-        SbPattern.timePattern,
-        SbPattern.footerPattern,
-        SbPattern.yearVotesPattern,
-        SbPattern.votesPattern,
-        SbPattern.waitingForVotePattern,
-        SbPattern.northstarsPattern,
-        SbPattern.profileTypePattern,
-        SbPattern.autoClosingPattern,
-        SbPattern.startingInPattern,
-        SbPattern.timeElapsedPattern,
-        SbPattern.instanceShutdownPattern,
-        SbPattern.keysPattern,
-        SbPattern.clearedPattern,
-        SbPattern.soloPattern,
-        SbPattern.teammatesPattern,
-        SbPattern.floor3GuardiansPattern,
-        SbPattern.m7dragonsPattern,
-        SbPattern.wavePattern,
-        SbPattern.tokensPattern,
-        SbPattern.submergesPattern,
-        SbPattern.medalsPattern,
-        SbPattern.lockedPattern,
-        SbPattern.cleanUpPattern,
-        SbPattern.pastingPattern,
-        SbPattern.peltsPattern,
-        SbPattern.mobLocationPattern,
-        SbPattern.jacobsContestPattern,
-        SbPattern.plotPattern,
-        SbPattern.powderGreedyPattern,
-        SbPattern.windCompassPattern,
-        SbPattern.windCompassArrowPattern,
-        SbPattern.miningEventPattern,
-        SbPattern.miningEventZonePattern,
-        SbPattern.raffleUselessPattern,
-        SbPattern.raffleTicketsPattern,
-        SbPattern.rafflePoolPattern,
-        SbPattern.mithrilUselessPattern,
-        SbPattern.mithrilRemainingPattern,
-        SbPattern.mithrilYourMithrilPattern,
-        SbPattern.nearbyPlayersPattern,
-        SbPattern.uselessGoblinPattern,
-        SbPattern.remainingGoblinPattern,
-        SbPattern.yourGoblinKillsPattern,
-        SbPattern.magmaBossPattern,
-        SbPattern.damageSoakedPattern,
-        SbPattern.killMagmasPattern,
-        SbPattern.killMagmasDamagedSoakedBarPattern,
-        SbPattern.reformingPattern,
-        SbPattern.bossHealthPattern,
-        SbPattern.bossHealthBarPattern,
-        SpidersDenAPI.broodmotherPattern,
-        SbPattern.bossHPPattern,
-        SbPattern.bossDamagePattern,
-        SbPattern.slayerQuestPattern,
-        SbPattern.essencePattern,
-        SbPattern.redstonePattern,
-        SbPattern.anniversaryPattern,
-        SbPattern.visitingPattern,
-        SbPattern.flightDurationPattern,
-        SbPattern.dojoChallengePattern,
-        SbPattern.dojoDifficultyPattern,
-        SbPattern.dojoPointsPattern,
-        SbPattern.dojoTimePattern,
-        SbPattern.objectivePattern,
-        ServerRestartTitle.restartingGreedyPattern,
-        SbPattern.travelingZooPattern,
-        SbPattern.newYearPattern,
-        SbPattern.spookyPattern,
-        SbPattern.winterEventStartPattern,
-        SbPattern.winterNextWavePattern,
-        SbPattern.winterWavePattern,
-        SbPattern.winterMagmaLeftPattern,
-        SbPattern.winterTotalDmgPattern,
-        SbPattern.winterCubeDmgPattern,
-        SbPattern.riftDimensionPattern,
-        RiftBloodEffigies.heartsPattern,
-        SbPattern.wtfAreThoseLinesPattern,
-        SbPattern.timeLeftPattern,
-        SbPattern.darkAuctionCurrentItemPattern,
-        MiningAPI.coldPattern,
-        SbPattern.riftHotdogTitlePattern,
-        SbPattern.riftHotdogEatenPattern,
-        SbPattern.mineshaftNotStartedPattern,
-        SbPattern.queuePattern,
-        SbPattern.queueTierPattern,
-        SbPattern.queuePositionPattern,
-        SbPattern.queueWaitingForLeaderPattern,
-        SbPattern.fortunateFreezingBonusPattern,
-        SbPattern.riftAveikxPattern,
-        SbPattern.riftHayEatenPattern,
-        SbPattern.fossilDustPattern,
-        SbPattern.cluesPattern,
-        SbPattern.barryProtestorsQuestlinePattern,
-        SbPattern.barryProtestorsHandledPattern,
-        SbPattern.timeSlicedPattern,
-        SbPattern.bigDamagePattern,
-        SbPattern.carnivalPattern,
-        SbPattern.carnivalTasksPattern,
-        SbPattern.carnivalTokensPattern,
-        SbPattern.carnivalFruitsPattern,
-        SbPattern.carnivalScorePattern,
-        SbPattern.carnivalCatchStreakPattern,
-        SbPattern.carnivalAccuracyPattern,
-        SbPattern.carnivalKillsPattern,
-    )
-    private var remoteOnlyPatternsAdded = false
-
     fun handleUnknownLines() {
         val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
-        if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
+        val patternsToExclude = CustomScoreboard.activePatterns.toMutableList()
+
+        if (::remoteOnlyPatterns.isInitialized) {
             patternsToExclude.addAll(remoteOnlyPatterns)
-            remoteOnlyPatternsAdded = true
         }
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
@@ -172,14 +51,14 @@ object UnknownLinesHandler {
          * Remove Known Text
          **/
         // Remove objectives
-        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) } ?: "Objective"
+        val objectiveLine = sidebarLines.firstOrNull { SBPattern.objectivePattern.matches(it) } ?: "Objective"
 
         unknownLines = unknownLines.filter { line ->
             val nextLine = sidebarLines.nextAfter(objectiveLine)
             val secondNextLine = sidebarLines.nextAfter(objectiveLine, 2)
             val thirdNextLine = sidebarLines.nextAfter(objectiveLine, 3)
 
-            line != nextLine && line != secondNextLine && line != thirdNextLine && !SbPattern.thirdObjectiveLinePattern.matches(line)
+            line != nextLine && line != secondNextLine && line != thirdNextLine && !SBPattern.thirdObjectiveLinePattern.matches(line)
         }
 
         // Remove jacobs contest
@@ -187,7 +66,7 @@ object UnknownLinesHandler {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        SbPattern.jacobsContestPattern.matches(line)
+                        SBPattern.jacobsContestPattern.matches(line)
                     } ?: "§eJacob's Contest",
                     i,
                 ) != it
@@ -199,7 +78,7 @@ object UnknownLinesHandler {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        SbPattern.slayerQuestPattern.matches(line)
+                        SBPattern.slayerQuestPattern.matches(line)
                     } ?: "Slayer Quest",
                     i,
                 ) != it
@@ -210,7 +89,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
-                    SbPattern.mobLocationPattern.matches(line)
+                    SBPattern.mobLocationPattern.matches(line)
                 } ?: "Tracker Mob Location:",
             ) != it
         }
@@ -219,7 +98,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter {
             sidebarLines.nextAfter(
                 sidebarLines.firstOrNull { line ->
-                    SbPattern.darkAuctionCurrentItemPattern.matches(line)
+                    SBPattern.darkAuctionCurrentItemPattern.matches(line)
                 } ?: "Current Item:",
             ) != it
         }

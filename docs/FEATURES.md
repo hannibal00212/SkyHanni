@@ -58,6 +58,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
++ Added Sound Responses. - Thunderblade73 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2222)
+    + Plays meow sound when 'meow' appears in chat.
+    + Plays bark sound when 'woof' appears in chat.
++ Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 
 </details>
 <details open><summary>
@@ -516,6 +520,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Blaze Slayer fire pillar display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1766)
     + Shows a large display with a timer when the Fire Pillar is about to explode.
     + Also displays for other players' bosses.
++ Added blocking for slayers that cannot spawn in the current dimension to prevent Maddox's menu from closing. - Luna (https://github.com/hannibal002/SkyHanni/pull/3211)
 
 </details>
 <details open><summary>
@@ -1365,6 +1370,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Added the current minister to the calendar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
   + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
   + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
++ Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
@@ -1467,6 +1473,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Automatically tracks coins received from customers via `/trade`.
 + Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
     +  Tracks items and profit while using the Draconic Altar in the End.
++ Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
+    + Displays current buffed region and duration until next change.
++ Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n1 (https://github.com/hannibal002/SkyHanni/pull/2886)
 
 </details>
 <details open><summary>

@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -96,9 +95,9 @@ object NonGodPotEffectDisplay {
     }
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("MaxLineLength")
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()
             update()
@@ -137,7 +136,7 @@ object NonGodPotEffectDisplay {
             effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
         }
 
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
+        if (event.message == "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.") {
             effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
             update()
         }
@@ -202,14 +201,13 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         checkFooter = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
@@ -270,10 +268,10 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
-        if (RiftAPI.inRift()) return
+        if (RiftApi.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,
@@ -289,5 +287,5 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 }

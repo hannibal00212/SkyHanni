@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -33,9 +32,9 @@ object HoppityNpc {
 
     private var lastReminderSent = SimpleTimeMark.farPast()
     private var hoppityYearOpened
-        get() = ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened ?: -1
+        get() = ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened ?: -1
         set(value) {
-            ChocolateFactoryAPI.profileStorage?.hoppityShopYearOpened = value
+            ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened = value
         }
 
     private val slotsToHighlight = mutableSetOf<Int>()
@@ -55,8 +54,10 @@ object HoppityNpc {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
+        if (LorenzUtils.isStrandedProfile) return
+
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityApi.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 2.minutes) return
 
         ChatUtils.clickToActionOrDisable(
@@ -69,7 +70,7 @@ object HoppityNpc {
                     IslandGraphs.pathFind(
                         LorenzVec(6.4, 70.0, 7.4),
                         "§aHoppity's Shop",
-                        condition = { config.hoppityShopReminder }
+                        condition = { config.hoppityShopReminder },
                     )
                 }
             },
@@ -83,8 +84,8 @@ object HoppityNpc {
         clear()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         clear()
     }
 
@@ -99,7 +100,7 @@ object HoppityNpc {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isHighlightEnabled()) return
         if (!inShop) return

@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -201,17 +201,17 @@ object FishingTimer {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingApi.isFishing()) return
 
         display = createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingApi.isFishing()) return
 
         val text = display ?: return
         config.pos.renderString(text, posLabel = "BarnTimer")
@@ -244,8 +244,8 @@ object FishingTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         mobDespawnTime.clear()
         recentMobs.clear()
         babyMagmaSlugsToFind = 0

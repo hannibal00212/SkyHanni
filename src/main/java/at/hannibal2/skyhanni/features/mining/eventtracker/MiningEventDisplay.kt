@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.eventtracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,12 +13,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -32,7 +31,7 @@ object MiningEventDisplay {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderRenderables(display, posLabel = "Mining Event Tracker")
@@ -136,7 +135,7 @@ object MiningEventDisplay {
     private fun shouldDisplay(): Boolean {
         val isOnValidMiningLocation = LorenzUtils.inSkyBlock && (config.outsideMining || MiningEventTracker.isMiningIsland())
 
-        return (isOnValidMiningLocation || OutsideSbFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
+        return (isOnValidMiningLocation || OutsideSBFeature.MINING_EVENT_DISPLAY.isSelected()) && config.enabled
     }
 
     @HandleEvent

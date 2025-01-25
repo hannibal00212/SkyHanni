@@ -6,30 +6,28 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object KloonHacking {
 
-    private val config get() = RiftAPI.config.area.westVillage.hacking
+    private val config get() = RiftApi.config.area.westVillage.hacking
 
     private val colorPattern by RepoPattern.pattern(
         "rift.area.westvillage.kloon.color",
@@ -46,7 +44,7 @@ object KloonHacking {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         checkHelmet()
     }
 
@@ -59,7 +57,7 @@ object KloonHacking {
         inTerminalInventory = false
         inColorInventory = false
         nearestTerminal = null
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         if (!config.solver) return
         if (event.inventoryName == "Hacking" || event.inventoryName == "Hacking (As seen on CSI)") {
             inTerminalInventory = true
@@ -81,9 +79,9 @@ object KloonHacking {
         inColorInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
         if (inTerminalInventory) {
             if (!config.solver) return
             var i = 0
@@ -114,15 +112,15 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inTerminalInventory || !RiftAPI.inRift()) return
+        if (!inTerminalInventory || !RiftApi.inRift()) return
         event.makePickblock()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!RiftAPI.inRift()) return
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
+        if (!RiftApi.inRift()) return
         if (!config.waypoints) return
         if (!wearingHelmet) return
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
@@ -133,9 +131,9 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!RiftAPI.inRift()) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!RiftApi.inRift()) return
         if (!wearingHelmet) return
         colorPattern.matchMatcher(event.message.removeColor()) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
@@ -146,9 +144,9 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!RiftAPI.inRift()) return
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
+        if (!RiftApi.inRift()) return
         if (!inTerminalInventory) return
         if (!config.solver) return
 

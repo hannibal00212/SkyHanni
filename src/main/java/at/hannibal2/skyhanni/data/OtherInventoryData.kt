@@ -23,7 +23,7 @@ object OtherInventoryData {
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close(event.gui.getTitle())
     }

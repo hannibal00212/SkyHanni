@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BazaarCancelledBuyOrderClipboard {
@@ -55,7 +54,7 @@ object BazaarCancelledBuyOrderClipboard {
     )
 
     private var latestAmount: Int? = null
-    private var lastClickedItem: NEUInternalName? = null
+    private var lastClickedItem: NeuInternalName? = null
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -82,7 +81,7 @@ object BazaarCancelledBuyOrderClipboard {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!BazaarApi.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
         val item = event.slot?.stack ?: return
@@ -90,11 +89,11 @@ object BazaarCancelledBuyOrderClipboard {
         val name = lastItemClickedPattern.matchMatcher(item.name) {
             group("name")
         } ?: return
-        lastClickedItem = NEUInternalName.fromItemName(name)
+        lastClickedItem = NeuInternalName.fromItemName(name)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         @Suppress("UnusedPrivateProperty")
         val coins = cancelledMessagePattern.matchMatcher(event.message) {

@@ -19,7 +19,7 @@ object DungeonShadowAssassinNotification {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onWorldBorderChange(event: PacketReceivedEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.dungeonFloor?.contains("3") == true && DungeonAPI.inBossRoom) return
+        if (DungeonApi.dungeonFloor?.contains("3") == true && DungeonApi.inBossRoom) return
 
         val packet = event.packet as? AccessorWorldBorderPacket ?: return
         val action = packet.action

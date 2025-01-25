@@ -31,7 +31,11 @@ object SoundUtils {
                 if (e.message?.startsWith("value already present:") == true) return@execute
                 ErrorManager.logErrorWithData(e, "Failed to play a sound", "soundLocation" to this.soundLocation)
             } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to play a sound", "soundLocation" to this.soundLocation)
+
+                ErrorManager.logErrorWithData(
+                    e, "Failed to play a sound",
+                    "soundLocation" to this.soundLocation,
+                )
             } finally {
                 if (!SkyHanniMod.feature.misc.maintainGameVolume) {
                     gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
