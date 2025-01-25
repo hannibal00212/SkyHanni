@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -28,8 +27,8 @@ object NotificationManager {
 
     private const val CLOSE_TEXT = "§c[X] Close"
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         currentNotification ?: return
         if (lastNotificationClosed.passedSince() < 200.milliseconds) return
         if (event.keyCode != Keyboard.KEY_X) return
@@ -37,7 +36,7 @@ object NotificationManager {
         lastNotificationClosed = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         val notification = getCurrentNotification() ?: return
 
@@ -102,8 +101,8 @@ data class SkyHanniNotification(
 
     var endTime = SimpleTimeMark.farFuture()
 
-    val width by lazy { (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8 }
-    val height by lazy { message.size * 10 + 18 }
+    val width = (message.maxOfOrNull { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0) + 8
+    val height = message.size * 10 + 18
 
     fun setEndTime() {
         if (length.isInfinite()) return

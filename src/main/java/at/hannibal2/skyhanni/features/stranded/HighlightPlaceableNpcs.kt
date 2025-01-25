@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.stranded
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,8 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightPlaceableNpcs {
@@ -40,8 +39,8 @@ object HighlightPlaceableNpcs {
     private var inInventory = false
     private var highlightedItems = emptyList<Int>()
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
         if (!isEnabled()) return
 
@@ -57,13 +56,13 @@ object HighlightPlaceableNpcs {
         this.highlightedItems = highlightedItems
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         highlightedItems = emptyList()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -73,7 +72,7 @@ object HighlightPlaceableNpcs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "stranded", "misc.stranded")
     }

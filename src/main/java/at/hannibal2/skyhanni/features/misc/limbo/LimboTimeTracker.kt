@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -46,8 +47,8 @@ object LimboTimeTracker {
     private var doMigrate = false
     private var notMigratedPB = 0
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -55,10 +56,10 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (event.message.startsWith("/playtime") && inLimbo) {
-            event.isCanceled
+            event.cancel()
             printStats(true)
         }
     }
@@ -88,13 +89,13 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!inLimbo) return
         leaveLimbo()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inLimbo) return
@@ -137,7 +138,7 @@ object LimboTimeTracker {
         shownPB = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(27, oldPath = "misc.limboTimePB", newPath = "#player.personalBest")
     }
@@ -168,8 +169,8 @@ object LimboTimeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Limbo")
         if (!inLimbo) {
             event.addIrrelevant("not in limbo")
@@ -188,7 +189,7 @@ object LimboTimeTracker {
         notMigratedPB = personalBest
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (!doMigrate) return
         if (notMigratedPB != 0) {

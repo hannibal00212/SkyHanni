@@ -23,9 +23,8 @@ public class CakeTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Note",
-        desc = "§cNote7:" +
-            "\nThis feature is not compatible with the NEU Storage Overlay." +
-            "\nBackpacks/Ender Chest will not be scanned correctly with it enabled."
+        desc = "This feature is not compatible with the NEU Storage Overlay." +
+            "Backpacks/Ender Chest will not be scanned correctly with it enabled."
     )
     @ConfigEditorInfoText
     public boolean incompatibleNote = false;
@@ -73,9 +72,9 @@ public class CakeTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Maximum Rows",
-        desc = "The maximum number of rows to display in the tracker, before a cutoff is imposed."
+        name = "Max Height",
+        desc = "Maximum height of the tracker."
     )
-    @ConfigEditorSlider(minValue = 5, maxValue = 40, minStep = 1)
-    public Property<Integer> maxDisplayRows = Property.of(20);
+    @ConfigEditorSlider(minValue = 50, maxValue = 500, minStep = 10)
+    public Property<Float> maxHeight = Property.of(250F);
 }

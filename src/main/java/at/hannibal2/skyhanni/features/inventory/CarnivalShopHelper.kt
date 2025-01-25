@@ -1,39 +1,41 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
-import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CarnivalShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
-    private val NAME_TAG_ITEM by lazy { "NAME_TAG".toInternalName().getItemStack().item }
+    private inline val NAME_TAG_ITEM get() = Items.name_tag
+
+    /**
+     * All upgrades will appear in slots 11 -> 15
+     *
+     * Filter out items outside of these bounds
+     */
+    private val SLOT_RANGE = 11..15
 
     private var repoEventShops = mutableListOf<EventShop>()
     private var currentProgress: EventShopProgress? = null
@@ -42,6 +44,8 @@ object CarnivalShopHelper {
     private var tokensNeeded: Int = 0
     private var overviewInfoItemStack: ItemStack? = null
     private var shopSpecificInfoItemStack: ItemStack? = null
+
+    private val patternGroup = RepoPattern.group("inventory.carnival-shop-helper")
 
     /**
      * REGEX-TEST: §7Your Tokens: §a1,234,567
@@ -86,7 +90,7 @@ object CarnivalShopHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || repoEventShops.isEmpty() || event.slot != CUSTOM_STACK_LOCATION) return
         tryReplaceShopSpecificStack(event)
@@ -99,15 +103,15 @@ object CarnivalShopHelper {
 
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
         if (currentProgress == null || event.isUnknownShop()) return
-        shopSpecificInfoItemStack.let { event.replace(it) }
+        shopSpecificInfoItemStack?.let { event.replace(it) }
     }
 
     private fun tryReplaceOverviewStack(event: ReplaceItemEvent) {
         if (!overviewInventoryNamesPattern.matches(event.inventory.name)) return
-        overviewInfoItemStack.let { event.replace(it) }
+        overviewInfoItemStack?.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
@@ -117,22 +121,12 @@ object CarnivalShopHelper {
         regenerateOverviewItemStack()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEventType = ""
         tokensOwned = 0
         tokensNeeded = 0
-    }
-
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        processInventoryEvent(event)
-    }
-
-    @SubscribeEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        processInventoryEvent(event)
     }
 
     private fun checkSavedProgress() {
@@ -225,46 +219,37 @@ object CarnivalShopHelper {
         )
     }
 
-    private fun processInventoryEvent(event: InventoryOpenEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
-        processTokenShopFooter(event)
-        val matchingShop = repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
-        currentEventType = matchingShop.shopName
-        processEventShopUpgrades(event.inventoryItems)
+        var shouldUpdate = processTokenShopFooter(event)
+        repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) }?.let { matchingShop ->
+            currentEventType = matchingShop.shopName
+            processEventShopUpgrades(event.inventoryItems)
+            shouldUpdate = true
+        }
+
+        if (!shouldUpdate) return
         regenerateShopSpecificItemStack()
         regenerateOverviewItemStack()
         saveProgress()
     }
 
-    private fun processTokenShopFooter(event: InventoryOpenEvent) {
+    private fun processTokenShopFooter(event: InventoryOpenEvent): Boolean {
         val tokenFooterStack = event.inventoryItems[32]
-        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return
+        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return false
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
-            tokensOwned = groupOrNull("tokens")?.formatInt() ?: 0
+            val new = groupOrNull("tokens")?.formatInt() ?: 0
+            val changed = new != tokensOwned
+            tokensOwned = new
+            return changed
         }
+
+        return false
     }
 
     private fun processEventShopUpgrades(inventoryItems: Map<Int, ItemStack>) {
-        /**
-         * All upgrades will appear in slots 11 -> 15
-         *
-         * Filter out items outside of these bounds
-         */
-        val upgradeStacks = inventoryItems.filter { it.key in 11..15 && it.value.item != null }
-        // TODO remove duplicate code fragment with EssenceShopHelper
-        val purchasedUpgrades: MutableMap<String, Int> = buildMap {
-            for (value in upgradeStacks.values) {
-                // Right now Carnival and Essence Upgrade patterns are 'in-sync'
-                // This may change in the future, and this would then need its own pattern
-                essenceUpgradePattern.matchMatcher(value.displayName) {
-                    val upgradeName = groupOrNull("upgrade") ?: return
-                    val nextUpgradeRoman = groupOrNull("tier") ?: return
-                    val nextUpgrade = nextUpgradeRoman.romanToDecimal()
-                    val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
-                    put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
-                }
-            }
-        }.toMutableMap()
+        val purchasedUpgrades = EssenceUtils.extractPurchasedUpgrades(inventoryItems, SLOT_RANGE)
         currentProgress = EventShopProgress(currentEventType, purchasedUpgrades)
     }
 

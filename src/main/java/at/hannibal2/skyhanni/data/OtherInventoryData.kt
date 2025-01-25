@@ -21,20 +21,20 @@ object OtherInventoryData {
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
     fun close(reopenSameName: Boolean = false) {
-        InventoryCloseEvent(reopenSameName).postAndCatch()
+        InventoryCloseEvent(reopenSameName).post()
         currentInventory = null
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         lateEvent?.let {
-            it.postAndCatch()
+            it.post()
             lateEvent = null
         }
     }
@@ -95,9 +95,9 @@ object OtherInventoryData {
     }
 
     private fun done(inventory: Inventory) {
-        InventoryFullyOpenedEvent(inventory).postAndCatch()
+        InventoryFullyOpenedEvent(inventory).post()
         inventory.fullyOpenedOnce = true
-        InventoryUpdatedEvent(inventory).postAndCatch()
+        InventoryUpdatedEvent(inventory).post()
         acceptItems = false
     }
 

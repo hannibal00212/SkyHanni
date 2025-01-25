@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,8 +30,8 @@ object DungeonArchitectFeatures {
 
     private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".toInternalName()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         puzzleFailPattern.matchMatcher(event.message) {
@@ -44,11 +44,11 @@ object DungeonArchitectFeatures {
 
     private val architectsFirstDraft = "ARCHITECT_FIRST_DRAFT".toInternalName().makePrimitiveStack()
 
-    private fun generateMessage(name: String, event: LorenzChatEvent) {
+    private fun generateMessage(name: String, event: SkyHanniChatEvent) {
         val architectItemAmount = architectsFirstDraftItem.getAmountInSacks()
         if (architectItemAmount <= 0) return
 
-        GetFromSackAPI.getFromChatMessageSackItems(
+        GetFromSackApi.getFromChatMessageSackItems(
             architectsFirstDraft,
             "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
@@ -58,5 +58,5 @@ object DungeonArchitectFeatures {
         event.blockedReason = "puzzle_fail"
     }
 
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.architectNotifier
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.architectNotifier
 }

@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.DungeonStartEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -25,7 +26,7 @@ object DungeonMilestonesDisplay {
      */
     private val milestonePattern by RepoPattern.pattern(
         "dungeon.milestone",
-        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*"
+        "§e§l.*Milestone §r§e.§r§7: You have (?:tanked and )?(?:dealt|healed) §r§.*§r§7.*so far! §r§a.*",
     )
 
     private var display = ""
@@ -41,8 +42,8 @@ object DungeonMilestonesDisplay {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         if (milestonePattern.matches(event.message)) {
@@ -66,27 +67,27 @@ object DungeonMilestonesDisplay {
         display = "Current Milestone: $currentMilestone"
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = ""
         currentMilestone = 0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         currentMilestone = 0
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
             color + display,
-            posLabel = "Dungeon Milestone"
+            posLabel = "Dungeon Milestone",
         )
     }
 
-    private fun isEnabled() = DungeonAPI.inDungeon() && config.showMilestonesDisplay
+    private fun isEnabled() = DungeonApi.inDungeon() && config.showMilestonesDisplay
 }

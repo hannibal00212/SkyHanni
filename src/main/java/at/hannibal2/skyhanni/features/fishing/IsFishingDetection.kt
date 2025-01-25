@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.fishing
 
-import at.hannibal2.skyhanni.events.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -25,7 +26,7 @@ object IsFishingDetection {
     private var lastSeaCreatureKillArea: LorenzVec? = null
     private var lastSeaCreatureKillAreaTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobber(event: FishingBobberInLiquidEvent) {
         lastRodCastLocation = LocationUtils.playerLocation()
         lastRodCastTime = SimpleTimeMark.now()
@@ -41,7 +42,7 @@ object IsFishingDetection {
 
         if (lastInAreaTime.passedSince() < 5.seconds) {
             if (EntityUtils.getEntitiesNextToPlayer<EntityArmorStand>(5.0)
-                    .filter { FishingAPI.seaCreatureCount(it) > 0 }.any()
+                    .filter { FishingApi.seaCreatureCount(it) > 0 }.any()
             ) {
                 lastSeaCreatureKillArea = LocationUtils.playerLocation()
                 lastSeaCreatureKillAreaTime = SimpleTimeMark.now()

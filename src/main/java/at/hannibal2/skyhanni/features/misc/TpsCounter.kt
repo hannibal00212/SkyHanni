@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -39,8 +39,11 @@ object TpsCounter {
     private var display: String? = null
 
     private val timeSinceWorldSwitch get() = LorenzUtils.lastWorldSwitch.passedSince()
+    private val tilCalculated: String
+        get() =
+            "§fCalculating... §7(${(10.seconds - timeSinceWorldSwitch).inWholeSeconds}s)"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (shouldIgnore()) {
             updateDisplay()
@@ -73,8 +76,8 @@ object TpsCounter {
     }
 
     private fun tpsCommand() {
-        val tps = tps ?: return ChatUtils.chat("§eTPS: §fCalculating...")
-        ChatUtils.chat("§eTPS: ${getColor(tps)}$tps")
+        val tpsMessage = tps?.let { "${getColor(it)}$it" } ?: tilCalculated
+        ChatUtils.chat("§eTPS: $tpsMessage")
     }
 
     @SubscribeEvent
@@ -85,8 +88,8 @@ object TpsCounter {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         tpsList.clear()
         tps = null
         packetsFromLastSecond = 0
@@ -99,7 +102,7 @@ object TpsCounter {
         hasReceivedPacket = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -119,9 +122,9 @@ object TpsCounter {
 
     private fun isEnabled() = LorenzUtils.onHypixel &&
         config.tpsDisplay &&
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
+        (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tpsDisplayEnabled", "gui.tpsDisplay")
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")

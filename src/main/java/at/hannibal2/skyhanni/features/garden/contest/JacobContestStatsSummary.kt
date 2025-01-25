@@ -1,35 +1,35 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.CropClickEvent
-import at.hannibal2.skyhanni.events.FarmingContestEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object JacobContestStatsSummary {
 
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
     private var blocksBroken = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
-        if (FarmingContestAPI.inContest && event.crop == FarmingContestAPI.contestCrop) {
+        if (FarmingContestApi.inContest && event.crop == FarmingContestApi.contestCrop) {
             blocksBroken++
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFarmingContest(event: FarmingContestEvent) {
         if (!isEnabled()) return
 
@@ -61,5 +61,5 @@ object JacobContestStatsSummary {
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
 
-    fun isEnabled() = GardenAPI.inGarden() && config.jacobContestSummary
+    fun isEnabled() = GardenApi.inGarden() && config.jacobContestSummary
 }

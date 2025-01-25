@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -39,7 +40,7 @@ object SummoningSoulsName {
 
     private fun check() {
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
-            if (souls.contains(entity)) continue
+            if (entity in souls) continue
 
             if (entity.hasSkullTexture(SUMMONING_SOUL_TEXTURE)) {
                 val soulLocation = entity.getLorenzVec()
@@ -52,7 +53,7 @@ object SummoningSoulsName {
 
                 val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
                 if (nearestMob != null) {
-                    souls[entity] = mobsName.getOrNull(nearestMob)!!
+                    souls[entity] = mobsName[nearestMob] ?: continue
                 }
             }
         }
@@ -72,8 +73,8 @@ object SummoningSoulsName {
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((entity, name) in souls) {
@@ -82,8 +83,8 @@ object SummoningSoulsName {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         souls.clear()
         mobsLastLocation.clear()
         mobsName.clear()

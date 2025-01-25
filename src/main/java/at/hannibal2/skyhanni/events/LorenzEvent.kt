@@ -22,11 +22,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @Deprecated("Use SkyHanniEvent instead")
 abstract class LorenzEvent : Event() {
 
-    private val eventName by lazy {
-        this::class.simpleName!!
-    }
+    private val eventName = this::class.simpleName!!
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
+    @Deprecated("Use SkyHanniEvent instead")
     fun postAndCatch() = postAndCatchAndBlock {}
 
     companion object {
@@ -39,7 +37,7 @@ abstract class LorenzEvent : Event() {
         val isInGuardedEventHandler get() = eventHandlerDepth > 0 || PlatformUtils.isDevEnvironment
     }
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
+    @Deprecated("Use SkyHanniEvent instead")
     fun postAndCatchAndBlock(
         printError: Boolean = true,
         stopOnFirstError: Boolean = false,
@@ -71,11 +69,11 @@ abstract class LorenzEvent : Event() {
             val hiddenErrors = errors - visibleErrors
             ChatUtils.chat(
                 Text.text(
-                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!",
+                    "§c[SkyHanni-${SkyHanniMod.VERSION}] $hiddenErrors more errors in $eventName are hidden!",
                 ),
             )
         }
-        return if (isCancelable) isCanceled else false
+        return isCancelable && isCanceled
     }
 
     private fun getListeners(): Array<out IEventListener> {
@@ -83,10 +81,9 @@ abstract class LorenzEvent : Event() {
         return listenerList.getListeners(accessorEventBus.busId)
     }
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
+    @Deprecated("Use SkyHanniEvent instead")
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun cancel() {
         isCanceled = true
     }

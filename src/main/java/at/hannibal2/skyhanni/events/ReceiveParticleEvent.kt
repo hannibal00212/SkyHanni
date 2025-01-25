@@ -1,22 +1,20 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-@Cancelable
 class ReceiveParticleEvent(
     val type: EnumParticleTypes,
     val location: LorenzVec,
     val count: Int,
     val speed: Float,
     val offset: LorenzVec,
-    val longDistance: Boolean,
-    val particleArgs: IntArray,
-) :
-    LorenzEvent() {
+    private val longDistance: Boolean,
+    private val particleArgs: IntArray,
+) : CancellableSkyHanniEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -26,16 +26,15 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
 
     private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
-    private val config get() = GardenAPI.config.visitors
+    private val config get() = GardenApi.config.visitors
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         visitorJson = event.getConstant<GardenJson>(
             "Garden", GardenJson::class.java,
@@ -67,7 +66,7 @@ object HighlightVisitorsOutsideOfGarden {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
         val color = LorenzColor.DARK_RED.toColor().addAlpha(50)
@@ -102,7 +101,7 @@ object HighlightVisitorsOutsideOfGarden {
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 ChatUtils.chatAndOpenConfig(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    GardenAPI.config.visitors::blockInteracting,
+                    GardenApi.config.visitors::blockInteracting,
                 )
             }
         }

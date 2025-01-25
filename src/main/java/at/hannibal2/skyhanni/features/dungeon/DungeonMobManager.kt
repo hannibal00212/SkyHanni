@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -29,7 +30,7 @@ object DungeonMobManager {
     private val staredInvisible = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             starredConfig.highlight,
@@ -57,15 +58,15 @@ object DungeonMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)
@@ -79,8 +80,8 @@ object DungeonMobManager {
         handleInvisibleStar()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {

@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.MiningAPI.inCrystalHollows
-import at.hannibal2.skyhanni.data.MiningAPI.inDwarvenMines
-import at.hannibal2.skyhanni.data.MiningAPI.inGlacite
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.MiningApi.inCrystalHollows
+import at.hannibal2.skyhanni.data.MiningApi.inDwarvenMines
+import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -66,7 +67,7 @@ object MiningCommissionsBlocksColor {
     private var replaceBlocksMapCache = mutableMapOf<IBlockState, IBlockState>()
 
     // TODO Commission API
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
             val tabList = " §r§f${block.commissionName}: "
@@ -82,8 +83,8 @@ object MiningCommissionsBlocksColor {
     private val ignoredTabListCommissions = TimeLimitedSet<CommissionBlock>(5.seconds)
 
     // TODO Commission API
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!enabled) return
         commissionCompletePattern.matchMatcher(event.message) {
             val name = group("name")
@@ -129,8 +130,8 @@ object MiningCommissionsBlocksColor {
         }
     }
 
-    @SubscribeEvent
-    fun onConfigReload(event: ConfigLoadEvent) {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         color = config.color.get().toDyeColor()
         config.sneakQuickToggle.onToggle {
             oldSneakState = false
@@ -145,14 +146,14 @@ object MiningCommissionsBlocksColor {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         enabled = false
         replaceBlocksMapCache = mutableMapOf()
     }
 
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")

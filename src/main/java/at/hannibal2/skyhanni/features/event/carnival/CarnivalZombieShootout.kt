@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,8 +68,8 @@ object CarnivalZombieShootout {
         DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: RenderWorldEvent) {
         if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
         lamp?.let {
@@ -114,7 +114,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !started || !config.lampTimer) return
 
@@ -143,7 +143,7 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
@@ -157,8 +157,8 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message.removeColor()

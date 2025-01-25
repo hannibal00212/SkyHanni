@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -14,14 +15,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MagicalPowerDisplay {
@@ -74,7 +74,7 @@ object MagicalPowerDisplay {
         "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
@@ -96,8 +96,8 @@ object MagicalPowerDisplay {
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}$endMP"
     }
 
-    @SubscribeEvent
-    fun onInventoryOpened(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!abiphoneNamePattern.matches(event.inventoryName)) return
 
@@ -110,7 +110,7 @@ object MagicalPowerDisplay {
         }
     }
 
-    private fun NEUInternalName.isAbicase(): Boolean = this.startsWith("ABICASE_")
+    private fun NeuInternalName.isAbicase(): Boolean = this.startsWith("ABICASE_")
 
     private fun LorenzRarity.toMP(): Int? = when (this) {
         LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3

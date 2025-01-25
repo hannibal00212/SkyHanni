@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -10,39 +11,35 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenVisitorSupercraft {
 
-    private val isSupercraftEnabled get() = VisitorAPI.config.shoppingList.showSuperCraft
+    private val isSupercraftEnabled get() = VisitorApi.config.shoppingList.showSuperCraft
 
     private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()
     private var lastSuperCraftMaterial = ""
 
     private val superCraftItem by lazy {
-        val neuItem = "GOLD_PICKAXE".toInternalName().getItemStack()
         ItemUtils.createItemStack(
-            neuItem.item,
-            "§bSuper Craft",
+            Items.golden_pickaxe,
+            "§bSupercraft",
             "§8(From SkyHanni)",
             "",
-            "§7You have the items to craft",
-            "§7Click me to open the super crafter!",
+            "§7You have the items to craft.",
+            "§7Click me to open the supercrafter!",
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (hasIngredients) {
             hasIngredients = false
@@ -50,7 +47,7 @@ object GardenVisitorSupercraft {
     }
 
     // needs to run later than onVisitorOpen at GardenVisitorFeatures
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         visitor.offer?.offerItem ?: return
@@ -72,12 +69,12 @@ object GardenVisitorSupercraft {
         }
     }
 
-    private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
-        val ingredients = NEUItems.getRecipes(internalName)
+    private fun getSupercraftForSacks(internalName: NeuInternalName, amount: Int) {
+        val ingredients = NeuItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients ?: return
-        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        val requiredIngredients = mutableMapOf<NeuInternalName, Int>()
         for ((key, count) in ingredients.toPrimitiveItemStacks()) {
             requiredIngredients.addOrPut(key, count)
         }
@@ -92,7 +89,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!hasIngredients) return
         if (event.inventory is InventoryPlayer) return
@@ -102,7 +99,7 @@ object GardenVisitorSupercraft {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!hasIngredients) return
 

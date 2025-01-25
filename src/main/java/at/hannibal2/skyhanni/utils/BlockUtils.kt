@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntitySkull
-import net.minecraftforge.common.util.Constants
 
 object BlockUtils {
 
@@ -15,13 +15,11 @@ object BlockUtils {
 
     fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
 
-    fun LorenzVec.isInLoadedChunk(): Boolean = world.chunkProvider.provideChunk(toBlockPos()).isLoaded
+    fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
 
     fun getTextureFromSkull(position: LorenzVec?): String? {
         val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
-        val serializeNBT = entity.serializeNBT()
-        return serializeNBT.getCompoundTag("Owner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
     }
 
     fun IBlockState.isBabyCrop(): Boolean {
@@ -39,6 +37,6 @@ object BlockUtils {
     fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),
         Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
-        distance
+        distance,
     )
 }

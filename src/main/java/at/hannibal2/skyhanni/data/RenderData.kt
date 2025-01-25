@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -14,7 +14,6 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -28,7 +27,7 @@ object RenderData {
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         GlStateManager.translate(0f, 0f, -3f)
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        renderOverlay()
         GlStateManager.translate(0f, 0f, 3f)
     }
 
@@ -45,28 +44,30 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             GlStateManager.translate(0f, 0f, -3f)
-            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+            renderOverlay()
             GlStateManager.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
 
         GlStateManager.popMatrix()
     }
 
     private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!SkyHanniDebugsAndTests.globalRender) return
-        LorenzRenderWorldEvent(event.partialTicks).postAndCatch()
-    }
-
     // TODO find better spot for this
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(17, "chroma.chromaDirection") { element ->
             ConfigUtils.migrateIntToEnum(element, ChromaConfig.Direction::class.java)
         }
+    }
+
+    var outsideInventory = false
+
+    fun renderOverlay() {
+        outsideInventory = true
+        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        outsideInventory = false
     }
 }

@@ -29,8 +29,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
                 MinecraftForge.EVENT_BUS.register(instance)
             } else {
                 SkyHanniMod.modules.remove(instance)
-                primaryConstructor.isAccessible = true
-                val newInstance = primaryConstructor.newInstance()
+                val newInstance = primaryConstructor.makeAccessible().newInstance()
                 ChatUtils.chat("Reconstructing $instance -> $newInstance!")
                 val instanceField = runCatching { instance.javaClass.getDeclaredField("INSTANCE") }.getOrNull()
                     ?.takeIf { it.type == instance.javaClass }

@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -11,7 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -23,7 +24,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object VerminHighlighter {
-    private val config get() = RiftAPI.config.area.westVillage.verminHighlight
+    private val config get() = RiftApi.config.area.westVillage.verminHighlight
 
     private val checkedEntities = TimeLimitedSet<Int>(1.minutes)
 
@@ -45,7 +46,7 @@ object VerminHighlighter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.color) {
             // running setEntityColorWithNoHurtTime() again
@@ -62,6 +63,6 @@ object VerminHighlighter {
 
     private fun hasItemInHand() = InventoryUtils.itemInHandId == "TURBOMAX_VACUUM".toInternalName()
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inWestVillage() && config.enabled && hasItemInHand()
+    fun isEnabled() = RiftApi.inRift() && RiftApi.inWestVillage() && config.enabled && hasItemInHand()
 
 }

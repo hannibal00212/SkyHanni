@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SeaCreatureTracker {
@@ -45,7 +44,7 @@ object SeaCreatureTracker {
         var amount: MutableMap<String, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
 
@@ -75,7 +74,7 @@ object SeaCreatureTracker {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         needMigration = true
     }
@@ -167,29 +166,32 @@ object SeaCreatureTracker {
         return { it in items }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         tracker.firstUpdate()
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!FishingAPI.isFishing(checkRodInHand = false)) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (!FishingApi.isFishing(checkRodInHand = false)) return false
+
+        return true
     }
 
     fun resetCommand() {
         tracker.resetCommand()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingAPI.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }

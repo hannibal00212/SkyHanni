@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -9,8 +10,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -81,7 +81,7 @@ object UpgradeReminder {
     private var lastReminderSend = SimpleTimeMark.farPast()
 
     // TODO: (for 0.27) merge this logic with reminder manager
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
@@ -94,9 +94,8 @@ object UpgradeReminder {
         lastReminderSend = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = event.inventoryName == "Community Shop"
         if (!inInventory) return
 
@@ -130,12 +129,12 @@ object UpgradeReminder {
         return false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inInventory) return
         val item = event.item ?: return
@@ -143,9 +142,8 @@ object UpgradeReminder {
         clickedUpgrade = CommunityShopUpgrade.fromItem(item) ?: return
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (upgradeStartedPattern.matches(event.message)) {
             clickedUpgrade?.start()
             when (clickedUpgradeType) {
@@ -167,7 +165,7 @@ object UpgradeReminder {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.accountUpgradeReminder
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             49,

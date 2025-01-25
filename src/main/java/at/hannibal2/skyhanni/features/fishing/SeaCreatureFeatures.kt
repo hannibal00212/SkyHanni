@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +36,7 @@ object SeaCreatureFeatures {
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -49,7 +49,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         var shouldHighlight = config.highlight
-        if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
             val seaCreaturesBosses =
                 BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
             if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
@@ -68,14 +68,13 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         rareSeaCreatures.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.alertOwnCatches) return
 
         if (event.seaCreature.rare) {
@@ -87,25 +86,25 @@ object SeaCreatureFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         rareSeaCreatures.clear()
         entityIds.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.XRAY) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.rareSeaCreatureHighlight", "fishing.rareCatches.highlight")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->

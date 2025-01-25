@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.*
+import java.util.Locale
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -29,26 +29,27 @@ object ChocolateFactoryStrayTimer {
     private var lastPingTime = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onEggFound(eggFoundEvent: EggFoundEvent) {
-        val type = eggFoundEvent.type
+    fun onEggFound(event: EggFoundEvent) {
+        val type = event.type
         // Only reset the timer for meal entries and hitman eggs
         if (type !in resettingEntries && type != HoppityEggType.HITMAN) return
         timer = 30.seconds
         lastTimerSubtraction = null
     }
 
-    @SubscribeEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        if (timer == Duration.ZERO || timer == 30.seconds) return
-        // Reset the timer if the inventory is closed and the timer is not at 30 seconds
-        // The 30s stray timer only counts if you stay in the inventory for the full duration
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         timer = Duration.ZERO
+    }
+
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (timer > Duration.ZERO) timer = 30.seconds
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!HoppityAPI.isHoppityEvent() || !ChocolateFactoryAPI.inChocolateFactory) return
-        if (timer <= Duration.ZERO) return
+        if (!ChocolateFactoryApi.inChocolateFactory || timer <= Duration.ZERO) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -60,9 +61,9 @@ object ChocolateFactoryStrayTimer {
         } ?: SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!HoppityAPI.isHoppityEvent() || !ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!eventConfig.enabled || timer <= Duration.ZERO) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }

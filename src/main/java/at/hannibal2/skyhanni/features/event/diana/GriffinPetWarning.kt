@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.BurrowDugEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -23,10 +24,10 @@ object GriffinPetWarning {
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(10)) return
         if (!config.petWarning) return
-        if (!DianaAPI.isDoingDiana()) return
-        if (!DianaAPI.hasSpadeInHand()) return
+        if (!DianaApi.isDoingDiana()) return
+        if (!DianaApi.hasSpadeInHand()) return
 
-        val hasGriffinPet = DianaAPI.hasGriffinPet()
+        val hasGriffinPet = DianaApi.hasGriffinPet()
         if (hasGriffinPet) {
             wasCorrectPetAlready = true
             return
@@ -37,14 +38,14 @@ object GriffinPetWarning {
         warn()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         DelayedRun.runDelayed(2.seconds) {
             wasCorrectPetAlready = false
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         DelayedRun.runDelayed(5.seconds) {
             wasCorrectPetAlready = false

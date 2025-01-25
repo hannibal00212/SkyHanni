@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
-import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -18,9 +18,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
-import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
-import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
@@ -37,7 +35,7 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureT
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
@@ -56,7 +54,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -91,8 +88,7 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
-import at.hannibal2.skyhanni.test.graph.GraphEditor
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -102,7 +98,10 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
 @Suppress("LargeClass", "LongMethod")
+@Deprecated("do not use this class anymore")
 object Commands {
+    // Do not add new commands in this class
+    // TODO move all command loading away from this class
 
     val commandList = mutableListOf<CommandBuilder>()
 
@@ -115,7 +114,6 @@ object Commands {
         devTest(event)
         devDebug(event)
         internalCommands(event)
-        shortenedCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
@@ -127,10 +125,6 @@ object Commands {
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGUI.onCommand() }
-        }
-        event.register("shcommands") {
-            description = "Shows this list"
-            callback { HelpCommand.onCommand(it) }
         }
         event.register("shdefaultoptions") {
             description = "Select default options"
@@ -163,7 +157,7 @@ object Commands {
     private fun usersNormal(event: CommandRegistrationEvent) {
         event.register("shcroptime") {
             description =
-                "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
+                "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropTimeCommand.onCommand(it) }
         }
@@ -255,8 +249,8 @@ object Commands {
         event.register("shskills") {
             description = "Skills XP/Level related command"
             category = CommandCategory.USERS_ACTIVE
-            callback { SkillAPI.onCommand(it) }
-            autoComplete { SkillAPI.onComplete(it) }
+            callback { SkillApi.onCommand(it) }
+            autoComplete { SkillApi.onComplete(it) }
         }
         event.register("shlimbostats") {
             description = "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!"
@@ -380,7 +374,7 @@ object Commands {
         event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
-            callback { GardenAPI.resetCropSpeed() }
+            callback { GardenApi.resetCropSpeed() }
         }
         event.register("shresetkismet") {
             description = "Resets the saved values of the applied kismet feathers in Croesus"
@@ -433,7 +427,7 @@ object Commands {
         event.register("shtogglehypixelapierrors") {
             description = "Show/hide hypixel api error messages in chat"
             category = CommandCategory.USERS_BUG_FIX
-            callback { APIUtils.toggleApiErrorMessages() }
+            callback { ApiUtils.toggleApiErrorMessages() }
         }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
@@ -459,11 +453,6 @@ object Commands {
             description = "Shows the status of all the mods constants"
             category = CommandCategory.USERS_BUG_FIX
             callback { SkyHanniMod.repo.displayRepoStatus(false) }
-        }
-        event.register("shkingfix") {
-            description = "Resets the local King Talisman Helper offset."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { KingTalismanHelper.kingFix() }
         }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
@@ -547,7 +536,7 @@ object Commands {
         event.register("shtestsackapi") {
             description = "Get the amount of an item in sacks according to internal feature SackAPI"
             category = CommandCategory.DEVELOPER_DEBUG
-            callback { SackAPI.testSackAPI(it) }
+            callback { SackApi.testSackApi(it) }
         }
         event.register("shtestgriffinspots") {
             description = "Show potential griffin spots around you."
@@ -630,11 +619,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.repo.reloadLocalRepo() }
         }
-        event.register("shgraph") {
-            description = "Enables the graph editor"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GraphEditor.commandIn() }
-        }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
             category = CommandCategory.DEVELOPER_TEST
@@ -703,7 +687,7 @@ object Commands {
         event.register("shpartydebug") {
             description = "List persons into the chat SkyHanni thinks are in your party."
             category = CommandCategory.DEVELOPER_TEST
-            callback { PartyAPI.listMembers() }
+            callback { PartyApi.listMembers() }
         }
         event.register("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
@@ -765,44 +749,6 @@ object Commands {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
             callback { ChatClickActionManager.onCommand(it) }
-        }
-    }
-
-    private fun shortenedCommands(event: CommandRegistrationEvent) {
-        event.register("pko") {
-            description = "Kicks offline party members"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kickOffline() }
-        }
-        event.register("pw") {
-            description = "Warps your party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.warp() }
-        }
-        event.register("pk") {
-            description = "Kick a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.kick(it) }
-        }
-        event.register("pt") {
-            description = "Transfer the party to another party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.transfer(it) }
-        }
-        event.register("pp") {
-            description = "Promote a specific party member"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.promote(it) }
-        }
-        event.register("pd") {
-            description = "Disbands the party"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.disband() }
-        }
-        event.register("rpt") {
-            description = "Reverse transfer party to the previous leader"
-            category = CommandCategory.SHORTENED_COMMANDS
-            callback { PartyCommands.reverseTransfer() }
         }
     }
 }

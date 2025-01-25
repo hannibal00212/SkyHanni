@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -16,7 +17,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HideArmor {
@@ -41,7 +41,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPre(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
@@ -59,7 +59,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderLivingPost(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
         val entity = event.entity
         if (!shouldHideArmor(entity)) return
@@ -70,7 +70,7 @@ object HideArmor {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "misc.hideArmor2.mode") { element ->
             ConfigUtils.migrateIntToEnum(element, ModeEntry::class.java)

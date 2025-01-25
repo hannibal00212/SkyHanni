@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -16,12 +16,11 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,7 +41,7 @@ object SlayerQuestWarning {
         var lastSlayerType: SlayerType? = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         val slayerType = event.full.nextAfter("Slayer Quest")
         val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
@@ -60,7 +59,7 @@ object SlayerQuestWarning {
         }
     }
 
-    private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
+    private fun getSlayerData() = if (RiftApi.inRift()) outsideRiftData else insideRiftData
 
     private fun String.inCombat() = contains("Combat") || contains("Kills")
     private fun String.inBoss() = this == "Slay the boss!"
@@ -101,7 +100,7 @@ object SlayerQuestWarning {
         if (!config.questWarning) return
         if (lastWarning.passedSince() < 10.seconds) return
 
-        if (DianaAPI.isDoingDiana()) return
+        if (DianaApi.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
 
@@ -113,9 +112,8 @@ object SlayerQuestWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
@@ -124,7 +122,7 @@ object SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+        val slayerType = SlayerApi.getSlayerTypeForCurrentArea() ?: return false
 
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false
@@ -134,11 +132,11 @@ object SlayerQuestWarning {
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false
 
-        SlayerAPI.activeSlayer?.let {
+        SlayerApi.activeSlayer?.let {
             if (slayerType != it) {
                 val activeSlayerName = it.displayName
                 val slayerName = slayerType.displayName
-                SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
+                SlayerApi.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",

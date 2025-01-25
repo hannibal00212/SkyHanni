@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
@@ -16,13 +17,12 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConf
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -288,7 +288,7 @@ object PowderMiningChatFilter {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
-                val amountParsed = amountStr.replace(",", "").toInt()
+                val amountParsed = amountStr.formatInt()
                 return if (amountParsed < config.powderFilterThreshold) "powder_mining_powder"
                 else "no_filter"
             }
@@ -316,7 +316,7 @@ object PowderMiningChatFilter {
     private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
         emptyMap()
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
         rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",

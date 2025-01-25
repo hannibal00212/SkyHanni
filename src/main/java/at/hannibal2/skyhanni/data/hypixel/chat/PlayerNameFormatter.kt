@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
+import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
@@ -34,7 +35,6 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.
@@ -59,7 +59,7 @@ object PlayerNameFormatter {
         "(?<emblem>(?:§.){0,2}.) (?<author>.*)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent) {
         if (!isEnabled()) return
         val levelColor = event.levelColor
@@ -87,7 +87,7 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCoopChat(event: CoopChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -100,7 +100,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuildChat(event: GuildChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -113,7 +113,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPartyChat(event: PartyChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -126,7 +126,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -140,7 +140,7 @@ object PlayerNameFormatter {
         ) ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
@@ -189,7 +189,7 @@ object PlayerNameFormatter {
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
             val faction = it.faction.icon?.trim()?.toCleanChatComponent()
             val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
-            val bingo = it.bingoLevel?.let { level -> BingoAPI.getBingoIcon(level).toCleanChatComponent() }
+            val bingo = it.bingoLevel?.let { level -> BingoApi.getBingoIcon(level).toCleanChatComponent() }
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 
@@ -279,7 +279,7 @@ object PlayerNameFormatter {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(41, "chat.PlayerMessagesConfig.partsOrder") { element ->
             val newList = JsonArray()
