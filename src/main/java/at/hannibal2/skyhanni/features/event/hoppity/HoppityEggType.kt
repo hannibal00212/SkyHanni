@@ -21,7 +21,7 @@ enum class HoppityEggType(
     private val mealColor: String,
     val resetsAt: Int,
     private var claimed: Boolean = false,
-    private var lastReset: SkyBlockTime = SkyBlockTime.fromSbYear(0),
+    private var lastReset: SkyBlockTime = SkyBlockTime.fromSBYear(0),
     val altDay: Boolean = false,
 ) {
     BREAKFAST("Breakfast", "§6", 7),
