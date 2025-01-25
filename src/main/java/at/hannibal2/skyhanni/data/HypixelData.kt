@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -393,8 +392,8 @@ object HypixelData {
     }
 
     // TODO rewrite everything in here
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             sendLocraw()
         }

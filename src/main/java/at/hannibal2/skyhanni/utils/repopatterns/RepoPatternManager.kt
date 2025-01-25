@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -83,7 +82,7 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
+        if (EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
         }
     }
