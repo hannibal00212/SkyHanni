@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -223,34 +222,6 @@ object LorenzUtils {
             }
             add(" ")
         }
-    }
-
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
-    inline fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        add(
-            buildList {
-                add(prefix)
-                add("§a[")
-                if (tips.isEmpty()) {
-                    add(Renderable.link("§e$getName", false, onClick))
-                } else {
-                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                }
-                add("§a]")
-            },
-        )
     }
 
     fun GuiEditSign.isRancherSign(): Boolean {
