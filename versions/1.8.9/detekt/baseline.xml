@@ -188,9 +188,9 @@
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minosinquisitor", ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "minotaur", ".* §r§eYou dug out a §r§2Minotaur§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "siameselynxes", ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!", )</ID>
-    <ID>RepoPatternRegexTestMissing:NPCVisitorFix.kt$NPCVisitorFix$by RepoPattern.pattern( "garden.barn.skin.change", "§aChanging Barn skin to §r.*" )</ID>
     <ID>RepoPatternRegexTestMissing:NewYearCakeReminder.kt$NewYearCakeReminder$by RepoPattern.pattern( "event.winter.newyearcake.reminder.sidebar", "§dNew Year Event!§f (?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:NonGodPotEffectDisplay.kt$NonGodPotEffectDisplay$by RepoPattern.pattern( "misc.nongodpot.effects", "§7You have §e(?&lt;name&gt;\\d+) §7non-god effects\\.", )</ID>
+    <ID>RepoPatternRegexTestMissing:NpcVisitorFix.kt$NpcVisitorFix$by RepoPattern.pattern( "garden.barn.skin.change", "§aChanging Barn skin to §r.*" )</ID>
     <ID>RepoPatternRegexTestMissing:PartyApi.kt$PartyApi$by patternGroup.pattern( "kuudrafinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:PestApi.kt$PestApi$by patternGroup.pattern( "inventory", "§4§lൠ §cThis plot has §6(?&lt;amount&gt;\\d) Pests?§c!", )</ID>
     <ID>RepoPatternRegexTestMissing:PestApi.kt$PestApi$by patternGroup.pattern( "scoreboard.pests", " §7⏣ §[ac]The Garden §4§lൠ§7 x(?&lt;pests&gt;.*)", )</ID>
