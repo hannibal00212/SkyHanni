@@ -97,15 +97,15 @@ public class DisplayConfig {
         BOTH("Available / All"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        PowderDisplay(String str) {
-            this.str = str;
+        PowderDisplay(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -118,15 +118,15 @@ public class DisplayConfig {
         LONG("1,234,567"),
         SHORT("1.2M");
 
-        private final String str;
+        private final String displayName;
 
-        NumberFormat(String str) {
-            this.str = str;
+        NumberFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
