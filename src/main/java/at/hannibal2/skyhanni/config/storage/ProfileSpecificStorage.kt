@@ -37,8 +37,9 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.BucketData
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
@@ -600,8 +601,11 @@ class ProfileSpecificStorage {
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
-            var corpseProfitTracker: BucketData = BucketData()
+            var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
         }
+
+        @Expose
+        var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
     }
 
     @Expose
