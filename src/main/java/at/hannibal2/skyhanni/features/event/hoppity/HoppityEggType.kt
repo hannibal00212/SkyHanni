@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.isAlternateDay
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -71,7 +71,7 @@ enum class HoppityEggType(
     }
 
     fun hasRemainingSpawns(): Boolean {
-        val hoppityEndMark = HoppityAPI.getEventEndMark() ?: return false
+        val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
         if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
@@ -112,15 +112,15 @@ enum class HoppityEggType(
             }
 
         fun checkClaimed() {
-            val currentSbTime = SkyBlockTime.now()
-            val currentSbDay = currentSbTime.day
-            val currentSbHour = currentSbTime.hour
-            val isAltDay = currentSbTime.isAlternateDay()
+            val currentSBTime = SkyBlockTime.now()
+            val currentSBDay = currentSBTime.day
+            val currentSBHour = currentSBTime.hour
+            val isAltDay = currentSBTime.isAlternateDay()
 
             for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
-                if (currentSbHour < eggType.resetsAt || eggType.lastResetDay == currentSbDay) continue
+                if (currentSBHour < eggType.resetsAt || eggType.lastResetDay == currentSBDay) continue
                 eggType.markSpawned()
-                eggType.lastResetDay = currentSbDay
+                eggType.lastResetDay = currentSBDay
                 if (HoppityEggLocator.currentEggType == eggType) {
                     HoppityEggLocator.currentEggType = null
                     HoppityEggLocator.currentEggNote = null

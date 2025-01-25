@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityChatConfig
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.HoppityStateDataSet
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.getRabbitsFormat
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,10 +25,10 @@ typealias RarityType = HoppityChatConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var hoppityDataSet = HoppityStateDataSet()
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private val chatConfig get() = HoppityEggsManager.config.chat
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
-    val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
+    private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
 
     fun compactChat(event: SkyHanniChatEvent?, dataSet: HoppityStateDataSet) {
         if (!chatConfig.compact) return
@@ -124,7 +124,7 @@ object HoppityEggsCompactChat {
 
     private fun Long?.getChocExtraTimeString(): String {
         if (this == null) return "?"
-        val extraTime = ChocolateFactoryAPI.timeUntilNeed(this)
+        val extraTime = ChocolateFactoryApi.timeUntilNeed(this)
         return if (config.showDuplicateTime) ", §a+§b${extraTime.format(maxUnits = 2)}§7" else ""
     }
 

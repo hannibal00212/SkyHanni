@@ -29,11 +29,11 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventEndMark
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.getEventStartMark
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventStartMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -74,7 +74,7 @@ object HoppityEventSummary {
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
      */
-    private val rabbitTheFishPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val rabbitTheFishPattern by ChocolateFactoryApi.patternGroup.pattern(
         "rabbit.thefish",
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
     )
@@ -84,7 +84,7 @@ object HoppityEventSummary {
      * REGEX-TEST: Chocolate Factory Milestones
      * REGEX-TEST: Chocolate Shop Milestones
      */
-    private val miscCfInventoryPatterns by ChocolateFactoryAPI.patternGroup.pattern(
+    private val miscCfInventoryPatterns by ChocolateFactoryApi.patternGroup.pattern(
         "cf.inventory",
         "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
@@ -118,7 +118,7 @@ object HoppityEventSummary {
         val inventoryName = InventoryUtils.openInventoryName()
 
         val inChocolateFactory =
-            ChocolateFactoryAPI.inChocolateFactory ||
+            ChocolateFactoryApi.inChocolateFactory ||
                 menuNamePattern.matches(inventoryName) ||
                 miscCfInventoryPatterns.matches(inventoryName)
 
@@ -138,7 +138,7 @@ object HoppityEventSummary {
         val isToggledOff = storage.hoppityStatLiveDisplayToggledOff
         val isEnabled = liveDisplayConfig.enabled
         val isIslandEnabled = !liveDisplayConfig.onlyHoppityIslands || onHoppityIsland
-        val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
+        val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityApi.isHoppityEvent()
         val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
         val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
 
@@ -152,7 +152,7 @@ object HoppityEventSummary {
     }
 
     private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
-        if (ChocolateFactoryAPI.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        if (ChocolateFactoryApi.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
         else this
 
     private data class StatString(var string: String, val headed: Boolean = true)
@@ -182,11 +182,11 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
-        if (!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
         stats.mealsFound.addOrPut(event.eggType, 1)
-        val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
+        val rarity = HoppityApi.rarityByRabbit(event.rabbitName) ?: return
         val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
         if (event.duplicate) rarityMap.dupes++
         else rarityMap.uniques++
@@ -209,7 +209,7 @@ object HoppityEventSummary {
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryAPI.inChocolateFactory) return
+        if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -218,7 +218,7 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
         if (rabbitTheFishPattern.matches(event.message)) {
@@ -255,7 +255,7 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
-        ChocolateFactoryAPI.config.partyMode.afterChange {
+        ChocolateFactoryApi.config.partyMode.afterChange {
             lastKnownStatHash = 0
         }
     }
@@ -266,7 +266,7 @@ object HoppityEventSummary {
         reCheckInventoryState()
         checkEnded()
         recheckHashClear(event)
-        if (!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityApi.isHoppityEvent()) return
         checkAddCfTime()
     }
 
@@ -314,7 +314,7 @@ object HoppityEventSummary {
     }
 
     private fun checkLbUpdateWarning() {
-        if (!LorenzUtils.inSkyBlock || !HoppityAPI.isHoppityEvent() || !updateCfConfig.enabled) return
+        if (!LorenzUtils.inSkyBlock || !HoppityApi.isHoppityEvent() || !updateCfConfig.enabled) return
 
         // Only run if the user has leaderboard stats enabled
         if (!statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
@@ -391,7 +391,7 @@ object HoppityEventSummary {
             )
             val eventEnd = getEventEndMark(statYear)
             val yearNow = getCurrentSBYear()
-            val isHoppity = HoppityAPI.isHoppityEvent()
+            val isHoppity = HoppityApi.isHoppityEvent()
 
             val isCurrentEvent = isHoppity && statYear == yearNow
             val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
@@ -467,7 +467,7 @@ object HoppityEventSummary {
     private fun getCurrentSBYear() = SkyBlockTime.now().year
 
     private fun checkAddCfTime() {
-        if (!ChocolateFactoryAPI.inChocolateFactory) {
+        if (!ChocolateFactoryApi.inChocolateFactory) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
             return
         }
@@ -505,7 +505,7 @@ object HoppityEventSummary {
     }
 
     fun updateCfPosition(position: Int?, percentile: Double?) {
-        if (!HoppityAPI.isHoppityEvent() || inSameServer() || position == null || percentile == null) return
+        if (!HoppityApi.isHoppityEvent() || inSameServer() || position == null || percentile == null) return
         val stats = getYearStats() ?: return
         val snapshot = LeaderboardPosition(position, percentile)
         stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
@@ -514,7 +514,7 @@ object HoppityEventSummary {
     }
 
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
-        if (!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
         val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
         rarityMap.strays++
@@ -530,7 +530,7 @@ object HoppityEventSummary {
         val chocFormatLine = buildString {
             append(" §6+${chocGained.addSeparators()} Chocolate")
             if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
+                val timeFormatted = ChocolateFactoryApi.timeUntilNeed(chocGained).format(maxUnits = 2)
                 append(" §7(§a+§b$timeFormatted§7)")
             }
         }
@@ -694,7 +694,7 @@ object HoppityEventSummary {
             statList.clear()
             statList.addEmptyLine()
             statList.addStr("§c§lNothing to show!")
-            val isCurrentEvent = HoppityAPI.isHoppityEvent() && eventYear == getCurrentSBYear()
+            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == getCurrentSBYear()
             val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
@@ -729,7 +729,7 @@ object HoppityEventSummary {
     }
 
     private fun getSpawnedEggCount(year: Int): Int {
-        val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
+        val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
         // Calculate total eggs from complete days and incomplete day periods
         val previousEggs = if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3
@@ -750,7 +750,7 @@ object HoppityEventSummary {
 
         return mutableListOf(
             "§7$name Rabbits: §f$rabbitsSum",
-            HoppityAPI.hoppityRarities.joinToString(" §7-") {
+            HoppityApi.hoppityRarities.joinToString(" §7-") {
                 " ${it.chatColorCode}${rarityMap[it] ?: 0}"
             },
         )

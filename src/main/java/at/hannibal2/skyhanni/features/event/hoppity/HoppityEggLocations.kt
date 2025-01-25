@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 object HoppityEggLocations {
 
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>> get() =
-        ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
+        ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 

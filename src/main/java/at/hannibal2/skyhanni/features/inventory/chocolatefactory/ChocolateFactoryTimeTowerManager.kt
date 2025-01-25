@@ -17,8 +17,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChocolateFactoryTimeTowerManager {
 
-    private val config get() = ChocolateFactoryAPI.config
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
+    private val config get() = ChocolateFactoryApi.config
+    private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
     private var warnAboutNewCharge = false
@@ -41,7 +41,7 @@ object ChocolateFactoryTimeTowerManager {
 
         checkTimeTowerExpired()
 
-        if (ChocolateFactoryAPI.inChocolateFactory) return
+        if (ChocolateFactoryApi.inChocolateFactory) return
 
         if (timeTowerFullTimeMark().isInPast()) {
             profileStorage.currentTimeTowerUses = maxCharges()
@@ -49,7 +49,7 @@ object ChocolateFactoryTimeTowerManager {
             var nextCharge = profileStorage.nextTimeTower
             while (nextCharge.isInPast() && !nextCharge.isFarPast()) {
                 profileStorage.currentTimeTowerUses++
-                nextCharge += ChocolateFactoryAPI.timeTowerChargeDuration()
+                nextCharge += ChocolateFactoryApi.timeTowerChargeDuration()
                 profileStorage.nextTimeTower = nextCharge
                 warnAboutNewCharge = true
             }
@@ -89,7 +89,7 @@ object ChocolateFactoryTimeTowerManager {
     }
 
     fun checkTimeTowerWarning(inInventory: Boolean) {
-        if (!ChocolateFactoryAPI.isEnabled()) return
+        if (!ChocolateFactoryApi.isEnabled()) return
         if (!config.timeTowerWarning) return
         if (!timeTowerFull()) return
         if (ReminderUtils.isBusy()) return
@@ -137,7 +137,7 @@ object ChocolateFactoryTimeTowerManager {
         if (timeTowerFull()) return SimpleTimeMark.farPast()
         val nextChargeDuration = profileStorage.nextTimeTower
         val remainingChargesAfter = profileStorage.maxTimeTowerUses - (profileStorage.currentTimeTowerUses + 1)
-        val endTime = nextChargeDuration + ChocolateFactoryAPI.timeTowerChargeDuration() * remainingChargesAfter
+        val endTime = nextChargeDuration + ChocolateFactoryApi.timeTowerChargeDuration() * remainingChargesAfter
 
         return endTime
     }
