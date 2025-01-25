@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -204,7 +204,7 @@ object GiftProfitTracker {
         }
     }
 
-    private val boostPotionCache = mutableMapOf<Pair<SkillType, Int>, NEUInternalName>()
+    private val boostPotionCache = mutableMapOf<Pair<SkillType, Int>, NeuInternalName>()
     private fun getBoostPotion(skill: SkillType, tier: Int) = boostPotionCache.getOrPut(skill to tier) {
         "POTION_${skill.name.uppercase()}_XP_BOOST;$tier".toInternalName()
     }
@@ -300,7 +300,7 @@ object GiftProfitTracker {
                 "◆ Ice Rune" -> "ICE_RUNE;1" to 1
                 else -> ItemUtils.readItemAmount(group("item")) ?: return
             }
-            NEUInternalName.fromItemNameOrNull(itemName)?.let { item ->
+            NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
                 tracker.addItem(item, amount, false)
             }
         }
