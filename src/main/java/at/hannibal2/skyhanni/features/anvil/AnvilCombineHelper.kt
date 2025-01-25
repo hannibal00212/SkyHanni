@@ -37,25 +37,19 @@ object AnvilCombineHelper {
         getLowerItems().hashCode() + getUpperItems().hashCode()
 
     private fun ContainerChest.checkInventory() {
-        lastInventoryHash = this.compHash().takeIf {
-            it != lastInventoryHash
-        } ?: return
+        lastInventoryHash = this.compHash().takeIf { it != lastInventoryHash } ?: return
 
         // Reset highlight cache
         highlightSlots = emptySet()
 
         val (leftStack, rightStack) = getSlot(LEFT_STACK_INDEX)?.stack to getSlot(RIGHT_STACK_INDEX)?.stack
-        if (leftStack != null && rightStack != null) return
-
         val itemInternalName = when {
-            leftStack != null -> leftStack.getInternalNameOrNull()
-            rightStack != null -> rightStack.getInternalNameOrNull()
-            else -> null
-        } ?: return
+            leftStack != null && rightStack == null -> leftStack.getInternalNameOrNull()
+            rightStack != null && leftStack == null -> rightStack.getInternalNameOrNull()
+            else -> return
+        }
 
-        var slots = 0
         highlightSlots = getLowerItems().mapNotNull { (slot, stack) ->
-            slots++
             slot.slotIndex.takeIf {
                 stack.getInternalNameOrNull() == itemInternalName
             }
