@@ -181,7 +181,6 @@ object ArmorDropTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-
         event.register("shresetarmordroptracker") {
             description = "Resets the Armor Drop Tracker"
             category = CommandCategory.USERS_RESET
