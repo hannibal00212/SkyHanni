@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.WinterAPI
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
@@ -124,7 +124,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!WinterAPI.isDecember()) return
+        if (!WinterApi.isDecember()) return
 
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }

@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -50,7 +50,7 @@ object EnoughUpdatesManager {
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
     private val recipes = mutableSetOf<PrimitiveRecipe>()
-    private val recipesMap = mutableMapOf<NEUInternalName, MutableSet<PrimitiveRecipe>>()
+    private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: JsonObject? = null
@@ -85,7 +85,7 @@ object EnoughUpdatesManager {
         }
     }
 
-    fun getRecipesFor(internalName: NEUInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
         val itemDir = File(repoLocation, "items")

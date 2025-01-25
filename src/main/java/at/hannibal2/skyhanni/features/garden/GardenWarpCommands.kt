@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenWarpCommands {
 
-    private val config get() = GardenAPI.config.gardenCommands
+    private val config get() = GardenApi.config.gardenCommands
 
     /**
      * REGEX-TEST: /tp 3
@@ -33,7 +33,7 @@ object GardenWarpCommands {
     @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.warpCommands) return
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
 
         val message = event.message.lowercase()
 
@@ -59,9 +59,9 @@ object GardenWarpCommands {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
 
         if (lastWarpTime.passedSince() < 2.seconds) return
 

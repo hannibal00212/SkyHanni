@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -58,7 +58,7 @@ object EssenceShopHelper {
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
     private var currentEssenceType: String = ""
-    private var currentEssenceItem: NEUInternalName? = null
+    private var currentEssenceItem: NeuInternalName? = null
     private var essenceOwned: Int = 0
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
@@ -139,7 +139,7 @@ object EssenceShopHelper {
         val currentEssenceItem = currentEssenceItem ?: return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            BazaarAPI.searchForBazaarItem(currentEssenceItem, essenceNeeded)
+            BazaarApi.searchForBazaarItem(currentEssenceItem, essenceNeeded)
             lastClick = SimpleTimeMark.now()
         }
     }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 
 // widget
 // widget update event
@@ -28,5 +28,5 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
 
     override val configLine = "Soulflow: §3761"
 
-    override fun showIsland() = !RiftAPI.inRift()
+    override fun showIsland() = !RiftApi.inRift()
 }
