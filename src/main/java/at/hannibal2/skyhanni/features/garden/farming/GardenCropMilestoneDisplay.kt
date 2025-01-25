@@ -105,9 +105,8 @@ object GardenCropMilestoneDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
 
         try {
             val item = event.itemStack

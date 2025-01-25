@@ -29,9 +29,8 @@ object GardenInventoryNumbers {
         "§7Current Tier: §[ea](?<tier>.*)§7/§a.*",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!GardenAPI.inGarden()) return
 
         if (InventoryUtils.openInventoryName() == "Crop Milestones") {
             if (!config.cropMilestone) return

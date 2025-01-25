@@ -57,9 +57,8 @@ object GardenWarpCommands {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyPress(event: KeyPressEvent) {
-        if (!GardenAPI.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
 

@@ -10,9 +10,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.burrowingSporesNotification) return
 
         if (event.message.endsWith("§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores")) {

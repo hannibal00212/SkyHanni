@@ -200,9 +200,8 @@ object PestAPI {
         updatePests()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in GardenPlotAPI.plots) {
@@ -217,9 +216,8 @@ object PestAPI {
         updatePests()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
         for (line in event.tabList) {
             infectedPlotsTablistPattern.matchMatcher(line) {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
@@ -240,16 +238,14 @@ object PestAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
         checkScoreboardLines(event.added)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
         if (pestDeathChatPattern.matches(event.message)) {
             lastPestKillTime = SimpleTimeMark.now()
             removeNearestPest()
@@ -278,9 +274,8 @@ object PestAPI {
         firstScoreboardCheck = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!GardenAPI.inGarden()) return
         if (event.oldItem !in vacuumVariants) return
         lastTimeVacuumHold = SimpleTimeMark.now()
     }

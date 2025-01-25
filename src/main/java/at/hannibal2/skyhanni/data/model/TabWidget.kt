@@ -265,6 +265,14 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Pest Traps: (?:§.)*(?<count>\\d+)/(?<max>\\d+)",
     ),
+    FULL_TRAPS(
+        // language=RegExp
+        "Full Traps: (?:§.)*(None|§r§a#(?<one>\\d)§r§7(?:, §r§a#(?<two>\\d)§r§7)?(?:, §r§a#(?<three>\\d))?)",
+    ),
+    NO_BAIT(
+        // language=RegExp
+        "No Bait: (?:§.)*(None|§r§a#(?<one>\\d)§r§7(?:, §r§a#(?<two>\\d)§r§7)?(?:, §r§a#(?<three>\\d))?)"
+    ),
     VISITORS(
         // language=RegExp
         "(?:§.)*Visitors: (?:§.)*\\((?<count>\\d+)\\)",

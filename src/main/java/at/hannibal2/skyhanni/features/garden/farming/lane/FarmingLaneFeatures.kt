@@ -191,9 +191,8 @@ object FarmingLaneFeatures {
         return MovementState.NORMAL
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.cornerWaypoints) return
 
         val lane = FarmingLaneAPI.currentLane ?: return
@@ -210,9 +209,8 @@ object FarmingLaneFeatures {
 
     private fun LorenzVec.capAtBuildHeight(): LorenzVec = if (y > 76) copy(y = 76.0) else this
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")

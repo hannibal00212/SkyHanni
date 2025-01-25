@@ -32,9 +32,8 @@ object NPCVisitorFix {
         "§aChanging Barn skin to §r.*"
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!GardenAPI.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
         val nearest = findNametags(name).firstOrNull { it.distanceToPlayer() < 3 } ?: return
         DelayedRun.runDelayed(200.milliseconds) {

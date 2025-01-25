@@ -13,9 +13,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 @SkyHanniModule
 object GardenComposterUpgradesData {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
             ComposterUpgrade.regex.matchMatcher(item.name) {

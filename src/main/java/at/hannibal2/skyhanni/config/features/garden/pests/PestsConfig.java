@@ -12,6 +12,11 @@ public class PestsConfig {
     public PestSpawnConfig pestSpawn = new PestSpawnConfig();
 
     @Expose
+    @ConfigOption(name = "Pest Trap", desc = "")
+    @Accordion
+    public PestTrapConfig pestTrap = new PestTrapConfig();
+
+    @Expose
     @ConfigOption(name = "Pest Finder", desc = "")
     @Accordion
     public PestFinderConfig pestFinder = new PestFinderConfig();

@@ -79,9 +79,8 @@ object GardenLevelDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
             addExp(group("exp").toInt())
@@ -110,9 +109,8 @@ object GardenLevelDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         val item = when (event.inventoryName) {
             "Desk" -> event.inventoryItems[4] ?: return
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
@@ -144,9 +142,8 @@ object GardenLevelDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.overflow.get()) return
         val slotIndex = event.slot.slotIndex
         val name = InventoryUtils.openInventoryName()

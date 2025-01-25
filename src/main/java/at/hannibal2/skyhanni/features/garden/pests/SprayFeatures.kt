@@ -71,9 +71,8 @@ object SprayFeatures {
         config.position.renderString(display, posLabel = "Pest Spray Selector")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
         if (InventoryUtils.itemInHandId != SPRAYONATOR) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return

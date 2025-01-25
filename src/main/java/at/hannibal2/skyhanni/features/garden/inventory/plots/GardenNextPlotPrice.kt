@@ -15,9 +15,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 @SkyHanniModule
 object GardenNextPlotPrice {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return

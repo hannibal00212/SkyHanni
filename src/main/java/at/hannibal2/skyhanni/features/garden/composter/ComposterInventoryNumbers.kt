@@ -34,9 +34,8 @@ object ComposterInventoryNumbers {
         "§7§7Compost Available: §a(?<amount>.*)",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return

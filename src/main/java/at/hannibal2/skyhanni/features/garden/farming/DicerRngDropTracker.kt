@@ -99,9 +99,8 @@ object DicerRngDropTracker {
         PRAY_TO_RNGESUS('5', "PRAY TO RNGESUS"),
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.hideChat && !config.display) return
 
         val message = event.message

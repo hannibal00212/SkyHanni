@@ -158,9 +158,8 @@ object GardenOptimalSpeed {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
 
         val speed = optimalSpeed ?: return
 

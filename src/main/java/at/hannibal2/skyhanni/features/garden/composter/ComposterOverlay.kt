@@ -131,9 +131,8 @@ object ComposterOverlay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
         inComposterUpgrades = event.inventoryName == "Composter Upgrades"

@@ -105,9 +105,8 @@ object FarmingFortuneDisplay {
 
     private val ZORROS_CAPE = "ZORROS_CAPE".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
         event.tabList.firstNotNullOfOrNull {
             universalTabFortunePattern.matchMatcher(it) {
                 val fortune = group("fortune").toDouble()

@@ -81,9 +81,8 @@ object StereoHarmonyDisplay {
         add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
         selectVinylPattern.matchMatcher(event.message) {
             activeVinyl = VinylType.getByName(group("type"))
             update()

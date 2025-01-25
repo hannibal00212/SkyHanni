@@ -250,9 +250,8 @@ object GardenPlotAPI {
         plots = list
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
@@ -283,9 +282,8 @@ object GardenPlotAPI {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {

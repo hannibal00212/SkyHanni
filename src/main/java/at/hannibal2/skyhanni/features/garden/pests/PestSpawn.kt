@@ -51,9 +51,8 @@ object PestSpawn {
     )
     private var plotNames = mutableListOf<String>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenAPI.inGarden()) return
         val message = event.message
         var blocked = false
 

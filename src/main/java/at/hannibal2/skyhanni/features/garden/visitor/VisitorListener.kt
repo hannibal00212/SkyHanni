@@ -67,9 +67,8 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: WidgetUpdateEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.VISITORS)) return
 
         val hasVisitorInfo = event.lines.any { VisitorAPI.visitorCountPattern.matches(it) }
@@ -93,9 +92,8 @@ object VisitorListener {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[INFO_SLOT] ?: return
         val lore = npcItem.getLore()
         if (!VisitorAPI.isVisitorInfo(lore)) return
@@ -154,9 +152,8 @@ object VisitorListener {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 

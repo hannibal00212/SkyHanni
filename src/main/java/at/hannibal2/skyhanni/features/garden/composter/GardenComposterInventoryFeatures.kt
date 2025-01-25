@@ -24,9 +24,8 @@ object GardenComposterInventoryFeatures {
 
     private val config get() = GardenAPI.config.composters
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenAPI.inGarden()) return
         if (!config.upgradePrice) return
 
         if (InventoryUtils.openInventoryName() != "Composter Upgrades") return
