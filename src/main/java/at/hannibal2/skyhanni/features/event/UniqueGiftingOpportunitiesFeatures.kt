@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.WinterAPI
+import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -76,7 +76,7 @@ object UniqueGiftingOpportunitiesFeatures {
         if (entity.name != HAS_GIFTED_NAMETAG) return
 
         val matchedPlayer = EntityUtils.getEntitiesNearby<EntityPlayer>(entity.getLorenzVec(), 2.0)
-            .singleOrNull { !it.isNPC() } ?: return
+            .singleOrNull { !it.isNpc() } ?: return
         addGiftedPlayer(matchedPlayer.name)
     }
 
@@ -95,7 +95,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun playerColor(event: EntityEnterWorldEvent<Entity>) {
         if (event.entity is EntityOtherPlayerMP) {
             val entity = event.entity
-            if (entity.isNPC() || isIronman(entity) || isBingo(entity)) return
+            if (entity.isNpc() || isIronman(entity) || isBingo(entity)) return
 
             RenderLivingEntityHelper.setEntityColor(
                 entity,
@@ -124,7 +124,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
-        if (!WinterAPI.isDecember()) return
+        if (!WinterApi.isDecember()) return
 
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
