@@ -5,32 +5,24 @@ import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.data.ChatManager
-import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
-import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
-import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
-import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -44,8 +36,6 @@ import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
-import at.hannibal2.skyhanni.features.garden.farming.FarmingWeightDisplay
-import at.hannibal2.skyhanni.features.garden.farming.GardenStartLocation
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
@@ -59,14 +49,9 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
-import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
-import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
-import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -74,8 +59,6 @@ import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
-import at.hannibal2.skyhanni.test.PacketTest
-import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -86,8 +69,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
-import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
-import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -126,15 +107,6 @@ object Commands {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGUI.onCommand() }
         }
-        event.register("shdefaultoptions") {
-            description = "Select default options"
-            callback { DefaultConfigFeatures.onCommand(it) }
-            autoComplete { DefaultConfigFeatures.onComplete(it) }
-        }
-        event.register("shremind") {
-            description = "Set a reminder for yourself"
-            callback { ReminderManager.command(it) }
-        }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
             callback { VisualWordGui.onCommand() }
@@ -142,14 +114,6 @@ object Commands {
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
-        }
-        event.register("shmarkplayer") {
-            description = "Add a highlight effect to a player for better visibility"
-            callback { MarkedPlayerManager.command(it) }
-        }
-        event.register("shtrackcollection") {
-            description = "Tracks your collection gain over time"
-            callback { CollectionTracker.command(it) }
         }
     }
 
@@ -165,38 +129,6 @@ object Commands {
             description = "Calculates with your current crop per second how many items you can collect in this amount of time"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropsInCommand.onCommand(it) }
-        }
-        event.register("shrpcstart") {
-            description = "Manually starts the Discord Rich Presence feature"
-            category = CommandCategory.USERS_ACTIVE
-            callback { DiscordRPCManager.startCommand() }
-        }
-        event.register("shcropstartlocation") {
-            description = "Manually sets the crop start location"
-            category = CommandCategory.USERS_ACTIVE
-            callback { GardenStartLocation.setLocationCommand() }
-        }
-        event.register("shbingotoggle") {
-            description = "Toggle the bingo card display mode"
-            category = CommandCategory.USERS_ACTIVE
-            callback { BingoCardDisplay.toggleCommand() }
-        }
-        event.register("shfarmingprofile") {
-            description = "Look up the farming profile from yourself or another player on elitebot.dev"
-            category = CommandCategory.USERS_ACTIVE
-            callback { FarmingWeightDisplay.lookUpCommand(it) }
-        }
-        event.register("shcopytranslation") {
-            description =
-                "Copy the translation of a message in another language to your clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message."
-            category = CommandCategory.USERS_ACTIVE
-            callback { Translator.fromNativeLanguage(it) }
-        }
-        event.register("shtranslate") {
-            description = "Translate a message in another language your language."
-            category = CommandCategory.USERS_ACTIVE
-            callback { Translator.toNativeLanguage(it) }
         }
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -595,11 +527,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { CopyItemCommand.command() }
         }
-        event.register("shcopyfoundburrowlocations") {
-            description = "Copy all ever found burrow locations to clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { AllBurrowsList.copyToClipboard() }
-        }
     }
 
     @Suppress("LongMethod")
@@ -608,11 +535,6 @@ object Commands {
             description = "Unused test command."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.testCommand(it) }
-        }
-        event.register("shchathistory") {
-            description = "Show the unfiltered chat history"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { ChatManager.openChatFilterGUI(it) }
         }
         event.register("shreloadlocalrepo") {
             description = "Reloading the local repo data"
@@ -623,11 +545,6 @@ object Commands {
             description = "See where regexes are loaded from"
             category = CommandCategory.DEVELOPER_TEST
             callback { RepoPatternGui.open() }
-        }
-        event.register("shtestrabbitpaths") {
-            description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { HoppityEggLocator.testPathfind(it) }
         }
         event.register("shtestitem") {
             description = "test item internal name resolving"
@@ -644,11 +561,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.waypoint(it) }
         }
-        event.register("shtesttablist") {
-            description = "Set your clipboard as a fake tab list."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { TabListData.toggleDebug() }
-        }
         event.register("shstoplisteners") {
             description = "Unregistering all loaded forge event listeners"
             category = CommandCategory.DEVELOPER_TEST
@@ -658,21 +570,6 @@ object Commands {
             description = "Trying to load all forge event listeners again. Might not work at all"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.reloadListeners() }
-        }
-        event.register("shtracksounds") {
-            description = "Tracks the sounds for the specified duration (in seconds) and copies it to the clipboard"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { TrackSoundsCommand.command(it) }
-        }
-        event.register("shtrackparticles") {
-            description = "Tracks the particles for the specified duration (in seconds) and copies it to the clipboard"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { TrackParticlesCommand.command(it) }
-        }
-        event.register("shtestpacket") {
-            description = "Logs incoming and outgoing packets to the console"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { PacketTest.command(it) }
         }
         event.register("shtestmessage") {
             description = "Sends a custom chat message client side in the chat"
@@ -684,63 +581,15 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { ExtendedChatColor.testCommand() }
         }
-        event.register("shpartydebug") {
-            description = "List persons into the chat SkyHanni thinks are in your party."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { PartyApi.listMembers() }
-        }
         event.register("shplaysound") {
             description = "Play the specified sound effect at the given pitch and volume."
             category = CommandCategory.DEVELOPER_TEST
             callback { SoundUtils.command(it) }
         }
-        event.register("shsendtitle") {
-            description = "Display a title on the screen with the specified settings."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { TitleManager.command(it) }
-        }
-        event.register("shresetconfig") {
-            description =
-                "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff)."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniDebugsAndTests.resetConfigCommand() }
-        }
-        event.register("shreadcropmilestonefromclipboard") {
-            description = "Read crop milestone from clipboard. This helps fixing wrong crop milestone data"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
-        }
-        event.register("shaddfoundburrowlocationsfromclipboard") {
-            description = "Add all ever found burrow locations from clipboard"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { AllBurrowsList.addFromClipboard() }
-        }
-        event.register("shtoggleegglocationdebug") {
-            description = "Shows Hoppity egg locations with their internal API names and status."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { HoppityEggLocations.toggleDebug() }
-        }
-        event.register("shtranslateadvanced") {
-            description = "Translates a message in an inputted language to another inputted language."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { Translator.translateAdvancedCommand(it) }
-        }
         event.register("shconfigsave") {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
-        }
-        event.register("shtestburrow") {
-            description = "Sets a test burrow waypoint at your location"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { GriffinBurrowHelper.setTestBurrow(it) }
-        }
-        event.register("shtestisland") {
-            description = "Changes the SkyBlock island SkyHanni thinks you are on"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { SkyBlockIslandTest.onCommand(it) }
         }
     }
 
