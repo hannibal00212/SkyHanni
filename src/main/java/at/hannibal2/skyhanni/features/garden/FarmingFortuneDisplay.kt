@@ -233,9 +233,8 @@ object FarmingFortuneDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden()) return
         if (event.isMod(2)) update()
         if (gardenJoinTime.passedSince() > 5.seconds && !foundTabUniversalFortune && !gardenJoinTime.isFarPast()) {
             if (lastUniversalFortuneMissingError.passedSince() < 20.seconds) return

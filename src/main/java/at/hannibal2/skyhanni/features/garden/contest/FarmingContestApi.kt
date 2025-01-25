@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -58,12 +59,15 @@ object FarmingContestApi {
         ContestBracket.entries.forEach { it.bracketPattern }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (internalContest && startTime.passedSince() > 20.minutes) {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
+
+        @Suppress("IsInIslandEarlyReturn")
+        if (!GardenApi.inGarden()) return
 
         checkActiveContest()
     }

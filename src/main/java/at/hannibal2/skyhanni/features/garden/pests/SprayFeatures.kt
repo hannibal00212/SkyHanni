@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPests

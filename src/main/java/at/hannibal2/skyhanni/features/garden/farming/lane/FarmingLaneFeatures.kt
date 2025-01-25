@@ -61,9 +61,8 @@ object FarmingLaneFeatures {
         display = emptyList()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return

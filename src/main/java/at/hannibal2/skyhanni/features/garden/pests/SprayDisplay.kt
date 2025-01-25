@@ -26,9 +26,9 @@ object SprayDisplay {
     private val config get() = PestApi.config.spray
     private var display: String? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden() || !event.isMod(5, 3)) return
+        if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
             display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
