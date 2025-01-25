@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class PowderMiningFilterConfig {
+class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Hide messages while opening chests in the Crystal Hollows.")
     @ConfigEditorBoolean
@@ -24,7 +24,7 @@ class PowderMiningFilterConfig {
             "§c60000§7: §cHide all"
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60000f, minStep = 500f)
-    var powderFilterThreshold: Int = 1000
+    var powderThreshold: Int = 1000
 
     @Expose
     @ConfigOption(
@@ -34,9 +34,9 @@ class PowderMiningFilterConfig {
             "§c20§7: §cHide all"
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
-    var essenceFilterThreshold: Int = 5
+    var essenceThreshold: Int = 5
 
-    enum class SimplePowderMiningRewardTypes(private val displayName: String) {
+    enum class SimplePowderMiningRewardTypes(val displayName: String) {
         ASCENSION_ROPE("§9Ascension Rope"),
         WISHING_COMPASS("§aWishing Compass"),
         OIL_BARREL("§aOil Barrel"),
@@ -68,9 +68,9 @@ class PowderMiningFilterConfig {
     @Expose
     @ConfigOption(name = "Goblin Egg", desc = "Hide Goblin Egg rewards that are below a certain rarity.")
     @ConfigEditorDropdown
-    var goblinEggs: GoblinEggFilterEntry = GoblinEggFilterEntry.YELLOW_UP
+    var goblinEggs: GoblinEggEntry = GoblinEggEntry.YELLOW_UP
 
-    enum class GoblinEggFilterEntry(private val displayName: String) {
+    enum class GoblinEggEntry(val displayName: String) {
         SHOW_ALL("Show all"),
         HIDE_ALL("Hide all"),
         GREEN_UP("Show §aGreen §7and up"),
@@ -81,9 +81,8 @@ class PowderMiningFilterConfig {
         override fun toString() = displayName
     }
 
-    // TODO rename to "gemstoneFilter" (addressed in #2285)
     @Expose
     @ConfigOption(name = "Gemstones", desc = "")
     @Accordion
-    var gemstoneFilterConfig: PowderMiningGemstoneFilterConfig = PowderMiningGemstoneFilterConfig()
+    var gemstone: PowderMiningGemstoneConfig = PowderMiningGemstoneConfig()
 }

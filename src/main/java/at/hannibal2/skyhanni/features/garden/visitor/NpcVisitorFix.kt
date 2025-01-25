@@ -24,12 +24,16 @@ import kotlin.time.Duration.Companion.seconds
  * Fixing the visitor detection problem with Anita and Jacob, as those two are on the garden twice when visiting.
  */
 @SkyHanniModule
-object NPCVisitorFix {
+object NpcVisitorFix {
     private val staticVisitors = listOf("Jacob", "Anita")
 
+    /**
+     * REGEX-TEST: §aChanging Barn skin to §r§fDefault§r§a!
+     * REGEX-TEST: §aChanging Barn skin to §r§5Mansion Heights§r§a!
+     */
     private val barnSkinChangePattern by RepoPattern.pattern(
         "garden.barn.skin.change",
-        "§aChanging Barn skin to §r.*"
+        "§aChanging Barn skin to §r.*",
     )
 
     @HandleEvent
