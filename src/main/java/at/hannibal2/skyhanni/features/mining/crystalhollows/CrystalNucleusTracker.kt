@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.EPIC_BAL_ITEM
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.JUNGLE_KEY_ITEM
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.LEGENDARY_BAL_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.EPIC_BAL_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -137,8 +137,8 @@ object CrystalNucleusTracker {
                 ).toSearchable("Jungle Key"),
             )
 
-            val usesApparatus = CrystalNucleusAPI.usesApparatus()
-            val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
+            val usesApparatus = CrystalNucleusApi.usesApparatus()
+            val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
             val totalSapphireCost: Double = partsCost * runsCompleted
             val rawConfigString = config.professorUsage.get().toString()
             val usageString = if (usesApparatus) StringUtils.pluralize(

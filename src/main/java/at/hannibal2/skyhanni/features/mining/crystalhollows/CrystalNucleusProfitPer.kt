@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusAPI.JUNGLE_KEY_ITEM
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -45,7 +45,7 @@ object CrystalNucleusProfitPer {
         }
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
-        val partsCost = CrystalNucleusAPI.getPrecursorRunPrice()
+        val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
         totalProfit -= (jungleKeyCost + partsCost)
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"

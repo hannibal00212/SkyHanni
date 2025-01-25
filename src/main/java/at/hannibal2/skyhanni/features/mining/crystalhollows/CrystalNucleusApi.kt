@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object CrystalNucleusAPI {
+object CrystalNucleusApi {
 
     private val patternGroup = RepoPattern.group("mining.crystalnucleus")
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
