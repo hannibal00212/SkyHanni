@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 // update with bits update event
 object ScoreboardElementBits : ScoreboardElement() {
     override fun getDisplay(): String? {
-        val bitsToClaim = BitsAPI.bitsAvailable
-        if (informationFilteringConfig.hideEmptyLines && BitsAPI.bits == 0 && (bitsToClaim == -1 || bitsToClaim == 0)) return null
+        val bitsToClaim = BitsApi.bitsAvailable
+        if (informationFilteringConfig.hideEmptyLines && BitsApi.bits == 0 && (bitsToClaim == -1 || bitsToClaim == 0)) return null
 
         return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Bits", getBitsLine(), "§b")
     }
@@ -22,7 +22,7 @@ object ScoreboardElementBits : ScoreboardElement() {
 
     override val configLine = "Bits: §b59,264"
 
-    override val elementPatterns = listOf(BitsAPI.bitsScoreboardPattern)
+    override val elementPatterns = listOf(BitsApi.bitsScoreboardPattern)
 
     override fun showIsland() = !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }

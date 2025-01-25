@@ -69,7 +69,7 @@ object DungeonHighlightClickedBlocks {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (DungeonApi.inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         val type = event.blockType
 
@@ -108,6 +108,6 @@ object DungeonHighlightClickedBlocks {
     private data class ClickedBlock(val displayText: String, var color: Color)
     private data class BlockProperties(val name: String, val color: String)
 
-    private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled() = !DungeonApi.inBossRoom && DungeonApi.inDungeon() && config.enabled
 
 }

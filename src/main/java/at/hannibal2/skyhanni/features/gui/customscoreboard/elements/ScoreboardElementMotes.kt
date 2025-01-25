@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 
 // scoreboard
 // scoreboard update event
@@ -21,5 +21,5 @@ object ScoreboardElementMotes : ScoreboardElement() {
 
     override val elementPatterns = listOf(ScoreboardPattern.motesPattern)
 
-    override fun showIsland() = RiftAPI.inRift()
+    override fun showIsland() = RiftApi.inRift()
 }
