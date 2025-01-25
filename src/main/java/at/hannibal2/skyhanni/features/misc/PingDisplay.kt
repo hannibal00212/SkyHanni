@@ -23,21 +23,21 @@ object PingDisplay {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private var lastPingAt: Long = -1L
+    private var lastPingAt: Long? = null
     private var invokedCommand = false
     private var display: String? = null
 
     private var latestPing: Double = 0.0
 
     private fun sendPing(command: Boolean) {
-        if (lastPingAt > 0) {
+        if (lastPingAt != null) {
             if (invokedCommand) {
                 ChatUtils.chat("§cAlready pinging!")
                 return
             }
         }
         Minecraft.getMinecraft().thePlayer.sendQueue.networkManager.sendPacket(
-            C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS)
+            C16PacketClientStatus(C16PacketClientStatus.EnumState.REQUEST_STATS),
         )
         lastPingAt = System.nanoTime()
         invokedCommand = command
@@ -47,19 +47,17 @@ object PingDisplay {
     fun onPacketReceived(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet
-        if (lastPingAt > 0) {
-            when (packet) {
-                is S37PacketStatistics -> {
-                    val diff = abs(System.nanoTime() - lastPingAt) / 1_000_000.0
-                    lastPingAt = -1L
-                    latestPing = diff
-                    updateDisplay()
-                    if (invokedCommand) {
-                        invokedCommand = false
-                        ChatUtils.chat(formatPingMessage(latestPing))
-                    }
-                }
-            }
+        val lastPingTime = lastPingAt ?: return
+        if (packet !is S37PacketStatistics) return
+
+        val diff = abs(System.nanoTime() - lastPingTime) / 1_000_000.0
+        lastPingAt = null
+        latestPing = diff
+        updateDisplay()
+
+        if (invokedCommand) {
+            invokedCommand = false
+            ChatUtils.chat(formatPingMessage(latestPing))
         }
     }
 
