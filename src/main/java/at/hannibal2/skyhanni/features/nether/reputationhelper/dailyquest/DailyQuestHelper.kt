@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -102,7 +102,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
@@ -197,7 +197,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -213,7 +213,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: RenderWorldEvent) {
+    private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
         val location = when (reputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
