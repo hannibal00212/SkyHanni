@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.PartyAPI
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -97,7 +97,7 @@ object CorpseLocator {
 
         if (!config.autoSendLocation) return
         if (MineshaftWaypoints.waypoints.isEmpty()) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         shareCorpse()
     }
 

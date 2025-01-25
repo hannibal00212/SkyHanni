@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -97,7 +97,7 @@ object SlayerProfitTracker {
         }
     }
 
-    private var allowedItems = mapOf<String, List<NEUInternalName>>()
+    private var allowedItems = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -108,8 +108,8 @@ object SlayerProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         val coins = event.coins
-        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
+        if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerApi.isInCorrectArea) {
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             addSlayerCosts(coins)
@@ -155,14 +155,14 @@ object SlayerProfitTracker {
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
-        if (!SlayerAPI.hasActiveSlayerQuest()) return
+        if (!SlayerApi.isInCorrectArea) return
+        if (!SlayerApi.hasActiveSlayerQuest()) return
 
         tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
-        if (!isAllowedItem(internalName) && internalName != NEUInternalName.SKYBLOCK_COIN) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+        if (!isAllowedItem(internalName) && internalName != NeuInternalName.SKYBLOCK_COIN) {
             ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$category'")
             return
         }
@@ -170,7 +170,7 @@ object SlayerProfitTracker {
         getTracker()?.addItem(internalName, amount, command)
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean {
+    private fun isAllowedItem(internalName: NeuInternalName): Boolean {
         val allowedList = allowedItems[baseSlayerType] ?: return false
         return internalName in allowedList
     }
@@ -234,7 +234,7 @@ object SlayerProfitTracker {
 
     private fun shouldShowDisplay(): Boolean {
         if (!isEnabled()) return false
-        if (!SlayerAPI.isInCorrectArea) return false
+        if (!SlayerApi.isInCorrectArea) return false
 
         return true
     }

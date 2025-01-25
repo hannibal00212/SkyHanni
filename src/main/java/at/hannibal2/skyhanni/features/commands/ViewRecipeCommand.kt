@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,7 +49,7 @@ object ViewRecipeCommand {
 
     val list by lazy {
         val list = mutableListOf<String>()
-        for ((key, value) in NEUItems.allNeuRepoItems()) {
+        for ((key, value) in NeuItems.allNeuRepoItems()) {
             if (value.has("recipe")) {
                 list.add(key.lowercase())
             }

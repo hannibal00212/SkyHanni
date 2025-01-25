@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -122,7 +122,7 @@ object DraconicSacrificeTracker {
         bonusLoot.matchMatcher(event.message) {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
-            val internalName = NEUInternalName.fromItemNameOrNull(item) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
             tracker.addItem(internalName, amount, command = false)
         }
         tracker.update()

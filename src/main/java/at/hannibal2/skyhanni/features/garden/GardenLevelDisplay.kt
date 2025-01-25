@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object GardenLevelDisplay {
 
-    private val config get() = GardenAPI.config.gardenLevels
+    private val config get() = GardenApi.config.gardenLevels
     private var useRomanNumerals: Boolean
         get() = ProfileStorageData.playerSpecific?.useRomanNumerals ?: true
         set(value) {
@@ -88,13 +88,13 @@ object GardenLevelDisplay {
     }
 
     private fun addExp(moreExp: Int) {
-        val gardenExp = GardenAPI.gardenExp ?: return
-        val oldLevel = GardenAPI.getGardenLevel()
-        GardenAPI.gardenExp = gardenExp + moreExp
+        val gardenExp = GardenApi.gardenExp ?: return
+        val oldLevel = GardenApi.getGardenLevel()
+        GardenApi.gardenExp = gardenExp + moreExp
         update()
 
         if (!config.overflowChat) return
-        val newLevel = GardenAPI.getGardenLevel()
+        val newLevel = GardenApi.getGardenLevel()
         if (newLevel != oldLevel + 1 || newLevel <= 15) return
         DelayedRun.runDelayed(50.milliseconds) {
             // TODO utils function that is shared with Crop Milestone Display
@@ -132,13 +132,13 @@ object GardenLevelDisplay {
             }
             overflowPattern.matchMatcher(line) {
                 val overflow = group("overflow").formatLong()
-                GardenAPI.gardenExp = overflow
+                GardenApi.gardenExp = overflow
                 update()
                 return
             }
         }
-        val expForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
-        GardenAPI.gardenExp = expForLevel + nextLevelExp
+        val expForLevel = GardenApi.getExpForLevel(currentLevel).toInt()
+        GardenApi.gardenExp = expForLevel + nextLevelExp
         update()
     }
 
@@ -149,14 +149,14 @@ object GardenLevelDisplay {
         val name = InventoryUtils.openInventoryName()
         if (!((name == "Desk" && slotIndex == 4) || (name == "SkyBlock Menu" && slotIndex == 10))) return
 
-        val gardenExp = GardenAPI.gardenExp ?: return
-        val currentLevel = GardenAPI.getGardenLevel()
+        val gardenExp = GardenApi.gardenExp ?: return
+        val currentLevel = GardenApi.getGardenLevel()
         if (currentLevel < 15) return
 
-        val needForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
+        val needForLevel = GardenApi.getExpForLevel(currentLevel).toInt()
         val overflow = (gardenExp - needForLevel).toDouble()
-        val overflowTotal = (gardenExp - GardenAPI.getExpForLevel(15)).toInt()
-        val needForNextLevel = GardenAPI.getExpForLevel(currentLevel + 1).toInt()
+        val overflowTotal = (gardenExp - GardenApi.getExpForLevel(15)).toInt()
+        val needForNextLevel = GardenApi.getExpForLevel(currentLevel + 1).toInt()
         val needForOnlyNextLvl = needForNextLevel - needForLevel
 
         val iterator = event.toolTip.listIterator()
@@ -187,16 +187,16 @@ object GardenLevelDisplay {
     }
 
     private fun drawDisplay(): String {
-        val gardenExp = GardenAPI.gardenExp ?: return "§aGarden Level ? §cOpen the desk!"
-        val currentLevel = GardenAPI.getGardenLevel(overflow = config.overflow.get())
+        val gardenExp = GardenApi.gardenExp ?: return "§aGarden Level ? §cOpen the desk!"
+        val currentLevel = GardenApi.getGardenLevel(overflow = config.overflow.get())
         val isMax = !config.overflow.get() && currentLevel == 15
-        val needForLevel = GardenAPI.getExpForLevel(currentLevel).toInt()
+        val needForLevel = GardenApi.getExpForLevel(currentLevel).toInt()
         val overflow = gardenExp - needForLevel
 
         return "§aGarden level $currentLevel " + if (isMax) {
             "§7(§e${overflow.addSeparators()}§7)"
         } else {
-            val needForNextLevel = GardenAPI.getExpForLevel(currentLevel + 1).toInt()
+            val needForNextLevel = GardenApi.getExpForLevel(currentLevel + 1).toInt()
             val needForOnlyNextLevel = needForNextLevel - needForLevel
             "§7(§e${overflow.addSeparators()}§7/§e${needForOnlyNextLevel.addSeparators()}§7)"
         }
@@ -209,7 +209,7 @@ object GardenLevelDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
+        if (GardenApi.hideExtraGuis()) return
 
         config.pos.renderString(display, posLabel = "Garden Level")
     }
@@ -219,7 +219,7 @@ object GardenLevelDisplay {
         ConditionalUtils.onToggle(config.overflow) { update() }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

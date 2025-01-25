@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.SkyBlockXPAPI
+import at.hannibal2.skyhanni.api.SkyBlockXPApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -15,13 +15,13 @@ object SkyBlockXPBar {
     private val config get() = SkyHanniMod.feature.misc
     private var cache: OriginalValues? = null
 
-    private class OriginalValues(val currentXp: Float, val maxXp: Int, val level: Int)
+    private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)
 
     @SubscribeEvent
     fun onRenderExperienceBar(event: RenderGameOverlayEvent.Pre) {
         if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
-        val (level, xp) = SkyBlockXPAPI.levelXpPair ?: return
+        val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
         with(Minecraft.getMinecraft().thePlayer) {
             cache = OriginalValues(experience, experienceTotal, experienceLevel)
@@ -33,7 +33,7 @@ object SkyBlockXPBar {
     fun onRenderExperienceBarPost(event: RenderGameOverlayEvent.Post) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         with(cache ?: return) {
-            Minecraft.getMinecraft().thePlayer.setXPStats(currentXp, maxXp, level)
+            Minecraft.getMinecraft().thePlayer.setXPStats(currentXP, maxXP, level)
             cache = null
         }
     }

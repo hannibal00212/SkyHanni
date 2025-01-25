@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
@@ -15,24 +15,24 @@ object ScoreboardEventMining : ScoreboardEvent() {
     // TODO: Rethink this one
     override fun getDisplay() = buildList {
         // Wind
-        val (compassTitle, compassArrow) = ScoreboardPattern.windCompassPattern.firstMatches(getSbLines()) to
-            ScoreboardPattern.windCompassArrowPattern.firstMatches(getSbLines())
+        val (compassTitle, compassArrow) = ScoreboardPattern.windCompassPattern.firstMatches(getSBLines()) to
+            ScoreboardPattern.windCompassArrowPattern.firstMatches(getSBLines())
         if (compassTitle != null && compassArrow != null) {
             add(compassTitle)
             add(compassArrow align HorizontalAlignment.CENTER)
         }
 
         // Better Together
-        ScoreboardPattern.nearbyPlayersPattern.firstMatches(getSbLines())?.let {
+        ScoreboardPattern.nearbyPlayersPattern.firstMatches(getSBLines())?.let {
             add("§dBetter Together")
             add(" $it")
         }
 
         // Zone Events
-        val zoneEvent = ScoreboardPattern.miningEventPattern.firstMatches(getSbLines())
+        val zoneEvent = ScoreboardPattern.miningEventPattern.firstMatches(getSBLines())
         zoneEvent?.let { eventTitle ->
             add(eventTitle.removePrefix("Event: "))
-            ScoreboardPattern.miningEventZonePattern.firstMatches(getSbLines())?.let { zone ->
+            ScoreboardPattern.miningEventZonePattern.firstMatches(getSBLines())?.let { zone ->
                 add("in ${zone.removePrefix("Zone: ")}")
             }
         }
@@ -42,7 +42,7 @@ object ScoreboardEventMining : ScoreboardEvent() {
             listOf(
                 ScoreboardPattern.mithrilRemainingPattern,
                 ScoreboardPattern.mithrilYourMithrilPattern,
-            ).allMatches(getSbLines()),
+            ).allMatches(getSBLines()),
         )
 
         // Raffle
@@ -50,7 +50,7 @@ object ScoreboardEventMining : ScoreboardEvent() {
             listOf(
                 ScoreboardPattern.raffleTicketsPattern,
                 ScoreboardPattern.rafflePoolPattern,
-            ).allMatches(getSbLines()),
+            ).allMatches(getSBLines()),
         )
 
         // Raid
@@ -58,14 +58,14 @@ object ScoreboardEventMining : ScoreboardEvent() {
             listOf(
                 ScoreboardPattern.yourGoblinKillsPattern,
                 ScoreboardPattern.remainingGoblinPattern,
-            ).allMatches(getSbLines()),
+            ).allMatches(getSBLines()),
         )
 
         // Fortunate Freezing
-        addNotNull(ScoreboardPattern.fortunateFreezingBonusPattern.firstMatches(getSbLines()))
+        addNotNull(ScoreboardPattern.fortunateFreezingBonusPattern.firstMatches(getSBLines()))
 
         // Fossil Dust
-        addNotNull(ScoreboardPattern.fossilDustPattern.firstMatches(getSbLines()))
+        addNotNull(ScoreboardPattern.fossilDustPattern.firstMatches(getSBLines()))
     }
 
     override val configLine = "§7(All Mining Event Lines)"
@@ -91,5 +91,5 @@ object ScoreboardEventMining : ScoreboardEvent() {
 
     )
 
-    override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
+    override fun showIsland() = MiningApi.inAdvancedMiningIsland()
 }

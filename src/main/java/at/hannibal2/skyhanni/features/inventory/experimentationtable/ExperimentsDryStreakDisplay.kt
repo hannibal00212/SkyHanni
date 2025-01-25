@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.bookPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.ultraRarePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.bookPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.ultraRarePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -34,7 +34,7 @@ object ExperimentsDryStreakDisplay {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!ExperimentationTableAPI.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!ExperimentationTableApi.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
 
         display = drawDisplay()
         config.position.renderStrings(
@@ -50,7 +50,7 @@ object ExperimentsDryStreakDisplay {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (!isEnabled() || didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
@@ -72,7 +72,7 @@ object ExperimentsDryStreakDisplay {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
 
         val storage = storage ?: return
         storage.attemptsSince += 1
@@ -82,7 +82,7 @@ object ExperimentsDryStreakDisplay {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled() || didJustFind) return
 
-        ExperimentationTableAPI.enchantingExpChatPattern.matchMatcher(event.message.removeColor()) {
+        ExperimentationTableApi.enchantingExpChatPattern.matchMatcher(event.message.removeColor()) {
             val storage = storage ?: return
             storage.xpSince += group("amount").substringBefore(",").toInt() * 1000
         }

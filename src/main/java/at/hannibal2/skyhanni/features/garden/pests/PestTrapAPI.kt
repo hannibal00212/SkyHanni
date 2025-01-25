@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -41,7 +41,7 @@ object PestTrapAPI {
     }
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
-    private val storage get() = GardenAPI.storage
+    private val storage get() = GardenApi.storage
 
     private var MAX_PEST_COUNT_PER_TRAP = 3
     private var lastTabHash: Int = 0
@@ -146,7 +146,7 @@ object PestTrapAPI {
     private fun baseWidgetStatus() = TimeLimitedCache<TabWidget, Boolean>(
         expireAfterWrite = 60.seconds,
         removalListener = { key, _, removalCause ->
-            if (key != null && GardenAPI.inGarden() && removalCause == EXPIRED) {
+            if (key != null && GardenApi.inGarden() && removalCause == EXPIRED) {
                 ChatUtils.userError(
                     "Could not read ${key.name.lowercase().replace("_", " ")} data from the tab list!",
                     replaceSameMessage = true

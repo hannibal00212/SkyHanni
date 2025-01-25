@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -45,7 +45,7 @@ object NPCVisitorFix {
         // clicked on the real visitor, ignoring
         if (lastVisitorOpen.passedSince() < 1.seconds) return
 
-        val storage = GardenAPI.storage ?: return
+        val storage = GardenApi.storage ?: return
 
         val location = entity.getLorenzVec()
         storage.npcVisitorLocations[name]?.let {
@@ -67,7 +67,7 @@ object NPCVisitorFix {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         barnSkinChangePattern.matchMatcher(event.message) {
-            GardenAPI.storage?.npcVisitorLocations?.clear()
+            GardenApi.storage?.npcVisitorLocations?.clear()
         }
     }
 
@@ -79,7 +79,7 @@ object NPCVisitorFix {
             return nametags[0]
         }
 
-        val staticLocation = GardenAPI.storage?.npcVisitorLocations?.get(visitorName) ?: return null
+        val staticLocation = GardenApi.storage?.npcVisitorLocations?.get(visitorName) ?: return null
 
         for (entity in nametags.toMutableList()) {
             val distance = entity.distanceTo(staticLocation)

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -83,5 +83,5 @@ object TentacleWaypoint {
         tentacleHits.clear()
     }
 
-    private fun isEnabled() = RiftAPI.inColosseum() && config.tentacleWaypoints
+    private fun isEnabled() = RiftApi.inColosseum() && config.tentacleWaypoints
 }
