@@ -13,14 +13,13 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CraftMaterialsFromBazaar {
@@ -82,7 +81,7 @@ object CraftMaterialsFromBazaar {
     }
 
     private fun calculateMaterialsNeeded(items: Map<Int, PrimitiveItemStack>): List<PrimitiveItemStack> {
-        val recipeMaterials = mutableMapOf<NEUInternalName, Int>()
+        val recipeMaterials = mutableMapOf<NeuInternalName, Int>()
         for (slot in materialSlots) {
             val item = items[slot] ?: continue
             val internalName = item.internalName
@@ -162,7 +161,7 @@ object CraftMaterialsFromBazaar {
         inRecipeInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!inRecipeInventory && !purchasing) return

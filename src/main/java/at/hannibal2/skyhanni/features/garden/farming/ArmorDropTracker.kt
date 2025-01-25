@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -27,13 +26,12 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ArmorDropTracker {
 
-    private val config get() = GardenAPI.config.farmingArmorDrop
+    private val config get() = GardenApi.config.farmingArmorDrop
 
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
@@ -73,8 +71,8 @@ object ArmorDropTracker {
         hasArmor = false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
             if (dropType.chatMessage == event.message) {
                 addDrop(dropType)
@@ -99,14 +97,17 @@ object ArmorDropTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!config.enabled) return
-        if (!hasArmor) return
-        if (!GardenAPI.hasFarmingToolInHand()) return
+    init {
+        tracker.initRenderer(config.pos) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.pos)
+    private fun shouldShowDisplay(): Boolean {
+        if (!GardenApi.inGarden()) return false
+        if (!config.enabled) return false
+        if (!hasArmor) return false
+        if (!GardenApi.hasFarmingToolInHand()) return false
+
+        return true
     }
 
     @HandleEvent
@@ -118,7 +119,7 @@ object ArmorDropTracker {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.enabled) return
 
         checkArmor()

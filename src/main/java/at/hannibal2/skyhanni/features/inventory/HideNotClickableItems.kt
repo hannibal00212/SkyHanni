@@ -6,14 +6,14 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -50,8 +50,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -109,9 +107,8 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is GuiChest) return
@@ -128,8 +125,8 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 
@@ -158,7 +155,7 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
@@ -216,12 +213,12 @@ object HideNotClickableItems {
     }
 
     private fun hideFossilExcavator(stack: ItemStack): Boolean {
-        if (!FossilExcavatorAPI.inExcavatorMenu) return false
+        if (!FossilExcavatorApi.inExcavatorMenu) return false
 
         showGreenLine = true
 
         val internalName = stack.getInternalNameOrNull() ?: return true
-        if (internalName == FossilExcavatorAPI.scrapItem) {
+        if (internalName == FossilExcavatorApi.scrapItem) {
             return false
         }
 
@@ -269,8 +266,8 @@ object HideNotClickableItems {
     }
 
     private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
-        if (!RiftAPI.inRift()) return false
-        if (chestName != "Motes Grubber" && !ShiftClickNPCSell.inInventory) return false
+        if (!RiftApi.inRift()) return false
+        if (chestName != "Motes Grubber" && !ShiftClickNpcSell.inInventory) return false
 
         showGreenLine = true
 
@@ -477,9 +474,9 @@ object HideNotClickableItems {
     }
 
     private fun hideNpcSell(stack: ItemStack): Boolean {
-        if (RiftAPI.inRift()) return false
-        if (!ShiftClickNPCSell.inInventory) return false
-        if (VisitorAPI.inInventory) return false
+        if (RiftApi.inRift()) return false
+        if (!ShiftClickNpcSell.inInventory) return false
+        if (VisitorApi.inInventory) return false
         showGreenLine = true
 
         var name = stack.cleanName()

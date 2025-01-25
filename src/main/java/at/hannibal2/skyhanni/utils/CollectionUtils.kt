@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
+import java.util.EnumMap
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -284,6 +286,22 @@ object CollectionUtils {
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
+    inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
+        return EnumMap<K, V>(K::class.java)
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: (K) -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize(it) } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: () -> V): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize() } }
+    }
+
+    inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
+        return enumMapOf<K, V>().apply { putAll(pairs) }
+    }
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,
@@ -307,7 +325,7 @@ object CollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NEUItems.itemFontSize,
+        scale: Double = NeuItems.itemFontSize,
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
@@ -316,7 +334,7 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
-    fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
+    fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
         addItemStack(internalName.getItemStack())
     }
 
@@ -391,20 +409,16 @@ object CollectionUtils {
                 ChatUtils.lastButtonClicked = System.currentTimeMillis()
             }
         }
-        add(
-            Renderable.horizontalContainer(
-                buildList {
-                    addString(prefix)
-                    addString("§a[")
-                    if (tips.isEmpty()) {
-                        add(Renderable.link("§e$getName", false, onClick))
-                    } else {
-                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                    }
-                    addString("§a]")
-                },
-            ),
-        )
+        addLine {
+            addString(prefix)
+            addString("§a[")
+            if (tips.isEmpty()) {
+                add(Renderable.link("§e$getName", false, onClick))
+            } else {
+                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+            }
+            addString("§a]")
+        }
     }
 
     // TODO move to RenderableUtils

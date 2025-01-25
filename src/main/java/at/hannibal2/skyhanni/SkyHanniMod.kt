@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
@@ -38,14 +39,16 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
+@SkyHanniModule
 @Mod(
     modid = SkyHanniMod.MODID,
     clientSideOnly = true,
     useMetadata = true,
     guiFactory = "at.hannibal2.skyhanni.config.ConfigGuiForgeInterop",
     version = SkyHanniMod.VERSION,
+    modLanguageAdapter = "at.hannibal2.skyhanni.utils.system.KotlinLanguageAdapter",
 )
-class SkyHanniMod {
+object SkyHanniMod {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
@@ -53,7 +56,6 @@ class SkyHanniMod {
 
         HotswapSupport.load()
 
-        loadModule(this)
         LoadedModules.modules.forEach { loadModule(it) }
 
         loadModule(CrimsonIsleReputationHelper(this))
@@ -106,49 +108,46 @@ class SkyHanniMod {
         }
     }
 
-    companion object {
+    const val MODID: String = "skyhanni"
+    const val VERSION: String = "@MOD_VERSION@"
 
-        const val MODID: String = "skyhanni"
-        const val VERSION: String = "@MOD_VERSION@"
+    val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
-        val modVersion: ModVersion = ModVersion.fromString(VERSION)
+    val isBetaVersion: Boolean
+        get() = modVersion.isBeta
 
-        val isBetaVersion: Boolean
-            get() = modVersion.isBeta
+    @JvmField
+    var feature: Features = Features()
+    lateinit var sackData: SackData
+    lateinit var friendsData: FriendsJson
+    lateinit var knownFeaturesData: KnownFeaturesJson
+    lateinit var jacobContestsData: JacobContestsJson
+    lateinit var visualWordsData: VisualWordsJson
 
-        @JvmField
-        var feature: Features = Features()
-        lateinit var sackData: SackData
-        lateinit var friendsData: FriendsJson
-        lateinit var knownFeaturesData: KnownFeaturesJson
-        lateinit var jacobContestsData: JacobContestsJson
-        lateinit var visualWordsData: VisualWordsJson
+    lateinit var repo: RepoManager
+    lateinit var configManager: ConfigManager
+    val logger: Logger = LogManager.getLogger("SkyHanni")
+    fun getLogger(name: String): Logger {
+        return LogManager.getLogger("SkyHanni.$name")
+    }
 
-        lateinit var repo: RepoManager
-        lateinit var configManager: ConfigManager
-        val logger: Logger = LogManager.getLogger("SkyHanni")
-        fun getLogger(name: String): Logger {
-            return LogManager.getLogger("SkyHanni.$name")
-        }
+    val modules: MutableList<Any> = ArrayList()
+    private val globalJob: Job = Job(null)
+    val coroutineScope = CoroutineScope(
+        CoroutineName("SkyHanni") + SupervisorJob(globalJob),
+    )
+    var screenToOpen: GuiScreen? = null
+    private var screenTicks = 0
+    fun consoleLog(message: String) {
+        logger.log(Level.INFO, message)
+    }
 
-        val modules: MutableList<Any> = ArrayList()
-        private val globalJob: Job = Job(null)
-        val coroutineScope = CoroutineScope(
-            CoroutineName("SkyHanni") + SupervisorJob(globalJob),
-        )
-        var screenToOpen: GuiScreen? = null
-        private var screenTicks = 0
-        fun consoleLog(message: String) {
-            logger.log(Level.INFO, message)
-        }
-
-        fun launchCoroutine(function: suspend () -> Unit) {
-            coroutineScope.launch {
-                try {
-                    function()
-                } catch (ex: Exception) {
-                    ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
-                }
+    fun launchCoroutine(function: suspend () -> Unit) {
+        coroutineScope.launch {
+            try {
+                function()
+            } catch (ex: Exception) {
+                ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
             }
         }
     }

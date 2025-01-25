@@ -13,16 +13,16 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -41,10 +40,25 @@ object EssenceShopHelper {
     private const val CUSTOM_STACK_LOCATION = 8
     private inline val GOLD_NUGGET_ITEM get() = Items.gold_nugget
 
+    /**
+     * Essence Upgrade Bounds
+     * Undead  -> 10 to 20
+     * Wither  -> 10 to 16
+     * Dragon  -> 19 to 33
+     * Spider  -> 19 to 25
+     * Crimson -> 20 to 33
+     * Ice     -> 21 to 32
+     * Gold    -> 19 to 25
+     * Diamond -> 19 to 25
+     *
+     * Filter out items that fall outside the bounds of 10 - 33
+     */
+    private val SLOT_RANGE = 10..33
+
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
     private var currentEssenceType: String = ""
-    private var currentEssenceItem: NEUInternalName? = null
+    private var currentEssenceItem: NeuInternalName? = null
     private var essenceOwned: Int = 0
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
@@ -119,7 +133,7 @@ object EssenceShopHelper {
         infoItemStack?.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
         val currentEssenceItem = currentEssenceItem ?: return
@@ -243,34 +257,7 @@ object EssenceShopHelper {
     }
 
     private fun processEssenceShopUpgrades(essenceName: String, inventoryItems: Map<Int, ItemStack>) {
-        /**
-         * Essence Upgrade Bounds
-         * Undead  -> 10 to 20
-         * Wither  -> 10 to 16
-         * Dragon  -> 19 to 33
-         * Spider  -> 19 to 25
-         * Crimson -> 20 to 33
-         * Ice     -> 21 to 32
-         * Gold    -> 19 to 25
-         * Diamond -> 19 to 25
-         *
-         * Filter out items that fall outside the bounds of 10 - 33
-         */
-        val upgradeStacks = inventoryItems.filter { it.key in 10..33 && it.value.item != null }
-        // TODO remove duplicate code fragment with CarnivalShopHelper
-        val purchasedUpgrades: MutableMap<String, Int> = buildMap {
-            for (value in upgradeStacks.values) {
-                // Right now Carnival and Essence Upgrade patterns are 'in-sync'
-                // This may change in the future, and this would then need its own pattern
-                essenceUpgradePattern.matchMatcher(value.displayName) {
-                    val upgradeName = groupOrNull("upgrade") ?: return
-                    val nextUpgradeRoman = groupOrNull("tier") ?: return
-                    val nextUpgrade = nextUpgradeRoman.romanToDecimal()
-                    val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
-                    put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
-                }
-            }
-        }.toMutableMap()
+        val purchasedUpgrades = EssenceUtils.extractPurchasedUpgrades(inventoryItems, SLOT_RANGE)
         currentProgress = EssenceShopProgress(essenceName, purchasedUpgrades)
     }
 

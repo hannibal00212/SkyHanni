@@ -4,17 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -26,7 +25,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -90,26 +88,26 @@ object PestProfitTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        PestAPI.pestDeathChatPattern.matchMatcher(event.message) {
+        PestApi.pestDeathChatPattern.matchMatcher(event.message) {
             val amount = group("amount").toInt()
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
 
             tryAddItem(internalName, amount, command = false)
             addKill()
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
 
             tryAddItem(internalName, 1, command = false)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         tracker.addItem(internalName, amount, command)
     }
 
@@ -136,13 +134,16 @@ object PestProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenAPI.isCurrentlyFarming()) return
-        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestAPI.hasVacuumInHand()) return
+    init {
+        tracker.initRenderer(config.position) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (GardenApi.isCurrentlyFarming()) return false
+        if (lastPestKillTime.passedSince() > config.timeDisplayed.seconds && !PestApi.hasVacuumInHand()) return false
+
+        return true
     }
 
     @HandleEvent
@@ -151,7 +152,7 @@ object PestProfitTracker {
         val coins = event.coins
         if (coins > 1000) return
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
     }
 
@@ -166,5 +167,5 @@ object PestProfitTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.enabled
+    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

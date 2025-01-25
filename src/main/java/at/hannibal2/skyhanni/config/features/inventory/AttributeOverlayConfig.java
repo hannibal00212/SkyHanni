@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI;
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -23,7 +23,7 @@ public class AttributeOverlayConfig {
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
-    public List<AttributeAPI.AttributeType> attributesList = new ArrayList<>(AttributeAPI.AttributeType.getEntries());
+    public List<AttributeApi.AttributeType> attributesList = new ArrayList<>(AttributeApi.AttributeType.getEntries());
 
     @Expose
     @ConfigOption(

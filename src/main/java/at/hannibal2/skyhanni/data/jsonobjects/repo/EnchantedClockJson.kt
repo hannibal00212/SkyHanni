@@ -14,5 +14,5 @@ data class BoostJson(
     @Expose val color: String,
     @Expose @SerializedName("display_slot") val displaySlot: Int,
     @Expose @SerializedName("status_slot") val statusSlot: Int,
-    @Expose @SerializedName("usage_hours") val cooldownHours: Int = 48,
+    @Expose @SerializedName("usage_hours") val cooldownHours: Int,
 )

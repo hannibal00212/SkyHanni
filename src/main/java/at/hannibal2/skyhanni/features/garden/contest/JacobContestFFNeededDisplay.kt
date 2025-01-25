@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrueFarmingFortune
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -18,14 +18,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object JacobContestFFNeededDisplay {
 
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
     private var display = emptyList<List<Any>>()
     private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
@@ -44,8 +43,8 @@ object JacobContestFFNeededDisplay {
             return
         }
 
-        val time = FarmingContestAPI.getSbTimeFor(stack.name) ?: return
-        val contest = FarmingContestAPI.getContestAtTime(time) ?: return
+        val time = FarmingContestApi.getSBTimeFor(stack.name) ?: return
+        val contest = FarmingContestApi.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)
         display = newDisplay
@@ -69,7 +68,7 @@ object JacobContestFFNeededDisplay {
         }
         addAsSingletonList("")
 
-        val (size, averages) = FarmingContestAPI.calculateAverages(crop)
+        val (size, averages) = FarmingContestApi.calculateAverages(crop)
         add(listOf("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:"))
         for (bracket in ContestBracket.entries) {
             addAsSingletonList(getLine(bracket, averages, crop))
@@ -117,10 +116,10 @@ object JacobContestFFNeededDisplay {
         return " ${bracket.displayName}§f: §6$format FF §7(${counter.addSeparators()} crops)"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!FarmingContestAPI.inInventory) return
+        if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
         config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
     }

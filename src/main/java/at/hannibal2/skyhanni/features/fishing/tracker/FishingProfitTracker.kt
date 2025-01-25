@@ -4,25 +4,25 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -82,12 +81,12 @@ object FishingProfitTracker {
             )
         }
 
-        override fun getCustomPricePer(internalName: NEUInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName): Double {
             // TODO find better way to tell if the item is a trophy
             val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
             return if (internalName in neuInternalNames) {
-                SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingAPI.getFilletPerTrophy(internalName)
+                SkyHanniTracker.getPricePer(MAGMA_FISH) * FishingApi.getFilletPerTrophy(internalName)
             } else super.getCustomPricePer(internalName)
         }
 
@@ -102,7 +101,7 @@ object FishingProfitTracker {
     private const val NAME_ALL: CategoryName = "All"
     private var currentCategory: CategoryName = NAME_ALL
 
-    private var itemCategories = mapOf<String, List<NEUInternalName>>()
+    private var itemCategories = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -124,7 +123,7 @@ object FishingProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFishing Profit Tracker")
-        val filter: (NEUInternalName) -> Boolean = addCategories(data)
+        val filter: (NeuInternalName) -> Boolean = addCategories(data)
 
         val profit = tracker.drawItems(data, filter, this)
 
@@ -141,7 +140,7 @@ object FishingProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun MutableList<Searchable>.addCategories(data: Data): (NEUInternalName) -> Boolean {
+    private fun MutableList<Searchable>.addCategories(data: Data): (NeuInternalName) -> Boolean {
         val amounts = getCurrentCategories(data)
         checkMissingItems(data)
         val list = amounts.keys.toList()
@@ -161,7 +160,7 @@ object FishingProfitTracker {
             )
         }
 
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
+        val filter: (NeuInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
             { it in (itemCategories[currentCategory].orEmpty()) }
@@ -170,8 +169,10 @@ object FishingProfitTracker {
     }
 
     private fun checkMissingItems(data: Data) {
-        val missingItems = mutableListOf<NEUInternalName>()
+        val missingItems = mutableListOf<NeuInternalName>()
         for (internalName in data.items.keys) {
+            // TODO remove workaround to not warn about ATTRIBUTE_SHARD
+            if (internalName == "ATTRIBUTE_SHARD".toInternalName()) continue
             if (itemCategories.none { internalName in it.value }) {
                 missingItems.add(internalName)
             }
@@ -201,10 +202,10 @@ object FishingProfitTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         coinsChatPattern.matchMatcher(event.message) {
-            tryAddItem(NEUInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
+            tryAddItem(NeuInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
             addCatch()
         }
     }
@@ -216,23 +217,27 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-        if (recentPickup || FishingAPI.isFishing(checkRodInHand = false)) {
-            tracker.renderDisplay(config.position)
-        }
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { isEnabled() },
+            onRender = {
+                val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
+                if (recentPickup || FishingApi.isFishing(checkRodInHand = false)) {
+                    tracker.renderDisplay(config.position)
+                }
+            },
+        )
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
-        if (!FishingAPI.isFishing(checkRodInHand = false)) return
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+        if (!FishingApi.isFishing(checkRodInHand = false)) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
@@ -242,7 +247,7 @@ object FishingProfitTracker {
         addCatch()
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
+    private fun isAllowedItem(internalName: NeuInternalName) = itemCategories.any { internalName in it.value }
 
     @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {

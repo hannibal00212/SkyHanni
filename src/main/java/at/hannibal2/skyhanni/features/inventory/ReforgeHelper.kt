@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -35,7 +35,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
@@ -83,10 +82,10 @@ object ReforgeHelper {
     private var itemToReforge: ItemStack? = null
     private var inventoryContainer: Container? = null
 
-    private var currentReforge: ReforgeAPI.Reforge? = null
-    private var reforgeToSearch: ReforgeAPI.Reforge? = null
+    private var currentReforge: ReforgeApi.Reforge? = null
+    private var reforgeToSearch: ReforgeApi.Reforge? = null
 
-    private var hoveredReforge: ReforgeAPI.Reforge? = null
+    private var hoveredReforge: ReforgeApi.Reforge? = null
 
     private val reforgeItem get() = if (isInHexReforgeMenu) 19 else 13
     private val reforgeButton get() = if (isInHexReforgeMenu) 48 else 22
@@ -117,12 +116,12 @@ object ReforgeHelper {
         itemToReforge = newItem
         val newReforgeName = itemToReforge?.getReforgeName().orEmpty()
         if (newReforgeName == currentReforge?.lowercaseName) return
-        currentReforge = ReforgeAPI.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
+        currentReforge = ReforgeApi.reforgeList.firstOrNull { it.lowercaseName == newReforgeName }
         updateDisplay()
     }
 
-    @SubscribeEvent
-    fun onClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
             if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
@@ -153,8 +152,8 @@ object ReforgeHelper {
         return false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         when {
             reforgeChatMessage.matches(event.message) -> {
@@ -178,9 +177,8 @@ object ReforgeHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         when {
             isHexReforgeMenu(event.inventoryName) -> {
                 isInHexReforgeMenu = true
@@ -233,7 +231,7 @@ object ReforgeHelper {
         val itemRarity = item.getItemRarityOrNull() ?: return@buildList
 
         val rawReforgeList =
-            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeAPI.nonePowerStoneReforge else ReforgeAPI.reforgeList
+            if (!isInHexReforgeMenu && config.reforgeStonesOnlyHex) ReforgeApi.nonePowerStoneReforge else ReforgeApi.reforgeList
         val reforgeList = rawReforgeList.filter { it.isValid(itemType, internalName) }
 
         val statTypes = reforgeList.mapNotNull { it.stats[itemRarity]?.keys }.flatten().toSet()
@@ -245,14 +243,14 @@ object ReforgeHelper {
         this.addAll(list)
     }
 
-    private fun getReforgeColor(reforge: ReforgeAPI.Reforge) = when {
+    private fun getReforgeColor(reforge: ReforgeApi.Reforge) = when {
         currentReforge == reforge -> "§6"
         reforgeToSearch == reforge -> "§3"
         reforge.isReforgeStone -> "§9"
         else -> "§7"
     }
 
-    private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeAPI.Reforge) -> Renderable = { reforge ->
+    private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeApi.Reforge) -> Renderable = { reforge ->
         val text = getReforgeColor(reforge) + reforge.name
         val tips = getReforgeTips(reforge, itemRarity)
         val onHover = if (!isInHexReforgeMenu) {
@@ -273,7 +271,7 @@ object ReforgeHelper {
     }
 
     private fun getReforgeTips(
-        reforge: ReforgeAPI.Reforge,
+        reforge: ReforgeApi.Reforge,
         itemRarity: LorenzRarity,
     ): List<Renderable> {
         val stats: List<Renderable>
@@ -304,7 +302,7 @@ object ReforgeHelper {
         return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }
 
-    private fun getReforgeEffect(reforge: ReforgeAPI.Reforge?, rarity: LorenzRarity) =
+    private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =
         reforge?.extraProperty?.get(rarity)?.let {
             Renderable.wrappedString(
                 it,
@@ -316,9 +314,9 @@ object ReforgeHelper {
     private fun getSortSelector(
         itemRarity: LorenzRarity,
         sorting: SkyblockStat?,
-    ): Comparator<ReforgeAPI.Reforge> =
+    ): Comparator<ReforgeApi.Reforge> =
         if (sorting != null) {
-            Comparator.comparing<ReforgeAPI.Reforge, Double> { it.stats[itemRarity]?.get(sorting) ?: 0.0 }.reversed()
+            Comparator.comparing<ReforgeApi.Reforge, Double> { it.stats[itemRarity]?.get(sorting) ?: 0.0 }.reversed()
         } else {
             Comparator.comparing { it.isReforgeStone }
         }
@@ -367,13 +365,13 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (currentReforge == null) return
@@ -383,8 +381,8 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")

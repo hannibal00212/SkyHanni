@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
 // scoreboard
 // scoreboard update event
@@ -19,5 +20,7 @@ object ScoreboardElementHeat : ScoreboardElement() {
 
     override val configLine = "Heat: §c♨ 14"
 
-    override fun showIsland() = MiningAPI.inCrystalHollows()
+    override val elementPatterns = listOf(ScoreboardPattern.heatPattern)
+
+    override fun showIsland() = MiningApi.inCrystalHollows()
 }
