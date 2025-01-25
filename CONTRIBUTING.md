@@ -157,7 +157,9 @@ for more information and usages.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve readability and maintain encapsulation.
-- Follow Kotlin conventions for class, variable, and function names by treating acronyms like regular words (e.g., `Api`, `Xp`). For strings or UI text, use standard formatting with fully capitalized acronyms (e.g., `API`, `XP`) to prioritize clarity and familiarity for users.
+- Follow Kotlin conventions for acronym naming:
+    - Use all-uppercase for two-letter acronyms (e.g., `XP`).
+    - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 
 ## Additional Useful Development Tools
 
