@@ -8,13 +8,11 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -57,7 +55,7 @@ object JacobContestTimeNeeded {
                 onChange = {
                     currentBracket = it
                     update()
-                }
+                },
             )
             addString("")
             for (crop in sorted.sorted().keys) {
@@ -81,7 +79,7 @@ object JacobContestTimeNeeded {
             sorted[crop] = Duration.INFINITE
             map[crop] = Renderable.hoverTips(
                 "§9${crop.cropName} §cNo speed data!",
-                listOf("§cFarm ${crop.cropName} to show data!")
+                listOf("§cFarm ${crop.cropName} to show data!"),
             )
             return
         }
@@ -90,7 +88,7 @@ object JacobContestTimeNeeded {
             sorted[crop] = Duration.INFINITE
             map[crop] = Renderable.hoverTips(
                 "§9${crop.cropName} §cNo Farming Fortune data!",
-                listOf("§cHold a ${crop.cropName} specific", "§cfarming tool in hand to show data!")
+                listOf("§cHold a ${crop.cropName} specific", "§cfarming tool in hand to show data!"),
             )
             return
         }
@@ -102,8 +100,8 @@ object JacobContestTimeNeeded {
                 "§9${crop.cropName} §cNo contest data!",
                 listOf(
                     "§cOpen more pages or participate",
-                    "§cin a ${crop.cropName} Contest to show data!"
-                )
+                    "§cin a ${crop.cropName} Contest to show data!",
+                ),
             )
             return
         }
@@ -185,7 +183,7 @@ object JacobContestTimeNeeded {
                 val bps = crop.getBps()?.roundTo(1) ?: 0
                 add("§7${addBpsTitle()}§e${bps.addSeparators()}")
                 addAll(lowBPSWarning)
-            }
+            },
         )
     }
 

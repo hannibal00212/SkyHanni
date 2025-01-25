@@ -204,7 +204,7 @@
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSB.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSB.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt$ScoreboardPattern$by dungeonSB.pattern( "teammates", "(?:§.)*(?&lt;classAbbv&gt;\\[\\w]) (?:§.)*(?&lt;username&gt;\\w{2,16}) (?:(?:§.)*(?&lt;classLevel&gt;\\[Lvl?(?&lt;level&gt;[\\w,.]+)?]?)|(?:§.)*(?&lt;health&gt;[\\w,.]+)(?:§.)*.?)", )</ID>
-    <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt$ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*" )</ID>
+    <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt$ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*", )</ID>
     <ID>RepoPatternRegexTestMissing:SkillApi.kt$SkillApi$by patternGroup.pattern( "skill.tab.max", " (?&lt;type&gt;\\w+) (?&lt;level&gt;\\d+): §r§c§lMAX", )</ID>
     <ID>RepoPatternRegexTestMissing:SkillApi.kt$SkillApi$by patternGroup.pattern( "skill.tab.nopercent", " §r§a(?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: §r§e(?&lt;current&gt;[0-9,.]+)§r§6/§r§e(?&lt;needed&gt;[0-9kmb]+)", )</ID>
     <ID>RepoPatternRegexTestMissing:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
