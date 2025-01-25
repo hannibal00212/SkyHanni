@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -56,7 +57,11 @@ object PestTrapAPI {
         val index get() = number - 1
         val isFull get() = count >= MAX_PEST_COUNT_PER_TRAP
         val noBait get() = baitCount == 0
-        val plot get() = plotName?.let { GardenPlotApi.getPlotByName(it) }
+        val plot get() = plotName?.let {
+            GardenPlotApi.getPlotByName(it)
+        } ?: location?.let {
+            GardenPlotApi.closestPlot(it)
+        }
     }
 
     enum class PestTrapType(val displayName: String) {
@@ -109,7 +114,7 @@ object PestTrapAPI {
         "Bait: (?:§.)+(?:NO BAIT|(?<bait>.+))"
     )
 
-    private val entityFullTrap by patternGroup.pattern(
+    private val entityFullTrapPattern by patternGroup.pattern(
         "entity.full",
         "§c§lFULL"
     )
@@ -118,9 +123,31 @@ object PestTrapAPI {
      * REGEX-TEST: Mouse Trap
      * REGEX-TEST: Pest Trap
      */
-    private val pestTrapInventoryName by patternGroup.pattern(
+    private val pestTrapInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "(?<type>Mouse|Pest) Trap"
+    )
+
+    /**
+     * REGEX-TEST: §7You removed a §5Mouse Trap§7. (2/3)
+     * REGEX-TEST: §7You removed a §2Pest Trap§7. (1/3)
+     */
+    private val trapRemovedChatPattern by patternGroup.pattern(
+        "chat.removed",
+        "(?:§.)*You removed a (?:§.)*(?<type>Pest|Mouse) Trap(?:§.)*\\. (?:§.)*\\(\\d+/\\d+\\)"
+    )
+
+    private val trapBaitItemPattern by patternGroup.pattern(
+        "inventory.bait.none",
+        "§6Trap Bait"
+    )
+    private val pestSlotItemPattern by patternGroup.pattern(
+        "inventory.pest.none",
+        "§aPest Slot"
+    )
+    private val noneToReleasePattern by patternGroup.pattern(
+        "inventory.release.none",
+        "§cThere are no §2Pests §cto release!"
     )
     // </editor-fold>
 
@@ -147,17 +174,20 @@ object PestTrapAPI {
         if (!PestApi.isNearPestTrap()) return
         if (lastClickedIndex == -1) return
         inIndex = lastClickedIndex
-        pestTrapInventoryName.matchMatcher(event.inventoryName) {
+        pestTrapInventoryNamePattern.matchMatcher(event.inventoryName) {
             val inventoryTrapType = this.extractTrapType() ?: return
             val storage = storage ?: return
             val baitStack = event.inventoryItems[BAIT_SLOT]?.takeIf {
-                it.displayName.isNotEmpty() && it.displayName != "§6Trap Bait"
-            } ?: return
-            val baitInternalName = baitStack.getInternalNameOrNull() ?: return
+                trapBaitItemPattern.matches(it.displayName)
+            }
+            val baitInternalName = baitStack?.getInternalNameOrNull()
             storage.pestTrapStatus[lastClickedIndex].apply {
                 trapType = inventoryTrapType
-                baitType = SprayType.getByInternalName(baitInternalName)
-                baitCount = baitStack.stackSize
+                baitType = baitInternalName?.let { SprayType.getByInternalName(baitInternalName) }
+                baitCount = baitStack?.stackSize ?: 0
+                count = PEST_SLOTS.count { slotNumber ->
+                    pestSlotItemPattern.matches(event.inventoryItems[slotNumber]?.displayName)
+                }
             }
         }
     }
@@ -174,12 +204,15 @@ object PestTrapAPI {
         val trap = storage.pestTrapStatus[inIndex].takeIf { it.count > 0 } ?: return
         val stack = event.slot?.stack ?: return
         when (event.slot.slotNumber) {
-            in PEST_SLOTS -> if (stack.displayName != "§aPest Slot") trap.apply { count-- }
+            in PEST_SLOTS -> if (pestSlotItemPattern.matches(stack.displayName)) trap.apply { count-- }
             RELEASE_ALL_SLOT -> {
                 if (!stack.canReleaseAll() || !canReleasePest(trap.count)) return
                 val existingPests = PestApi.scoreboardPests.takeIf { it < MAX_RELEASED_PESTS } ?: return
                 val pestsToRelease = min(trap.count, MAX_RELEASED_PESTS - existingPests)
-                trap.count -= pestsToRelease
+                @Suppress("UnnecessaryApply")
+                trap.apply {
+                    count -= pestsToRelease
+                }
             }
             else -> return
         }
@@ -192,7 +225,7 @@ object PestTrapAPI {
     }
 
     private fun ItemStack.canReleaseAll() =
-        this.getLore().any { it == "§cThere are no §2Pests §cto release!" }
+        this.getLore().none { noneToReleasePattern.matches(it) }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -205,7 +238,7 @@ object PestTrapAPI {
         val entityName = event.entity.name
         pestTrapPattern.matchMatcher(entityName) { this.extractPositionNameType(event.entity) }
         entityBaitPattern.matchMatcher(entityName) { this.extractBaitType(event.entity) }
-        entityFullTrap.matchMatcher(entityName) { extractIsFull(event.entity) }
+        entityFullTrapPattern.matchMatcher(entityName) { extractIsFull(event.entity) }
     }
 
     private fun Matcher.extractTrapType() = when (groupOrNull("type")?.lowercase()) {
@@ -217,6 +250,10 @@ object PestTrapAPI {
     private fun Matcher.extractPositionNameType(entity: EntityArmorStand) {
         val storage = storage ?: return
         val number = groupOrNull("number")?.toIntOrNull() ?: return
+
+        // Provision space for the trap if it doesn't exist
+        while (storage.pestTrapStatus.size < max(number, 10)) storage.pestTrapStatus.add(PestTrapData(number))
+
         storage.pestTrapStatus[number - 1].apply {
             location = entity.getLorenzVec()
             name = entity.cleanName()
@@ -252,8 +289,9 @@ object PestTrapAPI {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
+        val storage = storage ?: return
+
         caughtChatPattern.matchMatcher(event.message) {
-            val storage = storage ?: return
             val plotName = groupOrNull("plot") ?: return
             storage.pestTrapStatus.filter {
                 it.plotName == plotName && it.count < MAX_PEST_COUNT_PER_TRAP
@@ -262,6 +300,15 @@ object PestTrapAPI {
                 it.baitCount =
                     if (it.baitCount == -1) -1
                     else (it.baitCount - 1).coerceAtLeast(0)
+            }
+        }
+
+        trapRemovedChatPattern.matchMatcher(event.message) {
+            if (lastClickedIndex == -1 || storage.pestTrapStatus.size <= lastClickedIndex) return
+            storage.apply {
+                pestTrapStatus = pestTrapStatus.filterIndexed { index, _ ->
+                    index != lastClickedIndex
+                }.toMutableList()
             }
         }
     }

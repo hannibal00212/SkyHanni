@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapAPI.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -71,7 +70,7 @@ object PestTrapFeatures {
         val titleWarnEnabled = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
 
         val firstDataItem = data.firstOrNull { it.isFull || it.noBait }
-        val actionPlot = firstDataItem?.plot ?: firstDataItem?.location?.let { GardenPlotApi.closestPlot(it) }
+        val actionPlot = firstDataItem?.plot
 
         lastWarningCount = (fullSet.size + noBaitSet.size).takeIf {
             it != 0
