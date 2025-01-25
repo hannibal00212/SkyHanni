@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -37,7 +37,7 @@ object SkyMartCopperPrice {
     )
 
     private var display = emptyList<Renderable>()
-    private val config get() = GardenAPI.config.skyMart
+    private val config get() = GardenApi.config.skyMart
 
     var inInventory = false
 
@@ -122,5 +122,5 @@ object SkyMartCopperPrice {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.copperPrice
+    private fun isEnabled() = GardenApi.inGarden() && config.copperPrice
 }

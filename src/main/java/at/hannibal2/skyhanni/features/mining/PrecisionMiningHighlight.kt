@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
@@ -28,7 +28,7 @@ object PrecisionMiningHighlight {
     private var lookingAtParticle: Boolean = false
     private var deleteTime: SimpleTimeMark? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
@@ -67,5 +67,5 @@ object PrecisionMiningHighlight {
         }
     }
 
-    fun isEnabled() = MiningAPI.inCustomMiningIsland() && config
+    fun isEnabled() = MiningApi.inCustomMiningIsland() && config
 }

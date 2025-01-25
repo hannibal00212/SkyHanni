@@ -56,6 +56,7 @@ public class DebugMobConfig {
         @Expose
         @ConfigOption(name = "DisplayNPC", desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name.")
         @ConfigEditorDropdown
+        // TODO rename to displayNpc
         public HowToShow displayNPC = HowToShow.OFF;
 
         @Expose

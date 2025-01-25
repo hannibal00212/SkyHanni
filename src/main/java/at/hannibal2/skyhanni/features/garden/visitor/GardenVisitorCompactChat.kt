@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object GardenVisitorCompactChat {
 
-    private val config get() = VisitorAPI.config
+    private val config get() = VisitorApi.config
 
     private val patternGroup = RepoPattern.group("garden.visitor.compact")
 
@@ -74,7 +74,7 @@ object GardenVisitorCompactChat {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (GardenAPI.inGarden() && config.compactRewardChat && (
+        if (GardenApi.inGarden() && config.compactRewardChat && (
                 fullyAcceptedPattern.matcher(event.message.removeResets()).matches() ||
                     visitorRewardPattern.matcher(event.message.removeResets()).matches() ||
                     rewardsTextPattern.matcher(event.message.removeResets()).matches()

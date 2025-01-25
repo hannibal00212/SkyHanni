@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
-    private val config get() = GardenAPI.config.personalBests
+    private val config get() = GardenApi.config.personalBests
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
     private var personalBestIncrements = mapOf<CropType, Int>()
 
@@ -83,7 +83,7 @@ object FarmingPersonalBestGain {
             crop = cropName
             cropType = CropType.getByName(cropName)
             val cropType = cropType ?: return
-            GardenAPI.storage?.let {
+            GardenApi.storage?.let {
                 it.personalBestFF[cropType] = newFF
             }
             checkDelayed()
@@ -116,5 +116,5 @@ object FarmingPersonalBestGain {
         }
     }
 
-    fun isEnabled() = GardenAPI.inGarden() && config.increaseFF
+    fun isEnabled() = GardenApi.inGarden() && config.increaseFF
 }
