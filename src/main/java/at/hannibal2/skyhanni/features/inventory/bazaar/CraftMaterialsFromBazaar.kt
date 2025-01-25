@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI.isBazaarItem
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -81,7 +81,7 @@ object CraftMaterialsFromBazaar {
     }
 
     private fun calculateMaterialsNeeded(items: Map<Int, PrimitiveItemStack>): List<PrimitiveItemStack> {
-        val recipeMaterials = mutableMapOf<NEUInternalName, Int>()
+        val recipeMaterials = mutableMapOf<NeuInternalName, Int>()
         for (slot in materialSlots) {
             val item = items[slot] ?: continue
             val internalName = item.internalName
@@ -108,7 +108,7 @@ object CraftMaterialsFromBazaar {
                     Renderable.optionalLink(
                         text,
                         onClick = {
-                            BazaarAPI.searchForBazaarItem(material, priceMultiplier)
+                            BazaarApi.searchForBazaarItem(material, priceMultiplier)
                         },
                     ),
                 )

@@ -201,7 +201,7 @@ object FishingTimer {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingApi.isFishing()) return
 
         display = createDisplay()
     }
@@ -211,7 +211,7 @@ object FishingTimer {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
-        if (!FishingAPI.isFishing()) return
+        if (!FishingApi.isFishing()) return
 
         val text = display ?: return
         config.pos.renderString(text, posLabel = "BarnTimer")

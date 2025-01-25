@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -337,7 +337,7 @@ object DamageIndicatorManager {
     private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
             val entityData = grabData(entity) ?: return null
-            if (DungeonAPI.inDungeon()) {
+            if (DungeonApi.inDungeon()) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
@@ -403,7 +403,7 @@ object DamageIndicatorManager {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
-                    val floor = DungeonAPI.dungeonFloor
+                    val floor = DungeonApi.dungeonFloor
                     ErrorManager.logErrorStateWithData(
                         "Could not detect thorn",
                         "checkThorn returns null",
@@ -741,7 +741,7 @@ object DamageIndicatorManager {
     @Suppress("CyclomaticComplexMethod", "ReturnCount")
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
-        val health = if (DungeonAPI.isOneOf("F4")) {
+        val health = if (DungeonApi.isOneOf("F4")) {
             maxHealth = 4
 
             if (realMaxHealth == 300_000L) {
@@ -767,7 +767,7 @@ object DamageIndicatorManager {
                     else -> return null
                 }
             }
-        } else if (DungeonAPI.isOneOf("M4")) {
+        } else if (DungeonApi.isOneOf("M4")) {
             maxHealth = 6
 
             if (realMaxHealth == 900_000L) {
@@ -801,7 +801,7 @@ object DamageIndicatorManager {
             ErrorManager.logErrorStateWithData(
                 "Thorn in wrong floor detected",
                 "Invalid floor for thorn",
-                "dungeonFloor" to DungeonAPI.dungeonFloor,
+                "dungeonFloor" to DungeonApi.dungeonFloor,
             )
             return null
         }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events.hoppity
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 
 class RabbitFoundEvent(
@@ -11,7 +11,7 @@ class RabbitFoundEvent(
     val chocGained: Long = 0,
 ) : SkyHanniEvent() {
 
-    constructor(dataSet: HoppityAPI.HoppityStateDataSet) : this(
+    constructor(dataSet: HoppityApi.HoppityStateDataSet) : this(
         dataSet.lastMeal ?: HoppityEggType.BREAKFAST,
         dataSet.duplicate,
         dataSet.lastName,

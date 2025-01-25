@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config.storage
 
-import at.hannibal2.skyhanni.api.HotmAPI.PowderType
-import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.HotmApi.PowderType
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MaxwellAPI.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.PlotData
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.WardrobeData
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.BucketData
@@ -50,8 +50,8 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
@@ -256,7 +256,7 @@ class ProfileSpecificStorage {
         var currentArrow: String? = null
 
         @Expose
-        var arrowAmount: MutableMap<NEUInternalName, Int> = mutableMapOf()
+        var arrowAmount: MutableMap<NeuInternalName, Int> = mutableMapOf()
     }
 
     @Expose
@@ -373,10 +373,10 @@ class ProfileSpecificStorage {
         var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
 
         @Expose
-        var composterCurrentOrganicMatterItem: NEUInternalName? = NONE
+        var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
 
         @Expose
-        var composterCurrentFuelItem: NEUInternalName? = NONE
+        var composterCurrentFuelItem: NeuInternalName? = NONE
 
         @Expose
         var uniqueVisitors: Int = 0
@@ -424,7 +424,7 @@ class ProfileSpecificStorage {
 
         class PlotIcon {
             @Expose
-            var plotList: MutableMap<Int, NEUInternalName> = mutableMapOf()
+            var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
         @Expose
@@ -683,7 +683,7 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    var skillData: MutableMap<SkillType, SkillAPI.SkillInfo> = enumMapOf()
+    var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
 
     @Expose
     var wardrobe: WardrobeStorage = WardrobeStorage()
