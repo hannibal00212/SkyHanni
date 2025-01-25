@@ -10,7 +10,12 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "")
     @Accordion
-    var powderMiningFilter: PowderMiningFilterConfig = PowderMiningFilterConfig()
+    var powderMining: PowderMiningConfig = PowderMiningConfig()
+
+    @Expose
+    @ConfigOption(name = "Crystal Nucleus", desc = "")
+    @Accordion
+    var crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
