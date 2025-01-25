@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.currentSpray
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -35,8 +35,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestWarning {
 
-    private val config get() = PestAPI.config.pestTimer
-    private val storage get() = GardenAPI.storage
+    private val config get() = PestApi.config.pestTimer
+    private val storage get() = GardenApi.storage
 
     private val BASE_PEST_COOLDOWN = 5.minutes
 
@@ -90,7 +90,7 @@ object PestWarning {
             equipmentPestCooldown = checkEquipment(event.inventoryItems)
         }
 
-        WardrobeAPI.inventoryPattern.matchMatcher(event.inventoryName) {
+        WardrobeApi.inventoryPattern.matchMatcher(event.inventoryName) {
             if (!warningShown) return
             wardrobeOpened = true
         }
@@ -126,7 +126,7 @@ object PestWarning {
     }
 
     private fun checkSpray(): Double {
-        val plot = GardenPlotAPI.getCurrentPlot() ?: return 1.0
+        val plot = GardenPlotApi.getCurrentPlot() ?: return 1.0
         return if (plot.currentSpray == null) 1.0 else if (Perk.PEST_ERADICATOR.isActive) 0.25 else 0.5
     }
 
@@ -188,7 +188,7 @@ object PestWarning {
             add("Spray Multiplier: $sprayMultiplier")
             add("Equipment Pest Cooldown: $equipmentPestCooldown")
             add("")
-            add("Is plot sprayed: ${GardenPlotAPI.getCurrentPlot()?.currentSpray != null}")
+            add("Is plot sprayed: ${GardenPlotApi.getCurrentPlot()?.currentSpray != null}")
             add("Pest eradicator Active: ${Perk.PEST_ERADICATOR.isActive}")
             add("")
             add("Cooldown: ${cooldown ?: "Unknown"}")
@@ -199,5 +199,5 @@ object PestWarning {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.pestSpawnWarning
+    private fun isEnabled() = GardenApi.inGarden() && config.pestSpawnWarning
 }

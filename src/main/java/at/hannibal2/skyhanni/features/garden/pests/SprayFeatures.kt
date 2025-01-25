@@ -39,7 +39,6 @@ object SprayFeatures {
             pests.joinToString("§7, §6") { it.displayName }
         } ?: "§cUnknown Effect"
 
-
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
