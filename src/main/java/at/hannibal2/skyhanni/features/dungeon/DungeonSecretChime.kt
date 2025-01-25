@@ -10,16 +10,15 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraft.entity.item.EntityItem
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonSecretChime {
     private val config get() = SkyHanniMod.feature.dungeon.secretChime
-    private var dungeonSecretItems = setOf<NEUInternalName>()
+    private var dungeonSecretItems = setOf<NeuInternalName>()
 
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
@@ -35,7 +34,7 @@ object DungeonSecretChime {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled() || event.mob.name != "Dungeon Secret Bat") return
         playSound()
@@ -45,7 +44,7 @@ object DungeonSecretChime {
     fun onItemPickup(event: EntityRemovedEvent<EntityItem>) {
         if (!isEnabled()) return
         val itemName = event.entity.entityItem.displayName
-        if (NEUInternalName.fromItemName(itemName) !in dungeonSecretItems) return
+        if (NeuInternalName.fromItemName(itemName) !in dungeonSecretItems) return
         playSound()
     }
 
@@ -74,7 +73,7 @@ object DungeonSecretChime {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         dungeonSecretItems = data.dungeonSecretItems
