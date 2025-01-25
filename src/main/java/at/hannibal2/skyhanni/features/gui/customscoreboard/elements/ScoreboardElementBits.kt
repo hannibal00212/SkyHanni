@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 // internal
 // update with bits update event
 object ScoreboardElementBits : ScoreboardElement(), CustomScoreboardNumberTrackingElement {
-    override var previousAmount: Long = BitsAPI.bits.toLong()
+    override var previousAmount: Long = BitsApi.bits.toLong()
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§b"
 
     override fun getDisplay(): String? {
-        val bits = BitsAPI.bits.toLong()
+        val bits = BitsApi.bits.toLong()
         val bitsToClaim = BitsApi.bitsAvailable
         checkDifference(bits)
         val line = getBitsLine() + temporaryChangeDisplay.orEmpty()
