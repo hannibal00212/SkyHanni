@@ -49,7 +49,7 @@ object ChocolateFactoryStrayTimer {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory || timer <= Duration.ZERO) return
+        if (!ChocolateFactoryApi.inChocolateFactory || timer <= Duration.ZERO) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -63,7 +63,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!eventConfig.enabled || timer <= Duration.ZERO) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }

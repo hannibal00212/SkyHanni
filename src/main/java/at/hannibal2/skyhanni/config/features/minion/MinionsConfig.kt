@@ -23,7 +23,7 @@ class MinionsConfig {
     @Expose
     @ConfigOption(
         name = "Minion Upgrade Helper",
-        desc = "Add a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar."
+        desc = "Add a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -42,17 +42,14 @@ class MinionsConfig {
     @Expose
     @ConfigOption(
         name = "Hopper Profit Display",
-        desc = "Use the hopper's held coins and the last empty time to calculate the coins per day."
+        desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var hopperProfitDisplay: Boolean = true
 
     @Expose
-    @ConfigOption(
-        name = "Show Xp",
-        desc = "Show how much skill experience you will get when picking up items from the minion storage."
-    )
+    @ConfigOption(name = "Show XP", desc = "Show how much skill experience you will get when picking up items from the minion storage.")
     @ConfigEditorBoolean
     @FeatureToggle
     var xpDisplay: Boolean = true
@@ -68,10 +65,7 @@ class MinionsConfig {
     var hideMobsNametagNearby: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Inferno Fuel Blocker",
-        desc = "Prevent picking up the fuel or minion while there is active fuel."
-    )
+    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevent picking up the fuel or minion while there is active fuel.")
     @ConfigEditorBoolean
     @FeatureToggle
     var infernoFuelBlocker: Boolean = false

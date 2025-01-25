@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
-import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.getValue
+import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.setValue
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingLaneFeatures {
-    val config get() = FarmingLaneAPI.config
+    val config get() = FarmingLaneApi.config
 
     private var currentPositon: Double? = null
     private var currentDistance = 0.0
@@ -63,11 +63,11 @@ object FarmingLaneFeatures {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return
-        if (!GardenAPI.isCurrentlyFarming()) return
+        if (!GardenApi.isCurrentlyFarming()) return
 
         if (calculateSpeed()) {
             showWarning()
@@ -93,7 +93,7 @@ object FarmingLaneFeatures {
     }
 
     private fun calculateDistance(): Boolean {
-        val lane = FarmingLaneAPI.currentLane ?: return false
+        val lane = FarmingLaneApi.currentLane ?: return false
         val min = lane.min
         val max = lane.max
         val position = lane.direction.getValue(LocationUtils.playerLocation())
@@ -193,10 +193,10 @@ object FarmingLaneFeatures {
 
     @HandleEvent
     fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.cornerWaypoints) return
 
-        val lane = FarmingLaneAPI.currentLane ?: return
+        val lane = FarmingLaneApi.currentLane ?: return
         val direction = lane.direction
         val location = LocationUtils.playerLocation()
         val min = direction.setValue(location, lane.min).capAtBuildHeight()
@@ -212,7 +212,7 @@ object FarmingLaneFeatures {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")

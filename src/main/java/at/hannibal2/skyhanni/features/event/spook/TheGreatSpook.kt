@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.NEUCalculator
+import at.hannibal2.skyhanni.utils.NeuCalculator
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -166,7 +166,7 @@ object TheGreatSpook {
     }
 
     private fun mathSolver(query: String?) {
-        val answer = query?.let { NEUCalculator.calculateOrNull(it)?.toInt() } ?: run {
+        val answer = query?.let { NeuCalculator.calculateOrNull(it)?.toInt() } ?: run {
             ChatUtils.userError("Failed to solve $query!")
             return
         }

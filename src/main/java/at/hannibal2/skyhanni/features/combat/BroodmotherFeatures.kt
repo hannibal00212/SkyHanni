@@ -134,7 +134,7 @@ object BroodmotherFeatures {
 
     private fun onBroodmotherSlain() {
         broodmotherSpawnTime = SimpleTimeMark.now() + 10.minutes
-        if (!(config.hideSlainWhenNearby && SpidersDenAPI.isAtTopOfNest())) {
+        if (!(config.hideSlainWhenNearby && SpidersDenApi.isAtTopOfNest())) {
             ChatUtils.chat("The Broodmother was killed!")
         }
     }

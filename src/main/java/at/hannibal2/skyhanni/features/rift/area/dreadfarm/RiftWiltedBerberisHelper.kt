@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -30,7 +30,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object RiftWiltedBerberisHelper {
 
-    private val config get() = RiftAPI.config.area.dreadfarm.wiltedBerberis
+    private val config get() = RiftApi.config.area.dreadfarm.wiltedBerberis
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
     private var list = listOf<WiltedBerberis>()
@@ -50,7 +50,7 @@ object RiftWiltedBerberisHelper {
 
         list = list.editCopy { removeIf { it.lastTime.passedSince() > 500.milliseconds } }
 
-        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftAPI.farmingTool
+        hasFarmingToolInHand = InventoryUtils.getItemInHand()?.getInternalName() == RiftApi.farmingTool
 
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             val block = LorenzVec.getBlockBelowPlayer().getBlockAt()
@@ -159,10 +159,10 @@ object RiftWiltedBerberisHelper {
         return LorenzVec(x, y, z)
     }
 
-    private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && RiftApi.inDreadfarm() && config.enabled
 
-    private fun isMuteOthersSoundsEnabled() = RiftAPI.inRift() &&
+    private fun isMuteOthersSoundsEnabled() = RiftApi.inRift() &&
         config.muteOthersSounds &&
-        (RiftAPI.inDreadfarm() || RiftAPI.inWestVillage()) &&
+        (RiftApi.inDreadfarm() || RiftApi.inWestVillage()) &&
         !(hasFarmingToolInHand && isOnFarmland)
 }
