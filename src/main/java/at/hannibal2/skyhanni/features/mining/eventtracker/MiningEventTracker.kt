@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -177,7 +177,7 @@ object MiningEventTracker {
 
     private fun sendData(json: String) {
         val response = try {
-            APIUtils.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+            ApiUtils.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
         } catch (e: IOException) {
             if (LorenzUtils.debug) {
                 ErrorManager.logErrorWithData(
@@ -211,7 +211,7 @@ object MiningEventTracker {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
             val data = try {
-                APIUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+                ApiUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
             } catch (e: Exception) {
                 apiErrorCount++
                 canRequestAt = SimpleTimeMark.now() + 20.minutes

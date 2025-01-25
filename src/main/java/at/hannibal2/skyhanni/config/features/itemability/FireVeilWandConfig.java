@@ -17,17 +17,17 @@ public class FireVeilWandConfig {
         LINE("Line", 1),
         OFF("Off", 2),
         ;
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        DisplayEntry(String str, int legacyId) {
-            this.str = str;
+        DisplayEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        DisplayEntry(String str) {
-            this(str, -1);
+        DisplayEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -37,7 +37,7 @@ public class FireVeilWandConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

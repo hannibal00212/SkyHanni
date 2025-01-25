@@ -67,10 +67,10 @@ data class ChocolateFactoryUpgrade(
 
         fun updateIgnoredSlots() {
             ignoredSlotIndexes = listOf(
-                ChocolateFactoryAPI.prestigeIndex,
-                ChocolateFactoryAPI.handCookieIndex,
-                ChocolateFactoryAPI.shrineIndex,
-                ChocolateFactoryAPI.barnIndex,
+                ChocolateFactoryApi.prestigeIndex,
+                ChocolateFactoryApi.handCookieIndex,
+                ChocolateFactoryApi.shrineIndex,
+                ChocolateFactoryApi.barnIndex,
             )
         }
     }

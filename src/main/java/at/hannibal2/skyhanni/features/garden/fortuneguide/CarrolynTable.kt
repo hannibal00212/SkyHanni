@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -44,8 +44,8 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
 
     val thxResponse = "§aYou have already given Carrolyn enough $label."
 
-    fun get() = GardenAPI.storage?.fortune?.carrolyn?.get(crop) ?: false
-    fun set(value: Boolean) = GardenAPI.storage?.fortune?.carrolyn?.set(crop, value)
+    fun get() = GardenApi.storage?.fortune?.carrolyn?.get(crop) ?: false
+    fun set(value: Boolean) = GardenApi.storage?.fortune?.carrolyn?.set(crop, value)
 
     fun setVisibleActive(value: Boolean) {
         set(value)
