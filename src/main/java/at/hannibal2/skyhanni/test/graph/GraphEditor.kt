@@ -361,9 +361,29 @@ object GraphEditor {
             category = CommandCategory.DEVELOPER_TEST
             callback { toggleFindAll() }
         }
+        event.register("shgraphloadthisisland") {
+            description = "Loads the current island data into the graph editor."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { loadThisIsland() }
+        }
     }
 
-    fun toggleFeature() {
+    private fun loadThisIsland() {
+        val graph = IslandGraphs.currentIslandGraph
+        if (graph == null) {
+            ChatUtils.userError("This island does not have graph data!")
+            return
+        }
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("Graph Editor is now active.")
+        }
+
+        import(graph)
+        ChatUtils.chat("Graph Editor loaded this island!")
+    }
+
+    private fun toggleFeature() {
         config.enabled = !config.enabled
         if (config.enabled) {
             ChatUtils.chat("Graph Editor is now active.")
