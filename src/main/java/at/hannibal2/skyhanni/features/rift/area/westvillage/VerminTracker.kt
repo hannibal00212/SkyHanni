@@ -96,9 +96,8 @@ object VerminTracker {
         SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftApi.inRift()) return
         checkVacuum()
     }
 
@@ -107,7 +106,7 @@ object VerminTracker {
             .any { it.getInternalName() == TURBOMAX_VACUUM }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
@@ -120,9 +119,9 @@ object VerminTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!RiftApi.inRift() || event.inventoryName != "Vermin Bin") return
+        if (event.inventoryName != "Vermin Bin") return
 
         val bin = event.inventoryItems[13]?.getLore() ?: return
         val bag = InventoryUtils.getItemsInOwnInventory()

@@ -55,7 +55,7 @@ class IsInIslandEarlyReturn(config: Config) : SkyHanniRule(config) {
             isInIslandRegex to "IslandType",
             isInGardenRegex to "IslandType.GARDEN",
             isInRiftRegex to "IslandType.THE_RIFT",
-            isInDungeonRegex to "IslandType.DUNGEON"
+            isInDungeonRegex to "IslandType.CATACOMBS"
         )
     }
 }

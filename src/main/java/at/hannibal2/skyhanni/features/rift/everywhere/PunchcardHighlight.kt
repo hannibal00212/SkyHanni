@@ -215,10 +215,9 @@ object PunchcardHighlight {
         display = drawDisplay()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
-        if (!RiftApi.inRift()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")
     }

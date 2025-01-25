@@ -51,9 +51,9 @@ object SprayDisplay {
         sendExpiredPlotsToChat(true)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenApi.inGarden() || !config.displayEnabled) return
+        if (!config.displayEnabled) return
         val display = display ?: return
         config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
     }

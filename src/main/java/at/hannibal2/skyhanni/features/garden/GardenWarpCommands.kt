@@ -31,10 +31,9 @@ object GardenWarpCommands {
 
     private var lastWarpTime = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.warpCommands) return
-        if (!GardenApi.inGarden()) return
 
         val message = event.message.lowercase()
 
