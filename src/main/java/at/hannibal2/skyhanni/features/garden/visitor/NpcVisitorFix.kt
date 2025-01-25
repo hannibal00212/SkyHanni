@@ -30,7 +30,7 @@ object NpcVisitorFix {
 
     private val barnSkinChangePattern by RepoPattern.pattern(
         "garden.barn.skin.change",
-        "§aChanging Barn skin to §r.*"
+        "§aChanging Barn skin to §r.*",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
