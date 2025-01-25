@@ -48,7 +48,7 @@ object BroodmotherFeatures {
     private var display = ""
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
         if (newStage.isNotEmpty() && newStage != lastStage.toString()) {
@@ -134,7 +134,7 @@ object BroodmotherFeatures {
 
     private fun onBroodmotherSlain() {
         broodmotherSpawnTime = SimpleTimeMark.now() + 10.minutes
-        if (!(config.hideSlainWhenNearby && SpidersDenAPI.isAtTopOfNest())) {
+        if (!(config.hideSlainWhenNearby && SpidersDenApi.isAtTopOfNest())) {
             ChatUtils.chat("The Broodmother was killed!")
         }
     }

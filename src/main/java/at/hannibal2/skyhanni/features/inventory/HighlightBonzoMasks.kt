@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
@@ -81,7 +81,7 @@ object HighlightBonzoMasks {
     }
 
     // This timer is overestimating since mage level affects the cooldown
-    private enum class MaskType(val internalNames: List<NEUInternalName>, val cooldown: Duration) {
+    private enum class MaskType(val internalNames: List<NeuInternalName>, val cooldown: Duration) {
         BONZO_MASK(listOf("BONZO_MASK".toInternalName(), "STARRED_BONZO_MASK".toInternalName()), 6.minutes),
         SPIRIT_MASK(listOf("SPIRIT_MASK".toInternalName(), "STARRED_SPIRIT_MASK".toInternalName()), 30.seconds),
         ;
@@ -91,7 +91,7 @@ object HighlightBonzoMasks {
         }
 
         companion object {
-            fun getByInternalName(internalName: NEUInternalName): MaskType? {
+            fun getByInternalName(internalName: NeuInternalName): MaskType? {
                 return entries.firstOrNull { internalName in it.internalNames }
             }
         }

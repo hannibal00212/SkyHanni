@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 // scoreboard update event
 object ScoreboardEventQueue : ScoreboardEvent() {
 
-    override fun getDisplay() = elementPatterns.allMatches(getSbLines())
+    override fun getDisplay() = elementPatterns.allMatches(getSBLines())
 
     override val configLine = "Queued: Glacite Mineshafts\nPosition: §b#45 §fSince: §a00:00"
 

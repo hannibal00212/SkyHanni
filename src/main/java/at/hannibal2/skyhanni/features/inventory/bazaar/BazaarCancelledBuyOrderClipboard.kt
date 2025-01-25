@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -54,7 +54,7 @@ object BazaarCancelledBuyOrderClipboard {
     )
 
     private var latestAmount: Int? = null
-    private var lastClickedItem: NEUInternalName? = null
+    private var lastClickedItem: NeuInternalName? = null
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -89,7 +89,7 @@ object BazaarCancelledBuyOrderClipboard {
         val name = lastItemClickedPattern.matchMatcher(item.name) {
             group("name")
         } ?: return
-        lastClickedItem = NEUInternalName.fromItemName(name)
+        lastClickedItem = NeuInternalName.fromItemName(name)
     }
 
     @HandleEvent

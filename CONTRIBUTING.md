@@ -109,20 +109,20 @@ format like "- #821" to illustrate the dependency.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
-      After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
-     `baseline.xml` replacing the old one.
+          After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
+          `baseline.xml` replacing the old one.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
-  - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
-    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
-    - If you can improve the existing feature in a meaningful way.
+    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
+        - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
+        - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
     - This will automatically register it to the forge event bus and load the repo patterns.
-    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`. 
+    - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -148,7 +148,7 @@ format like "- #821" to illustrate the dependency.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
     - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-for more information and usages.
+      for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
@@ -157,6 +157,9 @@ for more information and usages.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve readability and maintain encapsulation.
+- Follow Kotlin conventions for acronym naming:
+    - Use all-uppercase for two-letter acronyms (e.g., `XP`).
+    - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 
 ## Additional Useful Development Tools
 
@@ -447,5 +450,5 @@ change beyond just their name (for example different generics), a `typealias` ca
 
 These helper methods should generally be placed in the `at.hannibal2.skyhanni.utils.compat` package and should be named after what they are
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
-it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files 
+it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.

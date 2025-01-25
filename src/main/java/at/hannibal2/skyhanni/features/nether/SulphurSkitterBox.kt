@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -33,8 +32,8 @@ object SulphurSkitterBox {
     private var renderBox: AxisAlignedBB? = null
     private const val RADIUS = 4
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(1)) {
             calculateSpongeLocations()
@@ -67,7 +66,7 @@ object SulphurSkitterBox {
             val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
             val pos2 = it.add(RADIUS, RADIUS, RADIUS)
             BlockPos.getAllInBox(pos1, pos2).any { pos ->
-                pos.toLorenzVec().getBlockAt() in FishingAPI.lavaBlocks
+                pos.toLorenzVec().getBlockAt() in FishingApi.lavaBlocks
             }
         }.map { it.toLorenzVec() }
     }
@@ -80,7 +79,7 @@ object SulphurSkitterBox {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
@@ -110,7 +109,7 @@ object SulphurSkitterBox {
     }
 
     fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || FishingAPI.holdingLavaRod)
+        IslandType.CRIMSON_ISLE.isInIsland() && config.enabled && (!config.onlyWithRods || FishingApi.holdingLavaRod)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
