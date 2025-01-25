@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -50,7 +49,7 @@ object TimiteTracker {
             return emptyList()
         }
 
-        override fun getCustomPricePer(internalName: NEUInternalName): Double {
+        override fun getCustomPricePer(internalName: NeuInternalName): Double {
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
         }
 
@@ -68,7 +67,7 @@ object TimiteTracker {
         val profit = tracker.drawItems(data, { true }, this)
 
 
-        val highliteRecipe = NEUItems.getRecipes(HIGHLITE).singleOrNull()
+        val highliteRecipe = NeuItems.getRecipes(HIGHLITE).singleOrNull()
         if (highliteRecipe != null) {
             var craftableAmount = 0
 
@@ -123,7 +122,7 @@ object TimiteTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
@@ -139,6 +138,6 @@ object TimiteTracker {
         }
     }
 
-    private fun isEnabled() = RiftAPI.inMountainTop() && config.timiteTracker
+    private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTracker
 
 }

@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -27,7 +27,6 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -70,7 +69,7 @@ object TimiteHelper {
         holdingClick = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
@@ -92,7 +91,7 @@ object TimiteHelper {
 
     private val timiteLocations = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         val location = LocationUtils.playerLocation()
         val from = location.add(-15, -15, -15).toBlockPos()
@@ -122,9 +121,9 @@ object TimiteHelper {
 
     }
 
-    @SubscribeEvent
-    fun onBlockRender(event: LorenzRenderWorldEvent) {
-        if (!RiftAPI.inMountainTop() || !config.timiteExpiryTimer) return
+    @HandleEvent
+    fun onBlockRender(event: RenderWorldEvent) {
+        if (!RiftApi.inMountainTop() || !config.timiteExpiryTimer) return
 
         for (timiteLocation in timiteLocations.entries) {
             val timeLeft = timiteLocation.value + 31.seconds
@@ -134,10 +133,10 @@ object TimiteHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) = timiteLocations.clear()
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) = timiteLocations.clear()
 
 
-    private fun isEnabled() = RiftAPI.inMountainTop() && config.timiteTimer
+    private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTimer
 
 }

@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -518,7 +519,7 @@ class ProfileSpecificStorage {
 
     data class CakeData(
         @Expose var ownedCakes: MutableSet<Int> = mutableSetOf(),
-        @Expose var missingCakes: MutableSet<Int> = mutableSetOf()
+        @Expose var missingCakes: MutableSet<Int> = mutableSetOf(),
     )
 
     @Expose
@@ -554,7 +555,7 @@ class ProfileSpecificStorage {
         @Expose var currentMeter: Long = -1,
         @Expose var gainPerBoss: Long = -1,
         @Expose var goalNeeded: Long = -1,
-        @Expose var itemGoal: String = "?"
+        @Expose var itemGoal: String = "?",
     )
 
     @Expose
@@ -753,7 +754,7 @@ class ProfileSpecificStorage {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
-                @Expose var strays: Int = 0
+                @Expose var strays: Int = 0,
             )
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
@@ -772,4 +773,7 @@ class ProfileSpecificStorage {
 
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+
+    @Expose
+    var timiteHelperTracker: TimiteTracker.Data = TimiteTracker.Data()
 }
