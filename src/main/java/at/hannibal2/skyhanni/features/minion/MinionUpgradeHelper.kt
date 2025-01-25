@@ -1,20 +1,20 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarAPI
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -30,7 +30,7 @@ object MinionUpgradeHelper {
 
     private var displayItem: ItemStack? = null
     private var itemsNeeded: Int = 0
-    private var internalName: NEUInternalName? = null
+    private var internalName: NeuInternalName? = null
     private var itemsInSacks: Int = 0
 
     /**
@@ -46,7 +46,7 @@ object MinionUpgradeHelper {
         if (!config.minionConfigHelper) return
         val lore = event.inventoryItems[50]?.getLore()?.joinToString(" ") ?: return
         requiredItemsPattern.findMatcher(lore) {
-            internalName = NEUInternalName.fromItemName(group("itemName").removeColor())
+            internalName = NeuInternalName.fromItemName(group("itemName").removeColor())
             itemsNeeded = group("amount")?.toInt() ?: 0
         } ?: resetItems()
 
@@ -70,12 +70,12 @@ object MinionUpgradeHelper {
         displayItem = null
     }
 
-    private fun createDisplayItem(internalName: NEUInternalName): ItemStack {
+    private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
         val lore = createLore(internalName)
         return ItemStack(Blocks.diamond_block).setLore(lore).setStackDisplayName("§bGet Required Items")
     }
 
-    private fun createLore(internalName: NEUInternalName): List<String> {
+    private fun createLore(internalName: NeuInternalName): List<String> {
         val itemPrice = internalName.getPriceOrNull() ?: 0.0
         val lore = buildList {
             val itemsRemaining = itemsNeeded - itemsInSacks
@@ -121,9 +121,9 @@ object MinionUpgradeHelper {
         val internalName = internalName ?: return
         val remainingItems = itemsNeeded - itemsInSacks
         if (remainingItems > 0) {
-            BazaarAPI.searchForBazaarItem(internalName, remainingItems)
+            BazaarApi.searchForBazaarItem(internalName, remainingItems)
         } else {
-            GetFromSackAPI.getFromSack(internalName, itemsNeeded)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded)
         }
     }
 }

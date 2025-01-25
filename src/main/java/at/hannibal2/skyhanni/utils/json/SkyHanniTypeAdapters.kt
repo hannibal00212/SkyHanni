@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.system.ModVersion
@@ -26,14 +26,14 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object SkyHanniTypeAdapters {
 
-    val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NEUItems::saveNBTData, NEUItems::loadNBTData)
+    val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
         { java.util.UUID.fromString(this) },
     )
 
-    val INTERNAL_NAME: TypeAdapter<NEUInternalName> = SimpleStringTypeAdapter(
+    val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
         { this.asString() },
         { this.toInternalName() },
     )

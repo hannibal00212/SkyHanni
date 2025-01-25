@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -47,7 +47,7 @@ object EstimatedItemValue {
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
     private var currentlyShowing = false
 
@@ -59,7 +59,7 @@ object EstimatedItemValue {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent
@@ -72,7 +72,16 @@ object EstimatedItemValue {
     private fun isInNeuOverlay(): Boolean {
         val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
-        val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+
+        // Use reflection to make sure tradeMenu exists
+        val neuConfig = NotEnoughUpdates.INSTANCE.config
+        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
+        val trade = tradeField[neuConfig]
+
+        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
+        val customTradeEnabled = booleanField[trade] as Boolean
+
+        val inNeuTrade = inTrade && customTradeEnabled
         val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
 
         return inPv || inNeuTrade || inStorage

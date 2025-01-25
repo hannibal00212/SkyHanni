@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -48,7 +48,7 @@ object DungeonArchitectFeatures {
         val architectItemAmount = architectsFirstDraftItem.getAmountInSacks()
         if (architectItemAmount <= 0) return
 
-        GetFromSackAPI.getFromChatMessageSackItems(
+        GetFromSackApi.getFromChatMessageSackItems(
             architectsFirstDraft,
             "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
@@ -58,5 +58,5 @@ object DungeonArchitectFeatures {
         event.blockedReason = "puzzle_fail"
     }
 
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.architectNotifier
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.architectNotifier
 }

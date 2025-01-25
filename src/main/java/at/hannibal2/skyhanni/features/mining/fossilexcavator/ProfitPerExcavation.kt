@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 
@@ -25,7 +25,7 @@ object ProfitPerExcavation {
         val map = mutableMapOf<String, Double>()
         for ((name, amount) in loot) {
             if (name == "§bGlacite Powder") continue
-            NEUInternalName.fromItemNameOrNull(name)?.let {
+            NeuInternalName.fromItemNameOrNull(name)?.let {
                 val pricePer = it.getPrice()
                 if (pricePer == -1.0) continue
                 val profit = amount * pricePer
@@ -35,7 +35,7 @@ object ProfitPerExcavation {
             }
         }
 
-        val scrapItem = FossilExcavatorAPI.scrapItem
+        val scrapItem = FossilExcavatorApi.scrapItem
 
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.itemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice

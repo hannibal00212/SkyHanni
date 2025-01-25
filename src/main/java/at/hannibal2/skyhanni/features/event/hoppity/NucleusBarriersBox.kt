@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -69,7 +69,7 @@ object NucleusBarriersBox {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         Crystal.entries.forEach { crystal ->
@@ -82,5 +82,5 @@ object NucleusBarriersBox {
     }
 
     private fun isEnabled() =
-        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityAPI.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
+        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
 }
