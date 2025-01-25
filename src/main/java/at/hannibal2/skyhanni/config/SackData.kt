@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.data.SackItem
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
-import java.util.*
+import java.util.UUID
 
 class SackData {
     @Expose
@@ -16,6 +16,6 @@ class SackData {
 
     class ProfileSpecific {
         @Expose
-        var sackContents: Map<NEUInternalName, SackItem> = mutableMapOf()
+        var sackContents: Map<NeuInternalName, SackItem> = mutableMapOf()
     }
 }

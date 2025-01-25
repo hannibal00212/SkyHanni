@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
@@ -137,7 +137,13 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
+    public Property<List<OutsideSBFeature>> showOutsideSB = Property.of(new ArrayList<>());
+
+    @Expose
+    @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean autoJoinSkyblock = false;
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
@@ -170,11 +176,18 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.")
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to skyblockXPBar
     public boolean skyblockXpBar = false;
+
+    @Expose
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpInInventory = true;
 
     // TODO move into scoreboard accordion
     @Expose
@@ -347,13 +360,9 @@ public class MiscConfig {
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Open Last Storage",
-        desc = "Allows running §e/shlastopened §7as a command to open the last storage you opened. " +
-            "Also allows §e/ec - §7and §e/bp - §7to open the last Ender Chest and Backpack you opened.")
-    @FeatureToggle
-    @ConfigEditorBoolean
-    public boolean openLastStorage = true;
+    @ConfigOption(name = "Last Storage", desc = "")
+    @Accordion
+    public LastStorageConfig lastStorage = new LastStorageConfig();
 
     @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")

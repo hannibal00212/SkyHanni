@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
@@ -17,7 +17,7 @@ import net.minecraft.entity.Entity
 @SkyHanniModule
 object RiftUpsideDownParkour {
 
-    private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
+    private val config get() = RiftApi.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
 
     @HandleEvent
@@ -76,5 +76,5 @@ object RiftUpsideDownParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled
+    fun isEnabled() = RiftApi.inRift() && RiftApi.inMirrorVerse && config.enabled
 }

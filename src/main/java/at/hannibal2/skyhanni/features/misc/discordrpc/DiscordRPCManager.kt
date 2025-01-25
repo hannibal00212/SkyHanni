@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // This entire file was taken from SkyblockAddons code, ported to SkyHanni
 
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
+import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod.feature
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
