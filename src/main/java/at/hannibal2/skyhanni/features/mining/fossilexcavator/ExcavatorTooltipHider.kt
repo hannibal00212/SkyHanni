@@ -40,5 +40,5 @@ object ExcavatorTooltipHider {
         }
     }
 
-    fun isEnabled() = FossilExcavatorAPI.inInventory && !FossilExcavatorAPI.inExcavatorMenu
+    fun isEnabled() = FossilExcavatorApi.inInventory && !FossilExcavatorApi.inExcavatorMenu
 }

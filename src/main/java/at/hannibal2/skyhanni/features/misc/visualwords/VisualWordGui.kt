@@ -469,7 +469,7 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
-                tryImportFromSBE()
+                tryImportFromSbe()
             }
         }
     }
@@ -573,7 +573,7 @@ open class VisualWordGui : GuiScreen() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
-    private fun tryImportFromSBE() {
+    private fun tryImportFromSbe() {
         if (!drawImport) return
         try {
             val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
