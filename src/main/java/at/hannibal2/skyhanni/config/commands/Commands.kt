@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
+import at.hannibal2.skyhanni.features.dungeon.floor7.PlayerBossReplay
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -150,6 +151,10 @@ object Commands {
         event.register("shtrackcollection") {
             description = "Tracks your collection gain over time"
             callback { CollectionTracker.command(it) }
+        }
+        event.register("shrecord") {
+            description = "Download the SkyHanni repo again"
+            callback { PlayerBossReplay.command(it) }
         }
     }
 
