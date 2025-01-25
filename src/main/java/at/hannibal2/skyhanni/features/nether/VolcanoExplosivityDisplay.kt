@@ -28,7 +28,7 @@ object VolcanoExplosivityDisplay {
     private var display = ""
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.VOLCANO)) return
 

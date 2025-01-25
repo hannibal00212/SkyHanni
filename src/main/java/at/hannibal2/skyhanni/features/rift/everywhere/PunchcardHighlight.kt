@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -19,11 +19,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -117,7 +117,7 @@ object PunchcardHighlight {
     private var warningCooldown = SimpleTimeMark.farPast()
 
     private fun checkPunchcard() {
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
 
         val hasPunchcard = InventoryUtils.isItemInInventory(PUNCHCARD_ARTIFACT)
         if (!hasPunchcard && warningCooldown.passedSince() > 30.seconds) {
@@ -173,7 +173,7 @@ object PunchcardHighlight {
     fun onPunch(event: EntityClickEvent) {
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
-        if (entity.isNPC()) return
+        if (entity.isNpc()) return
         val name = entity.name
         if (name in playerList || name in playerQueue) return
         playerQueue.add(name)
@@ -218,7 +218,7 @@ object PunchcardHighlight {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
-        if (!RiftAPI.inRift()) return
+        if (!RiftApi.inRift()) return
 
         config.position.renderRenderable(display, "Punchcard Overlay")
     }

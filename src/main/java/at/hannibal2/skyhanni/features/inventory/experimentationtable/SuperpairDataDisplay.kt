@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.remainingClicksPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -61,7 +61,7 @@ object SuperpairDataDisplay {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
         }
-        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.getCurrentExperiment() == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
@@ -71,9 +71,9 @@ object SuperpairDataDisplay {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.getCurrentExperiment() == null) return
 
-        val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return
+        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return
 
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
@@ -219,7 +219,7 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return emptyList<String>()
+        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return emptyList<String>()
 
         add("§6Superpair Experimentation Data")
         add("")
@@ -280,10 +280,10 @@ object SuperpairDataDisplay {
                     }
             }
 
-    private fun isPowerUp(reward: String) = ExperimentationTableAPI.powerUpPattern.matches(reward)
+    private fun isPowerUp(reward: String) = ExperimentationTableApi.powerUpPattern.matches(reward)
 
     private fun isReward(reward: String) =
-        ExperimentationTableAPI.rewardPattern.matches(reward) || ExperimentationTableAPI.powerUpPattern.matches(reward)
+        ExperimentationTableApi.rewardPattern.matches(reward) || ExperimentationTableApi.powerUpPattern.matches(reward)
 
     // TODO use repo patterns instead
     private fun isWaiting(itemName: String) =

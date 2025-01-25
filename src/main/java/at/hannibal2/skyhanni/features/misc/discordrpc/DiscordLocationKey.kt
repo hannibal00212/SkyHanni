@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
 object DiscordLocationKey {
@@ -249,7 +249,7 @@ object DiscordLocationKey {
     private fun getAmbiguousKey(location: String): String {
         val island = LorenzUtils.skyBlockIsland
 
-        DungeonAPI.dungeonFloor?.lowercase()?.let {
+        DungeonApi.dungeonFloor?.lowercase()?.let {
             if (it.startsWith("m")) {
                 return "master-mode"
             }

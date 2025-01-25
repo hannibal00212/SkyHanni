@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
-import at.hannibal2.skyhanni.data.PartyAPI.transferVoluntaryPattern
+import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.data.PartyApi.partyLeader
+import at.hannibal2.skyhanni.data.PartyApi.transferVoluntaryPattern
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
@@ -26,25 +26,25 @@ object PartyCommands {
 
     private fun kickOffline() {
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyKickOffline()
     }
 
     private fun disband() {
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyDisband()
     }
 
     private fun warp() {
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyWarp()
     }
 
     private fun kick(args: Array<String>) {
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         val kickedPlayer = args[0]
         val kickedReason = args.drop(1).joinToString(" ").trim()
@@ -64,31 +64,29 @@ object PartyCommands {
             return
         }
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyTransfer(args[0])
     }
 
     private fun promote(args: Array<String>) {
         if (!config.shortCommands) return
-        if (PartyAPI.partyMembers.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         HypixelCommands.partyPromote(args[0])
     }
 
     private fun reverseTransfer() {
         if (!config.reversePT.command) return
-        if (PartyAPI.partyMembers.isEmpty()) return
-        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+        if (PartyApi.partyMembers.isEmpty()) return
+        val prevPartyLeader = PartyApi.prevPartyLeader ?: return
 
         autoPartyTransfer(prevPartyLeader)
     }
 
     private fun autoPartyTransfer(prevPartyLeader: String) {
         HypixelCommands.partyTransfer(prevPartyLeader)
-        config.reversePT.message?.let {
-            if (it.isNotBlank()) {
-                HypixelCommands.partyChat(it)
-            }
+        config.reversePT.message.takeIf { it.isNotBlank() }?.let {
+            HypixelCommands.partyChat(it)
         }
     }
 
@@ -112,7 +110,7 @@ object PartyCommands {
 
     fun customTabComplete(command: String): List<String>? {
         if (command == "pk" || command == "pt" || command == "pp" && config.shortCommands) {
-            return PartyAPI.partyMembers
+            return PartyApi.partyMembers
         }
         return null
     }
@@ -130,7 +128,7 @@ object PartyCommands {
         if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
         if (partyLeader != LorenzUtils.getPlayerName()) return
 
-        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+        val prevPartyLeader = PartyApi.prevPartyLeader ?: return
         event.blockedReason = "replacing"
 
         ChatUtils.clickableChat(

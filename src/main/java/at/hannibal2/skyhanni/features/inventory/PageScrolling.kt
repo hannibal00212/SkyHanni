@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ToolTipData
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,8 +51,8 @@ object PageScrolling {
 
     private var cooldown = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
         if (cooldown.isInFuture()) return

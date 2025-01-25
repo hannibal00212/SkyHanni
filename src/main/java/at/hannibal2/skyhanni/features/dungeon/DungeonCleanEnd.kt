@@ -83,7 +83,7 @@ object DungeonCleanEnd {
         if (event.entity.entityId != lastBossId) return
 
         if (event.health <= 0.5) {
-            val dungeonFloor = DungeonAPI.dungeonFloor
+            val dungeonFloor = DungeonApi.dungeonFloor
             ChatUtils.chat("§eFloor $dungeonFloor done!", false)
             bossDone = true
         }
@@ -98,7 +98,7 @@ object DungeonCleanEnd {
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
         if (config.F3IgnoreGuardians &&
-            DungeonAPI.isOneOf("F3", "M3") &&
+            DungeonApi.isOneOf("F3", "M3") &&
             entity is EntityGuardian &&
             entity.entityId != lastBossId &&
             Minecraft.getMinecraft().thePlayer.isSneaking
