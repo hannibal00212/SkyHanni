@@ -67,7 +67,7 @@ object PestTrapFeatures {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
         val warnings = WarningReason.entries.filter {
-          userEnabledWarnings.contains(it)
+            userEnabledWarnings.contains(it)
         }.mapNotNull {
             generateWarning(it, event.data)
         }
