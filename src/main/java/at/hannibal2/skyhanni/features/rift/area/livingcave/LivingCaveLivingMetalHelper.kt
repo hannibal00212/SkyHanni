@@ -10,10 +10,14 @@ import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
@@ -21,7 +25,7 @@ object LivingCaveLivingMetalHelper {
     private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
-    private var startTime = 0L
+    private var animationStartTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
@@ -54,7 +58,7 @@ object LivingCaveLivingMetalHelper {
             val distance = location.distance(it)
             if (distance < 2) {
                 pair = Pair(it, location)
-                startTime = System.currentTimeMillis()
+                animationStartTime = SimpleTimeMark.now()
             }
         }
     }
@@ -63,14 +67,10 @@ object LivingCaveLivingMetalHelper {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
-        if (System.currentTimeMillis() > startTime + 5_000) return
+        if (animationStartTime.passedSince() > 4.seconds) return
 
-        val maxTime = 500
-        val diff = startTime + maxTime - System.currentTimeMillis()
-        val location = if (diff > 0) {
-            val percentage = diff.toDouble() / maxTime
-            a.slope(b, 1 - percentage)
-        } else b
+        val maxTime = 500.milliseconds
+        val location = LocationUtils.slopeOverTime(animationStartTime, maxTime, a, b)
         event.drawWaypointFilled(
             location,
             color,

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -37,8 +38,9 @@ object LivingCaveSnakeFeatures {
         var lastAddTime: SimpleTimeMark = SimpleTimeMark.farPast(),
         var state: State = State.SPAWNING,
         var lastCalmTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-        var lastBreakTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var lastHitTime: SimpleTimeMark = SimpleTimeMark.farPast(),
         var invalidHeadSince: SimpleTimeMark? = null,
+        var lastBrokenBlock: LorenzVec? = null,
     ) {
         fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
             a.distance(b) > 3
@@ -52,7 +54,7 @@ object LivingCaveSnakeFeatures {
 
         fun getInteraction(): Interaction {
             if (this == selectedSnake) {
-                if (lastBreakTime.passedSince() < 2.seconds) {
+                if (lastHitTime.passedSince() < 2.seconds) {
                     return Interaction.BREAKING
                 }
                 if (lastCalmTime.passedSince() < 2.seconds) {
@@ -114,6 +116,7 @@ object LivingCaveSnakeFeatures {
                 snake.state = State.ACTIVE
             }
             snake.lastRemoveTime = SimpleTimeMark.now()
+            snake.lastBrokenBlock = location
 
             originalBlocks[location] = old
         }
@@ -165,7 +168,7 @@ object LivingCaveSnakeFeatures {
                 snake.lastCalmTime = SimpleTimeMark.now()
         } else {
             if (InventoryUtils.itemInHandId in pickaxes) {
-                snake.lastBreakTime = SimpleTimeMark.now()
+                snake.lastHitTime = SimpleTimeMark.now()
             }
         }
     }
@@ -214,25 +217,28 @@ object LivingCaveSnakeFeatures {
         for (snake in snakes) {
             val blocks = snake.blocks
             if (blocks.isEmpty()) continue
+            val interaction = snake.getInteraction()
+            event.drawString(blocks.last().add(0.5, 0.8, 0.5), "§fstate = ${snake.state}", seeThroughBlocks)
+            event.drawString(blocks.last().add(0.5, 1.1, 0.5), "§finteraction = $interaction", seeThroughBlocks)
 
             val remainingSize = blocks.size
             val color = snake.state.color.toColor()
 
-            val interaction = snake.getInteraction()
 
             if (blocks.size > 1 && snake.state == State.CALM && interaction != Interaction.CALMING) {
                 blocks.first().let {
-                    event.drawWaypointFilled(it, LorenzColor.GREEN.toColor(), seeThroughBlocks)
-                    event.drawString(it.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
+                    val lastBrokenBlock = snake.lastBrokenBlock
+                    val location = if (interaction == Interaction.BREAKING && lastBrokenBlock != null) {
+                        LocationUtils.slopeOverTime(snake.lastRemoveTime, 300.milliseconds, lastBrokenBlock, it)
+                    } else {
+                        it
+                    }
+
+                    event.drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks)
+                    event.drawString(location.add(0.5, 0.5, 0.5), "§aTail", seeThroughBlocks)
 
                     if (interaction == Interaction.BREAKING) {
-                        event.drawString(it.add(0.5, 0.2, 0.5), "§7($remainingSize blocks)", seeThroughBlocks)
-                    }
-                }
-                if (blocks.size > 2 && snake == selectedSnake && interaction == Interaction.BREAKING) {
-                    blocks[1].let {
-                        event.drawWaypointFilled(it, LorenzColor.GOLD.toColor(), seeThroughBlocks)
-                        event.drawString(it.add(0.5, 0.5, 0.5), "§aNext", seeThroughBlocks)
+                        event.drawString(location.add(0.5, 0.2, 0.5), "§7($remainingSize blocks)", seeThroughBlocks)
                     }
                 }
             }

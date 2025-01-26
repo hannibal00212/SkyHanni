@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration
 
 object LocationUtils {
 
@@ -129,5 +130,20 @@ object LocationUtils {
             yaw < 315 -> LorenzVec(-1, 0, 0)
             else -> LorenzVec(0, 0, -1)
         }
+    }
+
+    fun slopeOverTime(
+        startTime: SimpleTimeMark,
+        maxTime: Duration,
+        from: LorenzVec,
+        to: LorenzVec,
+    ): LorenzVec {
+        if (startTime == SimpleTimeMark.farPast()) return from
+        val diff = startTime.toMillis() + maxTime.inWholeMilliseconds - System.currentTimeMillis()
+        val location = if (diff > 0) {
+            val percentage = diff.toDouble() / maxTime.inWholeMilliseconds
+            from.slope(to, 1 - percentage)
+        } else to
+        return location
     }
 }
