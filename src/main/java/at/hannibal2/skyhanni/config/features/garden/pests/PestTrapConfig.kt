@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestTrapConfig {
 
+    @Suppress("StorageNeedsExpose")
     private val tabWidgetConfig: TabWidgetConfig get() = SkyHanniMod.feature.gui.tabWidget
 
     @ConfigOption(

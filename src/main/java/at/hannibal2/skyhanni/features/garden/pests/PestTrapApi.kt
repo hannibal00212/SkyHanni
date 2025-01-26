@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -17,7 +18,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -25,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -82,6 +85,7 @@ object PestTrapApi {
     private val storage get() = GardenApi.storage
     // Todo: Use this in the future to tell the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
+    private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
 
     var MAX_PEST_COUNT_PER_TRAP = 3
     private var lastTabHash: Int = 0
@@ -91,6 +95,7 @@ object PestTrapApi {
     private var lastTotalHash: Int = lastTitleHash + lastFullHash + lastNoBaitHash
     private var lastClickedIndex: Int = -1
     private var inIndex: Int = -1
+    private var timeEnteredGarden: SimpleTimeMark? = null
 
     // <editor-fold desc="Patterns">
     /**
@@ -151,6 +156,14 @@ object PestTrapApi {
         "§cThere are no §2Pests §cto release!"
     )
     // </editor-fold>
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onIslandChange(event: IslandChangeEvent) {
+        timeEnteredGarden = when (event.newIsland) {
+            IslandType.GARDEN -> SimpleTimeMark.now()
+            else -> null
+        }
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onClickEntity(event: PacketSentEvent) {
@@ -321,6 +334,8 @@ object PestTrapApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTabListUpdate(event: TabListUpdateEvent) {
+        val timeEnteredGarden = timeEnteredGarden ?: return
+        if (timeEnteredGarden.passedSince() < 5.seconds) return
         val storage = storage ?: return
         lastTabHash = event.tabList.sumOf { it.hashCode() }.takeIf { it != lastTabHash } ?: return
 
@@ -388,14 +403,10 @@ object PestTrapApi {
 
     @Suppress("UnstableApiUsage")
     private fun baseWidgetStatus() = TimeLimitedCache<TabWidget, Boolean>(
-        expireAfterWrite = 60.seconds,
+        expireAfterWrite = 30.seconds,
         removalListener = { key, _, removalCause ->
-            if (key != null && GardenApi.inGarden() && removalCause == EXPIRED) {
-                ChatUtils.userError(
-                    "Could not read ${key.name.lowercase().replace("_", " ")} data from the tab list!",
-                    replaceSameMessage = true
-                )
-            }
+            if (removalCause != EXPIRED) return@TimeLimitedCache
+            widgetErrors.addOrPut(key ?: return@TimeLimitedCache, 1)
         }
     )
 }
