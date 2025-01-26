@@ -96,13 +96,28 @@ object CropMoneyDisplay {
         update()
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Crop Money - Extra")
+        event.addIrrelevant(extraMoneyPerHour.toString())
+        event.title("Crop Money - Crop")
+        event.addIrrelevant {
+            val currentCrop = GardenApi.getCurrentlyFarmedCrop()
+            for (data in moneyPerHour.values) {
+                if (data.crop == currentCrop) {
+                    add(data.toString())
+                    add(" ")
+                }
+            }
+        }
+    }
+
     private fun update() {
         init()
         display = buildDisplay()
     }
 
     private fun buildDisplay(): Renderable? {
-
         val title = if (config.compact) {
             "§7Money/Hour:"
         } else {
@@ -130,7 +145,6 @@ object CropMoneyDisplay {
     }
 
     private fun buildDisplayBody(): Renderable {
-
         GardenApi.getCurrentlyFarmedCrop()?.let {
             val reforgeName = InventoryUtils.getItemInHand()?.getReforgeName()
             toolHasBountiful?.put(it, reforgeName == "bountiful")
@@ -189,17 +203,33 @@ object CropMoneyDisplay {
             }
             return Renderable.string("§cFarm crops to add them to this list!")
         }
-
-
-
-        val data = moneyPerHour
-            .mapValues { it.value.toPrices() }.toList().sortedByDescending { it.second.max() }
-
+        val cropList = createDescendingCropList(moneyPerHour)
         return Container.vertical {
-            for ((index, pair) in data.withIndex()) {
+            for ((index, pair) in cropList.withIndex()) {
                 renderable(buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total))
             }
         }
+    }
+
+    private fun createDescendingCropList(
+        moneyPerHour: Map<NeuInternalName, CropMoneyData>
+    ): List<Pair<NeuInternalName, List<Double>>> {
+        val defaultPrices = listOf(0.0, 0.0, 0.0)
+        val enchantedSeedPrices = moneyPerHour[ENCHANTED_SEEDS]?.toPrices() ?: defaultPrices
+        val seedPrices = moneyPerHour[SEEDS]?.toPrices() ?: defaultPrices
+        val bestSeedPrices = enchantedSeedPrices.zip(seedPrices).map { (a, b) -> a.coerceAtLeast(b) }
+
+        val priceList: MutableList<Pair<NeuInternalName, List<Double>>> = mutableListOf()
+        for ((internalName, cropMoneyData) in moneyPerHour) {
+            if (config.mergeSeeds && isSeeds(internalName)) continue
+            var prices = cropMoneyData.toPrices()
+            if (config.mergeSeeds && cropMoneyData.crop == CropType.WHEAT) {
+                prices = prices.zip(bestSeedPrices).map { (a, b) -> a + b }
+            }
+            priceList.add(internalName to prices)
+        }
+        priceList.sortByDescending { it.second.max() }
+        return priceList
     }
 
     private fun buildCropMoneyLine(
@@ -211,10 +241,6 @@ object CropMoneyDisplay {
         val crop = cropNames[internalName]!!
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
         if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) return null
-        val debug = isCurrent && showCalculation
-        if (debug) {
-            debugCalculationData.add("final calculation for: $internalName/$crop")
-        }
 
         return Container.horizontal {
             if (!config.compact) string("§7$number# ")
@@ -237,7 +263,7 @@ object CropMoneyDisplay {
             }
 
             val coinsColor = if (config.compact && GardenApi.getCurrentlyFarmedCrop() == crop) "§e" else "§6"
-            val coins = prices.map {
+            val coins = prices.joinToString("§7/") {
                 val finalPrice = it + extraMoneyPerHour
                 val formattedPrice = if (config.compactPrice) {
                     finalPrice.shortFormat()
@@ -245,54 +271,14 @@ object CropMoneyDisplay {
                     finalPrice.toLong().addSeparators()
                 }
                 "$coinsColor$formattedPrice"
-            }.joinToString { "§7/" }
+            }
             string(coins)
         }
     }
 
-    // TODO : Rewrite to not be index-reliant
     private fun fullTitle(title: String): String {
-        val titleText: String
-        val nameList = mutableListOf<String>()
-        if (config.useCustomFormat) {
-            val map = mapOf(
-                0 to "Sell Offer",
-                1 to "Instant Sell",
-                2 to "NPC Price",
-            )
-            val list = mutableListOf<String>()
-            for (index in config.customFormat) {
-                // TODO, change functionality to use enum rather than ordinals
-                map[index.ordinal]?.let {
-                    list.add(it)
-                }
-            }
-            for (line in list) {
-                nameList.add("§e$line")
-                nameList.add("§7/")
-            }
-            nameList.removeLast()
-            titleText = nameList.joinToString("")
-        } else {
-            titleText = if (LorenzUtils.noTradeMode) "§eNPC Price" else "§eSell Offer"
-        }
-        return "$title §7($titleText§7)"
+        return currentFormats().joinToString("§7/", "$title §7(", "§7)")
     }
-
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Crop Money")
-        event.addIrrelevant(extraMoneyPerHour.toString())
-        val currentCrop = GardenApi.getCurrentlyFarmedCrop()
-        for (data in moneyPerHour.values) {
-            if (data.crop == currentCrop) {
-                event.addIrrelevant(data.toString())
-                event.addIrrelevant(" ")
-            }
-        }
-    }
-
-    private val debugCalculationData: MutableList<String> = mutableListOf()
 
     private fun calculateMoneyPerHour(): Map<NeuInternalName, CropMoneyData> {
         val moneyPerHours = mutableMapOf<NeuInternalName, CropMoneyData>()
@@ -334,9 +320,9 @@ object CropMoneyDisplay {
         val cropsPerHour = speedPerHour / amount.toDouble()
         val bazaarData = internalName.getBazaarData() ?: return null
 
-        var npcCoins = internalName.getNpcPrice() * cropsPerHour
-        var sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
-        var instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
+        val npcCoins = internalName.getNpcPrice() * cropsPerHour
+        val sellOfferCoins = bazaarData.sellOfferPrice * cropsPerHour
+        val instantSellCoins = bazaarData.instantBuyPrice * cropsPerHour
         val bountifulCoins = if (toolHasBountiful?.get(crop) == true && config.bountiful) speedPerHour * 0.2 else 0.0
 
         return CropMoneyData(
@@ -353,69 +339,14 @@ object CropMoneyDisplay {
         )
     }
 
-    private fun CropMoneyData.toPrices(): List<Double> {
-        val formats = if (config.useCustomFormat) {
+    private fun currentFormats() =
+        if (config.useCustomFormat) {
             config.customFormat
         } else if (LorenzUtils.noTradeMode) {
             listOf(CustomFormatEntry.NPC_PRICE)
         } else {
             listOf(CustomFormatEntry.SELL_OFFER)
         }
-        return formats.map { getCoins(it, config.bountiful) }
-    }
-
-    data class ExtraMoneyData(
-        var mushroomCowCoins: Double,
-        var armorCoins: Double,
-        var dicerCoins: Double
-    ) {
-        override fun toString(): String = """
-            extraMushroomCowPerkCoins: ${mushroomCowCoins.addSeparators()}
-            extraArmorCoins: ${armorCoins.addSeparators()}
-            extraDicerCoins: ${dicerCoins.addSeparators()}
-        """.trimIndent()
-
-        val total get() = armorCoins + dicerCoins + mushroomCowCoins
-
-
-    }
-
-
-    data class CropMoneyData(
-        val crop: CropType,
-        val exactCrop: NeuInternalName,
-        val speed: Double,
-        val replenishReduction: Double,
-        val speedPerHour: Double,
-        val cropsPerHour: Double,
-        val npcCoins: Double,
-        val sellOfferCoins: Double,
-        val instantSellCoins: Double,
-        val bountifulCoins: Double,
-    ) {
-        override fun toString(): String = """
-            override fun toString(): String = ""${'"'}
-            speed: ${speed.addSeparators()}
-            ${if (replenishReduction != 0.0) "replenish reduction: ${replenishReduction.addSeparators()}" else ""}
-            crop: $crop ($exactCrop)
-            speedPerHour: ${speedPerHour.addSeparators()}
-            cropsPerHour: ${cropsPerHour.addSeparators()}
-            npcCoins: ${npcCoins.addSeparators()}
-            sellOfferCoins: ${sellOfferCoins.addSeparators()}
-            instantSellCoins: ${instantSellCoins.addSeparators()}
-            ${if (bountifulCoins > 0.0) "bountifulCoins: ${bountifulCoins.addSeparators()}" else ""}
-            ""${'"'}.trimIndent()
-        """.trimIndent()
-
-        fun getCoins(sellType: CustomFormatEntry, bountiful: Boolean): Double {
-            val coins = when (sellType) {
-                CustomFormatEntry.SELL_OFFER -> sellOfferCoins
-                CustomFormatEntry.INSTANT_SELL -> instantSellCoins
-                CustomFormatEntry.NPC_PRICE -> npcCoins
-            }
-            return coins + if (bountiful) bountifulCoins else 0.0
-        }
-    }
 
     private fun isSeeds(internalName: NeuInternalName) = internalName == ENCHANTED_SEEDS || internalName == SEEDS
 
@@ -469,6 +400,59 @@ object CropMoneyDisplay {
         event.move(3, "garden.moneyPerHourPos", "garden.moneyPerHours.pos")
         event.transform(11, "garden.moneyPerHours.customFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, CustomFormatEntry::class.java)
+        }
+    }
+
+    private fun CropMoneyData.toPrices(): List<Double> {
+        val formats = currentFormats()
+        return formats.map { getCoins(it, config.bountiful) }
+    }
+
+    data class ExtraMoneyData(
+        var mushroomCowCoins: Double,
+        var armorCoins: Double,
+        var dicerCoins: Double
+    ) {
+        override fun toString(): String = """
+            extraMushroomCowPerkCoins: ${mushroomCowCoins.addSeparators()}
+            extraArmorCoins: ${armorCoins.addSeparators()}
+            extraDicerCoins: ${dicerCoins.addSeparators()}
+        """.trimIndent()
+
+        val total get() = armorCoins + dicerCoins + mushroomCowCoins
+    }
+
+    data class CropMoneyData(
+        val crop: CropType,
+        val exactCrop: NeuInternalName,
+        val speed: Double,
+        val replenishReduction: Double,
+        val speedPerHour: Double,
+        val cropsPerHour: Double,
+        val npcCoins: Double,
+        val sellOfferCoins: Double,
+        val instantSellCoins: Double,
+        val bountifulCoins: Double,
+    ) {
+        override fun toString(): String = """
+            speed: ${speed.addSeparators()}
+            ${if (replenishReduction != 0.0) "replenish reduction: ${replenishReduction.addSeparators()}" else ""}
+            crop: $crop ($exactCrop)
+            speedPerHour: ${speedPerHour.addSeparators()}
+            cropsPerHour: ${cropsPerHour.addSeparators()}
+            npcCoins: ${npcCoins.addSeparators()}
+            sellOfferCoins: ${sellOfferCoins.addSeparators()}
+            instantSellCoins: ${instantSellCoins.addSeparators()}
+            ${if (bountifulCoins > 0.0) "bountifulCoins: ${bountifulCoins.addSeparators()}" else ""}
+        """.trimIndent()
+
+        fun getCoins(sellType: CustomFormatEntry, bountiful: Boolean): Double {
+            val coins = when (sellType) {
+                CustomFormatEntry.SELL_OFFER -> sellOfferCoins
+                CustomFormatEntry.INSTANT_SELL -> instantSellCoins
+                CustomFormatEntry.NPC_PRICE -> npcCoins
+            }
+            return coins + if (bountiful) bountifulCoins else 0.0
         }
     }
 }
