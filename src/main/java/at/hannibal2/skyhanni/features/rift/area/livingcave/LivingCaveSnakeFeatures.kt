@@ -38,10 +38,15 @@ object LivingCaveSnakeFeatures {
         var state: State = State.SPAWNING,
         var lastCalmTime: SimpleTimeMark = SimpleTimeMark.farPast(),
         var lastBreakTime: SimpleTimeMark = SimpleTimeMark.farPast(),
+        var invalidHeadSince: SimpleTimeMark? = null,
     ) {
         fun invalidSize(): Boolean = blocks.zipWithNext().any { (a, b) ->
             a.distance(b) > 3
         }
+
+        fun invalidHeadRightNow(): Boolean = blocks.last().getBlockAt() != Blocks.lapis_block
+
+        fun invalidHead(): Boolean = invalidHeadSince?.let { it.passedSince() > 1.seconds } ?: false
 
         fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
 
@@ -84,35 +89,37 @@ object LivingCaveSnakeFeatures {
 
         val distance = 5
 
-        // hypixel sends the current block when right click again
-//         if (old == new) return
-
         if (new == Blocks.lapis_block) {
             val snake = snakes.filter { it.blocks.isNotEmpty() && it.blocks.last().distance(location) < distance }
                 .minByOrNull { it.blocks.last().distance(location) }
             if (snake != null) {
+
+                // hypixel is sometimes funny
+                if (location in snake.blocks) return
+
                 snake.blocks = snake.blocks.editCopy { add(location) }
                 snake.lastAddTime = SimpleTimeMark.now()
+                snake.invalidHeadSince = null
             } else {
                 snakes = snakes.editCopy { add(Snake(listOf(location))) }
             }
             originalBlocks[location] = old
+
         }
         for (snake in snakes) {
-            if (location in snake.blocks) {
-                if (originalBlocks[location] == new || new == Blocks.lapis_ore) {
-//                 if (originalBlocks[location] == new) {
-                    originalBlocks.remove(location)
-                    snake.blocks = snake.blocks.editCopy { remove(location) }
-                    if (snake.blocks.isEmpty()) {
-                        snakes = snakes.editCopy { remove(snake) }
-                    }
-                    if (snake.state == State.SPAWNING) {
-                        snake.state = State.ACTIVE
-                    }
-                    snake.lastRemoveTime = SimpleTimeMark.now()
-                }
+            if (location !in snake.blocks) continue
+            if (originalBlocks[location] != new) continue
+            originalBlocks.remove(location)
+            snake.blocks = snake.blocks.editCopy { remove(location) }
+            if (snake.blocks.isEmpty()) {
+                snakes = snakes.editCopy { remove(snake) }
             }
+            if (snake.state == State.SPAWNING) {
+                snake.state = State.ACTIVE
+            }
+            snake.lastRemoveTime = SimpleTimeMark.now()
+
+            originalBlocks[location] = old
         }
     }
 
@@ -155,8 +162,15 @@ object LivingCaveSnakeFeatures {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        snakes = snakes.filter { !it.invalidSize() }
+        snakes = snakes.filter { !it.invalidSize() && !it.invalidHead() }
         for (snake in snakes) {
+            if (snake.invalidHeadRightNow()) {
+                if (snake.invalidHeadSince == null) {
+                    snake.invalidHeadSince = SimpleTimeMark.now()
+                }
+            } else {
+                snake.invalidHeadSince = null
+            }
             if (snake.state == State.SPAWNING) continue
 
             snake.state = if (snake.isNotTouchingAir()) {
