@@ -245,7 +245,7 @@
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
     <ID>ReturnCount:ChatPeek.kt$ChatPeek$@JvmStatic fun peek(): Boolean</ID>
     <ID>ReturnCount:ChestValue.kt$ChestValue$private fun isValidStorage(): Boolean</ID>
-    <ID>ReturnCount:CollectionTracker.kt$CollectionTracker$fun command(args: Array&lt;String&gt;)</ID>
+    <ID>ReturnCount:CollectionTracker.kt$CollectionTracker$private fun command(args: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:CompactBingoChat.kt$CompactBingoChat$private fun onSkyBlockLevelUp(message: String): Boolean</ID>
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
     <ID>ReturnCount:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>

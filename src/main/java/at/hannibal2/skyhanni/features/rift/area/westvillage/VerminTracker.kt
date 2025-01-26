@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -199,8 +201,13 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetvermintracker") {
+            description = "Resets the Vermin Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun isEnabled() = RiftApi.inRift() && config.enabled
