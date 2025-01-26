@@ -179,7 +179,7 @@ object PestTrapApi {
             it.location?.distance(entityLocation)?.takeIf { distance ->
                 distance < 2.0
             } ?: Double.MAX_VALUE
-        } ?.index ?: return
+        }?.index ?: return
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

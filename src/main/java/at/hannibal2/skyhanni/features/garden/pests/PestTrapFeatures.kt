@@ -30,7 +30,6 @@ object PestTrapFeatures {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
     private val warningConfig get() = config.warningConfig
-    private val sound get() = warningConfig.warningSound
     private val enabledTypes get() = warningConfig.warningDisplayType
     private val reminderInterval get() = warningConfig.warningIntervalSeconds.get()
     private val userEnabledWarnings get() = warningConfig.enabledWarnings.get()
@@ -47,7 +46,7 @@ object PestTrapFeatures {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(sound) {
+        ConditionalUtils.onToggle(warningConfig.warningSound) {
             warningSound = refreshSound()
         }
     }
@@ -57,7 +56,7 @@ object PestTrapFeatures {
         val (finalWarning, actionPlot) = activeWarning
         if (nextWarning.isInFuture() || finalWarning.isEmpty()) return
 
-        tryWarnSound()
+        warningSound?.playSound()
         tryWarnChat(finalWarning, actionPlot)
         tryWarnTitle(finalWarning)
 
@@ -74,9 +73,8 @@ object PestTrapFeatures {
         activeWarning = finalWarning to actionPlot
     }
 
-    private fun refreshSound() = sound.get().takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
+    private fun refreshSound() = warningConfig.warningSound.get().takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
     private fun List<PestTrapData>.joinPlots(): String = this.joinToString("§8, ") { "§a#${it.number}" }
-    private fun tryWarnSound() = warningSound?.playSound()
 
     private fun generateWarning(reason: WarningReason, data: List<PestTrapData>): Pair<String, GardenPlotApi.Plot?>? {
         val dataSet = data.getTrapReport(reason).takeIfNotEmpty()?.toList() ?: return null
