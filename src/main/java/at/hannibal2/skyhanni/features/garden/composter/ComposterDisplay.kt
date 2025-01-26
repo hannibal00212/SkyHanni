@@ -73,7 +73,7 @@ object ComposterDisplay {
 
     private fun updateDisplay() {
         if (!config.displayEnabled) return
-        val display = Container.vertical {
+        display = Container.vertical {
             string("§bComposter")
             renderable(DataType.TIME_LEFT.labeledWithData(tabListData))
             horizontal {

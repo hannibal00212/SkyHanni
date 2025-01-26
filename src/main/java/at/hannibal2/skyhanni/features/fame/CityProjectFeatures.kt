@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -178,15 +177,15 @@ object CityProjectFeatures {
     }
 
     private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
-            "$name §ex${amount.addSeparators()}",
-            {
-                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                    LorenzUtils.setTextIntoSign("$amount")
-                } else {
-                    BazaarApi.searchForBazaarItem(name, amount)
-                }
-            },
-        ) { inInventory && !NeuItems.neuHasFocus() }
+        "$name §ex${amount.addSeparators()}",
+        {
+            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                LorenzUtils.setTextIntoSign("$amount")
+            } else {
+                BazaarApi.searchForBazaarItem(name, amount)
+            }
+        },
+    ) { inInventory && !NeuItems.neuHasFocus() }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
