@@ -36,8 +36,8 @@ object PestTrapFeatures {
     private val chatWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
     private val titleWarnEnabled get() = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
     private val warnReasonFormatMap: Map<WarningReason, Map<Int, String>> = mapOf(
-        WarningReason.TRAP_FULL to mapOf(1 to "§cFull: ", 2 to "§cPest Traps Full!"),
-        WarningReason.NO_BAIT to mapOf(1 to "§cNo Bait: ", 2 to "§cNo Bait in Pest Traps!"),
+        WarningReason.TRAP_FULL to mapOf(1 to "§cFull: ", 2 to "§cPest Traps Full! "),
+        WarningReason.NO_BAIT to mapOf(1 to "§cNo Bait: ", 2 to "§cNo Bait in Pest Traps! "),
     )
 
     private var warningSound: ISound? = refreshSound()
